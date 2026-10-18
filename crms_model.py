@@ -87,6 +87,13 @@ def _rule_database_payload(path: Path) -> dict[str, Any]:
             for kind in ("accepted_primitives", "accepted_primitive_artifacts",
                          "no_fit_cases"):
                 payload[kind] = auxiliary.get(kind, [])
+            expected_digest = payload.pop("memory_sha256", None)
+            if (not isinstance(expected_digest, str)
+                    or hashlib.sha256(json.dumps(
+                        payload, ensure_ascii=False,
+                        separators=(",", ":")).encode("utf-8")).hexdigest()
+                    != expected_digest):
+                raise ValueError("SQLite rule memory integrity check failed")
             return payload
         finally:
             connection.close()
@@ -133,6 +140,9 @@ def _write_rule_database(path: Path, payload: dict[str, Any]) -> None:
                     if key not in {"examples", "procedures",
                                    "accepted_primitives",
                                    "accepted_primitive_artifacts", "no_fit_cases"}}
+        settings["memory_sha256"] = hashlib.sha256(json.dumps(
+            payload, ensure_ascii=False,
+            separators=(",", ":")).encode("utf-8")).hexdigest()
         connection.execute("INSERT INTO rule_store_settings VALUES (1,?)",
                            (json.dumps(settings, ensure_ascii=False,
                                        separators=(",", ":")),))

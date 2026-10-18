@@ -104,6 +104,8 @@ def main() -> None:
         model_types = {row[0] for row in sqlite3.connect(database).execute(
             "SELECT name FROM sqlite_master WHERE type='table'")}
         require(model_types == {"model_metadata", "learned_memories",
+                                "model_rule_settings", "model_rule_examples",
+                                "model_rule_procedures", "model_rule_artifacts",
                                 "research_documents"},
                 f"model database contains unexpected tables: {model_types}")
         metadata = dict(sqlite3.connect(database).execute(
@@ -151,7 +153,9 @@ def main() -> None:
             lean_tables = {row[0] for row in db.execute(
                 "SELECT name FROM sqlite_master WHERE type='table'")}
         require(lean_metadata["contains_research_index"] == "false"
-                and lean_tables == {"model_metadata", "learned_memories"}
+                and lean_tables == {"model_metadata", "learned_memories",
+                                    "model_rule_settings", "model_rule_examples",
+                                    "model_rule_procedures", "model_rule_artifacts"}
                 and not model_database_has_research(memories_only),
                 "memories-only portable database format regressed")
 

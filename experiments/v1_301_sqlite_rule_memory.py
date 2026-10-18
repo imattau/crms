@@ -6,6 +6,7 @@ Run from the project root with:
 from __future__ import annotations
 
 from pathlib import Path
+import shutil
 import subprocess
 import sqlite3
 import sys
@@ -17,7 +18,8 @@ sys.path.insert(0, str(PROJECT))
 
 from crms_model import CRMSModel
 from crms_knowledge import CRMSKnowledgeBase
-from crms_package import export_model_database, inspect_model_database
+from crms_package import (export_model_database, inspect_model_database,
+                          install_model_database)
 
 
 def require(condition: bool, message: str) -> None:
@@ -56,6 +58,18 @@ def main() -> None:
         require(counts["rule_examples"] == len(examples)
                 and counts["rule_procedures"] == 1,
                 f"rule training evidence was not persisted row-by-row: {counts}")
+        corrupted = root / "corrupted-rules.sqlite"
+        shutil.copy2(sqlite_path, corrupted)
+        with sqlite3.connect(corrupted) as db:
+            db.execute("UPDATE rule_examples SET output_json='[999]' "
+                       "WHERE ordinal=0")
+        try:
+            CRMSModel(corrupted, max_search_expansions=20_000, max_workers=1)
+        except ValueError as error:
+            require("integrity" in str(error),
+                    f"corrupt rule memory failed for an unrelated reason: {error}")
+        else:
+            raise SystemExit("tampered SQLite rule evidence was accepted")
 
         knowledge_path = root / "knowledge.json"
         CRMSKnowledgeBase().save(knowledge_path)
@@ -64,11 +78,49 @@ def main() -> None:
         require(set(inspect_model_database(portable_model)) == {"knowledge", "rules"},
                 "portable model rejected SQLite-backed rule memory")
         with sqlite3.connect(portable_model) as db:
+            packaged_tables = {row[0] for row in db.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'")}
             packaged = db.execute(
                 "SELECT payload_json FROM learned_memories WHERE kind='rules'"
             ).fetchone()[0]
+        require({"model_rule_settings", "model_rule_examples",
+                 "model_rule_procedures", "model_rule_artifacts"} <= packaged_tables,
+                "portable model omitted normalized rule-memory tables")
         require(instruction in packaged and '"reverse"' in packaged,
                 "portable model dropped the learned rule or its procedure")
+        corrupted_model = root / "corrupted-model.sqlite"
+        shutil.copy2(portable_model, corrupted_model)
+        with sqlite3.connect(corrupted_model) as db:
+            db.execute("UPDATE model_rule_examples SET output_json='[999]' "
+                       "WHERE ordinal=0")
+        try:
+            inspect_model_database(corrupted_model)
+        except ValueError as error:
+            require("disagree" in str(error),
+                    f"normalized rule corruption failed for an unrelated reason: {error}")
+        else:
+            raise SystemExit("portable model accepted inconsistent normalized rules")
+        installed = install_model_database(portable_model, root / "installed")
+        require(installed["rules"].suffix == ".sqlite",
+                "portable model did not restore rules as a SQLite memory")
+        packaged_restored = CRMSModel(
+            installed["rules"], max_search_expansions=20_000, max_workers=1)
+        packaged_prediction = packaged_restored.predict(instruction, [4, 1, -3])
+        require(packaged_prediction.status == "ok"
+                and packaged_prediction.output == [-1, 3, 6],
+                "installed portable SQL model lost its learned rule")
+        model_chat = subprocess.run(
+            [sys.executable, str(PROJECT / "crms_chat.py"),
+             "--model-db", str(portable_model),
+             "--dialogue-state", str(root / "model-dialogue.json")],
+            input=f"/apply-rule {instruction}|4,1,-3\n/quit\n",
+            text=True, capture_output=True, cwd=root, timeout=30)
+        model_sidecar = Path(str(portable_model) + ".memories")
+        require(model_chat.returncode == 0
+                and "CRMS> [-1, 3, 6]" in model_chat.stdout
+                and (model_sidecar / "rules.sqlite").is_file(),
+                f"portable-model chat did not use normalized rules:\n"
+                f"{model_chat.stdout}\n{model_chat.stderr}")
 
         restored = CRMSModel(
             sqlite_path, max_search_expansions=20_000, max_workers=1)

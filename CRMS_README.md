@@ -413,8 +413,9 @@ print(model.predict(instruction, [5, 2]).output)  # [20, 8]
 Rule memories can be stored as JSON or as a versioned SQLite database. In chat,
 pass a `.sqlite` path to `--rules`; examples, accepted procedures, and supporting
 rule artifacts are stored in separate rows. JSON remains available for import,
-export, and existing workflows. Portable model files currently package this
-memory through the existing JSON-compatible format.
+export, and existing workflows. Portable model v2 files include normalized rule
+tables, verify them against the compatibility payload, and install rules as a
+SQLite sidecar for chat. Existing v1 model files remain readable.
 
 The parameterized rule family can also discover multipliers beyond doubling:
 

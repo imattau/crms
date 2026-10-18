@@ -11,12 +11,91 @@ import tempfile
 
 
 FORMAT = "crms-learned-model"
-VERSION = 1
+VERSION = 2
+_LEGACY_VERSION = 1
 APPLICATION_ID = int.from_bytes(b"CRMS", "big")
 _MEMORY_NAMES = ("knowledge", "rules", "math", "translations")
 _MAX_MEMBER_BYTES = 512 * 1024 * 1024
 _REQUIRED_TABLES = {"model_metadata", "learned_memories"}
 _RESEARCH_TABLES = {"research_documents"}
+_RULE_TABLES = {"model_rule_settings", "model_rule_examples",
+                "model_rule_procedures", "model_rule_artifacts"}
+
+
+def _create_rule_tables(db: sqlite3.Connection) -> None:
+    db.execute("""CREATE TABLE model_rule_settings (
+        id INTEGER PRIMARY KEY CHECK(id=1), payload_json TEXT NOT NULL
+    )""")
+    db.execute("""CREATE TABLE model_rule_examples (
+        phrase TEXT NOT NULL, ordinal INTEGER NOT NULL,
+        input_json TEXT NOT NULL, output_json TEXT NOT NULL,
+        PRIMARY KEY(phrase,ordinal)
+    ) WITHOUT ROWID""")
+    db.execute("""CREATE TABLE model_rule_procedures (
+        phrase TEXT PRIMARY KEY, steps_json TEXT NOT NULL
+    ) WITHOUT ROWID""")
+    db.execute("""CREATE TABLE model_rule_artifacts (
+        kind TEXT NOT NULL, ordinal INTEGER NOT NULL, payload_json TEXT NOT NULL,
+        PRIMARY KEY(kind,ordinal)
+    ) WITHOUT ROWID""")
+
+
+def _write_rule_tables(db: sqlite3.Connection, payload: dict) -> None:
+    settings = {key: value for key, value in payload.items()
+                if key not in {"examples", "procedures", "accepted_primitives",
+                               "accepted_primitive_artifacts", "no_fit_cases"}}
+    db.execute("INSERT INTO model_rule_settings VALUES (1,?)",
+               (json.dumps(settings, ensure_ascii=False, separators=(",", ":")),))
+    db.executemany(
+        "INSERT INTO model_rule_examples VALUES (?,?,?,?)",
+        ((phrase, ordinal,
+          json.dumps(pair[0], ensure_ascii=False, separators=(",", ":")),
+          json.dumps(pair[1], ensure_ascii=False, separators=(",", ":")))
+         for phrase, examples in payload["examples"].items()
+         for ordinal, pair in enumerate(examples)))
+    db.executemany(
+        "INSERT INTO model_rule_procedures VALUES (?,?)",
+        ((phrase, json.dumps(steps, ensure_ascii=False, separators=(",", ":")))
+         for phrase, steps in payload["procedures"].items()))
+    db.executemany(
+        "INSERT INTO model_rule_artifacts VALUES (?,?,?)",
+        ((kind, ordinal,
+          json.dumps(value, ensure_ascii=False, separators=(",", ":")))
+         for kind in ("accepted_primitives", "accepted_primitive_artifacts",
+                      "no_fit_cases")
+         for ordinal, value in enumerate(payload[kind])))
+
+
+def _read_rule_tables(db: sqlite3.Connection) -> dict:
+    row = db.execute(
+        "SELECT payload_json FROM model_rule_settings WHERE id=1").fetchone()
+    if row is None:
+        raise ValueError("model database has no normalized rule settings")
+    payload = json.loads(row[0])
+    if not isinstance(payload, dict):
+        raise ValueError("model rule settings are malformed")
+    examples: dict[str, list[list]] = {}
+    for phrase, _ordinal, inputs, outputs in db.execute(
+            "SELECT phrase,ordinal,input_json,output_json "
+            "FROM model_rule_examples ORDER BY phrase,ordinal"):
+        examples.setdefault(phrase, []).append([json.loads(inputs), json.loads(outputs)])
+    payload["examples"] = examples
+    payload["procedures"] = {
+        phrase: json.loads(steps)
+        for phrase, steps in db.execute(
+            "SELECT phrase,steps_json FROM model_rule_procedures ORDER BY phrase")
+    }
+    artifacts: dict[str, list] = {}
+    for kind, _ordinal, data in db.execute(
+            "SELECT kind,ordinal,payload_json FROM model_rule_artifacts "
+            "ORDER BY kind,ordinal"):
+        artifacts.setdefault(kind, []).append(json.loads(data))
+    for kind in ("accepted_primitives", "accepted_primitive_artifacts", "no_fit_cases"):
+        payload[kind] = artifacts.get(kind, [])
+    if set(artifacts) - {"accepted_primitives", "accepted_primitive_artifacts",
+                         "no_fit_cases"}:
+        raise ValueError("model database has an unknown rule-artifact kind")
+    return payload
 
 
 def _sha256(data: bytes) -> str:
@@ -102,6 +181,7 @@ def export_model_database(output: str | Path, *, knowledge: str | Path,
                 sha256 TEXT NOT NULL,
                 source_bytes INTEGER NOT NULL CHECK(source_bytes >= 0)
             ) WITHOUT ROWID""")
+            _create_rule_tables(db)
             if research_count:
                 db.execute("""CREATE TABLE research_documents (
                     document_id TEXT PRIMARY KEY,
@@ -161,8 +241,9 @@ def export_model_database(output: str | Path, *, knowledge: str | Path,
             db.executemany("INSERT INTO learned_memories VALUES (?, ?, ?, ?)", [
                 (name, payload, digest, size)
                 for name, (payload, digest, size) in sorted(memories.items())])
+            _write_rule_tables(db, json.loads(memories["rules"][0]))
             db.execute(f"PRAGMA application_id={APPLICATION_ID}")
-            db.execute("PRAGMA user_version=1")
+            db.execute(f"PRAGMA user_version={VERSION}")
             db.commit()
         # Confirm the completed database is readable before publishing it.
         inspect_model_database(temporary_path)
@@ -182,18 +263,22 @@ def inspect_model_database(path: str | Path) -> dict[str, dict[str, str | int]]:
         try:
             if db.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
                 raise ValueError("model database failed SQLite integrity check")
+            schema_version = db.execute("PRAGMA user_version").fetchone()[0]
             if (db.execute("PRAGMA application_id").fetchone()[0] != APPLICATION_ID
-                    or db.execute("PRAGMA user_version").fetchone()[0] != VERSION):
+                    or schema_version not in {_LEGACY_VERSION, VERSION}):
                 raise ValueError("unsupported CRMS model database header")
             tables = {row[0] for row in db.execute(
                 "SELECT name FROM sqlite_master WHERE type='table'")}
-            if (tables != _REQUIRED_TABLES
-                    and tables != _REQUIRED_TABLES | _RESEARCH_TABLES):
+            base_tables = _REQUIRED_TABLES
+            if schema_version == VERSION:
+                base_tables = base_tables | _RULE_TABLES
+            expected_table_sets = [base_tables, base_tables | _RESEARCH_TABLES]
+            if tables not in expected_table_sets:
                 raise ValueError("database is not a CRMS learned-model database")
             metadata = dict(db.execute("SELECT key, value FROM model_metadata"))
             has_research = "research_documents" in tables
             if (metadata.get("format") != FORMAT
-                    or metadata.get("version") != str(VERSION)
+                    or metadata.get("version") != str(schema_version)
                     or metadata.get("contains_source_documents") != str(has_research).lower()
                     or metadata.get("contains_research_index") != str(has_research).lower()):
                 raise ValueError("unsupported or non-portable CRMS model database")
@@ -217,6 +302,15 @@ def inspect_model_database(path: str | Path) -> dict[str, dict[str, str | int]]:
                 }
             if not {"knowledge", "rules"} <= memories.keys():
                 raise ValueError("model database must include knowledge and rule memories")
+            if schema_version == VERSION:
+                stored_rules = json.loads(db.execute(
+                    "SELECT payload_json FROM learned_memories WHERE kind='rules'"
+                ).fetchone()[0])
+                normalized_rules = _read_rule_tables(db)
+                if normalized_rules != stored_rules:
+                    raise ValueError(
+                        "normalized rule tables disagree with the compatibility payload")
+                memories["rules"]["storage"] = "sqlite"
             if has_research:
                 for document_id, title, body, pages_json, digest in db.execute(
                         "SELECT document_id,title,body,pages_json,sha256 "
@@ -316,7 +410,7 @@ def model_database_research_stats(path: str | Path, *,
 def install_model_database(path: str | Path,
                            destination: str | Path, *,
                            validated: bool = False) -> dict[str, Path]:
-    """Materialize validated memory JSON files for the existing CRMS CLI."""
+    """Materialize sidecar memories, retaining normalized SQLite rules."""
     memories = (inspect_model_database(path) if not validated else None)
     root = Path(destination)
     root.mkdir(parents=True, exist_ok=True)
@@ -328,10 +422,18 @@ def install_model_database(path: str | Path,
         has_research = db.execute(
             "SELECT 1 FROM sqlite_master WHERE type='table' "
             "AND name='research_documents'").fetchone() is not None
+        rule_tables = {row[0] for row in db.execute(
+            "SELECT name FROM sqlite_master WHERE type='table'")}
+        has_sqlite_rules = _RULE_TABLES <= rule_tables
     with tempfile.TemporaryDirectory(dir=root) as staging_name:
         staging = Path(staging_name)
         with sqlite3.connect(f"file:{Path(path).resolve()}?mode=ro", uri=True) as db:
             for kind in memory_kinds:
+                if kind == "rules" and has_sqlite_rules:
+                    payload = _read_rule_tables(db)
+                    from crms_model import _write_rule_database
+                    _write_rule_database(staging / "rules.sqlite", payload)
+                    continue
                 payload = db.execute(
                     "SELECT payload_json FROM learned_memories WHERE kind=?",
                     (kind,)).fetchone()[0]
@@ -339,8 +441,10 @@ def install_model_database(path: str | Path,
                     json.dumps(json.loads(payload), indent=2, ensure_ascii=False) + "\n",
                     encoding="utf-8")
         for kind in memory_kinds:
-            target = root / f"{kind}.json"
-            (staging / f"{kind}.json").replace(target)
+            suffix = (".sqlite" if kind == "rules" and has_sqlite_rules
+                      else ".json")
+            target = root / f"{kind}{suffix}"
+            (staging / f"{kind}{suffix}").replace(target)
             installed[kind] = target
     if has_research:
         from crms_research import CRMSSQLiteResearchIndex
@@ -396,11 +500,18 @@ def repack_model_database(path: str | Path, memory_dir: str | Path,
         install_model_database(source, recovered, validated=True)
         chosen_memories: dict[str, Path] = {}
         for name in _MEMORY_NAMES:
-            sidecar_file = sidecar / f"{name}.json"
-            recovered_file = recovered / f"{name}.json"
-            if sidecar_file.is_file():
+            candidates = ([sidecar / "rules.sqlite", sidecar / "rules.json"]
+                          if name == "rules" else [sidecar / f"{name}.json"])
+            recovered_candidates = (
+                [recovered / "rules.sqlite", recovered / "rules.json"]
+                if name == "rules" else [recovered / f"{name}.json"])
+            sidecar_file = next((candidate for candidate in candidates
+                                 if candidate.is_file()), None)
+            recovered_file = next((candidate for candidate in recovered_candidates
+                                   if candidate.is_file()), None)
+            if sidecar_file is not None:
                 chosen_memories[name] = sidecar_file
-            elif recovered_file.is_file():
+            elif recovered_file is not None:
                 chosen_memories[name] = recovered_file
             elif name in {"knowledge", "rules"}:
                 raise ValueError(f"model has no {name} memory to repack")

@@ -3747,7 +3747,14 @@ def main() -> int:
                 args.model_db, validate=False).items():
             setattr(args, name, value)
         memory_dir = args.model_db.with_name(args.model_db.name + ".memories")
-        expected_files = {memory_dir / f"{name}.json" for name in memories}
+        rule_memory_name = ("rules.sqlite"
+                            if memories.get("rules", {}).get("storage") == "sqlite"
+                            else "rules.json")
+        expected_files = {
+            memory_dir / (rule_memory_name if name == "rules"
+                          else f"{name}.json")
+            for name in memories
+        }
         model_digest = _file_sha256(args.model_db)
         sidecar_marker = memory_dir / ".model.sha256"
         if memory_dir.exists():
@@ -3770,7 +3777,7 @@ def main() -> int:
         if embedded_research:
             model_research_sidecar = research_sidecar
         args.knowledge = memory_dir / "knowledge.json"
-        args.rules = memory_dir / "rules.json"
+        args.rules = memory_dir / rule_memory_name
         args.math = memory_dir / "math.json"
         args.translations = memory_dir / "translations.json"
         if args.fact_db is None:
