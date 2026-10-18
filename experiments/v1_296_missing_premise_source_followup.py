@@ -21,7 +21,9 @@ Run from the project root with:
 from __future__ import annotations
 
 from dataclasses import asdict
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -107,6 +109,44 @@ def main() -> None:
             and "Family notes" in reply,
             f"missing-premise candidate was not attached for review: {reply}")
 
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        knowledge_path = root / "knowledge.json"
+        index_path = root / "index.json"
+        dialogue_path = root / "dialogue.json"
+        rules_path = root / "rules.json"
+        rule_session_path = root / "rule-session.json"
+        candidate_session_path = root / "candidate-session.json"
+        knowledge.save(knowledge_path)
+        index.save(index_path)
+        chat = subprocess.run(
+            [sys.executable,
+             str(Path(__file__).resolve().parents[1] / "crms_chat.py"),
+             "--knowledge", str(knowledge_path),
+             "--index", str(index_path),
+             "--dialogue-state", str(dialogue_path),
+             "--rules", str(rules_path),
+             "--rule-session", str(rule_session_path),
+             "--candidate-session", str(candidate_session_path)],
+            input=("Who is grandparent of Cal?\n"
+                   "/pending-candidates\n"
+                   "/accept 1\n"
+                   "/quit\n"),
+            text=True, capture_output=True, check=False, timeout=30,
+            cwd=root)
+        require(chat.returncode == 0
+                and "I need Bea — parent of → Cal to derive this." in chat.stdout
+                and "1. Bea — parent of → Cal (supports)" in chat.stdout
+                and "Accepted positive fact: Bea — parent of → Cal." in chat.stdout
+                and "Ada" in chat.stdout,
+                f"CLI review and rerun flow failed:\n{chat.stdout}\n{chat.stderr}")
+        reloaded = CRMSKnowledgeBase.load(knowledge_path)
+        persisted_answer = reloaded.infer_relation(
+            "Ada", "grandparent of", "Cal")
+        require(persisted_answer.status == "answered"
+                and persisted_answer.proofs,
+                "CLI acceptance did not persist the fact needed by the proof")
+
     no_frame = make_knowledge(teach_frame=False)
     require(not _missing_premise_source_candidates(
         no_frame, index, list(initial.missing_premises)),
@@ -133,7 +173,7 @@ def main() -> None:
 
     print("missing-premise source follow-through diagnostic: PASS")
     print("exact licensed parse, reversed/wrong-relation rejection, no-frame abstention, "
-          "review acceptance, and verified derivation: PASS")
+          "CLI review/accept/rerun, and persisted verified derivation: PASS")
 
 
 if __name__ == "__main__":

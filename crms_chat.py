@@ -1268,7 +1268,36 @@ def _follow_missing_premise_sources(
     research.status = "needs_review"
     candidate = candidates[0]
     title = index.document(candidate.source.split("#", 1)[0]).title
-    return ((text.rstrip() + "\n" if text else "")
+    # Preserve the inference diagnosis rather than a generic research fallback
+    # such as "no source sentence found for this wording". The sentence below
+    # is evidence for a missing premise, not a direct answer to the question.
+    base = knowledge.render_brief(response)
+    for entry in response.missing_premises[:3]:
+        missing = (entry.get("missing_premise")
+                   if isinstance(entry, dict) else None)
+        if not isinstance(missing, dict):
+            continue
+        for candidate in candidates:
+            if ((tuple(normalized_tokens(candidate.subject)),
+                 tuple(normalized_tokens(candidate.relation)),
+                 tuple(normalized_tokens(candidate.object)))
+                    != (tuple(normalized_tokens(missing.get("subject", ""))),
+                        tuple(normalized_tokens(missing.get("relation", ""))),
+                        tuple(normalized_tokens(missing.get("object", ""))))):
+                continue
+            original = (f"{missing.get('subject', '')} — "
+                        f"{missing.get('relation', '')} → "
+                        f"{missing.get('object', '')}")
+            realized = (f"{candidate.subject} — {candidate.relation} → "
+                        f"{candidate.object}")
+            base = re.sub(re.escape(original), lambda _match: realized,
+                          base, count=1, flags=re.IGNORECASE)
+            break
+        else:
+            continue
+        break
+    prefix = base or text
+    return ((prefix.rstrip() + "\n" if prefix else "")
             + "I found a source sentence that matches the missing premise "
             "using an accepted fact frame, but it is not accepted yet: “"
             + candidate.sentence + f"” [Source: {title}].")
