@@ -1700,6 +1700,16 @@ proof tampering, CLI access, and persistence. `v1_87_contextual_rule_discovery.p
 checks scope-matched candidate support, source-separated held-out validation,
 counterexamples, visible context labels in terminal review, and use of an
 accepted rule in a new context.
+`experiments/v1_297_large_scale_rule_learning.py` adds a 980-fact diagnostic:
+40 labeled training chains, 12 source-held-out labeled chains, 12 unlabeled
+endpoint pairs, and 800 disconnected background facts. It discovers the
+parent-parent-to-ancestor candidate, validates it on independent sources,
+requires explicit acceptance, and independently verifies each of the 12
+proofs on unlabeled pairs. This is evidence that the bounded symbolic path
+scales to this generated graph; it is not evidence of rule discovery from
+noisy natural-language documents. The next discovery evaluation should add
+linked distractor relations and planted counterexamples, then measure runtime
+and candidate precision as graph size and relation diversity increase.
 
 `CRMSKnowledgeBase.research(question, index)` connects retrieval to the
 knowledge layer. It searches supplied documents, answers from existing facts
@@ -4525,9 +4535,10 @@ The remaining architectural proposals should be staged behind measured needs:
    are not current rule features. A Datalog-style core is a possible later
    direction, contingent on a proof semantics for each construct and
    differential tests against the current bounded engine.
-4. **Discovery quality and candidate durability:** expand rule-discovery
-   evaluation to larger, source-separated knowledge bases with known rules and
-   planted counterexamples. Pending fact candidates already survive restart
+4. **Discovery quality and candidate durability:** the 980-fact source-separated
+   diagnostic now covers rule transfer to unlabeled pairs, but uses disconnected
+   generated distractors. Expand evaluation to linked, noisy knowledge bases
+   with known rules and planted counterexamples. Pending fact candidates already survive restart
    when their citation and learned-frame license still validate;
    `experiments/v1_217_natural_candidate_review.py` covers restore, later
    acceptance, rejection, and ambiguous queues. The loader removes invalid
