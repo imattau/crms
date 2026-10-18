@@ -3450,7 +3450,12 @@ class CRMSKnowledgeBase:
         # "Canberra is the capital of Australia, not Sydney." The correction
         # replaces the entity filling the subject slot, so retain the first
         # positive claim and produce a distinct negative claim for review.
-        entity = (r"[A-Z][\w’'-]*(?:\s+(?:[A-Z][\w’'-]*|\d{2,}))*")
+        # Preserve common lowercase name particles inside a proper-name span
+        # (for example, ``Guido van Rossum``). Without this, nominal predicate
+        # frames silently fail on names that other active/passive parsers can
+        # already recognize.
+        entity = (r"[A-Z][\w’'-]*(?:\s+(?:(?:van|von|de|del|da|di|la|le)\s+)?"
+                  r"(?:[A-Z][\w’'-]*|\d{2,}))*")
         nominal = (r"[a-z][\w’'-]*(?:\s+[a-z][\w’'-]*){0,2}")
         nominal_head = (r"[A-Za-z][\w’'-]*(?:\s+[A-Za-z][\w’'-]*){0,2}")
 

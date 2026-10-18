@@ -138,9 +138,9 @@ def main() -> None:
                 or "Accepted source-backed wording 'made' for relation 'create'"
                 not in cli.stdout
                 or "Guido van Rossum" not in cli.stdout
-                or "Review candidate 1 (positive)" not in cli.stdout
+                or "1 source claim available for review" not in cli.stdout
                 or "Accepted positive fact: Dana — create → the Satellite." not in cli.stdout
-                or "Dana created the Satellite." not in cli.stdout):
+                or "Dana made the Satellite." not in cli.stdout):
             raise SystemExit(
                 f"interactive review path failed to teach the form: {cli.stdout}")
         restored = CRMSKnowledgeBase.load(knowledge_path)
