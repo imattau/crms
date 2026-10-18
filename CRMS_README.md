@@ -3569,7 +3569,9 @@ proof trees found and the number and identifiers of distinct source documents
 at their fact leaves. “Lineage” is a distinct proof tree, not a
 statistical-independence claim. Contradiction takes precedence as `contested`.
 `partial` means a verified positive proof was found but bounded search stopped
-before enumerating all support; it is not eligible for persistent practice.
+before enumerating all support; the result identifies whether the rule-depth,
+candidate-expansion, or proof-list bound was reached, and is not eligible for
+persistent practice.
 An incomplete search with no proof still returns `unknown` with no support
 class. The same summary is computed when a verified practiced derivation is
 reused from the derived-case cache.
@@ -3838,9 +3840,12 @@ items record which bounded extensions have landed and their current limits:
    depth limit. When bounded enumeration reaches a limit after finding a
    verified proof, the concrete conclusion is returned as answered with
    `complete=false` and `support_class=partial`; such results cannot enter
-   derived practice memory. `v1_309_long_transitivity_proofs.py` checks
-   independently verified chains through 30 edges and this partial-proof
-   contract. No other relation schemas are implemented.
+   derived practice memory. Transitive search uses breadth-first traversal,
+   returns shortest paths first, and caps each goal at 64 proof trees. A capped
+   result reports `limit_kind=proof_limit`. `v1_309_long_transitivity_proofs.py`
+   checks independently verified chains through 30 edges, shortest-path
+   selection, proof-list limits, and partial-proof behavior. No other relation
+   schemas are implemented.
 7. **Completed: try a bounded fact-store counterfactual.** For a query whose answer has a
    proof, `counterfactual_path_between` now excludes one cited fact proposition
    in a temporary view and reruns the same bounded query. It distinguishes

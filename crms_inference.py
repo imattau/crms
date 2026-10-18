@@ -9,6 +9,7 @@ into the source fact store.
 
 from __future__ import annotations
 
+from collections import deque
 import re
 import json
 from dataclasses import asdict, dataclass
@@ -68,6 +69,7 @@ class InferenceResult:
     source_documents: tuple[str, ...] = ()
     failure_kind: str | None = None
     missing_premises: tuple[dict[str, Any], ...] = ()
+    limit_kind: str | None = None
 
 
 def _proof_support(proofs: Iterable[Mapping[str, Any]], *,
@@ -182,8 +184,9 @@ def infer_relation(
 
     Only facts in the exact requested qualifier scope can be proof leaves.
     Facts from different scopes are never combined.
-    A bound exhaustion returns ``unknown`` even if a partial proof was found,
-    since the unsearched branches could contain contradictory evidence.
+    A verified positive proof remains usable if later alternative-proof search
+    reaches a bound. Such a result is marked incomplete and cannot enter
+    persistent practice memory.
     """
     for name, value in (("subject", subject), ("relation", relation), ("object", obj)):
         if not isinstance(value, str) or not value.strip():
@@ -338,6 +341,9 @@ def infer_relation(
 
     expansions = 0
     exhausted = False
+    proofs_truncated = False
+    limit_kind: str | None = None
+    max_proofs_per_goal = 64
     def proof_height(proof: Mapping[str, Any]) -> int:
         premises = proof.get("premises", [])
         if not isinstance(premises, list) or not premises:
@@ -367,9 +373,10 @@ def infer_relation(
             rows.sort(key=lambda item: (item[0], repr(item[1])))
 
     def spend() -> bool:
-        nonlocal expansions, exhausted
+        nonlocal expansions, exhausted, limit_kind
         if expansions >= max_expansions:
             exhausted = True
+            limit_kind = "expansion_limit"
             return False
         expansions += 1
         return True
@@ -378,6 +385,7 @@ def infer_relation(
                          relation_type_fact: Mapping[str, Any],
                          depth: int, active: frozenset) -> list[dict[str, Any]]:
         """Join same-relation edges and emit a flat, independently checked proof."""
+        nonlocal proofs_truncated
         result: list[dict[str, Any]] = []
         relation_key = atom[1]
         outgoing = transitive_edge_index.get(relation_key, {})
@@ -454,18 +462,26 @@ def infer_relation(
                             for proof in derived_edge_cache[edge])
             return rows
 
-        def walk(current: tuple[str, ...],
-                 edge_proofs: list[dict[str, Any]],
-                 visited: frozenset[tuple[str, ...]]) -> None:
+        queue = deque([(atom[0], [], frozenset({atom[0]}))])
+        shortest_path_length: int | None = None
+        while queue:
+            current, edge_proofs, visited = queue.popleft()
+            if (shortest_path_length is not None
+                    and len(edge_proofs) >= shortest_path_length):
+                continue
             for next_entity, edge_proof in edges_from(current, visited):
                 if exhausted:
-                    return
+                    break
                 if next_entity in visited:
                     continue
                 if not spend():
-                    return
+                    break
                 next_edges = [*edge_proofs, edge_proof]
                 if next_entity == atom[2] and len(next_edges) >= 2:
+                    if shortest_path_length is None:
+                        shortest_path_length = len(next_edges)
+                    if len(next_edges) != shortest_path_length:
+                        continue
                     result.append({
                         "kind": "schema",
                         "schema": {
@@ -483,17 +499,22 @@ def infer_relation(
                         "conclusion": display_atom((atom[0], relation_key, next_entity)),
                         "premises": next_edges,
                     })
+                    if len(result) >= max_proofs_per_goal:
+                        proofs_truncated = True
+                        return result
                     continue
-                walk(next_entity, next_edges, visited | {next_entity})
+                if (shortest_path_length is None
+                        or len(next_edges) < shortest_path_length):
+                    queue.append((next_entity, next_edges,
+                                  visited | {next_entity}))
 
-        walk(atom[0], [], frozenset({atom[0]}))
         return result
 
     def prove_symmetric(atom: tuple[tuple[str, ...], ...],
                         relation_type_fact: Mapping[str, Any],
                         depth: int, active: frozenset) -> list[dict[str, Any]]:
         """Reverse direct, cached, or independently rule-proved edges."""
-        nonlocal exhausted
+        nonlocal exhausted, proofs_truncated, limit_kind
         reverse = (atom[2], atom[1], atom[0])
         premises = [
             {"kind": "fact", "conclusion": display_atom(reverse), "fact": fact}
@@ -506,6 +527,9 @@ def infer_relation(
         # through symmetry.
         premises.extend(prove(reverse, active, depth + 1))
         premises = list({repr(premise): premise for premise in premises}.values())
+        if len(premises) > max_proofs_per_goal:
+            premises = premises[:max_proofs_per_goal]
+            proofs_truncated = True
         result = []
         for premise in sorted(premises, key=repr):
             if not spend():
@@ -527,24 +551,35 @@ def infer_relation(
             }
             if depth + proof_height(proof) > max_depth:
                 exhausted = True
+                limit_kind = "depth_limit"
                 return result
             result.append(proof)
+            if len(result) >= max_proofs_per_goal:
+                proofs_truncated = True
+                return result
         return result
 
     def prove(atom: tuple[tuple[str, ...], ...], active: frozenset,
               depth: int) -> list[dict[str, Any]]:
-        nonlocal exhausted
+        nonlocal exhausted, proofs_truncated, limit_kind
         if depth > max_depth:
             exhausted = True
+            limit_kind = "depth_limit"
             return []
         direct = fact_index.get(atom, [])
         proofs = [{"kind": "fact", "conclusion": display_atom(atom),
                    "fact": fact} for fact in direct]
         if direct:
+            if len(proofs) > max_proofs_per_goal:
+                proofs_truncated = True
+                return proofs[:max_proofs_per_goal]
             return proofs
         reusable = [dict(proof) for proof in derived_proofs.get(atom, ())
                     if proof_height(proof) <= max_depth - depth]
         if reusable:
+            if len(reusable) > max_proofs_per_goal:
+                proofs_truncated = True
+                return reusable[:max_proofs_per_goal]
             return reusable
         if atom in active:
             return []
@@ -581,6 +616,11 @@ def infer_relation(
                 else:
                     proofs.extend(prove_symmetric(
                         atom, relation_type_fact, depth, new_active))
+                if len(proofs) > max_proofs_per_goal:
+                    proofs = proofs[:max_proofs_per_goal]
+                    proofs_truncated = True
+                if proofs_truncated and len(proofs) >= max_proofs_per_goal:
+                    return proofs
                 if exhausted:
                     return proofs
                 continue
@@ -687,6 +727,9 @@ def infer_relation(
                             if kind_fact is not None:
                                 proof["middle_kind_fact"] = kind_fact
                             proofs.append(proof)
+                            if len(proofs) >= max_proofs_per_goal:
+                                proofs_truncated = True
+                                return proofs
                 continue
 
             third_relation = _key(rule.third_relation)
@@ -748,14 +791,27 @@ def infer_relation(
                                 "premises": list(premise_set),
                                 "middle_kind_facts": list(kind_facts),
                             })
+                            if len(proofs) >= max_proofs_per_goal:
+                                proofs_truncated = True
+                                return proofs
         return proofs
 
     found = prove(goal, frozenset(), 0)
-    if exhausted and not found:
+    incomplete_search = exhausted or proofs_truncated
+    if incomplete_search and limit_kind is None:
+        limit_kind = "proof_limit"
+    if incomplete_search and not found:
+        limit_labels = {
+            "depth_limit": "rule-depth limit",
+            "expansion_limit": "candidate-expansion limit",
+            "proof_limit": "proof-list limit",
+        }
+        limit_reason = (f"Inference reached its {limit_labels[limit_kind]}; "
+                        "no complete conclusion was established.")
         return InferenceResult(
-            "unknown", request="Inference search reached its depth or expansion limit; no conclusion was drawn.",
+            "unknown", request=limit_reason,
             expansions=expansions, complete=False, reason_code="search_limit",
-            failure_kind="search_limit")
+            failure_kind="search_limit", limit_kind=limit_kind)
     if not found:
         root_relation = goal[1]
         root_has_rule = bool(
@@ -773,13 +829,13 @@ def infer_relation(
 
     integrity_conflicts: list[tuple[str, dict[str, Any]]] = []
     relation_constraints = integrity_type_facts.get(goal[1], {})
-    if exhausted and ("asymmetric" in relation_constraints
-                      or "functional" in relation_constraints):
+    if incomplete_search and ("asymmetric" in relation_constraints
+                              or "functional" in relation_constraints):
         return InferenceResult(
             "unknown", request=("A proof was found, but the search limit prevented "
                                 "checking the declared relation integrity constraint."),
             expansions=expansions, complete=False, reason_code="search_limit",
-            failure_kind="search_limit")
+            failure_kind="search_limit", limit_kind=limit_kind)
     if goal[0] == goal[2]:
         for constraint in ("irreflexive", "asymmetric"):
             declarations = relation_constraints.get(constraint, [])
@@ -790,15 +846,16 @@ def infer_relation(
         if declarations:
             reverse_goal = (goal[2], goal[1], goal[0])
             reverse_found = prove(reverse_goal, frozenset(), 0)
-            if exhausted:
+            if exhausted or proofs_truncated:
                 return InferenceResult(
                     "unknown", request=("Integrity check for asymmetric relation "
                                         "reached the inference search limit."),
                     expansions=expansions, complete=False,
-                    reason_code="search_limit", failure_kind="search_limit")
+                    reason_code="search_limit", failure_kind="search_limit",
+                    limit_kind=limit_kind)
             if reverse_found:
                 integrity_conflicts.append(("asymmetric", declarations[0]))
-    if not exhausted:
+    if not incomplete_search:
         declarations = relation_constraints.get("functional", [])
         if declarations:
             for candidate_object in candidates:
@@ -811,7 +868,8 @@ def infer_relation(
                         "unknown", request=("Integrity check for functional relation "
                                             "reached the inference search limit."),
                         expansions=expansions, complete=False,
-                        reason_code="search_limit", failure_kind="search_limit")
+                        reason_code="search_limit", failure_kind="search_limit",
+                        limit_kind=limit_kind)
                 if alternative:
                     integrity_conflicts.append(("functional", declarations[0]))
                     break
@@ -845,11 +903,14 @@ def infer_relation(
     return InferenceResult(
         "answered", conclusion, tuple(found),
         request=("A verified proof was found, but the search limit prevented "
-                 "enumerating all supporting proofs." if exhausted else None),
-        expansions=expansions, complete=not exhausted,
-        reason_code="search_limit" if exhausted else None,
-        failure_kind="search_limit" if exhausted else None,
-        support_class=("partial" if exhausted else support[0]),
+                 f"enumerating all supporting proofs ({limit_kind})." if exhausted else
+                 f"A verified proof was found; support listing was capped at "
+                 f"{max_proofs_per_goal} proofs." if proofs_truncated else None),
+        expansions=expansions, complete=not incomplete_search,
+        reason_code="search_limit" if incomplete_search else None,
+        failure_kind="search_limit" if incomplete_search else None,
+        limit_kind=limit_kind,
+        support_class=("partial" if incomplete_search else support[0]),
         lineage_count=support[1],
         source_count=support[2], source_documents=support[3])
 

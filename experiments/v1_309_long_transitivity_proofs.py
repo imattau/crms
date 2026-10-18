@@ -53,7 +53,8 @@ def main() -> None:
     result = recursive.infer_relation("Person 0", "ancestor", "Person 5")
     require(result.status == "answered" and result.proofs,
             f"a found recursive proof was discarded after a depth-limited branch: {result}")
-    require(not result.complete and result.support_class == "partial",
+    require(not result.complete and result.support_class == "partial"
+            and result.limit_kind == "depth_limit",
             "incomplete alternative enumeration was reported as complete support")
     checked = verify_inference_proof(
         result.proofs[0], [asdict(fact) for fact in recursive.facts()],
@@ -84,7 +85,8 @@ def main() -> None:
         previous = current
     diamond.add_relation_type("connects to", "transitive", "schema:diamond")
     branching = diamond.infer_relation("Start", "connects to", "Finish")
-    require(branching.status == "answered" and branching.proofs,
+    require(branching.status == "answered" and len(branching.proofs) == 64
+            and not branching.complete and branching.limit_kind == "proof_limit",
             f"ten-layer diamond did not prove at default depth: {branching}")
     checked = verify_inference_proof(
         branching.proofs[0], [asdict(fact) for fact in diamond.facts()], [],
@@ -92,10 +94,31 @@ def main() -> None:
     require(checked.valid,
             f"independent verifier rejected a diamond proof: {checked}")
 
+    shortest = CRMSKnowledgeBase()
+    for source, target, citation in (
+            ("Start", "A", "edge:start-a"),
+            ("A", "Finish", "edge:a-finish"),
+            ("Start", "B", "edge:start-b"),
+            ("B", "C", "edge:b-c"),
+            ("C", "Finish", "edge:c-finish")):
+        shortest.add_fact(source, "reaches", target, citation)
+    shortest.add_relation_type("reaches", "transitive", "schema:shortest")
+    shortest_result = shortest.infer_relation("Start", "reaches", "Finish")
+    require(shortest_result.status == "answered" and shortest_result.proofs
+            and all(len(proof.get("premises", [])) == 2
+                    for proof in shortest_result.proofs),
+            "transitive search returned a longer proof before the shortest path")
+    expansion_limited = shortest.infer_relation(
+        "Start", "reaches", "Finish", max_expansions=1)
+    require(expansion_limited.status == "unknown"
+            and expansion_limited.limit_kind == "expansion_limit",
+            f"candidate expansion limit was not identified: {expansion_limited}")
+
     print("long transitive proof diagnostic: PASS")
     print("2, 8, 9, 12, 20, and 30-edge paths proved and independently verified")
     print("recursive proof retained with an explicit partial-support label: PASS")
-    print(f"ten-layer diamond: {len(branching.proofs)} verified proof paths; PASS")
+    print(f"ten-layer diamond: {len(branching.proofs)} shortest proof records; PASS")
+    print("transitive search selects the two-edge proof before a longer path: PASS")
 
 
 if __name__ == "__main__":
