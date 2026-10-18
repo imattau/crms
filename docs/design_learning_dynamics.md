@@ -1,9 +1,14 @@
 # Design: learning dynamics for CRMS (evidence ledger, gap follow-through, equivalence conjectures, revision tests)
 
 **Audience:** the developer (human or AI) implementing this.
-**Status:** proposed. Prototypes that produced the numbers below are throwaway scripts
-(`ledger.py`, `exp_belief*.py`, `gap_followup.py`, `dream2.py`); they are summarised here and
-should be re-implemented inside the repo, not imported.
+**Status:** staged implementation. Section 2's exact, review-only missing-premise source
+follow-through is implemented in `crms_chat.py` and covered by
+`experiments/v1_296_missing_premise_source_followup.py`. Section 3's report-only equivalence
+analysis is implemented in `crms_equivalence_dream.py` and covered by
+`experiments/v1_297_equivalence_dream_diagnostic.py`. The evidence ledger and belief-revision
+mechanisms in sections 1 and 4 remain proposed. Prototype results below are design evidence;
+their throwaway code (`ledger.py`, `exp_belief*.py`, `gap_followup.py`, `dream2.py`) is not
+imported.
 **Origin:** ideas reviewed from the HPM Learning Agent repo (belief weights, demand-driven
 learning, "dreaming"), re-expressed without vectors.
 
@@ -225,7 +230,8 @@ New script `crms_equivalence_dream.py`:
 4. Validate each such group on an **independent holdout** of 3,000 random lists drawn with a
    different seed. Drop any group whose members disagree on the holdout.
 5. Write the surviving groups to a report (`json`), one entry per conjectured law: the
-   programs, the probe and holdout sizes, and the seeds.
+   programs, behavior digests, probe and holdout sizes, and seeds. Rejected weak-probe groups
+   remain visible with their reason and warnings.
 
 **Do not use the report to prune the live search.** It is input to a later step that either
 proves the law in `_semantic_key` or records it as a conjecture with its evidence.
@@ -243,6 +249,13 @@ holdout lists. The one-off cost was about 20 seconds.
 - Passing a deliberately weak probe (150 random lists, no exhaustive set) must produce a visible
   warning in the report if any group fails holdout.
 - Deterministic output for fixed seeds.
+
+The checked-in implementation is `crms_equivalence_dream.py`. Its default run evaluated 5,184
+two-step programs over 4,801 probes (2,801 exhaustive short lists plus 2,000 seeded random
+lists), produced 2,969 probe behavior classes, and reported 81 conjecture groups with zero
+holdout disagreements on 3,000 independent lists. The weak-probe regression in
+`experiments/v1_297_equivalence_dream_diagnostic.py` rejects false merges and checks the warning
+and deterministic-output paths. These remain finite-test conjectures, not proofs.
 
 ## 4. Belief-revision experiments (tests only, no new mechanism)
 
@@ -266,8 +279,10 @@ record a baseline.
 1. `crms_ledger.py` + tables + registration hooks + tests 1.7.1-1.7.6. No behaviour change yet.
 2. Ledger listings and `/stale`. Still no change to answers.
 3. `prefer()` wired into conflict resolution with the margin policy. Add the experiments in 4.
-4. `crms_gap_followup.py` and its hook (section 2).
-5. `crms_equivalence_dream.py` (section 3), independent of 1-4 and can run in parallel.
+4. [Implemented] Exact missing-premise source follow-through in `crms_chat.py`; see
+   `experiments/v1_296_missing_premise_source_followup.py`.
+5. [Implemented] `crms_equivalence_dream.py` (section 3). Keep its report out of live search
+   until a conjectured law has an exact proof.
 
 Each step lands separately, with `python3 run_experiments.py` passing before and after.
 
