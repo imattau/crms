@@ -1281,7 +1281,8 @@ def _exact_title_location_evidence(
     entity_tokens = tuple(normalized_tokens(entity))
     if not entity_tokens:
         return None
-    if len(hits) != 1:
+    exact_title_document_ids = {hit.document_id for hit in hits} if len(hits) == 1 else set()
+    if not exact_title_document_ids:
         hits = []
     # Exact-title pages can use page context for lead sentences. Also search
     # indexed source text directly so a mixed document can support the same
@@ -1292,7 +1293,13 @@ def _exact_title_location_evidence(
         if hit.document_id not in seen and not _is_code_source(hit.location))
     for hit in hits:
         document = index.document(hit.document_id)
-        if (0 <= hit.start < hit.end
+        if hit.document_id in exact_title_document_ids:
+            # A title search may return a metadata field (for example
+            # DEFAULTSORT) instead of the article's assertion sentence. Once
+            # the title is exact and unique, inspect sentence boundaries in
+            # that one document rather than suppressing its other snippets.
+            spans = _sentence_spans(document.text)
+        elif (0 <= hit.start < hit.end
                 and document.text[hit.start:hit.end] == hit.snippet):
             spans = [(hit.start + start, hit.start + end)
                      for start, end in _sentence_spans(hit.snippet)]
@@ -1303,8 +1310,14 @@ def _exact_title_location_evidence(
             relation_match = pattern.search(sentence)
             if relation_match is None:
                 continue
-            subject_tokens = tuple(normalized_tokens(
-                sentence[:relation_match.start()]))
+            subject_prefix = sentence[:relation_match.start()].strip()
+            # Keep a narrow fronted temporal adjunct, such as "During World
+            # War II, ...", outside the subject slot.
+            temporal = re.match(r"during\b[^,]{1,120},\s*", subject_prefix,
+                                flags=re.IGNORECASE)
+            if temporal is not None:
+                subject_prefix = subject_prefix[temporal.end():]
+            subject_tokens = tuple(normalized_tokens(subject_prefix))
             valid_subject_prefixes = {
                 entity_tokens, ("the", *entity_tokens),
                 (*entity_tokens, "is"), (*entity_tokens, "was"),
@@ -1314,6 +1327,10 @@ def _exact_title_location_evidence(
                 ("the", *entity_tokens, "are"),
                 ("the", *entity_tokens, "were"),
             }
+            if hit.document_id in exact_title_document_ids and len(entity_tokens) > 1:
+                # Exact-title article context licenses its conventional final
+                # name only as the subject alias in that same article.
+                valid_subject_prefixes.add((entity_tokens[-1],))
             if subject_tokens not in valid_subject_prefixes:
                 continue
             if _sentence_context_kind(

@@ -1091,6 +1091,14 @@ VERB?` route adds transparent regular present, past, and progressive spellings
 for the final question verb, so `Where does Alan Turing work?` can retrieve a
 sentence containing “worked.” The expansion is shown with its spelling rule
 and changes retrieval only; it neither infers a relation nor stores a fact.
+When an exact, unique article title returns a metadata snippet instead of a
+sentence, the locative lookup scans sentence boundaries in that one article.
+It accepts a surname-only subject only within that exact-title article, and a
+bounded fronted time phrase such as “During World War II,” does not get parsed
+as part of the subject. The answer remains a quoted source sentence. The
+SimpleWiki chat check for `Where did Alan Turing work?` is covered by
+`experiments/v1_303_exact_title_locative_chat.py` and returns the Bletchley
+Park sentence from the 2 GB index.
 For code corpora, explicit programming cues, a programming language paired
 with a code construct, or an identifier containing `_` makes code files rank
 ahead of prose. A generic question such as “What is the function of a feedback
