@@ -49,6 +49,7 @@ _KNOWLEDGE_DB_TABLES = _KNOWLEDGE_DB_V1_TABLES | {"knowledge_records"}
 _KNOWLEDGE_RECORD_SECTIONS = frozenset({
     "entity_aliases", "entity_alias_explicit_sources",
     "fact_pattern_alias_sources", "question_examples",
+    "subject_pattern_question_examples",
     "induced_question_frames", "induced_qualified_question_frames",
     "induced_multi_qualified_question_frames", "qualified_question_examples",
     "multi_qualified_question_examples", "polar_question_examples",
@@ -829,6 +830,15 @@ class CRMSKnowledgeBase:
         ] = set()
         self._question_examples: dict[
             tuple[str, str, tuple[str, ...], tuple[str, ...]],
+            dict[tuple[str, ...], set[str]],
+        ] = {}
+        # A reviewed question slot may correspond to a subspan of a fact
+        # endpoint, e.g. place in "What research happened at {place}?" maps to
+        # the subject pattern "Researchers at {place}". Keep this separate
+        # from ordinary endpoint-bound frames.
+        self._subject_pattern_question_examples: dict[
+            tuple[str, str, tuple[str, ...], tuple[str, ...], str,
+                  tuple[str, ...], tuple[str, ...]],
             dict[tuple[str, ...], set[str]],
         ] = {}
         # Mechanically validated analogical frames remain separate from
@@ -8180,6 +8190,180 @@ class CRMSKnowledgeBase:
             if (other_relation, other_answer_field, _other_prefix, _other_suffix) != key
         )
 
+    def teach_subject_pattern_question(
+            self, question: str, *, relation: str, answer_field: str,
+            bound_entity: str, answer: str) -> bool:
+        """Teach a question slot that maps into a fact endpoint pattern.
+
+        Every example must resolve to exactly one accepted direct fact, and the
+        question's bound entity must occur once inside the opposite fact
+        endpoint. The resulting frame activates only after two distinct
+        entity-pattern examples agree on relation, roles, and wording.
+        """
+        if answer_field not in {"subject", "object"}:
+            raise ValueError("answer_field must be 'subject' or 'object'")
+        question = _display(question, "question")
+        relation = _display(relation, "relation")
+        bound_entity = _display(bound_entity, "bound_entity")
+        answer = _display(answer, "answer")
+        question_words = _tokens(question)
+        bound_words = _tokens(bound_entity)
+        positions = [index for index in range(
+            len(question_words) - len(bound_words) + 1)
+            if bound_words and question_words[index:index + len(bound_words)]
+            == bound_words]
+        if len(positions) != 1:
+            raise ValueError("bound entity must occur exactly once in the question")
+        question_start = positions[0]
+        question_end = question_start + len(bound_words)
+        question_prefix = question_words[:question_start]
+        question_suffix = question_words[question_end:]
+
+        fact_bound_field = "object" if answer_field == "subject" else "subject"
+        relation_key = _tokens(relation)
+        answer_key = _tokens(answer)
+        matches = []
+        for fact in self._facts.values():
+            if (_tokens(fact.relation) != relation_key or fact.qualifiers
+                    or _tokens(getattr(fact, answer_field)) != answer_key):
+                continue
+            endpoint = _tokens(getattr(fact, fact_bound_field))
+            endpoint_positions = [index for index in range(
+                len(endpoint) - len(bound_words) + 1)
+                if endpoint[index:index + len(bound_words)] == bound_words]
+            if len(endpoint_positions) != 1:
+                continue
+            fact_start = endpoint_positions[0]
+            fact_end = fact_start + len(bound_words)
+            matches.append((fact, endpoint[:fact_start], endpoint[fact_end:]))
+        if len(matches) != 1:
+            raise ValueError(
+                "example must match exactly one direct fact whose endpoint "
+                "contains the bound entity once")
+        fact, fact_prefix, fact_suffix = matches[0]
+        if self._fact_key(fact.subject, fact.relation, fact.object,
+                          fact.qualifiers) in self._negative_facts:
+            raise ValueError("conflicting direct evidence cannot teach a question pattern")
+        key = (json.dumps(list(relation_key), ensure_ascii=False), answer_field,
+               question_prefix, question_suffix, fact_bound_field,
+               fact_prefix, fact_suffix)
+        examples = self._subject_pattern_question_examples.setdefault(key, {})
+        answers = examples.setdefault(bound_words, set())
+        if answers and answer not in answers:
+            raise ValueError(
+                "the same bound entity has conflicting answers in this frame")
+        answers.add(answer)
+        return (len(examples) >= 2
+                and all(len(values) == 1 for values in examples.values()))
+
+    def _ask_subject_pattern_question(
+            self, words: tuple[str, ...],
+            qualifiers: tuple[tuple[str, str], ...]) -> QuestionResult | None:
+        """Answer only through a licensed frame and an exact direct fact."""
+        if not self._subject_pattern_question_examples:
+            return None
+        matches = []
+        recognized = False
+        for key, examples in self._subject_pattern_question_examples.items():
+            (relation_repr, answer_field, question_prefix, question_suffix,
+             fact_bound_field, fact_prefix, fact_suffix) = key
+            if any(len(answers) != 1 for answers in examples.values()):
+                continue
+            relation = tuple(json.loads(relation_repr))
+            relation_text = " ".join(relation)
+            active_examples = []
+            for entity, answers in examples.items():
+                endpoint = fact_prefix + entity + fact_suffix
+                endpoint_text = " ".join(endpoint)
+                support = []
+                for answer in answers:
+                    direct = self._find_fact(
+                        relation_text, fact_bound_field, endpoint_text, answer, ())
+                    for fact in direct:
+                        if fact.qualifiers:
+                            continue
+                        fact_key = self._fact_key(
+                            fact.subject, fact.relation, fact.object, fact.qualifiers)
+                        if fact_key not in self._negative_facts:
+                            support.append(fact)
+                if support:
+                    active_examples.append({
+                        "entity": " ".join(entity),
+                        "answer": next(iter(answers)),
+                        "sources": sorted({source for fact in support
+                                           for source in fact.sources}),
+                    })
+            if len(active_examples) < 2:
+                continue
+            if (len(words) <= len(question_prefix) + len(question_suffix)
+                    or words[:len(question_prefix)] != question_prefix
+                    or (question_suffix
+                        and words[-len(question_suffix):] != question_suffix)):
+                continue
+            bound_end = len(words) - len(question_suffix) if question_suffix else len(words)
+            bound = words[len(question_prefix):bound_end]
+            if not bound:
+                continue
+            recognized = True
+            endpoint = fact_prefix + bound + fact_suffix
+            facts = [fact for fact in self._facts.values()
+                     if (_tokens(fact.relation) == relation
+                         and self._has_qualifiers(fact, qualifiers)
+                         and _tokens(getattr(fact, fact_bound_field)) == endpoint)]
+            negatives = [fact for fact in self._negative_facts.values()
+                         if (_tokens(fact.relation) == relation
+                             and self._has_qualifiers(fact, qualifiers)
+                             and _tokens(getattr(fact, fact_bound_field)) == endpoint
+                             and any(_tokens(getattr(positive, answer_field))
+                                     == _tokens(getattr(fact, answer_field))
+                                     for positive in facts))]
+            answers = {_tokens(getattr(fact, answer_field)): fact
+                       for fact in facts}
+            frame = {
+                "kind": "subject_pattern_question_frame",
+                "relation": " ".join(relation),
+                "answer_field": answer_field,
+                "bound_entity": " ".join(bound),
+                "fact_endpoint_pattern": " ".join(
+                    fact_prefix + ("{entity}",) + fact_suffix),
+                "training_examples": active_examples,
+            }
+            evidence = [asdict(fact) for fact in facts]
+            evidence.extend(asdict(fact) for fact in negatives)
+            template = (" ".join(question_prefix + ("{entity}",) + question_suffix)
+                        + " [fact endpoint: "
+                        + " ".join(fact_prefix + ("{entity}",) + fact_suffix)
+                        + "]")
+            matches.append((answers, evidence, frame, template, bool(negatives)))
+
+        if not recognized:
+            return None
+        if len(matches) != 1:
+            return QuestionResult(
+                "unknown", request=("More than one learned subject-pattern frame "
+                                    "matches this wording; please clarify the relation."))
+        answers, evidence, frame, template, conflict = matches[0]
+        if conflict or len(answers) > 1:
+            return QuestionResult(
+                "ambiguous", candidates=sorted(
+                    {str(item.get("object" if frame["answer_field"] == "object"
+                                 else "subject")) for item in evidence}),
+                evidence=evidence or None, matched_templates=[template],
+                language_evidence=[frame],
+                request="The learned role frame finds conflicting direct evidence.")
+        if not answers:
+            return QuestionResult(
+                "unknown", evidence=None, matched_templates=[template],
+                language_evidence=[frame],
+                request=("The learned wording is recognized, but no direct fact "
+                         "matches this entity and relation."))
+        fact = next(iter(answers.values()))
+        answer = getattr(fact, frame["answer_field"])
+        return QuestionResult(
+            "answered", answer=answer, candidates=[answer],
+            evidence=evidence, matched_templates=[template],
+            language_evidence=[frame])
+
     def _optional_question_word_evidence(
             self, qualifiers: tuple[tuple[str, str], ...]
             ) -> dict[tuple[str, str, tuple[str, ...], tuple[str, ...]],
@@ -10997,6 +11181,11 @@ class CRMSKnowledgeBase:
             return conjunctive
         words = _tokens(question)
         requested_qualifiers = self._normalize_qualifiers(qualifiers)
+        subject_pattern_result = self._ask_subject_pattern_question(
+            words, requested_qualifiers)
+        if subject_pattern_result is not None:
+            return self._attach_query_alias_evidence(
+                question, subject_pattern_result)
         class_definition = self._ask_is_a_definition_question(
             words, requested_qualifiers)
         if class_definition is not None:
@@ -12540,6 +12729,19 @@ class CRMSKnowledgeBase:
                  "entities": [list(entity) for entity in sorted(values)]}
                 for key, values in sorted(self._question_examples.items())
             ],
+            "subject_pattern_question_examples": [
+                {"relation": list(json.loads(key[0])),
+                 "answer_field": key[1], "question_prefix": list(key[2]),
+                 "question_suffix": list(key[3]),
+                 "fact_bound_field": key[4],
+                 "fact_prefix": list(key[5]), "fact_suffix": list(key[6]),
+                 "examples": [
+                     {"entity": list(entity), "answers": sorted(answers)}
+                     for entity, answers in sorted(examples.items())
+                 ]}
+                for key, examples in sorted(
+                    self._subject_pattern_question_examples.items())
+            ],
             "induced_question_frames": [
                 copy.deepcopy(proposal)
                 for _key, proposal in sorted(self._induced_question_frames.items())
@@ -12927,6 +13129,28 @@ class CRMSKnowledgeBase:
                 knowledge._question_examples[key] = {
                     tuple(entity): {" ".join(entity)} for entity in item["entities"]
                 }
+            for item in payload.get("subject_pattern_question_examples", []):
+                relation = tuple(item["relation"])
+                answer_field = item.get("answer_field")
+                fact_bound_field = item.get("fact_bound_field")
+                if (not relation or answer_field not in {"subject", "object"}
+                        or fact_bound_field not in {"subject", "object"}
+                        or fact_bound_field == answer_field):
+                    raise ValueError("stored subject-pattern question frame is malformed")
+                key = (json.dumps(relation, ensure_ascii=False), answer_field,
+                       tuple(item["question_prefix"]),
+                       tuple(item["question_suffix"]), fact_bound_field,
+                       tuple(item["fact_prefix"]), tuple(item["fact_suffix"]))
+                examples = {}
+                for example in item.get("examples", []):
+                    entity = tuple(example["entity"])
+                    answers = set(example.get("answers", []))
+                    if not entity or len(answers) != 1:
+                        raise ValueError(
+                            "stored subject-pattern examples need one answer")
+                    examples[entity] = answers
+                if examples:
+                    knowledge._subject_pattern_question_examples[key] = examples
             for item in payload.get("qualified_question_examples", []):
                 key = (tuple(item["relation"]), item["answer_field"],
                        tuple(item["qualifier"]), item.get("entity_first", True),

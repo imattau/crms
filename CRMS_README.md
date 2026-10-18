@@ -2118,6 +2118,19 @@ complete verified inference proof.
 Unsupported examples and attempts to create a frame from one example leave
 memory unchanged. `experiments/v1_218_incremental_question_frame_learning.py`
 checks transfer, grounding, rejection, and persistence.
+When a query entity is only part of either source fact endpoint, the separate
+`/teach-question-pattern QUESTION|RELATION|subject/object|BOUND ENTITY|ANSWER`
+form learns that endpoint structure from reviewed direct facts. For example,
+two examples can align `What research happened at {place}?` with the fact
+subject pattern `Researchers at {place}` and return the fact object for a new
+place. It also handles object-endpoint patterns. The relation, answer slot,
+and both question/fact patterns must match across examples; every answer still
+requires an exact direct fact, and
+positive/negative conflicts remain ambiguous. One example is insufficient.
+This is a teacher-licensed role mapping, not an automatic event-noun synonym.
+`experiments/v1_308_subject_pattern_question_learning.py` checks transfer,
+unsupported wording/place abstention, conflict handling, JSON and SQLite
+persistence, and terminal chat.
 Each question frame also licenses only its learned answer direction. To ask in
 the opposite direction, teach that wording from its own fact-backed examples,
 for example `"What did Ada Lovelace design?" => "the Analytical Engine"` and

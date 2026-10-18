@@ -72,6 +72,8 @@ HELP = """Commands:
                  teach a cited sentence frame that extracts qualifiers
   /teach-question Q|R|FIELD|ENTITY|ANSWER
                  teach a fact-backed question example (FIELD: subject/object)
+  /teach-question-pattern Q|R|FIELD|ENTITY|ANSWER
+                 teach a reviewed query slot mapped into a fact-endpoint pattern
   Teach a question frame from examples: "QUESTION 1" => "ANSWER 1"; "QUESTION 2" => "ANSWER 2"
                  learn a question pattern only when both examples match one fact relation
   Teach paired question frames from examples: 4–8 "QUESTION" => "ANSWER" pairs
@@ -4355,6 +4357,27 @@ def main() -> int:
                       "Question example stored; another distinct bound entity is needed to license the frame.")
             except (OSError, ValueError) as error:
                 print(f"Could not teach question example: {error}")
+            continue
+        if line.startswith("/teach-question-pattern "):
+            fields = [value.strip() for value in
+                      line[len("/teach-question-pattern "):].split("|")]
+            if len(fields) != 5 or not all(fields):
+                print("Use: /teach-question-pattern QUESTION|RELATION|subject/object|BOUND ENTITY|ANSWER")
+                continue
+            question, relation, answer_field, bound_entity, answer = fields
+            if answer_field not in {"subject", "object"}:
+                print("Question answer field must be subject or object.")
+                continue
+            try:
+                licensed = knowledge.teach_subject_pattern_question(
+                    question, relation=relation, answer_field=answer_field,
+                    bound_entity=bound_entity, answer=answer)
+                knowledge.save(args.knowledge)
+                print("Subject-pattern question frame licensed." if licensed else
+                      "Question-pattern example stored; another distinct, "
+                      "fact-backed entity is needed to license the frame.")
+            except (OSError, ValueError) as error:
+                print(f"Could not teach subject-pattern question: {error}")
             continue
         if _NATURAL_PREDICATE_FORM_REVIEW_RE.fullmatch(line):
             try:
