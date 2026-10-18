@@ -73,6 +73,30 @@ def main() -> None:
                 "Person 0", "ancestor", "Person 5") is None,
             "partial proof was incorrectly persisted as a complete practiced result")
 
+    # Two recursive branches converge on the same subgoal. Query-local
+    # memoization should reuse that complete positive proof set.
+    overlapping = CRMSKnowledgeBase()
+    for source, target in (
+            ("Root", "Left"), ("Root", "Right"),
+            ("Left", "Join"), ("Right", "Join"),
+            ("Join", "Next"), ("Next", "End")):
+        overlapping.add_fact(source, "parent", target,
+                             f"family:{source}:{target}")
+    overlapping.add_inference_rule(
+        "ancestor-recursive", "parent", "ancestor", "ancestor")
+    overlapping.add_inference_rule(
+        "ancestor-base", "parent", "parent", "ancestor")
+    memoized = overlapping.infer_relation("Root", "ancestor", "End")
+    require(memoized.status == "answered" and memoized.proofs
+            and memoized.memo_hits > 0,
+            f"overlapping recursive subgoals were not memoized: {memoized}")
+    checked = verify_inference_proof(
+        memoized.proofs[0], [asdict(fact) for fact in overlapping.facts()],
+        [asdict(rule) for rule in overlapping._inference_rules.values()],
+        expected_conclusion=memoized.conclusion)
+    require(checked.valid,
+            f"independent verifier rejected memoized proof: {checked}")
+
     diamond = CRMSKnowledgeBase()
     previous = ["Start"]
     for layer in range(10):
@@ -117,6 +141,7 @@ def main() -> None:
     print("long transitive proof diagnostic: PASS")
     print("2, 8, 9, 12, 20, and 30-edge paths proved and independently verified")
     print("recursive proof retained with an explicit partial-support label: PASS")
+    print(f"overlapping recursive subgoals reused ({memoized.memo_hits} memo hits): PASS")
     print(f"ten-layer diamond: {len(branching.proofs)} shortest proof records; PASS")
     print("transitive search selects the two-edge proof before a longer path: PASS")
 

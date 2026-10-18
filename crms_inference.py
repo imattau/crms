@@ -70,6 +70,7 @@ class InferenceResult:
     failure_kind: str | None = None
     missing_premises: tuple[dict[str, Any], ...] = ()
     limit_kind: str | None = None
+    memo_hits: int = 0
 
 
 def _proof_support(proofs: Iterable[Mapping[str, Any]], *,
@@ -559,13 +560,35 @@ def infer_relation(
                 return result
         return result
 
+    proof_cache: dict[
+        tuple[tuple[tuple[str, ...], ...], int], list[dict[str, Any]]
+    ] = {}
+    memo_hits = 0
+
     def prove(atom: tuple[tuple[str, ...], ...], active: frozenset,
               depth: int) -> list[dict[str, Any]]:
-        nonlocal exhausted, proofs_truncated, limit_kind
+        """Reuse only complete, positive proof sets at an equal remaining depth."""
+        nonlocal memo_hits, exhausted, limit_kind
         if depth > max_depth:
             exhausted = True
             limit_kind = "depth_limit"
             return []
+        cache_key = (atom, max_depth - depth)
+        cached = proof_cache.get(cache_key)
+        if cached is not None:
+            memo_hits += 1
+            return [dict(proof) for proof in cached]
+        was_exhausted = exhausted
+        was_truncated = proofs_truncated
+        proofs = prove_uncached(atom, active, depth)
+        if (proofs and not was_exhausted and not was_truncated
+                and not exhausted and not proofs_truncated):
+            proof_cache[cache_key] = [dict(proof) for proof in proofs]
+        return proofs
+
+    def prove_uncached(atom: tuple[tuple[str, ...], ...], active: frozenset,
+                       depth: int) -> list[dict[str, Any]]:
+        nonlocal exhausted, proofs_truncated, limit_kind
         direct = fact_index.get(atom, [])
         proofs = [{"kind": "fact", "conclusion": display_atom(atom),
                    "fact": fact} for fact in direct]
@@ -912,7 +935,8 @@ def infer_relation(
         limit_kind=limit_kind,
         support_class=("partial" if incomplete_search else support[0]),
         lineage_count=support[1],
-        source_count=support[2], source_documents=support[3])
+        source_count=support[2], source_documents=support[3],
+        memo_hits=memo_hits)
 
 
 def discover_rule_candidates(
