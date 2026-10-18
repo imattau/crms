@@ -50,7 +50,19 @@ def main() -> None:
             ("authored-b", "Bea authored Compiler."),
             ("weak-a", rejected[0]),
             ("weak-b", rejected[1]),
-            ("title-a", rejected[2])):
+            ("title-a", rejected[2]),
+            ("comma-quality-a",
+             "Finally, the quality of the body image produced by the network is evaluated."),
+            ("comma-quality-b",
+             "However, the quality of automatic parses can vary greatly."),
+            ("comma-most-a",
+             "Finally, most of our interviewees do not report high enjoyment."),
+            ("comma-most-b",
+             "However, most of them either focus on ranked list evaluation."),
+            ("comma-class-a",
+             "Interestingly, a class of butterfly matrices belongs to this category."),
+            ("comma-set-a",
+             "In this paper, we introduce DR-Tools Suite, a set of lightweight tools.")):
         index.add_document(document_id, "Corpus fixture", sentence,
                            f"{document_id}.txt")
     proposals = learner.propose_corpus_relation_frames(index)
@@ -61,6 +73,10 @@ def main() -> None:
     if any(proposal["relation"] in {"edits", "methods", "are"}
            for proposal in proposals):
         raise SystemExit(f"weak or title-derived relation remained: {proposals}")
+    comma_artifacts = {"quality of", "most of", "a class of", "a set of"}
+    if comma_artifacts & {proposal["relation"] for proposal in proposals}:
+        raise SystemExit(
+            f"comma-bearing discourse/appositive text became a corpus rule: {proposals}")
     if learner.facts():
         raise SystemExit("proposal quality check mutated accepted knowledge")
     negative = learner._discover_surface_relation_candidates(

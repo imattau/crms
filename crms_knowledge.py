@@ -4145,7 +4145,13 @@ class CRMSKnowledgeBase:
                 # Truncated extraction windows and title/list fragments can
                 # produce convincing-looking slot splits while lacking a full
                 # claim. Keep corpus rule discovery to bounded complete
-                # sentences; the original text remains untouched in storage.
+                # sentences. Until corpus mining has a clause-boundary parser,
+                # skip comma/semicolon sentences unless the extractor marks a
+                # uniquely bounded appositive parse. Source audits found
+                # discourse openings and loose appositives being mistaken for
+                # relation slots (e.g. "Finally, the quality of ..."). The
+                # original text remains untouched in storage and remains
+                # available to ordinary retrieval and explicit extraction.
                 if sentence[-1:] not in {".", "!", "?"}:
                     continue
                 page_number = None
@@ -4160,11 +4166,12 @@ class CRMSKnowledgeBase:
                 if page_number is not None:
                     citation += (f"&page={page_number}"
                                  f"&match={start}:{end}")
-                for candidate in self._discover_surface_relation_candidates(
+                candidates = self._discover_surface_relation_candidates(
                         sentence, source=citation,
                         research_index=research_index,
                         morphology_rules=morphology_rules,
-                        bare_predicate_support_cache=bare_support_cache):
+                        bare_predicate_support_cache=bare_support_cache)
+                for candidate in candidates:
                     relation_tokens_for_review = _tokens(candidate.relation)
                     relation_words_for_review = (
                         _RESEARCH_STOPWORDS
@@ -4187,6 +4194,10 @@ class CRMSKnowledgeBase:
                     evidence = next((item for item in candidate.language_evidence
                                      if item.get("kind")
                                      == "surface_relation_discovery"), {})
+                    if (("," in sentence or ";" in sentence)
+                            and evidence.get("method")
+                            != "single bounded nominal appositive with unique core parse"):
+                        continue
                     surface_phrase = str(evidence.get(
                         "predicate_phrase", candidate.relation))
                     key = (_tokens(candidate.relation),

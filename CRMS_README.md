@@ -1324,6 +1324,14 @@ On the current 2,006-document local corpus, the wider review-only scan yields
 23 relation-frame proposals and no repeated-pair predicate alignments. The
 remaining proposals still include noisy nominal and copular parses, so corpus
 discovery is not yet safe for unattended learning.
+An audit of the bounded `v1_274_corpus_relation_learning.py` scan found six of
+nine proposals came from comma-bearing discourse openings or loose appositives
+(for example, “Finally, the quality of ...” and “one of ...”). Corpus mining
+now skips comma/semicolon sentences unless the extractor marks a unique,
+bounded appositive parse. The same 2,006-document diagnostic now retains three
+review-only frames (`achieves`, `is-a`, and `returns`); the dedicated appositive
+diagnostic still passes. This removes the observed false structures, but the
+remaining type and return claims still require source review.
 `experiments/v1_245_zero_frame_corpus_learning.py` checks the evidence gates,
 no-mutation-before-acceptance, stale proposal protection, transaction staging,
 question transfer, provenance, both index backends, later-page discovery,
