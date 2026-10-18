@@ -1700,16 +1700,18 @@ proof tampering, CLI access, and persistence. `v1_87_contextual_rule_discovery.p
 checks scope-matched candidate support, source-separated held-out validation,
 counterexamples, visible context labels in terminal review, and use of an
 accepted rule in a new context.
-`experiments/v1_297_large_scale_rule_learning.py` adds a 980-fact diagnostic:
-40 labeled training chains, 12 source-held-out labeled chains, 12 unlabeled
-endpoint pairs, and 800 disconnected background facts. It discovers the
-parent-parent-to-ancestor candidate, validates it on independent sources,
-requires explicit acceptance, and independently verifies each of the 12
-proofs on unlabeled pairs. This is evidence that the bounded symbolic path
-scales to this generated graph; it is not evidence of rule discovery from
-noisy natural-language documents. The next discovery evaluation should add
-linked distractor relations and planted counterexamples, then measure runtime
-and candidate precision as graph size and relation diversity increase.
+`experiments/v1_297_large_scale_rule_learning.py` adds an end-to-end 980-fact
+diagnostic over 180 indexed sentences: two cited examples per relation license
+the sentence frames, later claims enter through reviewable extraction, 40
+labeled chains form the training partition, 12 are held out by source, and 12
+premise-only chains test transfer. It discovers the parent-parent-to-ancestor
+candidate, validates it on independent sources, requires explicit acceptance,
+and independently verifies each of the 12 inferred proofs. The wording and
+entities are generated and the 800 background facts are disconnected, so this
+does not establish performance on noisy natural-language corpora. The next
+discovery evaluation should add linked distractor relations and planted
+counterexamples, then measure runtime and candidate precision as graph size
+and relation diversity increase.
 
 `CRMSKnowledgeBase.research(question, index)` connects retrieval to the
 knowledge layer. It searches supplied documents, answers from existing facts
@@ -4536,10 +4538,11 @@ The remaining architectural proposals should be staged behind measured needs:
    direction, contingent on a proof semantics for each construct and
    differential tests against the current bounded engine.
 4. **Discovery quality and candidate durability:** the 980-fact source-separated
-   diagnostic now covers rule transfer to unlabeled pairs, but uses disconnected
-   generated distractors. Expand evaluation to linked, noisy knowledge bases
-   with known rules and planted counterexamples. Pending fact candidates already survive restart
-   when their citation and learned-frame license still validate;
+   diagnostic now covers cited language-frame acquisition, reviewed extraction,
+   and rule transfer to unlabeled pairs, but uses generated sentences and
+   disconnected distractors. Expand evaluation to linked, noisy knowledge bases
+   with known rules and planted counterexamples. Pending fact candidates already
+   survive restart when their citation and learned-frame license still validate;
    `experiments/v1_217_natural_candidate_review.py` covers restore, later
    acceptance, rejection, and ambiguous queues. The loader removes invalid
    proposals from the active queue but retains their details and validation

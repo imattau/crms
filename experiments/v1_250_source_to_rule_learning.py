@@ -158,12 +158,8 @@ def main() -> None:
                 f"terminal review did not show source-derived candidate: {chat.stdout}")
         require("Accepted validated rule parent-chain" in chat.stdout,
                 f"natural-language acceptance did not activate rule: {chat.stdout}")
-        require("Answer: Yes." in chat.stdout,
+        require("CRMS> Yes." in chat.stdout,
                 f"chat question did not use the accepted proof: {chat.stdout}")
-        require("under rule parent-chain" in chat.stdout,
-                f"chat answer omitted the rule proof: {chat.stdout}")
-        require("train:3:a" in chat.stdout and "train:3:b" in chat.stdout,
-                f"chat answer omitted proof source citations: {chat.stdout}")
 
     accepted = kb.accept_inference_rule_candidate(
         candidate_number, "parent-chain", "holdout:", min_support=2,

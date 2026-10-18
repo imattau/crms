@@ -18,6 +18,7 @@ PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
 from crms_knowledge import CRMSKnowledgeBase
+from crms_research import CRMSResearchIndex
 from crms_rule_proof import verify_inference_proof
 
 
@@ -26,26 +27,65 @@ def require(condition: bool, message: str) -> None:
         raise SystemExit(message)
 
 
-def add_chain(kb: CRMSKnowledgeBase, number: int, partition: str,
-              *, labeled: bool = True) -> None:
-    subject = f"person {number:04d}a"
-    middle = f"person {number:04d}b"
-    target = f"person {number:04d}c"
+def add_source_fact(kb: CRMSKnowledgeBase, index: CRMSResearchIndex,
+                    source_id: str, sentence: str, subject: str,
+                    relation: str, obj: str, *, teach: bool = False) -> None:
+    index.add_document(source_id, "Generated relational record", sentence,
+                       source_id + ".txt")
+    hit = next((row for row in index.search(sentence, limit=10)
+                if row.document_id == source_id), None)
+    require(hit is not None, f"indexed source was not retrievable: {source_id}")
+    if teach:
+        kb.add_fact_from_hit(subject, relation, obj, index, hit)
+        predicate = "mentored" if relation == "parent" else "guided"
+        kb.teach_fact_pattern_from_hit(
+            sentence, subject=subject, relation=relation, obj=obj,
+            predicate_phrase=predicate, research_index=index, hit=hit)
+        return
+
+    candidates = kb.propose_facts_from_hit(
+        sentence, research_index=index, hit=hit)
+    candidate = next((item for item in candidates
+                      if (item.subject, item.relation, item.object)
+                      == (subject, relation, obj)), None)
+    require(candidate is not None,
+            f"learned language frames did not extract {sentence!r}: {candidates}")
+    before = len(kb.facts())
+    kb.accept_fact_candidate(candidate, index)
+    require(len(kb.facts()) == before + 1,
+            "reviewed source extraction did not add exactly one fact")
+
+
+def add_chain(kb: CRMSKnowledgeBase, index: CRMSResearchIndex,
+              number: int, partition: str, *, labeled: bool = True,
+              teach: bool = False) -> None:
+    subject = f"Person{number:04d}A"
+    middle = f"Person{number:04d}B"
+    target = f"Person{number:04d}C"
     source = f"{partition}:{number:04d}"
-    kb.add_fact(subject, "parent", middle, source + "#first")
-    kb.add_fact(middle, "parent", target, source + "#second")
+    rows = [
+        ("first", f"{subject} mentored {middle}.", subject, "parent", middle),
+        ("second", f"{middle} mentored {target}.", middle, "parent", target),
+    ]
     if labeled:
-        kb.add_fact(subject, "ancestor", target, source + "#label")
+        rows.append(("label", f"{subject} guided {target}.", subject,
+                     "ancestor", target))
+    for suffix, sentence, left, relation, right in rows:
+        add_source_fact(kb, index, source + ":" + suffix, sentence,
+                        left, relation, right, teach=teach)
 
 
 def main() -> None:
     kb = CRMSKnowledgeBase()
+    index = CRMSResearchIndex()
     for number in range(40):
-        add_chain(kb, number, "training")
+        # The first two chains teach the two sentence-to-relation frames from
+        # cited examples. Later claims must pass through learned extraction.
+        add_chain(kb, index, number, "training", teach=number < 2)
     for number in range(40, 52):
-        add_chain(kb, number, "validation")
+        add_chain(kb, index, number, "validation")
     for number in range(52, 64):
-        add_chain(kb, number, "unlabeled", labeled=False)
+        add_chain(kb, index, number, "unlabeled", labeled=False)
 
     # Add disconnected background facts to ensure discovery runs against a
     # nontrivial store without introducing accidental chain examples.
@@ -93,8 +133,8 @@ def main() -> None:
 
     results = []
     for number in range(52, 64):
-        subject = f"person {number:04d}a"
-        target_entity = f"person {number:04d}c"
+        subject = f"Person{number:04d}A"
+        target_entity = f"Person{number:04d}C"
         result = kb.infer_relation(subject, "ancestor", target_entity)
         require(result.status == "answered" and result.complete and result.proofs,
                 f"accepted rule did not generalize to unlabeled pair {number}: {result}")
@@ -110,10 +150,13 @@ def main() -> None:
             require(checked.valid, f"independent proof check failed: {checked}")
             proof_count += 1
 
-    print("large-scale self-learning rule diagnostic: PASS")
-    print(f"facts={len(kb.facts())}; candidates={len(discovery.candidates)}; "
+    print("large-scale language-to-rule learning diagnostic: PASS")
+    print(f"facts={len(kb.facts())}; indexed_sources={len(index.documents())}; "
+          f"candidates={len(discovery.candidates)}; "
           f"discovery_expansions={discovery.expansions}; "
           f"discovery_seconds={elapsed:.3f}")
+    print("two cited examples per relation licensed the language frames; "
+          "all later chain claims entered through reviewed extraction")
     print("review split: training=40 labeled pairs; "
           "heldout=12 independent labeled pairs; "
           "unlabeled transfer=12 pairs")
