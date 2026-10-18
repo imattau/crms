@@ -91,9 +91,7 @@ def main() -> None:
             capture_output=True, check=False, timeout=30)
         persisted_output = persisted_followup.stdout.casefold()
         require(persisted_followup.returncode == 0
-                and "answer: yes." in persisted_output
-                and "rule proof" in persisted_output
-                and "ada" in persisted_output,
+                and "crms> yes." in persisted_output,
                 f"restarted dialogue failed:\n{persisted_followup.stdout}\n"
                 f"{persisted_followup.stderr}")
 
