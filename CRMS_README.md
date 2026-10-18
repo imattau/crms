@@ -1219,6 +1219,14 @@ subject/object AND/OR and two/three-clause composition, polar truth combination
 and conflict, evidence retention, a rule-derived conjunct, retrieval coverage
 for each research clause without auto-committing facts, unsupported and
 disjoint abstention, ambiguity, persistence, and terminal chat.
+Compound reconstruction now evaluates its invariant first clause once and
+reuses the result across candidate prefixes. The small in-memory check in
+`experiments/v1_304_compound_question_reuse.py` verifies one evaluation,
+answer/provenance stability, and both conjunction and disjunction. It measured
+about 0.8 ms for the two-fact case; this does not justify parallel dispatch or
+replace the planned large-store profile. Research sharding and persistent
+worker pools should remain benchmark-gated, with SQLite shards using separate
+read-only connections and deterministic merge order.
 An explicit named-subject form such as “What did Ada and Grace each build?”
 reuses the learned question frame once per stored subject and combines answers
 only when both queries are answered uniquely. Boolean forms use AND: each

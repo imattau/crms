@@ -10136,11 +10136,15 @@ class CRMSKnowledgeBase:
             "conflicts with explicit negative evidence",
             "conflicting support",
         )
+        # The first clause is invariant across every candidate reconstruction.
+        # Evaluate it once; only the suffix clause changes with the prefix.
+        first_result = self.ask(first + "?", qualifiers=qualifiers)
         for prefix in prefixes:
             standalone = [first] + [prefix + clause.strip()
                                     for clause in clauses[1:]]
-            results = [self.ask(clause + "?", qualifiers=qualifiers)
-                       for clause in standalone]
+            results = [first_result] + [
+                self.ask(clause + "?", qualifiers=qualifiers)
+                for clause in standalone[1:]]
             if any(result.status == "ambiguous" and any(
                     marker in (result.request or "").casefold()
                     for marker in conflict_markers) for result in results):
