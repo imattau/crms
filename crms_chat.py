@@ -3294,7 +3294,7 @@ def build_parser() -> argparse.ArgumentParser:
                         default=Path("crms_dialogue.json"),
                         help="short-term context state (default: %(default)s)")
     parser.add_argument("--rules", type=Path, default=Path("crms_rules.json"),
-                        help="learned transformation-rule memory (default: %(default)s)")
+                        help="learned transformation-rule memory; .sqlite paths use indexed SQLite storage (default: %(default)s)")
     parser.add_argument("--rule-depth", type=int, choices=(1, 2, 3, 4), default=2,
                         help="maximum rule-composition depth (default: %(default)s)")
     parser.add_argument("--rule-max-add", type=int, default=10,

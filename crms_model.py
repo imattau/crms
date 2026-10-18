@@ -24,6 +24,7 @@ import math
 import os
 import random
 import re
+import sqlite3
 from collections import Counter, OrderedDict
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import asdict, dataclass
@@ -32,6 +33,135 @@ from itertools import combinations, product
 from pathlib import Path
 from typing import Any, Iterable
 from crms_text import casefold_nfc, tokens as normalized_tokens
+
+
+_RULE_DB_APPLICATION_ID = int.from_bytes(b"CRUL", "big")
+_RULE_DB_VERSION = 1
+_RULE_DB_TABLES = {
+    "rule_store_settings", "rule_examples", "rule_procedures",
+    "rule_artifacts",
+}
+
+
+def _rule_database_payload(path: Path) -> dict[str, Any]:
+    """Reconstruct the JSON-compatible rule memory from normalized SQLite rows."""
+    try:
+        connection = sqlite3.connect(
+            f"file:{path.resolve()}?mode=ro", uri=True)
+        try:
+            if (connection.execute("PRAGMA application_id").fetchone()[0]
+                    != _RULE_DB_APPLICATION_ID
+                    or connection.execute("PRAGMA user_version").fetchone()[0]
+                    != _RULE_DB_VERSION):
+                raise ValueError("unsupported CRMS SQLite rule memory header")
+            tables = {row[0] for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' "
+                "AND name NOT LIKE 'sqlite_%'")}
+            if tables != _RULE_DB_TABLES:
+                raise ValueError("SQLite file is not a CRMS rule memory")
+            row = connection.execute(
+                "SELECT payload_json FROM rule_store_settings WHERE id=1").fetchone()
+            if row is None:
+                raise ValueError("SQLite rule memory has no settings row")
+            payload = json.loads(row[0])
+            if not isinstance(payload, dict):
+                raise ValueError("SQLite rule settings are malformed")
+            examples: dict[str, list[list[list[int]]]] = {}
+            for phrase, _ordinal, inputs, outputs in connection.execute(
+                    "SELECT phrase,ordinal,input_json,output_json "
+                    "FROM rule_examples ORDER BY phrase,ordinal"):
+                examples.setdefault(phrase, []).append(
+                    [json.loads(inputs), json.loads(outputs)])
+            procedures = {
+                phrase: json.loads(steps)
+                for phrase, steps in connection.execute(
+                    "SELECT phrase,steps_json FROM rule_procedures ORDER BY phrase")
+            }
+            auxiliary: dict[str, list[Any]] = {}
+            for kind, _ordinal, value in connection.execute(
+                    "SELECT kind,ordinal,payload_json FROM rule_artifacts "
+                    "ORDER BY kind,ordinal"):
+                auxiliary.setdefault(kind, []).append(json.loads(value))
+            payload["examples"] = examples
+            payload["procedures"] = procedures
+            for kind in ("accepted_primitives", "accepted_primitive_artifacts",
+                         "no_fit_cases"):
+                payload[kind] = auxiliary.get(kind, [])
+            return payload
+        finally:
+            connection.close()
+    except sqlite3.DatabaseError as error:
+        raise ValueError("invalid CRMS SQLite rule memory") from error
+
+
+def _write_rule_database(path: Path, payload: dict[str, Any]) -> None:
+    """Replace one SQLite rule-memory snapshot in a single transaction."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    connection = sqlite3.connect(path, isolation_level=None)
+    try:
+        tables = {row[0] for row in connection.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' "
+            "AND name NOT LIKE 'sqlite_%'")}
+        if tables and (tables != _RULE_DB_TABLES
+                       or connection.execute("PRAGMA application_id").fetchone()[0]
+                       != _RULE_DB_APPLICATION_ID
+                       or connection.execute("PRAGMA user_version").fetchone()[0]
+                       != _RULE_DB_VERSION):
+            raise ValueError("existing SQLite file is not a CRMS rule memory")
+        connection.execute("PRAGMA journal_mode=DELETE")
+        connection.execute("PRAGMA synchronous=FULL")
+        connection.execute("CREATE TABLE IF NOT EXISTS rule_store_settings ("
+                           "id INTEGER PRIMARY KEY CHECK(id=1), "
+                           "payload_json TEXT NOT NULL)")
+        connection.execute("CREATE TABLE IF NOT EXISTS rule_examples ("
+                           "phrase TEXT NOT NULL, ordinal INTEGER NOT NULL, "
+                           "input_json TEXT NOT NULL, output_json TEXT NOT NULL, "
+                           "PRIMARY KEY(phrase,ordinal)) WITHOUT ROWID")
+        connection.execute("CREATE TABLE IF NOT EXISTS rule_procedures ("
+                           "phrase TEXT PRIMARY KEY, steps_json TEXT NOT NULL) "
+                           "WITHOUT ROWID")
+        connection.execute("CREATE TABLE IF NOT EXISTS rule_artifacts ("
+                           "kind TEXT NOT NULL, ordinal INTEGER NOT NULL, "
+                           "payload_json TEXT NOT NULL, PRIMARY KEY(kind,ordinal)) "
+                           "WITHOUT ROWID")
+        connection.execute(f"PRAGMA application_id={_RULE_DB_APPLICATION_ID}")
+        connection.execute(f"PRAGMA user_version={_RULE_DB_VERSION}")
+        connection.execute("BEGIN IMMEDIATE")
+        for table in _RULE_DB_TABLES:
+            connection.execute(f"DELETE FROM {table}")
+        settings = {key: value for key, value in payload.items()
+                    if key not in {"examples", "procedures",
+                                   "accepted_primitives",
+                                   "accepted_primitive_artifacts", "no_fit_cases"}}
+        connection.execute("INSERT INTO rule_store_settings VALUES (1,?)",
+                           (json.dumps(settings, ensure_ascii=False,
+                                       separators=(",", ":")),))
+        connection.executemany(
+            "INSERT INTO rule_examples VALUES (?,?,?,?)",
+            ((phrase, ordinal,
+              json.dumps(pair[0], ensure_ascii=False, separators=(",", ":")),
+              json.dumps(pair[1], ensure_ascii=False, separators=(",", ":")))
+             for phrase, examples in payload["examples"].items()
+             for ordinal, pair in enumerate(examples)))
+        connection.executemany(
+            "INSERT INTO rule_procedures VALUES (?,?)",
+            ((phrase, json.dumps(steps, ensure_ascii=False,
+                                 separators=(",", ":")))
+             for phrase, steps in payload["procedures"].items()))
+        connection.executemany(
+            "INSERT INTO rule_artifacts VALUES (?,?,?)",
+            ((kind, ordinal,
+              json.dumps(value, ensure_ascii=False, separators=(",", ":")))
+             for kind in ("accepted_primitives", "accepted_primitive_artifacts",
+                          "no_fit_cases")
+             for ordinal, value in enumerate(payload[kind])))
+        connection.commit()
+    except Exception:
+        if connection.in_transaction:
+            connection.rollback()
+        raise
+    finally:
+        connection.close()
 
 
 def _reverse(xs: list[int], **_: Any) -> list[int]:
@@ -6513,7 +6643,10 @@ class CRMSModel:
             'accepted_primitive_artifacts': self.accepted_primitive_artifacts(),
             'no_fit_cases': list(self._no_fit_records.values()),
         }
-        target.write_text(json.dumps(payload, indent=2), encoding='utf-8')
+        if target.suffix.casefold() in {'.sqlite', '.sqlite3', '.db'}:
+            _write_rule_database(target, payload)
+        else:
+            target.write_text(json.dumps(payload, indent=2), encoding='utf-8')
 
     def _decode_procedure(
             self, steps: Any, *, bounds: dict[str, int] | None = None,
@@ -6610,7 +6743,9 @@ class CRMSModel:
         target = Path(path) if path is not None else self.memory_path
         if target is None:
             raise ValueError('provide a path or configure memory_path')
-        payload = json.loads(target.read_text(encoding='utf-8'))
+        payload = (_rule_database_payload(target)
+                   if target.suffix.casefold() in {'.sqlite', '.sqlite3', '.db'}
+                   else json.loads(target.read_text(encoding='utf-8')))
         if not isinstance(payload, dict) or payload.get('format_version') != self.FORMAT_VERSION:
             raise ValueError('unsupported CRMS memory format version')
         stored_depth = payload.get('max_composition_depth')

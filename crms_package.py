@@ -37,13 +37,24 @@ def export_model_database(output: str | Path, *, knowledge: str | Path,
     for name, source in sources.items():
         if not source.is_file():
             raise FileNotFoundError(f"{name} memory does not exist: {source}")
-        data = source.read_bytes()
-        if len(data) > _MAX_MEMBER_BYTES:
-            raise ValueError(f"{name} memory exceeds the model database size limit")
-        payload = json.loads(data.decode("utf-8"))
+        if (name == "rules"
+                and source.suffix.casefold() in {".sqlite", ".sqlite3", ".db"}):
+            from crms_model import _rule_database_payload
+            payload = _rule_database_payload(source)
+            source_bytes = source.stat().st_size
+        else:
+            data = source.read_bytes()
+            if len(data) > _MAX_MEMBER_BYTES:
+                raise ValueError(
+                    f"{name} memory exceeds the model database size limit")
+            payload = json.loads(data.decode("utf-8"))
+            source_bytes = len(data)
         canonical = json.dumps(payload, ensure_ascii=False,
                                separators=(",", ":"))
-        memories[name] = (canonical, _sha256(canonical.encode("utf-8")), len(data))
+        if len(canonical.encode("utf-8")) > _MAX_MEMBER_BYTES:
+            raise ValueError(f"{name} memory exceeds the model database size limit")
+        memories[name] = (canonical, _sha256(canonical.encode("utf-8")),
+                          source_bytes)
 
     research_source = None
     research_cursor = None

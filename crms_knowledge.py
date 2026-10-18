@@ -12460,14 +12460,14 @@ class CRMSKnowledgeBase:
             knowledge._facts = SQLiteFactMap(fact_connection, "positive_facts")
             knowledge._negative_facts = SQLiteFactMap(
                 fact_connection, "negative_facts")
+            fact_connection.execute("BEGIN")
             fact_connection.execute("DELETE FROM positive_facts")
             fact_connection.execute("DELETE FROM negative_facts")
             fact_connection.execute(
                 "INSERT OR REPLACE INTO fact_store_metadata VALUES (?,?)",
                 ("format", "crms-fact-store"))
-            fact_connection.execute("BEGIN")
-        payload: dict[str, Any] = {}
         try:
+            payload: dict[str, Any] = {}
             with Path(path).open("r", encoding="utf-8") as source:
                 for name, value in _iter_knowledge_json(source):
                     if name in {"facts", "negative_facts"}:
@@ -12488,306 +12488,308 @@ class CRMSKnowledgeBase:
                                     qualifiers=dict(item.get("qualifiers", [])))
                     else:
                         payload[name] = value
+            if payload.get("format_version") != cls.FORMAT_VERSION:
+                raise ValueError("unsupported knowledge-base format version")
+            configured_limit = cls(
+                max_derived_cases=payload.get("max_derived_cases", 1_000))
+            knowledge.max_derived_cases = configured_limit.max_derived_cases
+            for item in payload.get("inference_rules", []):
+                rule = knowledge.add_inference_rule(
+                    item["rule_id"], item["first_relation"],
+                    item["second_relation"], item["conclusion_relation"],
+                    middle_kind=item.get("middle_kind"),
+                    third_relation=item.get("third_relation"),
+                    second_middle_kind=item.get("second_middle_kind"))
+                validation = item.get("validation")
+                if validation is not None:
+                    if not isinstance(validation, dict):
+                        raise ValueError("stored inference-rule validation is malformed")
+                    knowledge._inference_rule_validation[_tokens(rule.rule_id)] = validation
+            for order, case in enumerate(payload.get("derived_cases", [])):
+                conclusion = case.get("conclusion", {})
+                if not isinstance(conclusion, dict):
+                    raise ValueError("stored derived-case conclusion is malformed")
+                case_qualifiers = knowledge._normalize_qualifiers(
+                    dict(case.get("qualifiers", [])))
+                key = knowledge._fact_key(
+                    conclusion.get("subject", ""), conclusion.get("relation", ""),
+                    conclusion.get("object", ""), case_qualifiers)
+                proofs = case.get("proofs")
+                lineage = case.get("lineage")
+                practice_count = case.get("practice_count")
+                retrieval_count = case.get("retrieval_count")
+                if (not isinstance(proofs, list) or not proofs
+                        or not isinstance(lineage, dict)
+                        or not isinstance(practice_count, int)
+                        or isinstance(practice_count, bool) or practice_count < 1
+                        or not isinstance(retrieval_count, int)
+                        or isinstance(retrieval_count, bool) or retrieval_count < 0):
+                    raise ValueError("stored derived case is malformed")
+                reuse_count = case.get("reuse_count", 0)
+                if (not isinstance(reuse_count, int) or isinstance(reuse_count, bool)
+                        or reuse_count < 0 or reuse_count > retrieval_count):
+                    raise ValueError("stored derived-case reuse count is malformed")
+                practice_order = case.get("practice_order", order)
+                if (not isinstance(practice_order, int)
+                        or isinstance(practice_order, bool) or practice_order < 0):
+                    raise ValueError("stored derived-case order is malformed")
+                knowledge._derived_cases[key] = {
+                    "conclusion": {name: _display(conclusion[name], name)
+                                   for name in ("subject", "relation", "object")},
+                    "proofs": copy.deepcopy(proofs),
+                    "lineage": {"sources": list(lineage.get("sources", [])),
+                                "rule_ids": list(lineage.get("rule_ids", []))},
+                    "practice_count": practice_count,
+                    "retrieval_count": retrieval_count,
+                    "reuse_count": reuse_count,
+                    "practice_order": practice_order,
+                    "qualifiers": list(case_qualifiers),
+                    "validation_fingerprint": case.get("validation_fingerprint"),
+                    "validation_bounds": copy.deepcopy(
+                        case.get("validation_bounds", [])),
+                }
+                knowledge._next_derived_case_order = max(
+                    knowledge._next_derived_case_order, practice_order + 1)
+            knowledge._enforce_derived_case_limit()
+            for item in payload.get("entity_aliases", []):
+                sources = item.get("sources", [])
+                if not sources:
+                    raise ValueError("stored entity alias has no source provenance")
+                for source in sources:
+                    knowledge.teach_entity_alias(
+                        " ".join(item["alias"]), item["entity"], source=source)
+            if "entity_alias_explicit_sources" in payload:
+                knowledge._entity_alias_explicit_sources = {
+                    tuple(item["alias"]): set(item.get("sources", []))
+                    for item in payload.get("entity_alias_explicit_sources", [])
+                }
+            for item in payload.get("fact_pattern_alias_sources", []):
+                if type(item.get("positive")) is not bool:
+                    raise ValueError("stored fact-pattern alias polarity is malformed")
+                record = (tuple(item["alias"]), item["entity"],
+                          tuple(item["relation"]), tuple(item["subject"]),
+                          tuple(item["object"]), item["source"], item["positive"])
+                if not record[0] or not record[1] or not record[5]:
+                    raise ValueError("stored fact-pattern alias support is malformed")
+                knowledge._fact_pattern_alias_sources.add(record)
+            for alias in set(knowledge._entity_aliases) | {
+                    item[0] for item in knowledge._fact_pattern_alias_sources}:
+                knowledge._refresh_entity_alias(alias)
+            for item in payload.get("question_examples", []):
+                relation = tuple(item["relation"])
+                key = (json.dumps(relation, ensure_ascii=False), item["answer_field"],
+                       tuple(item["prefix"]), tuple(item["suffix"]))
+                knowledge._question_examples[key] = {
+                    tuple(entity): {" ".join(entity)} for entity in item["entities"]
+                }
+            for item in payload.get("qualified_question_examples", []):
+                key = (tuple(item["relation"]), item["answer_field"],
+                       tuple(item["qualifier"]), item.get("entity_first", True),
+                       tuple(item["prefix"]), tuple(item["middle"]),
+                       tuple(item["suffix"]))
+                knowledge._qualified_question_examples[key] = {
+                    (tuple(example["entity"]), tuple(example["value"])):
+                    set(example.get("answers", []))
+                    for example in item.get("examples", [])
+                }
+            for item in payload.get("multi_qualified_question_examples", []):
+                key = (tuple(item["relation"]), item["answer_field"],
+                       tuple(tuple(name) for name in item["qualifier_names"]),
+                       tuple(item["template"]))
+                knowledge._multi_qualified_question_examples[key] = {
+                    (tuple(example["entity"]),
+                     tuple(tuple(value) for value in example["values"])):
+                    set(example.get("answers", []))
+                    for example in item.get("examples", [])
+                }
+            for item in payload.get("polar_question_examples", []):
+                key = (tuple(item["template"]), tuple(item["relation"]))
+                examples = {}
+                for example in item.get("examples", []):
+                    pair = (tuple(example["subject"]), tuple(example["object"]))
+                    if type(example.get("answer")) is not bool:
+                        raise ValueError("stored polar-question answer must be bool")
+                    examples[pair] = example["answer"]
+                knowledge._polar_question_examples[key] = examples
+            for item in payload.get("qualified_polar_question_examples", []):
+                key = (tuple(item["relation"]),
+                       tuple(tuple(name) for name in item["qualifier_names"]),
+                       tuple(item["template"]))
+                examples = {}
+                for example in item.get("examples", []):
+                    if type(example.get("answer")) is not bool:
+                        raise ValueError("stored qualified polar answer must be bool")
+                    pair = (tuple(example["subject"]), tuple(example["object"]),
+                            tuple(tuple(value) for value in example["values"]))
+                    examples[pair] = example["answer"]
+                knowledge._qualified_polar_question_examples[key] = examples
+            for item in payload.get("path_question_examples", []):
+                key = (tuple(tuple(relation) for relation in item["relations"]),
+                       tuple(item["prefix"]), tuple(item["suffix"]))
+                knowledge._path_question_examples[key] = {
+                    tuple(entity) for entity in item["entities"]
+                }
+            for item in payload.get("counterfactual_source_examples", []):
+                key = (tuple(item["start"]), tuple(item["target"]),
+                       tuple(tuple(relation) for relation in item["relations"]),
+                       tuple((tuple(pair["name"]), tuple(pair["value"]))
+                             for pair in item.get("qualifiers", [])),
+                       tuple(item["prefix"]), tuple(item["suffix"]))
+                knowledge._counterfactual_source_examples[key] = {
+                    tuple(example["tokens"]): example["source"]
+                    for example in item.get("sources", [])
+                }
+            for item in payload.get("counterfactual_path_examples", []):
+                key = (tuple(item["template"]),
+                       tuple(tuple(relation) for relation in item["relations"]),
+                       tuple((tuple(pair["name"]), tuple(pair["value"]))
+                             for pair in item.get("qualifiers", [])))
+                knowledge._counterfactual_path_examples[key] = {
+                    (tuple(example["start"]), tuple(example["target"]),
+                     tuple(example["source"])): tuple(example["display"])
+                    for example in item.get("examples", [])
+                }
+            for item in payload.get("about_question_examples", []):
+                key = (tuple(item["prefix"]), tuple(item["suffix"]))
+                knowledge._about_question_examples[key] = {
+                    tuple(example["tokens"]): example["entity"]
+                    for example in item.get("entities", [])
+                }
+            for item in payload.get("fact_pattern_examples", []):
+                key = (tuple(item["template"]), tuple(item["relation"]))
+                examples = {}
+                for example in item["examples"]:
+                    pair = (tuple(example["subject"]), tuple(example["object"]))
+                    examples[pair] = set(example.get("sources", []))
+                knowledge._fact_pattern_examples[key] = examples
+            for item in payload.get("context_fact_patterns", []):
+                if type(item.get("positive")) is not bool:
+                    raise ValueError("stored context fact-frame polarity is malformed")
+                key = (tuple(item["template"]), tuple(item["relation"]),
+                       tuple(item["qualifier_names"]), item["positive"])
+                examples = {}
+                for example in item.get("examples", []):
+                    signature = (tuple(example["subject"]), tuple(example["object"]),
+                                 tuple(tuple(value) for value in
+                                       example["qualifier_values"]),
+                                 tuple(example["predicate"]))
+                    sources = set(example.get("sources", []))
+                    if not sources:
+                        raise ValueError("stored context fact-frame example has no source")
+                    examples[signature] = sources
+                if (not key[0] or not key[1] or not key[2]
+                        or any(len(example[2]) != len(key[2])
+                               for example in examples)):
+                    raise ValueError("stored context fact-frame pattern is malformed")
+                knowledge._context_fact_patterns[key] = examples
+            for item in payload.get("fact_pattern_surfaces", []):
+                key = (tuple(item["template"]), tuple(item["relation"]))
+                knowledge._fact_pattern_surfaces[key] = set(item.get("surfaces", []))
+            for item in payload.get("fact_pattern_predicates", []):
+                key = (tuple(item["template"]), tuple(item["relation"]))
+                knowledge._fact_pattern_predicates[key] = {
+                    tuple(phrase) for phrase in item.get("phrases", [])
+                }
+            for item in payload.get("fact_pattern_predicate_sources", []):
+                key = (tuple(item["template"]), tuple(item["relation"]))
+                knowledge._fact_pattern_predicate_sources[key] = {
+                    tuple(phrase["phrase"]): {
+                        (tuple(example["subject"]), tuple(example["object"])):
+                        set(example.get("sources", []))
+                        for example in phrase.get("examples", [])
+                    }
+                    for phrase in item.get("phrases", [])
+                }
+            for item in payload.get("fact_pattern_surface_sources", []):
+                key = (tuple(item["template"]), tuple(item["relation"]))
+                knowledge._fact_pattern_surface_sources[key] = {
+                    surface["surface"]: {
+                        (tuple(example["subject"]), tuple(example["object"])):
+                        set(example.get("sources", []))
+                        for example in surface.get("examples", [])
+                    }
+                    for surface in item.get("surfaces", [])
+                }
+            for item in payload.get("fact_pattern_polarities", []):
+                if type(item.get("positive")) is not bool:
+                    raise ValueError("stored fact-pattern polarity must be bool")
+                key = (tuple(item["template"]), tuple(item["relation"]))
+                knowledge._fact_pattern_polarities[key] = item["positive"]
+            # Older saved knowledge bases stored the canonical relation directly
+            # in the frame and therefore need no separate predicate slot.
+            for key, examples in knowledge._fact_pattern_examples.items():
+                knowledge._fact_pattern_polarities.setdefault(key, True)
+                if key not in knowledge._fact_pattern_predicates:
+                    if "<predicate>" not in key[0]:
+                        knowledge._fact_pattern_predicates[key] = {key[1]}
+                # Migrate older stores conservatively to the available example
+                # lineage. New stores retain per-form and per-surface citations.
+                pairs = {pair: set(sources) for pair, sources in examples.items()}
+                if key not in knowledge._fact_pattern_predicate_sources:
+                    knowledge._fact_pattern_predicate_sources[key] = {
+                        phrase: {pair: set(sources) for pair, sources in pairs.items()}
+                        for phrase in knowledge._fact_pattern_predicates.get(key, set())
+                    }
+                if key not in knowledge._fact_pattern_surface_sources:
+                    knowledge._fact_pattern_surface_sources[key] = {
+                        surface: {pair: set(sources) for pair, sources in pairs.items()}
+                        for surface in knowledge._fact_pattern_surfaces.get(key, set())
+                    }
+            raw_induced_frames = payload.get("induced_question_frames", [])
+            if (not isinstance(raw_induced_frames, list)
+                    or len(raw_induced_frames) > 1000):
+                raise ValueError("stored induced question frames exceed their bound")
+            for record in raw_induced_frames:
+                if (not isinstance(record, dict)
+                        or record.get("kind") not in {
+                            "analogical_question_frame",
+                            "analogical_qualified_question_frame",
+                            "active_question_role_alternation"}
+                        or not isinstance(record.get("artifact_id"), str)):
+                    raise ValueError("stored induced question frame is malformed")
+                # Recreate and re-evaluate the artifact against the loaded snapshot.
+                # Removed or changed evidence makes it stale, so it is not activated.
+                try:
+                    knowledge.accept_question_frame_proposal(record["artifact_id"])
+                except ValueError:
+                    continue
+            raw_induced_qualified_frames = payload.get(
+                "induced_qualified_question_frames", [])
+            if (not isinstance(raw_induced_qualified_frames, list)
+                    or len(raw_induced_qualified_frames) > 1000):
+                raise ValueError("stored induced qualified question frames exceed their bound")
+            for record in raw_induced_qualified_frames:
+                if (not isinstance(record, dict)
+                        or record.get("kind") != "analogical_qualified_question_frame"
+                        or not isinstance(record.get("artifact_id"), str)):
+                    raise ValueError("stored induced qualified question frame is malformed")
+                try:
+                    knowledge.accept_question_frame_proposal(record["artifact_id"])
+                except ValueError:
+                    continue
+            raw_induced_multi_frames = payload.get(
+                "induced_multi_qualified_question_frames", [])
+            if (not isinstance(raw_induced_multi_frames, list)
+                    or len(raw_induced_multi_frames) > 1000):
+                raise ValueError("stored induced multi-qualified frames exceed their bound")
+            for record in raw_induced_multi_frames:
+                if (not isinstance(record, dict)
+                        or record.get("kind")
+                            != "analogical_multi_qualified_question_frame"
+                        or not isinstance(record.get("artifact_id"), str)):
+                    raise ValueError("stored induced multi-qualified frame is malformed")
+                try:
+                    knowledge.accept_question_frame_proposal(record["artifact_id"])
+                except ValueError:
+                    continue
             if fact_connection is not None:
+                # Keep the replacement fact snapshot private until every section
+                # of the knowledge payload has passed validation. Earlier commits
+                # could leave a partial or unsupported snapshot in the sidecar.
                 fact_connection.commit()
+            return knowledge
         except Exception:
             if fact_connection is not None:
                 fact_connection.rollback()
                 fact_connection.close()
-                Path(fact_db).expanduser().resolve().unlink(missing_ok=True)
             raise
-        if payload.get("format_version") != cls.FORMAT_VERSION:
-            raise ValueError("unsupported knowledge-base format version")
-        configured_limit = cls(
-            max_derived_cases=payload.get("max_derived_cases", 1_000))
-        knowledge.max_derived_cases = configured_limit.max_derived_cases
-        for item in payload.get("inference_rules", []):
-            rule = knowledge.add_inference_rule(
-                item["rule_id"], item["first_relation"],
-                item["second_relation"], item["conclusion_relation"],
-                middle_kind=item.get("middle_kind"),
-                third_relation=item.get("third_relation"),
-                second_middle_kind=item.get("second_middle_kind"))
-            validation = item.get("validation")
-            if validation is not None:
-                if not isinstance(validation, dict):
-                    raise ValueError("stored inference-rule validation is malformed")
-                knowledge._inference_rule_validation[_tokens(rule.rule_id)] = validation
-        for order, case in enumerate(payload.get("derived_cases", [])):
-            conclusion = case.get("conclusion", {})
-            if not isinstance(conclusion, dict):
-                raise ValueError("stored derived-case conclusion is malformed")
-            case_qualifiers = knowledge._normalize_qualifiers(
-                dict(case.get("qualifiers", [])))
-            key = knowledge._fact_key(
-                conclusion.get("subject", ""), conclusion.get("relation", ""),
-                conclusion.get("object", ""), case_qualifiers)
-            proofs = case.get("proofs")
-            lineage = case.get("lineage")
-            practice_count = case.get("practice_count")
-            retrieval_count = case.get("retrieval_count")
-            if (not isinstance(proofs, list) or not proofs
-                    or not isinstance(lineage, dict)
-                    or not isinstance(practice_count, int)
-                    or isinstance(practice_count, bool) or practice_count < 1
-                    or not isinstance(retrieval_count, int)
-                    or isinstance(retrieval_count, bool) or retrieval_count < 0):
-                raise ValueError("stored derived case is malformed")
-            reuse_count = case.get("reuse_count", 0)
-            if (not isinstance(reuse_count, int) or isinstance(reuse_count, bool)
-                    or reuse_count < 0 or reuse_count > retrieval_count):
-                raise ValueError("stored derived-case reuse count is malformed")
-            practice_order = case.get("practice_order", order)
-            if (not isinstance(practice_order, int)
-                    or isinstance(practice_order, bool) or practice_order < 0):
-                raise ValueError("stored derived-case order is malformed")
-            knowledge._derived_cases[key] = {
-                "conclusion": {name: _display(conclusion[name], name)
-                               for name in ("subject", "relation", "object")},
-                "proofs": copy.deepcopy(proofs),
-                "lineage": {"sources": list(lineage.get("sources", [])),
-                            "rule_ids": list(lineage.get("rule_ids", []))},
-                "practice_count": practice_count,
-                "retrieval_count": retrieval_count,
-                "reuse_count": reuse_count,
-                "practice_order": practice_order,
-                "qualifiers": list(case_qualifiers),
-                "validation_fingerprint": case.get("validation_fingerprint"),
-                "validation_bounds": copy.deepcopy(
-                    case.get("validation_bounds", [])),
-            }
-            knowledge._next_derived_case_order = max(
-                knowledge._next_derived_case_order, practice_order + 1)
-        knowledge._enforce_derived_case_limit()
-        for item in payload.get("entity_aliases", []):
-            sources = item.get("sources", [])
-            if not sources:
-                raise ValueError("stored entity alias has no source provenance")
-            for source in sources:
-                knowledge.teach_entity_alias(
-                    " ".join(item["alias"]), item["entity"], source=source)
-        if "entity_alias_explicit_sources" in payload:
-            knowledge._entity_alias_explicit_sources = {
-                tuple(item["alias"]): set(item.get("sources", []))
-                for item in payload.get("entity_alias_explicit_sources", [])
-            }
-        for item in payload.get("fact_pattern_alias_sources", []):
-            if type(item.get("positive")) is not bool:
-                raise ValueError("stored fact-pattern alias polarity is malformed")
-            record = (tuple(item["alias"]), item["entity"],
-                      tuple(item["relation"]), tuple(item["subject"]),
-                      tuple(item["object"]), item["source"], item["positive"])
-            if not record[0] or not record[1] or not record[5]:
-                raise ValueError("stored fact-pattern alias support is malformed")
-            knowledge._fact_pattern_alias_sources.add(record)
-        for alias in set(knowledge._entity_aliases) | {
-                item[0] for item in knowledge._fact_pattern_alias_sources}:
-            knowledge._refresh_entity_alias(alias)
-        for item in payload.get("question_examples", []):
-            relation = tuple(item["relation"])
-            key = (json.dumps(relation, ensure_ascii=False), item["answer_field"],
-                   tuple(item["prefix"]), tuple(item["suffix"]))
-            knowledge._question_examples[key] = {
-                tuple(entity): {" ".join(entity)} for entity in item["entities"]
-            }
-        for item in payload.get("qualified_question_examples", []):
-            key = (tuple(item["relation"]), item["answer_field"],
-                   tuple(item["qualifier"]), item.get("entity_first", True),
-                   tuple(item["prefix"]), tuple(item["middle"]),
-                   tuple(item["suffix"]))
-            knowledge._qualified_question_examples[key] = {
-                (tuple(example["entity"]), tuple(example["value"])):
-                set(example.get("answers", []))
-                for example in item.get("examples", [])
-            }
-        for item in payload.get("multi_qualified_question_examples", []):
-            key = (tuple(item["relation"]), item["answer_field"],
-                   tuple(tuple(name) for name in item["qualifier_names"]),
-                   tuple(item["template"]))
-            knowledge._multi_qualified_question_examples[key] = {
-                (tuple(example["entity"]),
-                 tuple(tuple(value) for value in example["values"])):
-                set(example.get("answers", []))
-                for example in item.get("examples", [])
-            }
-        for item in payload.get("polar_question_examples", []):
-            key = (tuple(item["template"]), tuple(item["relation"]))
-            examples = {}
-            for example in item.get("examples", []):
-                pair = (tuple(example["subject"]), tuple(example["object"]))
-                if type(example.get("answer")) is not bool:
-                    raise ValueError("stored polar-question answer must be bool")
-                examples[pair] = example["answer"]
-            knowledge._polar_question_examples[key] = examples
-        for item in payload.get("qualified_polar_question_examples", []):
-            key = (tuple(item["relation"]),
-                   tuple(tuple(name) for name in item["qualifier_names"]),
-                   tuple(item["template"]))
-            examples = {}
-            for example in item.get("examples", []):
-                if type(example.get("answer")) is not bool:
-                    raise ValueError("stored qualified polar answer must be bool")
-                pair = (tuple(example["subject"]), tuple(example["object"]),
-                        tuple(tuple(value) for value in example["values"]))
-                examples[pair] = example["answer"]
-            knowledge._qualified_polar_question_examples[key] = examples
-        for item in payload.get("path_question_examples", []):
-            key = (tuple(tuple(relation) for relation in item["relations"]),
-                   tuple(item["prefix"]), tuple(item["suffix"]))
-            knowledge._path_question_examples[key] = {
-                tuple(entity) for entity in item["entities"]
-            }
-        for item in payload.get("counterfactual_source_examples", []):
-            key = (tuple(item["start"]), tuple(item["target"]),
-                   tuple(tuple(relation) for relation in item["relations"]),
-                   tuple((tuple(pair["name"]), tuple(pair["value"]))
-                         for pair in item.get("qualifiers", [])),
-                   tuple(item["prefix"]), tuple(item["suffix"]))
-            knowledge._counterfactual_source_examples[key] = {
-                tuple(example["tokens"]): example["source"]
-                for example in item.get("sources", [])
-            }
-        for item in payload.get("counterfactual_path_examples", []):
-            key = (tuple(item["template"]),
-                   tuple(tuple(relation) for relation in item["relations"]),
-                   tuple((tuple(pair["name"]), tuple(pair["value"]))
-                         for pair in item.get("qualifiers", [])))
-            knowledge._counterfactual_path_examples[key] = {
-                (tuple(example["start"]), tuple(example["target"]),
-                 tuple(example["source"])): tuple(example["display"])
-                for example in item.get("examples", [])
-            }
-        for item in payload.get("about_question_examples", []):
-            key = (tuple(item["prefix"]), tuple(item["suffix"]))
-            knowledge._about_question_examples[key] = {
-                tuple(example["tokens"]): example["entity"]
-                for example in item.get("entities", [])
-            }
-        for item in payload.get("fact_pattern_examples", []):
-            key = (tuple(item["template"]), tuple(item["relation"]))
-            examples = {}
-            for example in item["examples"]:
-                pair = (tuple(example["subject"]), tuple(example["object"]))
-                examples[pair] = set(example.get("sources", []))
-            knowledge._fact_pattern_examples[key] = examples
-        for item in payload.get("context_fact_patterns", []):
-            if type(item.get("positive")) is not bool:
-                raise ValueError("stored context fact-frame polarity is malformed")
-            key = (tuple(item["template"]), tuple(item["relation"]),
-                   tuple(item["qualifier_names"]), item["positive"])
-            examples = {}
-            for example in item.get("examples", []):
-                signature = (tuple(example["subject"]), tuple(example["object"]),
-                             tuple(tuple(value) for value in
-                                   example["qualifier_values"]),
-                             tuple(example["predicate"]))
-                sources = set(example.get("sources", []))
-                if not sources:
-                    raise ValueError("stored context fact-frame example has no source")
-                examples[signature] = sources
-            if (not key[0] or not key[1] or not key[2]
-                    or any(len(example[2]) != len(key[2])
-                           for example in examples)):
-                raise ValueError("stored context fact-frame pattern is malformed")
-            knowledge._context_fact_patterns[key] = examples
-        for item in payload.get("fact_pattern_surfaces", []):
-            key = (tuple(item["template"]), tuple(item["relation"]))
-            knowledge._fact_pattern_surfaces[key] = set(item.get("surfaces", []))
-        for item in payload.get("fact_pattern_predicates", []):
-            key = (tuple(item["template"]), tuple(item["relation"]))
-            knowledge._fact_pattern_predicates[key] = {
-                tuple(phrase) for phrase in item.get("phrases", [])
-            }
-        for item in payload.get("fact_pattern_predicate_sources", []):
-            key = (tuple(item["template"]), tuple(item["relation"]))
-            knowledge._fact_pattern_predicate_sources[key] = {
-                tuple(phrase["phrase"]): {
-                    (tuple(example["subject"]), tuple(example["object"])):
-                    set(example.get("sources", []))
-                    for example in phrase.get("examples", [])
-                }
-                for phrase in item.get("phrases", [])
-            }
-        for item in payload.get("fact_pattern_surface_sources", []):
-            key = (tuple(item["template"]), tuple(item["relation"]))
-            knowledge._fact_pattern_surface_sources[key] = {
-                surface["surface"]: {
-                    (tuple(example["subject"]), tuple(example["object"])):
-                    set(example.get("sources", []))
-                    for example in surface.get("examples", [])
-                }
-                for surface in item.get("surfaces", [])
-            }
-        for item in payload.get("fact_pattern_polarities", []):
-            if type(item.get("positive")) is not bool:
-                raise ValueError("stored fact-pattern polarity must be bool")
-            key = (tuple(item["template"]), tuple(item["relation"]))
-            knowledge._fact_pattern_polarities[key] = item["positive"]
-        # Older saved knowledge bases stored the canonical relation directly
-        # in the frame and therefore need no separate predicate slot.
-        for key, examples in knowledge._fact_pattern_examples.items():
-            knowledge._fact_pattern_polarities.setdefault(key, True)
-            if key not in knowledge._fact_pattern_predicates:
-                if "<predicate>" not in key[0]:
-                    knowledge._fact_pattern_predicates[key] = {key[1]}
-            # Migrate older stores conservatively to the available example
-            # lineage. New stores retain per-form and per-surface citations.
-            pairs = {pair: set(sources) for pair, sources in examples.items()}
-            if key not in knowledge._fact_pattern_predicate_sources:
-                knowledge._fact_pattern_predicate_sources[key] = {
-                    phrase: {pair: set(sources) for pair, sources in pairs.items()}
-                    for phrase in knowledge._fact_pattern_predicates.get(key, set())
-                }
-            if key not in knowledge._fact_pattern_surface_sources:
-                knowledge._fact_pattern_surface_sources[key] = {
-                    surface: {pair: set(sources) for pair, sources in pairs.items()}
-                    for surface in knowledge._fact_pattern_surfaces.get(key, set())
-                }
-        raw_induced_frames = payload.get("induced_question_frames", [])
-        if (not isinstance(raw_induced_frames, list)
-                or len(raw_induced_frames) > 1000):
-            raise ValueError("stored induced question frames exceed their bound")
-        for record in raw_induced_frames:
-            if (not isinstance(record, dict)
-                    or record.get("kind") not in {
-                        "analogical_question_frame",
-                        "analogical_qualified_question_frame",
-                        "active_question_role_alternation"}
-                    or not isinstance(record.get("artifact_id"), str)):
-                raise ValueError("stored induced question frame is malformed")
-            # Recreate and re-evaluate the artifact against the loaded snapshot.
-            # Removed or changed evidence makes it stale, so it is not activated.
-            try:
-                knowledge.accept_question_frame_proposal(record["artifact_id"])
-            except ValueError:
-                continue
-        raw_induced_qualified_frames = payload.get(
-            "induced_qualified_question_frames", [])
-        if (not isinstance(raw_induced_qualified_frames, list)
-                or len(raw_induced_qualified_frames) > 1000):
-            raise ValueError("stored induced qualified question frames exceed their bound")
-        for record in raw_induced_qualified_frames:
-            if (not isinstance(record, dict)
-                    or record.get("kind") != "analogical_qualified_question_frame"
-                    or not isinstance(record.get("artifact_id"), str)):
-                raise ValueError("stored induced qualified question frame is malformed")
-            try:
-                knowledge.accept_question_frame_proposal(record["artifact_id"])
-            except ValueError:
-                continue
-        raw_induced_multi_frames = payload.get(
-            "induced_multi_qualified_question_frames", [])
-        if (not isinstance(raw_induced_multi_frames, list)
-                or len(raw_induced_multi_frames) > 1000):
-            raise ValueError("stored induced multi-qualified frames exceed their bound")
-        for record in raw_induced_multi_frames:
-            if (not isinstance(record, dict)
-                    or record.get("kind")
-                        != "analogical_multi_qualified_question_frame"
-                    or not isinstance(record.get("artifact_id"), str)):
-                raise ValueError("stored induced multi-qualified frame is malformed")
-            try:
-                knowledge.accept_question_frame_proposal(record["artifact_id"])
-            except ValueError:
-                continue
-        return knowledge
