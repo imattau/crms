@@ -37,6 +37,12 @@ class SQLiteFactMap(MutableMapping):
         connection.execute(
             f"CREATE INDEX IF NOT EXISTS {table}_relation_object "
             f"ON {table}(relation_key, object_key)")
+        connection.execute(
+            f"CREATE INDEX IF NOT EXISTS {table}_subject "
+            f"ON {table}(subject_key)")
+        connection.execute(
+            f"CREATE INDEX IF NOT EXISTS {table}_object "
+            f"ON {table}(object_key)")
 
     @staticmethod
     def _encode_key(key: tuple[Any, ...]) -> str:
@@ -158,6 +164,24 @@ class SQLiteFactMap(MutableMapping):
             if not isinstance(relation, tuple):
                 raise ValueError("stored fact relation key is malformed")
             yield relation
+
+    def contains_any_phrase(self, phrases) -> bool:
+        """Check exact normalized subject/relation/object phrases by index."""
+        encoded = sorted({self._encode_key(tuple(phrase)) for phrase in phrases})
+        for offset in range(0, len(encoded), 200):
+            batch = encoded[offset:offset + 200]
+            if not batch:
+                continue
+            placeholders = ",".join("?" for _ in batch)
+            row = self.connection.execute(
+                f"SELECT 1 FROM {self.table} WHERE "
+                f"subject_key IN ({placeholders}) OR "
+                f"relation_key IN ({placeholders}) OR "
+                f"object_key IN ({placeholders}) LIMIT 1",
+                (*batch, *batch, *batch)).fetchone()
+            if row is not None:
+                return True
+        return False
 
     def select_relation_subjects(self, relation: tuple[str, ...], subjects):
         relation_json = json.dumps(tuple(relation), ensure_ascii=False,

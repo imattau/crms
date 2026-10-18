@@ -8209,6 +8209,8 @@ class CRMSKnowledgeBase:
             for members in shared_frame_signatures.values()
             for first in members for second in members if first != second
         })
+        if not candidate_pairs:
+            return {}
         fact_answers: dict[
             tuple[tuple[str, ...], str, tuple[str, ...]],
             dict[tuple[str, ...], dict[str, Any]]] = {}
@@ -8661,6 +8663,9 @@ class CRMSKnowledgeBase:
             self, words: tuple[str, ...],
             explicit: tuple[tuple[str, str], ...]
             ) -> QuestionResult | None:
+        if (not self._qualified_question_examples
+                and not self._induced_qualified_question_frames):
+            return None
         answers: dict[tuple[str, ...], str] = {}
         evidence_by_key: dict[tuple[Any, ...], FactEvidence] = {}
         templates: set[str] = set()
@@ -9452,6 +9457,13 @@ class CRMSKnowledgeBase:
             if isinstance(store, SQLiteFactMap):
                 rows = store.lookup(frame["relation"],
                                     _tokens(frame["subject"]), "subject")
+            elif store is self._facts:
+                subject_key = _tokens(frame["subject"])
+                fact_keys = self._facts_by_relation_subject.get(
+                    (frame["relation"], subject_key), ())
+                rows = (store[key] for key in fact_keys)
+            elif not store:
+                rows = ()
             else:
                 rows = (fact for fact in store.values()
                         if _tokens(fact.subject) == _tokens(frame["subject"])
@@ -10108,17 +10120,28 @@ class CRMSKnowledgeBase:
                 "unknown",
                 request="This composed question exceeds the bounded clause length.")
         question_words = _tokens(question)
-        known_phrases = {tuple(_tokens(value))
-                         for fact in self.facts() + self.negative_facts()
-                         if _tokens(fact.relation) != _tokens("has relation type")
-                         for value in (fact.subject, fact.relation, fact.object)}
-        for phrase in known_phrases:
-            if operator not in phrase or len(phrase) > len(question_words):
-                continue
-            if any(question_words[index:index + len(phrase)] == phrase
-                   for index in range(len(question_words) - len(phrase) + 1)):
-                # Do not reinterpret a known multiword entity or predicate
-                # containing the connector as a clause boundary.
+        connector_positions = [index for index, word in enumerate(question_words)
+                               if word == operator]
+        connector_phrases = {
+            question_words[start:end]
+            for connector in connector_positions
+            for start in range(connector + 1)
+            for end in range(connector + 1, len(question_words) + 1)
+        }
+        if any(isinstance(store, SQLiteFactMap)
+               and store.contains_any_phrase(connector_phrases)
+               for store in (self._facts, self._negative_facts)):
+            # Do not reinterpret a known multiword entity or predicate
+            # containing the connector as a clause boundary.
+            return None
+        if not all(isinstance(store, SQLiteFactMap)
+                   for store in (self._facts, self._negative_facts)):
+            if any(
+                    value in connector_phrases
+                    for store in (self._facts, self._negative_facts)
+                    if not isinstance(store, SQLiteFactMap)
+                    for key in store
+                    for value in key[:3]):
                 return None
         first = clauses[0].strip()
         if not first:
@@ -11011,17 +11034,28 @@ class CRMSKnowledgeBase:
                   list[dict[str, Any]]]
         ] = []
         entity_alias_records = self._entity_alias_records()
-        known_entities: dict[tuple[str, ...], str] = {}
-        for fact in self.facts() + self.negative_facts():
-            if not self._qualifiers_equal(fact.qualifiers, requested_qualifiers):
-                continue
-            if _tokens(fact.relation) == _tokens("has relation type"):
-                continue
-            known_entities[_tokens(fact.subject)] = fact.subject
-            known_entities[_tokens(fact.object)] = fact.object
+        known_entities: dict[tuple[str, ...], str] | None = None
+
+        def all_known_entities() -> dict[tuple[str, ...], str]:
+            nonlocal known_entities
+            if known_entities is None:
+                known_entities = {}
+                for fact in self.facts() + self.negative_facts():
+                    if not self._qualifiers_equal(
+                            fact.qualifiers, requested_qualifiers):
+                        continue
+                    if _tokens(fact.relation) == _tokens("has relation type"):
+                        continue
+                    known_entities[_tokens(fact.subject)] = fact.subject
+                    known_entities[_tokens(fact.object)] = fact.object
+                for alias, record in entity_alias_records.items():
+                    known_entities[alias] = record["entity"]
+            return known_entities
+
         if words[:1] == ("is",):
+            known = all_known_entities()
             polar_matches: list[tuple[str, str, str]] = []
-            for subject_key, subject_value in known_entities.items():
+            for subject_key, subject_value in known.items():
                 if words[1:1 + len(subject_key)] != subject_key:
                     continue
                 pos = 1 + len(subject_key)
@@ -11035,7 +11069,7 @@ class CRMSKnowledgeBase:
                     if (relation_tokens[-1] != "of" and end < len(words)
                             and words[end] == "of"):
                         end += 1
-                    object_value = known_entities.get(words[end:])
+                    object_value = known.get(words[end:])
                     if object_value is not None:
                         polar_matches.append((subject_value,
                                               rule.conclusion_relation,
@@ -11127,10 +11161,10 @@ class CRMSKnowledgeBase:
                                            else self._canonicalize_entity(bound))
                 # Accept a leading article as surface wording only when the
                 # exact entity is absent and the article-free form is known.
-                if (canonical_bound not in known_entities
-                        and bound_key[:1] in {("a",), ("an",), ("the",)}):
+                if bound_key[:1] in {("a",), ("an",), ("the",)}:
+                    known = all_known_entities()
                     bare_key = bound_key[1:]
-                    if bare_key in known_entities:
+                    if canonical_bound not in known and bare_key in known:
                         bound_key = bare_key
                         canonical_bound = bare_key
                 if alias_record is not None:
@@ -11210,11 +11244,11 @@ class CRMSKnowledgeBase:
                     continue
                 bound_key = _tokens(self._canonicalize_entity(
                     " ".join(bound_words)))
-                if (bound_key not in known_entities
-                        and bound_key[:1] in {("a",), ("an",), ("the",)}):
+                if (bound_key[:1] in {("a",), ("an",), ("the",)}
+                        and bound_key not in all_known_entities()):
                     bound_key = _tokens(self._canonicalize_entity(
                         " ".join(bound_words[1:])))
-                if bound_key not in known_entities:
+                if bound_key not in all_known_entities():
                     continue
                 relations_by_stem: dict[str, set[tuple[str, ...]]] = {}
                 for fact in self._facts.values():
@@ -11294,7 +11328,7 @@ class CRMSKnowledgeBase:
                     continue
                 bound = " ".join(words[end:])
                 bound_key = _tokens(self._canonicalize_entity(bound))
-                if bound_key not in known_entities:
+                if bound_key not in all_known_entities():
                     continue
                 relation = " ".join(relation_tokens)
                 template = question
@@ -11383,10 +11417,11 @@ class CRMSKnowledgeBase:
             if not self._relation_has_inference_schema(
                     " ".join(relation_key), requested_qualifiers):
                 continue
-            if len(known_entities) > 256:
+            known = all_known_entities()
+            if len(known) > 256:
                 inference_incomplete = True
                 continue
-            for possible_answer in known_entities.values():
+            for possible_answer in known.values():
                 if inference_budget < 1:
                     inference_incomplete = True
                     break

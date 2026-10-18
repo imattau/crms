@@ -205,8 +205,7 @@ def main() -> None:
             text=True, capture_output=True, check=True, timeout=20)
         if ("Ada" not in process.stdout
                 or "source:Ada:designed:Engine" not in process.stdout
-                or "design-source#" not in process.stdout
-                or "build-source#" not in process.stdout):
+                or "source:Ada:built:Compiler" not in process.stdout):
             raise SystemExit(f"terminal chat lost composed answer/provenance:\n{process.stdout}")
 
     print("compositional question logic diagnostic: PASS")

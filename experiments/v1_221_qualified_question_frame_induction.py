@@ -116,7 +116,7 @@ def main() -> None:
                 f"{process.stdout}\n{process.stderr}")
         if ("designed → built; qualifier=year" not in process.stdout
                 or "Accepted 1 source-backed question frame(s)" not in process.stdout
-                or "Answer: Jo." not in process.stdout):
+                or "Jo built Tunnel. [context: year=2008]" not in process.stdout):
             raise SystemExit(
                 f"natural-language qualified frame training failed:\n{process.stdout}")
 
