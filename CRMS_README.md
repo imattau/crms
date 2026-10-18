@@ -3938,6 +3938,14 @@ qualifier scope before joining, so sparse corpora scale with matching joins
 rather than scanning every possible fact pair. The same diagnostic checks this
 with a 36,000-fact sparse and multi-context fixture and verifies the reported
 join count without mixing conclusions across qualifier scopes.
+Rule discovery also memoizes each input fact's normalized triple and context
+scope within one search. The sparse scale diagnostic
+`experiments/v1_306_rule_discovery_scale.py` checks a labeled rule and stable
+candidate status at 10k, 50k, and 100k facts while reporting discovery time.
+On the development runtime this reduced the prior 100k sparse fixture from
+about 2.05 seconds to roughly 1.2–1.35 seconds. This measures preparation
+and sparse joins, not dense-corpus rule enumeration, which remains bounded by
+`max_expansions`.
 `/suggest-inference-rules MIN|SOURCE_PREFIX`
 excludes matching provenance sources from candidate generation and measures
 the candidates against that held-out partition. `/accept-inference-rule

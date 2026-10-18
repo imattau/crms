@@ -875,6 +875,32 @@ def discover_rule_candidates(
     positives = [dict(fact) for fact in facts]
     negatives = [dict(fact) for fact in negative_facts]
 
+    # Discovery revisits facts while building indexes, joining chains, and
+    # attaching counterexamples. Normalize each immutable input row once;
+    # tokenization otherwise dominates sparse large-store searches even when
+    # the join itself has almost no expansions.
+    fact_key_cache: dict[
+        int,
+        tuple[tuple[tuple[str, ...], ...],
+              tuple[tuple[tuple[str, ...], tuple[str, ...]], ...]],
+    ] = {}
+
+    def normalized_keys(fact: Mapping[str, Any]):
+        identity = id(fact)
+        value = fact_key_cache.get(identity)
+        if value is None:
+            value = (_triple_key(fact),
+                     _qualifier_key(fact.get("qualifiers", ())))
+            fact_key_cache[identity] = value
+        return value
+
+    def triple_key(fact: Mapping[str, Any]) -> tuple[tuple[str, ...], ...]:
+        return normalized_keys(fact)[0]
+
+    def scope_key(fact: Mapping[str, Any]
+                  ) -> tuple[tuple[tuple[str, ...], tuple[str, ...]], ...]:
+        return normalized_keys(fact)[1]
+
     positive_by_endpoint: dict[
         tuple[tuple[str, ...], tuple[str, ...],
               tuple[tuple[tuple[str, ...], tuple[str, ...]], ...]],
@@ -891,14 +917,14 @@ def discover_rule_candidates(
         list[dict[str, Any]],
     ] = {}
     for fact in positives:
-        triple = _triple_key(fact)
-        scope = _qualifier_key(fact.get("qualifiers", ()))
+        triple = triple_key(fact)
+        scope = scope_key(fact)
         positive_by_endpoint.setdefault((triple[0], triple[2], scope), []).append(fact)
         positive_outgoing.setdefault(
             (triple[0], scope), []).append(fact)
     for fact in negatives:
-        triple = _triple_key(fact)
-        scope = _qualifier_key(fact.get("qualifiers", ()))
+        triple = triple_key(fact)
+        scope = scope_key(fact)
         negative_by_endpoint.setdefault((triple[0], triple[2], scope), []).append(fact)
 
     support: dict[tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...]],
@@ -907,17 +933,17 @@ def discover_rule_candidates(
                           dict[tuple[tuple[str, ...], tuple[str, ...]], dict[str, Any]]] = {}
     displays: dict[tuple[str, ...], str] = {}
     for fact in positives + negatives:
-        triple = _triple_key(fact)
+        triple = triple_key(fact)
         displays.setdefault(triple[1], str(fact["relation"]))
 
     expansions = 0
     complete = True
     stop = False
     for first in positives:
-        first_key = _triple_key(first)
-        first_scope = _qualifier_key(first.get("qualifiers", ()))
+        first_key = triple_key(first)
+        first_scope = scope_key(first)
         for second in positive_outgoing.get((first_key[2], first_scope), ()):
-            second_key = _triple_key(second)
+            second_key = triple_key(second)
             if expansions >= max_expansions:
                 complete = False
                 stop = True
@@ -927,12 +953,12 @@ def discover_rule_candidates(
             binding = (first_key[0], first_key[2], second_key[2])
             conclusion_key = (endpoints[0], endpoints[1], first_scope)
             for conclusion in positive_by_endpoint.get(conclusion_key, []):
-                conclusion_relation = _triple_key(conclusion)[1]
+                conclusion_relation = triple_key(conclusion)[1]
                 key = (first_key[1], second_key[1], conclusion_relation)
                 support.setdefault(key, {})[(binding[0], binding[2])] = {
                     "first": first, "second": second, "conclusion": conclusion}
             for conclusion in negative_by_endpoint.get(conclusion_key, []):
-                conclusion_relation = _triple_key(conclusion)[1]
+                conclusion_relation = triple_key(conclusion)[1]
                 key = (first_key[1], second_key[1], conclusion_relation)
                 counterexamples.setdefault(key, {})[(binding[0], binding[2])] = {
                     "first": first, "second": second, "conclusion": conclusion}
@@ -956,23 +982,23 @@ def discover_rule_candidates(
         ] = {}
         kind_displays: dict[tuple[str, ...], str] = {}
         for row in positives:
-            triple = _triple_key(row)
+            triple = triple_key(row)
             if triple[1] == _key("is-a"):
                 kinds.setdefault((triple[0],
-                                  _qualifier_key(row.get("qualifiers", ()))), []).append(row)
+                                  scope_key(row)), []).append(row)
                 kind_displays.setdefault(triple[2], str(row["object"]))
                 continue
             outgoing.setdefault((triple[0],
-                                 _qualifier_key(row.get("qualifiers", ()))), []).append(row)
+                                 scope_key(row)), []).append(row)
         for rows in outgoing.values():
-            rows.sort(key=lambda row: tuple(_triple_key(row)))
+            rows.sort(key=lambda row: tuple(triple_key(row)))
         for first in positives:
-            first_key = _triple_key(first)
-            first_scope = _qualifier_key(first.get("qualifiers", ()))
+            first_key = triple_key(first)
+            first_scope = scope_key(first)
             if first_key[1] == _key("is-a"):
                 continue
             for second in outgoing.get((first_key[2], first_scope), ()):
-                second_key = _triple_key(second)
+                second_key = triple_key(second)
                 if second_key[1] == _key("is-a"):
                     continue
                 if expansions >= max_expansions:
@@ -981,7 +1007,7 @@ def discover_rule_candidates(
                     break
                 expansions += 1
                 for third in outgoing.get((second_key[2], first_scope), ()):
-                    third_key = _triple_key(third)
+                    third_key = triple_key(third)
                     if third_key[1] == _key("is-a"):
                         continue
                     if expansions >= max_expansions:
@@ -994,14 +1020,14 @@ def discover_rule_candidates(
                     if not first_kind_rows or not second_kind_rows:
                         continue
                     for first_kind_fact in first_kind_rows:
-                        first_kind_key = _triple_key(first_kind_fact)[2]
+                        first_kind_key = triple_key(first_kind_fact)[2]
                         for second_kind_fact in second_kind_rows:
                             if expansions >= max_expansions:
                                 complete = False
                                 stop = True
                                 break
                             expansions += 1
-                            second_kind_key = _triple_key(second_kind_fact)[2]
+                            second_kind_key = triple_key(second_kind_fact)[2]
                             key = (first_key[1], second_key[1], third_key[1],
                                    first_kind_key, second_kind_key)
                             example = {
@@ -1012,12 +1038,12 @@ def discover_rule_candidates(
                             endpoints = (first_key[0], third_key[2])
                             conclusion_key = (endpoints[0], endpoints[1], first_scope)
                             for conclusion in positive_by_endpoint.get(conclusion_key, ()):
-                                conclusion_relation = _triple_key(conclusion)[1]
+                                conclusion_relation = triple_key(conclusion)[1]
                                 typed_key = (*key, conclusion_relation)
                                 typed_support.setdefault(typed_key, {})[endpoints] = {
                                     **example, "conclusion": conclusion}
                             for conclusion in negative_by_endpoint.get(conclusion_key, ()):
-                                conclusion_relation = _triple_key(conclusion)[1]
+                                conclusion_relation = triple_key(conclusion)[1]
                                 typed_key = (*key, conclusion_relation)
                                 typed_counterexamples.setdefault(typed_key, {})[endpoints] = {
                                     **example, "conclusion": conclusion}
