@@ -158,9 +158,9 @@ HELP = """Commands:
                  explicitly teach a two-premise rule in ordinary language
   Teach CRMS rule "ID": if X has relation "R1" to Y, Y is of kind "K1", and Y has relation "R2" to Z, Z is of kind "K2", and Z has relation "R3" to W, then X has relation "R4" to W.
                  explicitly teach a typed three-premise rule in ordinary language
-  /teach-relation-type RELATION|transitive/symmetric/irreflexive/asymmetric/functional|SOURCE
-                 declare relation behavior or an integrity constraint
-  Teach CRMS that the relation "RELATION" is transitive/symmetric/irreflexive/asymmetric.
+  /teach-relation-type RELATION|transitive/symmetric/irreflexive/asymmetric/functional/closed-world|SOURCE
+                 declare relation behavior, a constraint, or a closed-world boundary
+  Teach CRMS that the relation "RELATION" is transitive/symmetric/irreflexive/asymmetric/functional/closed-world.
                  declare a bounded relation schema in ordinary language
   /suggest-inference-rules [MIN_SUPPORT|HOLDOUT_SOURCE_PREFIX][|arity=3]
                  discover/review rules; arity=3 enables typed three-premise search
@@ -405,7 +405,7 @@ _NATURAL_TYPED_INFERENCE_RULE_TEACH_RE = re.compile(
 _NATURAL_RELATION_TYPE_TEACH_RE = re.compile(
     r"\s*(?:please\s+)?teach\s+(?:crms\s+)?that\s+the\s+relation\s+"
     r"['\"]([^'\"\r\n]+)['\"]\s+is\s+"
-    r"(transitive|symmetric|irreflexive|asymmetric|functional)"
+    r"(transitive|symmetric|irreflexive|asymmetric|functional|closed-world)"
     r"\s*[.!?]*\s*\Z", re.IGNORECASE)
 _NATURAL_QUESTION_FRAME_REVIEW_RE = re.compile(
     r"\s*(?:please\s+)?(?:review|show|list)(?:\s+me)?\s+"
@@ -5121,7 +5121,7 @@ def main() -> int:
             fields = [value.strip() for value in
                       line[len("/teach-relation-type "):].split("|")]
             if len(fields) != 3 or not all(fields):
-                print("Use: /teach-relation-type RELATION|transitive/symmetric/irreflexive/asymmetric/functional|SOURCE")
+                print("Use: /teach-relation-type RELATION|transitive/symmetric/irreflexive/asymmetric/functional/closed-world|SOURCE")
                 continue
             try:
                 fact = knowledge.add_relation_type(*fields)

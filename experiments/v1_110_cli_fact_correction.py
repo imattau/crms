@@ -61,7 +61,7 @@ def main() -> None:
             "source:backup-country",
             "Retracted the final source support; the fact is no longer stored.",
             "Derived case [stale_or_conflicted]",
-            "No explicit rule proof supports this conclusion.",
+            "A rule applies, but no complete premise chain supports this conclusion.",
         )
         if any(text not in rendered for text in checks):
             raise SystemExit(f"fact correction workflow output was incomplete:\n{rendered}")

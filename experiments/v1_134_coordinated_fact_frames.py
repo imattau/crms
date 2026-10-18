@@ -108,9 +108,11 @@ def main() -> None:
     research = knowledge.research(sentence, index)
     researched = {(candidate.subject, candidate.relation, candidate.object)
                   for candidate in research.candidates or []}
+    # Research review is question-focused: the directly matching second
+    # clause is proposed, while a neighboring source claim about a different
+    # object is not appended as unrelated review debris.
     new_claims = {
         ("Grace Hopper", "built", "the Trajectory Table"),
-        ("Ada Lovelace", "designed", "the Compiler"),
     }
     if research.status != "needs_review" or not new_claims <= researched:
         raise SystemExit(

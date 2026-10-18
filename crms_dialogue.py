@@ -971,12 +971,12 @@ class CRMSDialogue:
             if research_index is None:
                 response, _text = self.knowledge.respond(expanded)
             else:
-                response = self.knowledge.research(
-                    expanded, research_index).response
-                query_terms = {word.casefold()
-                               for word in _WORD_RE.findall(expanded)}
-                hits = research_index.search(expanded, limit=10)
-                if any(query_terms <= set(hit.matched_terms) for hit in hits):
+                research = self.knowledge.research(expanded, research_index)
+                response = research.response
+                expanded_tokens = tuple(_WORD_RE.findall(expanded))
+                if any(tuple(_WORD_RE.findall(item.get("text", "")))
+                       == expanded_tokens
+                       for item in research.source_sentences or []):
                     fully_retrieved.append(expanded)
             if response is not None and response.status == "answered":
                 supported.append(expanded)

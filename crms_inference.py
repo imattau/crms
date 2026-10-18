@@ -267,7 +267,7 @@ def infer_relation(
         elif triple[2] == _key("symmetric"):
             symmetric_type_facts.setdefault(triple[0], []).append(fact)
         elif triple[2] in {_key("irreflexive"), _key("asymmetric"),
-                           _key("functional")}:
+                           _key("functional"), _key("closed-world")}:
             integrity_type_facts.setdefault(triple[0], {}).setdefault(
                 " ".join(triple[2]), []).append(fact)
     for triple in fact_index:
@@ -843,6 +843,14 @@ def infer_relation(
             or symmetric_type_facts.get(root_relation))
         missing = tuple(missing_premises[key]
                         for key in sorted(missing_premises)[:8])
+        if integrity_type_facts.get(root_relation, {}).get("closed world"):
+            return InferenceResult(
+                "unknown", conclusion={
+                    "subject": subject, "relation": relation, "object": obj},
+                request=("No: this relation is declared closed-world and a "
+                         "complete search found no supporting proof."),
+                expansions=expansions, reason_code="closed_world_absence",
+                failure_kind="closed_world_absence")
         failure_kind = ("missing_premise" if root_has_rule else
                         "no_applicable_rule")
         return InferenceResult("unknown", request="No explicit rule proof supports this conclusion.",

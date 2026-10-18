@@ -1245,10 +1245,11 @@ class CRMSKnowledgeBase:
         relation_type = _display(relation_type, "relation type")
         if _tokens(relation_type) not in {
                 ("transitive",), ("symmetric",),
-                ("irreflexive",), ("asymmetric",), ("functional",)}:
+                ("irreflexive",), ("asymmetric",), ("functional",),
+                ("closed", "world")}:
             raise ValueError(
                 "supported relation types are transitive, symmetric, "
-                "irreflexive, asymmetric, and functional")
+                "irreflexive, asymmetric, functional, and closed-world")
         return self.add_fact(relation, "has relation type", relation_type, source,
                              qualifiers=qualifiers)
 
@@ -8115,9 +8116,25 @@ class CRMSKnowledgeBase:
             and _tokens(fact.relation) == _tokens("has relation type")
             and _tokens(fact.object) in {
                 _tokens("transitive"), _tokens("irreflexive"),
-                _tokens("asymmetric")}
+                _tokens("asymmetric"), _tokens("closed-world")}
             and self._qualifiers_equal(fact.qualifiers, qualifiers)
             for fact in self._facts.values())
+
+    def _relation_type_fact(
+            self, relation: str, relation_type: str,
+            qualifiers: tuple[tuple[str, str], ...] = ()
+            ) -> FactEvidence | None:
+        """Return the exact-scope declaration that licenses a relation type."""
+        if isinstance(self._facts, SQLiteFactMap):
+            candidates = self._facts.lookup(
+                _tokens("has relation type"), _tokens(relation), "subject")
+        else:
+            candidates = self._facts.values()
+        return next((fact for fact in candidates
+                     if _tokens(fact.subject) == _tokens(relation)
+                     and _tokens(fact.relation) == _tokens("has relation type")
+                     and _tokens(fact.object) == _tokens(relation_type)
+                     and self._qualifiers_equal(fact.qualifiers, qualifiers)), None)
 
     def _inference_relation_names(
             self, qualifiers: tuple[tuple[str, str], ...] = ()) -> list[str]:
@@ -8128,7 +8145,7 @@ class CRMSKnowledgeBase:
             if (_tokens(fact.relation) == _tokens("has relation type")
                 and _tokens(fact.object) in {
                     _tokens("transitive"), _tokens("irreflexive"),
-                    _tokens("asymmetric")}
+                    _tokens("asymmetric"), _tokens("closed-world")}
                 and self._qualifiers_equal(fact.qualifiers, qualifiers)))
         return sorted(relations, key=_tokens)
 
@@ -9518,6 +9535,15 @@ class CRMSKnowledgeBase:
             return QuestionResult(
                 "answered", answer="No", candidates=["No"], evidence=evidence,
                 matched_templates=[template], truth=False)
+        if inferred.failure_kind == "closed_world_absence":
+            schema = self._relation_type_fact(
+                " ".join(relation), "closed-world", requested)
+            return QuestionResult(
+                "answered", answer="No", candidates=["No"],
+                evidence=[asdict(schema)] if schema is not None else evidence,
+                matched_templates=[template], truth=False,
+                language_evidence=[{"kind": "closed_world_absence",
+                                    "relation": " ".join(relation)}])
         return QuestionResult(
             "unknown", matched_templates=[template],
             request="The contextual question frame is learned, but this proposition has no explicit truth evidence.")
@@ -9956,6 +9982,11 @@ class CRMSKnowledgeBase:
                 store, "relation_keys") else
                 (key[1] for key in store))
         }
+        stored_relations.update(
+            _tokens(fact.subject) for fact in self._facts.values()
+            if (_tokens(fact.relation) == _tokens("has relation type")
+                and _tokens(fact.object) == _tokens("closed-world")
+                and self._qualifiers_equal(fact.qualifiers, qualifiers)))
         licensed_relations = {
             key[1] for key, examples in self._fact_pattern_examples.items()
             if self._fact_pattern_is_licensed(key, examples)
@@ -10099,6 +10130,16 @@ class CRMSKnowledgeBase:
                 matched_templates=[matched_template],
                 language_evidence=language_evidence,
                 request=inferred.request)
+        if inferred.failure_kind == "closed_world_absence":
+            schema = self._relation_type_fact(
+                " ".join(frame["relation"]), "closed-world", qualifiers)
+            return QuestionResult(
+                "answered", answer="No", candidates=["No"], truth=False,
+                evidence=[asdict(schema)] if schema is not None else evidence,
+                matched_templates=[matched_template],
+                language_evidence=language_evidence + [{
+                    "kind": "closed_world_absence",
+                    "relation": " ".join(frame["relation"])}])
         return QuestionResult(
             "unknown", matched_templates=[matched_template],
             language_evidence=language_evidence,
@@ -10169,6 +10210,12 @@ class CRMSKnowledgeBase:
             elif negative is not None:
                 results.append((False, asdict(negative), template_text,
                                 relation_tokens, [], False))
+            elif inferred and inferred.failure_kind == "closed_world_absence":
+                schema = self._relation_type_fact(
+                    " ".join(relation_tokens), "closed-world",
+                    requested_qualifiers)
+                results.append((False, asdict(schema) if schema else None,
+                                template_text, relation_tokens, [], False))
             else:
                 results.append((None, None, template_text, relation_tokens, [], False))
         if not results:

@@ -28,7 +28,7 @@ from crms_text import word_matches
 # Function words contribute little to document selection and can make a query
 # such as "what is the capital of France" match almost the whole corpus.
 _RESEARCH_STOPWORDS = frozenset({
-    "a", "an", "and", "are", "as", "at", "be", "by", "did", "do",
+    "a", "an", "and", "am", "are", "as", "at", "be", "by", "did", "do",
     "can", "could", "does", "for", "from", "had", "has", "have",
     "how", "i", "in", "is", "it", "may", "might", "must", "of",
     "on", "or", "should", "that", "the", "this", "to", "was", "were",

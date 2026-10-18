@@ -113,6 +113,30 @@ def main() -> None:
             (zero_missing.request or "")):
         raise SystemExit(
             f"source-licensed do-support treated absence as false: {zero_missing}")
+    zero_kb.add_relation_type("create", "closed-world", "teacher:closed-world")
+    closed_world_no = zero_kb.ask("Did Ada Lovelace create Linux?")
+    if (closed_world_no.status != "answered" or closed_world_no.truth is not False
+            or closed_world_no.answer != "No"
+            or not any(item.get("object") == "closed-world"
+                       for item in closed_world_no.evidence or [])):
+        raise SystemExit(
+            f"explicit closed-world declaration did not ground a negative answer: "
+            f"{closed_world_no}")
+    still_yes = zero_kb.ask("Did Ada Lovelace create the Engine?")
+    if still_yes.status != "answered" or still_yes.truth is not True:
+        raise SystemExit("closed-world absence changed a directly supported positive")
+    zero_kb.add_inference_rule(
+        "parent-recursion", "parent", "ancestor", "ancestor")
+    zero_kb.add_inference_rule(
+        "parent-base", "parent", "parent", "ancestor")
+    zero_kb.add_fact("Ada Lovelace", "parent", "Bea", "family:one")
+    zero_kb.add_fact("Bea", "parent", "Cara", "family:two")
+    bounded_no = zero_kb.infer_relation(
+        "Ada Lovelace", "ancestor", "Missing", max_expansions=1)
+    if (bounded_no.complete or bounded_no.failure_kind != "search_limit"
+            or bounded_no.reason_code == "closed_world_absence"):
+        raise SystemExit(
+            f"incomplete inference was incorrectly turned into closed-world no: {bounded_no}")
     zero_kb.add_negative_fact(
         "Ada Lovelace", "create", "Linux", "explicit-negative")
     zero_negative = zero_kb.ask("Did Ada Lovelace create Linux?")
@@ -127,12 +151,16 @@ def main() -> None:
         disk_kb = CRMSKnowledgeBase.load(memory_path, fact_db=fact_db_path)
         disk_result = disk_kb.ask("Did Grace Hopper create the Compiler?")
         disk_unknown = disk_kb.ask("Did Grace Hopper create Linux?")
+        disk_closed_no = disk_kb.ask("Did Ada Lovelace create Linux?")
         if disk_result.status != "answered" or disk_result.answer != "Yes":
             raise SystemExit(
                 f"SQLite fact lookup failed source-licensed do-support: {disk_result}")
-        if disk_unknown.status != "unknown":
+        if disk_unknown.status != "answered" or disk_unknown.truth is not False:
             raise SystemExit(
-                f"SQLite do-support treated missing evidence as false: {disk_unknown}")
+                f"SQLite closed-world schema did not answer missing proposition: {disk_unknown}")
+        if disk_closed_no.status != "answered" or disk_closed_no.truth is not False:
+            raise SystemExit(
+                "SQLite relation schema did not preserve closed-world no semantics")
 
     copular_index = CRMSResearchIndex()
     copular_kb = CRMSKnowledgeBase()

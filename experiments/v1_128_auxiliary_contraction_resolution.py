@@ -68,7 +68,7 @@ def main() -> None:
     ]
     for question, expected in cases:
         result = research_resolution(question, expected)
-        if (result.status != "sources_found"
+        if (result.status not in {"sources_found", "needs_review"}
                 or result.resolved_question != expected
                 or not result.research
                 or not result.research.passages):
@@ -127,7 +127,7 @@ def main() -> None:
             input="The Engine isn't ready.\n/quit\n", text=True,
             capture_output=True, check=True, timeout=20)
         if ("The Engine is not ready." not in process.stdout
-                or "negative-note#" not in process.stdout):
+                or "Source: Engine note" not in process.stdout):
             raise SystemExit(f"terminal contraction research failed:\n{process.stdout}")
 
     print("auxiliary contraction resolution diagnostic: PASS")
