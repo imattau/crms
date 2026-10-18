@@ -98,7 +98,11 @@ def verify_inference_proof(
                             "status": "validated",
                             "validator": "builtin-schema-check-v1"}):
                     raise ValueError("schema declaration is unknown or not validated")
-                if len(premises) != schema_spec[1]:
+                flat_transitivity = (
+                    schema_id == "transitivity-v1"
+                    and node.get("proof_form") == "flat-chain-v1")
+                if (len(premises) < 2 if flat_transitivity else
+                        len(premises) != schema_spec[1]):
                     raise ValueError("schema proof has the wrong number of premises")
                 relation = schema.get("relation")
                 if not isinstance(relation, str) or not relation.strip() or not _key(relation):
@@ -111,6 +115,24 @@ def verify_inference_proof(
                     raise ValueError("relation-type assertion does not license this schema")
                 cs, cr, co = conclusion_key
                 if schema_id == "transitivity-v1":
+                    if node.get("proof_form") == "flat-chain-v1":
+                        if len(premises) < 2 or cr != _key(relation):
+                            raise ValueError("flat transitivity proof needs at least two matching edges")
+                        visited = [visit(item, depth + 1) for item in premises]
+                        triples = [item[0] for item in visited]
+                        scopes = [item[1] for item in visited]
+                        if any(triple[1] != _key(relation) for triple in triples):
+                            raise ValueError("flat transitivity edge has a different relation")
+                        if triples[0][0] != cs or triples[-1][2] != co:
+                            raise ValueError("flat transitivity chain has the wrong endpoints")
+                        if any(left[2] != right[0]
+                               for left, right in zip(triples, triples[1:])):
+                            raise ValueError("flat transitivity edges do not form a continuous chain")
+                        if any(scope != expected_scope for scope in scopes):
+                            raise ValueError("schema premises use a different qualifier scope")
+                        return conclusion_key, expected_scope
+                    if node.get("proof_form") is not None:
+                        raise ValueError("transitivity proof form is unknown")
                     left, left_scope = visit(premises[0], depth + 1)
                     right, right_scope = visit(premises[1], depth + 1)
                     s1, r1, o1 = left

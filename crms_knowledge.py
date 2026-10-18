@@ -2129,6 +2129,8 @@ class CRMSKnowledgeBase:
             assert result.conclusion is not None
             text = ("Derived: {subject} — {relation} → {object}.".format(
                 **result.conclusion))
+            if result.request:
+                text += "\n" + result.request
 
         for item in result.language_evidence:
             if item.get("kind") == "entity_alias":
@@ -11292,6 +11294,7 @@ class CRMSKnowledgeBase:
                         "answered", answer="Yes", candidates=["Yes"],
                         inference_proofs=list(inferred.proofs), truth=True,
                         matched_templates=[question],
+                        request=inferred.request,
                         complete=inferred.complete,
                         expansions=inferred.expansions)
                 if inferred.status == "ambiguous":
@@ -12217,6 +12220,8 @@ class CRMSKnowledgeBase:
         if result.matched_templates:
             text += "\nMatched question frame: " + "; ".join(
                 result.matched_templates) + "."
+        if result.status == "answered" and result.complete is False and result.request:
+            text += "\n" + result.request
 
         for item in result.language_evidence or []:
             if item.get("kind") == "entity_alias":

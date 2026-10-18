@@ -283,13 +283,14 @@ def infer_relation(
             relation_displays.setdefault(_key(rule.third_relation), rule.third_relation)
         relation_displays.setdefault(_key(rule.conclusion_relation),
                                      rule.conclusion_relation)
-    for rows in rules_by_conclusion.values():
-        rows.sort(key=lambda rule: rule.rule_id)
-
     def relation_is_derivable(relation_key: tuple[str, ...]) -> bool:
         return bool(rules_by_conclusion.get(relation_key)
                     or transitive_type_facts.get(relation_key)
                     or symmetric_type_facts.get(relation_key))
+
+    derivable_relations = (set(rules_by_conclusion)
+                           | set(transitive_type_facts)
+                           | set(symmetric_type_facts))
 
     def display_atom(atom: tuple[tuple[str, ...], ...]) -> dict[str, str]:
         return {
@@ -376,16 +377,10 @@ def infer_relation(
     def prove_transitive(atom: tuple[tuple[str, ...], ...],
                          relation_type_fact: Mapping[str, Any],
                          depth: int, active: frozenset) -> list[dict[str, Any]]:
-        """Join proved same-relation edges and emit nested schema proofs."""
+        """Join same-relation edges and emit a flat, independently checked proof."""
         result: list[dict[str, Any]] = []
         relation_key = atom[1]
         outgoing = transitive_edge_index.get(relation_key, {})
-        nonlocal_exhausted = [False]
-        max_schema_steps = max_depth - depth
-        if max_schema_steps < 1:
-            if outgoing.get(atom[0]):
-                nonlocal_exhausted[0] = True
-            return result
 
         derived_edge_cache: dict[
             tuple[tuple[str, ...], tuple[str, ...]],
@@ -459,8 +454,9 @@ def infer_relation(
                             for proof in derived_edge_cache[edge])
             return rows
 
-        def walk(current: tuple[str, ...], current_proof: dict[str, Any] | None,
-                 schema_steps: int, visited: frozenset[tuple[str, ...]]) -> None:
+        def walk(current: tuple[str, ...],
+                 edge_proofs: list[dict[str, Any]],
+                 visited: frozenset[tuple[str, ...]]) -> None:
             for next_entity, edge_proof in edges_from(current, visited):
                 if exhausted:
                     return
@@ -468,10 +464,9 @@ def infer_relation(
                     continue
                 if not spend():
                     return
-                next_proof = edge_proof
-                next_steps = schema_steps
-                if current_proof is not None:
-                    next_proof = {
+                next_edges = [*edge_proofs, edge_proof]
+                if next_entity == atom[2] and len(next_edges) >= 2:
+                    result.append({
                         "kind": "schema",
                         "schema": {
                             "schema_id": "transitivity-v1",
@@ -483,29 +478,15 @@ def infer_relation(
                                 "validator": "builtin-schema-check-v1",
                             },
                         },
+                        "proof_form": "flat-chain-v1",
                         "relation_type_fact": relation_type_fact,
                         "conclusion": display_atom((atom[0], relation_key, next_entity)),
-                        "premises": [current_proof, edge_proof],
-                    }
-                    next_steps += 1
-                    if depth + proof_height(next_proof) > max_depth:
-                        nonlocal_exhausted[0] = True
-                        return
-                if next_entity == atom[2] and next_steps:
-                    result.append(next_proof)
+                        "premises": next_edges,
+                    })
                     continue
-                if next_steps >= max_schema_steps:
-                    if any(candidate not in visited | {next_entity}
-                           for candidate, _ in outgoing.get(next_entity, ())):
-                        nonlocal_exhausted[0] = True
-                    continue
-                walk(next_entity, next_proof, next_steps,
-                     visited | {next_entity})
+                walk(next_entity, next_edges, visited | {next_entity})
 
-        walk(atom[0], None, 0, frozenset({atom[0]}))
-        if nonlocal_exhausted[0]:
-            nonlocal exhausted
-            exhausted = True
+        walk(atom[0], [], frozenset({atom[0]}))
         return result
 
     def prove_symmetric(atom: tuple[tuple[str, ...], ...],
@@ -572,6 +553,14 @@ def infer_relation(
         new_active = active | {atom}
         applications: list[tuple[InferenceRule, Mapping[str, Any] | None]] = [
             (rule, None) for rule in rules_by_conclusion.get(atom[1], [])]
+        # Explore grounded base rules before recursive alternatives. An
+        # unproductive recursive branch must not exhaust the shared bound
+        # before a shorter proof is assembled.
+        applications.sort(key=lambda item: (
+            sum(_key(relation) in derivable_relations for relation in (
+                item[0].first_relation, item[0].second_relation,
+                *((item[0].third_relation,) if item[0].third_relation else ()))),
+            item[0].rule_id))
         applications.extend((InferenceRule(
             "transitivity-v1", " ".join(relation_key), " ".join(relation_key),
             " ".join(relation_key)), type_fact)
@@ -655,7 +644,7 @@ def infer_relation(
                     premise_proofs = []
                     for premise_index, premise_goal in enumerate(goals, start=1):
                         premise_proofs.append(prove(premise_goal, new_active, depth + 1))
-                        if exhausted:
+                        if exhausted and not premise_proofs[-1]:
                             return proofs
                         if not premise_proofs[-1]:
                             note_missing_premise(atom, premise_goal,
@@ -734,7 +723,7 @@ def infer_relation(
                     premise_proofs = []
                     for premise_index, premise_goal in enumerate(goals, start=1):
                         premise_proofs.append(prove(premise_goal, new_active, depth + 1))
-                        if exhausted:
+                        if exhausted and not premise_proofs[-1]:
                             return proofs
                         if not premise_proofs[-1]:
                             note_missing_premise(atom, premise_goal,
@@ -762,7 +751,7 @@ def infer_relation(
         return proofs
 
     found = prove(goal, frozenset(), 0)
-    if exhausted:
+    if exhausted and not found:
         return InferenceResult(
             "unknown", request="Inference search reached its depth or expansion limit; no conclusion was drawn.",
             expansions=expansions, complete=False, reason_code="search_limit",
@@ -784,6 +773,13 @@ def infer_relation(
 
     integrity_conflicts: list[tuple[str, dict[str, Any]]] = []
     relation_constraints = integrity_type_facts.get(goal[1], {})
+    if exhausted and ("asymmetric" in relation_constraints
+                      or "functional" in relation_constraints):
+        return InferenceResult(
+            "unknown", request=("A proof was found, but the search limit prevented "
+                                "checking the declared relation integrity constraint."),
+            expansions=expansions, complete=False, reason_code="search_limit",
+            failure_kind="search_limit")
     if goal[0] == goal[2]:
         for constraint in ("irreflexive", "asymmetric"):
             declarations = relation_constraints.get(constraint, [])
@@ -847,8 +843,14 @@ def infer_relation(
             source_count=support[2], source_documents=support[3],
             reason_code="contradiction", failure_kind="contradiction")
     return InferenceResult(
-        "answered", conclusion, tuple(found), expansions=expansions,
-        support_class=support[0], lineage_count=support[1],
+        "answered", conclusion, tuple(found),
+        request=("A verified proof was found, but the search limit prevented "
+                 "enumerating all supporting proofs." if exhausted else None),
+        expansions=expansions, complete=not exhausted,
+        reason_code="search_limit" if exhausted else None,
+        failure_kind="search_limit" if exhausted else None,
+        support_class=("partial" if exhausted else support[0]),
+        lineage_count=support[1],
         source_count=support[2], source_documents=support[3])
 
 

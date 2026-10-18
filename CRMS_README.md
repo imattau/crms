@@ -3564,12 +3564,15 @@ contract is specified and measured.
 
 `python3 experiments/v1_186_symbolic_support_classes.py` exposes a non-
 probabilistic support summary on rule-inference results: `unique`, `redundant`,
-`contested`, or `none`, plus the number of structurally distinct proof trees
-and the number and identifiers of distinct source documents at their fact
-leaves. “Lineage” is a distinct proof tree, not a statistical-independence
-claim. Contradiction takes precedence as `contested`; incomplete searches still
-return `unknown` with no support class. The same summary is computed when a
-verified practiced derivation is reused from the derived-case cache.
+`contested`, `partial`, or `none`, plus the number of structurally distinct
+proof trees found and the number and identifiers of distinct source documents
+at their fact leaves. “Lineage” is a distinct proof tree, not a
+statistical-independence claim. Contradiction takes precedence as `contested`.
+`partial` means a verified positive proof was found but bounded search stopped
+before enumerating all support; it is not eligible for persistent practice.
+An incomplete search with no proof still returns `unknown` with no support
+class. The same summary is computed when a verified practiced derivation is
+reused from the derived-case cache.
 
 `python3 experiments/v1_187_middle_kind_index.py` checks typed middle-entity
 pruning for explicit two-premise rules. A rule may name a `middle_kind`; only
@@ -3830,7 +3833,14 @@ items record which bounded extensions have landed and their current limits:
    provenance, explicit licensing, limits, and contradiction. Candidate
    targets from nonrecursive rule premises use scoped edge indexes; recursively
    derivable premises remain subject to entity enumeration and the same
-   inference bounds. No other relation schemas are implemented.
+   inference bounds. A transitive chain is represented as one flat schema node,
+   so chain length consumes the expansion budget rather than the rule-nesting
+   depth limit. When bounded enumeration reaches a limit after finding a
+   verified proof, the concrete conclusion is returned as answered with
+   `complete=false` and `support_class=partial`; such results cannot enter
+   derived practice memory. `v1_309_long_transitivity_proofs.py` checks
+   independently verified chains through 30 edges and this partial-proof
+   contract. No other relation schemas are implemented.
 7. **Completed: try a bounded fact-store counterfactual.** For a query whose answer has a
    proof, `counterfactual_path_between` now excludes one cited fact proposition
    in a temporary view and reruns the same bounded query. It distinguishes
