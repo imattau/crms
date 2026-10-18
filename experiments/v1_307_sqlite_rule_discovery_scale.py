@@ -84,7 +84,7 @@ def check_pruned_parity() -> None:
 
 def main() -> None:
     check_pruned_parity()
-    print("SQLite facts | expansions | median discovery time (3 runs)")
+    print("SQLite facts | expansions | in-memory ms | SQLite ms (median of 3)")
     for background in (20_000, 100_000):
         memory = seeded(background)
         expected = signature(memory)
@@ -98,6 +98,12 @@ def main() -> None:
                 != ("parent", "parent", "ancestor", "uncontradicted", 2,
                     ("labeled:0", "labeled:1"))):
             raise SystemExit(f"unexpected in-memory discovery result: {expected}")
+        memory_durations = []
+        for _ in range(3):
+            started = time.perf_counter()
+            if signature(memory) != expected:
+                raise SystemExit("in-memory discovery changed across repeated runs")
+            memory_durations.append(time.perf_counter() - started)
         with tempfile.TemporaryDirectory(prefix="crms-sql-rule-discovery-") as folder:
             path = Path(folder) / "knowledge.sqlite"
             memory.save(path)
@@ -110,9 +116,10 @@ def main() -> None:
                 if observed != expected:
                     raise SystemExit(
                         f"SQLite discovery diverged from memory: {observed}")
-            milliseconds = statistics.median(durations) * 1000
+            memory_ms = statistics.median(memory_durations) * 1000
+            sqlite_ms = statistics.median(durations) * 1000
             print(f"{background + 6:>12,} | {expected[1]:>10,} | "
-                  f"{milliseconds:>10.2f} ms", flush=True)
+                  f"{memory_ms:>12.2f} | {sqlite_ms:>9.2f}", flush=True)
             sqlite_kb.close()
 
 
