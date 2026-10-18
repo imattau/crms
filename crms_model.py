@@ -1900,11 +1900,14 @@ def _semantic_key_uncached(procedure: Iterable[Step]) -> tuple:
     # retain its procedure syntax except for exact pointwise/reordering laws:
     # absolute value is idempotent and commutes with structure-only operators
     # and parity filters, all of which preserve the selected values' mapping.
+    # ``keep_every_kth_position`` has the same value-independent selection
+    # property, so it commutes with the pointwise absolute-value map as well.
     if any(step.operation == 'absolute_values' for step in raw_steps):
         absolute_commuting = {
             'reverse', 'rotate_left_k', 'duplicate_each', 'repeat_each_k',
             'keep_even_positions', 'keep_odd_positions', 'keep_evens',
-            'keep_odds', 'keep_multiples_k', 'first', 'last',
+            'keep_every_kth_position', 'keep_odds', 'keep_multiples_k',
+            'first', 'last',
             'drop_first', 'drop_last',
         }
         normalized = list(raw_steps)

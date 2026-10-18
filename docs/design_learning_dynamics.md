@@ -250,12 +250,17 @@ holdout lists. The one-off cost was about 20 seconds.
   warning in the report if any group fails holdout.
 - Deterministic output for fixed seeds.
 
-The checked-in implementation is `crms_equivalence_dream.py`. Its default run evaluated 5,184
-two-step programs over 4,801 probes (2,801 exhaustive short lists plus 2,000 seeded random
+The checked-in implementation is `crms_equivalence_dream.py`. Its initial default run evaluated
+5,184 two-step programs over 4,801 probes (2,801 exhaustive short lists plus 2,000 seeded random
 lists), produced 2,969 probe behavior classes, and reported 81 conjecture groups with zero
-holdout disagreements on 3,000 independent lists. The weak-probe regression in
+holdout disagreements on 3,000 independent lists. One group exposed the exact law that
+`absolute_values` commutes with `keep_every_kth_position`: the former maps each value
+independently, while the latter selects positions without inspecting values. The law is now
+canonicalized in `_semantic_key`; after that proof-backed normalization, the same default run
+reports 77 conjecture groups and zero holdout disagreements. The weak-probe regression in
 `experiments/v1_297_equivalence_dream_diagnostic.py` rejects false merges and checks the warning
-and deterministic-output paths. These remain finite-test conjectures, not proofs.
+and deterministic-output paths. Remaining report groups are still finite-test conjectures, not
+proofs.
 
 ## 4. Belief-revision experiments (tests only, no new mechanism)
 
