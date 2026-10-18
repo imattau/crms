@@ -83,7 +83,7 @@ def main() -> None:
         readback = root / "readback"
         install_model_database(output_model, readback)
         require(CRMSKnowledgeBase.load(
-                    readback / "knowledge.json").ask("What is the repack probe?").answer
+                    readback / "knowledge.sqlite").ask("What is the repack probe?").answer
                 == "widget",
                 "repacked fact memory did not retain the new reviewed fact")
         math_result = CRMSMath.load(readback / "math.json").ask(

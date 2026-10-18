@@ -1,27 +1,27 @@
 # CRMS knowledge and rule storage: SQLite design
 
-**Status:** staged implementation. Learned transformation-rule memory supports normalized SQLite storage, and portable model v2 embeds and installs that rule schema. Fact-sidecar replacement is transactional. The knowledge graph and portable compatibility payloads still need migration to a single canonical row store.
+**Status:** staged implementation. Facts, inference rules, and derived cases now have a canonical SQLite knowledge-memory path; portable model v3 embeds and installs normalized knowledge and rule tables. Variable-shaped language frames and compatibility payloads still use JSON records during transition.
 
 ## Recommendation
 
-Move learned knowledge and rules toward a versioned SQLite memory database, but do it in stages. SQLite should become the authoritative writable store for learned state; JSON should remain a supported import/export interchange format during migration. Do not treat the current `facts.sqlite` sidecar as the finished design: it is an indexed projection rebuilt from JSON, not the source of truth.
+Move learned knowledge and rules toward a versioned SQLite memory database, but do it in stages. SQLite should become the authoritative writable store for learned state; JSON should remain a supported import/export interchange format during migration. The optional `facts.sqlite` sidecar for JSON knowledge remains an indexed projection; `.sqlite` knowledge memories and portable model v3 now provide canonical SQL storage.
 
 For a distributable model, embed the memory tables and searchable source documents in the existing portable SQLite model file. At runtime, either update that model database transactionally or make a writable copy first when the model is installed read-only/shared. This preserves the current single-file distribution goal and avoids a mandatory external knowledge file. Keep original documents out of the package; retain extracted text, source identifiers, and citations as the current packaging design does.
 
 ## Current state observed
 
-- `CRMSKnowledgeBase.save/load` serializes facts, negative facts, rules, derivations, aliases, question frames, extraction patterns, and their support/provenance into `knowledge.json`.
-- `SQLiteFactMap` gives positive and negative facts indexes at runtime, but `CRMSKnowledgeBase.load(..., fact_db=...)` clears and repopulates those tables from JSON. Saving still writes facts back to JSON. Thus the SQLite fact sidecar is a cache/index, not canonical memory.
+- `CRMSKnowledgeBase.save/load` retains JSON import/export and also accepts `.sqlite`, `.sqlite3`, and `.db` paths. SQL memory stores positive/negative facts in indexed tables, inference rules and derived cases in separate tables, and variable-shaped learned language frames as versioned payload records. Facts can be updated directly in the SQLite-backed runtime map.
+- `SQLiteFactMap` gives positive and negative facts indexes at runtime. With `fact_db=...`, it clears and repopulates those tables from JSON and remains a cache/index. With a `.sqlite` knowledge path, the fact tables are canonical and new facts are persisted directly.
 - `CRMSModel.save/load` persists rule examples, procedures, accepted primitive artifacts, no-fit cases, and search settings as one JSON document. The current checked-in `crms_rules.json` is only 781 bytes, and the packaged rule memories are about 454 bytes; the case for migration is future scale and coherent durability, not current file size.
 - `CRMSModel.save/load` also accepts `.sqlite`, `.sqlite3`, and `.db` paths. That backend stores settings, each rule example, each accepted procedure, and auxiliary artifacts in separate versioned tables. Chat can use it with `--rules rules.sqlite`; the portable-model exporter accepts it.
-- Portable model v2 stores rule settings, examples, procedures, and artifacts in normalized tables and verifies that they reconstruct the compatibility payload. Installation materializes `rules.sqlite`, which the chat uses directly. The v1 reader remains supported.
-- The v2 `learned_memories` rule JSON is still retained as a compatibility/checksum payload; the normalized SQL tables currently duplicate it. Knowledge/math/translation remain JSON payloads, and source documents remain separate rows. Removing the duplicate rule payload and making all memory rows canonical are future migration steps.
-- Existing memory sidecars contain separately persisted knowledge/rule/math/translation JSON plus a `facts.sqlite` projection and a research SQLite index. Runtime edits are tracked and re-packaged from those memory files.
+- Portable model v3 stores knowledge facts, inference rules, derived cases, and rule settings/examples/procedures/artifacts in normalized tables, then checks those tables against compatibility payloads. Installation materializes `knowledge.sqlite` and `rules.sqlite`, which chat uses directly. Readers for v1 and v2 remain supported.
+- The v3 `learned_memories` knowledge/rule JSON remains a compatibility payload and is checked against normalized rows. Less-structured acquired language frames, math, and translation memories are still JSON payloads; source documents remain separate rows. Removing duplicate payloads and normalizing all learned memories are future steps.
+- Older model sidecars contain JSON knowledge/rule/math/translation memories plus a `facts.sqlite` projection. V3 sidecars use `knowledge.sqlite` and `rules.sqlite`; runtime edits are tracked and re-packaged from those memories.
 - Rebuilding the fact projection now starts a transaction before clearing old rows and commits only after the entire knowledge payload validates. Failed loads preserve the prior database snapshot.
 
 ## Target data model
 
-Use one `crms_memory.sqlite` schema (or the same tables inside the portable model DB), with explicit ownership, versioning, and migration metadata:
+Use one `crms_memory.sqlite` schema (or the same tables inside the portable model DB), with explicit ownership, versioning, and migration metadata. The fact, inference-rule, derived-case, and transformation-rule learner tables are implemented in standalone memory files and portable model v3:
 
 | Area | Initial table design | Why |
 |---|---|---|
@@ -57,7 +57,7 @@ Capture representative knowledge/rule JSON fixtures and hashes, including aliase
 
 Implement a versioned SQLite memory store and a one-way importer from existing JSON. Import into a temporary DB inside one transaction; validate row counts, canonical fact keys, evidence/lineage, rule configuration, and required schema; run SQLite integrity and foreign-key checks; only then atomically publish it. Keep JSON export and verify export → import → export semantic equality (not byte equality where ordering/format differs). A failed import leaves the input and destination untouched.
 
-The transformation-rule substore is implemented: it has separate rows for examples and accepted procedures, preserves JSON import/export, is readable by chat through `--rules`, and is retained as SQL tables in portable v2 packages. The fact and language-memory importer still needs to move from cache/rebuild to authoritative persistence.
+The transformation-rule substore and fact graph are implemented: they persist separate rows, preserve JSON import/export, are readable by chat through `--rules` and `--knowledge`, and are retained as SQL tables in portable v3 packages. Variable-shaped language-frame records remain payloads rather than fully relational tables.
 
 ### Phase 2 — Backend compatibility interfaces
 
@@ -67,9 +67,9 @@ Route fact and rule operations through narrow repository interfaces while retain
 
 Switch new installations to SQLite. Existing JSON-only users are migrated on startup only after a backup and successful validation; avoid silently deleting or overwriting JSON. Chat changes should commit mutations immediately or at explicit command boundaries rather than relying on a large end-of-session full-file save. Continue JSON import/export for portability and diagnostics.
 
-### Phase 4 — Portable model packaging (rule memory implemented; other memories pending)
+### Phase 4 — Portable model packaging (knowledge and rule tables implemented; other memories pending)
 
-`crms_package.py` writes normalized rule rows into v2 and installs those rows as `rules.sqlite`. Inspection checks they reconstruct the compatibility payload. The package still duplicates rule JSON and has not normalized knowledge, math, or translation memories. Keep the v1 JSON-payload reader and test older model fixtures when extending the schema.
+`crms_package.py` writes normalized fact, rule, and derivation rows into v3, installs knowledge and rules as SQLite sidecars, and checks they reconstruct compatibility payloads. The package still duplicates knowledge/rule JSON and has not normalized language-frame payloads, math, or translation memories. Keep v1/v2 readers and test older model fixtures when extending the schema.
 
 ## Validation criteria
 

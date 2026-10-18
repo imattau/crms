@@ -39,6 +39,190 @@ _MAX_COORDINATED_WRITING_CLAIMS = 8
 _KNOWLEDGE_JSON_CHUNK = 64 * 1024
 _FACT_DB_APPLICATION_ID = int.from_bytes(b"CRMF", "big")
 _FACT_DB_VERSION = 1
+_KNOWLEDGE_DB_APPLICATION_ID = int.from_bytes(b"CRMK", "big")
+_KNOWLEDGE_DB_VERSION = 1
+_KNOWLEDGE_DB_TABLES = {
+    "knowledge_metadata", "knowledge_payload", "inference_rules",
+    "derived_cases", "positive_facts", "negative_facts",
+}
+
+
+def _write_knowledge_database(path: Path, payload: dict[str, Any],
+                              facts: Mapping[tuple[Any, ...], FactEvidence],
+                              negative_facts: Mapping[tuple[Any, ...], FactEvidence],
+                              *, existing_connection: sqlite3.Connection | None = None
+                              ) -> sqlite3.Connection | None:
+    """Persist canonical knowledge state as indexed, provenance-bearing rows."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    connection = existing_connection or sqlite3.connect(
+        path, isolation_level=None)
+    owns_connection = existing_connection is None
+    try:
+        tables = {row[0] for row in connection.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' "
+            "AND name NOT LIKE 'sqlite_%'")}
+        if tables and (tables != _KNOWLEDGE_DB_TABLES
+                       or connection.execute("PRAGMA application_id").fetchone()[0]
+                       != _KNOWLEDGE_DB_APPLICATION_ID
+                       or connection.execute("PRAGMA user_version").fetchone()[0]
+                       != _KNOWLEDGE_DB_VERSION):
+            raise ValueError("existing SQLite file is not a CRMS knowledge database")
+        connection.execute("PRAGMA journal_mode=DELETE")
+        connection.execute("PRAGMA synchronous=FULL")
+        connection.execute("CREATE TABLE IF NOT EXISTS knowledge_metadata ("
+                           "key TEXT PRIMARY KEY,value TEXT NOT NULL) WITHOUT ROWID")
+        connection.execute("CREATE TABLE IF NOT EXISTS knowledge_payload ("
+                           "section TEXT PRIMARY KEY,payload_json TEXT NOT NULL) "
+                           "WITHOUT ROWID")
+        connection.execute("CREATE TABLE IF NOT EXISTS inference_rules ("
+                           "rule_key TEXT PRIMARY KEY,payload_json TEXT NOT NULL) "
+                           "WITHOUT ROWID")
+        connection.execute("CREATE TABLE IF NOT EXISTS derived_cases ("
+                           "case_key TEXT PRIMARY KEY,subject_key TEXT NOT NULL,"
+                           "relation_key TEXT NOT NULL,object_key TEXT NOT NULL,"
+                           "payload_json TEXT NOT NULL) WITHOUT ROWID")
+        connection.execute("CREATE INDEX IF NOT EXISTS derived_cases_conclusion "
+                           "ON derived_cases(relation_key,subject_key,object_key)")
+        target_facts = SQLiteFactMap(connection, "positive_facts")
+        target_negative = SQLiteFactMap(connection, "negative_facts")
+        connection.execute(f"PRAGMA application_id={_KNOWLEDGE_DB_APPLICATION_ID}")
+        connection.execute(f"PRAGMA user_version={_KNOWLEDGE_DB_VERSION}")
+        connection.execute("BEGIN IMMEDIATE")
+        connection.execute("DELETE FROM knowledge_metadata")
+        connection.execute("DELETE FROM knowledge_payload")
+        connection.execute("DELETE FROM inference_rules")
+        connection.execute("DELETE FROM derived_cases")
+        # SQLiteFactMap wrappers are newly constructed above. Detect the same
+        # database by connection identity before replacing fact rows.
+        same_fact_store = (existing_connection is not None
+                           and isinstance(facts, SQLiteFactMap)
+                           and facts.connection is connection)
+        if not same_fact_store:
+            target_facts.clear()
+            target_negative.clear()
+            for store, destination in ((facts, target_facts),
+                                       (negative_facts, target_negative)):
+                for key, fact in store.items():
+                    destination[key] = fact
+        connection.executemany("INSERT INTO knowledge_metadata VALUES (?,?)", [
+            ("format", "crms-knowledge-database"),
+            ("version", str(_KNOWLEDGE_DB_VERSION)),
+        ])
+        relational_sections = {"inference_rules", "derived_cases"}
+        connection.executemany(
+            "INSERT INTO knowledge_payload VALUES (?,?)",
+            ((name, json.dumps(value, ensure_ascii=False, separators=(",", ":")))
+             for name, value in payload.items() if name not in relational_sections))
+        connection.executemany(
+            "INSERT INTO inference_rules VALUES (?,?)",
+            ((json.dumps(_tokens(item["rule_id"]), ensure_ascii=False,
+                         separators=(",", ":")),
+              json.dumps(item, ensure_ascii=False, separators=(",", ":")))
+             for item in payload.get("inference_rules", [])))
+        connection.executemany(
+            "INSERT INTO derived_cases VALUES (?,?,?,?,?)",
+            ((json.dumps(CRMSKnowledgeBase._fact_key(
+                    item["conclusion"]["subject"],
+                    item["conclusion"]["relation"],
+                    item["conclusion"]["object"],
+                    CRMSKnowledgeBase._normalize_qualifiers(
+                        dict(item.get("qualifiers", [])))),
+                    ensure_ascii=False, separators=(",", ":")),
+              json.dumps(_tokens(item["conclusion"]["subject"]),
+                         ensure_ascii=False, separators=(",", ":")),
+              json.dumps(_tokens(item["conclusion"]["relation"]),
+                         ensure_ascii=False, separators=(",", ":")),
+              json.dumps(_tokens(item["conclusion"]["object"]),
+                         ensure_ascii=False, separators=(",", ":")),
+              json.dumps(item, ensure_ascii=False, separators=(",", ":")))
+             for item in payload.get("derived_cases", [])))
+        connection.commit()
+        return None if owns_connection else connection
+    except Exception:
+        if connection.in_transaction:
+            connection.rollback()
+        if owns_connection:
+            connection.close()
+        raise
+
+
+def _read_knowledge_database(path: Path) -> tuple[sqlite3.Connection, dict[str, Any]]:
+    """Open a validated writable knowledge database and load its typed payload."""
+    connection = sqlite3.connect(path, isolation_level=None)
+    try:
+        if connection.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+            raise ValueError("SQLite knowledge database failed its integrity check")
+        if (connection.execute("PRAGMA application_id").fetchone()[0]
+                != _KNOWLEDGE_DB_APPLICATION_ID
+                or connection.execute("PRAGMA user_version").fetchone()[0]
+                != _KNOWLEDGE_DB_VERSION):
+            raise ValueError("unsupported CRMS SQLite knowledge database header")
+        tables = {row[0] for row in connection.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' "
+            "AND name NOT LIKE 'sqlite_%'")}
+        if tables != _KNOWLEDGE_DB_TABLES:
+            raise ValueError("SQLite file is not a CRMS knowledge database")
+        metadata = dict(connection.execute(
+            "SELECT key,value FROM knowledge_metadata"))
+        if (metadata.get("format") != "crms-knowledge-database"
+                or metadata.get("version") != str(_KNOWLEDGE_DB_VERSION)):
+            raise ValueError("SQLite knowledge database metadata is invalid")
+        payload = {section: json.loads(value) for section, value in connection.execute(
+            "SELECT section,payload_json FROM knowledge_payload")}
+        payload["inference_rules"] = [json.loads(value) for (value,) in connection.execute(
+            "SELECT payload_json FROM inference_rules ORDER BY rule_key")]
+        payload["derived_cases"] = [json.loads(value) for (value,) in connection.execute(
+            "SELECT payload_json FROM derived_cases ORDER BY case_key")]
+        for table in ("positive_facts", "negative_facts"):
+            for key, fact in SQLiteFactMap(connection, table).items():
+                expected_key = CRMSKnowledgeBase._fact_key(
+                    fact.subject, fact.relation, fact.object,
+                    CRMSKnowledgeBase._normalize_qualifiers(
+                        dict(fact.qualifiers)))
+                if key != expected_key or not fact.sources:
+                    raise ValueError(
+                        f"SQLite {table} row has invalid key or missing provenance")
+        return connection, payload
+    except Exception:
+        connection.close()
+        raise
+
+
+def _knowledge_database_payload(path: Path) -> dict[str, Any]:
+    """Return the JSON interchange view of a validated SQLite knowledge DB."""
+    connection, payload = _read_knowledge_database(path)
+    try:
+        payload["facts"] = [asdict(fact) for fact in
+                            SQLiteFactMap(connection, "positive_facts").values()]
+        payload["negative_facts"] = [asdict(fact) for fact in
+                                     SQLiteFactMap(connection, "negative_facts").values()]
+        return payload
+    finally:
+        connection.close()
+
+
+def _write_knowledge_database_payload(path: Path,
+                                      payload: dict[str, Any]) -> None:
+    """Install a complete JSON-compatible knowledge payload into SQLite."""
+    knowledge = CRMSKnowledgeBase()
+    stores = {}
+    for name in ("facts", "negative_facts"):
+        store: dict[tuple[Any, ...], FactEvidence] = {}
+        for item in payload.get(name, []):
+            if not isinstance(item, dict) or not item.get("sources"):
+                raise ValueError(f"stored {name} record has no valid provenance")
+            qualifiers = tuple(tuple(pair) for pair in item.get("qualifiers", []))
+            fact = FactEvidence(item["subject"], item["relation"], item["object"],
+                                tuple(item["sources"]), qualifiers)
+            key = knowledge._fact_key(fact.subject, fact.relation, fact.object,
+                                      knowledge._normalize_qualifiers(
+                                          dict(fact.qualifiers)))
+            store[key] = fact
+        stores[name] = store
+    sections = {name: value for name, value in payload.items()
+                if name not in {"facts", "negative_facts"}}
+    _write_knowledge_database(path, sections, stores["facts"],
+                              stores["negative_facts"])
 _IRREGULAR_VERB_PARADIGMS = {
     "be": ("be", "am", "is", "are", "was", "were", "been", "being"),
     "begin": ("begin", "begins", "began", "begun", "beginning"),
@@ -545,6 +729,7 @@ class CRMSKnowledgeBase:
                 or max_derived_cases < 0):
             raise ValueError("max_derived_cases must be a non-negative integer")
         self.max_derived_cases = max_derived_cases
+        self._knowledge_db_path: Path | None = None
         self._next_derived_case_order = 0
         self._facts: dict[tuple[Any, ...], FactEvidence] = {}
         self._negative_facts: dict[tuple[Any, ...], FactEvidence] = {}
@@ -12389,6 +12574,17 @@ class CRMSKnowledgeBase:
                 for key, polarity in sorted(self._fact_pattern_polarities.items())
             ],
         }
+        if destination.suffix.casefold() in {".sqlite", ".sqlite3", ".db"}:
+            existing_connection = None
+            if (self._knowledge_db_path is not None
+                    and self._knowledge_db_path.resolve() == destination.resolve()
+                    and isinstance(self._facts, SQLiteFactMap)):
+                existing_connection = self._facts.connection
+            _write_knowledge_database(
+                destination, payload, self._facts, self._negative_facts,
+                existing_connection=existing_connection)
+            self._knowledge_db_path = destination.resolve()
+            return
         destination.parent.mkdir(parents=True, exist_ok=True)
         with destination.open("w", encoding="utf-8", newline="\n") as output:
             output.write("{\n")
@@ -12429,7 +12625,20 @@ class CRMSKnowledgeBase:
              ) -> "CRMSKnowledgeBase":
         knowledge = cls()
         fact_connection = None
-        if fact_db is not None:
+        knowledge_database_path = Path(path).expanduser().resolve()
+        is_knowledge_database = knowledge_database_path.suffix.casefold() in {
+            ".sqlite", ".sqlite3", ".db"}
+        if is_knowledge_database:
+            if fact_db is not None:
+                raise ValueError(
+                    "fact_db cannot be combined with a knowledge SQLite database")
+            fact_connection, database_payload = _read_knowledge_database(
+                knowledge_database_path)
+            knowledge._facts = SQLiteFactMap(fact_connection, "positive_facts")
+            knowledge._negative_facts = SQLiteFactMap(
+                fact_connection, "negative_facts")
+            knowledge._knowledge_db_path = knowledge_database_path
+        elif fact_db is not None:
             fact_path = Path(fact_db).expanduser().resolve()
             fact_path.parent.mkdir(parents=True, exist_ok=True)
             fact_connection = sqlite3.connect(fact_path, isolation_level=None)
@@ -12467,27 +12676,29 @@ class CRMSKnowledgeBase:
                 "INSERT OR REPLACE INTO fact_store_metadata VALUES (?,?)",
                 ("format", "crms-fact-store"))
         try:
-            payload: dict[str, Any] = {}
-            with Path(path).open("r", encoding="utf-8") as source:
-                for name, value in _iter_knowledge_json(source):
-                    if name in {"facts", "negative_facts"}:
-                        if name == "facts":
-                            add = knowledge.add_fact
+            payload: dict[str, Any] = (database_payload
+                                       if is_knowledge_database else {})
+            if not is_knowledge_database:
+                with Path(path).open("r", encoding="utf-8") as source:
+                    for name, value in _iter_knowledge_json(source):
+                        if name in {"facts", "negative_facts"}:
+                            if name == "facts":
+                                add = knowledge.add_fact
+                            else:
+                                add = knowledge.add_negative_fact
+                            for item in value:
+                                if not isinstance(item, dict):
+                                    raise ValueError(f"stored {name} record is malformed")
+                                sources = item.get("sources", [])
+                                if not sources:
+                                    raise ValueError(
+                                        f"stored {'negative ' if name == 'negative_facts' else ''}fact has no source provenance")
+                                for citation in sources:
+                                    add(item["subject"], item["relation"], item["object"],
+                                        citation,
+                                        qualifiers=dict(item.get("qualifiers", [])))
                         else:
-                            add = knowledge.add_negative_fact
-                        for item in value:
-                            if not isinstance(item, dict):
-                                raise ValueError(f"stored {name} record is malformed")
-                            sources = item.get("sources", [])
-                            if not sources:
-                                raise ValueError(
-                                    f"stored {'negative ' if name == 'negative_facts' else ''}fact has no source provenance")
-                            for citation in sources:
-                                add(item["subject"], item["relation"], item["object"],
-                                    citation,
-                                    qualifiers=dict(item.get("qualifiers", [])))
-                    else:
-                        payload[name] = value
+                            payload[name] = value
             if payload.get("format_version") != cls.FORMAT_VERSION:
                 raise ValueError("unsupported knowledge-base format version")
             configured_limit = cls(
@@ -12782,7 +12993,7 @@ class CRMSKnowledgeBase:
                     knowledge.accept_question_frame_proposal(record["artifact_id"])
                 except ValueError:
                     continue
-            if fact_connection is not None:
+            if fact_connection is not None and not is_knowledge_database:
                 # Keep the replacement fact snapshot private until every section
                 # of the knowledge payload has passed validation. Earlier commits
                 # could leave a partial or unsupported snapshot in the sidecar.

@@ -3276,7 +3276,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--model-db", type=Path, default=None,
                         help="start from a portable CRMS SQLite learned-model database")
     parser.add_argument("--knowledge", type=Path, default=Path("crms_knowledge.json"),
-                        help="knowledge store to load and update (default: %(default)s)")
+                        help="knowledge store; .sqlite paths use canonical indexed SQLite memory (default: %(default)s)")
     parser.add_argument("--fact-db", type=Path, default=None,
                         help="use an indexed SQLite fact sidecar while loading knowledge JSON")
     parser.add_argument("--math", type=Path, default=Path("crms_math.json"),
@@ -3747,11 +3747,16 @@ def main() -> int:
                 args.model_db, validate=False).items():
             setattr(args, name, value)
         memory_dir = args.model_db.with_name(args.model_db.name + ".memories")
+        knowledge_memory_name = (
+            "knowledge.sqlite"
+            if memories.get("knowledge", {}).get("storage") == "sqlite"
+            else "knowledge.json")
         rule_memory_name = ("rules.sqlite"
                             if memories.get("rules", {}).get("storage") == "sqlite"
                             else "rules.json")
         expected_files = {
-            memory_dir / (rule_memory_name if name == "rules"
+            memory_dir / (knowledge_memory_name if name == "knowledge"
+                          else rule_memory_name if name == "rules"
                           else f"{name}.json")
             for name in memories
         }
@@ -3776,11 +3781,11 @@ def main() -> int:
             install_model_database(args.model_db, memory_dir, validated=True)
         if embedded_research:
             model_research_sidecar = research_sidecar
-        args.knowledge = memory_dir / "knowledge.json"
+        args.knowledge = memory_dir / knowledge_memory_name
         args.rules = memory_dir / rule_memory_name
         args.math = memory_dir / "math.json"
         args.translations = memory_dir / "translations.json"
-        if args.fact_db is None:
+        if (args.fact_db is None and knowledge_memory_name == "knowledge.json"):
             args.fact_db = memory_dir / "facts.sqlite"
         print(f"Loaded portable learned model: {args.model_db}")
         model_memory_paths = (args.knowledge, args.rules, args.math,

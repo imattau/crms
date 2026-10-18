@@ -84,8 +84,28 @@ def main() -> None:
                 "SELECT payload_json FROM learned_memories WHERE kind='rules'"
             ).fetchone()[0]
         require({"model_rule_settings", "model_rule_examples",
-                 "model_rule_procedures", "model_rule_artifacts"} <= packaged_tables,
-                "portable model omitted normalized rule-memory tables")
+                 "model_rule_procedures", "model_rule_artifacts",
+                 "knowledge_metadata", "knowledge_payload", "inference_rules",
+                 "derived_cases", "positive_facts", "negative_facts"}
+                <= packaged_tables,
+                "portable model omitted normalized knowledge or rule tables")
+        legacy_v2 = root / "legacy-v2.sqlite"
+        shutil.copy2(portable_model, legacy_v2)
+        with sqlite3.connect(legacy_v2) as db:
+            for table in ("knowledge_metadata", "knowledge_payload",
+                          "inference_rules", "derived_cases",
+                          "positive_facts", "negative_facts"):
+                db.execute(f"DROP TABLE {table}")
+            db.execute("UPDATE model_metadata SET value='2' WHERE key='version'")
+            db.execute("PRAGMA user_version=2")
+        legacy_memories = inspect_model_database(legacy_v2)
+        legacy_installed = install_model_database(
+            legacy_v2, root / "legacy-v2-installed")
+        require("storage" not in legacy_memories["knowledge"]
+                and legacy_memories["rules"].get("storage") == "sqlite"
+                and legacy_installed["knowledge"].suffix == ".json"
+                and legacy_installed["rules"].suffix == ".sqlite",
+                "portable model v2 compatibility path regressed")
         require(instruction in packaged and '"reverse"' in packaged,
                 "portable model dropped the learned rule or its procedure")
         corrupted_model = root / "corrupted-model.sqlite"
@@ -101,8 +121,9 @@ def main() -> None:
         else:
             raise SystemExit("portable model accepted inconsistent normalized rules")
         installed = install_model_database(portable_model, root / "installed")
-        require(installed["rules"].suffix == ".sqlite",
-                "portable model did not restore rules as a SQLite memory")
+        require(installed["rules"].suffix == ".sqlite"
+                and installed["knowledge"].suffix == ".sqlite",
+                "portable model did not restore knowledge and rules as SQLite memories")
         packaged_restored = CRMSModel(
             installed["rules"], max_search_expansions=20_000, max_workers=1)
         packaged_prediction = packaged_restored.predict(instruction, [4, 1, -3])
@@ -118,7 +139,8 @@ def main() -> None:
         model_sidecar = Path(str(portable_model) + ".memories")
         require(model_chat.returncode == 0
                 and "CRMS> [-1, 3, 6]" in model_chat.stdout
-                and (model_sidecar / "rules.sqlite").is_file(),
+                and (model_sidecar / "rules.sqlite").is_file()
+                and (model_sidecar / "knowledge.sqlite").is_file(),
                 f"portable-model chat did not use normalized rules:\n"
                 f"{model_chat.stdout}\n{model_chat.stderr}")
 

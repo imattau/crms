@@ -106,6 +106,9 @@ def main() -> None:
         require(model_types == {"model_metadata", "learned_memories",
                                 "model_rule_settings", "model_rule_examples",
                                 "model_rule_procedures", "model_rule_artifacts",
+                                "knowledge_metadata", "knowledge_payload",
+                                "inference_rules", "derived_cases",
+                                "positive_facts", "negative_facts",
                                 "research_documents"},
                 f"model database contains unexpected tables: {model_types}")
         metadata = dict(sqlite3.connect(database).execute(
@@ -155,7 +158,10 @@ def main() -> None:
         require(lean_metadata["contains_research_index"] == "false"
                 and lean_tables == {"model_metadata", "learned_memories",
                                     "model_rule_settings", "model_rule_examples",
-                                    "model_rule_procedures", "model_rule_artifacts"}
+                                    "model_rule_procedures", "model_rule_artifacts",
+                                    "knowledge_metadata", "knowledge_payload",
+                                    "inference_rules", "derived_cases",
+                                    "positive_facts", "negative_facts"}
                 and not model_database_has_research(memories_only),
                 "memories-only portable database format regressed")
 

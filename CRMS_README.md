@@ -45,12 +45,14 @@ SQLite research indexes are exported and installed in batches to bound working
 memory as the corpus grows. `crms_package.py inspect` reports embedded source
 document count, UTF-8 bytes, and CRMS word-unit count so local corpus growth can
 be measured; word units are not an LLM tokenizer count and do not establish
-knowledge equivalence to a model by parameter count. The terminal also rebuilds an indexed SQLite fact
-sidecar at `<model-db>.memories/facts.sqlite` from the portable knowledge
-memory on startup; pass `--fact-db PATH` to select a sidecar for a standalone
-knowledge JSON file. Direct fact lookups use subject/relation and
-object/relation indexes, while source facts and citations remain in the
-portable knowledge memory. Backward-chaining queries against this sidecar fetch
+knowledge equivalence to a model by parameter count. Model v3 installs
+`knowledge.sqlite` and `rules.sqlite` into the neighboring `.memories/` working
+sidecar and chat writes learned changes back into the portable model. Older
+v1/v2 models still rebuild the indexed fact sidecar from their JSON knowledge
+payload. Pass `--fact-db PATH` only when using a standalone knowledge JSON file.
+Direct fact lookups use subject/relation and
+object/relation indexes, while source facts and citations remain alongside the
+portable knowledge memory. Backward-chaining queries against these SQL tables fetch
 only facts for the relations reachable through the query's declared rules,
 plus the schema and entity-kind facts needed to verify that proof. The
 independent proof checker validates against that same scoped snapshot. This
@@ -413,9 +415,10 @@ print(model.predict(instruction, [5, 2]).output)  # [20, 8]
 Rule memories can be stored as JSON or as a versioned SQLite database. In chat,
 pass a `.sqlite` path to `--rules`; examples, accepted procedures, and supporting
 rule artifacts are stored in separate rows. JSON remains available for import,
-export, and existing workflows. Portable model v2 files include normalized rule
-tables, verify them against the compatibility payload, and install rules as a
-SQLite sidecar for chat. Existing v1 model files remain readable.
+export, and existing workflows. Portable model v3 files include normalized
+knowledge and rule tables, verify them against compatibility payloads, and
+install writable SQLite sidecars for chat. Existing v1 and v2 model files
+remain readable.
 
 The parameterized rule family can also discover multipliers beyond doubling:
 
@@ -995,9 +998,11 @@ rebuilt when knowledge is loaded and preserve qualifier filtering. Knowledge
 serialization writes fact rows incrementally instead of materializing a second
 full list and encoded JSON string; loading streams the positive and negative
 fact arrays one record at a time while retaining the existing provenance
-checks. The optional `--fact-db` backend stores positive and negative facts
-in indexed SQLite tables and supports incremental iteration, mutation, and
-direct lookup. It is rebuilt from portable JSON at startup; rule inference and
+checks. A `.sqlite` path supplied to `--knowledge` stores facts, inference
+rules, and derived proofs as indexed SQL rows, with acquired language frames
+retained as typed memory payloads. The optional `--fact-db` backend stores
+positive and negative facts in indexed SQLite tables for a standalone JSON
+knowledge file; it is rebuilt from that JSON at startup. Rule inference and
 backward inference fetches only facts in the reachable relation closure and
 exact qualifier scope. Corpus-wide discovery retains its current search
 bounds. `v1_248` checks indexed lookup with 10,000 unrelated facts, both
@@ -1005,6 +1010,16 @@ directions, source retraction, qualifiers, selective inference snapshots,
 SQLite derived-case reuse and invalidation, streaming persistence, and malformed
 input rejection. An initial relation and answer
 direction are licensed by two distinct bound entities tied to stored facts.
+
+Convert an existing JSON knowledge memory while preserving its facts, learned
+frames, provenance, and proof cases with:
+
+```python
+from crms_knowledge import CRMSKnowledgeBase
+
+knowledge = CRMSKnowledgeBase.load("knowledge.json")
+knowledge.save("knowledge.sqlite")
+```
 After that, one additional
 fact-backed example can license a new exact wording frame for that same
 relation and answer direction. For example, grounded examples of "Who designed
