@@ -1179,12 +1179,15 @@ def _contrastive_probe(
             break
 
     # Short separators that leave most candidates in one output class are
-    # technically valid but poor teacher questions. Spend a reserved budget
-    # on period-covering lists when filters or rotations structure the rules.
+    # technically valid but poor teacher questions. A short probe that sends
+    # at least 10% of the version space to another output is useful enough to
+    # answer and often preferable to a much longer, marginally more balanced
+    # list. Spend the reserved budget on period-covering lists only when the
+    # short probe would leave more than 90% of candidates in one class.
     if best_input is not None:
         short_counts = Counter(tuple(output) for output in best_outputs or [])
         dominant_fraction = max(short_counts.values()) / len(procedures)
-        if dominant_fraction <= 0.80:
+        if dominant_fraction <= 0.90:
             return best_input, best_outputs
 
     # When competing procedures differ by deduplication after a positional
