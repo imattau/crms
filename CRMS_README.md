@@ -2118,9 +2118,10 @@ complete verified inference proof.
 Unsupported examples and attempts to create a frame from one example leave
 memory unchanged. `experiments/v1_218_incremental_question_frame_learning.py`
 checks transfer, grounding, rejection, and persistence.
-When a query entity is only part of either source fact endpoint, the separate
+When a query entity is only part of either source fact endpoint, the
 `/teach-question-pattern QUESTION|RELATION|subject/object|BOUND ENTITY|ANSWER`
-form learns that endpoint structure from reviewed direct facts. For example,
+command or the conversational `Teach a question frame from examples:` form
+can learn that endpoint structure from reviewed direct facts. For example,
 two examples can align `What research happened at {place}?` with the fact
 subject pattern `Researchers at {place}` and return the fact object for a new
 place. It also handles object-endpoint patterns. The relation, answer slot,

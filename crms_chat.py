@@ -2988,6 +2988,89 @@ def _resolve_question_example(knowledge: CRMSKnowledgeBase,
     return next(iter(matches)) if len(matches) == 1 else None
 
 
+def _resolve_subject_pattern_question_example(
+        knowledge: CRMSKnowledgeBase, question: str, answer: str):
+    """Resolve an example whose named query entity is inside a fact endpoint.
+
+    Proper-name spans are proposed only as candidate slots. A result is
+    returned only when exactly one unconflicted direct fact supplies the
+    answer and its endpoint contains that exact span once.
+    """
+    question_words = tuple(normalized_tokens(question))
+    answer_words = tuple(normalized_tokens(answer))
+    entity_pattern = re.compile(
+        r"[A-Z][\w’'-]*(?:\s+(?:(?:van|von|de|del|da|di|la|le)\s+)?"
+        r"[A-Z][\w’'-]*)*")
+    excluded_heads = {"who", "what", "which", "where", "when", "why", "how"}
+    spans = []
+    for match in entity_pattern.finditer(question):
+        surface = match.group().strip()
+        tokens = tuple(normalized_tokens(surface))
+        if not tokens or tokens[0] in excluded_heads:
+            continue
+        if (sum(question_words[index:index + len(tokens)] == tokens
+                for index in range(len(question_words) - len(tokens) + 1)) == 1):
+            spans.append((surface, tokens))
+    if not spans:
+        return None
+
+    negative_keys = {
+        (tuple(normalized_tokens(fact.subject)),
+         tuple(normalized_tokens(fact.relation)),
+         tuple(normalized_tokens(fact.object)),
+         tuple((tuple(normalized_tokens(name)), tuple(normalized_tokens(value)))
+               for name, value in fact.qualifiers))
+        for fact in knowledge.negative_facts()
+    }
+    matches = {}
+    for fact in knowledge.facts():
+        if fact.qualifiers:
+            continue
+        fact_subject = tuple(normalized_tokens(fact.subject))
+        fact_object = tuple(normalized_tokens(fact.object))
+        if answer_words == fact_object:
+            answer_field, endpoint_field, endpoint = (
+                "object", "subject", fact_subject)
+        elif answer_words == fact_subject:
+            answer_field, endpoint_field, endpoint = (
+                "subject", "object", fact_object)
+        else:
+            continue
+        fact_key = (fact_subject, tuple(normalized_tokens(fact.relation)),
+                    fact_object, ())
+        if fact_key in negative_keys:
+            continue
+        for surface, bound in spans:
+            question_positions = [index for index in range(
+                len(question_words) - len(bound) + 1)
+                if question_words[index:index + len(bound)] == bound]
+            endpoint_positions = [index for index in range(
+                len(endpoint) - len(bound) + 1)
+                if endpoint[index:index + len(bound)] == bound]
+            if len(question_positions) != 1 or len(endpoint_positions) != 1:
+                continue
+            q_start = question_positions[0]
+            f_start = endpoint_positions[0]
+            key = (
+                fact.relation, answer_field, surface,
+                question_words[:q_start],
+                question_words[q_start + len(bound):], endpoint_field,
+                endpoint[:f_start], endpoint[f_start + len(bound):])
+            matches[key] = None
+    if len(matches) != 1:
+        return None
+    (relation, answer_field, bound_entity, question_prefix, question_suffix,
+     fact_bound_field, fact_prefix, fact_suffix) = next(iter(matches))
+    return {
+        "relation": relation, "answer_field": answer_field,
+        "bound_entity": bound_entity,
+        "question_prefix": question_prefix,
+        "question_suffix": question_suffix,
+        "fact_bound_field": fact_bound_field,
+        "fact_prefix": fact_prefix, "fact_suffix": fact_suffix,
+    }
+
+
 def _resolve_qualified_question_example(knowledge: CRMSKnowledgeBase,
                                         question: str, answer: str):
     """Resolve one contextual question example to a unique stored fact."""
@@ -6686,10 +6769,41 @@ def main() -> int:
                                 answer=answer, qualifier=dict(item[3]))
                         frame_kind = "qualified"
                     else:
-                        print("The examples do not uniquely identify one shared "
-                              "fact-backed question pattern across distinct entities "
-                              "and contexts; no change was saved.")
-                        continue
+                        pattern_examples = [
+                            _resolve_subject_pattern_question_example(
+                                candidate_knowledge, question, answer)
+                            for question, answer in natural_question_examples]
+                        pattern_ok = all(item is not None
+                                         for item in pattern_examples)
+                        if pattern_ok:
+                            first_pattern = pattern_examples[0]
+                            signature = tuple(first_pattern[key] for key in (
+                                "relation", "answer_field", "question_prefix",
+                                "question_suffix", "fact_bound_field",
+                                "fact_prefix", "fact_suffix"))
+                            pattern_ok = (
+                                all(tuple(item[key] for key in (
+                                    "relation", "answer_field", "question_prefix",
+                                    "question_suffix", "fact_bound_field",
+                                    "fact_prefix", "fact_suffix")) == signature
+                                    for item in pattern_examples)
+                                and len({tuple(normalized_tokens(item["bound_entity"]))
+                                         for item in pattern_examples})
+                                == len(pattern_examples))
+                        if not pattern_ok:
+                            print("The examples do not uniquely identify one shared "
+                                  "fact-backed question pattern across distinct entities "
+                                  "and contexts; no change was saved.")
+                            continue
+                        relation = first_pattern["relation"]
+                        answer_field = first_pattern["answer_field"]
+                        for (question, answer), item in zip(
+                                natural_question_examples, pattern_examples):
+                            licensed = candidate_knowledge.teach_subject_pattern_question(
+                                question, relation=relation,
+                                answer_field=answer_field,
+                                bound_entity=item["bound_entity"], answer=answer)
+                        frame_kind = "subject-pattern"
                 if not licensed:
                     print("The examples do not share one licensed question frame; "
                           "no change was saved.")

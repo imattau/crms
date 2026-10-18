@@ -139,6 +139,28 @@ def main() -> None:
                 and "Source: cli:three" in run.stdout,
                 f"CLI teaching/persistence setup failed: {run.stdout}\n{run.stderr}")
 
+        conversational = [
+            sys.executable, str(PROJECT / "crms_chat.py"),
+            "--knowledge", str(cli_knowledge),
+            "--index", str(root / "index-natural.json"),
+            "--dialogue-state", str(root / "dialogue-natural.json"),
+            "--rules", str(root / "rules-natural.json"),
+            "--rule-session", str(root / "rule-session-natural.json"),
+        ]
+        natural = subprocess.run(
+            conversational,
+            input=("Teach a question frame from examples: "
+                   "\"What research happened at Meridian Institute?\" => \"quartz field\"; "
+                   "\"What research happened at Atlas Center?\" => \"basalt samples\"\n"
+                   "What research happened at Boreal Station?\n/quit\n"),
+            text=True, capture_output=True, cwd=root, timeout=30, check=False)
+        require(natural.returncode == 0
+                and "Question frame licensed from 2 subject-pattern examples"
+                in natural.stdout
+                and "Researchers at Boreal Station studied mica." in natural.stdout,
+                "natural-language example teaching failed to learn the role mapping:\n"
+                f"{natural.stdout}\n{natural.stderr}")
+
     require(kb.remove_fact("Researchers at Meridian Institute", "studied",
                            "quartz field", "study:one"),
             "could not retract subject-pattern training evidence")
