@@ -18,7 +18,7 @@ from crms_codegen import (
     render as render_codegen, show_generated_code_evidence,
 )
 from crms_inference import RuleReviewResult
-from crms_knowledge import (CRMSKnowledgeBase, FactCandidate,
+from crms_knowledge import (CRMSKnowledgeBase, FactCandidate, ResearchResult,
                             _analyze_predicate_spelling)
 from crms_math import CRMSMath, render as render_math
 from crms_model import CRMSModel, Prediction
@@ -1181,6 +1181,97 @@ def _natural_polar_evidence(
                     },))
     
     return [candidates[key] for key in sorted(candidates)]
+
+
+def _missing_premise_source_candidates(
+        knowledge: CRMSKnowledgeBase, index: CRMSSQLiteResearchIndex,
+        entries: list[dict[str, Any]], *, limit: int = 8
+        ) -> list[FactCandidate]:
+    """Find cited sentences licensed to state exact concrete missing premises.
+
+    Retrieval only locates candidate sentences. A candidate is returned only
+    when an existing accepted fact frame parses its subject, relation, and
+    object exactly; this helper never discovers or licenses a new relation.
+    """
+    if type(limit) is not int or limit < 1:
+        raise ValueError("missing-premise candidate limit must be positive")
+    found: dict[tuple[Any, ...], FactCandidate] = {}
+    for entry in entries[:3]:
+        if not isinstance(entry, dict):
+            continue
+        missing = entry.get("missing_premise")
+        if not isinstance(missing, dict):
+            continue
+        subject, relation, object_ = (
+            missing.get("subject"), missing.get("relation"),
+            missing.get("object"))
+        if not all(isinstance(value, str) and value.strip()
+                   for value in (subject, relation, object_)):
+            continue
+        subject_key = tuple(normalized_tokens(subject))
+        relation_key = tuple(normalized_tokens(relation))
+        object_key = tuple(normalized_tokens(object_))
+        required_terms = set(subject_key) | set(object_key)
+        if not subject_key or not relation_key or not object_key:
+            continue
+        query = f"{subject} {object_}"
+        for hit in index.search(query, limit=100, context_chars=240):
+            if (_is_code_source(hit.location)
+                    or not required_terms <= set(hit.matched_terms)):
+                continue
+            document = index.document(hit.document_id)
+            for start, end in _sentence_spans(document.text):
+                sentence = document.text[start:end]
+                if (not sentence.strip()
+                        or _sentence_context_kind(
+                            sentence, document.text, start) != "assertion"
+                        or not required_terms <= set(normalized_tokens(sentence))):
+                    continue
+                evidence = _cited_sentence_evidence(
+                    index, hit, start, end, tuple(sorted(required_terms)))
+                if evidence is None:
+                    continue
+                for candidate in knowledge.propose_facts(
+                        sentence, source=evidence["citation"]):
+                    if (not candidate.polarity
+                            or tuple(normalized_tokens(candidate.subject))
+                                != subject_key
+                            or tuple(normalized_tokens(candidate.relation))
+                                != relation_key
+                            or tuple(normalized_tokens(candidate.object))
+                                != object_key):
+                        continue
+                    key = (candidate.source, subject_key, relation_key,
+                           object_key, candidate.polarity)
+                    found.setdefault(key, candidate)
+                    if len(found) >= limit:
+                        return [found[key] for key in sorted(found)]
+    return [found[key] for key in sorted(found)]
+
+
+def _follow_missing_premise_sources(
+        knowledge: CRMSKnowledgeBase, index: CRMSSQLiteResearchIndex,
+        response: Any, research: ResearchResult | None, text: str
+        ) -> str:
+    """Attach exact missing-premise source candidates to review state."""
+    if (research is None or response is None
+            or response.reason_code != "missing_premise"
+            or not response.missing_premises):
+        return text
+    candidates = _missing_premise_source_candidates(
+        knowledge, index, response.missing_premises)
+    if not candidates:
+        return text
+    # Replace the general retrieval proposals: only the exact, frame-parsed
+    # gap candidates belong in this reasoning follow-through prompt.
+    research.candidates = candidates
+    research.status = "needs_review"
+    candidate = candidates[0]
+    title = index.document(candidate.source.split("#", 1)[0]).title
+    return ((text.rstrip() + "\n" if text else "")
+            + "I found a source sentence that matches the missing premise "
+            "using an accepted fact frame, but it is not accepted yet: “"
+            + candidate.sentence + f"” [Source: {title}].")
 
 
 def _natural_source_lookup_topic(message: str) -> str | None:
@@ -8055,6 +8146,8 @@ def main() -> int:
                 f"{source_realization['text']} [Source: "
                 f"{source_realization.get('source_title') or 'source'}; "
                 "quoted evidence, not an accepted fact]")
+        turn.text = _follow_missing_premise_sources(
+            knowledge, index, turn.response, turn.research, turn.text)
         print(f"CRMS> {turn.text}")
         if typed_relation_route_used:
             source_rows = (turn.research.source_sentences
