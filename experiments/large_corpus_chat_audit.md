@@ -1416,3 +1416,44 @@ sentence is already shown, the chat replaces the duplicate numbered candidate
 line with a pointer to `/pending-candidates`. The 1,200-document stress fixture
 checks this response shape and retains the distinction between quoted evidence
 and accepted knowledge.
+
+### Follow-up regressions from longer untaught-corpus chats
+
+A fresh three-file replay exposed a risk in ordinary lexical retrieval: a
+question naming Marie Curie could receive an Einstein sentence because both
+sentences mention the Nobel Prize. Natural-language retrieval now treats
+capitalized names and named objects from the question as identity anchors and
+filters source sentences that omit any of those terms. This reduces false
+answers from topical overlap; it remains a lexical identity constraint, not a
+full entity linker.
+
+Location questions now search asserted source sentences for the named subject
+and requested relation even when the source document has a generic title. The
+fallback also uses a plain `location statement` abstention instead of wording
+such as `located location`. Do-support yes/no parsing now carries a locative
+preposition into the relation, and a small explicit irregular-verb fallback
+handles `win`/`won` (plus a short fixed set) only when the subject and requested
+object occur in the same cited sentence.
+
+`Who created Python and Linux?` now reports partial evidence and names the
+unresolved conjunct instead of silently returning only the Python evidence.
+The zero-frame extractor also treats `Cara is a parent of Dan` as the relation
+`parent of`, not as a type claim that Cara is-a parent. The long-chat candidate
+queue regression replays repeated questions, multiple pending candidates,
+`/pending-candidates`, and a follow-up answer in one process; it completes
+without a traceback. These cases are covered by
+`experiments/v1_295_natural_language_regressions.py`. The corpus-alignment
+diagnostic now checks the updated sentence-first review wording while keeping
+its alignment acceptance and held-out transfer gates.
+
+### Predicate alignment discovery at corpus scale
+
+The existing predicate aligner previously had a small fixture for learning
+`studied` as wording for `investigated`. A new scale probe builds on the full
+1,200-document mixed corpus and adds two independent source records that repeat
+the same river/city pairs with `passes through`. The corpus miner proposes
+`flows through` ↔ `passes through` from the two shared pairs, writes no facts
+before review, and transfers the accepted wording to a chat query over the
+indexed corpus. `experiments/v1_296_large_corpus_predicate_learning.py` passes.
+This is still evidence-based, explicit review rather than an automatic claim
+that every related-looking verb is a synonym.

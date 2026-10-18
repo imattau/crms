@@ -254,8 +254,8 @@ def main() -> None:
             "[Source: heldout.txt; accepted fact]")
         if (chat.returncode
                 or "Accepted 'studied' as wording for 'investigated'" not in chat.stdout
-                or "Unverified source candidate (supports)" not in chat.stdout
-                or "Evidence: Researcher 0002 studied Quartz Field 0002." not in chat.stdout
+                or "supporting claim awaiting review; not yet an accepted fact" not in chat.stdout
+                or "Researcher 0002 studied Quartz Field 0002. [Source: heldout.txt; supporting claim awaiting review" not in chat.stdout
                 or expected_sentence not in chat.stdout):
             raise SystemExit(
                 "natural-language predicate learning chat flow failed:\n"
