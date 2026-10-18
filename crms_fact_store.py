@@ -165,6 +165,40 @@ class SQLiteFactMap(MutableMapping):
                 raise ValueError("stored fact relation key is malformed")
             yield relation
 
+    def rule_discovery_values(self):
+        """Yield only facts that can participate in a two-edge join.
+
+        Facts whose object is never a subject, and whose subject is never an
+        object, cannot participate in any chain. Keep standalone ``is-a``
+        facts because the typed three-premise discovery path uses them as
+        middle-entity declarations. The indexed endpoint columns make this
+        filter cheap while preserving every possible rule example.
+        """
+        is_a = json.dumps(("is", "a"), ensure_ascii=False,
+                          separators=(",", ":"))
+        cursor = self.connection.execute(
+            f"""SELECT fact.payload_json FROM {self.table} AS fact
+                WHERE fact.relation_key=?
+                   OR EXISTS (SELECT 1 FROM {self.table} AS following
+                              WHERE following.subject_key=fact.object_key)
+                   OR EXISTS (SELECT 1 FROM {self.table} AS preceding
+                              WHERE preceding.object_key=fact.subject_key)
+                   OR EXISTS (SELECT 1 FROM {self.table} AS first_edge
+                              JOIN {self.table} AS second_edge
+                                ON second_edge.subject_key=first_edge.object_key
+                              WHERE first_edge.subject_key=fact.subject_key
+                                AND second_edge.object_key=fact.object_key)
+                   OR EXISTS (SELECT 1 FROM {self.table} AS first_edge
+                              JOIN {self.table} AS second_edge
+                                ON second_edge.subject_key=first_edge.object_key
+                              JOIN {self.table} AS third_edge
+                                ON third_edge.subject_key=second_edge.object_key
+                              WHERE first_edge.subject_key=fact.subject_key
+                                AND third_edge.object_key=fact.object_key)
+                ORDER BY fact.key_json""", (is_a,))
+        for (payload,) in cursor:
+            yield self._decode_fact(payload)
+
     def contains_any_phrase(self, phrases) -> bool:
         """Check exact normalized subject/relation/object phrases by index."""
         encoded = sorted({self._encode_key(tuple(phrase)) for phrase in phrases})

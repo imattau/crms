@@ -1897,12 +1897,15 @@ class CRMSKnowledgeBase:
                                  max_arity: int = 2
                                  ) -> RuleDiscoveryResult:
         """Propose chain rules from labeled facts without installing them."""
-        def rows(store):
+        def rows(store, *, discovery_positive: bool = False):
             if isinstance(store, SQLiteFactMap):
-                # SQLiteFactMap.values() already has deterministic key order.
-                # Avoid the extra Python sort and dataclasses.asdict deep copy
-                # performed by facts(), which are costly for large model DBs.
-                values = store.values()
+                if discovery_positive:
+                    # Rule candidates require connected premise edges. Use
+                    # endpoint indexes to skip isolated positive facts before
+                    # decoding; keep all negative rows for counterexamples.
+                    values = store.rule_discovery_values()
+                else:
+                    values = store.values()
             else:
                 values = (store[key] for key in sorted(store))
             return ({"subject": fact.subject, "relation": fact.relation,
@@ -1911,7 +1914,8 @@ class CRMSKnowledgeBase:
                     for fact in values)
 
         return discover_rule_candidates(
-            rows(self._facts), negative_facts=rows(self._negative_facts),
+            rows(self._facts, discovery_positive=True),
+            negative_facts=rows(self._negative_facts),
             min_support=min_support, max_expansions=max_expansions,
             max_arity=max_arity)
 
