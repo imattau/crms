@@ -3943,9 +3943,13 @@ scope within one search. The sparse scale diagnostic
 `experiments/v1_306_rule_discovery_scale.py` checks a labeled rule and stable
 candidate status at 10k, 50k, and 100k facts while reporting discovery time.
 On the development runtime this reduced the prior 100k sparse fixture from
-about 2.05 seconds to roughly 1.2–1.35 seconds. This measures preparation
+about 2.05 seconds to roughly 1.0–1.35 seconds. This measures preparation
 and sparse joins, not dense-corpus rule enumeration, which remains bounded by
-`max_expansions`.
+`max_expansions`. `experiments/v1_307_sqlite_rule_discovery_scale.py` repeats
+the same evidence and completeness checks through saved and reloaded SQLite
+models: warm medians were 233 ms at 20k facts and 1.37 s at 100k. Candidate
+status, support, provenance, and expansion counts matched the in-memory
+backend; the benchmark excludes database creation and loading from query time.
 `/suggest-inference-rules MIN|SOURCE_PREFIX`
 excludes matching provenance sources from candidate generation and measures
 the candidates against that held-out partition. `/accept-inference-rule

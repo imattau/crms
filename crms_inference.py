@@ -872,8 +872,10 @@ def discover_rule_candidates(
             raise ValueError(f"{name} must be a positive integer")
     if type(max_arity) is not int or max_arity not in {2, 3}:
         raise ValueError("max_arity must be 2 or 3")
-    positives = [dict(fact) for fact in facts]
-    negatives = [dict(fact) for fact in negative_facts]
+    positives = [fact if isinstance(fact, dict) else dict(fact)
+                 for fact in facts]
+    negatives = [fact if isinstance(fact, dict) else dict(fact)
+                 for fact in negative_facts]
 
     # Discovery revisits facts while building indexes, joining chains, and
     # attaching counterexamples. Normalize each immutable input row once;
