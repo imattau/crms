@@ -1700,18 +1700,22 @@ proof tampering, CLI access, and persistence. `v1_87_contextual_rule_discovery.p
 checks scope-matched candidate support, source-separated held-out validation,
 counterexamples, visible context labels in terminal review, and use of an
 accepted rule in a new context.
-`experiments/v1_297_large_scale_rule_learning.py` adds an end-to-end 980-fact
+`experiments/v1_297_large_scale_rule_learning.py` adds an end-to-end 1,162-fact
 diagnostic over 180 indexed sentences: two cited examples per relation license
 the sentence frames, later claims enter through reviewable extraction, 40
 labeled chains form the training partition, 12 are held out by source, and 12
 premise-only chains test transfer. It discovers the parent-parent-to-ancestor
 candidate, validates it on independent sources, requires explicit acceptance,
-and independently verifies each of the 12 inferred proofs. The wording and
-entities are generated and the 800 background facts are disconnected, so this
-does not establish performance on noisy natural-language corpora. The next
-discovery evaluation should add linked distractor relations and planted
-counterexamples, then measure runtime and candidate precision as graph size
-and relation diversity increase.
+and independently verifies each of the 12 inferred proofs. The graph also
+contains a linked `member-of` / `located-in` pattern with a plausible
+`has-region` conclusion. A held-out negative example marks that candidate as
+contradicted, blocks its installation, and keeps runtime inference unknown.
+The linked decoy triples are symbolic fixtures; the language frames and main
+rule chain use cited generated sentences. The entities are generated and the
+800 background facts are disconnected, so this does not establish performance
+on noisy natural-language corpora. The next discovery evaluation should use
+linked distractors extracted from natural-language sources, then measure
+runtime and candidate precision as graph size and relation diversity increase.
 
 `CRMSKnowledgeBase.research(question, index)` connects retrieval to the
 knowledge layer. It searches supplied documents, answers from existing facts
@@ -4537,10 +4541,11 @@ The remaining architectural proposals should be staged behind measured needs:
    are not current rule features. A Datalog-style core is a possible later
    direction, contingent on a proof semantics for each construct and
    differential tests against the current bounded engine.
-4. **Discovery quality and candidate durability:** the 980-fact source-separated
+4. **Discovery quality and candidate durability:** the 1,162-fact source-separated
    diagnostic now covers cited language-frame acquisition, reviewed extraction,
-   and rule transfer to unlabeled pairs, but uses generated sentences and
-   disconnected distractors. Expand evaluation to linked, noisy knowledge bases
+   rule transfer to unlabeled pairs, linked distractors, and held-out
+   counterexample rejection, but uses generated sentences. Expand evaluation to
+   linked, noisy knowledge bases
    with known rules and planted counterexamples. Pending fact candidates already
    survive restart when their citation and learned-frame license still validate;
    `experiments/v1_217_natural_candidate_review.py` covers restore, later

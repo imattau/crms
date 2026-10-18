@@ -73,6 +73,21 @@ def add_chain(kb: CRMSKnowledgeBase, index: CRMSResearchIndex,
     for suffix, sentence, left, relation, right in rows:
         add_source_fact(kb, index, source + ":" + suffix, sentence,
                         left, relation, right, teach=teach)
+    group = f"Group{number:04d}"
+    region = f"Region{number:04d}"
+    linked_source = f"linked:{partition}:{number:04d}"
+    kb.add_fact(subject, "member-of", group, linked_source + "#membership")
+    kb.add_fact(group, "located-in", region, linked_source + "#location")
+    if labeled:
+        kb.add_fact(subject, "has-region", region, linked_source + "#label")
+
+
+def add_linked_counterexample(kb: CRMSKnowledgeBase) -> None:
+    subject, group, region = "Person9999A", "Group9999", "Region9999"
+    source = "validation:linked-counterexample"
+    kb.add_fact(subject, "member-of", group, source + "#membership")
+    kb.add_fact(group, "located-in", region, source + "#location")
+    kb.add_negative_fact(subject, "has-region", region, source + "#negative")
 
 
 def main() -> None:
@@ -86,6 +101,7 @@ def main() -> None:
         add_chain(kb, index, number, "validation")
     for number in range(52, 64):
         add_chain(kb, index, number, "unlabeled", labeled=False)
+    add_linked_counterexample(kb)
 
     # Add disconnected background facts to ensure discovery runs against a
     # nontrivial store without introducing accidental chain examples.
@@ -105,6 +121,15 @@ def main() -> None:
                    == ("parent", "parent", "ancestor")), None)
     require(target is not None and target.status == "uncontradicted",
             f"planted rule was not proposed cleanly: {target}")
+    linked_candidate = next((candidate for candidate in discovery.candidates
+                             if (candidate.first_relation,
+                                 candidate.second_relation,
+                                 candidate.conclusion_relation)
+                             == ("member-of", "located-in", "has-region")), None)
+    require(linked_candidate is not None
+            and linked_candidate.status == "contradicted"
+            and len(linked_candidate.negative_examples) == 1,
+            f"linked decoy or its counterexample was not surfaced: {linked_candidate}")
     require(len(target.positive_examples) == 52,
             f"unexpected training support: {len(target.positive_examples)}")
 
@@ -123,6 +148,16 @@ def main() -> None:
             and target_review.validation.status == "validated"
             and len(target_review.validation.positive_examples) == 12,
             f"held-out rule failed its independent-source gate: {target_review}")
+    linked_review = next((item for item in review.reviews
+                          if (item.candidate.first_relation,
+                              item.candidate.second_relation,
+                              item.candidate.conclusion_relation)
+                          == ("member-of", "located-in", "has-region")), None)
+    require(linked_review is not None
+            and linked_review.validation is not None
+            and linked_review.validation.status == "contradicted"
+            and len(linked_review.validation.negative_examples) == 1,
+            f"held-out linked counterexample did not block the decoy rule: {linked_review}")
 
     candidate_number = review.reviews.index(target_review) + 1
     acceptance = kb.accept_inference_rule_candidate(
@@ -139,6 +174,10 @@ def main() -> None:
         require(result.status == "answered" and result.complete and result.proofs,
                 f"accepted rule did not generalize to unlabeled pair {number}: {result}")
         results.append(result)
+        rejected_decoy = kb.infer_relation(
+            subject, "has-region", f"Region{number:04d}")
+        require(rejected_decoy.status == "unknown",
+                f"counterexample-rejected rule was unexpectedly installed: {rejected_decoy}")
 
     facts = [asdict(fact) for fact in kb.facts()]
     rules = [asdict(rule) for rule in kb._inference_rules.values()]
@@ -160,6 +199,8 @@ def main() -> None:
     print("review split: training=40 labeled pairs; "
           "heldout=12 independent labeled pairs; "
           "unlabeled transfer=12 pairs")
+    print("linked candidate=member-of + located-in -> has-region; "
+          "one held-out negative blocked installation; runtime abstained")
     print(f"unlabeled_answers=12; independently_verified_proofs={proof_count}; "
           "explicit_review_gate=PASS")
 
