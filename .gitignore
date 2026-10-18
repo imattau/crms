@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+
+# Large learned/imported data and indexes (rebuild with the crms_import_* / crms_build_* scripts)
+/data/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite.memories/
+
+# Runtime state written by the chat (per-user memory, not source)
+crms_memory.json
+crms_knowledge.json
+crms_math.json
+crms_translations.json
+crms_dialogue.json
+crms_rule_session.json
+crms_rules.json
+
+# Stray empty file created by a mistyped shell redirect
+/-l

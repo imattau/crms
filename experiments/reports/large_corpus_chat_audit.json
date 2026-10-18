@@ -1,0 +1,327 @@
+{
+  "documents": 1200,
+  "sentences": 7200,
+  "queries": 30,
+  "expected_answer_sentences_seen": 30,
+  "misses": [],
+  "baseline_query_results": {
+    "Which river flows through Nacre City 0000?": {
+      "expected_sentence": "The Serein River 0000 flows through Nacre City 0000.",
+      "response": "CRMS> I found this source sentence: \u201cThe Serein River 0000 flows through Nacre City 0000.\u201d It supports the relation to Nacre City 0000, but I couldn't independently verify that the subject is a river. [Source: doc-0000.txt; quoted evidence, not an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Who designed the Vela instrument 0000?": {
+      "expected_sentence": "Researcher 0000 designed the Vela instrument 0000.",
+      "response": "CRMS> Researcher 0000 designed the Vela instrument 0000. [Source: doc-0000.txt; supporting claim awaiting review; not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "What did researchers at the Meridian Institute 0000 study?": {
+      "expected_sentence": "Researchers at the Meridian Institute 0000 studied quartz field 0000.",
+      "response": "CRMS> Researchers at the Meridian Institute 0000 studied quartz field 0000. [Source: doc-0000.txt; source claim awaiting review, not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Which river flows through Nacre City 0133?": {
+      "expected_sentence": "The Serein River 0133 flows through Nacre City 0133.",
+      "response": "CRMS> I found this source sentence: \u201cThe Serein River 0133 flows through Nacre City 0133.\u201d It supports the relation to Nacre City 0133, but I couldn't independently verify that the subject is a river. [Source: doc-0133.txt; quoted evidence, not an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Who designed the Vela instrument 0133?": {
+      "expected_sentence": "Researcher 0133 designed the Vela instrument 0133.",
+      "response": "CRMS> Researcher 0133 designed the Vela instrument 0133. [Source: doc-0133.txt; supporting claim awaiting review; not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "What did researchers at the Meridian Institute 0133 study?": {
+      "expected_sentence": "Researchers at the Meridian Institute 0133 studied quartz field 0133.",
+      "response": "CRMS> Researchers at the Meridian Institute 0133 studied quartz field 0133. [Source: doc-0133.txt; source claim awaiting review, not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Which river flows through Nacre City 0266?": {
+      "expected_sentence": "The Serein River 0266 flows through Nacre City 0266.",
+      "response": "CRMS> I found this source sentence: \u201cThe Serein River 0266 flows through Nacre City 0266.\u201d It supports the relation to Nacre City 0266, but I couldn't independently verify that the subject is a river. [Source: doc-0266.txt; quoted evidence, not an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Who designed the Vela instrument 0266?": {
+      "expected_sentence": "Researcher 0266 designed the Vela instrument 0266.",
+      "response": "CRMS> Researcher 0266 designed the Vela instrument 0266. [Source: doc-0266.txt; supporting claim awaiting review; not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "What did researchers at the Meridian Institute 0266 study?": {
+      "expected_sentence": "Researchers at the Meridian Institute 0266 studied quartz field 0266.",
+      "response": "CRMS> Researchers at the Meridian Institute 0266 studied quartz field 0266. [Source: doc-0266.txt; source claim awaiting review, not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Which river flows through Nacre City 0400?": {
+      "expected_sentence": "The Serein River 0400 flows through Nacre City 0400.",
+      "response": "CRMS> I found this source sentence: \u201cThe Serein River 0400 flows through Nacre City 0400.\u201d It supports the relation to Nacre City 0400, but I couldn't independently verify that the subject is a river. [Source: doc-0400.txt; quoted evidence, not an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Who designed the Vela instrument 0400?": {
+      "expected_sentence": "Researcher 0400 designed the Vela instrument 0400.",
+      "response": "CRMS> Researcher 0400 designed the Vela instrument 0400. [Source: doc-0400.txt; supporting claim awaiting review; not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "What did researchers at the Meridian Institute 0400 study?": {
+      "expected_sentence": "Researchers at the Meridian Institute 0400 studied quartz field 0400.",
+      "response": "CRMS> Researchers at the Meridian Institute 0400 studied quartz field 0400. [Source: doc-0400.txt; source claim awaiting review, not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Which river flows through Nacre City 0533?": {
+      "expected_sentence": "The Serein River 0533 flows through Nacre City 0533.",
+      "response": "CRMS> I found this source sentence: \u201cThe Serein River 0533 flows through Nacre City 0533.\u201d It supports the relation to Nacre City 0533, but I couldn't independently verify that the subject is a river. [Source: doc-0533.txt; quoted evidence, not an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Who designed the Vela instrument 0533?": {
+      "expected_sentence": "Researcher 0533 designed the Vela instrument 0533.",
+      "response": "CRMS> Researcher 0533 designed the Vela instrument 0533. [Source: doc-0533.txt; supporting claim awaiting review; not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "What did researchers at the Meridian Institute 0533 study?": {
+      "expected_sentence": "Researchers at the Meridian Institute 0533 studied quartz field 0533.",
+      "response": "CRMS> Researchers at the Meridian Institute 0533 studied quartz field 0533. [Source: doc-0533.txt; source claim awaiting review, not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Which river flows through Nacre City 0666?": {
+      "expected_sentence": "The Serein River 0666 flows through Nacre City 0666.",
+      "response": "CRMS> I found this source sentence: \u201cThe Serein River 0666 flows through Nacre City 0666.\u201d It supports the relation to Nacre City 0666, but I couldn't independently verify that the subject is a river. [Source: doc-0666.txt; quoted evidence, not an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Who designed the Vela instrument 0666?": {
+      "expected_sentence": "Researcher 0666 designed the Vela instrument 0666.",
+      "response": "CRMS> Researcher 0666 designed the Vela instrument 0666. [Source: doc-0666.txt; supporting claim awaiting review; not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "What did researchers at the Meridian Institute 0666 study?": {
+      "expected_sentence": "Researchers at the Meridian Institute 0666 studied quartz field 0666.",
+      "response": "CRMS> Researchers at the Meridian Institute 0666 studied quartz field 0666. [Source: doc-0666.txt; source claim awaiting review, not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Which river flows through Nacre City 0799?": {
+      "expected_sentence": "The Serein River 0799 flows through Nacre City 0799.",
+      "response": "CRMS> I found this source sentence: \u201cThe Serein River 0799 flows through Nacre City 0799.\u201d It supports the relation to Nacre City 0799, but I couldn't independently verify that the subject is a river. [Source: doc-0799.txt; quoted evidence, not an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Who designed the Vela instrument 0799?": {
+      "expected_sentence": "Researcher 0799 designed the Vela instrument 0799.",
+      "response": "CRMS> Researcher 0799 designed the Vela instrument 0799. [Source: doc-0799.txt; supporting claim awaiting review; not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "What did researchers at the Meridian Institute 0799 study?": {
+      "expected_sentence": "Researchers at the Meridian Institute 0799 studied quartz field 0799.",
+      "response": "CRMS> Researchers at the Meridian Institute 0799 studied quartz field 0799. [Source: doc-0799.txt; source claim awaiting review, not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Which river flows through Nacre City 0933?": {
+      "expected_sentence": "The Serein River 0933 flows through Nacre City 0933.",
+      "response": "CRMS> I found this source sentence: \u201cThe Serein River 0933 flows through Nacre City 0933.\u201d It supports the relation to Nacre City 0933, but I couldn't independently verify that the subject is a river. [Source: doc-0933.txt; quoted evidence, not an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Who designed the Vela instrument 0933?": {
+      "expected_sentence": "Researcher 0933 designed the Vela instrument 0933.",
+      "response": "CRMS> Researcher 0933 designed the Vela instrument 0933. [Source: doc-0933.txt; supporting claim awaiting review; not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "What did researchers at the Meridian Institute 0933 study?": {
+      "expected_sentence": "Researchers at the Meridian Institute 0933 studied quartz field 0933.",
+      "response": "CRMS> Researchers at the Meridian Institute 0933 studied quartz field 0933. [Source: doc-0933.txt; source claim awaiting review, not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Which river flows through Nacre City 1066?": {
+      "expected_sentence": "The Serein River 1066 flows through Nacre City 1066.",
+      "response": "CRMS> I found this source sentence: \u201cThe Serein River 1066 flows through Nacre City 1066.\u201d It supports the relation to Nacre City 1066, but I couldn't independently verify that the subject is a river. [Source: doc-1066.txt; quoted evidence, not an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Who designed the Vela instrument 1066?": {
+      "expected_sentence": "Researcher 1066 designed the Vela instrument 1066.",
+      "response": "CRMS> Researcher 1066 designed the Vela instrument 1066. [Source: doc-1066.txt; supporting claim awaiting review; not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "What did researchers at the Meridian Institute 1066 study?": {
+      "expected_sentence": "Researchers at the Meridian Institute 1066 studied quartz field 1066.",
+      "response": "CRMS> Researchers at the Meridian Institute 1066 studied quartz field 1066. [Source: doc-1066.txt; source claim awaiting review, not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Which river flows through Nacre City 1199?": {
+      "expected_sentence": "The Serein River 1199 flows through Nacre City 1199.",
+      "response": "CRMS> I found this source sentence: \u201cThe Serein River 1199 flows through Nacre City 1199.\u201d It supports the relation to Nacre City 1199, but I couldn't independently verify that the subject is a river. [Source: doc-1199.txt; quoted evidence, not an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "Who designed the Vela instrument 1199?": {
+      "expected_sentence": "Researcher 1199 designed the Vela instrument 1199.",
+      "response": "CRMS> Researcher 1199 designed the Vela instrument 1199. [Source: doc-1199.txt; supporting claim awaiting review; not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    },
+    "What did researchers at the Meridian Institute 1199 study?": {
+      "expected_sentence": "Researchers at the Meridian Institute 1199 studied quartz field 1199.",
+      "response": "CRMS> Researchers at the Meridian Institute 1199 studied quartz field 1199. [Source: doc-1199.txt; source claim awaiting review, not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+      "expected_sentence_found": true
+    }
+  },
+  "indexed_confirmation": "you> Indexed 1200 source file(s); skipped 0 existing file(s); 0 failure(s).",
+  "paraphrase_probes": [
+    "Who was the designer of the Vela instrument 0000?",
+    "Which stream passes through Nacre City 0133?",
+    "What research happened at Meridian Institute 0266?",
+    "Who was responsible for designing the Vela instrument 0133?",
+    "Who is credited with designing the Vela instrument 0133?",
+    "Who created the Vela instrument 0133?",
+    "Which waterway runs through Nacre City 0133?",
+    "What body of water crosses Nacre City 0133?",
+    "Where does the Serein River 0133 run?",
+    "What did the Meridian Institute 0266 investigate?",
+    "What topic was studied by the Meridian Institute 0266?",
+    "At which institute did researchers study quartz field 0266?",
+    "Who was responsible for orchestrating the Vela instrument 0133?",
+    "What did researchers at the Meridian Institute 0266 invent?"
+  ],
+  "event_nominal_related_evidence_only": {
+    "question": "What research happened at Meridian Institute 0266?",
+    "response": "CRMS> The closest related source says: \u201cResearchers at the Meridian Institute 0266 studied quartz field 0266.\u201d It mentions Meridian Institute 0266, but it does not establish the requested relation 'happened at'. [Source: doc-0266.txt; quoted evidence, not an answer to that relation]",
+    "evidence_shown_with_limit": true,
+    "counts_as_answered_paraphrase": false
+  },
+  "review_candidate_sentence_reply": {
+    "question": "Who designed the Vela instrument 0000?",
+    "response": "CRMS> Researcher 0000 designed the Vela instrument 0000. [Source: doc-0000.txt; supporting claim awaiting review; not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+    "sentence_with_explicit_review_status": true
+  },
+  "paraphrase_sentence_hits": 8,
+  "positive_paraphrase_related_evidence_only_count": 1,
+  "positive_paraphrase_probe_count": 11,
+  "negative_relation_control_count": 3,
+  "natural_language_probe_results": {
+    "Who was the designer of the Vela instrument 0000?": {
+      "response": "CRMS> Researcher 0000 designed the Vela instrument 0000. [Source: doc-0000.txt; supporting claim awaiting review; not yet an accepted fact]",
+      "expected_sentence_found": true,
+      "should_find_expected_sentence": true
+    },
+    "Which stream passes through Nacre City 0133?": {
+      "response": "CRMS> I couldn't find source sentences that support a stream passes through Nacre City 0133; I don't have a grounded answer for that question.",
+      "expected_sentence_found": false,
+      "should_find_expected_sentence": true
+    },
+    "What research happened at Meridian Institute 0266?": {
+      "response": "CRMS> The closest related source says: \u201cResearchers at the Meridian Institute 0266 studied quartz field 0266.\u201d It mentions Meridian Institute 0266, but it does not establish the requested relation 'happened at'. [Source: doc-0266.txt; quoted evidence, not an answer to that relation]",
+      "expected_sentence_found": true,
+      "should_find_expected_sentence": true
+    },
+    "Who was responsible for designing the Vela instrument 0133?": {
+      "response": "CRMS> Researcher 0133 designed the Vela instrument 0133. [Source: doc-0133.txt; supporting claim awaiting review; not yet an accepted fact]",
+      "expected_sentence_found": true,
+      "should_find_expected_sentence": true
+    },
+    "Who is credited with designing the Vela instrument 0133?": {
+      "response": "CRMS> Researcher 0133 designed the Vela instrument 0133. [Source: doc-0133.txt; supporting claim awaiting review; not yet an accepted fact]",
+      "expected_sentence_found": true,
+      "should_find_expected_sentence": true
+    },
+    "Who created the Vela instrument 0133?": {
+      "response": "CRMS> I couldn't find one source sentence that states who answers that question.",
+      "expected_sentence_found": false,
+      "should_find_expected_sentence": false
+    },
+    "Which waterway runs through Nacre City 0133?": {
+      "response": "CRMS> I couldn't find source sentences that support a waterway runs through Nacre City 0133; I don't have a grounded answer for that question.",
+      "expected_sentence_found": false,
+      "should_find_expected_sentence": true
+    },
+    "What body of water crosses Nacre City 0133?": {
+      "response": "CRMS> Source text: Fictional Research Record 0133\nThe Serein River 0133 flows through Nacre City 0133.\nSource: doc-0133.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
+      "expected_sentence_found": true,
+      "should_find_expected_sentence": true
+    },
+    "Where does the Serein River 0133 run?": {
+      "response": "CRMS> Source text: Fictional Research Record 0133\nThe Serein River 0133 flows through Nacre City 0133.\nSource: doc-0133.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
+      "expected_sentence_found": true,
+      "should_find_expected_sentence": true
+    },
+    "What did the Meridian Institute 0266 investigate?": {
+      "response": "CRMS> I found relevant source text, but no accepted fact supports an answer yet. Ask \u2018why?\u2019 to see the best matching sentence.",
+      "expected_sentence_found": false,
+      "should_find_expected_sentence": true
+    },
+    "What topic was studied by the Meridian Institute 0266?": {
+      "response": "CRMS> Source text: Researchers at the Meridian Institute 0266 studied quartz field 0266.\nSource: doc-0266.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
+      "expected_sentence_found": true,
+      "should_find_expected_sentence": true
+    },
+    "At which institute did researchers study quartz field 0266?": {
+      "response": "CRMS> Source text: Researchers at the Meridian Institute 0266 studied quartz field 0266.\nSource: doc-0266.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
+      "expected_sentence_found": true,
+      "should_find_expected_sentence": true
+    },
+    "Who was responsible for orchestrating the Vela instrument 0133?": {
+      "response": "CRMS> I couldn't find one source sentence that states who answers that question.",
+      "expected_sentence_found": false,
+      "should_find_expected_sentence": false
+    },
+    "What did researchers at the Meridian Institute 0266 invent?": {
+      "response": "CRMS> I couldn't find source sentences that support a did researchers at Meridian Institute 0266 invent; I don't have a grounded answer for that question.",
+      "expected_sentence_found": false,
+      "should_find_expected_sentence": false
+    }
+  },
+  "unknown_query_examples": [
+    "Who invented the Zorblax engine?",
+    "What is the population of Nacre City 9999?"
+  ],
+  "unknown_reply_count": 1,
+  "unknown_replies": {
+    "Who invented the Zorblax engine?": "CRMS> I couldn't find one source sentence that states who answers that question.",
+    "What is the population of Nacre City 9999?": "CRMS> I don't know this from the sources and facts I have. Add a source or teach the fact."
+  },
+  "unknown_reply_classifications": {
+    "Who invented the Zorblax engine?": "abstained",
+    "What is the population of Nacre City 9999?": "abstained"
+  },
+  "unknown_abstention_count": 2,
+  "pending_state_probe": {
+    "Who was the designer of the Vela instrument 0000?": "CRMS> Researcher 0000 designed the Vela instrument 0000. [Source: doc-0000.txt; supporting claim awaiting review; not yet an accepted fact]",
+    "Which stream passes through Nacre City 0133?": "CRMS> I couldn't find source sentences that support a stream passes through Nacre City 0133; I don't have a grounded answer for that question.",
+    "What research happened at Meridian Institute 0266?": "CRMS> The closest related source says: \u201cResearchers at the Meridian Institute 0266 studied quartz field 0266.\u201d It mentions Meridian Institute 0266, but it does not establish the requested relation 'happened at'. [Source: doc-0266.txt; quoted evidence, not an answer to that relation]",
+    "Who was responsible for designing the Vela instrument 0133?": "CRMS> Researcher 0133 designed the Vela instrument 0133. [Source: doc-0133.txt; supporting claim awaiting review; not yet an accepted fact]",
+    "Who is credited with designing the Vela instrument 0133?": "CRMS> Researcher 0133 designed the Vela instrument 0133. [Source: doc-0133.txt; supporting claim awaiting review; not yet an accepted fact]",
+    "Who created the Vela instrument 0133?": "CRMS> I couldn't find one source sentence that states who answers that question.",
+    "Which waterway runs through Nacre City 0133?": "CRMS> I couldn't find source sentences that support a waterway runs through Nacre City 0133; I don't have a grounded answer for that question.",
+    "What body of water crosses Nacre City 0133?": "CRMS> Source text: Fictional Research Record 0133\nThe Serein River 0133 flows through Nacre City 0133.\nSource: doc-0133.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
+    "Where does the Serein River 0133 run?": "CRMS> Source text: Fictional Research Record 0133\nThe Serein River 0133 flows through Nacre City 0133.\nSource: doc-0133.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
+    "What did the Meridian Institute 0266 investigate?": "CRMS> I found relevant source text, but no accepted fact supports an answer yet. Ask \u2018why?\u2019 to see the best matching sentence.",
+    "What topic was studied by the Meridian Institute 0266?": "CRMS> Source text: Researchers at the Meridian Institute 0266 studied quartz field 0266.\nSource: doc-0266.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
+    "At which institute did researchers study quartz field 0266?": "CRMS> Source text: Researchers at the Meridian Institute 0266 studied quartz field 0266.\nSource: doc-0266.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
+    "Who was responsible for orchestrating the Vela instrument 0133?": "CRMS> I couldn't find one source sentence that states who answers that question.",
+    "What did researchers at the Meridian Institute 0266 invent?": "CRMS> I couldn't find source sentences that support a did researchers at Meridian Institute 0266 invent; I don't have a grounded answer for that question."
+  },
+  "exact_answer_gate": "PASS",
+  "learned_transfer_answer": true,
+  "learned_transfer_candidate_reviewed": true,
+  "inverse_question_returns_accepted_answer": true,
+  "unlicensed_nominal_paraphrase_review_candidate": false,
+  "nominal_paraphrase_returns_quoted_evidence": false,
+  "nominal_paraphrase_returns_accepted_answer": true,
+  "unexpected_probe_results": {
+    "Which stream passes through Nacre City 0133?": {
+      "response": "CRMS> I couldn't find source sentences that support a stream passes through Nacre City 0133; I don't have a grounded answer for that question.",
+      "expected_sentence_found": false,
+      "should_find_expected_sentence": true
+    },
+    "Which waterway runs through Nacre City 0133?": {
+      "response": "CRMS> I couldn't find source sentences that support a waterway runs through Nacre City 0133; I don't have a grounded answer for that question.",
+      "expected_sentence_found": false,
+      "should_find_expected_sentence": true
+    },
+    "What did the Meridian Institute 0266 investigate?": {
+      "response": "CRMS> I found relevant source text, but no accepted fact supports an answer yet. Ask \u2018why?\u2019 to see the best matching sentence.",
+      "expected_sentence_found": false,
+      "should_find_expected_sentence": true
+    }
+  },
+  "learned_transfer_gate": true,
+  "unknown_abstention_gate": true,
+  "negative_relation_controls_abstained": 3,
+  "agent_noun_transfer_gate": true,
+  "inverse_question_transfer_gate": true,
+  "portable_model_documents": 1200,
+  "portable_model_retrieves_embedded_source": true,
+  "portable_model_gate": true,
+  "portable_model_reply": "CRMS> I found this source sentence: \u201cThe Serein River 0000 flows through Nacre City 0000.\u201d It supports the relation to Nacre City 0000, but I couldn't independently verify that the subject is a river. [Source: doc-0000.txt; quoted evidence, not an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
+  "unrelated_pending_queue_notices": 0
+}
