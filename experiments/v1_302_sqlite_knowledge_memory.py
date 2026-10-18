@@ -53,18 +53,26 @@ def main() -> None:
             tables = {row[0] for row in db.execute(
                 "SELECT name FROM sqlite_master WHERE type='table'")}
             fact_count = db.execute("SELECT count(*) FROM positive_facts").fetchone()[0]
+            language_record_count = db.execute(
+                "SELECT count(*) FROM knowledge_records").fetchone()[0]
+            language_sections = {row[0] for row in db.execute(
+                "SELECT DISTINCT section FROM knowledge_records")}
             source_row = db.execute(
                 "SELECT payload_json FROM positive_facts "
                 "WHERE subject_key='[\"ada\"]' "
                 "AND relation_key='[\"designed\"]' "
                 "AND object_key='[\"engine\"]'").fetchone()
-        require({"knowledge_metadata", "knowledge_payload", "inference_rules",
-                 "derived_cases", "positive_facts", "negative_facts"} <= tables,
+        require({"knowledge_metadata", "knowledge_payload", "knowledge_records",
+                 "inference_rules", "derived_cases", "positive_facts",
+                 "negative_facts"} <= tables,
                 f"knowledge database lacks typed SQL tables: {tables}")
         require(fact_count == 4 and source_row is not None
                 and {"paper:ada", "archive:engine"}
-                <= set(json.loads(source_row[0])["sources"]),
-                "fact values or evidence provenance were lost from SQL rows")
+                <= set(json.loads(source_row[0])["sources"])
+                and language_record_count >= 1
+                and "question_examples" in language_sections,
+                "fact values or learned language records were lost from SQL rows: "
+                f"records={language_record_count}, sections={language_sections}")
 
         restored = CRMSKnowledgeBase.load(database)
         require(isinstance(restored._facts, SQLiteFactMap)

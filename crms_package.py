@@ -12,8 +12,9 @@ import tempfile
 
 FORMAT = "crms-learned-model"
 _VERSION_RULE_SQL = 2
-VERSION = 3
-_LEGACY_VERSIONS = {1, _VERSION_RULE_SQL}
+_VERSION_KNOWLEDGE_SQL = 3
+VERSION = 4
+_LEGACY_VERSIONS = {1, _VERSION_RULE_SQL, _VERSION_KNOWLEDGE_SQL}
 APPLICATION_ID = int.from_bytes(b"CRMS", "big")
 _MEMORY_NAMES = ("knowledge", "rules", "math", "translations")
 _MAX_MEMBER_BYTES = 512 * 1024 * 1024
@@ -21,9 +22,39 @@ _REQUIRED_TABLES = {"model_metadata", "learned_memories"}
 _RESEARCH_TABLES = {"research_documents"}
 _RULE_TABLES = {"model_rule_settings", "model_rule_examples",
                 "model_rule_procedures", "model_rule_artifacts"}
-_KNOWLEDGE_TABLES = {"knowledge_metadata", "knowledge_payload",
-                     "inference_rules", "derived_cases",
-                     "positive_facts", "negative_facts"}
+_KNOWLEDGE_SQL_TABLES = {"knowledge_metadata", "knowledge_payload",
+                         "inference_rules", "derived_cases",
+                         "positive_facts", "negative_facts"}
+_KNOWLEDGE_RECORD_TABLES = {"knowledge_records"}
+_KNOWLEDGE_TABLES = _KNOWLEDGE_SQL_TABLES | _KNOWLEDGE_RECORD_TABLES
+_KNOWLEDGE_RECORD_SECTIONS = frozenset({
+    "entity_aliases", "entity_alias_explicit_sources",
+    "fact_pattern_alias_sources", "question_examples",
+    "induced_question_frames", "induced_qualified_question_frames",
+    "induced_multi_qualified_question_frames", "qualified_question_examples",
+    "multi_qualified_question_examples", "polar_question_examples",
+    "qualified_polar_question_examples", "path_question_examples",
+    "counterfactual_source_examples", "counterfactual_path_examples",
+    "about_question_examples", "fact_pattern_examples",
+    "context_fact_patterns", "fact_pattern_surfaces",
+    "fact_pattern_predicates", "fact_pattern_predicate_sources",
+    "fact_pattern_surface_sources", "fact_pattern_polarities",
+})
+
+
+def _knowledge_record_bytes(record: object) -> bytes:
+    return json.dumps(record, ensure_ascii=False, sort_keys=True,
+                      separators=(",", ":")).encode("utf-8")
+
+
+def _knowledge_record_anchor(record: object) -> str:
+    if isinstance(record, dict):
+        for field in ("relation", "relations", "template", "qualifier_names",
+                      "alias", "prefix", "start", "target"):
+            if field in record:
+                return json.dumps(record[field], ensure_ascii=False,
+                                  sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(_knowledge_record_bytes(record)).hexdigest()
 
 
 def _create_rule_tables(db: sqlite3.Connection) -> None:
@@ -122,19 +153,36 @@ def _create_knowledge_tables(db: sqlite3.Connection) -> None:
                    f"ON {table}(relation_key,object_key)")
     db.execute("CREATE INDEX derived_cases_conclusion "
                "ON derived_cases(relation_key,subject_key,object_key)")
+    db.execute("CREATE TABLE knowledge_records (section TEXT NOT NULL, "
+               "ordinal INTEGER NOT NULL, anchor_key TEXT NOT NULL, "
+               "record_key TEXT NOT NULL, payload_json TEXT NOT NULL, "
+               "PRIMARY KEY(section,ordinal)) WITHOUT ROWID")
+    db.execute("CREATE INDEX knowledge_records_anchor "
+               "ON knowledge_records(section,anchor_key)")
+    db.execute("CREATE INDEX knowledge_records_digest "
+               "ON knowledge_records(section,record_key)")
 
 
 def _write_knowledge_tables(db: sqlite3.Connection, payload: dict) -> None:
     from crms_knowledge import CRMSKnowledgeBase, _tokens
 
     db.executemany("INSERT INTO knowledge_metadata VALUES (?,?)", [
-        ("format", "crms-knowledge-database"), ("version", "1")])
+        ("format", "crms-knowledge-database"), ("version", "2")])
     relational_sections = {"facts", "negative_facts", "inference_rules",
                            "derived_cases"}
     db.executemany(
         "INSERT INTO knowledge_payload VALUES (?,?)",
         ((name, json.dumps(value, ensure_ascii=False, separators=(",", ":")))
-         for name, value in payload.items() if name not in relational_sections))
+         for name, value in payload.items()
+         if name not in relational_sections
+         and name not in _KNOWLEDGE_RECORD_SECTIONS))
+    db.executemany(
+        "INSERT INTO knowledge_records VALUES (?,?,?,?,?)",
+        ((section, ordinal, _knowledge_record_anchor(record),
+          _sha256(_knowledge_record_bytes(record)),
+          _knowledge_record_bytes(record).decode("utf-8"))
+         for section in sorted(_KNOWLEDGE_RECORD_SECTIONS)
+         for ordinal, record in enumerate(payload.get(section, []))))
     db.executemany(
         "INSERT INTO inference_rules VALUES (?,?)",
         ((json.dumps(_tokens(item["rule_id"]), ensure_ascii=False,
@@ -177,11 +225,31 @@ def _write_knowledge_tables(db: sqlite3.Connection, payload: dict) -> None:
 
 def _read_knowledge_tables(db: sqlite3.Connection) -> dict:
     metadata = dict(db.execute("SELECT key,value FROM knowledge_metadata"))
+    version = metadata.get("version")
     if (metadata.get("format") != "crms-knowledge-database"
-            or metadata.get("version") != "1"):
+            or version not in {"1", "2"}):
         raise ValueError("model database knowledge metadata is invalid")
     payload = {section: json.loads(value) for section, value in db.execute(
         "SELECT section,payload_json FROM knowledge_payload")}
+    if version == "2":
+        records: dict[str, list[tuple[int, object]]] = {}
+        for section, ordinal, anchor, digest, raw in db.execute(
+                "SELECT section,ordinal,anchor_key,record_key,payload_json "
+                "FROM knowledge_records ORDER BY section,ordinal"):
+            if section not in _KNOWLEDGE_RECORD_SECTIONS:
+                raise ValueError("model database has an unknown knowledge record section")
+            record = json.loads(raw)
+            if (_sha256(_knowledge_record_bytes(record)) != digest
+                    or _knowledge_record_anchor(record) != anchor):
+                raise ValueError("model database knowledge record failed integrity check")
+            records.setdefault(section, []).append((ordinal, record))
+        for section in _KNOWLEDGE_RECORD_SECTIONS:
+            rows = records.get(section, [])
+            if [ordinal for ordinal, _ in rows] != list(range(len(rows))):
+                raise ValueError("model database knowledge record order is malformed")
+            if section in payload:
+                raise ValueError("model database duplicates a knowledge record section")
+            payload[section] = [record for _, record in rows]
     payload["inference_rules"] = [json.loads(value) for (value,) in db.execute(
         "SELECT payload_json FROM inference_rules ORDER BY rule_key")]
     payload["derived_cases"] = [json.loads(value) for (value,) in db.execute(
@@ -385,8 +453,10 @@ def inspect_model_database(path: str | Path) -> dict[str, dict[str, str | int]]:
             base_tables = _REQUIRED_TABLES
             if schema_version >= _VERSION_RULE_SQL:
                 base_tables = base_tables | _RULE_TABLES
+            if schema_version >= _VERSION_KNOWLEDGE_SQL:
+                base_tables = base_tables | _KNOWLEDGE_SQL_TABLES
             if schema_version >= VERSION:
-                base_tables = base_tables | _KNOWLEDGE_TABLES
+                base_tables = base_tables | _KNOWLEDGE_RECORD_TABLES
             expected_table_sets = [base_tables, base_tables | _RESEARCH_TABLES]
             if tables not in expected_table_sets:
                 raise ValueError("database is not a CRMS learned-model database")
@@ -426,7 +496,7 @@ def inspect_model_database(path: str | Path) -> dict[str, dict[str, str | int]]:
                     raise ValueError(
                         "normalized rule tables disagree with the compatibility payload")
                 memories["rules"]["storage"] = "sqlite"
-            if schema_version >= VERSION:
+            if schema_version >= _VERSION_KNOWLEDGE_SQL:
                 stored_knowledge = json.loads(db.execute(
                     "SELECT payload_json FROM learned_memories "
                     "WHERE kind='knowledge'").fetchone()[0])
@@ -550,7 +620,7 @@ def install_model_database(path: str | Path,
         rule_tables = {row[0] for row in db.execute(
             "SELECT name FROM sqlite_master WHERE type='table'")}
         has_sqlite_rules = _RULE_TABLES <= rule_tables
-        has_sqlite_knowledge = _KNOWLEDGE_TABLES <= rule_tables
+        has_sqlite_knowledge = _KNOWLEDGE_SQL_TABLES <= rule_tables
     with tempfile.TemporaryDirectory(dir=root) as staging_name:
         staging = Path(staging_name)
         with sqlite3.connect(f"file:{Path(path).resolve()}?mode=ro", uri=True) as db:

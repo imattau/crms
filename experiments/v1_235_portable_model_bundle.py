@@ -107,6 +107,7 @@ def main() -> None:
                                 "model_rule_settings", "model_rule_examples",
                                 "model_rule_procedures", "model_rule_artifacts",
                                 "knowledge_metadata", "knowledge_payload",
+                                "knowledge_records",
                                 "inference_rules", "derived_cases",
                                 "positive_facts", "negative_facts",
                                 "research_documents"},
@@ -160,6 +161,7 @@ def main() -> None:
                                     "model_rule_settings", "model_rule_examples",
                                     "model_rule_procedures", "model_rule_artifacts",
                                     "knowledge_metadata", "knowledge_payload",
+                                    "knowledge_records",
                                     "inference_rules", "derived_cases",
                                     "positive_facts", "negative_facts"}
                 and not model_database_has_research(memories_only),

@@ -94,7 +94,8 @@ def main() -> None:
         with sqlite3.connect(legacy_v2) as db:
             for table in ("knowledge_metadata", "knowledge_payload",
                           "inference_rules", "derived_cases",
-                          "positive_facts", "negative_facts"):
+                          "positive_facts", "negative_facts",
+                          "knowledge_records"):
                 db.execute(f"DROP TABLE {table}")
             db.execute("UPDATE model_metadata SET value='2' WHERE key='version'")
             db.execute("PRAGMA user_version=2")

@@ -40,11 +40,40 @@ _KNOWLEDGE_JSON_CHUNK = 64 * 1024
 _FACT_DB_APPLICATION_ID = int.from_bytes(b"CRMF", "big")
 _FACT_DB_VERSION = 1
 _KNOWLEDGE_DB_APPLICATION_ID = int.from_bytes(b"CRMK", "big")
-_KNOWLEDGE_DB_VERSION = 1
-_KNOWLEDGE_DB_TABLES = {
+_KNOWLEDGE_DB_VERSION = 2
+_KNOWLEDGE_DB_V1_TABLES = {
     "knowledge_metadata", "knowledge_payload", "inference_rules",
     "derived_cases", "positive_facts", "negative_facts",
 }
+_KNOWLEDGE_DB_TABLES = _KNOWLEDGE_DB_V1_TABLES | {"knowledge_records"}
+_KNOWLEDGE_RECORD_SECTIONS = frozenset({
+    "entity_aliases", "entity_alias_explicit_sources",
+    "fact_pattern_alias_sources", "question_examples",
+    "induced_question_frames", "induced_qualified_question_frames",
+    "induced_multi_qualified_question_frames", "qualified_question_examples",
+    "multi_qualified_question_examples", "polar_question_examples",
+    "qualified_polar_question_examples", "path_question_examples",
+    "counterfactual_source_examples", "counterfactual_path_examples",
+    "about_question_examples", "fact_pattern_examples",
+    "context_fact_patterns", "fact_pattern_surfaces",
+    "fact_pattern_predicates", "fact_pattern_predicate_sources",
+    "fact_pattern_surface_sources", "fact_pattern_polarities",
+})
+
+
+def _knowledge_record_bytes(record: Any) -> bytes:
+    return json.dumps(record, ensure_ascii=False, sort_keys=True,
+                      separators=(",", ":")).encode("utf-8")
+
+
+def _knowledge_record_anchor(section: str, record: Any) -> str:
+    if isinstance(record, Mapping):
+        for field in ("relation", "relations", "template", "qualifier_names",
+                      "alias", "prefix", "start", "target"):
+            if field in record:
+                return json.dumps(record[field], ensure_ascii=False,
+                                  sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(_knowledge_record_bytes(record)).hexdigest()
 
 
 def _write_knowledge_database(path: Path, payload: dict[str, Any],
@@ -61,14 +90,17 @@ def _write_knowledge_database(path: Path, payload: dict[str, Any],
         tables = {row[0] for row in connection.execute(
             "SELECT name FROM sqlite_master WHERE type='table' "
             "AND name NOT LIKE 'sqlite_%'")}
-        if tables and (tables != _KNOWLEDGE_DB_TABLES
-                       or connection.execute("PRAGMA application_id").fetchone()[0]
-                       != _KNOWLEDGE_DB_APPLICATION_ID
-                       or connection.execute("PRAGMA user_version").fetchone()[0]
-                       != _KNOWLEDGE_DB_VERSION):
+        header_id = connection.execute("PRAGMA application_id").fetchone()[0]
+        header_version = connection.execute("PRAGMA user_version").fetchone()[0]
+        if tables and not (
+                header_id == _KNOWLEDGE_DB_APPLICATION_ID
+                and ((tables == _KNOWLEDGE_DB_V1_TABLES and header_version == 1)
+                     or (tables == _KNOWLEDGE_DB_TABLES
+                         and header_version == _KNOWLEDGE_DB_VERSION))):
             raise ValueError("existing SQLite file is not a CRMS knowledge database")
         connection.execute("PRAGMA journal_mode=DELETE")
         connection.execute("PRAGMA synchronous=FULL")
+        connection.execute("BEGIN IMMEDIATE")
         connection.execute("CREATE TABLE IF NOT EXISTS knowledge_metadata ("
                            "key TEXT PRIMARY KEY,value TEXT NOT NULL) WITHOUT ROWID")
         connection.execute("CREATE TABLE IF NOT EXISTS knowledge_payload ("
@@ -83,13 +115,22 @@ def _write_knowledge_database(path: Path, payload: dict[str, Any],
                            "payload_json TEXT NOT NULL) WITHOUT ROWID")
         connection.execute("CREATE INDEX IF NOT EXISTS derived_cases_conclusion "
                            "ON derived_cases(relation_key,subject_key,object_key)")
+        connection.execute("CREATE TABLE IF NOT EXISTS knowledge_records ("
+                           "section TEXT NOT NULL,ordinal INTEGER NOT NULL,"
+                           "anchor_key TEXT NOT NULL,record_key TEXT NOT NULL,"
+                           "payload_json TEXT NOT NULL,PRIMARY KEY(section,ordinal)) "
+                           "WITHOUT ROWID")
+        connection.execute("CREATE INDEX IF NOT EXISTS knowledge_records_anchor "
+                           "ON knowledge_records(section,anchor_key)")
+        connection.execute("CREATE INDEX IF NOT EXISTS knowledge_records_digest "
+                           "ON knowledge_records(section,record_key)")
         target_facts = SQLiteFactMap(connection, "positive_facts")
         target_negative = SQLiteFactMap(connection, "negative_facts")
         connection.execute(f"PRAGMA application_id={_KNOWLEDGE_DB_APPLICATION_ID}")
         connection.execute(f"PRAGMA user_version={_KNOWLEDGE_DB_VERSION}")
-        connection.execute("BEGIN IMMEDIATE")
         connection.execute("DELETE FROM knowledge_metadata")
         connection.execute("DELETE FROM knowledge_payload")
+        connection.execute("DELETE FROM knowledge_records")
         connection.execute("DELETE FROM inference_rules")
         connection.execute("DELETE FROM derived_cases")
         # SQLiteFactMap wrappers are newly constructed above. Detect the same
@@ -112,7 +153,20 @@ def _write_knowledge_database(path: Path, payload: dict[str, Any],
         connection.executemany(
             "INSERT INTO knowledge_payload VALUES (?,?)",
             ((name, json.dumps(value, ensure_ascii=False, separators=(",", ":")))
-             for name, value in payload.items() if name not in relational_sections))
+             for name, value in payload.items()
+             if name not in relational_sections
+             and name not in _KNOWLEDGE_RECORD_SECTIONS))
+        for section in sorted(_KNOWLEDGE_RECORD_SECTIONS):
+            records = payload.get(section, [])
+            if not isinstance(records, list):
+                raise ValueError(f"knowledge record section {section} is malformed")
+            connection.executemany(
+                "INSERT INTO knowledge_records VALUES (?,?,?,?,?)",
+                ((section, ordinal,
+                  _knowledge_record_anchor(section, record),
+                  hashlib.sha256(_knowledge_record_bytes(record)).hexdigest(),
+                  _knowledge_record_bytes(record).decode("utf-8"))
+                 for ordinal, record in enumerate(records)))
         connection.executemany(
             "INSERT INTO inference_rules VALUES (?,?)",
             ((json.dumps(_tokens(item["rule_id"]), ensure_ascii=False,
@@ -152,23 +206,47 @@ def _read_knowledge_database(path: Path) -> tuple[sqlite3.Connection, dict[str, 
     try:
         if connection.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
             raise ValueError("SQLite knowledge database failed its integrity check")
+        database_version = connection.execute("PRAGMA user_version").fetchone()[0]
         if (connection.execute("PRAGMA application_id").fetchone()[0]
                 != _KNOWLEDGE_DB_APPLICATION_ID
-                or connection.execute("PRAGMA user_version").fetchone()[0]
-                != _KNOWLEDGE_DB_VERSION):
+                or database_version not in {1, _KNOWLEDGE_DB_VERSION}):
             raise ValueError("unsupported CRMS SQLite knowledge database header")
         tables = {row[0] for row in connection.execute(
             "SELECT name FROM sqlite_master WHERE type='table' "
             "AND name NOT LIKE 'sqlite_%'")}
-        if tables != _KNOWLEDGE_DB_TABLES:
+        expected_tables = (_KNOWLEDGE_DB_V1_TABLES if database_version == 1
+                           else _KNOWLEDGE_DB_TABLES)
+        if tables != expected_tables:
             raise ValueError("SQLite file is not a CRMS knowledge database")
         metadata = dict(connection.execute(
             "SELECT key,value FROM knowledge_metadata"))
         if (metadata.get("format") != "crms-knowledge-database"
-                or metadata.get("version") != str(_KNOWLEDGE_DB_VERSION)):
+                or metadata.get("version") != str(database_version)):
             raise ValueError("SQLite knowledge database metadata is invalid")
         payload = {section: json.loads(value) for section, value in connection.execute(
             "SELECT section,payload_json FROM knowledge_payload")}
+        if database_version >= 2:
+            records: dict[str, list[tuple[int, Any]]] = {}
+            for section, ordinal, anchor, digest, value in connection.execute(
+                    "SELECT section,ordinal,anchor_key,record_key,payload_json "
+                    "FROM knowledge_records ORDER BY section,ordinal"):
+                if section not in _KNOWLEDGE_RECORD_SECTIONS:
+                    raise ValueError("SQLite knowledge DB has an unknown record section")
+                parsed = json.loads(value)
+                if (hashlib.sha256(_knowledge_record_bytes(parsed)).hexdigest() != digest
+                        or _knowledge_record_anchor(section, parsed) != anchor):
+                    raise ValueError(
+                        f"SQLite language-memory record failed integrity check: {section}")
+                records.setdefault(section, []).append((ordinal, parsed))
+            for section in _KNOWLEDGE_RECORD_SECTIONS:
+                rows = records.get(section, [])
+                if [ordinal for ordinal, _ in rows] != list(range(len(rows))):
+                    raise ValueError(
+                        f"SQLite language-memory record order is malformed: {section}")
+                if section in payload:
+                    raise ValueError(
+                        f"SQLite language-memory section is stored twice: {section}")
+                payload[section] = [record for _, record in rows]
         payload["inference_rules"] = [json.loads(value) for (value,) in connection.execute(
             "SELECT payload_json FROM inference_rules ORDER BY rule_key")]
         payload["derived_cases"] = [json.loads(value) for (value,) in connection.execute(
