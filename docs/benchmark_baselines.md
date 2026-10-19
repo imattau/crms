@@ -220,20 +220,26 @@ outside the claim.
 
 Command: `python3 experiments/v1_427_dialogue_multiturn_transcript.py`.
 
-Runtime replay on the 2026-10-20 code at `175ca7b`, using a fresh temporary
-source index and dialogue state. All 30 turns completed without a crash. The
+Runtime replay on 2026-10-20 for `d9a8a4c`, using a fresh temporary source
+index and dialogue state. All 30 turns completed without a crash. The
 Eiffel Tower → Colosseum switch kept the Colosseum's `80 CE` and `50,000
 spectators` evidence local; `why?` followed the capacity answer; history recall
 updated after an unanswered turn; and the final `why?` did not reuse stale
 evidence. Nearby regressions `v1_426` and `v1_419` also passed.
 
 The transcript is a two-paragraph diagnostic, not a representative dialogue
-benchmark. It exposes these remaining coverage gaps: returning to an indexed
-entity after an unrelated abstention is rejected; “Who built the Eiffel Tower?”
-does not connect the named entity to “the tower” in the same paragraph; and
-“What is its capital?” does not resolve its possessive referent. These abstain
-instead of producing a wrong answer in this run, but they limit recovery and
-language coverage. Keep safety and coverage as separate measurements.
+benchmark. It exposed a mismatch between the active topic and a newly named
+entity: an active-topic veto rejected a cited sentence whose preceding text in
+the exact same paragraph named that entity. Paragraph-local anchoring now
+allows the explicit “Who built the Eiffel Tower?” query to use “The tower was
+designed and built by Gustave Eiffel.” The resulting topic remains Eiffel
+Tower, so “Who designed it?” resolves to “Who designed Eiffel Tower?” instead
+of drifting to Gustave Eiffel. The same transcript now has four unknown turns:
+`When was it built?` immediately after an unsupported Analytical Engine query,
+`What about the Eiffel Tower?` and its follow-up after that failure, and
+`What is its capital?` after a source-backed Italy capital answer. These
+abstain rather than producing a wrong answer in this run, but they limit
+recovery and contextual language coverage. Keep safety and coverage separate.
 
 ## Grounded math-to-list-code composition
 

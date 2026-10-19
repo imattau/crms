@@ -988,20 +988,30 @@ class CRMSDialogue:
         return phrases
 
     def _question_entity_mentions(
-            self, question: str, source_sentences: list[dict[str, Any]]
+            self, question: str, source_sentences: list[dict[str, Any]],
+            research_index: Any | None = None
             ) -> list[dict[str, str]]:
         """Entities the user named that the shown source text also contains.
 
-        A name the user typed and the quoted sentence confirms is the topic
-        of the exchange. It leads the referent list ahead of names that only
-        happen to occur inside the sentence (a place, a date holder).
+        A name the user typed and the quoted sentence or its preceding,
+        citation-local paragraph context confirms is the topic of the exchange.
+        It leads the referent list ahead of names that only happen to occur
+        inside the sentence (a place, a date holder).
         """
         found: list[dict[str, str]] = []
         for phrase in self._question_entity_phrases(question):
             needle = phrase.casefold()
             for item in source_sentences:
                 text = item.get("text")
-                if isinstance(text, str) and needle in text.casefold():
+                directly_named = (isinstance(text, str)
+                                  and needle in text.casefold())
+                locally_anchored = False
+                if not directly_named and research_index is not None:
+                    local_result = ResearchResult(
+                        "sources_found", source_sentences=[item])
+                    locally_anchored = self._entity_anchors_source_paragraph(
+                        phrase, {phrase}, local_result, research_index)
+                if directly_named or locally_anchored:
                     found.append({
                         "entity": phrase,
                         "citation": str(item.get("citation", "")),
@@ -1060,9 +1070,6 @@ class CRMSDialogue:
         occur before that span.
         """
         if research is None or research_index is None:
-            return False
-        if (self.topic_entity is not None
-                and self.topic_entity.casefold() != entity.casefold()):
             return False
         for item in research.source_sentences or []:
             citation = item.get("citation")
@@ -2214,7 +2221,7 @@ class CRMSDialogue:
                         and item["text"].strip() in text)
                 ]
                 named = self._question_entity_mentions(
-                    resolved, visible_source_sentences)
+                    resolved, visible_source_sentences, research_index)
                 self.source_mentions = self._merge_mentions(
                     named,
                     self._source_entity_mentions(visible_source_sentences))

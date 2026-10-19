@@ -426,13 +426,13 @@ standalone corpus scan:
 1. **Close the observed dialogue coverage gaps.** The new 30-turn transcript
    (`v1_427`) and focused regressions pass their safety checks: topic switches
    do not leak Colosseum/Eiffel evidence, `why?` follows the latest answer,
-   and history updates across abstention. Through the same transcript, fix
-   only demonstrated gaps: recovery to a source-indexed entity after an
-   unrelated abstention; paragraph-local linking of “Eiffel Tower” to “the
-   tower” when the named subject is explicit; and possessive follow-up
-   resolution such as “What is its capital?”. Extend the same multi-turn test
-   with save/reload and a negative case that tries to transfer an antecedent
-   across paragraphs.
+   and history updates across abstention. Citation-local paragraph grounding
+   now connects explicit “Eiffel Tower” questions to “the tower” and keeps the
+   requested entity as the follow-up topic. The remaining transcript gaps are
+   recovery to an indexed entity after an unrelated abstention and possessive
+   resolution such as “What is its capital?” after a reviewed source answer.
+   Extend the multi-turn test with save/reload and a negative case that tries
+   to transfer an antecedent across paragraphs.
 2. **Advance recombination and self-learning rule transfer.** Use ordinary chat to
    test a genuinely unseen composition from learned components, plus a
    contrastive near-miss and missing-step case. Verify the result with an

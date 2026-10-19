@@ -89,12 +89,22 @@ def main() -> None:
             f"history recall did not report the preceding question: {turns[12]!r}")
     require("And Italy?" in turns[14].text,
             f"history recall was not updated after an unanswered turn: {turns[14]!r}")
+    built = turns[25]
+    require(built.status == "sources_found"
+            and "designed and built by Gustave Eiffel" in built.text
+            and "1889" not in built.text,
+            f"named Eiffel Tower did not bind its paragraph-local 'the tower' evidence: {built!r}")
+    designed = turns[26]
+    require(designed.status == "sources_found"
+            and designed.resolved_question == "Who designed Eiffel Tower?"
+            and "designed and built by Gustave Eiffel" in designed.text,
+            f"follow-up pronoun drifted from the explicitly named tower: {designed!r}")
     require("80 CE" not in turns[29].text and "1889" not in turns[29].text,
             "final why? reused stale evidence after an out-of-scope turn")
 
     # Coverage is deliberately reported separately: the experiment must not
     # turn honest abstentions into apparent passes.
-    weak_coverage = [number for number in (18, 19, 20, 23, 26, 27, 28)
+    weak_coverage = [number for number in (18, 19, 20, 23)
                      if turns[number - 1].status in {"unknown", "clarify"}]
     print("multi-turn transcript: 30 turns, no crash")
     print("topic switch and Colosseum follow-ups: grounded, no cross-topic leak")
@@ -102,7 +112,7 @@ def main() -> None:
     print("unanswered/clarification turns:", ", ".join(
         f"{n}:{turns[n - 1].status}" for n in weak_coverage) or "none")
     print("coverage gaps to track:")
-    for number in (18, 19, 20, 23, 26, 27, 28):
+    for number in (18, 19, 20, 23):
         turn = turns[number - 1]
         print(f"  {number}. {TRANSCRIPT[number - 1]} [{turn.status}]")
 
