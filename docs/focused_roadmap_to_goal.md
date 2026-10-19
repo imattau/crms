@@ -294,224 +294,123 @@ coverage; breadth does not compensate for wrong answers or untraceable claims.
 
 ## Focused plan from the current checkpoint (2026-10-20)
 
-### Overall alignment
+### Review of direction
 
-The project is still aimed at the right goal, but it has a trustworthy,
-inspectable substrate rather than a broad integrated assistant. The 70B-class
-reference is useful for identifying the experience gap; no live model run is
-needed to plan against it. Progress should mean more held-out tasks completed
-through ordinary language without increasing unsupported answers or losing
-lineage.
+CRMS remains on track in its design principles, but it is not yet on track for
+the breadth of its goal: it has an inspectable knowledge/proof substrate and
+bounded examples of learning and composition, not a broadly capable integrated
+assistant. A 70B-class model is an interaction and task-range reference only;
+no live model run or parity claim is needed.
 
-The central capability bet remains **recombination and self-learning rules**:
-CRMS must combine learned pieces in cases it was not directly shown. Reasoning
-must verify those compositions and remain reachable from chat. **Dialogue and
-contextual intent are a priority research area**, not a final polish phase; the
-conversation state and its regressions can be improved now, while corpus-induced
-moves remain an experiment. SQLite distribution is enabling infrastructure,
-not an end goal. Increasing corpus size cannot compensate for weak retrieval,
-language transfer, or answer selection.
+The highest-leverage capability target remains **recombination through
+self-learned rules**, checked by **reasoning**. **Dialogue and contextual user
+intent are priority research areas** and should advance alongside that core,
+not wait for it to finish. The immediate engineering priority is eliminating
+wrong answers across turns. More corpus volume and storage migration support
+the goal but cannot substitute for transfer, task completion, or safe context.
 
-### Execution sequence
+### Ordered work from here
 
-#### Next work cycles
+1. **Re-pin the real chat baseline and reconcile the current dialogue work.**
+   Run the full Rome/Paris and Eiffel Tower/Colosseum conversations through a
+   fresh process at a recorded commit. Include named topic switches, follow-ups,
+   source-only answers, an unanswered turn, `why?`, “and Italy?”, “what did I
+   just ask?”, and “the first one”. The current branch already has focused
+   work for answer-bearing pronoun sentences, topic-first pronoun binding,
+   and page-title coreference; the latter two are still uncommitted in the
+   working tree and must be reviewed as such, not reported as shipped.
 
-The sequence below is the near-term queue. Keep each cycle small enough to
-review, reproduce, and commit independently. Dialogue stays active alongside
-the core capability work; it is not deferred until the end.
+   **Gate:** no wrong-entity sentence is returned; a citation supports the
+   exact answer shown; current topic and explanation target update separately;
+   source-only evidence remains usable when valid; unresolved references
+   clarify or abstain. Keep passing short follow-ups and named switches.
 
-**Current next slice — make topic switches safe across source-only turns.**
-The latest user-driven chat review shows that short follow-ups and explicitly
-named topic changes work in the tested corpus, but a pronoun-led source sentence
-can still bind to the wrong entity after a switch. Source-only answers also
-need to preserve usable context without leaving `why?` attached to an older
-answer. Treat this as a correctness issue before adding more dialogue coverage.
+2. **Make turn state explicit and stable.** Only after the transcript pins a
+   failure, adjust context lifecycle so topic, referents, open slots, last
+   question, and last explainable answer have explicit update/clear rules.
+   Preserve valid context across source-only and review-only turns, but do not
+   let failed or ambiguous turns silently reuse an old answer. Add end-to-end
+   coverage for elliptical topic changes, repair, correction, history, and
+   ordinal references; unsupported dialogue requests should get a precise
+   clarification or abstention. Refactor the long `turn()` path only where
+   stages improve these tested boundaries.
 
-1. Freeze the full Rome/Paris and Eiffel Tower/Colosseum transcripts as
-   end-to-end regressions, including the known-good follow-ups and named
-   switches.
-2. Bind pronoun-led evidence to the active entity using local discourse
-   evidence (such as its paragraph or explicit entity anchor); if ownership is
-   ambiguous, ask or abstain instead of choosing whichever entity happens to
-   have a supported answer.
-3. Separate context retention from answer status. Preserve source-only topic
-   context while its citations are valid; update or clear the explanation
-   target on every turn so `why?` never explains a previous topic after a new
-   unresolved turn.
-4. Add the reported elliptical switches (“and Italy?”, “and the Colosseum?”),
-   question-history requests (“what did I just ask?”), and ordinal references
-   (“the first one”) as explicit probes. Implement only the smallest behavior
-   supported by the discourse state; otherwise clarify or abstain.
-5. Keep the code-structure review findings separate from behavior fixes.
-   Refactor `turn()` or the resolver only when the regression boundary yields
-   clearer, independently testable stages without changing established
-   routing behavior.
+   **Gate:** the same behavior survives save/reload and fresh-process runs;
+   `why?` never targets a stale answer; no context update makes a factual claim
+   accepted or changes its evidence status.
 
-**Gate:** the complete transcript passes through a fresh chat process; no
-pronoun-led evidence is attributed to a different active entity; a source-only
-answer remains followable while its evidence is available; and `why?` targets
-the latest answer or says there is no current answer to explain. Existing
-short follow-ups, named switches, and abstentions remain intact. Record the
-tested commit and do not infer broad dialogue competence from these cases.
+3. **Expand held-out recombination through chat.** Build on the passing
+   contrastive procedure-learning slice. Vary learned components, connective
+   rules, argument roles, order, values, and paraphrased requests; hold out
+   combinations and source examples. Include a matched unsupported composition
+   and a missing-middle-step case. Keep learner and validator independent.
+   Retain each rule's examples, source lineage, holdout result, status, and
+   tested scope.
 
-**Cycle 1 — Re-pin the integrated baseline and close one user-visible failure.**
-Run the selected scorecard from a clean scratch location on a recorded commit,
-then add the newest user-reported dialogue transcripts to it. First verify
-that the direct-search intent frame added in `6d35723` reaches useful retrieval
-and cited answers through ordinary chat. In the same cycle, lock the
-Colosseum/Eiffel topic-switch case, source-only referent retention, and `why?`
-targeting as full-turn regressions. Fix only reproduced failures.
+   **Gate:** at least one genuinely unseen composition works through ordinary
+   chat, passes an independent task validator, and survives save/reload with
+   lineage intact; near-miss and unsupported cases abstain. Prefer one new
+   transferred composition over more demonstrations of an existing one.
 
-**Gate:** the natural-language request reaches the intended evidence route;
-the multi-turn regression has no wrong-entity answer or stale explanation;
-all previously passing short follow-ups and named topic switches remain green.
-The result report names the tested commit and separates answer quality from
-intent-label agreement.
+4. **Connect reasoning to those compositions and govern derived learning.**
+   Route natural-language questions to proof paths; test joins, cycles,
+   explicit integrity constraints, contradictions, missing premises, proof
+   explanations, and incomplete search. Develop write-back as proposal →
+   independent verification → derived record, with source lineage and
+   dependency invalidation. Keep derived items separate and lower-trust than
+   taught/source evidence; no autonomous promotion until drift and correction
+   propagation are measured.
 
-**Cycle 2 — Demonstrate learned recombination beyond the demonstrations.**
-Use a small source-disjoint matrix of learned components, connective rules,
-argument roles, operation order, and values. Drive it through chat, including
-contrastive requests, missing middle steps, and paraphrased instructions. Keep
-the validator independent of the learner and preserve each rule's examples,
-holdout split, status, and lineage. Prefer one new composition that transfers
-over adding several more examples of an existing composition.
+   **Gate:** every positive conclusion has an independently verified proof;
+   cycle, conflict, and search limits are not rendered as unqualified truth;
+   changing a dependency marks derived records stale; chat and engine outcomes
+   agree. A derived case cannot validate itself.
 
-**Gate:** at least one genuinely unseen composition succeeds through chat and
-passes the independent validator; a matched unsupported composition abstains;
-the learned rule and its lineage survive save/reload. A direct engine-only
-pass does not meet this gate.
+5. **Advance dialogue intent and the move-learning pilot in parallel.**
+   Evaluate explicit topic, referent, open-question/slot, task-phase, user-act,
+   and task-intent state on conversation-held-out flows. Continue dialogue-move
+   induction as research using Codex-attributed labels and a source-disjoint
+   pilot. Compare with the scripted baseline on task progress, inappropriate
+   actions, coverage, abstention, and annotation effort; label agreement alone
+   is not correctness.
 
-**Cycle 3 — Govern derivation and connect reasoning to the same interaction.**
-Extend proposal-only derived cases through verification, provenance, and
-dependency invalidation. In parallel, use chat regressions for relation
-routing, cycles/integrity constraints, conflict, missing-premise prompts, and
-proof explanations. Keep derived knowledge lower-trust and separate from
-taught/source evidence; do not enable autonomous promotion in this cycle.
+   **Gate:** explicit state fixes the pinned failures without changing facts.
+   A learned move policy gets runtime authority only if it improves held-out
+   task progress or reduces unhelpful turns without increasing inappropriate
+   actions; otherwise keep it as a research result.
 
-**Gate:** tampered or unsupported conclusions are refused; a correction to a
-premise marks its dependent derivations stale; chat and direct proof results
-agree; no incomplete search or conflict is rendered as an unqualified answer.
+6. **Broaden math, coding, translation, and creative work through natural
+   language.** Grow one bounded task family at a time, with held-out requests,
+   negative cases, a domain validator, provenance, and multi-turn repair.
+   Prioritize combinations across learned components. Separate factual claims
+   from invented fiction and evaluate creative quality independently from
+   factuality.
 
-**Continuing lane — Dialogue and contextual intent.** Keep improving the
-bounded explicit discourse state while the cycles above run. Test topic,
-referent, open-slot, task-phase, user-act, and task-intent updates on
-conversation-held-out flows. Continue the dialogue-move induction pilot as a
-research lane, and only grant it runtime authority if it improves task
-progress or reduces unhelpful turns without increasing inappropriate moves.
+   **Gate:** each task family is demonstrated through chat on held-out wording,
+   with correctness, coverage, abstention, completeness, and cost reported.
 
-**Bounded enabling lane — Portable SQLite model.** Finish the build/copy/
-query/learn/export/reload contract as a time-boxed infrastructure task. Do not
-hold capability experiments hostage to the entire JSON migration: use the
-current supported storage path for experiments and schedule migration work
-when it directly blocks distribution or persistence validation.
+7. **Finish portable distribution and run a release-shaped evaluation.**
+   Complete the one-file SQLite build/copy/query/learn/export/reload contract
+   for searchable source text, rules, knowledge, and provenance, while keeping
+   original ingestion files optional at inference. Evaluate a clean copy on a
+   fixed cross-domain suite; report task breadth, wrong answers, abstentions,
+   dialogue progress, proof/source validity, latency, memory, and package size.
 
-1. **Pin a trustworthy end-to-end baseline.** Keep the scorecard small enough
-   to run routinely and include fixed positives and negatives for source
-   selection, paraphrases, multipart requests, multi-turn context, reasoning,
-   recombination, and domain tasks. Record commit/tree identity and separate
-   coverage, wrong answers, abstention, completeness, citation/proof validity,
-   and resource cost. Preserve the full transcript for every dialogue failure.
+   **Gate:** the copied model works without its original source files and
+   preserves semantics and lineage after supported learning/export/reload.
+   Publish remaining coverage limits. Keep the overall goal in progress until
+   a diverse task distribution demonstrates broad natural-language coverage,
+   reliable dialogue, and correct composition.
 
-   **Gate:** every planned change names the probe it should improve and the
-   negative controls it must preserve; reports are reproducible from a clean
-   scratch environment.
+### Execution rules
 
-2. **Complete the portable knowledge foundation.** Finish the one-file SQLite
-   model contract: searchable source text, knowledge, rules, provenance, and
-   supported learned records travel together; original source files are not
-   required at inference. Verify transactional updates, compatibility paths,
-   export/reload, and a clean-location query. Keep read-only distributable data
-   separate from writable user learning where needed. Keep this bounded to the
-   distribution and persistence contract; it must not displace the capability
-   work that follows.
-
-   **Gate:** a clean copy works without ingestion files, and supported learning
-   can be saved/exported/reloaded without changing provenance or semantics.
-
-3. **Finish the highest-risk chat correctness slice.** Exercise full sessions
-   with topic changes, unresolved pronouns, source-only evidence, failed and
-   review-only answers, and `why?`. Context updates must distinguish “no
-   answer” from “no valid current topic”; pronoun-led source sentences must be
-   tied to the active entity or abstain. Then cover multi-part omissions and
-   unrelated pending candidates. Retain the successful short follow-ups and
-   named switches as controls.
-
-   **Gate:** the complete transcript passes through a fresh chat process; no
-   wrong-entity answer or stale explanation is emitted, and source evidence is
-   clearly distinguished from accepted knowledge.
-
-4. **Prove recombination and learned-rule transfer.** Build a source-disjoint
-   grid that varies components, connective rules, argument roles, order, and
-   values. Test unseen combinations and contrastive near-misses through the
-   natural-language interface. Keep candidate discovery, review, holdout
-   validation, and licensing distinct. Preserve examples, split, status, and
-   lineage for every induced rule.
-
-   **Gate:** a learned rule supports at least one genuinely unseen composition
-   through chat, contrastive and unsupported-middle-step cases abstain, and an
-   independent task/proof validator accepts the output. Save/reload preserves
-   the same rule status and lineage. This milestone takes precedence over
-   adding more demos of already-supported combinations.
-
-5. **Govern derivation-based self-learning and strengthen reasoning.** Keep
-   write-back as proposal → independent verification → derived record. Test
-   deduplication, retrieval value, dependency invalidation, correction
-   propagation, and trust weighting. In parallel, close reasoning gaps in
-   natural-language routing, cycle/integrity checks, conflict semantics,
-   missing-premise prompts, incomplete search, and proof explanations. Keep
-   taught evidence, source evidence, induced rules, and derived cases separate.
-
-   **Gate:** no derived record validates itself; changed premises stale their
-   dependents; verified chat conclusions agree with direct engine calls; and
-   cycles, conflicts, or search limits are never reported as unqualified
-   truth/falsehood. Retain only stages that reduce errors or improve a measured
-   user outcome.
-
-6. **Advance contextual intent and dialogue alongside the core work.** First
-   model the current topic, referents, open question/slot, task phase, user act,
-   and task intent as bounded explicit state. Test topic switches, repairs,
-   corrections, clarification, and multi-turn tasks on held-out conversations.
-   Continue one source-disjoint dialogue-move pilot with Codex-attributed
-   primary labels. Compare with deterministic handlers on task progress,
-   inappropriate actions, coverage, abstention, and annotation cost. Label
-   agreement is not accuracy; do not grant candidate frames runtime authority
-   based on surface frequency alone.
-
-   **Gate:** explicit state prevents the locked topic/stale-answer failures and
-   intent never mutates factual knowledge. A learned move/intent policy ships
-   only if held-out conversations improve task progress or reduce unhelpful
-   turns without increasing inappropriate actions. Otherwise keep it as a
-   research result and continue improving the explicit baseline.
-
-7. **Broaden math, coding, translation, and creative work through the shared
-   natural-language interface.** Grow one bounded request family at a time.
-   Each needs independently held-out wording, negative cases, a domain-specific
-   validator, provenance, and multi-turn repair. Prioritize cross-component
-   compositions. Mark generated fiction separately from evidence-backed
-   claims; score creative coherence and revision separately from factuality.
-
-   **Gate:** capability is demonstrated in chat on held-out requests, not only
-   by a typed command or curated demo; report accuracy, abstention, and
-   incomplete work for each domain.
-
-8. **Run release-shaped evaluation.** Run the fixed cross-domain suite against
-   the portable model from a clean location. Report package size, latency,
-   memory, and per-capability quality, including accuracy, wrong answers,
-   abstention, completeness, dialogue task progress, and proof/source validity.
-
-   **Gate:** fixed negatives pass and remaining coverage limits are explicit.
-   Compare breadth and interaction qualitatively with the 70B-class reference;
-   do not claim parity unless representative evidence supports it.
-
-### Working rules
-
-- Inspect existing user-owned changes before touching them; preserve unrelated
-  files and scratch state.
-- Keep each implementation slice reviewable, run its focused runtime checks,
-  then the relevant regressions, and commit the slice when stable.
-- Add every discovered failure to the fixed suite before changing behavior.
-- Do not use more data, candidate counts, or fluent wording as a substitute for
-  held-out transfer, task validation, or evidence.
-- Keep the overall goal in progress until a defined, diverse task distribution
-  demonstrates broad natural-language coverage, reliable interaction, and
-  correct composition across knowledge, rules, reasoning, and dialogue.
+- Preserve each reported failure as a full-turn regression before changing
+  behavior, and record the tested commit/tree identity.
+- Keep training/induction and held-out sources disjoint. Report coverage,
+  correctness, wrong answers, abstention, completeness, provenance, and
+  resource costs separately.
+- Do not let retrieval scores, fluent wording, corpus size, or self-generated
+  outputs authorize facts or rules.
+- Work in small reviewable slices; run the focused runtime check and nearby
+  regressions, then commit only the intended files. Preserve concurrent and
+  user-owned changes.
