@@ -39,13 +39,17 @@ task. Search constraints are labeled as `provide-information`; explicit confirma
 as “Are you sure?” and “Is that right?” distinguish `confirm` and `reject` from ordinary yes/no
 answers. A rejection asks what should be corrected. The implementation uses bounded
 `_open_question_task_intent` and `_open_question_dialogue_act` rules in `crms_conversation.py`,
-with confirmation prompt typing in `infer_open_question_slot`; `experiments/v1_396_open_question_task_intent.py`
-checks the behavior and that ordinary yes/no questions remain distinct. It does not infer tasks from
-arbitrary natural language or parse all confirmation and correction forms. On the four-conversation
-Codex-labeled dev replay, joint label agreement rose from 51.6% to 61.3% among hypothesized turns
-(55.2% to 65.5% among selected turns), with coverage unchanged at 31/48. Dialogue-act agreement was
-77.4%, while task-intent agreement was 64.5%. This is a small single-annotator agreement change,
-not an accuracy claim or evidence of broad intent understanding.
+with confirmation prompt typing and the `restaurant_type` open-question slot in
+`infer_open_question_slot`; `crms_dialogue_intent.py` permits the corresponding typed context
+predicate. `experiments/v1_396_open_question_task_intent.py` checks these behaviors, including that
+ordinary yes/no questions remain distinct. It does not infer tasks from arbitrary natural language
+or parse all confirmation and correction forms. The expanded ten-conversation dev replay produced
+76.2% joint agreement among hypotheses (78.7% among selected turns), versus 61.9% and 63.9% before
+the search-prompt cues. However, the new search cues were designed after inspecting six of those
+conversations and the previous four were also used during development. This is **in-sample
+development agreement**, not held-out generalization or accuracy. The next evaluation must freeze
+the implementation and use previously untouched conversations; the primary labels remain from one
+Codex annotator without independent review.
 
 The elaboration baseline recognizes a small set of equivalent content-free forms, including
 “Could you tell me more?”, “Can you say more?”, and “Could you elaborate?”. These use the same

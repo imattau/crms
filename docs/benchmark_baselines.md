@@ -137,33 +137,35 @@ literal frame routes only when its context and predecessor match, its citation s
 persistence, and train-only frames remain inert. Candidate induction is now available through
 `experiments/v1_392_induce_dialogue_intent_candidates.py`; on the 563-turn single-Codex-label batch
 it produced 13 exact-surface candidates, all inert, with citations and active-task context. An
-offline check with `experiments/v1_393_evaluate_dialogue_intent_candidates.py` on four disjoint,
-Codex-labeled dev conversations matched 2 of 48 classifiable turns (4.2% coverage); both matched
-the same annotator's labels and 46 abstained. Typed active-task context prevented a search
-constraint candidate from matching a reservation answer. `experiments/v1_394_task_specific_intent_context.py`
+offline check with `experiments/v1_393_evaluate_dialogue_intent_candidates.py` initially matched 2
+of 48 classifiable turns (4.2%) in four disjoint Codex-labeled dev conversations. After expanding
+the development sample to ten disjoint conversations and 124 classifiable turns, the same frozen
+40-conversation training candidates matched 7/124 turns (5.6%); all seven agreed with the same
+primary annotator, while 117 had no candidate. Typed active-task context prevented a
+search-constraint candidate from matching a reservation answer. `experiments/v1_394_task_specific_intent_context.py`
 checks that identical wording can select a search constraint or reservation intent according to the
-active goal. The very low exact-match coverage shows that evidence-cited surface repetition is
-insufficient for broad intent understanding. These are small single-annotator diagnostics, not
-accuracy estimates, an independent evaluation, or evidence of paraphrase transfer. No independently
-reviewed intent model is available.
+active goal. Exact-surface candidate coverage remains too low for broad dialogue understanding.
+These are single-annotator label-agreement diagnostics, not accuracy estimates, independent review,
+or evidence of paraphrase transfer. No independently reviewed intent model is available.
 
 ### Runtime intent routing with supplied context
 
-`python3 experiments/v1_395_runtime_intent_oracle_context.py USER_TURNS.csv` replays the four
-Codex-labeled dev conversations through the existing hand-checked intent router. When supplied
-annotated context state, the preceding assistant question, and prior labeled active-task intent, it
-produced hypotheses for 31/48 classifiable turns (64.6%): 29 selected and 2 ambiguous, with 17
-abstentions. After `v1_396` added bounded task and act resolution from the open prompt and typed slot,
-joint act-and-task-intent agreement with the same annotator was 19/31 (61.3%) among hypotheses and
-19/29 (65.5%) among selected hypotheses. Coverage remained 31/48. The preceding task-resolution
-step scored 17/31 and 17/29; the original baseline scored 16/31 and 16/29. A context-free ablation
-hypothesized 16/48 (33.3%) and matched 7/16 labels (43.8%). The act-label agreement rose to 77.4%
-among hypotheses, while task-intent agreement was 64.5%. Mismatch remains, especially when task
-phase changes are not explicit in the prompt or the accumulated active task is stale. The labels,
-context, and score all come from one Codex annotator, so this is not accuracy, independent
-validation, or end-to-end performance. These are bounded hand-checked rules, not learned
-generalization. The next research step remains dialogue-act and task-intent prediction conditioned
-on typed question/slot and active-task context, with ambiguity preserved instead of forcing a label.
+`python3 experiments/v1_395_runtime_intent_oracle_context.py USER_TURNS.csv` replays labeled turns
+through the hand-checked router, supplying the annotated context state, preceding assistant question,
+and prior labeled active-task intent. On the ten-conversation development set (124 classifiable
+turns; seven uncertain), it produced 63 hypotheses (50.8% coverage): 61 selected and 2 ambiguous;
+61 turns abstained. Joint act-and-task-intent agreement with the primary Codex labels was 48/63
+(76.2%) among hypotheses and 48/61 (78.7%) among selected turns. A context-free ablation
+hypothesized 33/124 (26.6%) and matched 22/33 labels. These scores are **development-set fit**:
+the prompts and labels from six of these conversations were inspected while designing the new
+search-prompt and `restaurant_type` slot cues, so this is not held-out generalization. The result
+must not be compared as an independent accuracy estimate. It suggests the next experiment should
+freeze the rules and evaluate on untouched test conversations before any further changes. The
+development labels and context are from one Codex annotator; no independent review exists. The
+current implementation remains hand-checked bounded rules, not learned generalization, and exact
+phrase candidates still cover only 5.6% of this set. Longer-term work should induce dialogue-act
+and task-intent frames conditioned on typed question/slot and active task, while preserving
+ambiguity and abstention.
 
 ## Contextual intent: active task and expected slot
 

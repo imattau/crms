@@ -450,6 +450,18 @@ def _open_question_task_intent(dialogue: CRMSDialogue,
     reported as constraints rather than inheriting the broad task label.
     """
     prompt = " ".join(open_question.get("prompt", "").casefold().split())
+    search_prompt_cues = (
+        "what type of restaurant", "which type of restaurant",
+        "what kind of restaurant", "which kind of restaurant",
+        "what type of food", "what kind of food", "what style of food",
+        "what cuisine", "which cuisine", "restaurant preference",
+        "dining preference", "dining requirement", "dining need",
+        "additional characteristic", "restaurant to have",
+        "dietary restriction", "what area", "which area", "where are you",
+        "where in ",
+    )
+    if any(cue in prompt for cue in search_prompt_cues):
+        return "provide-constraint"
     if (re.search(r"\b(?:cancel|cancell?ing)\b", prompt)
             and re.search(r"\breserv(?:e|ation|ations)\b", prompt)):
         return "cancel-reservation"

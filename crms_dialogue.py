@@ -43,7 +43,8 @@ class _WordScanner:
 
 _WORD_RE = _WordScanner()
 _OPEN_QUESTION_SLOT_TYPES = {
-    "unknown", "detail", "topic", "entity", "location", "party_size",
+    "unknown", "detail", "topic", "entity", "location", "restaurant_type",
+    "party_size",
     "date_time", "seating", "cuisine", "restaurant_choice", "confirmation",
     "yes_no",
 }
@@ -74,7 +75,8 @@ def infer_open_question_slot(prompt: str, answer_kind: str) -> str:
         return "date_time"
     if any(cue in text for cue in (
             "what city", "which city", "what location", "where should",
-            "where would", "which area", "what area")):
+            "where would", "which area", "what area", "where are you",
+            "where in ")):
         return "location"
     if any(cue in text for cue in (
             "indoor or outdoor", "outdoor or indoor", "seating preference",
@@ -82,11 +84,15 @@ def infer_open_question_slot(prompt: str, answer_kind: str) -> str:
         return "seating"
     if any(cue in text for cue in (
             "what cuisine", "which cuisine", "what kind of food",
-            "what type of food", "food preference")):
+            "what type of food", "what style of food", "food preference")):
         return "cuisine"
     if any(cue in text for cue in (
             "which restaurant", "which place", "which option", "which one")):
         return "restaurant_choice"
+    if any(cue in text for cue in (
+            "what type of restaurant", "which type of restaurant",
+            "what kind of restaurant", "which kind of restaurant")):
+        return "restaurant_type"
     if any(cue in text for cue in ("which entity", "known entity")):
         return "entity"
     if any(cue in text for cue in ("which topic", "what topic", "which subject")):

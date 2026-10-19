@@ -48,6 +48,33 @@ def main() -> None:
             and reservation_from_state.task_intent == "make-reservation",
             f"reservation state did not persist through detail answer: {reservation_from_state}")
 
+    restaurant_search_during_booking = classify(
+        "What type of food do you like?", "cuisine", "make-reservation",
+        "French food.")
+    require(restaurant_search_during_booking is not None
+            and restaurant_search_during_booking.dialogue_act == "provide-information"
+            and restaurant_search_during_booking.task_intent == "provide-constraint",
+            "restaurant-search criteria inherited the later reservation task")
+
+    preference_detail = classify(
+        "Did you have any dining requirements?", "detail", "make-reservation",
+        "Outdoor seating.")
+    require(preference_detail is not None
+            and preference_detail.dialogue_act == "provide-information"
+            and preference_detail.task_intent == "provide-constraint",
+            "an open-ended restaurant preference question was left untyped")
+
+    category_prompt = "What type of restaurant are you looking for?"
+    require(infer_open_question_slot(category_prompt, "detail") == "restaurant_type",
+            "restaurant-category question did not receive its own typed slot")
+    category_state = CRMSDialogue(CRMSKnowledgeBase())
+    category_state.open_dialogue_question = {
+        "prompt": category_prompt, "answer_kind": "detail",
+        "expected_slot": infer_open_question_slot(category_prompt, "detail"),
+    }
+    require("awaiting_slot_restaurant_type" in category_state.intent_context()[0],
+            "restaurant-type slot did not reach the contextual intent model")
+
     change_from_prompt = classify(
         "What time would you like to change your reservation to?", "date_time",
         "seek-information", "8 pm.")
@@ -104,6 +131,8 @@ def main() -> None:
 
     print("search detail resolves as a constraint: PASS")
     print("reservation task resolves from active state or explicit prompt: PASS")
+    print("restaurant filters remain constraints during reservation flows: PASS")
+    print("restaurant type is exposed as a typed open-question slot: PASS")
     print("change-reservation task resolves from explicit prompt: PASS")
     print("missing task evidence retains the conservative continuation label: PASS")
     print("explicit yes/no confirmation and rejection use distinct acts: PASS")
