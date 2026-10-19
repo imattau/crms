@@ -16,7 +16,10 @@ from types import SimpleNamespace
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from crms_feedback import AnswerFeedbackStore, collect_feedback_refs
+from crms_feedback import (
+    AnswerFeedbackStore, collect_feedback_refs, feedback_answer_id,
+    render_feedback_refs,
+)
 from crms_knowledge import CRMSKnowledgeBase
 
 
@@ -28,7 +31,9 @@ def require(condition: bool, message: str) -> None:
 def main() -> None:
     response = SimpleNamespace(
         evidence=[{"subject": "Ada", "relation": "designed",
-                   "object": "Engine", "sources": ["book:12"]}],
+                   "object": "Engine", "sources": ["book:12"]},
+                  {"subject": "Ada", "relation": "designed",
+                   "object": "Engine", "sources": ["archive:3"]}],
         proofs=[{"rule": {"rule_id": "direct-proof-rule"},
                  "premises": [{"fact": {"sources": ["direct:1"]}}]}],
         inference_proofs=[{
@@ -40,16 +45,27 @@ def main() -> None:
         source_sentences=[{"document_id": "wiki:ada", "sentence_id": "s7"}],
         passages=[])
     refs = collect_feedback_refs(response, research)
-    require(refs == [
-        {"kind": "rule", "id": "direct-proof-rule"},
-        {"kind": "rule", "id": "parent-rule"},
-        {"kind": "source", "id": "book:12"},
-        {"kind": "source", "id": "direct:1"},
-        {"kind": "source", "id": "family:1"},
-        {"kind": "source", "id": "family:2"},
-        {"kind": "source", "id": "s7"},
-        {"kind": "source", "id": "wiki:ada"}],
-        f"did not collect exact fact/rule/source lineage: {refs}")
+    require(all({"kind": kind, "id": value} in refs for kind, value in (
+        ("rule", "direct-proof-rule"), ("rule", "parent-rule"),
+        ("source", "book:12"), ("source", "archive:3"),
+        ("source", "direct:1"),
+        ("source", "family:1"), ("source", "family:2"),
+        ("source", "s7"), ("source", "wiki:ada"))),
+        f"did not collect exact rule/source lineage: {refs}")
+    fact_ref = next((item for item in refs if item["kind"] == "fact"), None)
+    require(fact_ref is not None
+            and fact_ref["subject"] == "Ada"
+            and fact_ref["relation"] == "designed"
+            and fact_ref["object"] == "Engine"
+            and fact_ref["sources"] == ["archive:3", "book:12"],
+            f"did not retain the proposition and sources: {fact_ref}")
+    require("Ada — designed → Engine" in render_feedback_refs(refs)
+            and "book:12" in render_feedback_refs(refs),
+            "feedback references were not readable for fact correction")
+    require(feedback_answer_id("Q", "A", refs) == feedback_answer_id(
+        "Q", "A", [{"kind": item["kind"], "id": item["id"]}
+                    for item in refs]),
+        "adding readable fact metadata changed event identity")
 
     with tempfile.TemporaryDirectory(prefix="crms-feedback-") as directory:
         store = AnswerFeedbackStore(Path(directory) / "feedback.sqlite3")
@@ -165,12 +181,43 @@ def main() -> None:
         require(persisted["status"] == "needs_review",
                 "interactive feedback did not persist rule review status")
 
+    with tempfile.TemporaryDirectory(prefix="crms-fact-feedback-chat-") as directory:
+        root = Path(directory)
+        chat_kb = CRMSKnowledgeBase()
+        chat_kb.add_fact("Ada Lovelace", "designed", "Engine", "book:12")
+        chat_kb.teach_question("Who designed Engine?", relation="designed",
+                               answer_field="subject", bound_entity="Engine",
+                               answer="Ada Lovelace")
+        knowledge_path = root / "knowledge.json"
+        chat_kb.save(knowledge_path)
+        args = [sys.executable, str(ROOT / "crms_chat.py"),
+                "--knowledge", str(knowledge_path),
+                "--feedback-db", str(root / "feedback.sqlite3"),
+                "--dialogue-state", str(root / "dialogue.json"),
+                "--rules", str(root / "rules.json"),
+                "--math", str(root / "math.json"),
+                "--math-session", str(root / "math-session.json"),
+                "--translations", str(root / "translations.json"),
+                "--translation-session", str(root / "translation-session.json")]
+        run = subprocess.run(
+            args, input="Who designed Engine?\n/wrong\n/feedback\n/quit\n",
+            text=True, capture_output=True, timeout=30)
+        require(run.returncode == 0, run.stderr or run.stdout)
+        for phrase in ("Ada Lovelace", "Ada Lovelace — designed → Engine",
+                       "sources: book:12", "/retract-fact POS|SUBJECT|RELATION|OBJECT|SOURCE"):
+            require(phrase in run.stdout,
+                    f"direct-fact feedback omitted {phrase!r}: {run.stdout}")
+        persisted = CRMSKnowledgeBase.load(knowledge_path)
+        require(len(persisted.facts()) == 1 and not persisted.negative_facts(),
+                "wrong feedback silently altered stored facts")
+
     print("answer feedback attribution: direct facts, rule, and source refs PASS")
     print("SQLite persistence, deterministic IDs, duplicate suppression: PASS")
     print("conflicting feedback retained for review without changing knowledge: PASS")
     print("wrong proof feedback suspends only validated learned rules: PASS")
     print("rule feedback reason persists; teacher and duplicate signals are protected: PASS")
     print("interactive /wrong suspension and evidence-honest abstention: PASS")
+    print("direct-fact feedback shows proposition/retraction path without mutation: PASS")
 
 
 if __name__ == "__main__":

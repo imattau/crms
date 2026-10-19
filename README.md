@@ -120,10 +120,10 @@ Then type `/help` for a short guide. A good first session:
 
 After an evidence-backed answer, use `/right` or `/wrong` to record feedback
 against its cited fact, source, or inference rule. Use `/feedback` to inspect
-recent signals and their references. Feedback is saved in `crms_feedback.sqlite3`
-for review. Marking a proof-based answer wrong temporarily suspends validated
-learned rules used in that proof until they pass held-out revalidation; facts and
-teacher-supplied rules are not changed automatically.
+recent signals, fact propositions, and source references. Feedback is saved in
+`crms_feedback.sqlite3` for review. Marking a proof-based answer wrong temporarily
+suspends validated learned rules used in that proof until they pass held-out
+revalidation; facts and teacher-supplied rules are not changed automatically.
 
 ## Learn more
 

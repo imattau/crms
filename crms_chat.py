@@ -12,7 +12,9 @@ from pathlib import Path
 from typing import Any
 
 from crms_dialogue import CRMSDialogue
-from crms_feedback import AnswerFeedbackStore, collect_feedback_refs
+from crms_feedback import (
+    AnswerFeedbackStore, collect_feedback_refs, render_feedback_refs,
+)
 from crms_explain import render_verified_explanation
 from crms_codegen import (
     describe_generated_code, diagnose_list_then_math_support,
@@ -5259,9 +5261,8 @@ def main() -> int:
                             flagged_rules.append(item["id"])
                     if flagged_rules:
                         knowledge.save(args.knowledge)
-                evidence_summary = ", ".join(
-                    f"{item['kind']}={item['id']}"
-                    for item in last_feedback_record["evidence"])
+                evidence_summary = render_feedback_refs(
+                    last_feedback_record["evidence"])
                 print("CRMS> I recorded your feedback against "
                       f"{evidence_summary}. "
                       "It does not change facts by itself.")
@@ -5276,11 +5277,15 @@ def main() -> int:
                 print("CRMS> No answer feedback has been recorded.")
             else:
                 for event in events:
-                    refs = ", ".join(
-                        f"{item['kind']}={item['id']}"
-                        for item in event["evidence"]) or "no evidence references"
                     print(f"CRMS> {event['verdict'].upper()}: "
-                          f"{event['question']} => {event['answer']} [{refs}]")
+                          f"{event['question']} => {event['answer']}")
+                    print("  Used: " + render_feedback_refs(event["evidence"]))
+                    if (event["verdict"] == "wrong"
+                            and any(item.get("kind") == "fact"
+                                    for item in event["evidence"])):
+                        print("  To correct a stored fact, check its polarity and "
+                              "source in /facts, then use /retract-fact "
+                              "POS|SUBJECT|RELATION|OBJECT|SOURCE or NEG|...")
             continue
         if not line.startswith("/"):
             last_feedback_record = None

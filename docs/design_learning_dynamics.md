@@ -49,7 +49,10 @@ sources, and confirmed that a validated learned rule is withheld and its status 
 reload. Inference `why?` follow-ups also retain proof lineage. Remaining work includes persisting
 the immediate answer context across chat restarts, covering feedback on every specialized answer
 route, connecting `/right` to evidence-ledger confirmation, and measuring revision/abstention on a
-larger noisy-feedback benchmark.
+larger noisy-feedback benchmark. Direct-fact feedback stores the structured proposition and its
+supporting source ids; `/feedback` displays them and points to `/retract-fact`. A wrong signal alone
+does not retract or negate a fact: the user must inspect the polarity and source, then issue the
+explicit retraction or correction.
 
 ## 0. Ground rules (read first)
 

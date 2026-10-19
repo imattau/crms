@@ -22,23 +22,68 @@ def _canonical_json(value: Any) -> str:
                       separators=(",", ":"))
 
 
+def _normalize_ref(row: Mapping[str, Any]) -> dict[str, Any]:
+    normalized: dict[str, Any] = {
+        "kind": str(row["kind"]), "id": str(row["id"])}
+    for field in ("subject", "relation", "object"):
+        if row.get(field) is not None:
+            normalized[field] = str(row[field])
+    if row.get("qualifiers") is not None:
+        normalized["qualifiers"] = [
+            [str(name), str(value)] for name, value in row["qualifiers"]]
+    if row.get("sources") is not None:
+        normalized["sources"] = sorted({str(value)
+                                         for value in row["sources"] if value})
+    return normalized
+
+
 def feedback_answer_id(question: str, answer: str,
-                       evidence_refs: Iterable[Mapping[str, str]]) -> str:
+                       evidence_refs: Iterable[Mapping[str, Any]]) -> str:
     """Return a deterministic identifier for an answer and its evidence set."""
     payload = {
         "question": question.strip(),
         "answer": answer.strip(),
+        # Keep event identity stable as display metadata grows. The fact id is
+        # itself a hash of its proposition and qualifiers; the richer triple
+        # and source list are persisted separately in evidence_json.
         "evidence": sorted(
             ({"kind": str(row["kind"]), "id": str(row["id"])}
-             for row in evidence_refs), key=lambda row: (row["kind"], row["id"])),
+             for row in evidence_refs),
+            key=lambda row: (row["kind"], row["id"])),
     }
     return hashlib.sha256(_canonical_json(payload).encode("utf-8")).hexdigest()
 
 
 def collect_feedback_refs(response: Any = None, research: Any = None
-                          ) -> list[dict[str, str]]:
-    """Collect stable fact, rule, and source references from a chat answer."""
-    refs: set[tuple[str, str]] = set()
+                          ) -> list[dict[str, Any]]:
+    """Collect stable fact triples, rule ids, and source refs for an answer."""
+    refs: dict[tuple[str, str], dict[str, Any]] = {}
+
+    def add_ref(kind: str, value: str, **details: Any) -> None:
+        key = (kind, value)
+        row = refs.setdefault(key, {"kind": kind, "id": value})
+        for name, detail in details.items():
+            if detail is not None:
+                if name == "sources":
+                    row[name] = sorted(set(row.get(name, ())) | set(detail))
+                else:
+                    row[name] = detail
+
+    def add_fact(row: Mapping[str, Any]) -> None:
+        fields = {field: str(row.get(field, "")).strip()
+                  for field in ("subject", "relation", "object")}
+        if not all(fields.values()):
+            add_sources(row)
+            return
+        qualifiers = sorted((str(name), str(value))
+                            for name, value in row.get("qualifiers", ()) or ())
+        descriptor = {**fields, "qualifiers": qualifiers}
+        fact_id = hashlib.sha256(
+            _canonical_json(descriptor).encode("utf-8")).hexdigest()
+        add_ref("fact", fact_id, **fields, qualifiers=qualifiers,
+                sources=sorted({str(source) for source in row.get("sources", ())
+                                if source}))
+        add_sources(row)
 
     def add_sources(row: Mapping[str, Any], kind: str = "source") -> None:
         for field in ("fact_id", "rule_id", "schema_id", "source_id",
@@ -49,17 +94,17 @@ def collect_feedback_refs(response: Any = None, research: Any = None
                 ref_kind = ("rule" if field == "rule_id" else
                             "fact" if field == "fact_id" else
                             "schema" if field == "schema_id" else kind)
-                refs.add((ref_kind, str(value).strip()))
+                add_ref(ref_kind, str(value).strip())
         for value in row.get("sources", ()) or ():
             if str(value).strip():
-                refs.add((kind, str(value).strip()))
+                add_ref(kind, str(value).strip())
 
     def visit_proof(node: Any) -> None:
         if not isinstance(node, Mapping):
             return
         fact = node.get("fact")
         if isinstance(fact, Mapping):
-            add_sources(fact, "source")
+            add_fact(fact)
         rule = node.get("rule")
         if isinstance(rule, Mapping):
             add_sources(rule)
@@ -68,27 +113,27 @@ def collect_feedback_refs(response: Any = None, research: Any = None
             add_sources(schema)
         type_fact = node.get("relation_type_fact")
         if isinstance(type_fact, Mapping):
-            add_sources(type_fact, "source")
+            add_fact(type_fact)
         for item in node.get("middle_kind_facts", ()) or ():
             if isinstance(item, Mapping):
-                add_sources(item, "source")
+                add_fact(item)
         single_kind = node.get("middle_kind_fact")
         if isinstance(single_kind, Mapping):
-            add_sources(single_kind, "source")
+            add_fact(single_kind)
         for premise in node.get("premises", ()) or ():
             visit_proof(premise)
 
     if response is not None:
         for row in (getattr(response, "evidence", None) or []):
             if isinstance(row, Mapping):
-                add_sources(row, "source")
+                add_fact(row)
         for proof in (getattr(response, "proofs", None) or []):
             if isinstance(proof, Mapping):
                 visit_proof(proof)
             else:
                 for row in proof:
                     if isinstance(row, Mapping):
-                        add_sources(row, "source")
+                        add_fact(row)
         for proof in (getattr(response, "inference_proofs", None) or []):
             visit_proof(proof)
     if research is not None:
@@ -96,8 +141,25 @@ def collect_feedback_refs(response: Any = None, research: Any = None
             for row in (getattr(research, field, None) or []):
                 if isinstance(row, Mapping):
                     add_sources(row, "source")
-    return [{"kind": kind, "id": value}
-            for kind, value in sorted(refs)]
+    return [refs[key] for key in sorted(refs)]
+
+
+def render_feedback_refs(evidence_refs: Iterable[Mapping[str, Any]]) -> str:
+    """Render feedback references so a user can identify the proposition used."""
+    rendered = []
+    for item in evidence_refs:
+        if (item.get("kind") == "fact"
+                and all(item.get(field) for field in
+                        ("subject", "relation", "object"))):
+            sources = ", ".join(item.get("sources", ()))
+            label = (f"fact {item['subject']} — {item['relation']} → "
+                     f"{item['object']}")
+            if sources:
+                label += f" (sources: {sources})"
+            rendered.append(label)
+        else:
+            rendered.append(f"{item['kind']}={item['id']}")
+    return ", ".join(rendered) or "no evidence references"
 
 
 class AnswerFeedbackStore:
@@ -131,12 +193,11 @@ class AnswerFeedbackStore:
             connection.execute(f"PRAGMA user_version={_SCHEMA_VERSION}")
 
     def record(self, verdict: str, question: str, answer: str,
-               evidence_refs: Iterable[Mapping[str, str]]) -> tuple[str, bool]:
+               evidence_refs: Iterable[Mapping[str, Any]]) -> tuple[str, bool]:
         if verdict not in {"right", "wrong"}:
             raise ValueError("verdict must be 'right' or 'wrong'")
-        refs = sorted(
-            ({"kind": str(row["kind"]), "id": str(row["id"])}
-             for row in evidence_refs), key=lambda row: (row["kind"], row["id"]))
+        refs = sorted((_normalize_ref(row) for row in evidence_refs),
+                      key=lambda row: (row["kind"], row["id"]))
         answer_id = feedback_answer_id(question, answer, refs)
         with sqlite3.connect(self.path) as connection:
             cursor = connection.execute(
