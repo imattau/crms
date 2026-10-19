@@ -6,8 +6,8 @@
 `benchmark_baselines.md`. A read-only fact/rule/question-frame dependency and independent-origin report is
 implemented in `crms_support_report.py` and covered by
 `experiments/v1_344_fact_support_dependency_report.py`. Explicit question-frame source lineage is
-also retained; frame-use counts, lineage for induced question frames, and section 2's
-source-reliability ledger remain proposed.
+also retained, and currently valid induced question-frame lineage is reported; frame-use counts
+and section 2's source-reliability ledger remain proposed.
 **Origin:** diagnostics and test designs taken from the HPM working paper ("Human Learning as
 Hierarchical Pattern Modelling", included in the HPM Learning Agent repo), re-expressed for
 CRMS without vectors. The paper is a hypothesis, not validated science, and says it is not an AI
@@ -68,7 +68,10 @@ report the frame as a dependent, and retraction removes only the affected exampl
 installed rules without saved validation provenance remain unassessed. Source-backed declarative
 frames report their distinct fact-pair examples and resolved sources, but current teaching counts
 do not track which stored claims were later produced through a frame. Question-frame rows report
-their licensing evidence; usage counts for answers produced through a frame remain unavailable.
+their licensing evidence; accepted induced frames appear only while their stored training and
+validation sources still pass the proposal freshness checks. Stale induced-frame rows disappear
+after supporting evidence is retracted. Usage counts for answers produced through a frame remain
+unavailable.
 The report uses exact proof leaves and does not change facts, rules, derived cases, weights, or
 answers.
 

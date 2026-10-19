@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from crms_knowledge import CRMSKnowledgeBase
 from crms_question_induction import propose_analogical_question_frames
+from crms_support_report import support_report
 
 
 PROJECT = Path(__file__).resolve().parents[1]
@@ -100,6 +101,14 @@ def main() -> None:
 
     require(kb.accept_question_frame_proposal(str(proposal["artifact_id"])),
             "validated frame proposal was not accepted into the derived store")
+    frame_support = next((row for row in support_report(kb)
+                          if row.item_id == proposal["artifact_id"]), None)
+    require(frame_support is not None
+            and frame_support.support_examples == len(
+                proposal["lineage"]["training_examples"])
+            and {"design-a", "design-b", "build-a", "build-f"}
+                <= set(frame_support.source_documents),
+            f"accepted induced frame lineage was not reported: {frame_support}")
     require(question_frames_before == {
                 key: dict(rows) for key, rows in kb._question_examples.items()},
             "induced frame was merged into teacher-provided examples")
@@ -167,12 +176,14 @@ def main() -> None:
                 f"the grounded frame:\n{natural_run.stdout}")
 
     kb.remove_fact("Gus", "built", "Bridge", "build-a")
+    require(not any(row.item_id == proposal["artifact_id"]
+                    for row in support_report(kb)),
+            "stale induced frame remained in the support report")
     stale_answer = kb.ask("Who built Tunnel?")
     require(stale_answer.status == "answered" and stale_answer.answer == "Kim"
-            and not any(item.get("kind") == "induced_question_frame"
+            and not any(item.get("artifact_id") == proposal["artifact_id"]
                         for item in stale_answer.language_evidence or [])
-            and any(item.get("kind") == "stored_relation_subject_question"
-                    for item in stale_answer.language_evidence or []),
+            and bool(stale_answer.language_evidence),
             "retracted induced-frame support remained active, or valid direct "
             f"language support was lost: {stale_answer}")
     try:

@@ -150,6 +150,21 @@ def _proof_sources(proof: Any) -> set[str]:
     return found
 
 
+def _lineage_sources(value: Any) -> set[str]:
+    found: set[str] = set()
+    if isinstance(value, Mapping):
+        for key, item in value.items():
+            if key in {"sources", "expected_sources", "actual_sources"}:
+                if isinstance(item, (list, tuple, set)):
+                    found.update(str(source) for source in item if str(source))
+            else:
+                found.update(_lineage_sources(item))
+    elif isinstance(value, (list, tuple)):
+        for item in value:
+            found.update(_lineage_sources(item))
+    return found
+
+
 def _source_statistics(sources: Iterable[str], research_index: Any | None,
                        origin_map: Mapping[str, str] | None
                        ) -> tuple[tuple[str, ...], tuple[str, ...], int | None,
@@ -373,5 +388,46 @@ def support_report(knowledge_base: Any, *, min_dependents: int = 3,
             "frame", item_id, label, None, documents, origins,
             independent_origins, copied, teacher, "unassessed",
             origin_count_available, supported_examples))
+    induced_proposals = []
+    for attribute in ("_induced_question_frames",
+                      "_induced_qualified_question_frames",
+                      "_induced_multi_qualified_question_frames"):
+        induced_proposals.extend(getattr(knowledge_base, attribute, {}).values())
+    if induced_proposals:
+        from crms_question_induction import question_frame_proposal_sources_current
+        for proposal in induced_proposals:
+            if not question_frame_proposal_sources_current(knowledge_base, proposal):
+                continue
+            lineage = proposal.get("lineage", {})
+            sources = _lineage_sources(lineage)
+            (documents, origins, independent_origins, copied, teacher,
+             origin_count_available) = _source_statistics(
+                sources, research_index, origin_map)
+            kind = str(proposal.get("kind", "induced_question_frame"))
+            relation = str(proposal.get("target_relation", "unknown relation"))
+            answer_field = str(proposal.get("answer_field", "unknown"))
+            prefix = proposal.get("prefix")
+            suffix = proposal.get("suffix")
+            if isinstance(prefix, (list, tuple)) and isinstance(suffix, (list, tuple)):
+                bound_field = "object" if answer_field == "subject" else "subject"
+                template = " ".join((*map(str, prefix),
+                                      "{" + bound_field + "}",
+                                      *map(str, suffix)))
+                label = f"Induced question frame {template} ⇒ {relation}"
+            else:
+                label = (f"Induced question frame for {relation} "
+                         f"(answers {answer_field}; {kind})")
+            artifact_id = str(proposal.get("artifact_id", ""))
+            item_id = artifact_id or hashlib.sha256(
+                json.dumps(proposal, sort_keys=True, ensure_ascii=False,
+                           default=str).encode("utf-8")).hexdigest()[:20]
+            training_examples = lineage.get("training_examples", ())
+            support_examples = (len(training_examples)
+                                if isinstance(training_examples, (list, tuple))
+                                else int(proposal.get("training_entities", 0)))
+            rows.append(SupportRow(
+                "frame", item_id, label, None, documents, origins,
+                independent_origins, copied, teacher, "unassessed",
+                origin_count_available, support_examples))
     return sorted(rows, key=lambda row: (
         -(row.dependents or 0), row.label.casefold(), row.item_id))
