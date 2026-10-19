@@ -1548,11 +1548,23 @@ class CRMSDialogue:
                 answered[replacement] = (response, text, research)
 
         if len(answered) != 1:
-            response_text = (
-                "That follow-up matches multiple grounded entity substitutions; "
-                "please restate the full question."
-                if len(answered) > 1 else
-                "I could not verify that follow-up from stored evidence.")
+            if len(answered) > 1:
+                response_text = (
+                    "That follow-up matches multiple grounded entity "
+                    "substitutions; please restate the full question.")
+            elif len(target_candidates) == 1 and not target_is_pronoun:
+                # An explicit named switch still establishes conversational
+                # focus even when the previous question has no answer for that
+                # entity. Keep the source-backed mention as a candidate and
+                # invite the user to specify what they want to know.
+                target = target_candidates[0]
+                self.topic_entity = target
+                response_text = (
+                    f"I couldn't verify the same question about {target}. "
+                    f"What would you like to know about {target}?")
+            else:
+                response_text = (
+                    "I could not verify that follow-up from stored evidence.")
             # This turn attempted to move the active question to a different
             # entity. Keep the cited topic mentions for a possible repair, but
             # do not let a later "why?" silently explain the previous entity's

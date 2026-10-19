@@ -177,10 +177,12 @@ unanswered, but the prior Colosseum question had remained available to the
 `why?` handler, which replayed evidence for the wrong conversational move.
 When a named entity substitution has no grounded answer, dialogue now clears
 the explainable-question pointer while retaining the last cited topic as a
-candidate for repair. The regression checks both `CRMSDialogue.turn` and the
-interactive CLI in an isolated directory. It does not claim that all elliptical
-topic changes are understood; unsupported switches still need clarification or
-abstention.
+candidate for repair. A source-backed named switch becomes the current topic
+and asks what the user wants to know; a following “it” binds to that topic, and
+“why?” cites only the latest source-only turn. The regression checks both
+`CRMSDialogue.turn` and the interactive CLI in an isolated directory. It does
+not claim that all elliptical topic changes are understood; unsupported
+switches still need clarification or abstention.
 
 ## Grounded math-to-list-code composition
 
