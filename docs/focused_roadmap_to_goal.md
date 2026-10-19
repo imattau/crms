@@ -13,7 +13,7 @@ The 70B-class comparison is a reference for task range and interaction, not a cl
 
 The project is still pointed at the right goal. The architecture has meaningful strengths: searchable source text, explicit facts and procedures, provenance, bounded inference with proof checks, cautious abstention, and several narrow end-to-end language and task paths.
 
-The gap is integration and generalization. Most strong results are bounded experiments on authored or controlled examples. They do not yet demonstrate broad task coverage, robust dialogue, autonomous rule learning from source material, or a distributable model that can learn and operate without the original files. Recent dialogue work improves specific topic-grounding and follow-up failures, but remains small-corpus evidence. Procedure composition has a useful source-document holdout slice, while instruction alignment and connective evidence still depend on teacher-authored labels. Verified graph reasoning is stronger than its natural-language routing and governance.
+The gap is integration and generalization. Most strong results are bounded experiments on authored or controlled examples. They do not yet demonstrate broad task coverage, robust dialogue, autonomous rule learning from source material, or a distributable model that can learn and operate without the original files. Recent dialogue work improves specific topic-grounding and follow-up failures, but remains small-corpus evidence. A new ~30-turn Rome/Paris replay confirms useful follow-ups and explicit topic switches, but also exposes a confident wrong answer when an anaphoric sentence is bound to the previous topic, context loss after source-only answers, stale `why?` context, and unsupported history/ordinal questions. Procedure composition has a useful source-document holdout slice, while instruction alignment and connective evidence still depend on teacher-authored labels. Verified graph reasoning is stronger than its natural-language routing and governance.
 
 This is **on track architecturally, not yet on track to claim the capability goal**. The priority is to turn the strongest components into one measured, reproducible chat-level capability, then widen coverage without hiding abstentions or errors.
 
@@ -35,11 +35,13 @@ Work in these packets. Dialogue and contextual intent are an active research tra
 
 ### 1. Protect chat correctness and establish the evaluation contract
 
-Freeze the current reliable dialogue cases and add a compact multi-turn set around topic switches, paragraph/entity grounding, source-only answers, unanswered turns, `why?`, clarification, corrections, and save/reload. Include the Eiffel Tower/Colosseum competing-pronoun case and the source-only follow-up case. A confident wrong referent, stale explanation, or discarded valid context fails the packet; ambiguous context should trigger clarification or abstention.
+Freeze the current reliable dialogue cases and add a compact multi-turn set around topic switches, paragraph/entity grounding, source-only answers, unanswered turns, `why?`, clarification, corrections, history questions, ordinal selection, and save/reload. Include the Eiffel Tower/Colosseum competing-pronoun case and the source-only follow-up case. Specifically test sentences beginning with a pronoun or omitted subject: they may answer for an entity only when the source paragraph or another explicit relation binds that sentence to the entity. Retrieval support alone must not choose the referent.
 
-Use full chat transcripts and varied document layouts, not resolver-only checks. Keep the existing factual and language regressions in the same locked suite so dialogue changes cannot silently damage answer quality.
+Treat context as typed evidence with bounded lifetime, not a single all-or-nothing reset. Preserve the last visible source entities and active question across a source-only answer or a recoverable abstention; replace or expire them on explicit topic change, reset, or a turn that establishes incompatible context. `why?` must identify the exact answer or abstention being explained. For “and Italy?”, “what did I just ask?” and “the first one,” either resolve from visible, still-open context or ask a short clarification. Add the reported wording contrast (“built” vs “designed and built”) as a relation-coverage case, while keeping it separate from referent safety.
 
-**Exit:** fresh-process replay passes the fixed regressions across varied entities and layouts; citations support what the user saw; unresolved references are repaired or declined honestly. Record the scope of the corpus.
+Use full chat transcripts and varied document layouts, not resolver-only checks. Replay the reported 30-turn Rome/Paris sequence, the Eiffel/Colosseum sequence, and a fresh-process save/reload variant. Keep the existing factual and language regressions in the same locked suite so dialogue changes cannot silently damage answer quality. Report wrong referents separately from abstentions and omissions; a more cautious system is not a regression if it prevents a confident wrong answer.
+
+**Exit:** fresh-process replay passes the fixed regressions across varied entities and layouts; every pronoun-led source sentence has a justified entity/paragraph link; citations support what the user saw; unresolved references are repaired or declined honestly. Record corpus size and layout coverage. Do not proceed to learned dialogue moves as a product feature until this explicit baseline is stable.
 
 ### 2. Demonstrate source-disjoint procedure learning and recombination
 
@@ -59,7 +61,7 @@ Then test derivation as a governed proposal: retrieve → compose → independen
 
 ### 4. Advance contextual intent and dialogue
 
-Treat user intent as a revisable hypothesis from the current utterance and explicit discourse context. Use it to track task/subgoal, resolve follow-ups, choose a route, or ask for clarification; it must not create facts or authorize unsupported actions. Evaluate identical utterances in different contexts, topic changes, repairs, confirmations, open choices, and history questions.
+Treat user intent as a revisable hypothesis from the current utterance and explicit discourse context. Use it to track task/subgoal, resolve follow-ups, choose a route, or ask for clarification; it must not create facts or authorize unsupported actions. Evaluate identical utterances in different contexts, topic changes, repairs, confirmations, open choices, and history questions. Keep three measures separate: intent classification, safe context resolution, and successful task completion. A classifier improvement is not useful if the answer uses the wrong entity.
 
 Run the bounded dialogue-move induction pilot separately from the explicit baseline. Preserve utterance citations, corpus/domain policy, and Codex labeling provenance; compare coverage, task completion, inappropriate moves, abstention, and labeling effort. One labeler's agreement is a diagnostic, not accuracy.
 
@@ -79,14 +81,19 @@ After the records and learning lifecycle above are stable, complete migration an
 
 ## Near-term order and scope control
 
-1. Freeze and replay the compact dialogue/chat evaluation slice.
-2. Extend the source-disjoint procedure experiment beyond teacher-labeled aliases. Keep the 1/3 baseline and 3/3 explicitly supervised result side by side. Generalize the `v1_436` review-only proposal path across more operation phrases and near-miss source prose, then move it from the experiment into a reusable chat review flow only if held-out precision remains high and rejection remains safe.
-3. Connect one successful composition to proof/task verification and governed derivation.
-4. Use the scorecard's largest user-visible loss to select the next task: answer-bearing retrieval, paraphrase coverage, dialogue completion, or one bounded domain slice.
-5. Continue intent/dialogue evaluation in parallel; defer production dialogue-move induction until it clears its held-out gate.
-6. Finish SQLite distribution after the record model is stable, then evaluate the clean copy.
+### Immediate packets
 
-Choose work by reduction in wrong answers, increase in held-out useful coverage, or removal of a named integration blocker. Do not grow the corpus, add a domain, migrate storage, or add dialogue machinery solely to show activity. Keep recombination, self-learning rules, reasoning, dialogue, and contextual intent visible in each roadmap review. After every packet, update the scorecard and state plainly whether evidence moves CRMS closer to the overall goal.
+1. **Dialogue safety baseline:** encode and replay the latest Rome/Paris errors plus Eiffel/Colosseum, including source-only follow-ups and restart. Fix the paragraph/entity binding before widening pronoun resolution. Preserve relevant context across non-final outcomes, but make expiry/replacement rules explicit and tested. Make `why?` point to the most recent relevant result. Add history and visible-list ordinal turns only where there is concrete state to resolve them; otherwise clarify.
+2. **One source-disjoint rule-learning experiment:** extend the review-only phrase proposal across distinct operations and direction-sensitive near misses. Keep proposal, source evidence, teacher/labeler decision, accepted rule, and validation as separate records. Promote it to a reusable chat review path only if held-out precision and rejection controls remain strong. Do not call cue matching autonomous learning.
+3. **Reasoning and recombination integration:** send a successful unseen composition through the normal chat route, proof/task checker, and independent verifier; then test missing premises, negative/conflicting evidence, cycles/integrity constraints, and incomplete search. Derived knowledge remains a review-gated proposal with lineage.
+
+### Next packets after those gates
+
+4. Use the shared scorecard's largest user-visible loss to choose between answer-bearing retrieval, relation/paraphrase transfer, or a bounded math/coding/translation/creative task. Each domain gets held-out natural-language requests and an independent checker before scope expands.
+5. Continue contextual-intent evaluation in parallel. Defer learned dialogue-move induction until the safe explicit baseline is stable and the pilot beats it on held-out outcomes without raising wrong-referent or inappropriate-move rates.
+6. Finish SQLite distribution after the record model and learning lifecycle stabilize, then verify a copied model with source files unavailable.
+
+Choose work by reduction in wrong answers, increase in held-out useful coverage, or removal of a named integration blocker. Do not grow the corpus, add a domain, migrate storage, or add dialogue machinery solely to show activity. Keep recombination, self-learning rules, reasoning, dialogue, and contextual intent visible in each roadmap review. After every packet, update the scorecard and state plainly whether evidence moves CRMS closer to the overall goal. A packet is complete only when a clean-process chat replay and its negative controls pass; component scripts alone do not close it.
 
 ## Related design documents
 
