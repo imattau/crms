@@ -1785,6 +1785,28 @@ experiment with explicit human review and substantial labeler effort for
 reverse. It does not establish autonomous phrase induction, general language
 learning, or a production review feature.
 
+## Publisher-held-out source phrase transfer (2026-10-20)
+
+Command: `python3 experiments/v1_437_heldout_publisher_phrase_review.py`.
+
+An additional isolated probe uses the [MDN Array.prototype.sort
+reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
+as an unseen prose publisher and a cited `sorted()` doctest from the
+[Python Sorting HOWTO](https://docs.python.org/3/howto/sorting.html) as the
+independent executable source. A narrow `will <verb phrase>` cue extracts
+`sort the array in ascending order`; the exact spans are cited, the candidate
+remains review-only, and the learned rule keeps both citations and the Codex
+reviewer attribution after reload. Generated Python passes three independent
+held-out lists, while descending wording remains unlicensed. Negated and
+metalinguistic source controls produce 0 false proposals in 2 cases.
+
+The five-script source-learning/recombination run passed 5/5, including
+`v1_437`. This is a real publisher-held-out passage but still one short
+hand-selected excerpt, one extraction grammar, and one operation. It does not
+measure general source-language recall or proposal precision. The next gate is
+multiple publishers and sentence forms, with complete documents and
+independently authored negative passages held out from cue design.
+
 ## Procedure evidence and labeler provenance (2026-10-20)
 
 Commands:
