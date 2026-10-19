@@ -140,6 +140,37 @@ the SQLite model database. Keep a user's current slot values and unresolved inte
 session dialogue state. User-provided values remain user claims or task parameters; they do not
 become accepted world facts by default.
 
+### Distributable model boundary
+
+This boundary is designed but not implemented. The portable package currently includes `knowledge`,
+`rules`, `math`, and `translations`; it has no dialogue-intent memory. Runtime intent patterns still
+live in `crms_conversation.py`, and the present hypotheses identify themselves as
+`hand_checked_runtime_rule`. Do not describe these patterns as learned or as part of a portable
+model until they are moved behind a package-backed interface.
+
+Once a frame has independent human-reviewed training and held-out labels, store it in a versioned
+`dialogue` memory inside the portable SQLite model. Keep the record explicit and auditable:
+
+- stable frame ID, dialogue act, task intent, and realization or match pattern;
+- named slots and typed context/predecessor predicates;
+- exact utterance citations, source-document identities, labeler and adjudication provenance;
+- train/holdout split IDs, coverage and error measures, and review/license status;
+- the domain and corpus policy for which the frame is approved.
+
+Only frames marked licensed after the held-out gate may select an intent or route a turn. A proposed
+frame remains inspectable but cannot affect chat behavior. The live discourse context and current
+intent hypotheses remain in per-user dialogue state; they must never be copied into the shared
+model as user facts. This separates reusable conversational knowledge from the temporary context
+that makes a short answer such as “yes” interpretable.
+
+The implementation should add the `dialogue` package memory and a loader/validator first, with
+round-trip and legacy-model tests. Then migrate the bounded hand-checked seed frames into an
+explicitly labeled built-in policy section or keep them as a compatibility fallback; never silently
+merge built-in product policy with corpus-induced frames. Replace the corresponding hard-coded
+patterns only after the package-backed resolver matches the current regression behavior. Do not
+start induction until independently labeled examples exist: the Taskmaster annotation sheets are
+currently blank, so self-labeled predictions cannot serve as validation evidence.
+
 ## Runtime decision policy
 
 1. Match candidate frames against the current utterance and recent context.
