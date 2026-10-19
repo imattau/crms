@@ -1341,3 +1341,27 @@ negative. The 12 unlabeled chains all derive with independently verified proofs.
 language chat probe reaches one of those conclusions through the learned rule, and a one-edge
 near-miss does not receive a positive inference. This exercises the full pipeline on a controlled
 corpus, not broad natural-language or open-domain learning quality.
+
+## Sentence-ranker fresh-index diagnostic (2026-10-20)
+
+Command:
+
+```sh
+python3 experiments/v1_346_fts_sentence_ranker_evaluation.py \
+  --index data/crms_simplewiki_research.sqlite \
+  --docs-per-window 60 --train-examples 20 --test-examples 20
+```
+
+On the current 1.3 GB SimpleWiki research index, the disjoint 60-document
+windows produced 20 training questions (34 candidate rows, of which only 4
+were positive) and 20 test questions. The existing quoted-evidence gate
+answered 20/20 with 20/20 correct. The opt-in ranker answered 17/20 with 17/17
+correct and abstained on 3; both methods answered all eight test cases with
+multiple gate-passing candidates correctly. Median ranking time was 0.48 ms
+versus 0.30 ms for the gate on this run; total evaluation time was 91.8 s.
+
+This is a small, self-cloze WHO diagnostic with weak labels, not a representative
+quality evaluation. It shows no accuracy gain over the gate on this sample and
+lower overall coverage, so it does not justify enabling the ranker in chat.
+Expand and diversify the source-disjoint evaluation before reconsidering
+deployment; report wrong-answer rate and abstention as well as precision.
