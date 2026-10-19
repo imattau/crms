@@ -1734,18 +1734,20 @@ instruction mapping or sequence connective can be induced from source text.
 Those remain teacher-attributed, so the broader source-driven learning gate is
 still open.
 
-Three additional chat wording probes were run against the same saved model and
-then checked against four held-out input lists with the independent oracle.
-`Write Python code to keep the first occurrence of every number then sort the
-values then reverse the list` generated the expected procedure and passed the
-checker. The alternate stable-unique phrase was explicitly taught, so this
-shows composition with a taught component alias, not an unseen synonym. The
-requests using `remove repeated values ... ascending ...` and `find the unique
-elements in ascending order ...` both abstained because their operation
-phrases were not taught; direct generation agreed with chat. Result: 1/3
-wording probes generated and independently checked, 2/3 abstained, 0 wrong.
-This is a useful coverage boundary for the bounded learner, not a general
-paraphrase score.
+Before additional labels, three chat wording probes generated one procedure
+and abstained on two; none were wrong. After adding explicit Codex-labeled
+examples for the alternate phrases `remove repeated values`, `sort them
+ascending`, `reverse the result`, `reverse them`, and the composite phrase
+`find the unique elements in ascending order`, all three full requests
+generated and passed an independent oracle on four held-out lists and arrays
+from two complete held-out NumPy documents (3/3, 0 wrong, 0 abstained). The
+full requests were held out as compositions, while their component phrase
+mappings were supervised. The underlying operation examples retain
+source/labeler provenance; the composite phrase is a Codex label combining
+stable-unique and sort. The result demonstrates that explicit phrase teaching
+increases coverage for these requests and that the resulting components
+recombine. It does not demonstrate autonomous synonym discovery, source-only
+instruction alignment, or general paraphrase transfer.
 
 ## Procedure evidence and labeler provenance (2026-10-20)
 
