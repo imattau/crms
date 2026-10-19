@@ -1918,6 +1918,34 @@ source-language recall. The next gate is more publishers and sentence forms,
 complete document splits, and independently authored negatives held out from
 cue design.
 
+## Source-grounded procedure phrase recombination (2026-10-20)
+
+Command: `python3 experiments/v1_441_source_grounded_rule_recombination.py`;
+adjacent regression run: `v1_355`, `v1_431`, `v1_433`, `v1_436`, `v1_437`, and
+`v1_441` (6/6 passed).
+
+This joins the isolated source-phrase proposal and sequence-recombination
+paths. A reviewed MDN sentence and a separately sourced Python `sorted()`
+example ground “sort the array in ascending order”; a reviewed NumPy sentence
+and Python `reversed()` example ground “reverse the order of elements.” A
+Python `dict.fromkeys` doctest cites a duplicate-removal example. Codex labels
+the surface-to-operation associations and supplies independent input/output
+contrasts. Two separately labeled compound examples teach the `then`
+connective. CRMS then handles the held-out composition “remove duplicate
+values then sort the array in ascending order” through fresh-process chat,
+creates code with component/sequence evidence, and passes four held-out list
+inputs against an independent `sorted(set(values))` oracle. Citation and
+reviewer provenance survive rule-store reload; a descending-order near miss
+abstains without producing code.
+
+This is an end-to-end teacher-attributed recombination result, not autonomous
+prose learning: two extraction patterns are hand coded, the phrase alignments
+and connective examples are Codex-labeled, and the unique-operation wording is
+also labeler-supplied. It shows these labeled/source-cited components can cross
+in a new chat composition while preserving checks and lineage. It does not
+establish general language induction, broad coding capability, or source-only
+learning.
+
 ## Procedure evidence and labeler provenance (2026-10-20)
 
 Commands:

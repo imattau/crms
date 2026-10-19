@@ -178,6 +178,16 @@ only that narrow regression set. General relation entailment, author-held-out
 dialogue, source-only learning of action wording, and broad temporal phrasing
 remain open.
 
+The procedure track now has an additional end-to-end recombination slice:
+reviewed, source-cited sort and reverse phrases plus a cited duplicate-removal
+example compose through learned `then` into an unseen unique→sort chat request.
+It passes an independent output oracle, fresh-process generation, model reload,
+and a descending near-miss abstention. The phrase extraction and connective
+labels remain Codex-authored; this is teacher-attributed recombination, not
+autonomous prose learning. Adjacent source-learning/composition regressions pass
+6/6. The next gate remains complete-document, source-disjoint transfer with
+independently authored negative passages and a measured proposal precision.
+
 Do not grow the corpus as a substitute for these packets: more documents cannot
 repair relation selection, context updates, or a missing composition learner.
 Use a larger corpus only when a defined held-out evaluation needs it and record
