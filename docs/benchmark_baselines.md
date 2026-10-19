@@ -1785,27 +1785,38 @@ experiment with explicit human review and substantial labeler effort for
 reverse. It does not establish autonomous phrase induction, general language
 learning, or a production review feature.
 
-## Publisher-held-out source phrase transfer (2026-10-20)
+## Publisher- and sentence-form source phrase transfer (2026-10-20)
 
 Command: `python3 experiments/v1_437_heldout_publisher_phrase_review.py`.
 
-An additional isolated probe uses the [MDN Array.prototype.sort
+An isolated probe uses the [MDN Array.prototype.sort
 reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
-as an unseen prose publisher and a cited `sorted()` doctest from the
-[Python Sorting HOWTO](https://docs.python.org/3/howto/sorting.html) as the
-independent executable source. A narrow `will <verb phrase>` cue extracts
-`sort the array in ascending order`; the exact spans are cited, the candidate
-remains review-only, and the learned rule keeps both citations and the Codex
-reviewer attribution after reload. Generated Python passes three independent
-held-out lists, while descending wording remains unlicensed. Negated and
-metalinguistic source controls produce 0 false proposals in 2 cases.
+as an unseen publisher for the phrase “The following function will sort the
+array in ascending order,” paired with a cited `sorted()` doctest from the
+[Python Sorting HOWTO](https://docs.python.org/3/howto/sorting.html). The
+bounded `will <verb phrase>` cue proposes `sort the array in ascending order`.
+The same experiment adds the passive, conditional phrase “the returned array
+will be sorted in ascending order” from the [NumPy `sort`
+reference](https://numpy.org/doc/stable/reference/generated/numpy.sort.html),
+proposing `sort in ascending order`. This is a new NumPy document and sentence
+form, but not a held-out publisher: NumPy was already used for reverse in
+`v1_436`.
 
-The five-script source-learning/recombination run passed 5/5, including
-`v1_437`. This is a real publisher-held-out passage but still one short
-hand-selected excerpt, one extraction grammar, and one operation. It does not
-measure general source-language recall or proposal precision. The next gate is
-multiple publishers and sentence forms, with complete documents and
-independently authored negative passages held out from cue design.
+Both candidates stay review-only until taught through chat. Their exact prose
+and Python code citations and the Codex reviewer attribution survive reload;
+each generated rule passes three independent held-out lists. Opposite-direction
+wording remains unlicensed. Negation, metalinguistic, and direction-only
+controls produce no false proposals in the five cases exercised across the
+two extraction forms. The five-script source-learning/recombination run passed
+5/5, including `v1_437`.
+
+This is publisher holdout for one MDN excerpt and source-document/sentence-form
+holdout for one NumPy excerpt. Both depend on hand-coded extraction patterns
+and one operation, and both use selected snippets rather than complete held-out
+documents. The controls are too small to estimate proposal precision or broad
+source-language recall. The next gate is more publishers and sentence forms,
+complete document splits, and independently authored negatives held out from
+cue design.
 
 ## Procedure evidence and labeler provenance (2026-10-20)
 
