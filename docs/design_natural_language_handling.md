@@ -742,6 +742,16 @@ overlap can abstain on valid paraphrases, named-entity detection is capitalizati
 sets are partly tuned rather than a fresh independent evaluation. Reviewed equivalences remain
 future work; do not treat this as complete natural-language understanding.
 
+The generated-corpus probe exposed a smaller, exact inflection gap: `_stem("crosses")` returned
+`crosse`, while `_stem("crossed")` returned `cross`, so “What body of water crosses Nacre City
+0133?” rejected the source sentence “Nacre City 0133 is crossed by Serein River 0133.” The gate now
+normalizes a narrow set of regular `-es` forms (`-sses`, `-xes`, `-zzes`, `-ches`, `-shes`) while
+preserving ordinary final-e words such as `sizes`, `shoes`, and `uses`. The new
+`experiments/v1_416_regular_es_gate_morphology.py` accepts the active/passive exact-predicate pair,
+and still rejects the wrong numbered entity and the unrelated `flows through` predicate.
+`v1_329_runtime_nl_gate.py` also passes with the updated normalizer. This is morphological
+normalization only; it does not license `run` as a synonym of `cross` or `flow`.
+
 1. **Gate** (3.1), implemented for quoted-evidence and supported abstention routes; broaden its
    answer-type and relation coverage using independent evaluation.
 2. **Show the best sentence by default** for the "no accepted fact supports an answer yet" case,

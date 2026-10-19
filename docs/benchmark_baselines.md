@@ -126,6 +126,20 @@ to evaluate multi-turn dialogue across topic switches and restarts, and measure
 creative quality separately from scripted route and template correctness.
 No overall capability or parity claim follows from this run.
 
+## Active/passive exact-predicate morphology
+
+Commands: `python3 experiments/v1_416_regular_es_gate_morphology.py` and
+`python3 experiments/v1_329_runtime_nl_gate.py`.
+
+The large-corpus audit had a clear sentence but the evidence gate rejected it:
+the question used `crosses`, while the source used passive `is crossed by`.
+`_stem` had stripped only the final `s`, producing `crosse` versus `cross`.
+The narrow `-es` normalization now makes these forms agree. The exact-predicate
+positive is accepted; the wrong numbered entity and an unrelated `flows through`
+question remain rejected. Both focused experiments pass. This demonstrates a
+specific inflection/voice transfer, not semantic synonym coverage; questions
+using `run` still need a licensed relation or must abstain.
+
 ## Grounded math-to-list-code composition
 
 Command: `python3 experiments/v1_356_grounded_math_list_composition.py`

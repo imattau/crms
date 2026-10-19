@@ -55,6 +55,14 @@ def _stem(token: str) -> str:
         value = irregular_base
     elif value.endswith("ies") and len(value) > 4:
         value = value[:-3] + "y"
+    elif (value.endswith(("sses", "xes", "zzes", "ches", "shes"))
+          and len(value) > 4):
+        # Preserve the base consonant in regular -es forms: crosses -> cross,
+        # boxes -> box, and watches -> watch. Do not apply this to a generic
+        # ``-zes`` or ``-oes`` ending: words such as ``sizes`` and ``shoes``
+        # take the ordinary plural -s and retain their final e. A bare
+        # trailing-s strip instead leaves a spurious e in crosses -> crosse.
+        value = value[:-2]
     elif value.endswith("s") and not value.endswith("ss") and len(value) > 3:
         value = value[:-1]
     else:
