@@ -25,6 +25,9 @@ from urllib.request import Request, urlopen
 from crms_text import word_matches
 
 
+_BLANK_LINE_BOUNDARY = re.compile(r"\n[ \t]*\r?\n")
+_DOCTEST_PROMPT_LINE = re.compile(r"(?m)^\s*>>>\s")
+
 # Function words contribute little to document selection and can make a query
 # such as "what is the capital of France" match almost the whole corpus.
 _RESEARCH_STOPWORDS = frozenset({
@@ -229,6 +232,32 @@ def _sentence_spans(text: str) -> list[tuple[int, int]]:
     return spans
 
 
+def _doctest_paragraph_span_at(text: str, position: int
+                              ) -> tuple[int, int] | None:
+    """Return one small doctest paragraph so code and its result cite together."""
+    # Do not scan the entire source document for a paragraph boundary. This
+    # helper runs for each matched token, and source documents can be large.
+    scan_start = max(0, position - 1001)
+    previous_blanks = list(
+        _BLANK_LINE_BOUNDARY.finditer(text, scan_start, position))
+    if not previous_blanks and scan_start:
+        return None
+    start = previous_blanks[-1].end() if previous_blanks else scan_start
+    scan_end = min(len(text), position + 1001)
+    next_blank = _BLANK_LINE_BOUNDARY.search(text, position, scan_end)
+    if next_blank is None and scan_end < len(text):
+        return None
+    end = next_blank.start() if next_blank else len(text)
+    while start < end and text[start].isspace():
+        start += 1
+    while end > start and text[end - 1].isspace():
+        end -= 1
+    if (start >= end or end - start > 1000
+            or not _DOCTEST_PROMPT_LINE.search(text[start:end])):
+        return None
+    return start, end
+
+
 def _sentence_span_at(text: str, position: int,
                       lower_bound: int = 0) -> tuple[int, int]:
     """Return the conservative sentence span containing one character offset.
@@ -237,6 +266,9 @@ def _sentence_span_at(text: str, position: int,
     source documents can contain millions of characters, while a search hit
     usually needs only a handful of local sentence boundaries.
     """
+    doctest_span = _doctest_paragraph_span_at(text, position)
+    if doctest_span is not None:
+        return doctest_span
     start = lower_bound
     cursor = position - 1
     while cursor >= 0:

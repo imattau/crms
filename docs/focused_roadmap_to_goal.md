@@ -89,9 +89,12 @@ component tests used to locate causes.
 
 ### 1. Finish the active evidence and dialogue reliability slices
 
-Complete validation of the current doctest citation-span change, including
-normal retrieval and SQLite-backed retrieval, exact source offsets, and nearby
-rule-learning regressions. It is not shipped evidence until both paths work.
+The doctest citation-span change now returns the full prompt-plus-output block
+from both in-memory and SQLite retrieval. `v1_432` checks exact citation
+resolution, including CRLF text and whitespace-only blank lines. Its
+Python/NumPy citation checks and the adjacent `v1_430`/`v1_431` rule-transfer
+experiments pass. This verifies retrieval and citation boundaries only; it
+does not establish source-only induction or broad coding skill.
 
 Keep the multi-turn topic-switch, paragraph-grounding, source-only follow-up,
 clarification, history, and save/reload probes locked. Add a regression only

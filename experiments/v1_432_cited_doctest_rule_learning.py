@@ -19,7 +19,7 @@ from crms_codegen import generate_python, show_generated_code_evidence
 from crms_knowledge import CRMSKnowledgeBase
 from crms_math import CRMSMath
 from crms_model import CRMSModel
-from crms_research import CRMSResearchIndex, SearchHit
+from crms_research import CRMSResearchIndex, CRMSSQLiteResearchIndex
 from crms_translation import CRMSTranslation
 
 
@@ -46,6 +46,11 @@ TEACHER_CONTRASTS = (
     ([1, -1, 1], [-1, 1, 1]),
     ([0, 1, -1], [-1, 0, 1]),
 )
+CRLF_DOCTEST_DOCUMENT = (
+    "Example follows.\r\n\r\n"
+    ">>> sorted([3, 1, 2])\r\n[1, 2, 3]\r\n \t\r\n"
+    "This paragraph is outside the example.")
+CRLF_DOCTEST_BLOCK = ">>> sorted([3, 1, 2])\r\n[1, 2, 3]"
 
 
 def require(condition: bool, message: str) -> None:
@@ -56,14 +61,46 @@ def require(condition: bool, message: str) -> None:
 def citation_for(index: CRMSResearchIndex, document_id: str, title: str,
                  location: str, text: str) -> str:
     index.add_document(document_id, title, text, location)
-    # Cite the complete executable example, including the result line. Search
-    # currently returns individual code lines for some sources; the exact span
-    # here is still verified against the indexed document and its SHA-256.
-    hit = SearchHit(document_id, title, location, 1.0, text, 0, len(text), ())
+    query = "sorted" if "sorted(" in text else "sort"
+    hits = index.search(query, limit=10, context_chars=0)
+    hit = next((hit for hit in hits if hit.document_id == document_id), None)
+    require(hit is not None,
+            f"search did not retrieve the doctest in {document_id}")
     citation = index.citation(hit)
     require(index.resolve_citation(citation) == text,
             f"{document_id} citation is not the exact code example")
     return citation
+
+
+def check_sqlite_doctest_citations(path: Path) -> None:
+    index = CRMSSQLiteResearchIndex(path)
+    try:
+        for document_id, title, location, text, *_ in TRAINING:
+            index.add_document(document_id, title, text, location)
+        for document_id, _title, _location, text, *_ in TRAINING:
+            query = "sorted" if "sorted(" in text else "sort"
+            hits = index.search(query, limit=10, context_chars=0)
+            hit = next((hit for hit in hits
+                        if hit.document_id == document_id), None)
+            require(hit is not None,
+                    f"SQLite search missed doctest {document_id}")
+            citation = index.citation(hit)
+            require(index.resolve_citation(citation) == text,
+                    f"SQLite citation did not cover the full doctest: "
+                    f"{document_id}")
+        check_crlf_doctest_citation(index)
+    finally:
+        index.close()
+
+
+def check_crlf_doctest_citation(index: CRMSResearchIndex) -> None:
+    index.add_document("crlf-doctest", "CRLF doctest",
+                       CRLF_DOCTEST_DOCUMENT)
+    hits = index.search("sorted", limit=10, context_chars=0)
+    hit = next((hit for hit in hits if hit.document_id == "crlf-doctest"), None)
+    require(hit is not None, "search missed the CRLF doctest")
+    require(index.resolve_citation(index.citation(hit)) == CRLF_DOCTEST_BLOCK,
+            "CRLF/whitespace separator did not preserve the exact doctest")
 
 
 def launch(root: Path, lines: list[str]) -> subprocess.CompletedProcess[str]:
@@ -120,6 +157,7 @@ def main() -> None:
 
     with tempfile.TemporaryDirectory(prefix="crms-cited-doctest-") as folder:
         root = Path(folder)
+        check_sqlite_doctest_citations(root / "research.sqlite3")
         CRMSModel(max_workers=1).save(root / "rules.json")
         CRMSMath().save(root / "math.json")
         CRMSKnowledgeBase().save(root / "knowledge.json")
@@ -135,6 +173,7 @@ def main() -> None:
                 f"/teach-rule sort the numbers|"
                 f"{','.join(map(str, inputs))}|"
                 f"{','.join(map(str, outputs))}|{citation}")
+        check_crlf_doctest_citation(index)
         index.save(root / "index.json")
 
         # Both cited documentation examples are positive-only, so the learner
@@ -195,6 +234,7 @@ def main() -> None:
                 "an unsupported operation was licensed by the sort examples")
 
     print("Python and NumPy doctest citations verified without executing source: PASS")
+    print("in-memory and SQLite search cite complete doctest blocks: PASS")
     print("chat learned sort from two cited docs plus two teacher contrasts: PASS")
     print("three held-out lists and generated Python passed independent checks: PASS")
     print("unsupported rotation remained unlicensed: PASS")

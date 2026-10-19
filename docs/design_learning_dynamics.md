@@ -738,6 +738,13 @@ prove that the source wording licenses the natural-language instruction, and
 natural-language and contrastive teaching still lack automatic per-example
 source capture.
 
+Research retrieval now widens a hit within a short doctest paragraph to include
+its prompt and output together, so a cited command is not separated from the
+result that validates it. `v1_432` checks exact citation round trips through
+both in-memory and SQLite indexes, including CRLF input with whitespace-only
+blank lines. This affects evidence span construction only; the bounded parser
+and teacher-attributed instruction link remain unchanged.
+
 `v1_432_cited_doctest_rule_learning.py` exercises this path using exact code
 excerpts from the official Python Sorting HOWTO and NumPy documentation. The
 two cited examples are both positive-only, so the learner correctly refuses
