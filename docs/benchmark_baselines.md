@@ -8,10 +8,13 @@ reasoning, but these results are not a shared cross-domain score and do not
 establish equivalence to a large language model. The current container exposes
 an `ollama` executable but no reachable Ollama service (`ollama list` failed to
 connect to `127.0.0.1:11434` under the available runtime permissions), and no
-70B-class comparator outputs are recorded here. A comparison remains pending a
-pinned model/runtime that can be run on the same held-out tasks and context.
-Until then, report component results and unsupported cases separately; make no
-parity claim.
+direct 70B-class comparator outputs are recorded here. A qualitative
+capability and interaction comparison, based on published model reports and
+the CRMS component results, is in
+[`capability_comparison_70b.md`](capability_comparison_70b.md). A direct
+head-to-head score still requires a pinned model/runtime on the same held-out
+tasks and context. Report component results and unsupported cases separately;
+make no parity claim.
 
 ## Cross-surface question transfer v1
 
