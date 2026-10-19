@@ -145,6 +145,19 @@ Keep dev and test sealed from frame induction and policy tuning. If a target cla
 independently supported examples, report it as underpowered rather than borrowing turns across the
 split. The sampler refuses annotated inputs and never uses CRMS predictions as labels.
 
+### AI annotation provenance
+
+An AI model may fill the primary annotation fields when explicitly authorized, but its identity
+must be recorded as the annotator; do not describe those judgments as human-reviewed or
+independent. Do not fill `*_2` or adjudication fields with another pass from the same model. That
+does not provide an independent reliability check.
+
+The current `/tmp/crms_dialogue_feasibility_v1` batch has one AI annotation for each of its 563 user
+turns and 650 assistant turns. The designated audit sample still needs an independent rater. The
+annotations are useful for error analysis and provisional baseline comparison, but they are not
+gold labels, do not establish agreement, and must not license learned frames. The evaluator reports
+the batch as incomplete for that reason.
+
 The assistant worksheet stores the first label in `move_label`, `context_license`,
 `predecessor_label`, and `reviewer`. Record `reviewed_at` and `protocol_version` for that label. For
 rows marked `double_label_required=true`, a second annotator fills the corresponding `*_2` columns,

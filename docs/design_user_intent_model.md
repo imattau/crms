@@ -54,8 +54,10 @@ on dev, and 22.3% on test; selected-intent coverage is 19.9%, 20.0%, and 18.5% r
 current decisions include seek-information questions and modal requests, in addition to social
 phrases and ambiguous bare yes/no turns.
 
-This is a **coverage diagnostic, not an accuracy result**. The pilot labels are still blank, and
-fresh state deliberately removes the context that the proposed model must use. The coverage increase
+This is a **coverage diagnostic, not an accuracy result**. A 40-conversation train-only feasibility
+batch has since received one AI annotation pass (563 user turns and 650 assistant turns). The labels
+are provisional and have no independent second-rater review; fresh state also deliberately removes
+the context that the proposed model must use. The coverage increase
 shows that ordinary questions and requests were missing from the earlier baseline; it does not show
 that the new labels are correct. Turns with no hypothesis include ordinary task content; short slot
 answers such as a cuisine, party size, or time can only be interpreted as a task-intent continuation
@@ -74,8 +76,20 @@ The diagnostic is reproducible with
 [`v1_373_taskmaster_intent_baseline_coverage.py`](../experiments/v1_373_taskmaster_intent_baseline_coverage.py).
 It reports coverage by split and the preceding-question cue, without exposing utterance text or
 claiming correctness.
-Next evaluation requires human annotations and should compare context-free and context-aware
-decisions on the same held-out conversations.
+The single-AI-label pass enables a limited development comparison, but it does not satisfy the
+independent review gate. Running
+[`v1_385_provisional_dialogue_label_comparison.py`](../experiments/v1_385_provisional_dialogue_label_comparison.py)
+on that batch gave the context-free baseline hypotheses on 137/563 turns (24.3%) and selected
+intents on 125/563 (22.2%). Within the hypothesized turns, act labels matched the AI annotations
+on 86.1% and task-intent labels on 74.5%. These are **label-agreement diagnostics, not accuracy**;
+the batch has one AI annotator, and shared biases between annotation and hand-built rules may inflate
+agreement. Coverage was especially low for annotated `provide-constraint` turns (3/104, 2.9%) and
+`make-reservation` turns (7/63, 11.1%). This points to missing contextual slot and task-phase
+handling, rather than a need to add more factual knowledge.
+
+The next evaluation should compare context-free and context-aware decisions on the same held-out
+conversations. The AI labels can guide error analysis and prototype development, but must not be
+used as independent agreement evidence or to license learned frames.
 
 ## Why intent belongs in the model
 
@@ -159,8 +173,9 @@ model versions remain readable.
 This is a narrow runtime seam, not learned dialogue competence: there is no frame induction yet,
 surface patterns are exact phrases rather than slot-generalizing templates, and task-oriented
 slots beyond existing dialogue state are not supported. Most ordinary intent recognition still
-uses the hand-checked rules in `crms_conversation.py`. The Taskmaster labels remain blank, so no
-accuracy claim is available. If two licensed portable frames match the same utterance and context
+uses the hand-checked rules in `crms_conversation.py`. The 40-conversation feasibility batch has
+single-AI labels for error analysis, but no independent human review, so no accuracy claim is
+available. If two licensed portable frames match the same utterance and context
 but select different routes, CRMS now records an ambiguous hypothesis, asks the user to choose
 between the two routes, and executes only the selected route. The short yes/no choice retains the
 matched-frame evidence and never changes factual knowledge. This handles an explicit model conflict;
@@ -213,10 +228,12 @@ Use the two Taskmaster sheets in the dialogue pilot:
 - User-turn annotations separately label dialogue act, contextual task intent, context state, and
   preceding assistant act.
 
-The labels are human-reviewed measurements, not labels already present in Taskmaster. Train or
-induce on train conversations only; use dev to select frame/context policies; hold test conversations
-untouched until evaluation. Keep both annotators' labels and disagreements. Do not use a model's own
-predictions as their validation evidence. To test transfer, repeat on another independently
+Taskmaster does not provide these labels. The current feasibility batch has one AI-authored label
+per turn, while the designated second-rater and adjudication fields remain blank. Treat those labels
+as provisional error-analysis targets; do not calculate inter-rater agreement or use them as held-out
+validation evidence. Train or induce on train conversations only; use dev to select frame/context
+policies; hold test conversations untouched until evaluation. For licensed dialogue frames, retain
+independent annotator labels and adjudication. To test transfer, repeat on another independently
 collected corpus and report domain shift rather than pooling the corpora blindly.
 
 ## Evaluation and capability comparison
@@ -236,28 +253,33 @@ capability comparator, not a label oracle.
 
 ## Implementation sequence
 
-1. Finalize the annotation schema and label a feasibility batch with independent review.
-2. Measure the current scripted baseline on those adjudicated examples.
+1. Finalize the annotation schema; use AI labels for early error analysis and obtain independent
+   review before treating the feasibility batch as an evaluation set.
+2. Measure the current scripted baseline on independently reviewed examples. The existing
+   single-AI comparison is development evidence only.
 3. Induce user act/intent frames from train examples and learn context predicates only where the
    labels support them.
 4. Compare lexical-only and contextual models on held-out conversations.
 5. Integrate only intents that improve task progress without increasing unsupported claims or
    mistaken actions; keep unlicensed turns on the existing honest fallback.
 
-The current corpus preparation now emits `user_turns_to_label.csv` alongside the assistant move
-sheet. Both are in `/tmp/crms_taskmaster_pilot` in the current development environment; no labels
-have yet been supplied, so all quality claims remain open.
+The current corpus preparation emits `user_turns_to_label.csv` alongside the assistant move sheet.
+The full prepared pilot remains in `/tmp/crms_taskmaster_pilot`. A separate 40-conversation batch in
+`/tmp/crms_dialogue_feasibility_v1` now contains one AI label per user and assistant turn. The AI
+annotator identity is recorded in each row; second-rater and adjudication fields remain empty, so
+all quality claims remain open.
 
 `experiments/v1_366_dialogue_annotation_evaluation.py` checks split integrity, label values, audit
-coverage, raw agreement, Cohen's kappa, and adjudication of disagreements. On the current pack it
-reports `awaiting_annotations`, 6,227 user turns, 7,312 assistant turns, and no agreement score; an
-empty sheet is not evidence of agreement. It supports `--strict` to prevent incomplete annotations
-from being reported as a completed evaluation, and `--self-test` for the agreement formula,
+coverage, raw agreement, Cohen's kappa, and adjudication of disagreements. On the feasibility batch,
+all primary fields are filled but the evaluator correctly reports `incomplete`: its selected audit
+conversations have no independent second labels. The evaluator supports `--strict` to prevent
+incomplete annotations from being reported as a completed evaluation, and `--self-test` for the agreement formula,
 split-leakage checks, and required label provenance.
 
-To make a first human pass manageable, `experiments/v1_382_dialogue_feasibility_batch.py` selects
-whole conversations from train only, copies their cited transcripts, and deterministically assigns
-20% of the selected conversations for independent double labeling. The current 40-conversation
-batch contains 563 user turns and 650 assistant turns; its label cells remain blank. This creates a
-feasible annotation artifact, not an accuracy result. Run the evaluator after labels are entered,
-and do not train or tune on the double-label audit or held-out dev/test conversations.
+`experiments/v1_382_dialogue_feasibility_batch.py` selects whole conversations from train only,
+copies their cited transcripts, and deterministically assigns 20% of selected conversations for
+independent double labeling. The 40-conversation batch contains 563 user turns and 650 assistant
+turns. Its current primary labels are AI-authored; the designated audit remains incomplete. The
+comparison in `v1_385_provisional_dialogue_label_comparison.py` reports label agreement and coverage
+only, not accuracy. Do not train or tune licensed frames on these labels or on held-out dev/test
+conversations.

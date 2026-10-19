@@ -135,7 +135,10 @@ uses the wrong domain convention.
 Use [dialogue_move_annotation_protocol.md](dialogue_move_annotation_protocol.md) for the label
 definitions, context coding, independent review, agreement reporting, and comparator evaluation.
 The worksheet flags a deterministic 20% conversation-level reliability sample within each split
-and leaves the second-rater and adjudication fields empty until humans complete them.
+and leaves the second-rater and adjudication fields empty until an independent rater and adjudicator
+complete them. An explicitly authorized AI pass has filled the primary fields of the 40-conversation
+feasibility batch, but it is provisional and does not count as independent review; see the protocol
+for its provenance and limits.
 The separate [contextual user-intent design](design_user_intent_model.md) makes intent a first-class
 research target distinct from assistant move realization. The pilot now includes user-turn
 annotations because assistant-only labels cannot teach CRMS what users are trying to accomplish.
