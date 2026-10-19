@@ -67,13 +67,44 @@ def render_verified_explanation(knowledge: Any, proof: Mapping[str, Any], *,
 
     claims: list[tuple[str, tuple[tuple[str, ...], ...], bool]] = []
     paragraphs: list[str] = []
+    emitted_fact_keys: set[tuple[Any, ...]] = set()
+
+    def append_fact(fact: Mapping[str, Any]) -> str:
+        claim = {field: str(fact.get(field, ""))
+                 for field in ("subject", "relation", "object")}
+        key = _claim_key(claim)
+        sources = tuple(sorted(str(item) for item in fact.get("sources", ())
+                               if item))
+        fact_key = (*key, sources)
+        sentence, structured = sentence_for(claim)
+        claims.append((sentence, key, structured))
+        if fact_key not in emitted_fact_keys:
+            emitted_fact_keys.add(fact_key)
+            citation = (" [Sources: " + "; ".join(sources) + "]") if sources else ""
+            paragraphs.append(sentence + citation)
+        return sentence
 
     def visit(node: Mapping[str, Any]) -> None:
         for premise in node.get("premises", ()):
             if isinstance(premise, Mapping):
                 visit(premise)
+        kind_facts = node.get("middle_kind_facts", ())
+        if isinstance(kind_facts, list):
+            for fact in kind_facts:
+                if isinstance(fact, Mapping):
+                    append_fact(fact)
+        elif isinstance(node.get("middle_kind_fact"), Mapping):
+            append_fact(node["middle_kind_fact"])
+        type_fact = node.get("relation_type_fact")
+        if isinstance(type_fact, Mapping):
+            append_fact(type_fact)
         claim = node.get("conclusion")
         if not isinstance(claim, Mapping):
+            return
+        if node.get("kind") == "fact":
+            fact = node.get("fact")
+            if isinstance(fact, Mapping):
+                append_fact(fact)
             return
         sentence, structured = sentence_for(claim)
         key = _claim_key(claim)
@@ -90,6 +121,14 @@ def render_verified_explanation(knowledge: Any, proof: Mapping[str, Any], *,
             for item in premises:
                 if isinstance(item, Mapping):
                     premise_text.append(sentence_for(item)[0])
+            if isinstance(kind_facts, list):
+                premise_text.extend(sentence_for(fact)[0]
+                                    for fact in kind_facts
+                                    if isinstance(fact, Mapping))
+            elif isinstance(node.get("middle_kind_fact"), Mapping):
+                premise_text.append(sentence_for(node["middle_kind_fact"])[0])
+            if isinstance(type_fact, Mapping):
+                premise_text.append(sentence_for(type_fact)[0])
             rule = node.get("rule", {})
             label = (f"rule {rule.get('rule_id')}" if isinstance(rule, Mapping)
                      else str(node.get("schema", {}).get("schema_id", "schema")))

@@ -44,7 +44,8 @@ def main() -> None:
             f"Case {case} Node 0 — great-grandparent → "),
                 f"depth {depth} answer did not use structured fallback")
         structured_fallbacks += 1
-        expected_paragraphs = 1 + hops + 1 + (not result.complete)
+        # Answer + edge facts + relation-schema license + inference step.
+        expected_paragraphs = 1 + hops + 1 + 1 + (not result.complete)
         require(len(explanation.split("\n\n")) == expected_paragraphs,
                 f"depth {depth} had wrong paragraph count")
         require(explanation == render_verified_explanation(
@@ -96,6 +97,23 @@ def main() -> None:
     require(realized is not None
             and realized.startswith("Nia is a grandparent of Pia."),
             f"licensed wording was not selected and round-tripped: {realized}")
+
+    typed = CRMSKnowledgeBase()
+    typed.add_fact("Nia", "parent", "Oren", "typed:first")
+    typed.add_fact("Oren", "parent", "Pia", "typed:second")
+    typed.add_fact("Oren", "is-a", "person", "typed:kind")
+    typed.add_inference_rule(
+        "typed-grandparent", "parent", "parent", "grandparent",
+        middle_kind="person")
+    typed_result = typed.infer_relation("Nia", "grandparent", "Pia")
+    require(typed_result.status == "answered" and typed_result.proofs,
+            "typed rule did not establish its conclusion")
+    typed_text = render_verified_explanation(
+        typed, typed_result.proofs[0], complete=typed_result.complete)
+    require(typed_text is not None
+            and "Oren — is-a → person" in typed_text
+            and "typed:kind" in typed_text,
+            f"typed premise was omitted from explanation: {typed_text}")
 
     partial = CRMSKnowledgeBase()
     partial.add_fact("Open A", "connected", "Open B", "open:one")
