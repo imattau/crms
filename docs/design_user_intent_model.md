@@ -40,6 +40,28 @@ CRMS should model at least two distinct judgments:
 Neither label is the truth of a world claim. A user can ask a question while giving a false premise;
 intent recognition must never turn that premise into a fact.
 
+Treat intent as a model capability, not as a one-off chat heuristic or a property of the current
+utterance alone. The reusable part belongs in the distributable CRMS model: reviewed intent frames,
+their context and predecessor conditions, and the evidence and evaluation status that license
+them. The active conversation supplies the changing context. At each turn CRMS forms a bounded
+hypothesis about the user's immediate goal, updates or retains it as new turns arrive, and keeps
+multiple readings when the evidence does not distinguish them. The hypothesis is contextual and
+revisable; it is not a permanent profile or an assertion that CRMS knows the user's hidden mental
+state.
+
+This separates three things that must not be conflated:
+
+| Component | Lifetime | Example |
+|---|---|---|
+| Intent model | Shared/distributable; learned and reviewed | A correction frame is licensed when it refers to a prior answer |
+| Discourse context | Current session; bounded and inspectable | The last answer, open clarification, active topic, and unresolved slots |
+| Intent hypothesis | Current turn or unresolved exchange; revisable | “The user may be correcting the entity; another reading is a topic change” |
+
+Intent can guide routing, clarification, and task continuity. It cannot authorize a side effect, turn
+a user statement into accepted knowledge, or strengthen the evidence for a factual answer. When a
+new turn conflicts with the current hypothesis, CRMS should revise or ask; it should not silently
+reinterpret earlier user statements as facts.
+
 ## Explicit contextual representation
 
 Represent a user-intent hypothesis as an inspectable record, not a latent state:
@@ -54,6 +76,10 @@ Represent a user-intent hypothesis as an inspectable record, not a latent state:
 | `alternatives` | Other licensed readings and the evidence that supports them |
 | `decision` | `selected`, `ambiguous`, or `unlicensed` |
 | `evidence_refs` | Cited training utterances, label provenance, and review status |
+
+The record is a per-turn decision over the current discourse state, not a user-level identity label.
+Retain alternatives and the context predicates that would distinguish them; do not force a single
+intent when the context is insufficient.
 
 The minimum context state should remain bounded and typed: recent acts, the current question under
 discussion, the active task/topic, open required slots, pending clarification or offer, and the

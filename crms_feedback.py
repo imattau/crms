@@ -146,6 +146,43 @@ def collect_feedback_refs(response: Any = None, research: Any = None
     return [refs[key] for key in sorted(refs)]
 
 
+def collect_translation_feedback_refs(result: Any) -> list[dict[str, Any]]:
+    """Identify the aligned model examples behind a completed translation.
+
+    Translation examples do not necessarily have document citations (some are
+    taught directly), so the reference is a stable fingerprint of the exact
+    language pair, frame, output, and aligned examples used. This records
+    feedback provenance without treating the feedback as a new translation
+    example or as a quality judgment by itself.
+    """
+    if (getattr(result, "status", None) != "translated"
+            or not getattr(result, "output", None)
+            or not getattr(result, "language_pair", None)):
+        return []
+    examples = []
+    for row in getattr(result, "evidence", ()) or ():
+        if not isinstance(row, Mapping):
+            continue
+        source = str(row.get("source", "")).strip()
+        target = str(row.get("target", "")).strip()
+        if source and target:
+            examples.append({"source": source, "target": target})
+    if not examples:
+        return []
+    payload = {
+        "language_pair": list(result.language_pair),
+        "register": getattr(result, "register", None),
+        "template": getattr(result, "template", None),
+        "output": result.output,
+        "examples": sorted(examples, key=lambda row: (row["source"], row["target"])),
+    }
+    frame_id = hashlib.sha256(_canonical_json(payload).encode("utf-8")).hexdigest()
+    example_ids = sorted(hashlib.sha256(
+        _canonical_json(row).encode("utf-8")).hexdigest() for row in examples)
+    return [{"kind": "translation_frame", "id": frame_id,
+             "sources": example_ids}]
+
+
 def render_feedback_refs(evidence_refs: Iterable[Mapping[str, Any]]) -> str:
     """Render feedback references so a user can identify the proposition used."""
     rendered = []
@@ -158,6 +195,12 @@ def render_feedback_refs(evidence_refs: Iterable[Mapping[str, Any]]) -> str:
                      f"{item['object']}")
             if sources:
                 label += f" (sources: {sources})"
+            rendered.append(label)
+        elif item.get("kind") == "translation_frame":
+            examples = ", ".join(item.get("sources", ()))
+            label = f"translation frame {item['id']}"
+            if examples:
+                label += f" (aligned example ids: {examples})"
             rendered.append(label)
         else:
             rendered.append(f"{item['kind']}={item['id']}")

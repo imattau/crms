@@ -14,7 +14,8 @@ from typing import Any
 from crms_dialogue import CRMSDialogue
 from crms_conversation import is_farewell, respond as respond_conversation
 from crms_feedback import (
-    AnswerFeedbackStore, collect_feedback_refs, render_feedback_refs,
+    AnswerFeedbackStore, collect_feedback_refs,
+    collect_translation_feedback_refs, render_feedback_refs,
 )
 from crms_explain import render_verified_explanation
 from crms_codegen import (
@@ -8615,7 +8616,14 @@ def main() -> int:
             continue
         translation_result = translation_model.translate(line)
         if translation_result is not None:
-            print(f"CRMS> {render_translation(translation_result)}")
+            translation_text = render_translation(translation_result)
+            print(f"CRMS> {translation_text}")
+            translation_refs = collect_translation_feedback_refs(
+                translation_result)
+            remember_feedback(
+                {"question": line, "answer": translation_text,
+                 "evidence": translation_refs}
+                if translation_refs else None)
             if (translation_result.status == "ambiguous"
                     and translation_result.register is None
                     and len(translation_result.matched_registers) > 1

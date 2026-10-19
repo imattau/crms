@@ -51,9 +51,11 @@ now persists in SQLite across chat restarts, including its evidence references; 
 migrates without discarding its event history. A new natural-language turn clears that target, and
 opposite post-restart signals remain a reviewable conflict.
 `experiments/v1_367_persistent_feedback_context.py` checks those behaviors. Remaining work includes
-covering feedback on every specialized answer route,
-connecting `/right` to evidence-ledger confirmation, and measuring revision/abstention on a larger
-noisy-feedback benchmark. Direct-fact feedback stores the structured proposition and its supporting
+attaching feedback to the specialized translation route using a deterministic fingerprint of the
+aligned frame and examples used. This identifies the model evidence without turning user feedback
+into a new translation example. Other specialized answer routes still need coverage. Remaining work
+also includes connecting `/right` to evidence-ledger confirmation and measuring
+revision/abstention on a larger noisy-feedback benchmark. Direct-fact feedback stores the structured proposition and its supporting
 source ids; `/feedback` displays numbered propositions and citations, and
 `/retract-feedback FEEDBACK|FACT|SOURCE` retracts only the selected source support. A wrong signal
 alone does not retract or negate a fact: the user must inspect the evidence and explicitly choose a

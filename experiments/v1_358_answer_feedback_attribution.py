@@ -17,10 +17,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from crms_feedback import (
-    AnswerFeedbackStore, collect_feedback_refs, feedback_answer_id,
-    render_feedback_refs,
+    AnswerFeedbackStore, collect_feedback_refs,
+    collect_translation_feedback_refs, feedback_answer_id, render_feedback_refs,
 )
 from crms_knowledge import CRMSKnowledgeBase
+from crms_translation import CRMSTranslation
 
 
 def require(condition: bool, message: str) -> None:
@@ -52,6 +53,27 @@ def main() -> None:
         ("source", "family:1"), ("source", "family:2"),
         ("source", "s7"), ("source", "wiki:ada"))),
         f"did not collect exact rule/source lineage: {refs}")
+
+    translation = CRMSTranslation()
+    translation.teach(
+        "English", "Spanish", "neutral",
+        "The cat greets {name}.", "El gato saluda a {name}.",
+        [("The cat greets Lina.", "El gato saluda a Lina."),
+         ("The cat greets Omar.", "El gato saluda a Omar.")])
+    translated = translation.translate(
+        "Translate from English to Spanish: The cat greets Lina.")
+    translation_refs = collect_translation_feedback_refs(translated)
+    require(len(translation_refs) == 1
+            and translation_refs[0]["kind"] == "translation_frame"
+            and len(translation_refs[0]["sources"]) == 2,
+            f"translation feedback did not identify its aligned examples: {translation_refs}")
+    require(collect_translation_feedback_refs(SimpleNamespace(
+                status="ambiguous", output=None, evidence=())) == [],
+            "ambiguous translation was offered as answer feedback")
+    require(translation_refs == collect_translation_feedback_refs(translated),
+            "translation evidence fingerprint was not deterministic")
+    require("aligned example ids:" in render_feedback_refs(translation_refs),
+            "translation feedback did not display its aligned-example references")
     fact_ref = next((item for item in refs if item["kind"] == "fact"), None)
     require(fact_ref is not None
             and fact_ref["subject"] == "Ada"
@@ -229,7 +251,34 @@ def main() -> None:
         require(AnswerFeedbackStore(root / "feedback.sqlite3").event(1) is not None,
                 "explicit retraction deleted its feedback audit event")
 
+    with tempfile.TemporaryDirectory(prefix="crms-translation-feedback-chat-") as directory:
+        root = Path(directory)
+        translation.save(root / "translations.json")
+        args = [sys.executable, str(ROOT / "crms_chat.py"),
+                "--knowledge", str(root / "knowledge.json"),
+                "--feedback-db", str(root / "feedback.sqlite3"),
+                "--dialogue-state", str(root / "dialogue.json"),
+                "--rules", str(root / "rules.json"),
+                "--rule-session", str(root / "rule-session.json"),
+                "--math", str(root / "math.json"),
+                "--math-session", str(root / "math-session.json"),
+                "--translations", str(root / "translations.json"),
+                "--translation-session", str(root / "translation-session.json")]
+        run = subprocess.run(
+            args,
+            input=("Translate from English to Spanish: The cat greets Lina.\n"
+                   "/wrong\n/feedback\n/quit\n"),
+            text=True, capture_output=True, timeout=30)
+        require(run.returncode == 0, run.stderr or run.stdout)
+        events = AnswerFeedbackStore(root / "feedback.sqlite3").recent(1)
+        require(len(events) == 1
+                and any(item["kind"] == "translation_frame"
+                        for item in events[0]["evidence"]),
+                f"translation correction lost its model-frame attribution: {events}")
+
     print("answer feedback attribution: direct facts, rule, and source refs PASS")
+    print("translation feedback ties to deterministic aligned-frame evidence: PASS")
+    print("interactive translation feedback persists its frame attribution: PASS")
     print("SQLite persistence, deterministic IDs, duplicate suppression: PASS")
     print("conflicting feedback retained for review without changing knowledge: PASS")
     print("wrong proof feedback suspends only validated learned rules: PASS")
