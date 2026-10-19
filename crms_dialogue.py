@@ -112,6 +112,29 @@ class UserIntentHypothesis:
     basis: str = "hand_checked_runtime_rule"
 
 
+_HISTORY_LIMIT = 12
+_HISTORY_FIELD_LIMIT = 200
+_HISTORY_QUESTION_LIMIT = 500
+_SHOWN_LIMIT = 500
+_ELABORATION_BATCH = 3
+_HISTORY_KEYS = {"act", "utterance", "status"}
+
+
+def _shown_key(fact: Any) -> str:
+    parts = [fact.subject, fact.relation, fact.object,
+             *(f"{name}={value}" for name, value in fact.qualifiers)]
+    return " | ".join(" ".join(_WORD_RE.findall(part)).casefold()
+                      for part in parts)
+
+
+def _source_label(sources: Any) -> str:
+    names = [str(source).partition("#sha256=")[0] for source in sources]
+    if not names:
+        return "no source"
+    return "source: " + ", ".join(names[:2]) + (
+        f" +{len(names) - 2}" if len(names) > 2 else "")
+
+
 @dataclass
 class DialogueTurn:
     status: str
@@ -151,6 +174,102 @@ class CRMSDialogue:
         # Names extracted from the most recently quoted source passage are
         # discourse candidates only; they never become facts or answer evidence.
         self.source_mentions: list[dict[str, str]] = []
+        # Conversation memory that outlives a refused turn. ``clear`` drops
+        # referents so a stale pronoun cannot bind; it leaves these alone, and
+        # only ``reset_history`` (the explicit /reset) wipes them.
+        self.history: list[dict[str, str]] = []
+        self.last_answered: dict[str, str] | None = None
+        self.shown: list[str] = []
+
+    def record_turn(self, utterance: str, act: str,
+                    turn: "DialogueTurn") -> None:
+        """Append a bounded record of this turn and remember a grounded answer."""
+        self.history.append({
+            "act": act[:_HISTORY_FIELD_LIMIT],
+            "utterance": utterance.strip()[:_HISTORY_FIELD_LIMIT],
+            "status": str(turn.status)[:_HISTORY_FIELD_LIMIT],
+        })
+        del self.history[:-_HISTORY_LIMIT]
+        response = turn.response
+        if (turn.status == "answered" and response is not None
+                and response.status == "answered" and turn.resolved_question):
+            answer = response.answer or (
+                "yes" if response.truth is True else
+                "no" if response.truth is False else "")
+            self.last_answered = {
+                "question": turn.resolved_question[:_HISTORY_QUESTION_LIMIT],
+                "answer": answer[:_HISTORY_QUESTION_LIMIT],
+            }
+
+    def reset_history(self) -> None:
+        self.history = []
+        self.last_answered = None
+        self.shown = []
+
+    def focus_entities(self) -> list[str]:
+        """Entities the conversation is currently about, most recent answer first."""
+        return list(dict.fromkeys(
+            entity for entity in (
+                self.last_entity, self.subject_entity, self.object_entity)
+            if entity))
+
+    def _facts_about(self, entities: list[str]) -> list[Any]:
+        keys = {tuple(token.casefold() for token in _WORD_RE.findall(entity))
+                for entity in entities}
+        keys.discard(())
+        store = self.knowledge._facts
+        found: dict[tuple[Any, ...], Any] = {}
+        if hasattr(store, "lookup_subject") and hasattr(store, "lookup_object"):
+            candidates = (fact for key in sorted(keys)
+                          for fact in (*store.lookup_subject(key),
+                                       *store.lookup_object(key)))
+        else:
+            candidates = (fact for fact in store.values())
+        for fact in candidates:
+            subject = tuple(token.casefold() for token in
+                            _WORD_RE.findall(fact.subject))
+            obj = tuple(token.casefold() for token in _WORD_RE.findall(fact.object))
+            if subject in keys or obj in keys:
+                found[(subject, tuple(token.casefold() for token in
+                                      _WORD_RE.findall(fact.relation)), obj,
+                       tuple(fact.qualifiers))] = fact
+        return [found[key] for key in sorted(found)]
+
+    def elaborate(self) -> "DialogueTurn | None":
+        """Show the next accepted facts about the focus that were not shown yet.
+
+        Replies are cited fact lines, never retrieval; ``None`` means there is
+        no current focus to elaborate on.
+        """
+        entities = self.focus_entities()
+        if not entities:
+            return None
+        rows = self._facts_about(entities)
+        topic = entities[0]
+        if not rows:
+            text = (f"I have no accepted facts about {topic} yet. Ask a "
+                    "specific question about it, or add a source.")
+            return DialogueTurn("elaborated", "tell me more", "tell me more",
+                                text=text)
+        keyed = [(_shown_key(fact), fact) for fact in rows]
+        unshown = [(key, fact) for key, fact in keyed if key not in self.shown]
+        if not unshown:
+            return DialogueTurn(
+                "elaborated", "tell me more", "tell me more",
+                text=f"That is everything I have accepted about {topic}.")
+        batch = unshown[:_ELABORATION_BATCH]
+        lines = [("More about " if self.shown else "About ") + f"{topic}:"]
+        for key, fact in batch:
+            lines.append(f"- {fact.subject} — {fact.relation} → {fact.object} "
+                         f"[{_source_label(fact.sources)}]")
+            self.shown.append(key)
+        del self.shown[:-_SHOWN_LIMIT]
+        remaining = len(unshown) - len(batch)
+        lines.append(f"{remaining} more available; say ‘tell me more’ again."
+                     if remaining else
+                     f"That is everything I have accepted about {topic}.")
+        return DialogueTurn("elaborated", "tell me more", "tell me more",
+                            text="\n".join(lines))
 
     def clear(self) -> None:
         self.last_entity = None
@@ -1390,7 +1509,7 @@ class CRMSDialogue:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(
-            json.dumps({"format_version": 9, "last_entity": self.last_entity,
+            json.dumps({"format_version": 10, "last_entity": self.last_entity,
                         "subject_entity": self.subject_entity,
                         "object_entity": self.object_entity,
                         "last_question": self.last_question,
@@ -1405,7 +1524,10 @@ class CRMSDialogue:
                         if self.pending_result else None,
                         "last_intent_hypothesis": (
                             asdict(self.last_intent_hypothesis)
-                            if self.last_intent_hypothesis else None)},
+                            if self.last_intent_hypothesis else None),
+                        "history": self.history,
+                        "last_answered": self.last_answered,
+                        "shown": self.shown},
                        ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8")
 
@@ -1413,7 +1535,7 @@ class CRMSDialogue:
     def load(cls, knowledge: CRMSKnowledgeBase, path: str, *,
              research_index: Any | None = None) -> "CRMSDialogue":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
-        if payload.get("format_version") not in (1, 2, 3, 4, 5, 6, 7, 8, 9):
+        if payload.get("format_version") not in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10):
             raise ValueError("unsupported dialogue-state format version")
         dialogue = cls(knowledge)
         last_question = payload.get("last_question")
@@ -1567,4 +1689,29 @@ class CRMSDialogue:
                 selected_value=selected_value,
                 basis=basis,
             )
+        history = payload.get("history", [])
+        if (not isinstance(history, list) or len(history) > _HISTORY_LIMIT
+                or any(not isinstance(item, dict) or set(item) != _HISTORY_KEYS
+                       or any(not isinstance(value, str)
+                              or len(value) > _HISTORY_FIELD_LIMIT
+                              for value in item.values())
+                       for item in history)):
+            raise ValueError("stored conversation history is malformed")
+        dialogue.history = history
+        last_answered = payload.get("last_answered")
+        if last_answered is not None:
+            if (not isinstance(last_answered, dict)
+                    or set(last_answered) != {"question", "answer"}
+                    or any(not isinstance(value, str)
+                           or len(value) > _HISTORY_QUESTION_LIMIT
+                           for value in last_answered.values())
+                    or not last_answered["question"].strip()):
+                raise ValueError("stored last answer is malformed")
+            dialogue.last_answered = last_answered
+        shown = payload.get("shown", [])
+        if (not isinstance(shown, list) or len(shown) > _SHOWN_LIMIT
+                or any(not isinstance(value, str) or len(value) > 1000
+                       for value in shown)):
+            raise ValueError("stored shown facts are malformed")
+        dialogue.shown = shown
         return dialogue

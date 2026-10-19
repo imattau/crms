@@ -151,6 +151,16 @@ class SQLiteFactMap(MutableMapping):
         for (payload,) in cursor:
             yield self._decode_fact(payload)
 
+    def lookup_subject(self, subject_key: tuple[str, ...]):
+        """Yield facts for one subject across all relations via the subject index."""
+        encoded = json.dumps(subject_key, ensure_ascii=False,
+                             separators=(",", ":"))
+        cursor = self.connection.execute(
+            f"SELECT payload_json FROM {self.table} "
+            "WHERE subject_key=? ORDER BY key_json", (encoded,))
+        for (payload,) in cursor:
+            yield self._decode_fact(payload)
+
     def lookup_triple(self, subject: tuple[str, ...],
                       relation: tuple[str, ...],
                       object_: tuple[str, ...]):

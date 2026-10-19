@@ -78,14 +78,15 @@ Findings from the review that change the design:
   `dialogue.turn`. Each turn it handles carries an inspectable `UserIntentHypothesis` (dialogue act,
   task intent, decision, matched frame, context predicates, alternatives), shown by `/intent`.
   Basis is `hand_checked_runtime_rule`; nothing is learned.
-- **Elaboration is a stub.** "Tell me more" with a current topic returns "I can look for more
-  grounded information about X. Ask a specific question…". It retrieves and shows nothing.
-- **State is still a bag of fields, with two additions.** `CRMSDialogue` holds `last_entity`,
+- **Elaboration and conversation memory were added in phase 1** (the baseline described here
+  predates it). "Tell me more" lists unshown accepted facts about the focus; it used to return "I can
+  look for more grounded information about X…" and show nothing. For a topic that exists only in a
+  quoted source it still asks which entity to look at.
+- **State was a bag of fields, with additions.** `CRMSDialogue` holds `last_entity`,
   `subject_entity`, `object_entity`, `last_question`, `last_selected_answer`, a pending
-  clarification, writing and timeline fields, plus `source_mentions` (names quoted from sources,
-  kept as candidate referents) and `last_intent_hypothesis`. Saved as format version 9. There is
-  still no turn history, no record of what has been shown, no question under discussion and no open
-  offer.
+  clarification, writing and timeline fields, `source_mentions` (names quoted from sources, kept as
+  candidate referents), `last_intent_hypothesis`, and since phase 1 `history`, `last_answered` and
+  `shown` (format version 10). Still absent: a question under discussion and open offers.
 - **Entity recognition is partly widened.** `_source_entity_mentions` retains capitalised names from
   quoted sentences as candidates; `_canonical_entity` and `_known_entity_surfaces` still look only at
   accepted facts and aliases. Pronoun resolution does not consult entity kind.
@@ -167,10 +168,11 @@ state cannot be loaded.
 
 | Component | Contents | Used by | Today |
 |---|---|---|---|
-| `history` | Bounded turn records: act, utterance, resolved question, reply kind, status, ids of facts and citations shown | "why?", elaboration, correction, "are you sure?" | missing |
+| `history` | Bounded turn records: act, utterance, status (12 turns, 200 characters each) | "why?", correction, "are you sure?" | implemented in phase 1; no fact or citation ids yet |
+| `last_answered` | Question and answer of the last grounded answer, kept across refused turns | "why?" after a refusal | implemented in phase 1 |
 | `salience` | Ordered entities with kind (person, place, thing, event) and the turn that mentioned them | pronouns, ellipsis | partly (`last_entity`, `source_mentions`) |
 | `qud` | Question under discussion: relation asked, bound entity, answer slot | "And Ada Lovelace?", "What about X?" | missing |
-| `shown` | Claim identifiers already presented | elaboration without repeats | missing |
+| `shown` | Keys of accepted facts already presented (500 at most) | elaboration without repeats | implemented in phase 1 |
 | `offers` | Open proposals with a one-or-two-turn expiry | yes / no / "ok" | partly (open choice only) |
 | `session_facts` | Statements the user made, with speaker and turn as provenance, not accepted | conversational teaching (5.9) | missing |
 | intent hypothesis | Current-turn decision record | routing, `/intent` | exists |
@@ -185,12 +187,13 @@ Design decisions:
 - **Entity inventory.** Accepted-fact entities, learned aliases, subjects and objects of pending
   candidates, and source-quoted names. The last of these exists; replies about a source-only entity
   keep the label "quoted evidence, not an accepted fact".
-- **A refusal clears the dialogue context.** The cause is the `clear()` call described in section 0
-  for every non-answered turn, deliberately so that an unrelated pronoun cannot reach a stale
-  referent. "Why?" after two refused turns therefore returned "No previous grounded answer to explain
-  yet." Whether "Why?" after a refusal should explain the *older answer* or the *refusal itself* is a
-  policy question; the second is the more natural reading. The requirement is that `history` keeps the
-  last answered turn separately from the last turn and that "Why?" says which one it is explaining.
+- **A refusal clears the live referents but not the conversation memory.** `clear()` still runs on
+  every non-answered turn, deliberately so that an unrelated pronoun cannot reach a stale referent. It
+  no longer touches `history`, `last_answered` or `shown`; only the explicit `/reset` wipes those
+  (`reset_history`). "Why?" after a refusal now explains the earlier answer, recomputed from current
+  evidence, and begins "Explaining my earlier answer to ‘…’." so the user can see which turn it means.
+  Reading "Why?" as a request to explain the *refusal itself* is the other plausible meaning and is
+  not implemented; the refusal text is unchanged.
 - **User-supplied text is stored locally in the state file.** Say so in the help text, and clear it
   with the existing reset command.
 
@@ -210,8 +213,8 @@ Vocabulary follows `UserIntentHypothesis` (`dialogue_act`, `task_intent`) from t
 | affirm / deny | "yes", "no" | resolves an open offer; else asks what it answers | `offers` | partly: only during an open choice; otherwise an ambiguous hypothesis |
 | content question | "Who created Python?" | existing question path | n/a | implemented |
 | elliptical follow-up | "And Ada Lovelace?" | rebind `qud` (5.1) | `qud` | missing |
-| elaboration | "Tell me more" | next unshown facts about the focus (5.3) | `shown`, `salience` | stub that asks a question |
-| justification | "Why?" | existing explanation | `history` | hypothesis exists; a refused turn clears the context |
+| elaboration | "Tell me more" | next unshown facts about the focus (5.3) | `shown`, focus entities | implemented in phase 1 for accepted facts; source-only topics still ask a question |
+| justification | "Why?" | existing explanation | `last_answered` | implemented; after a refusal it explains the earlier answer and says which |
 | challenge | "Are you sure?" | re-run with evidence | `history` | missing |
 | correction / repair | "No, I meant …" | rebind the last reference (5.4) | `history`, `salience` | only while a choice is open |
 | clarification choice | "the second one" | `_select_candidate` | pending result | implemented |
@@ -254,10 +257,15 @@ with explicit names ("Who did Ada Lovelace work with?") belongs to the inverse-r
 reasoning notes, not to this layer.
 
 ### 5.3 Elaboration
-Select accepted facts and cited source sentences about the focus entity that are not in `shown`,
-ordered by the relations the user has asked about, then by stable identifier. Show a small batch with
-citations, add them to `shown`, and say how many remain. When none remain, say so. This replaces the
-current stub; it never retrieves on the words "tell me more".
+Implemented for accepted facts (`CRMSDialogue.elaborate`). The focus is the last answer's entity and
+the subject and object of the last answer, in that order. Facts are read through the fact store's
+subject and object indexes (a `lookup_subject` was added next to `lookup_object`), those not in
+`shown` are listed three at a time as "subject — relation → object [source: …]", and the reply says
+how many remain, then "That is everything I have accepted about X." The wording is deliberately a
+cited fact line, not a sentence: no licensed sentence frame is required, so it works on a fresh
+knowledge base. It never retrieves. Facts are ordered by relation name, not by what the user has asked
+about. Still to do: source-only topics (quoted candidates), ordering by the relations the user asked
+about, and licensed sentence wording where a frame exists.
 
 ### 5.4 Correction and repair
 "No, I meant X" rebinds the most recent resolved reference or ambiguity candidate and re-runs the
@@ -367,11 +375,15 @@ The numbering is changed from the first draft because phase 0 is largely done.
    `experiments/v1_370_conversation_content_free_and_referents.py`). Not done: a general rule for bare
    single-token topics (section 2, rule 1), mixed-turn handling beyond the comma form, and binding
    `him` and `she` to the right referent.
-1. **Discourse state.** Turn history, `shown`, `qud`, last answered turn kept separate from the last
-   turn, saved in the next format version with tolerant loading kept. Entity kind for source-derived
-   names.
-2. **Follow-ups.** Kind-based pronoun binding, elliptical turns, "why?" surviving a refusal, real
-   elaboration, entity card.
+1. **Discourse state.** Done on branch `conversation-phase1`: turn history, `last_answered` and
+   `shown`, saved in dialogue-state format version 10 with strict validation of the new fields and
+   version 9 files still loading (checked by
+   `experiments/v1_372_conversation_history_and_elaboration.py`). Elaboration moved here from phase 2
+   because `shown` needs it. Not done: `qud`, `offers`, `session_facts`, and entity kinds for
+   source-derived names.
+2. **Follow-ups.** Kind-based pronoun binding, elliptical turns (needs `qud`), the entity card, and
+   elaboration for source-only topics. "Why?" surviving a refusal and elaboration over accepted facts
+   are already done.
 3. **Mixed initiative.** Clarification questions beyond numbered candidates, offers, affirm and deny,
    correction of the last answer wired to `/wrong` and `/right`.
 4. **Conversational teaching.** First a spike on the two risks in 5.9; only then the confirm-and-learn

@@ -38,7 +38,16 @@ class ContentDialogue:
         self.last_selected_answer = None
         self.source_mentions: list = []
         self.last_intent_hypothesis = None
+        self.last_answered = None
+        self.history: list = []
+        self.calls_recorded: list = []
         self.calls: list[str] = []
+
+    def record_turn(self, utterance, act, turn) -> None:
+        self.calls_recorded.append((utterance, act))
+
+    def elaborate(self):
+        return None
 
     def turn(self, text: str, *, research_index=None):
         self.calls.append(text)

@@ -90,6 +90,15 @@ def classify_user_intent(
                 context_predicates=("previous_grounded_question",),
                 selected_value=dialogue.last_selected_answer,
             )
+        if dialogue.last_answered is not None:
+            return UserIntentHypothesis(
+                dialogue_act="question",
+                task_intent="seek-information",
+                decision="selected",
+                matched_frame="explanation-follow-up",
+                context_predicates=("earlier_grounded_answer",),
+                selected_value=dialogue.last_answered.get("answer") or None,
+            )
         return UserIntentHypothesis(
             dialogue_act="uncertain",
             task_intent=None,
@@ -180,15 +189,38 @@ def classify_user_intent(
     return None
 
 
+def _explain_earlier_answer(
+        dialogue: CRMSDialogue, text: str,
+        research_index: Any | None) -> DialogueTurn | None:
+    """Explain the last grounded answer after turns that left no live context.
+
+    The explanation recomputes the answer from current evidence, exactly as it
+    does for an immediate follow-up, and says which question it is explaining.
+    """
+    if (dialogue.last_question is not None or dialogue.last_answered is None
+            or dialogue.pending_result is not None
+            or dialogue.last_writing_subject is not None
+            or dialogue.last_timeline_subject is not None):
+        return None
+    earlier = dialogue.last_answered["question"]
+    dialogue.last_question = earlier
+    turn = dialogue.turn(text, research_index=research_index)
+    if turn.response is not None and turn.response.status == "answered":
+        turn.text = f"Explaining my earlier answer to ‘{earlier}’.\n{turn.text}"
+    return turn
+
+
 def respond(dialogue: CRMSDialogue, text: str, *,
             research_index: Any | None = None,
             pending_claims: int = 0) -> DialogueTurn:
     """Handle simple dialogue acts, delegating every content turn unchanged."""
     intent = classify_user_intent(dialogue, text)
+    act = classify_act(text)
 
     def with_intent(turn: DialogueTurn) -> DialogueTurn:
         turn.intent_hypothesis = intent
         dialogue.last_intent_hypothesis = intent
+        dialogue.record_turn(text, act or "question", turn)
         return turn
 
     mixed_greeting = _MIXED_GREETING_RE.fullmatch(text.strip())
@@ -204,7 +236,10 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         if turn.text:
             turn.text = "Hello. " + turn.text
         return with_intent(turn)
-    act = classify_act(text)
+    if act is None and _EXPLANATION_FOLLOWUP_RE.fullmatch(text.strip()):
+        explained = _explain_earlier_answer(dialogue, text, research_index)
+        if explained is not None:
+            return with_intent(explained)
     if act is None:
         return with_intent(dialogue.turn(text, research_index=research_index))
     if act == "acknowledgement" and dialogue.pending_result is not None:
@@ -244,12 +279,10 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             "social", text, text,
             text="Okay. What would you like to ask or do next?"))
     if act == "elaboration":
-        focus = dialogue.last_entity
-        if focus:
-            reply = (f"I can look for more grounded information about {focus}. "
-                     "Ask a specific question about it or name another topic.")
-        else:
-            reply = "Which entity or source should I look at in more detail?"
+        elaborated = dialogue.elaborate()
+        if elaborated is not None:
+            return with_intent(elaborated)
+        reply = "Which entity or source should I look at in more detail?"
         return with_intent(DialogueTurn("clarify", text, text, text=reply))
     if act == "help":
         return with_intent(DialogueTurn(

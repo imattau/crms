@@ -5641,6 +5641,7 @@ def main() -> int:
             continue
         if line == "/reset":
             dialogue.clear()
+            dialogue.reset_history()
             pending_candidates = []
             pending_question = ""
             _save_pending_candidates(args.candidate_session, args.knowledge,
