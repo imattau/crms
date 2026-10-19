@@ -3403,6 +3403,9 @@ class CRMSModel:
         # Parallel to _examples by phrase. None means that the demonstration
         # was not attributed to a source; never infer a source from its text.
         self._example_sources: dict[str, list[str | None]] = {}
+        # Parallel labeler IDs record who supplied the instruction/example
+        # association. They are declarations, not evidence of correctness.
+        self._example_labelers: dict[str, list[str | None]] = {}
         self._procedures: dict[str, tuple[Step, ...]] = {}
         # Keep a bounded index of instructions whose latest complete search
         # found no procedure. Their demonstrations remain in ``_examples``.
@@ -3447,14 +3450,15 @@ class CRMSModel:
                        if source is not None})
 
     def example_records(self, instruction: str) -> list[dict[str, Any]]:
-        """Return copied demonstrations with their recorded source IDs."""
+        """Return copied demonstrations with source and labeler attribution."""
         key = self._canonical_instruction_storage_key(
             self._clean_instruction(instruction))
         examples = self._examples.get(key, [])
         sources = self._example_sources.get(key, [None] * len(examples))
+        labelers = self._example_labelers.get(key, [None] * len(examples))
         return [
             {"phrase": key, "input": list(inputs), "output": list(outputs),
-             "source_id": sources[index]}
+             "source_id": sources[index], "labeler_id": labelers[index]}
             for index, (inputs, outputs) in enumerate(examples)
         ]
 
@@ -5556,13 +5560,15 @@ class CRMSModel:
               examples: Iterable[tuple[Iterable[int], Iterable[int]]],
               *, replace: bool = False,
               source_ids: Iterable[str | None] | None = None,
+              labeler_ids: Iterable[str | None] | None = None,
               _use_language_prior: bool = True) -> LearnResult:
         """Add demonstrations, infer a procedure, and store only a unique fit.
 
         Each example is `(input_values, expected_output_values)`. If evidence
         is ambiguous or outside the rule library, no rule is committed.
-        Optional source_ids identify the document or teacher record for each
-        demonstration; omitted IDs remain explicitly unknown.
+        Optional source_ids identify evidence documents. Optional labeler_ids
+        identify who supplied each instruction/example association. Neither
+        field affects rule selection; labeler IDs are declarations, not proof.
         """
         key = self._canonical_instruction_storage_key(
             self._clean_instruction(instruction))
@@ -5579,12 +5585,30 @@ class CRMSModel:
             raise ValueError('source_ids must align with examples and contain strings of 1 to 2048 characters or None')
         supplied_sources = [source.strip() if isinstance(source, str) else None
                             for source in supplied_sources]
+        if isinstance(labeler_ids, str):
+            raise ValueError('labeler_ids must be a sequence with one ID per example')
+        supplied_labelers = ([None] * len(supplied) if labeler_ids is None
+                             else list(labeler_ids))
+        if (len(supplied_labelers) != len(supplied)
+                or any(labeler is not None
+                       and (not isinstance(labeler, str)
+                            or not labeler.strip()
+                            or len(labeler.strip()) > 128
+                            or any(not char.isprintable()
+                                   for char in labeler.strip()))
+                       for labeler in supplied_labelers)):
+            raise ValueError(
+                'labeler_ids must align with examples and contain printable strings of 1 to 128 characters or None')
+        supplied_labelers = [labeler.strip()
+                             if isinstance(labeler, str) else None
+                             for labeler in supplied_labelers]
         if not supplied:
             return LearnResult('need_examples', key, 0, 0,
                                request='Please provide an input list and its intended output.')
         if replace:
             self._examples[key] = []
             self._example_sources[key] = []
+            self._example_labelers[key] = []
             self._procedures.pop(key, None)
             self._no_fit_records.pop(key, None)
             self._candidate_space_cache.pop(key, None)
@@ -5595,6 +5619,7 @@ class CRMSModel:
         evidence = self._examples.setdefault(key, [])
         evidence.extend(supplied)
         self._example_sources.setdefault(key, []).extend(supplied_sources)
+        self._example_labelers.setdefault(key, []).extend(supplied_labelers)
         candidates = self._candidate_space_for_examples(key, evidence)
         if self._last_search_complete:
             known_behaviors = {_semantic_key(procedure) for procedure in candidates}
@@ -5725,7 +5750,9 @@ class CRMSModel:
         snapshot = [(list(inputs), list(outputs))
                     for inputs, outputs in examples]
         sources = list(self._example_sources.get(key, [None] * len(snapshot)))
-        return self.teach(key, snapshot, replace=True, source_ids=sources)
+        labelers = list(self._example_labelers.get(key, [None] * len(snapshot)))
+        return self.teach(key, snapshot, replace=True, source_ids=sources,
+                          labeler_ids=labelers)
 
     def predict(self, instruction: str, values: Iterable[int]) -> Prediction:
         key = self._clean_instruction(instruction)
@@ -6219,6 +6246,8 @@ class CRMSModel:
             self._clean_instruction(instruction))
         existed = key in self._examples or key in self._procedures
         self._examples.pop(key, None)
+        self._example_sources.pop(key, None)
+        self._example_labelers.pop(key, None)
         self._procedures.pop(key, None)
         self._no_fit_records.pop(key, None)
         self._ambiguity_probe_cache.pop(key, None)
@@ -6672,6 +6701,10 @@ class CRMSModel:
                     f'primitive proposal has no retained examples for {phrase!r}')
             original_examples = [(list(inputs), list(outputs))
                                  for inputs, outputs in examples]
+            original_sources = list(candidate._example_sources.get(
+                phrase, [None] * len(original_examples)))
+            original_labelers = list(candidate._example_labelers.get(
+                phrase, [None] * len(original_examples)))
             probes: list[dict[str, Any]] = []
             learned = None
             for _ in range(9):
@@ -6690,6 +6723,9 @@ class CRMSModel:
                 # demonstrations so it cannot masquerade as external evidence.
                 output = _apply_procedure((primitive_step,), list(probe))
                 candidate._examples[phrase].append((list(probe), output))
+                candidate._example_sources.setdefault(phrase, []).append(None)
+                candidate._example_labelers.setdefault(phrase, []).append(
+                    'system:validated-primitive')
                 probes.append({
                     'input': list(probe),
                     'output': list(output),
@@ -6709,6 +6745,8 @@ class CRMSModel:
                     raise ValueError(
                         f'primitive failed demonstration replay for {phrase!r}')
             candidate._examples[phrase] = original_examples
+            candidate._example_sources[phrase] = original_sources
+            candidate._example_labelers[phrase] = original_labelers
             candidate._candidate_space_cache.pop(phrase, None)
             candidate._ambiguity_probe_cache.pop(phrase, None)
             candidate._invalidate_language_indexes()
@@ -6855,6 +6893,10 @@ class CRMSModel:
             'examples': {phrase: examples for phrase, examples in self._examples.items()},
             'example_sources': {
                 phrase: sources for phrase, sources in self._example_sources.items()
+            },
+            'example_labelers': {
+                phrase: labelers
+                for phrase, labelers in self._example_labelers.items()
             },
             'procedures': {phrase: _procedure_dict(proc)
                            for phrase, proc in self._procedures.items()},
@@ -7021,6 +7063,7 @@ class CRMSModel:
                 raise ValueError(f'memory {name} differs; initialize with matching retrieval settings')
         raw_examples = payload.get('examples', {})
         raw_example_sources = payload.get('example_sources', {})
+        raw_example_labelers = payload.get('example_labelers', {})
         raw_procedures = payload.get('procedures', {})
         raw_accepted_primitives = payload.get('accepted_primitives', [])
         raw_accepted_primitive_artifacts = payload.get(
@@ -7028,10 +7071,13 @@ class CRMSModel:
         raw_no_fit_cases = payload.get('no_fit_cases', [])
         if (not isinstance(raw_examples, dict)
                 or not isinstance(raw_example_sources, dict)
+                or not isinstance(raw_example_labelers, dict)
                 or not isinstance(raw_procedures, dict)):
             raise ValueError('stored examples and procedures must be objects')
         if not set(raw_example_sources) <= set(raw_examples):
             raise ValueError('stored example source metadata references an unknown instruction')
+        if not set(raw_example_labelers) <= set(raw_examples):
+            raise ValueError('stored example labeler metadata references an unknown instruction')
         if (not isinstance(raw_accepted_primitives, list)
                 or len(raw_accepted_primitives) > 64):
             raise ValueError('stored accepted primitive list is malformed or oversized')
@@ -7122,6 +7168,7 @@ class CRMSModel:
 
         examples_by_phrase = {}
         sources_by_phrase = {}
+        labelers_by_phrase = {}
         for phrase, examples in raw_examples.items():
             if self._clean_instruction(phrase) != phrase or not isinstance(examples, list):
                 raise ValueError('stored example association has an invalid phrase or examples')
@@ -7142,6 +7189,22 @@ class CRMSModel:
             sources_by_phrase[phrase] = [
                 source.strip() if isinstance(source, str) else None
                 for source in raw_sources
+            ]
+            raw_labelers = raw_example_labelers.get(
+                phrase, [None] * len(parsed))
+            if (not isinstance(raw_labelers, list)
+                    or len(raw_labelers) != len(parsed)
+                    or any(labeler is not None
+                           and (not isinstance(labeler, str)
+                                or not labeler.strip()
+                                or len(labeler.strip()) > 128
+                                or any(not char.isprintable()
+                                       for char in labeler.strip()))
+                           for labeler in raw_labelers)):
+                raise ValueError('stored example labeler metadata is malformed')
+            labelers_by_phrase[phrase] = [
+                labeler.strip() if isinstance(labeler, str) else None
+                for labeler in raw_labelers
             ]
 
         procedures_by_phrase = {}
@@ -7265,6 +7328,7 @@ class CRMSModel:
         # Replace live memory only after every persisted association validates.
         self._examples = examples_by_phrase
         self._example_sources = sources_by_phrase
+        self._example_labelers = labelers_by_phrase
         self._procedures = procedures_by_phrase
         self._accepted_primitives = {
             key: descriptor

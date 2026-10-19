@@ -719,10 +719,18 @@ SQLite round trips, and appear in generated code's evidence records. The
 `example_documents()` groups citations by document ID so multiple passages from
 one file are not mistaken for multiple documents; it makes no claim about
 independent publishers or origins.
-Old memories without this field load with `source_id=None`; CRMS must never
-infer or fabricate provenance. Source IDs identify origin only: they do not
-establish source independence, truth, or rule validity, and they do not affect
-candidate search or licensing.
+
+Each example can also retain a separate `labeler_id`, supplied through
+`CRMSModel.teach(..., labeler_ids=...)` or the optional fifth `/teach-rule`
+field. This records who supplied the instruction-to-example association,
+separately from the document that contains the input/output pair. Generated
+artifact provenance and its evidence view retain both fields. Labeler IDs are
+declared metadata: they do not validate the mapping, raise confidence, count as
+independent sources, or change rule search. Older memories load with an
+unrecorded labeler (`labeler_id=None`); CRMS does not guess who supplied a
+historical example. Memories without source metadata load with `source_id=None`.
+Source IDs identify origin only: they do not establish source independence,
+truth, or rule validity, and they do not affect candidate search or licensing.
 
 The initial runtime check uses fixture IDs and demonstrates only persistence,
 artifact traceability, and a held-out composition. It is not yet a transfer
@@ -750,8 +758,9 @@ and teacher-attributed instruction link remain unchanged.
 `v1_433_document_sourced_procedure_composition.py` extends the evidence path
 to a small multi-operation code artifact. Sort, unique, and reverse each have
 an exact numeric example cited to Python or NumPy documentation. Codex supplies
-the additional numeric contrasts and sequence-connective examples, explicitly
-unattributed. The unique operation now matches `numpy.unique`'s sorted-unique
+the additional numeric contrasts and sequence-connective examples; they have
+no external source citation but now carry the declared labeler ID. The unique
+operation now matches `numpy.unique`'s sorted-unique
 semantics; a non-monotonic standalone probe catches this distinction, which
 the later sort stage had previously hidden. The composed `unique → sort →
 reverse` artifact passes four held-out lists, keeps its three component

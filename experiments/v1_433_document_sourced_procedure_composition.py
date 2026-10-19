@@ -1,9 +1,9 @@
 """Compose small procedures taught from official documentation examples.
 
 Operation examples are cited to Python and NumPy documentation; the sequence
-connective is taught with explicitly unattributed teacher examples. The
-held-out composition is never sent to the learner. This is a bounded transfer
-probe, not source-only induction or broad coding competence.
+connective is taught with Codex-labeled examples that have no external source
+citation. The held-out composition is never sent to the learner. This is a
+bounded transfer probe, not source-only induction or broad coding competence.
 """
 from __future__ import annotations
 
@@ -148,7 +148,7 @@ def main() -> None:
             source_citations[phrase] = citation
             teaching.append(
                 f"/teach-rule {phrase}|{','.join(map(str, inputs))}|"
-                f"{','.join(map(str, outputs))}|{citation}")
+                f"{','.join(map(str, outputs))}|{citation}|codex:labeler-v1")
             # The source pair is only one demonstration and is often
             # underdetermined. Add an attributed set of varied examples and a
             # contrast that helps separate the intended operation.
@@ -164,7 +164,7 @@ def main() -> None:
                 }[operation])
                 teaching.append(
                     f"/teach-rule {phrase}|{','.join(map(str, values))}|"
-                    f"{','.join(map(str, out_values))}")
+                    f"{','.join(map(str, out_values))}||codex:labeler-v1")
 
         # These surface variants are Codex-attributed wording lessons, not
         # text-to-instruction mappings claimed by the cited code examples.
@@ -178,12 +178,12 @@ def main() -> None:
             source_input, source_output = supporting_source[5:7]
             teaching.append(
                 f"/teach-rule {phrase}|{','.join(map(str, source_input))}|"
-                f"{','.join(map(str, source_output))}|{citation}")
+                f"{','.join(map(str, source_output))}|{citation}|codex:labeler-v1")
             for values in examples:
                 output = apply(list(values), operation)
                 teaching.append(
                     f"/teach-rule {phrase}|{','.join(map(str, values))}|"
-                    f"{','.join(map(str, output))}")
+                    f"{','.join(map(str, output))}||codex:labeler-v1")
 
         # The connective examples are explicitly teacher supplied. They teach
         # order effects, which the source examples do not license by themselves.
@@ -192,7 +192,7 @@ def main() -> None:
                 output = apply_sequence(list(values), operations)
                 teaching.append(
                     f"/teach-rule {phrase}|{','.join(map(str, values))}|"
-                    f"{','.join(map(str, output))}")
+                    f"{','.join(map(str, output))}||codex:labeler-v1")
 
         held_out_outputs = [
             apply_sequence(list(values), ("unique", "sort", "reverse"))
@@ -213,6 +213,8 @@ def main() -> None:
                 f"chat did not compose cited operations: {run.stdout[-2500:]!r}")
         require("The cited text demonstrates this exact numeric pair" in run.stdout,
                 "chat omitted the citation-verification boundary")
+        require("Recorded declared labeler for this example: codex:labeler-v1" in run.stdout,
+                "chat did not report the supplied labeler attribution")
 
         learned = CRMSModel(root / "rules.json", max_workers=1)
         for phrase, citation in source_citations.items():
@@ -222,6 +224,9 @@ def main() -> None:
                     f"sourced component lost its citation: {phrase}")
             require(any(record.get("source_id") is None for record in records),
                     f"Codex-authored examples were mislabeled as sourced: {phrase}")
+            require(all(record.get("labeler_id") == "codex:labeler-v1"
+                        for record in records),
+                    f"declared labeler attribution was lost: {phrase}")
 
         artifact = generate_python(learned, HELD_OUT_TEXT)
         require(artifact is not None, "no standalone composition was generated")
@@ -244,12 +249,17 @@ def main() -> None:
                 "artifact provenance does not match the cited component "
                 f"examples: {artifact_sources!r} != "
                 f"{set(source_citations.values())!r}")
+        require(all(row.get("labeler_id") == "codex:labeler-v1"
+                    for row in namespace["CRMS_PROVENANCE"]["examples"]),
+                "generated artifact lost declared labeler attribution")
         require(namespace["validate_examples"](),
                 "generated artifact's embedded checks failed")
         evidence = show_generated_code_evidence(artifact)
         require(all(citation in evidence
                     for citation in source_citations.values()),
                 "user-facing evidence omitted a component citation")
+        require("[Declared labeler: codex:labeler-v1]" in evidence,
+                "user-facing evidence omitted declared labeler attribution")
 
         replay = launch(root, [answer])
         require(replay.returncode == 0
@@ -272,6 +282,8 @@ def main() -> None:
     print("unique rule sorts distinct values on a non-monotonic input: PASS")
     print("chat composed unique→sort→reverse on four held-out lists: PASS")
     print("generated artifact kept component citations and passed checks: PASS")
+    print("declared labeler attribution survived save and artifact rendering: PASS")
+    print("generated artifact retains declared labeler attribution: PASS")
     print("saved rules reproduced the artifact in a fresh chat process: PASS")
     print("unsupported encrypt composition abstained: PASS")
     print("connective examples are Codex-authored; source-to-instruction mapping is teacher-attributed: LIMITATION")

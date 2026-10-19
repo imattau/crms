@@ -252,17 +252,22 @@ def show_generated_code_evidence(result: GeneratedCode) -> str:
         for row in result.evidence_details:
             source = (f" [Source: {row['source_id']}]"
                       if row.get("source_id") else " [Source not recorded]")
+            labeler = (f" [Declared labeler: {row['labeler_id']}]"
+                       if row.get("labeler_id") else " [Labeler not recorded]")
             lines.append(
                 f"'{row['phrase']}': {row['input']} -> {row['output']}"
-                f"{source}")
+                f"{source}{labeler}")
     elif result.domain == "list_math_map":
         for row in result.evidence_details:
             if "input" in row:
                 source = (f" [Source: {row['source_id']}]"
                           if row.get("source_id") else " [Source not recorded]")
+                labeler = (f" [Declared labeler: {row['labeler_id']}]"
+                           if row.get("labeler_id")
+                           else " [Labeler not recorded]")
                 lines.append(
                     f"'{row['phrase']}': {row['input']} -> {row['output']}"
-                    f"{source}")
+                    f"{source}{labeler}")
             elif row.get("kind") == "grounded_number":
                 lines.append(
                     f"Grounded number '{row['phrase']}' = {row['value']} "

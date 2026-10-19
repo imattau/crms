@@ -224,8 +224,8 @@ HELP = """Commands:
                  teach a sourced counterfactual question frame
   /teach-counterfactual-path-question Q|REL1>REL2|START|TARGET|SOURCE[|KEY=VALUE...]
                  teach a frame that varies both endpoints and source
-  /teach-rule I|INPUT CSV|OUTPUT CSV[|SOURCE CITATION]
-                 teach one grounded list-transformation example
+  /teach-rule I|INPUT CSV|OUTPUT CSV[|SOURCE CITATION[|LABELER ID]]
+                 teach one example; record source and labeler separately
   /retry-rule I   rerun stored demonstrations under current rule bounds
   Try to learn the rule for INSTRUCTION
                  rerun stored examples in ordinary CRMS language
@@ -7670,16 +7670,20 @@ def main() -> int:
             continue
         if line.startswith("/teach-rule "):
             fields = [value.strip() for value in line[len("/teach-rule "):].split("|")]
-            if len(fields) not in {3, 4} or not fields[0]:
-                print("Use: /teach-rule INSTRUCTION|INPUT INTEGER CSV|OUTPUT INTEGER CSV[|SOURCE CITATION]")
+            if len(fields) not in {3, 4, 5} or not fields[0]:
+                print("Use: /teach-rule INSTRUCTION|INPUT INTEGER CSV|OUTPUT INTEGER CSV[|SOURCE CITATION[|LABELER ID]]")
                 continue
             try:
                 inputs = _parse_integer_list(fields[1], allow_empty=True)
                 outputs = _parse_integer_list(fields[2], allow_empty=True)
-                source_ids = None
-                if len(fields) == 4:
-                    if not fields[3]:
-                        raise ValueError("provide a source citation after the final separator")
+                labeler_id = fields[4] if len(fields) == 5 else "user"
+                if not labeler_id:
+                    raise ValueError("provide a declared labeler ID")
+                if len(fields) == 4 and not fields[3]:
+                    raise ValueError(
+                        "provide a source citation or omit the optional field")
+                source_ids = [None]
+                if len(fields) >= 4 and fields[3]:
                     cited_text = index.resolve_citation(fields[3])
                     if not _citation_contains_integer_pair(
                             cited_text, inputs, outputs):
@@ -7687,7 +7691,8 @@ def main() -> int:
                             "source citation does not contain this exact input/output pair")
                     source_ids = [fields[3]]
                 learned = rules.teach(fields[0], [(inputs, outputs)],
-                                      source_ids=source_ids)
+                                      source_ids=source_ids,
+                                      labeler_ids=[labeler_id])
                 rules.save(args.rules)
                 pending_rule = (
                     (fields[0], learned.contrastive_input)
@@ -7695,9 +7700,12 @@ def main() -> int:
                     and learned.contrastive_input is not None else None)
                 _save_pending_rule(args.rule_session, args.rules, pending_rule)
                 _print_rule_learning_result(learned)
-                if source_ids:
+                if source_ids[0] is not None:
                     print("Recorded source attribution for this example: "
                           + source_ids[0])
+                print("Recorded declared labeler for this example: "
+                      + labeler_id + "; this is attribution, not validation.")
+                if source_ids[0] is not None:
                     print("The cited text demonstrates this exact numeric pair; "
                           "CRMS has not independently checked that its wording "
                           "licenses the instruction.")
@@ -8097,7 +8105,8 @@ def main() -> int:
             # isolated from the live rules file until both independent fits pass.
             candidate_rules.memory_path = None
             results = [candidate_rules.teach(
-                phrase, examples, _use_language_prior=False)
+                phrase, examples, labeler_ids=["user"] * len(examples),
+                _use_language_prior=False)
                        for phrase in phrases]
             procedures = [result.procedure for result in results]
             if (all(result.status == "learned" for result in results)
@@ -8122,7 +8131,8 @@ def main() -> int:
         natural_demonstrations = _natural_rule_demonstrations(line)
         if natural_demonstrations is not None:
             instruction, examples = natural_demonstrations
-            learned = rules.teach(instruction, examples)
+            learned = rules.teach(
+                instruction, examples, labeler_ids=["user"] * len(examples))
             rules.save(args.rules)
             pending_rule = (
                 (instruction, learned.contrastive_input)
@@ -8136,7 +8146,8 @@ def main() -> int:
             if expected_output is not None:
                 instruction, contrastive_input = pending_rule
                 learned = rules.teach(
-                    instruction, [(contrastive_input, expected_output)])
+                    instruction, [(contrastive_input, expected_output)],
+                    labeler_ids=["user"])
                 rules.save(args.rules)
                 pending_rule = (
                     (instruction, learned.contrastive_input)

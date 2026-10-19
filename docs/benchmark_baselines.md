@@ -1665,3 +1665,32 @@ competence. It also exposed that the wording variant used by a composition
 must retain its own citation or the generated artifact loses that component's
 lineage. The cited NumPy example now uses a non-monotonic input, so the
 source-backed pair itself distinguishes sorted-unique from stable-unique.
+
+## Rule-example labeler provenance (2026-10-20)
+
+Commands:
+
+```sh
+python3 experiments/v1_434_rule_labeler_provenance.py
+python3 run_experiments.py --match 301 --match 428 --match 429 --match 430 \
+  --match 431 --match 432 --match 433 --match 434 --timeout 300
+python3 run_experiments.py --match 177 --match 208 --match 223 --timeout 300
+```
+
+Each procedure example can retain a `labeler_id` independently of its
+`source_id`. `/teach-rule` accepts an optional fifth field for the declared
+labeler; older chat forms record `user`, while old memories and direct API
+calls without attribution remain explicitly unknown. The distinction survives
+retry, JSON and SQLite round trips, generated-code provenance, and the readable
+artifact-evidence view. Forget removes the attribution with the associated
+examples. The loader rejects malformed or misaligned metadata and never
+invents a labeler for legacy records.
+
+Runtime result: the eight provenance, citation, and recombination experiments
+passed, followed by three primitive-learning regressions (11/11). The
+composition experiment labels Codex-authored examples `codex:labeler-v1`, so
+the artifact distinguishes those labels from the cited document and from a
+user-reviewed contrast. A labeler ID is a declared attribution only: CRMS does
+not authenticate the actor, use the ID to select rules, treat it as evidence,
+or count it as an independent source. The natural-language link between the
+source prose and instruction remains teacher supplied and unverified.
