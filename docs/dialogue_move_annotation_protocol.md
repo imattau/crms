@@ -149,14 +149,17 @@ split. The sampler refuses annotated inputs and never uses CRMS predictions as l
 
 An AI model may fill the primary annotation fields when explicitly authorized, but its identity
 must be recorded as the annotator; do not describe those judgments as human-reviewed or
-independent. Do not fill `*_2` or adjudication fields with another pass from the same model. That
-does not provide an independent reliability check.
+independent. Authorized AI labels may support candidate induction and label-conditioned research
+experiments. Comparisons against them measure agreement with the named annotator, not correctness
+or independent validation. Do not fill `*_2` or adjudication fields with another pass from the same
+model. That does not provide an independent reliability check.
 
-The current `/tmp/crms_dialogue_feasibility_v1` batch has one AI annotation for each of its 563 user
-turns and 650 assistant turns. The designated audit sample still needs an independent rater. The
-annotations are useful for error analysis and provisional baseline comparison, but they are not
-gold labels, do not establish agreement, and must not license learned frames. The evaluator reports
-the batch as incomplete for that reason.
+The current `/tmp/crms_dialogue_feasibility_v1` batch has one Codex annotation for each of its 563
+user turns and 650 assistant turns. The designated reliability audit remains incomplete. These
+labels may support candidate induction and provisional baseline comparison, but they do not
+establish inter-annotator agreement or independently validate learned frames. The evaluator reports
+the audit as incomplete for that reason. Resulting frames must remain inert (`candidate` or
+`train-only`) until held-out evidence and the separate policy gate support licensing.
 
 The assistant worksheet stores the first label in `move_label`, `context_license`,
 `predecessor_label`, and `reviewer`. Record `reviewed_at` and `protocol_version` for that label. For

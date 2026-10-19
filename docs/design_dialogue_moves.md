@@ -88,8 +88,13 @@ moves add value over the current explicit handlers.
 - Choose one bounded domain and a licensed, documented corpus; do not mix subtitles, forums, and
   support transcripts as if they represented one policy.
 - Start with four move classes: greet, acknowledge, clarify-request, and close.
-- Have a human label examples and retain exact source/utterance citations. If automated labeling is
-  used to scale proposals, audit a sample against independently labeled examples.
+- Label examples with a recorded annotator identity and retain exact source/utterance citations.
+  Codex may provide primary labels when the project owner authorizes it; the existing
+  40-conversation feasibility batch is such a set (563 user turns and 650 assistant turns). These
+  labels can support candidate induction and error analysis without waiting for human annotation.
+  Comparisons against them measure agreement with the named annotator, not correctness or
+  conversational appropriateness. Do not fill second-rater or adjudication fields with another
+  pass from the same model.
 - Split train and holdout by source document, not utterance, to avoid leakage between adjacent turns.
 - Learn realization frames and, separately, a small set of move-sequence templates. Context
   conditions remain explicit and reviewed.
@@ -134,11 +139,11 @@ uses the wrong domain convention.
 
 Use [dialogue_move_annotation_protocol.md](dialogue_move_annotation_protocol.md) for the label
 definitions, context coding, independent review, agreement reporting, and comparator evaluation.
-The worksheet flags a deterministic 20% conversation-level reliability sample within each split
-and leaves the second-rater and adjudication fields empty until an independent rater and adjudicator
-complete them. An explicitly authorized AI pass has filled the primary fields of the 40-conversation
-feasibility batch, but it is provisional and does not count as independent review; see the protocol
-for its provenance and limits.
+The worksheet flags a deterministic 20% conversation-level reliability sample within each split.
+The 40-conversation feasibility batch has Codex-authored primary labels, with second-rater and
+adjudication fields empty. Candidate induction may proceed, but these labels do not establish
+independent reliability or validate product behavior. See the annotation protocol for provenance
+and limits.
 The separate [contextual user-intent design](design_user_intent_model.md) makes intent a first-class
 research target distinct from assistant move realization. The pilot now includes user-turn
 annotations because assistant-only labels cannot teach CRMS what users are trying to accomplish.

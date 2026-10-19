@@ -179,8 +179,10 @@ This is a narrow runtime seam, not learned dialogue competence: there is no fram
 surface patterns are exact phrases rather than slot-generalizing templates, and task-oriented
 slots beyond existing dialogue state are not supported. Most ordinary intent recognition still
 uses the hand-checked rules in `crms_conversation.py`. The 40-conversation feasibility batch has
-single-AI labels for error analysis, but no independent human review, so no accuracy claim is
-available. If two licensed portable frames match the same utterance and context
+Codex-authored labels, which the project owner has authorized for candidate induction and
+label-conditioned experiments. No independent second annotation exists, so agreement with these
+labels is not an accuracy or appropriateness claim. If two licensed portable frames match the same
+utterance and context
 but select different routes, CRMS now records an ambiguous hypothesis, asks the user to choose
 between the two routes, and executes only the selected route. The short yes/no choice retains the
 matched-frame evidence and never changes factual knowledge. This handles an explicit model conflict;
@@ -203,9 +205,10 @@ that makes a short answer such as “yes” interpretable.
 
 Next, migrate bounded hand-checked seed frames into the separate built-in-policy section only where
 their behavior is reproduced; never silently merge product policy with corpus-induced frames.
-Expand matching to typed slots only with ambiguity and adversarial tests. Do not start induction
-until independently labeled examples exist: the Taskmaster annotation sheets are currently blank,
-so self-labeled predictions cannot serve as validation evidence. Packaging and runtime coverage
+Expand matching to typed slots only with ambiguity and adversarial tests. Candidate induction may
+use the authorized AI-labeled training batch; keep resulting frames `candidate` or `train-only`
+until conversation-held-out evidence and the separate policy gate support licensing. Agreement
+with labels from the same annotator is not independent validation. Packaging and runtime coverage
 are checked by [`v1_383_dialogue_model_memory_packaging.py`](../experiments/v1_383_dialogue_model_memory_packaging.py)
 and [`v1_384_contextual_dialogue_frame_resolution.py`](../experiments/v1_384_contextual_dialogue_frame_resolution.py).
 
@@ -284,7 +287,8 @@ split-leakage checks, and required label provenance.
 `experiments/v1_382_dialogue_feasibility_batch.py` selects whole conversations from train only,
 copies their cited transcripts, and deterministically assigns 20% of selected conversations for
 independent double labeling. The 40-conversation batch contains 563 user turns and 650 assistant
-turns. Its current primary labels are AI-authored; the designated audit remains incomplete. The
-comparison in `v1_385_provisional_dialogue_label_comparison.py` reports label agreement and coverage
-only, not accuracy. Do not train or tune licensed frames on these labels or on held-out dev/test
-conversations.
+turns. Its current primary labels are Codex-authored; the designated reliability audit remains
+incomplete. The comparison in `v1_385_provisional_dialogue_label_comparison.py` reports label
+agreement and coverage only, not accuracy. Candidate frames may be induced from training
+conversations. Do not use dev/test conversations for induction or mark frames held-out validated
+from agreement with the same annotator's labels.
