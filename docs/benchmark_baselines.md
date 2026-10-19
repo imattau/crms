@@ -1749,6 +1749,31 @@ increases coverage for these requests and that the resulting components
 recombine. It does not demonstrate autonomous synonym discovery, source-only
 instruction alignment, or general paraphrase transfer.
 
+## Source-derived procedure phrase proposal (2026-10-20)
+
+Command: `python3 experiments/v1_436_source_derived_rule_phrase_review.py`.
+
+The experiment retrieves a sentence stating “A simple ascending sort” and a
+matching Python `sorted()` doctest, plus an independently hosted pandas
+sentence stating “Sort values ascending order.” It proposes the normalized
+phrase `sort values ascending` for the operation `sort`, retaining the exact
+prose and code citations. The evidence comes from the [Python Sorting HOWTO](https://docs.python.org/3/howto/sorting.html)
+and [pandas Series.sort_values documentation](https://pandas.pydata.org/docs/reference/api/pandas.Series.sort_values.html).
+
+The candidate is inert and marked `needs_review`. The experiment confirms it
+does not alter the rule store until Codex explicitly reviews and teaches the
+mapping through chat. The accepted rule persists its code-example citation,
+phrase-source citation, and reviewer label. It passes three held-out numeric
+lists; descending wording remains unsupported. A tampered code/output pair
+and two documents assigned to the same source origin do not produce a valid
+candidate.
+
+Runtime result: all proposal, review, provenance, persistence, and negative
+checks passed. This is one bounded, cue-based proposal pattern—not general
+phrase induction. The extraction logic remains experiment-local, its cue
+normalization is hand-specified, and a Codex review plus contrast examples are
+still needed before the mapping is learned.
+
 ## Procedure evidence and labeler provenance (2026-10-20)
 
 Commands:
