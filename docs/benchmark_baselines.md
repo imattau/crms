@@ -50,6 +50,29 @@ each crossing. The unsupported `flip` operator and the ambiguous reverse/sort
 cross do not produce code. This is a bounded end-to-end composition check, not
 open-ended software generation.
 
+## Learned sequence connective to natural-language code generation
+
+Command: `python3 experiments/v1_355_learned_sequence_connective_codegen.py`
+
+Four base phrases teach sorting and reversal for two object phrases. Two
+separate compound instruction patterns then establish order-sensitive uses of
+`then`. For both compound rules, six all-distinct inputs initially leave two
+procedures consistent; CRMS requests `[0, 0]`, and the teacher's output resolves
+the ambiguity. A control with only one grounded compound still abstains on a
+new sequence crossing. With two compound contexts, the held-out instruction
+`sort the list then reverse the list` produces `[4, 4, 2, 1]` for the input
+`[4, 1, 4, 2]` through the learned `then` connective.
+
+The standalone code artifact executes and passes its parity cases. Its
+provenance retains the two component phrases and both compound examples. The
+actual chat CLI accepts `Write Python code to sort the list then reverse the
+list`, then answers `Explain that code` and `Show the examples for that code`
+from the generated artifact. Unsupported connective, operation, and modifier
+variants abstain and produce no code. This is a learned, reviewable composition
+of known list procedures; it does not show zero-shot programming or broad
+natural-language understanding. The control flow and source count are local
+CRMS results; no external 70B model was run on this fixture.
+
 ## Cross-surface question transfer v1
 
 Command: `python3 experiments/v1_315_cross_surface_question_transfer.py`

@@ -2107,6 +2107,16 @@ three training phrases in provenance; unsupported and conflicting queries
 produce no code, and each artifact ID is stable across the six teaching
 orders. This is bounded program composition, not open-ended software
 generation.
+`experiments/v1_355_learned_sequence_connective_codegen.py` checks a larger
+bounded composition: after learning sort and reverse procedures, the system
+learns the order-sensitive connective `then` from two compound patterns. A
+held-out “sort the list then reverse the list” request produces a verified,
+standalone Python artifact with both component and compound phrase evidence;
+the natural-language chat explains the artifact and retrieves its examples.
+The system asks for a duplicate-value contrast when initial examples leave two
+compound procedures possible, and it abstains when only one connective context
+exists or a component is unsupported. This is grounded program composition,
+not zero-shot coding.
 `experiments/v1_241_chat_usability_diagnostics.py` checks that an optional
 question word or contiguous phrase (up to three tokens) is inferred only from
 two aligned, fact-backed examples, carries its source trace through chat and

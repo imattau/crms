@@ -2254,21 +2254,20 @@ class CRMSResearchIndex:
                 if person_question:
                     covered_terms.update(
                         frame_expansion_coverage(set(sentence_words)))
-                # A selected sentence must cover at least two content terms
-                # for a multi-term query. Applying this to summaries as well
-                # as questions prevents a generic one-word match (for example
-                # "design choice") from displacing a source sentence that
-                # actually covers the requested topic ("CRMS reasoning").
-                # Keep the check lexical: it neither expands query terms nor
-                # changes the source wording. Explicit table and figure
-                # requests retain their dedicated matching rules below.
+                # Require multiple matching terms for ordinary retrieval so a
+                # generic one-word match cannot masquerade as an answer. For
+                # summaries, a one-term sentence can be useful when it covers
+                # a distinct part of the requested topic; the coverage-first
+                # selector below will prefer it only after selecting a more
+                # informative sentence. This lets summaries cover all query
+                # terms without rewarding repeated sentences.
                 effective_coverage = (
                     len(covered_terms - focus_terms)
                     + 2 * len(covered_terms & focus_terms))
                 if (len(original_terms) >= 2
                         and not requests_structured_source
                         and not requests_figure_source
-                        and effective_coverage < 2):
+                        and effective_coverage < (1 if limit > 1 else 2)):
                     continue
                 if (person_question
                         and len(covered_terms)
