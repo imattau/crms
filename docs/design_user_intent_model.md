@@ -17,7 +17,8 @@ retrieval. It also distinguishes an explanation follow-up after a grounded answe
 “why?”, and conditions “tell me more” on a current topic. The hypothesis records its act, task intent
 (when known), decision, matched frame, context predicates, alternatives, selected value, and that the
 basis is a hand-checked runtime rule. It is inspectable but not learned or corpus-licensed;
-unsupported turns have no hypothesis. Regression coverage is in
+unsupported turns have no hypothesis. `/intent` exposes the last hypothesis on demand in the
+interactive chat without adding diagnostics to ordinary answers. Regression coverage is in
 `experiments/v1_365_contextual_clarification_intent.py`.
 
 ## Why intent belongs in the model

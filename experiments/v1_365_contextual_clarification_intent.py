@@ -159,19 +159,26 @@ def main() -> None:
         ]
         completed = subprocess.run(
             command,
-            input="What did Ada Lovelace design?\nokay\nsecond option please\nGoodbye\n",
+            input=("What did Ada Lovelace design?\nokay\nsecond option please\n"
+                   "/intent\nGoodbye\n"),
             text=True, capture_output=True, check=True, timeout=30)
         require("does not identify one of the supported answers" in completed.stdout,
                 f"terminal did not explain the unresolved yes: {completed.stdout}")
         require("the Difference Engine" in completed.stdout
                 and "CRMS state saved. Goodbye." in completed.stdout,
                 f"terminal did not keep and resolve the pending choice: {completed.stdout}")
+        require("Last turn's intent hypothesis" in completed.stdout
+                and '"task_intent": "resolve-ambiguity"' in completed.stdout
+                and '"selected_value": "the Difference Engine"' in completed.stdout
+                and "hand-checked runtime rules; not learned" in completed.stdout,
+                f"/intent did not expose the selected contextual intent: {completed.stdout}")
 
     print("yes/no with an open choice preserves clarification state: PASS")
     print("ordinal selection after acknowledgement resolves the original candidates: PASS")
     print("explicit 'I meant' correction resolves the open candidate choice: PASS")
     print("unanchored yes/no asks for context instead of querying the corpus: PASS")
     print("terminal interaction retains context across the clarification sequence: PASS")
+    print("/intent exposes the last turn's contextual hypothesis on demand: PASS")
 
 
 if __name__ == "__main__":
