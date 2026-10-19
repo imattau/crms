@@ -471,6 +471,20 @@ def _open_question_task_intent(dialogue: CRMSDialogue,
     return active_task or "continue-current-task"
 
 
+def _open_question_dialogue_act(text: str, open_question: dict[str, str],
+                                task_intent: str) -> str:
+    """Name the conversational move for a response to a typed open question."""
+    if (open_question.get("answer_kind") == "yes-no"
+            and open_question.get("expected_slot") == "confirmation"):
+        normalized = text.strip().casefold()
+        if normalized.startswith(("no", "nope", "nah", "not really")):
+            return "reject"
+        return "confirm"
+    if task_intent == "provide-constraint":
+        return "provide-information"
+    return "answer-clarification"
+
+
 def is_farewell(text: str) -> bool:
     return classify_act(text) == "farewell"
 
@@ -638,10 +652,11 @@ def classify_user_intent(
         )
         if ((is_yes_no and expected_yes_no and not is_fresh_question)
                 or is_short_detail):
+            task_intent = _open_question_task_intent(dialogue, open_question)
             return UserIntentHypothesis(
-                dialogue_act="answer-clarification",
-                task_intent=_open_question_task_intent(
-                    dialogue, open_question),
+                dialogue_act=_open_question_dialogue_act(
+                    text, open_question, task_intent),
+                task_intent=task_intent,
                 decision="selected",
                 matched_frame="answer-to-open-dialogue-question",
                 context_predicates=("pending_assistant_question",
@@ -782,7 +797,8 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             intent.matched_frame == "elaboration-topic-slot"
             or intent.matched_frame == "yes-no-response-to-detail-question"
             or (intent.decision == "selected"
-                and intent.dialogue_act == "answer-clarification")))
+                and intent.dialogue_act in {
+                    "answer-clarification", "confirm", "reject"})))
     if dialogue.open_dialogue_question is not None and not preserves_question:
         # A fresh question or unrelated act replaces the prior QUD.
         dialogue.open_dialogue_question = None
@@ -796,6 +812,10 @@ def respond(dialogue: CRMSDialogue, text: str, *,
                 and dialogue.open_dialogue_question is not None):
             dialogue.remember_session_slot(
                 intent.selected_value or "", user_turn=text)
+            dialogue.open_dialogue_question = None
+        elif (intent is not None and intent.decision == "selected"
+              and intent.dialogue_act in {"confirm", "reject"}
+              and dialogue.open_dialogue_question is not None):
             dialogue.open_dialogue_question = None
         elif (turn.status == "clarify" and turn.text.rstrip().endswith("?")
               and dialogue.open_dialogue_question is None
@@ -940,6 +960,17 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             "clarify", text, question.get("prompt", ""),
             text=(f"I was asking for the {label}. "
                   f"{question.get('prompt', 'What detail should I use?')}")))
+
+    if (intent is not None and intent.decision == "selected"
+            and intent.dialogue_act in {"confirm", "reject"}
+            and dialogue.open_dialogue_question is not None):
+        dialogue.open_dialogue_question = None
+        if intent.dialogue_act == "confirm":
+            return with_intent(DialogueTurn(
+                "social", text, text, text="Got it."))
+        return with_intent(DialogueTurn(
+            "clarify", text, text,
+            text="Okay. What should I correct?"))
 
     mixed_greeting = _MIXED_GREETING_RE.fullmatch(text.strip())
     if mixed_greeting is not None:

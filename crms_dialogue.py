@@ -58,7 +58,11 @@ def infer_open_question_slot(prompt: str, answer_kind: str) -> str:
     text = " ".join(prompt.casefold().split())
     if answer_kind == "yes-no":
         if any(cue in text for cue in (
-                "to confirm", "did you say", "is that", "correct?", "right?")):
+                "to confirm", "did you say", "you said", "are you sure",
+                "is that right", "is that correct", "that's right",
+                "that's correct", "that's tonight", "that's today",
+                "that's tomorrow", "that's at ", "that's for ",
+                "so i have", "correct?", "right?")):
             return "confirmation"
         return "yes_no"
     if any(cue in text for cue in (
