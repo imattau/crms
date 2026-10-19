@@ -669,10 +669,99 @@ def _citation_contains_integer_pair(source_text: str, inputs: list[int],
             result = list(reversed(values))
         return values, result
 
+    def reversed_range_result(node: ast.AST
+                              ) -> tuple[str, list[int], list[int]] | None:
+        """Recognize one safe doctest loop that prints a reversed range."""
+        if (not isinstance(node, ast.For)
+                or not isinstance(node.target, ast.Name)
+                or node.orelse or len(node.body) != 1
+                or not isinstance(node.body[0], ast.Expr)):
+            return None
+        printed = node.body[0].value
+        if (not isinstance(printed, ast.Call)
+                or not isinstance(printed.func, ast.Name)
+                or printed.func.id != "print" or printed.keywords
+                or len(printed.args) != 1
+                or not isinstance(printed.args[0], ast.Name)
+                or printed.args[0].id != node.target.id):
+            return None
+        iterator = node.iter
+        if (not isinstance(iterator, ast.Call)
+                or not isinstance(iterator.func, ast.Name)
+                or iterator.func.id != "reversed" or iterator.keywords
+                or len(iterator.args) != 1):
+            return None
+        range_call = iterator.args[0]
+        if (not isinstance(range_call, ast.Call)
+                or not isinstance(range_call.func, ast.Name)
+                or range_call.func.id != "range" or range_call.keywords
+                or not 1 <= len(range_call.args) <= 3):
+            return None
+        bounds = []
+        for argument in range_call.args:
+            if (not isinstance(argument, ast.Constant)
+                    or type(argument.value) is not int):
+                return None
+            bounds.append(argument.value)
+        try:
+            range_values = range(*bounds)
+            if len(range_values) > 1000:
+                return None
+            values = list(range_values)
+        except (OverflowError, ValueError):
+            return None
+        return node.target.id, values, list(reversed(values))
+
     lines = source_text.splitlines()
     for position, line in enumerate(lines):
         prompt = re.match(r"^\s*>>>\s*(.*?)\s*$", line)
         if prompt is None:
+            continue
+        loop_match = re.fullmatch(
+            r"for\s+([A-Za-z_]\w*)\s+in\s+reversed\(range\(.*\)\):",
+            prompt.group(1))
+        if loop_match is not None:
+            continuation = []
+            output_start = position + 1
+            while output_start < len(lines):
+                continuation_match = re.match(
+                    r"^\s*\.\.\.\s{4}(?P<code>.+?)\s*$",
+                    lines[output_start])
+                if continuation_match is None:
+                    break
+                continuation.append(continuation_match.group("code"))
+                output_start += 1
+            if (not continuation or output_start >= len(lines)
+                    or not re.fullmatch(r"\s*\.\.\.\s*",
+                                        lines[output_start])):
+                continue
+            try:
+                loop_tree = ast.parse(
+                    prompt.group(1) + "\n    "
+                    + "\n    ".join(continuation), mode="exec")
+            except SyntaxError:
+                continue
+            if len(loop_tree.body) != 1:
+                continue
+            loop = reversed_range_result(loop_tree.body[0])
+            if loop is None or loop[1] != inputs or loop[2] != outputs:
+                continue
+            printed_values = []
+            for output_line in lines[output_start + 1:]:
+                if re.match(r"^\s*(?:>>>|\.\.\.)", output_line):
+                    break
+                if not output_line.strip():
+                    continue
+                try:
+                    printed_values.append(int(output_line.strip()))
+                except ValueError:
+                    printed_values = []
+                    break
+                if len(printed_values) > 1000:
+                    printed_values = []
+                    break
+            if printed_values == outputs:
+                return True
             continue
         try:
             tree = ast.parse(prompt.group(1), mode="exec")

@@ -732,11 +732,13 @@ index and demonstrates the exact input/output list pair before storing it.
 The citation checker accepts the explicit list-pair form and a deliberately
 small, non-executing AST subset of Python/NumPy doctests (`sorted`, `np.sort`,
 `np.unique`, `np.flip`, `list(reversed(...))`, and reverse slicing over literal
-integer lists or simple assigned arrays). Other source code remains
-unrecognized and must not be treated as verified. The citation still does not
-prove that the source wording licenses the natural-language instruction, and
-natural-language and contrastive teaching still lack automatic per-example
-source capture.
+integer lists or simple assigned arrays). It also recognizes the exact
+`for item in reversed(range(...))` loop with one `print(item)` body and
+integer range arguments. That loop is statically interpreted with a
+1,000-value bound, not executed. Other source code remains unrecognized and
+must not be treated as verified. The citation still does not prove that the
+source wording licenses the natural-language instruction, and natural-language
+and contrastive teaching still lack automatic per-example source capture.
 
 Research retrieval now widens a hit within a short doctest paragraph to include
 its prompt and output together, so a cited command is not separated from the
@@ -744,6 +746,16 @@ result that validates it. `v1_432` checks exact citation round trips through
 both in-memory and SQLite indexes, including CRLF input with whitespace-only
 blank lines. This affects evidence span construction only; the bounded parser
 and teacher-attributed instruction link remain unchanged.
+
+`v1_433_document_sourced_procedure_composition.py` extends the evidence path
+to a small multi-operation code artifact. Sort, unique, and reverse each have
+an exact numeric example cited to Python or NumPy documentation. Codex supplies
+the additional numeric contrasts and sequence-connective examples, explicitly
+unattributed. The composed `unique → sort → reverse` artifact passes four
+held-out lists, keeps its three component citations, survives a fresh chat
+process, and refuses an unsupported middle operation. This demonstrates
+teacher-guided recombination using source-cited component examples; the source
+text alone did not license the instructions or the connective.
 
 `v1_432_cited_doctest_rule_learning.py` exercises this path using exact code
 excerpts from the official Python Sorting HOWTO and NumPy documentation. The

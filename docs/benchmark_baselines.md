@@ -1640,3 +1640,25 @@ when rerun alongside it. This validates citation spans and one bounded
 teacher-guided rule path. It does not demonstrate induction from source text
 alone, broad coding skill, or natural-language transfer across diverse
 instructions.
+
+## Document-sourced component recombination through chat (2026-10-20)
+
+Command: `python3 experiments/v1_433_document_sourced_procedure_composition.py`.
+
+The chat learns numeric sort, stable unique, and reverse procedures using one
+exact numeric code example cited to each official documentation source, plus
+Codex-authored contrast examples. It also learns the `then` sequence connective
+from separate Codex-authored examples. The held-out natural-language request
+composes `unique → sort → reverse`; its generated Python passes four separate
+lists, preserves all three source citations, reproduces after a fresh chat
+restart, and refuses an unsupported `encrypt` middle step.
+
+Runtime result: all checks passed. The sources are Python and NumPy
+documentation (two publisher origins), but each operation has only one cited
+numeric example. Additional examples and the connective are teacher-attributed;
+the source pair checker verifies the code/result pair, not that source prose
+licenses the natural-language instruction. This is a source-cited,
+teacher-guided composition result, not source-only induction or broad coding
+competence. It also exposed that the wording variant used by a composition
+must retain its own citation or the generated artifact loses that component's
+lineage.

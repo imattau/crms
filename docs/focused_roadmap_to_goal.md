@@ -116,6 +116,15 @@ misses, missing steps, and unsupported compositions. Record source IDs,
 example lineage, validation split, and the rule's tested scope. Test the full
 path through chat and generated artifacts.
 
+`v1_433_document_sourced_procedure_composition.py` is a new stepping stone:
+three operation examples are cited to official Python/NumPy documentation,
+and a learned `unique → sort → reverse` artifact passes four held-out lists
+through chat and a fresh process. It preserves component citations and refuses
+an unsupported middle step. The contrast examples and sequence connective are
+Codex-authored, and there is only one source numeric pair per operation. It
+does not meet the source-disjoint transfer gate; the next round must improve
+the source example yield and test independent natural-language formulations.
+
 Keep source demonstration, teacher attribution, rule induction, and output
 validation separate. A citation proving an input/output pair does not by
 itself prove that the source licenses the natural-language instruction. Use

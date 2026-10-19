@@ -28,6 +28,11 @@ NUMPY_SORT_DOC = (
     ">>> a = np.array([2, 1, 5, 3, 7, 4, 6, 8])\n"
     ">>> np.sort(a)\n"
     "array([1, 2, 3, 4, 5, 6, 7, 8])")
+PYTHON_REVERSE_DOC = (
+    ">>> for i in reversed(range(1, 10, 2)):\n"
+    "...     print(i)\n"
+    "...\n"
+    "9\n7\n5\n3\n1")
 TRAINING = (
     ("python-sorting-howto", "Python Sorting HOWTO",
      "https://docs.python.org/3/howto/sorting.html", PYTHON_SORT_DOC,
@@ -59,10 +64,11 @@ def require(condition: bool, message: str) -> None:
 
 
 def citation_for(index: CRMSResearchIndex, document_id: str, title: str,
-                 location: str, text: str) -> str:
+                 location: str, text: str, *, query: str | None = None
+                 ) -> str:
     index.add_document(document_id, title, text, location)
-    query = "sorted" if "sorted(" in text else "sort"
-    hits = index.search(query, limit=10, context_chars=0)
+    search_query = query or ("sorted" if "sorted(" in text else "sort")
+    hits = index.search(search_query, limit=10, context_chars=0)
     hit = next((hit for hit in hits if hit.document_id == document_id), None)
     require(hit is not None,
             f"search did not retrieve the doctest in {document_id}")
@@ -88,9 +94,17 @@ def check_sqlite_doctest_citations(path: Path) -> None:
             require(index.resolve_citation(citation) == text,
                     f"SQLite citation did not cover the full doctest: "
                     f"{document_id}")
+        check_python_reverse_citation(index)
         check_crlf_doctest_citation(index)
     finally:
         index.close()
+
+
+def check_python_reverse_citation(index: CRMSResearchIndex) -> None:
+    citation_for(
+        index, "python-reversed-range", "Python Tutorial: Data Structures",
+        "https://docs.python.org/3/tutorial/datastructures.html",
+        PYTHON_REVERSE_DOC, query="reversed")
 
 
 def check_crlf_doctest_citation(index: CRMSResearchIndex) -> None:
@@ -140,6 +154,22 @@ def main() -> None:
         ">>> np.flip(np.array([3, 1, 2]))\narray([2, 1, 3])",
         [3, 1, 2], [2, 1, 3]),
         "NumPy flip doctest was not recognized")
+    require(_citation_contains_integer_pair(
+        PYTHON_REVERSE_DOC, [1, 3, 5, 7, 9], [9, 7, 5, 3, 1]),
+        "documented reversed-range loop was not recognized")
+    require(not _citation_contains_integer_pair(
+        PYTHON_REVERSE_DOC.replace("9\n7\n5", "9\n8\n5"),
+        [1, 3, 5, 7, 9], [9, 7, 5, 3, 1]),
+        "reversed-range validator trusted a tampered output")
+    require(not _citation_contains_integer_pair(
+        PYTHON_REVERSE_DOC.replace("print(i)", "print(i + 1)"),
+        [1, 3, 5, 7, 9], [9, 7, 5, 3, 1]),
+        "reversed-range validator accepted an unsupported loop body")
+    require(not _citation_contains_integer_pair(
+        ">>> for i in reversed(range(0, 1001)):\n"
+        "...     print(i)\n...\n1000",
+        list(range(1001)), list(reversed(range(1001)))),
+        "reversed-range validator exceeded its bounded iteration limit")
     require(not _citation_contains_integer_pair(
         ">>> list(reversed([3, 1, 2], ignored=True))\n[2, 1, 3]",
         [3, 1, 2], [2, 1, 3]),
@@ -173,6 +203,7 @@ def main() -> None:
                 f"/teach-rule sort the numbers|"
                 f"{','.join(map(str, inputs))}|"
                 f"{','.join(map(str, outputs))}|{citation}")
+        check_python_reverse_citation(index)
         check_crlf_doctest_citation(index)
         index.save(root / "index.json")
 
@@ -234,6 +265,7 @@ def main() -> None:
                 "an unsupported operation was licensed by the sort examples")
 
     print("Python and NumPy doctest citations verified without executing source: PASS")
+    print("official reversed-range example is verified and retrievable: PASS")
     print("in-memory and SQLite search cite complete doctest blocks: PASS")
     print("chat learned sort from two cited docs plus two teacher contrasts: PASS")
     print("three held-out lists and generated Python passed independent checks: PASS")
