@@ -140,8 +140,9 @@ def main() -> None:
                    "/infer-relation Ada|can-access|Lab\n/quit\n"),
             text=True, capture_output=True, check=True, timeout=20)
     require("with middle kinds: machine, component." in process.stdout
-                and "under rule cli-three" in process.stdout
-                and "Rotor is-a component [sources: kind-component:ada]" in process.stdout,
+                and "(rule cli-three)" in process.stdout
+                and "Rotor — is-a → component [Sources: kind-component:ada]"
+                in process.stdout,
                 f"three-premise CLI route omitted rule or type evidence:\n{process.stdout}")
 
     print("three-premise inference diagnostic: PASS")

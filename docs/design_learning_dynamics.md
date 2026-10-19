@@ -204,6 +204,26 @@ abstaining is the system's default for uncertainty. Make MARGIN configurable and
 5. **Dependents:** an item with a dependent derived case is never made `dormant`.
 6. **Determinism:** the same event sequence run twice yields identical rows.
 
+### 1.8 Held-out rule validation quality
+
+Rule validation now reports the fraction of applicable held-out chains with an explicit positive or
+negative label, plus the 95% Wilson lower bound for precision on labeled examples. By default, a
+candidate needs at least 50% label coverage and a precision lower bound of at least 25%, in addition
+to the existing positive-support, independent-source, disjoint-split, and completeness checks.
+These thresholds are configurable through `validate_rule_candidate`, `review_inference_rules`, and
+`accept_inference_rule_candidate`.
+
+Unknown applications remain unknown; they are not treated as false examples. A large number of
+unknown applications can now block a rule for low coverage, while a small number of explicit
+counterexamples can be tolerated when the accumulated labeled support clears the lower-bound gate.
+A candidate with only negative support remains contradicted, and too little labeled support remains
+insufficient. Review output includes training and held-out coverage and precision bounds, and
+accepted-rule metadata preserves the thresholds and measured values. The Wilson bound is a
+conservative diagnostic under a Bernoulli independence assumption, not a calibrated probability
+that a rule is true; source diversity remains a separate gate. `experiments/v1_359_rule_validation_quality.py`
+checks a rule with 2 labels among 500 applications, balanced positive/negative evidence, and strong
+support with one negative label. Broader calibration on noisy, source-linked corpora remains needed.
+
 ## 2. Missing-premise follow-through
 
 ### 2.1 Purpose
@@ -543,3 +563,29 @@ representation remains a later, larger change: it should replace duplicated two-
 joins and verifier branches only after the registry and proof formats are stable, with compatibility
 tests for persisted `rules.sqlite` data. Inverse and sub-relation behavior should be represented as
 declared rule data only when the proof format can verify their direction and provenance.
+
+### 8.5 Follow-ups from the rule-learning review
+
+- Exact missing-premise source follow-through is already implemented and reviewed in section 2;
+  it searches indexed text, requires the existing frame to parse the precise missing triple, and
+  routes proposals through explicit fact review. No relaxation of that match is needed.
+- Feedback capture is implemented, but the item-weighting evidence ledger remains proposed.
+  `/right` currently records evidence-attributed feedback without strengthening facts or rules.
+- Statistical proposals for symmetric, functional, inverse, or sub-relation behavior may be useful
+  if they include positive and negative examples and enter the same cited review workflow. They
+  must not install schemas or treat graph shape alone as proof. Separate derivation schemas from
+  integrity constraints in both proposal wording and proof semantics.
+- `experiments/v1_307_sqlite_rule_discovery_scale.py` exercises sparse synthetic stores up to
+  300,000 facts and checks in-memory/SQLite parity. That does not establish performance on a full
+  288,000-document package: report the package's fact count, connectivity, expansions, and bound
+  completion before claiming discovery usually exhausts its budget. High-degree joins still need
+  bounded, indexed candidate generation.
+- A closed-world absence currently returns `status="unknown"` with “No” wording. A future explicit
+  `denied` outcome needs a complete-search contract and independent verifier support. Constraint-
+  derived negatives (for example, a second value under a functional relation) also need explicit
+  proof nodes that cite the relevant schema and conflicting value. Never infer a negative from
+  absence without a declared closed-world scope.
+- Recursive-rule entity scans and repeated per-goal kind filtering remain optimization targets.
+  Profile them on recursive and high-degree graphs before hoisting shared indexes; preserve bounds,
+  deterministic results, and independent proof checks. Numeric comparisons and counting belong to
+  the deferred Datalog body and exact-math integration design.

@@ -119,8 +119,8 @@ def main() -> None:
                 if review.candidate.third_relation == "located in"
                 and review.candidate.conclusion_relation == "reaches"]
     require(len(rejected) == 1 and rejected[0].validation is not None
-            and rejected[0].validation.status == "contradicted",
-            "a held-out negative label did not defeat the candidate")
+            and rejected[0].validation.status == "low-confidence",
+            "balanced held-out positive and negative labels were over-trusted")
 
     missing_kinds = seeded(missing_second_holdout_kinds=True).review_inference_rules(
         "holdout:", max_arity=3)

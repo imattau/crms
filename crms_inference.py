@@ -281,6 +281,10 @@ class RuleValidation:
     expansions: int
     independent_sources: tuple[str, ...] = ()
     source_basis: str = "source documents"
+    label_coverage: float | None = None
+    precision_lower_bound: float | None = None
+    training_label_coverage: float | None = None
+    training_precision_lower_bound: float | None = None
 
 
 @dataclass(frozen=True)
@@ -302,6 +306,54 @@ class RuleAcceptanceResult:
     review: RuleReview | None
     rule: InferenceRule | None
     request: str | None = None
+
+
+def _wilson_lower_bound(successes: int, failures: int, *,
+                        z: float = 1.96) -> float | None:
+    """Return the two-sided 95% Wilson lower bound for observed precision."""
+    total = successes + failures
+    if total == 0:
+        return None
+    rate = successes / total
+    z2 = z * z
+    denominator = 1.0 + z2 / total
+    center = rate + z2 / (2.0 * total)
+    margin = z * ((rate * (1.0 - rate) / total)
+                  + (z2 / (4.0 * total * total))) ** 0.5
+    return max(0.0, (center - margin) / denominator)
+
+
+def _validation_metrics(positive_count: int, negative_count: int,
+                       unknown_count: int, *,
+                       labeled_count: int | None = None
+                       ) -> tuple[float | None, float | None]:
+    labels = positive_count + negative_count
+    observed_labels = labels if labeled_count is None else labeled_count
+    total = observed_labels + unknown_count
+    coverage = observed_labels / total if total else None
+    return coverage, _wilson_lower_bound(positive_count, negative_count)
+
+
+def _candidate_training_metrics(
+        candidate: RuleCandidate) -> tuple[float | None, float | None, int, int]:
+    def endpoints(examples: Iterable[Mapping[str, Any]]) -> set[tuple[tuple[str, ...], tuple[str, ...]]]:
+        result = set()
+        for example in examples:
+            conclusion = example.get("conclusion", {})
+            if isinstance(conclusion, Mapping):
+                result.add((_key(str(conclusion.get("subject", ""))),
+                            _key(str(conclusion.get("object", "")))))
+        return result
+
+    positives = endpoints(candidate.positive_examples)
+    negatives = endpoints(candidate.negative_examples)
+    positive_count = len(positives - negatives)
+    negative_count = len(negatives)
+    labeled_count = len(positives | negatives)
+    coverage = (min(1.0, labeled_count / candidate.possible_examples)
+                if candidate.possible_examples > 0 else None)
+    return (coverage, _wilson_lower_bound(positive_count, negative_count),
+            positive_count, negative_count)
 
 
 def _infer_relation_bounded(
@@ -1474,6 +1526,8 @@ def _validate_three_premise_rule_candidate(
         validation_facts: list[dict[str, Any]],
         validation_negative_facts: list[dict[str, Any]],
         min_positive_examples: int,
+        min_label_coverage: float,
+        min_precision_lower_bound: float,
         max_expansions: int, research_index: Any | None = None,
         origin_map: Mapping[str, str] | None = None) -> RuleValidation:
     if (candidate.third_relation is None or candidate.middle_kind is None
@@ -1577,10 +1631,25 @@ def _validate_three_premise_rule_candidate(
     ordered_negative = tuple(negatives[key] for key in sorted(negatives))
     independent_sources = _independent_sources_from_examples(
         ordered_positive, research_index=research_index, origin_map=origin_map)
+    label_coverage, precision_lower_bound = _validation_metrics(
+        len(ordered_positive), len(ordered_negative), len(unknown),
+        labeled_count=len(positives.keys() | negatives.keys()))
     if not complete:
         status = "incomplete"
-    elif ordered_negative:
+    elif ordered_negative and not ordered_positive:
         status = "contradicted"
+    elif (label_coverage is not None
+          and label_coverage < min_label_coverage):
+        status = "low-coverage"
+    elif (ordered_negative and (precision_lower_bound is None
+                                or precision_lower_bound
+                                < min_precision_lower_bound)):
+        status = "low-confidence"
+    elif len(ordered_positive) < min_positive_examples:
+        status = "insufficient"
+    elif (precision_lower_bound is None
+          or precision_lower_bound < min_precision_lower_bound):
+        status = "low-confidence"
     elif (len(ordered_positive) >= min_positive_examples
           and len(independent_sources) >= min_positive_examples):
         status = "validated"
@@ -1591,7 +1660,8 @@ def _validate_three_premise_rule_candidate(
     return RuleValidation(status, ordered_positive, ordered_negative,
                           len(unknown), complete, expansions,
                           tuple(sorted(independent_sources)),
-                          _evidence_basis(research_index, origin_map))
+                          _evidence_basis(research_index, origin_map),
+                          label_coverage, precision_lower_bound)
 
 
 def validate_rule_candidate(
@@ -1601,6 +1671,8 @@ def validate_rule_candidate(
         validation_facts: Iterable[Mapping[str, Any]],
         validation_negative_facts: Iterable[Mapping[str, Any]],
         min_positive_examples: int = 2,
+        min_label_coverage: float = 0.5,
+        min_precision_lower_bound: float = 0.25,
         max_expansions: int = 100_000,
         research_index: Any | None = None,
         origin_map: Mapping[str, str] | None = None) -> RuleValidation:
@@ -1609,6 +1681,11 @@ def validate_rule_candidate(
                         ("max_expansions", max_expansions)):
         if not isinstance(value, int) or isinstance(value, bool) or value < 1:
             raise ValueError(f"{name} must be a positive integer")
+    for name, value in (("min_label_coverage", min_label_coverage),
+                        ("min_precision_lower_bound", min_precision_lower_bound)):
+        if (not isinstance(value, (int, float)) or isinstance(value, bool)
+                or not 0.0 <= value <= 1.0):
+            raise ValueError(f"{name} must be between 0 and 1")
     train_rows = [dict(row) for row in
                   list(training_facts) + list(training_negative_facts)]
     valid_positive = [dict(row) for row in validation_facts]
@@ -1617,20 +1694,41 @@ def validate_rule_candidate(
     validation_triples = {_triple_key(row) for row in valid_positive + valid_negative}
     if train_triples & validation_triples:
         return RuleValidation("overlap", (), (), 0, True, 0)
-    if candidate.status == "contradicted":
-        return RuleValidation("training-contradicted", (), (), 0, True, 0)
     if candidate.status == "incomplete":
         return RuleValidation("incomplete", (), (), 0, False, 0)
+    training_coverage, training_lcb, training_positive, training_negative = (
+        _candidate_training_metrics(candidate))
+    if candidate.status == "contradicted" and training_positive == 0:
+        return RuleValidation("training-contradicted", (), (), 0, True, 0,
+                              training_label_coverage=training_coverage,
+                              training_precision_lower_bound=training_lcb)
+    if (training_coverage is not None
+            and training_coverage < min_label_coverage):
+        return RuleValidation("training-low-coverage", (), (), 0, True, 0,
+                              training_label_coverage=training_coverage,
+                              training_precision_lower_bound=training_lcb)
+    if (training_lcb is not None
+            and training_lcb < min_precision_lower_bound):
+        return RuleValidation("training-low-confidence", (), (), 0, True, 0,
+                              training_label_coverage=training_coverage,
+                              training_precision_lower_bound=training_lcb)
     if candidate.status == "insufficient-independent-sources":
         return RuleValidation("insufficient-independent-sources", (), (), 0,
-                              True, 0)
+                              True, 0,
+                              training_label_coverage=training_coverage,
+                              training_precision_lower_bound=training_lcb)
     if candidate.third_relation is not None:
-        return _validate_three_premise_rule_candidate(
+        validation = _validate_three_premise_rule_candidate(
             candidate, validation_facts=valid_positive,
             validation_negative_facts=valid_negative,
             min_positive_examples=min_positive_examples,
+            min_label_coverage=min_label_coverage,
+            min_precision_lower_bound=min_precision_lower_bound,
             max_expansions=max_expansions, research_index=research_index,
             origin_map=origin_map)
+        return replace(validation,
+                       training_label_coverage=training_coverage,
+                       training_precision_lower_bound=training_lcb)
 
     first_relation = _key(candidate.first_relation)
     second_relation = _key(candidate.second_relation)
@@ -1688,10 +1786,25 @@ def validate_rule_candidate(
     ordered_negative = tuple(negative_examples[key] for key in sorted(negative_examples))
     independent_sources = _independent_sources_from_examples(
         ordered_positive, research_index=research_index, origin_map=origin_map)
+    label_coverage, precision_lower_bound = _validation_metrics(
+        len(ordered_positive), len(ordered_negative), len(unknown),
+        labeled_count=len(positive_examples.keys() | negative_examples.keys()))
     if not complete:
         status = "incomplete"
-    elif ordered_negative:
+    elif ordered_negative and not ordered_positive:
         status = "contradicted"
+    elif (label_coverage is not None
+          and label_coverage < min_label_coverage):
+        status = "low-coverage"
+    elif (ordered_negative and (precision_lower_bound is None
+                                or precision_lower_bound
+                                < min_precision_lower_bound)):
+        status = "low-confidence"
+    elif len(ordered_positive) < min_positive_examples:
+        status = "insufficient"
+    elif (precision_lower_bound is None
+          or precision_lower_bound < min_precision_lower_bound):
+        status = "low-confidence"
     elif (len(ordered_positive) >= min_positive_examples
           and len(independent_sources) >= min_positive_examples):
         status = "validated"
@@ -1702,7 +1815,9 @@ def validate_rule_candidate(
     return RuleValidation(status, ordered_positive, ordered_negative,
                           len(unknown), complete, expansions,
                           tuple(sorted(independent_sources)),
-                          _evidence_basis(research_index, origin_map))
+                          _evidence_basis(research_index, origin_map),
+                          label_coverage, precision_lower_bound,
+                          training_coverage, training_lcb)
 
 
 def _proof_has_conflict(proof: Mapping[str, Any], negatives: set) -> bool:

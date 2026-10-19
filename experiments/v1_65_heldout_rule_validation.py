@@ -82,7 +82,7 @@ def main() -> None:
     add_chain(rejected_kb, "Jo", "Kim", "Lou", "holdout:two", label="positive")
     rejected = rejected_kb.accept_inference_rule_candidate(
         1, "parent-transitivity", "holdout:")
-    if rejected.accepted or rejected.review.validation.status != "contradicted":
+    if rejected.accepted or rejected.review.validation.status != "low-confidence":
         raise SystemExit(f"candidate with held-out counterexample was accepted: {rejected}")
 
     insufficient_kb = CRMSKnowledgeBase()
@@ -285,6 +285,8 @@ def main() -> None:
             cli, input="\n".join(commands) + "\n", text=True,
             capture_output=True, check=True, timeout=20)
         if ("holdout=validated" not in process.stdout
+                or "holdout-label-coverage=100.0%" not in process.stdout
+                or "holdout-precision-lcb95=" not in process.stdout
                 or "Accepted validated rule parent-transitivity" not in process.stdout
                 or "2 source documents" not in process.stdout
                 or "parent-transitivity [validated]" not in process.stdout
@@ -300,7 +302,11 @@ def main() -> None:
         if (validation_record.get("validation_source_prefix") != "holdout:"
                 or len(validation_record.get("positive_examples", [])) != 2
                 or len(validation_record.get("training_positive_examples", [])) != 2
-                or validation_record.get("validation_source_basis") != "source documents"):
+                or validation_record.get("validation_source_basis") != "source documents"
+                or validation_record.get("min_label_coverage") != 0.5
+                or validation_record.get("min_precision_lower_bound") != 0.25
+                or validation_record.get("label_coverage") != 1.0
+                or validation_record.get("precision_lower_bound") is None):
             raise SystemExit("accepted rule lost its validation provenance")
         loaded = CRMSKnowledgeBase.load(knowledge_path)
         if loaded.infer_relation("Nia", "ancestor", "Pia").status != "answered":

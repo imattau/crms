@@ -2513,6 +2513,8 @@ class CRMSKnowledgeBase:
     def review_inference_rules(self, validation_source_prefix: str, *,
                                min_support: int = 2,
                                min_validation_support: int = 2,
+                               min_label_coverage: float = 0.5,
+                               min_precision_lower_bound: float = 0.25,
                                max_expansions: int = 100_000,
                                max_arity: int = 2,
                                research_index: Any | None = None,
@@ -2551,6 +2553,8 @@ class CRMSKnowledgeBase:
                     validation_facts=validation_positive,
                     validation_negative_facts=validation_negative,
                     min_positive_examples=min_validation_support,
+                    min_label_coverage=min_label_coverage,
+                    min_precision_lower_bound=min_precision_lower_bound,
                     max_expansions=remaining, research_index=research_index,
                     origin_map=origin_map)
                 remaining -= validation.expansions
@@ -2563,6 +2567,8 @@ class CRMSKnowledgeBase:
             self, candidate_number: int, rule_id: str,
             validation_source_prefix: str, *, min_support: int = 2,
             min_validation_support: int = 2,
+            min_label_coverage: float = 0.5,
+            min_precision_lower_bound: float = 0.25,
             max_expansions: int = 100_000,
             max_arity: int = 2, research_index: Any | None = None,
             origin_map: Mapping[str, str] | None = None) -> RuleAcceptanceResult:
@@ -2573,6 +2579,8 @@ class CRMSKnowledgeBase:
         review_result = self.review_inference_rules(
             validation_source_prefix, min_support=min_support,
             min_validation_support=min_validation_support,
+            min_label_coverage=min_label_coverage,
+            min_precision_lower_bound=min_precision_lower_bound,
             max_expansions=max_expansions, max_arity=max_arity,
             research_index=research_index, origin_map=origin_map)
         if not review_result.complete:
@@ -2603,11 +2611,18 @@ class CRMSKnowledgeBase:
             "training_negative_examples": [dict(example)
                                            for example in candidate.negative_examples],
             "min_validation_support": min_validation_support,
+            "min_label_coverage": min_label_coverage,
+            "min_precision_lower_bound": min_precision_lower_bound,
             "positive_examples": [dict(example)
                                   for example in review.validation.positive_examples],
             "negative_examples": [dict(example)
                                   for example in review.validation.negative_examples],
             "unknown_endpoint_pairs": review.validation.unknown_endpoint_pairs,
+            "label_coverage": review.validation.label_coverage,
+            "precision_lower_bound": review.validation.precision_lower_bound,
+            "training_label_coverage": review.validation.training_label_coverage,
+            "training_precision_lower_bound": (
+                review.validation.training_precision_lower_bound),
             "independent_validation_sources": list(
                 review.validation.independent_sources),
             "validation_source_basis": review.validation.source_basis,
@@ -2702,19 +2717,39 @@ class CRMSKnowledgeBase:
                 f"({candidate.support_coverage:.1%})"
                 if candidate.support_coverage is not None
                 else "unavailable")
-            heldout_total = heldout_positive + heldout_negative + unknown
             heldout_coverage = (
-                f"{heldout_positive}/{heldout_total} "
-                f"({heldout_positive / heldout_total:.1%})"
-                if heldout_total else "unavailable")
+                f"{validation.label_coverage:.1%}"
+                if validation and validation.label_coverage is not None
+                else "unavailable")
+            heldout_precision = (
+                heldout_positive / (heldout_positive + heldout_negative)
+                if heldout_positive + heldout_negative else None)
+            heldout_lcb = (
+                f"{validation.precision_lower_bound:.1%}"
+                if validation and validation.precision_lower_bound is not None
+                else "unavailable")
+            training_coverage = (
+                f"{validation.training_label_coverage:.1%}"
+                if validation and validation.training_label_coverage is not None
+                else "unavailable")
+            training_lcb = (
+                f"{validation.training_precision_lower_bound:.1%}"
+                if validation and validation.training_precision_lower_bound is not None
+                else "unavailable")
+            heldout_precision_text = (
+                f"{heldout_precision:.1%}"
+                if heldout_precision is not None else "unavailable")
             lines.append(
                 f"Candidate {number} [{candidate.status}; holdout={heldout_status}]: "
                 f"{CRMSKnowledgeBase._rule_candidate_chain(candidate)}; "
                 f"train-positive={len(candidate.positive_examples)}, "
                 f"train-coverage={training_coverage}, "
+                f"train-precision-lcb95={training_lcb}, "
                 f"train-negative={len(candidate.negative_examples)}, "
                 f"holdout-positive={heldout_positive}, "
-                f"holdout-coverage={heldout_coverage}, "
+                f"holdout-label-coverage={heldout_coverage}, "
+                f"holdout-precision={heldout_precision_text}, "
+                f"holdout-precision-lcb95={heldout_lcb}, "
                 f"holdout-negative={heldout_negative}, holdout-unlabeled={unknown}, "
                 f"{(validation.source_basis if validation else candidate.source_basis).replace(' ', '-')}="
                 f"{source_count}.")
