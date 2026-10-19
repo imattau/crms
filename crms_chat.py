@@ -170,6 +170,8 @@ HELP = """Commands:
                  discover/review rules; arity=3 enables typed three-premise search
   /accept-inference-rule N|ID|HOLDOUT_SOURCE_PREFIX[|arity=3]
                  install a candidate only after passing holdout validation
+  /inference-rules
+                 inspect teacher rules, validated learned rules, and suspended rules
   Accept rule candidate N as "ID" using held-out source prefix "PREFIX".
                  accept through the same source-separated validation gate
   /infer-relation SUBJECT|RELATION|OBJECT[|name=value,...][|effort=quick/standard/thorough]
@@ -6416,6 +6418,31 @@ def main() -> int:
                             RuleReviewResult(True, (result.review,), 0)))
             except (TypeError, ValueError) as error:
                 print(f"Could not accept inference rule: {error}")
+            continue
+        if line == "/inference-rules":
+            learned = knowledge.list_inference_rules()
+            if not learned:
+                print("No inference rules are committed.")
+            for item in learned:
+                rule = item["rule"]
+                premises = [rule["first_relation"], rule["second_relation"]]
+                if rule.get("third_relation"):
+                    premises.append(rule["third_relation"])
+                kinds = [kind for kind in (rule.get("middle_kind"),
+                                           rule.get("second_middle_kind"))
+                         if kind]
+                typed = f" [middle kinds: {', '.join(kinds)}]" if kinds else ""
+                print(f"{rule['rule_id']} [{item['status']}]: "
+                      f"{' then '.join(premises)} entails "
+                      f"{rule['conclusion_relation']}{typed}.")
+                validation = item.get("validation") or {}
+                for counterexample in validation.get("counterexamples", []):
+                    sources = ", ".join(counterexample.get("negative_sources", []))
+                    print("  Counterexample: "
+                          f"{counterexample['subject']} — "
+                          f"{counterexample['relation']} → "
+                          f"{counterexample['object']} "
+                          f"(negative sources: {sources}).")
             continue
         if line == "/suggest-inference-rules" or line.startswith("/suggest-inference-rules "):
             fields = [value.strip() for value in

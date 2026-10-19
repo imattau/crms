@@ -1247,7 +1247,83 @@ class CRMSKnowledgeBase:
                                   tuple(sorted(set(old.sources) | {source})),
                                   old.qualifiers))
         self._negative_facts[key] = fact
+        self._flag_validated_rules_against_counterexample(fact)
         return fact
+
+    def _flag_validated_rules_against_counterexample(
+            self, negative: FactEvidence) -> None:
+        """Suspend a validated learned rule when it proves an explicit negative."""
+        target_key = self._fact_key(
+            negative.subject, negative.relation, negative.object,
+            negative.qualifiers)
+        for rule in self._inference_rules_for_use():
+            rule_key = _tokens(rule.rule_id)
+            validation = self._inference_rule_validation.get(rule_key)
+            if (validation is None
+                    or validation.get("status", "validated") != "validated"
+                    or _tokens(rule.conclusion_relation)
+                       != _tokens(negative.relation)):
+                continue
+            if isinstance(self._facts, SQLiteFactMap):
+                fact_rows, _negative_rows, _rule_rows = (
+                    self._sqlite_inference_snapshot(
+                        negative.relation, negative.qualifiers, [rule]))
+            else:
+                fact_rows = [asdict(fact) for fact in self.facts()]
+            # A directly taught positive conclusion does not establish that
+            # this learned rule is the source of the conflict.
+            premise_rows = [row for row in fact_rows if self._fact_key(
+                str(row["subject"]), str(row["relation"]),
+                str(row["object"]), self._normalize_qualifiers(
+                    dict(row.get("qualifiers", ())))) != target_key]
+            predicted = infer_relation(
+                premise_rows, [rule], subject=negative.subject,
+                relation=negative.relation, obj=negative.object,
+                qualifiers=dict(negative.qualifiers), max_expansions=10_000,
+                max_depth=40)
+            supporting_proofs = [proof for proof in predicted.proofs
+                                 if rule.rule_id in _proof_rule_ids(proof)]
+            if (predicted.status != "answered" or not predicted.complete
+                    or not supporting_proofs):
+                continue
+            record = copy.deepcopy(validation)
+            counterexample = {
+                "subject": negative.subject,
+                "relation": negative.relation,
+                "object": negative.object,
+                "qualifiers": list(negative.qualifiers),
+                "negative_sources": list(negative.sources),
+                "supporting_proofs": supporting_proofs,
+            }
+            counterexamples = list(record.get("counterexamples", []))
+            signature = json.dumps(counterexample, sort_keys=True,
+                                   ensure_ascii=False)
+            if signature not in {
+                    json.dumps(item, sort_keys=True, ensure_ascii=False)
+                    for item in counterexamples}:
+                counterexamples.append(counterexample)
+            record["status"] = "needs_review"
+            record["counterexamples"] = counterexamples
+            self._inference_rule_validation[rule_key] = record
+
+    def _inference_rules_for_use(self) -> list[InferenceRule]:
+        """Return rules not suspended by counterexamples pending review."""
+        return [rule for key, rule in self._inference_rules.items()
+                if self._inference_rule_validation.get(key, {}).get(
+                    "status", "validated") != "needs_review"]
+
+    def list_inference_rules(self) -> list[dict[str, Any]]:
+        """List rules with their validation status and counterexample records."""
+        rows = []
+        for key, rule in sorted(self._inference_rules.items()):
+            validation = self._inference_rule_validation.get(key)
+            rows.append({
+                "rule": asdict(rule),
+                "status": (validation.get("status", "validated")
+                           if validation is not None else "teacher_supplied"),
+                "validation": copy.deepcopy(validation),
+            })
+        return rows
 
     def remove_fact(self, subject: str, relation: str, obj: str, source: str, *,
                     qualifiers: Mapping[str, str] | None = None) -> bool:
@@ -1629,7 +1705,7 @@ class CRMSKnowledgeBase:
                        list[dict[str, Any]]]:
         """Fingerprint the facts and rules that can affect one relation query."""
         fact_rows, negative_rows, rule_rows = self._sqlite_inference_snapshot(
-            relation, qualifiers, list(self._inference_rules.values()))
+            relation, qualifiers, self._inference_rules_for_use())
         return (_inference_state_fingerprint(fact_rows, negative_rows, rule_rows),
                 fact_rows, negative_rows, rule_rows)
 
@@ -1663,6 +1739,53 @@ class CRMSKnowledgeBase:
                 or max_expansions < 1 or not isinstance(max_depth, int)
                 or isinstance(max_depth, bool) or max_depth < 1):
             raise ValueError("inference bounds must be positive integers")
+        query_key = self._fact_key(
+            subject, relation, obj, normalized_qualifiers)
+        for rule_key, rule in self._inference_rules.items():
+            validation = self._inference_rule_validation.get(rule_key, {})
+            if (validation.get("status") != "needs_review"
+                    or _tokens(rule.conclusion_relation) != _tokens(relation)):
+                continue
+            for counterexample in validation.get("counterexamples", []):
+                counterexample_key = self._fact_key(
+                    str(counterexample.get("subject", "")),
+                    str(counterexample.get("relation", "")),
+                    str(counterexample.get("object", "")),
+                    self._normalize_qualifiers(dict(
+                        counterexample.get("qualifiers", ()))))
+                if counterexample_key != query_key:
+                    continue
+                if isinstance(self._facts, SQLiteFactMap):
+                    positive_rows, negative_rows, _rule_rows = (
+                        self._sqlite_inference_snapshot(
+                            relation, normalized_qualifiers, [rule]))
+                else:
+                    positive_rows = [asdict(fact) for fact in self.facts()]
+                    negative_rows = [asdict(fact)
+                                     for fact in self.negative_facts()]
+                reviewed = infer_relation(
+                    positive_rows, [rule], subject=subject,
+                    relation=relation, obj=obj, negative_facts=negative_rows,
+                    qualifiers=normalized_qualifiers,
+                    max_expansions=max_expansions, max_depth=max_depth,
+                    max_candidates=budget.max_candidates,
+                    max_proofs=budget.max_proofs)
+                if (reviewed.status != "ambiguous" or not reviewed.complete
+                        or not any(rule.rule_id in _proof_rule_ids(proof)
+                                   for proof in reviewed.proofs)):
+                    continue
+                if not all(verify_inference_proof(
+                        proof, positive_rows, [asdict(rule)],
+                        expected_conclusion=reviewed.conclusion,
+                        expected_qualifiers=normalized_qualifiers,
+                        fact_lookup=self._proof_fact_is_present,
+                        max_depth=budget.max_depth,
+                        max_nodes=budget.max_verifier_nodes).valid
+                           for proof in reviewed.proofs):
+                    continue
+                return replace(reviewed,
+                               language_evidence=language_evidence,
+                               effort_level=budget.level)
         if isinstance(self._facts, SQLiteFactMap):
             type_facts = self._facts.lookup(
                 _tokens("has relation type"), _tokens(relation), "subject")
@@ -1685,7 +1808,7 @@ class CRMSKnowledgeBase:
         if cached is not None:
             return replace(cached, language_evidence=language_evidence,
                            effort_level=budget.level)
-        rules = list(self._inference_rules.values())
+        rules = self._inference_rules_for_use()
         if disk_backed:
             fact_rows, negative_rows, rule_rows = self._sqlite_inference_snapshot(
                 relation, normalized_qualifiers, rules)
@@ -1775,6 +1898,34 @@ class CRMSKnowledgeBase:
                     "Missing-premise follow-through: no specific missing premise found.")
             effort_checks = (corroboration, conflict_check, proof_check,
                              missing_check)
+        suspended_rules = [
+            rule for key, rule in self._inference_rules.items()
+            if (_tokens(rule.conclusion_relation) == _tokens(relation)
+                and self._inference_rule_validation.get(key, {}).get(
+                    "status") == "needs_review")
+        ]
+        active_same_relation = any(
+            _tokens(rule.conclusion_relation) == _tokens(relation)
+            for rule in rules)
+        if (result.status == "unknown" and suspended_rules
+                and not active_same_relation):
+            sources = sorted({
+                str(source)
+                for rule in suspended_rules
+                for counterexample in self._inference_rule_validation[
+                    _tokens(rule.rule_id)].get("counterexamples", [])
+                for source in counterexample.get("negative_sources", [])
+            })
+            source_text = (" Counterexample source(s): " + ", ".join(sources) + "."
+                           if sources else "")
+            result = replace(
+                result,
+                request=("A previously validated rule for this relation is "
+                         "suspended after contradictory source-backed evidence. "
+                         "Review or correct the evidence, then revalidate the rule "
+                         "before using it." + source_text),
+                reason_code="rule_needs_review",
+                failure_kind="rule_needs_review")
         return replace(result, language_evidence=language_evidence,
                        effort_level=budget.level, effort_checks=effort_checks)
 
@@ -1857,7 +2008,7 @@ class CRMSKnowledgeBase:
 
         base_facts = [asdict(fact) for fact in self.facts()]
         base_negative_facts = [asdict(fact) for fact in self.negative_facts()]
-        rules = list(self._inference_rules.values())
+        rules = self._inference_rules_for_use()
         found: list[AbductionHypothesis] = []
         used_subsets: list[frozenset[int]] = []
         subsets_checked = 0
@@ -2364,6 +2515,8 @@ class CRMSKnowledgeBase:
             third_relation=candidate.third_relation,
             second_middle_kind=candidate.second_middle_kind)
         self._inference_rule_validation[_tokens(rule.rule_id)] = {
+            "status": "validated",
+            "counterexamples": [],
             "validation_source_prefix": _display(
                 validation_source_prefix, "validation source prefix"),
             "training_positive_examples": [dict(example)
@@ -12975,6 +13128,7 @@ class CRMSKnowledgeBase:
         inference_conflict = False
         inference_incomplete = False
         inference_failure_kinds: set[str] = set()
+        inference_failure_requests: dict[str, None] = {}
         missing_premises: dict[str, dict[str, Any]] = {}
         inference_budget = max_inference_expansions
 
@@ -12989,7 +13143,7 @@ class CRMSKnowledgeBase:
             bounded entity scan or report incomplete search.
             """
             relation_key = _tokens(relation)
-            target_rules = [rule for rule in self._inference_rules.values()
+            target_rules = [rule for rule in self._inference_rules_for_use()
                             if _tokens(rule.conclusion_relation) == relation_key]
             if not target_rules:
                 return None
@@ -13225,6 +13379,8 @@ class CRMSKnowledgeBase:
                         inference_incomplete = True
                     elif inferred.failure_kind:
                         inference_failure_kinds.add(inferred.failure_kind)
+                        if inferred.request:
+                            inference_failure_requests[inferred.request] = None
                         for item in inferred.missing_premises:
                             missing_premises[repr(item)] = item
                     continue
@@ -13325,6 +13481,15 @@ class CRMSKnowledgeBase:
                     language_evidence=language_evidence,
                     request="No inference rule or derivation schema applies to this relation.",
                     reason_code="no_applicable_rule")
+            if "rule_needs_review" in inference_failure_kinds:
+                return QuestionResult(
+                    "unknown", matched_templates=templates,
+                    language_evidence=language_evidence,
+                    request=(next(iter(inference_failure_requests), None)
+                             or "A validated inference rule is suspended after "
+                             "contradictory evidence. Review the rule and evidence "
+                             "before using it."),
+                    reason_code="rule_needs_review")
             return QuestionResult(
                 "unknown", matched_templates=templates,
                 language_evidence=language_evidence,
@@ -14662,6 +14827,18 @@ class CRMSKnowledgeBase:
                     if not isinstance(validation, dict):
                         raise ValueError("stored inference-rule validation is malformed")
                     knowledge._inference_rule_validation[_tokens(rule.rule_id)] = validation
+            validated_relations = {
+                _tokens(rule.conclusion_relation)
+                for rule in knowledge._inference_rules_for_use()
+                if knowledge._inference_rule_validation.get(
+                    _tokens(rule.rule_id), {}).get("status", "validated")
+                   == "validated"
+            }
+            if validated_relations:
+                for negative in knowledge.negative_facts():
+                    if _tokens(negative.relation) in validated_relations:
+                        knowledge._flag_validated_rules_against_counterexample(
+                            negative)
             for order, case in enumerate(payload.get("derived_cases", [])):
                 conclusion = case.get("conclusion", {})
                 if not isinstance(conclusion, dict):

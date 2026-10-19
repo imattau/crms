@@ -14,7 +14,11 @@ The `practice_question` retained flag is true only when the case can be retrieve
 so a zero storage cap cannot be reported as learning. `experiments/v1_65_heldout_rule_validation.py`
 also checks the learning loop after acceptance: adding an explicit negative fact makes the rule
 query ambiguous, invalidates the practiced case for retrieval, and preserves that behavior after
-SQLite reload.
+SQLite reload. Validated, discovered rules that predict the explicit negative are marked
+`needs_review` and withheld from other conclusions until source-separated validation is run again;
+the exact contradicted conclusion remains ambiguous with its supporting proof. Teacher-supplied
+rules remain active and report the conflict at the affected conclusion. `/inference-rules` exposes
+rule status and the cited counterexample so a user can inspect and correct it.
 **Origin:** ideas reviewed from the HPM Learning Agent repo (belief weights, demand-driven
 learning, "dreaming"), re-expressed without vectors.
 
