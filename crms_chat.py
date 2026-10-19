@@ -844,6 +844,66 @@ def _natural_type_field_evidence(
     return evidence
 
 
+def _natural_population_field_evidence(
+        index: CRMSSQLiteResearchIndex, question: str
+        ) -> dict[str, Any] | None:
+    """Read an exact-title total population field for a bounded question."""
+    match = re.fullmatch(
+        r"\s*what\s+(?:is|was)\s+(?:the\s+)?population\s+of\s+"
+        r"(?P<entity>.+?)\s*[?!.]?\s*",
+        question, flags=re.IGNORECASE)
+    if match is None:
+        return None
+    entity = re.sub(r"^(?:the|a|an)\s+", "", match.group("entity").strip(),
+                    flags=re.IGNORECASE)
+    entity_tokens = tuple(normalized_tokens(entity))
+    if not entity_tokens:
+        return None
+    hits = [hit for hit in _exact_title_hits(index, entity)
+            if not _is_code_source(hit.location)]
+    documents = {hit.document_id: hit for hit in hits}
+    if len(documents) != 1:
+        return None
+    hit = next(iter(documents.values()))
+    document = index.document(hit.document_id)
+    field_rows = _infobox_field_rows(document, "population_total")
+    values = {normalized_tokens(value): value
+              for value, _start, _end in field_rows}
+    if len(values) != 1:
+        return None
+    value, start, end = field_rows[0]
+    cited_end = end
+    # Include the adjacent as-of field when present, so the answer retains
+    # the source's temporal qualifier without inferring a current population.
+    as_of_rows = _infobox_field_rows(document, "population_as_of")
+    if len({normalized_tokens(v) for v, _s, _e in as_of_rows}) == 1 and as_of_rows:
+        as_of, as_of_start, as_of_end = as_of_rows[0]
+        if as_of_start >= end:
+            cited_end = as_of_end
+    else:
+        as_of = None
+    source_field = document.text[start:cited_end]
+    evidence = _cited_sentence_evidence(
+        index, hit, start, cited_end,
+        tuple(dict.fromkeys((*entity_tokens, "population_total",
+                             *normalized_tokens(value)))))
+    if evidence is None:
+        return None
+    evidence["structured_metadata"] = True
+    evidence["realized_answer"] = {
+        "text": (f"The source lists {entity}'s population as {value}"
+                 + (f" (as of {as_of})." if as_of else ".")),
+        "source_title": hit.title or "source",
+        "citation": evidence["citation"],
+        "method": "exact-title structured-field realization",
+        "field_text": source_field,
+        "stored_as_fact": False,
+    }
+    evidence["population_value"] = value
+    evidence["population_as_of"] = as_of
+    return evidence
+
+
 def _exact_title_definition(index: CRMSSQLiteResearchIndex,
                             topic: str) -> dict[str, Any] | None:
     """Quote a definition only from one exact-title source and its own lead."""
@@ -9413,6 +9473,7 @@ def main() -> int:
                     f"{definition_topic}. Which one should I use?")
         capital_field_evidence = None
         type_field_evidence = None
+        population_field_evidence = None
         if (turn.status in {"unknown", "sources_found"}
                 and not (turn.response is not None
                          and (turn.response.status in {"answered", "ambiguous"}
@@ -9451,6 +9512,32 @@ def main() -> int:
                         template="exact-title structured type field",
                         sentence=str(realized["field_text"]))
                     turn.research.candidates = [type_candidate]
+                    turn.research.status = "needs_review"
+        if (turn.status in {"unknown", "sources_found"}
+                and not (turn.response is not None
+                         and (turn.response.status in {"answered", "ambiguous"}
+                              or turn.response.candidates))):
+            population_field_evidence = _natural_population_field_evidence(
+                index, line)
+            if population_field_evidence is not None:
+                realized = population_field_evidence["realized_answer"]
+                turn.text = (
+                    f"{realized['text']} [Source: {realized['source_title']}; "
+                    f"field “{realized['field_text']}”; quoted structured "
+                    "evidence, not an accepted fact]")
+                if turn.research is not None:
+                    turn.research.source_sentences = [population_field_evidence]
+                    qualifiers = (("as_of", str(population_field_evidence[
+                        "population_as_of"])),) if population_field_evidence.get(
+                            "population_as_of") else ()
+                    turn.research.candidates = [FactCandidate(
+                        subject=str(population_field_evidence["title"]),
+                        relation="population",
+                        object=str(population_field_evidence["population_value"]),
+                        source=str(realized["citation"]),
+                        template="exact-title structured population field",
+                        sentence=str(realized["field_text"]),
+                        qualifiers=qualifiers)]
                     turn.research.status = "needs_review"
         source_realization = (
             turn.research.realized_answer
@@ -9584,6 +9671,7 @@ def main() -> int:
             superlative_evidence is not None,
             capital_field_evidence is not None,
             type_field_evidence is not None,
+            population_field_evidence is not None,
         ))
         specialist_route_abstained = (
             where_route_used and where_evidence is None)
@@ -9709,6 +9797,8 @@ def main() -> int:
             last_research_evidence = capital_field_evidence
         elif type_field_evidence is not None:
             last_research_evidence = type_field_evidence
+        elif population_field_evidence is not None:
+            last_research_evidence = population_field_evidence
         elif irregular_form_route_used and irregular_form_candidate is not None:
             last_research_evidence = {
                 "document_id": irregular_form_candidate.source.split("#", 1)[0],
