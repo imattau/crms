@@ -1720,12 +1720,19 @@ Chat-generated Python passes those lists, preserves the citations and labeler
 attribution, reproduces after a fresh chat restart, and refuses an unsupported
 `encrypt` middle step. Held-out inputs and expected outputs remain in the
 experiment evaluator and are not written to the source index loaded by chat.
+Two complete NumPy reference documents (`numpy.unique` and
+`numpy.unique_values`) also supply held-out arrays. They live in a separate
+evaluation index, remain absent from the training/search index, and their
+outputs are checked against an independent `sorted(set(values))` oracle before
+the generated artifact is run on those arrays.
 
 Runtime result: all checks passed. This remains a source-cited,
 teacher-guided composition result, not source-only induction or broad coding
-competence. The component examples, connective, and instruction mappings are
-not held out by complete document, so this still does not meet the
-source-disjoint transfer gate.
+competence. The held-out arrays test behavior transfer across complete
+documents and a separate publisher; they do not test whether the language
+instruction mapping or sequence connective can be induced from source text.
+Those remain teacher-attributed, so the broader source-driven learning gate is
+still open.
 
 ## Procedure evidence and labeler provenance (2026-10-20)
 

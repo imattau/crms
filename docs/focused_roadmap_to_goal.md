@@ -390,9 +390,12 @@ revised `stable unique → sort → reverse` artifact passes four held-out lists
 through chat and a fresh process, and ablation confirms that every stage affects
 the tested outputs. Sort and reverse have cited code pairs; stable-unique
 examples are Codex-labeled and linked to Python dictionary-ordering semantics.
-The contrast examples, instruction mappings, and sequence connective remain
-teacher-attributed. The test still lacks complete-document holdout and does not
-meet the source-disjoint transfer gate.
+Two complete NumPy documents now supply additional held-out arrays in a
+separate evaluation index, never the chat's training/search index. Their
+source outputs pass an independent oracle and the generated artifact passes on
+the arrays. This is document-disjoint behavioral transfer; contrast examples,
+instruction mappings, and the sequence connective remain teacher-attributed,
+so autonomous source-driven rule learning remains unproven.
 
 Keep source demonstration, teacher attribution, rule induction, and output
 validation separate. A citation proving an input/output pair does not by

@@ -4,7 +4,8 @@ The target composition uses stable-unique, sort, and reverse. Its stable-unique
 examples are Codex-labeled demonstrations linked to Python's documented
 insertion-order semantics; sort and reverse have cited code pairs. The sequence
 connective is also teacher-labeled. Each operation must change held-out outputs.
-The held-out composition is never sent to the learner. This remains a bounded,
+NumPy unique examples from two complete documents are held out in a separate
+evaluation index and never sent to the learner. This remains a bounded,
 teacher-guided probe, not source-only induction or broad coding competence.
 """
 from __future__ import annotations
@@ -29,12 +30,14 @@ SORT_DOC = (">>> sorted([5, 2, 3, 1, 4])\n[1, 2, 3, 4, 5]")
 UNIQUE_DOC = (
     ">>> a = np.array([1, 2, 6, 4, 2, 3, 2])\n"
     ">>> np.unique(a)\narray([1, 2, 3, 4, 6])")
+UNIQUE_VALUES_DOC = (
+    "Returns the unique elements of an input array x.\n"
+    ">>> np.unique_values([1, 1, 2])\narray([1, 2])  # may vary")
 REVERSE_DOC = (
     ">>> for i in reversed(range(1, 10, 2)):\n"
     "...     print(i)\n...\n9\n7\n5\n3\n1")
 SORT_PROSE = (
     "A simple ascending sort is very easy: just call the sorted() function.")
-UNIQUE_PROSE = "Returns the sorted unique elements of an array."
 REVERSE_PROSE = (
     "To loop over a sequence in reverse, first specify the sequence in a "
     "forward direction and then call the reversed() function.")
@@ -43,11 +46,6 @@ SOURCES = (
      "https://docs.python.org/3/howto/sorting.html",
      "sort the list", SORT_DOC, SORT_PROSE,
      [5, 2, 3, 1, 4], [1, 2, 3, 4, 5]),
-    ("numpy-unique", "NumPy: numpy.unique",
-     "https://numpy.org/doc/stable/reference/generated/numpy.unique.html",
-     "remove duplicate values", UNIQUE_DOC, UNIQUE_PROSE,
-     [1, 2, 6, 4, 2, 3, 2],
-     [1, 2, 3, 4, 6]),
     ("python-reverse", "Python Tutorial: Data Structures",
      "https://docs.python.org/3/tutorial/datastructures.html",
      "reverse the list", REVERSE_DOC, REVERSE_PROSE,
@@ -94,6 +92,14 @@ HELD_OUT_TEXT = (
     "then reverse the values")
 HELD_OUT_VALUES = (
     [6, 2, 6, -1, 2], [4, 4, 0, -3, 1, 0], [9, -2, 9, 3], [],
+)
+HELD_OUT_SOURCE_CASES = (
+    ("numpy-unique-heldout", "NumPy: numpy.unique",
+     "https://numpy.org/doc/stable/reference/generated/numpy.unique.html",
+     UNIQUE_DOC, [1, 2, 6, 4, 2, 3, 2], [1, 2, 3, 4, 6]),
+    ("numpy-unique-values-heldout", "NumPy: numpy.unique_values",
+     "https://numpy.org/doc/stable/reference/generated/numpy.unique_values.html",
+     UNIQUE_VALUES_DOC, [1, 1, 2], [1, 2]),
 )
 
 
@@ -195,14 +201,10 @@ def main() -> None:
             # contrast that helps separate the intended operation.
             operation = {
                 "sort the list": "sort",
-                "remove duplicate values": "unique",
                 "reverse the list": "reverse",
             }[phrase]
             for values in BASE_TRAINING_VALUES[phrase]:
-                out_values = apply(list(values), {
-                    "sort": "sort", "unique": "unique",
-                    "reverse": "reverse",
-                }[operation])
+                out_values = apply(list(values), operation)
                 teaching.append(
                     f"/teach-rule {phrase}|{','.join(map(str, values))}|"
                     f"{','.join(map(str, out_values))}||codex:labeler-v1")
@@ -285,6 +287,31 @@ def main() -> None:
                     for document_id, _title, _location
                     in index.source_list(limit=1000)),
                 "held-out examples leaked into the chat's source index")
+        training_document_ids = {
+            document_id for document_id, _title, _location
+            in index.source_list(limit=1000)
+        }
+        evaluation_index = CRMSResearchIndex()
+        evaluation_cases = []
+        for (document_id, title, location, text, values,
+             source_unique_output) in HELD_OUT_SOURCE_CASES:
+            require(document_id not in training_document_ids,
+                    f"held-out document {document_id} entered the training index")
+            evaluation_index.add_document(document_id, title, text, location)
+            hit = next((hit for hit in evaluation_index.search(
+                "unique elements", limit=10, context_chars=0)
+                if hit.document_id == document_id), None)
+            require(hit is not None,
+                    f"evaluation retrieval missed held-out document {document_id}")
+            citation = evaluation_index.citation(hit)
+            require(evaluation_index.resolve_citation(citation) == text,
+                    f"held-out citation did not resolve: {document_id}")
+            unique_oracle = sorted(set(values))
+            require(set(source_unique_output) == set(unique_oracle),
+                    f"held-out source output disagrees with the independent "
+                    f"unique-values oracle: {document_id}")
+            evaluation_cases.append(
+                (values, list(reversed(unique_oracle)), citation))
         index.save(root / "index.json")
 
         answer = f"Write Python code to {HELD_OUT_TEXT}"
@@ -315,10 +342,6 @@ def main() -> None:
 
         artifact = generate_python(learned, HELD_OUT_TEXT)
         require(artifact is not None, "no standalone composition was generated")
-        unique_probe = learned.predict("remove duplicate values", [4, 1, 4, 2])
-        require(unique_probe.status == "ok"
-                and unique_probe.output == [1, 2, 4],
-                "unique rule did not preserve the source's sorted-unique behavior")
         stable_unique_probe = learned.predict(
             STABLE_UNIQUE_PHRASE, [4, 1, 4, 2])
         require(stable_unique_probe.status == "ok"
@@ -331,6 +354,9 @@ def main() -> None:
         require([transform(values) for values in HELD_OUT_VALUES]
                 == held_out_outputs,
                 "generated composition failed the held-out inputs")
+        require(all(transform(values) == expected
+                    for values, expected, _citation in evaluation_cases),
+                "generated composition failed a complete held-out source document")
         artifact_sources = {
             row["source_id"]
             for row in namespace["CRMS_PROVENANCE"]["examples"]
@@ -371,23 +397,26 @@ def main() -> None:
                 and artifact.provenance_id in replay.stdout,
                 "fresh chat process did not reproduce the saved artifact")
 
-        unsupported = launch(root, [
-            "Write Python code to remove duplicate values then encrypt the list "
-            "then reverse the values"])
+        unsupported_request = (
+            "Write Python code to keep the first occurrence of each value "
+            "then encrypt the list then reverse the values")
+        unsupported = launch(root, [unsupported_request])
         generated_lines = [line for line in unsupported.stdout.splitlines()
                            if line.startswith("CRMS> Generated Python")]
         require(unsupported.returncode == 0
                 and not generated_lines
-                and "I could not resolve 'remove duplicate values then "
-                    "encrypt the list then reverse the values'" in unsupported.stdout,
+                and "I could not resolve 'keep the first occurrence of each "
+                    "value then encrypt the list then reverse the values'"
+                    in unsupported.stdout,
                 "chat generated code with an unsupported middle operation: "
                 + repr(generated_lines))
 
     print("code-pair and instruction-prose citations resolve independently: PASS")
-    print("unique rule sorts distinct values on a non-monotonic input: PASS")
+    print("stable-unique rule preserves first occurrence order: PASS")
     print("each non-empty held-out output changes when any one stage is removed: PASS")
     print("chat composed stable-unique→sort→reverse on four held-out lists: PASS")
     print("held-out input/output pairs were not in the chat source index: PASS")
+    print("complete NumPy documents validate composition outside training: PASS")
     print("generated artifact kept component citations and passed checks: PASS")
     print("declared labeler attribution survived save and artifact rendering: PASS")
     print("generated artifact retains declared labeler attribution: PASS")
