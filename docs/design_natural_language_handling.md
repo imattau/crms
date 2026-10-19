@@ -646,6 +646,19 @@ Corpus frame discovery now rejects those bounded cases. Compared with the earlie
 five-window run, the repeated-pair and role-type aligners still propose no real-corpus transfer.
 This improves frame precision but does not solve entity linking or paraphrase coverage.
 
+A 2026-10-20 five-window replay with page-local endpoint identity found 190
+relation frames and 1,378 positive supports; 368 had both endpoints typed.
+Before local identity qualification, the report surfaced a false
+`born in`/`lives in` match caused by the surname “Jones” appearing on two
+different biography pages, plus a broad `electoral district of`/`region of`
+match. The improved diagnostic resolves shortened names to their local page
+title and prints the supporting cited sentences. It leaves one weak
+`district of`/`province of` candidate and no candidate with two independent
+pairs per wording. Manual inspection found the remaining phrases are not
+equivalent. This is evidence against using coarse role types as a standalone
+predicate-equivalence signal; the diagnostic remains report-only and does not
+license rules.
+
 ### 3.7 Pronouns and follow-ups
 
 Baseline: every pronoun follow-up in nine scripted two-turn dialogues returned "Please name the

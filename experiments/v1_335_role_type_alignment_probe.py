@@ -41,6 +41,24 @@ def _entity_key(value: str) -> tuple[str, ...]:
     return tokens
 
 
+def _contextual_entity_key(entity: str, page_title: str) -> tuple[str, ...]:
+    """Qualify a shortened endpoint with its local exact-page title.
+
+    Cross-document role matching by bare strings can merge different people
+    named only by a shared surname (for example, "Jones" on the Felicity and
+    Owen Jones pages). When the relation sentence's page title ends in the
+    extracted endpoint, use that page-local identity for this support row.
+    The source page is not promoted into a global alias.
+    """
+    entity_key = _entity_key(entity)
+    title = re.sub(r"\s*\([^)]*\)\s*$", "", page_title).strip()
+    title_key = _entity_key(title)
+    if (entity_key and len(title_key) > len(entity_key)
+            and title_key[-len(entity_key):] == entity_key):
+        return title_key
+    return entity_key
+
+
 def _coarse_head(noun_phrase: str) -> str | None:
     words = list(_tokens(noun_phrase))
     if words[:3] == ["one", "of", "the"]:
@@ -116,6 +134,12 @@ def main() -> None:
     assert _entity_key("The Serein River 0000") == _entity_key(
         "Serein River 0000")
     assert _entity_key("An Example") == _entity_key("Example")
+    assert _contextual_entity_key("Jones", "Felicity Jones") == (
+        "felicity", "jones")
+    assert _contextual_entity_key("Jones", "Owen Jones (writer)") == (
+        "owen", "jones")
+    assert _contextual_entity_key("Felicity Jones", "Felicity Jones") == (
+        "felicity", "jones")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "index", nargs="?", type=Path,
@@ -149,10 +173,14 @@ def main() -> None:
         aggregate: dict[str, dict[tuple[str, str], dict[
             tuple[tuple[str, ...], tuple[str, ...]], set[str]]]] = defaultdict(
                 lambda: defaultdict(lambda: defaultdict(set)))
+        evidence_rows: dict[str, dict[tuple[str, str], dict[
+            tuple[tuple[str, ...], tuple[str, ...]], list[dict]]]] = defaultdict(
+                lambda: defaultdict(lambda: defaultdict(list)))
         total_frames = non_is_a_support = 0
         typed_subject = typed_object = typed_both = 0
         untyped_subjects: dict[str, int] = defaultdict(int)
         untyped_objects: dict[str, int] = defaultdict(int)
+        page_titles: dict[str, str] = {}
         offsets = [round(index * max(document_count - args.window_documents, 0)
                          / max(args.window_count - 1, 1))
                    for index in range(args.window_count)]
@@ -168,8 +196,17 @@ def main() -> None:
                 relation = frame["relation"].casefold()
                 for row in frame["support"]:
                     non_is_a_support += 1
-                    subject_type = types.get(_entity_key(row["subject"]))
-                    object_type = types.get(_entity_key(row["object"]))
+                    document_id = row["document_id"]
+                    if document_id not in page_titles:
+                        page_titles[document_id] = index.document(
+                            document_id).title
+                    page_title = page_titles[document_id]
+                    subject_key = _contextual_entity_key(
+                        row["subject"], page_title)
+                    object_key = _contextual_entity_key(
+                        row["object"], page_title)
+                    subject_type = types.get(subject_key)
+                    object_type = types.get(object_key)
                     typed_subject += subject_type is not None
                     typed_object += object_type is not None
                     if subject_type is None:
@@ -179,10 +216,11 @@ def main() -> None:
                     if subject_type is None or object_type is None:
                         continue
                     typed_both += 1
-                    pair = (_entity_key(row["subject"]),
-                            _entity_key(row["object"]))
+                    pair = (subject_key, object_key)
                     aggregate[relation][(subject_type, object_type)][pair].add(
                         row["document_id"])
+                    evidence_rows[relation][(subject_type, object_type)][pair].append(
+                        row)
             print(f"offset={offset}: relation_frames={len(frames)}")
 
         relation_names = sorted(aggregate)
@@ -241,6 +279,14 @@ def main() -> None:
                   f"typed_support={support}; "
                   f"examples={' '.join(left_pair[0])}/{ ' '.join(left_pair[1]) }"
                   f" ~ {' '.join(right_pair[0])}/{ ' '.join(right_pair[1]) }")
+            for pair, relation in ((left_pair, left), (right_pair, right)):
+                row = next((item for item in evidence_rows[relation][signature][pair]
+                            if item["document_id"] in
+                            (left_docs if relation == left else right_docs)), None)
+                if row is None:
+                    continue
+                print(f"    {relation}: {row.get('sentence', '')}")
+                print(f"      source: {row.get('source', row['document_id'])}")
     finally:
         index.close()
 

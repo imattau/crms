@@ -1005,6 +1005,33 @@ conflicting class values are withheld. It retained 84 frames and 355 positive no
 revised replay still found zero role-type alignment hypotheses. The low yield does not justify
 weakening the review or evidence thresholds.
 
+### Page-local identity control for role-type candidates (2026-10-20)
+
+Command:
+
+```sh
+python3 experiments/v1_335_role_type_alignment_probe.py \
+  data/crms_simplewiki_research.sqlite --type-documents 300000 \
+  --window-documents 10000 --window-count 5 --sentences-per-window 200000
+```
+
+The report-only diagnostic now qualifies a shortened endpoint with its local
+page title when that title ends in the extracted name. This prevented “Jones”
+on the Felicity Jones and Owen Jones pages from being counted as one entity,
+and added exact cited sentences and offsets for every candidate example. On the
+285,478-document index, the rerun scanned 190 frames and 1,378 positive
+non-`is-a` support rows; 368 rows had both endpoints typed. It found one weak
+candidate (`district of` / `province of`) at one distinct pair per wording, and
+zero candidates at the existing two-pair threshold. The cited examples,
+“Maseru is a district of Lesotho” and “Stara Zagora is a province of Bulgaria,”
+are not equivalent relations. Codex's manual review of the previous run also
+found the stronger `electoral district of` / `region of` candidate and
+`born in` / `lives in` candidate were false alignments. These are provisional
+single-reviewer judgments, not an independent precision estimate. Keep the
+method report-only: page-local identity removes observed collisions, but the
+current real-corpus sample still provides no supported alignment at the
+two-pair threshold.
+
 ## Exact-title structured type answers
 
 Command: `python3 experiments/v1_336_structured_type_field_chat.py`
