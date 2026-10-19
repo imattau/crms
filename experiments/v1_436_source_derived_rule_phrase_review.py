@@ -8,6 +8,7 @@ does not claim open-vocabulary synonym discovery.
 from __future__ import annotations
 
 import subprocess
+import re
 import sys
 import tempfile
 from dataclasses import dataclass
@@ -51,6 +52,16 @@ NUMPY_FLIP_SOURCE = (
 PANDAS_DESCENDING_SOURCE = (
     "pandas-series-descending", "pandas.Series.sort_values descending",
     PANDAS_SOURCE[2], "Sort values descending order (default behavior).",
+)
+NEGATED_SORT_SOURCE = (
+    "negated-sort-instruction", "Controlled negated sort near miss",
+    "https://example.invalid/negative-sort-fixture",
+    "Do not sort values ascending; use descending order instead.",
+)
+NEGATED_REVERSE_SOURCE = (
+    "negated-reverse-instruction", "Controlled negated reverse near miss",
+    "https://example.invalid/negative-reverse-fixture",
+    "Do not reverse the order of elements; preserve their original order.",
 )
 TRAINING_PAIR = ([5, 2, 3, 1, 4], [1, 2, 3, 4, 5])
 REVERSE_PAIR = ([1, 3, 5, 7, 9], [9, 7, 5, 3, 1])
@@ -111,6 +122,13 @@ def hit_for(index: CRMSResearchIndex, document_id: str,
         if hit.document_id == document_id), None)
 
 
+def phrase_is_directly_negated(text: str, phrase: str) -> bool:
+    """Reject a target phrase under a small, explicit negation window."""
+    pattern = (r"\b(?:do\s+not|don't|never|must\s+not|should\s+not)\s+"
+               r"(?:\w+\s+){0,2}" + re.escape(phrase) + r"\b")
+    return re.search(pattern, text, flags=re.IGNORECASE) is not None
+
+
 def propose_sort_phrase(index: CRMSResearchIndex,
                         prose_source_id: str = PANDAS_SOURCE[0]
                         ) -> RulePhraseCandidate | None:
@@ -123,6 +141,8 @@ def propose_sort_phrase(index: CRMSResearchIndex,
     code = index.resolve_citation(index.citation(code_hit))
     normalized = " ".join(prose.casefold().split())
     if "sort values ascending" not in normalized:
+        return None
+    if phrase_is_directly_negated(prose, "sort values ascending"):
         return None
     if not _citation_contains_integer_pair(code, *TRAINING_PAIR):
         return None
@@ -148,10 +168,11 @@ def propose_sort_phrase(index: CRMSResearchIndex,
         phrase="sort values ascending", operation="sort", evidence=evidence)
 
 
-def propose_reverse_phrase(index: CRMSResearchIndex
+def propose_reverse_phrase(index: CRMSResearchIndex,
+                           prose_source_id: str = NUMPY_FLIP_SOURCE[0]
                            ) -> RulePhraseCandidate | None:
     """Link a verbatim reverse phrase to a separately cited reverse example."""
-    prose_hit = hit_for(index, NUMPY_FLIP_SOURCE[0], "reverse order elements")
+    prose_hit = hit_for(index, prose_source_id, "reverse order elements")
     code_hit = hit_for(index, PYTHON_REVERSE_SOURCE[0],
                        "reversed range 1 10 2 9 7 5 3 1")
     if prose_hit is None or code_hit is None:
@@ -160,6 +181,8 @@ def propose_reverse_phrase(index: CRMSResearchIndex
     code = index.resolve_citation(index.citation(code_hit))
     phrase = "reverse the order of elements"
     if phrase not in " ".join(prose.casefold().split()):
+        return None
+    if phrase_is_directly_negated(prose, phrase):
         return None
     if not _citation_contains_integer_pair(code, *REVERSE_PAIR):
         return None
@@ -382,6 +405,27 @@ def main() -> None:
             descending_index, PANDAS_DESCENDING_SOURCE[0]) is None,
             "descending prose was accepted as ascending instruction evidence")
 
+        negative_sort_index = CRMSResearchIndex()
+        negative_sort_index.add_document(
+            PYTHON_SOURCE[0], PYTHON_SOURCE[1], PYTHON_SOURCE[3],
+            PYTHON_SOURCE[2],
+        )
+        negative_sort_index.add_document(
+            NEGATED_SORT_SOURCE[0], NEGATED_SORT_SOURCE[1],
+            NEGATED_SORT_SOURCE[3], NEGATED_SORT_SOURCE[2],
+        )
+        require(propose_sort_phrase(
+            negative_sort_index, NEGATED_SORT_SOURCE[0]) is None,
+            "negated sort wording produced a positive source proposal")
+        negative_reverse_index = CRMSResearchIndex()
+        for document_id, title, location, text in (
+                PYTHON_REVERSE_SOURCE, NEGATED_REVERSE_SOURCE):
+            negative_reverse_index.add_document(
+                document_id, title, text, location)
+        require(propose_reverse_phrase(
+            negative_reverse_index, NEGATED_REVERSE_SOURCE[0]) is None,
+                "negated reverse wording produced a positive source proposal")
+
         # Bad code output cannot enter the candidate, even when its prose cue is
         # identical. A single source cannot pass the independent-origin gate.
         bad_index = CRMSResearchIndex()
@@ -411,7 +455,7 @@ def main() -> None:
     print("two-origin prose/code evidence proposed a phrase mapping: PASS")
     print("proposal remained review-only and preserved exact citations: PASS")
     print("reviewed rule learned, persisted, and passed three held-out lists: PASS")
-    print("descending wording and tampered/single-origin evidence were rejected: PASS")
+    print("descending, negated, tampered, and single-origin controls rejected: PASS")
     print("limitation: phrase and source association used a bounded cue rule; Codex reviewed before teaching")
 
 
