@@ -18,7 +18,8 @@ SQLite reload. Validated, discovered rules that predict the explicit negative ar
 `needs_review` and withheld from other conclusions until source-separated validation is run again;
 the exact contradicted conclusion remains ambiguous with its supporting proof. Teacher-supplied
 rules remain active and report the conflict at the affected conclusion. `/inference-rules` exposes
-rule status and the cited counterexample so a user can inspect and correct it.
+rule status and the cited counterexample so a user can inspect and correct it. Loading an older
+accepted-rule store also rechecks saved negative evidence and suspends rules that it contradicts.
 **Origin:** ideas reviewed from the HPM Learning Agent repo (belief weights, demand-driven
 learning, "dreaming"), re-expressed without vectors.
 

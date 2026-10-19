@@ -165,6 +165,25 @@ def main() -> None:
             or revised_kb.ask("Who is an ancestor of Uma?").answer != "Ria"):
         raise SystemExit("corrected rule could not be revalidated and reused")
 
+    revised_kb.add_negative_fact(
+        "Nia", "ancestor", "Pia", "revision:legacy-negative")
+    with tempfile.TemporaryDirectory() as folder:
+        legacy_path = Path(folder) / "legacy-accepted.json"
+        revised_kb.save(legacy_path)
+        legacy_payload = json.loads(legacy_path.read_text(encoding="utf-8"))
+        for stored_rule in legacy_payload["inference_rules"]:
+            stored_rule.get("validation", {}).pop("status", None)
+        legacy_path.write_text(json.dumps(legacy_payload), encoding="utf-8")
+        migrated = CRMSKnowledgeBase.load(legacy_path)
+        if (migrated.list_inference_rules()[0]["status"] != "needs_review"
+                or migrated.infer_relation("Ria", "ancestor", "Uma").reason_code
+                   != "rule_needs_review"
+                or migrated.infer_relation("Nia", "ancestor", "Pia").status
+                   != "ambiguous"):
+            raise SystemExit(
+                "legacy accepted-rule record was not reconciled with its counterexample")
+        migrated.close()
+
     teacher_kb = CRMSKnowledgeBase()
     teacher_kb.add_inference_rule(
         "teacher-parent-transitivity", "parent", "parent", "ancestor")
@@ -225,7 +244,8 @@ def main() -> None:
     print("held-out rule validation diagnostic: PASS")
     print("disjoint source split, counterexample rejection, explicit acceptance, "
           "learned-rule suspension and revalidation, teacher-rule preservation, "
-          "derived-case invalidation, SQLite persistence, and CLI use: PASS")
+          "legacy-store reconciliation, derived-case invalidation, "
+          "SQLite persistence, and CLI use: PASS")
 
 
 if __name__ == "__main__":
