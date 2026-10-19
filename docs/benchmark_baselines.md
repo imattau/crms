@@ -186,7 +186,24 @@ this test set frozen. Any changes motivated by these cases must be developed on 
 checked on a later untouched test sample. The test labels were supplied by Codex under user
 authorization and have no independent human review. Subsequent phrase-rule changes were developed
 against dev labels; the pilot metrics above apply to commit `5afd9f5`, not the current code. No
-post-change test result is claimed.
+post-change result is claimed by this first pilot.
+
+### Second frozen contextual-intent test pilot
+
+A second disjoint set of six complete conversations was selected in source order from the remaining
+Taskmaster-1 test split after the first pilot, using the same 8–18 user-turn window. The 69 turns
+include one uncertain label; all 69 cited record hashes and exact utterance spans verified, and IDs
+were checked against train, dev, and the first test pilot. With the implementation frozen at
+`8bd3b69`, the contextual runtime replay hypothesized 31/68 classifiable turns (45.6%), selected
+all 31, and matched both labels on 23/31 (74.2%). The context-free comparison hypothesized 13/68
+(19.1%) and matched 12/13. The inert train-only candidate memory matched four turns (5.9% coverage),
+all four agreeing with the provisional labels; it remains inactive at runtime.
+
+These results are provisional agreement with one Codex annotator, not accuracy or independent
+validation. The sample is small and non-random, and the runtime replay was given annotated context
+state and predecessor acts, so it is not end-to-end performance. The higher context-free agreement
+rate is based on only 13 predictions. Keep this sample frozen and use train/dev labels for subsequent
+changes. Label and output files are in `/tmp/crms_dialogue_test_v2`.
 
 ## Contextual intent: active task and expected slot
 

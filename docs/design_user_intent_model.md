@@ -57,8 +57,8 @@ checks these positive-assessment forms, task-state retention, and that question 
 swallowed. On the same in-sample dev labels, the rules raised hypothesis coverage from 63/124
 (50.8%) to 67/124 (54.0%); joint label agreement was 52/67 (77.6%) among hypotheses and 52/65
 (80.0%) among selected turns. This is a development fit, not an independent quality result. The
-test pilot still measures commit `5afd9f5`; these later changes have not been evaluated on a fresh
-test sample.
+first test pilot still measures commit `5afd9f5`; a second, disjoint test sample has since
+been evaluated against the current frozen implementation, as described below.
 
 The implementation was frozen in commit `5afd9f5` before a first test-split pilot. Six complete,
 non-randomly selected test conversations (66 classifiable turns; two uncertain) yielded 31 runtime
@@ -71,6 +71,17 @@ coverage remained below half. Failures include generic preference prompts, short
 without an open question, task changes from search into booking, and request-versus-question
 classification. Keep this pilot untouched; use development labels to address these cases and then
 evaluate against another unseen sample.
+
+A second disjoint test pilot was labeled after freezing commit `8bd3b69`. It contains six complete
+conversations selected in source order from the remaining test split (69 turns; one uncertain).
+With annotated context supplied, the router hypothesized 31/68 classifiable turns (45.6%), selected
+all 31, and matched both labels on 23/31 (74.2%). The context-free comparison hypothesized 13/68
+(19.1%) and matched 12/13. The inert train-only candidate memory matched four turns (5.9% coverage),
+all four agreeing with the provisional labels. This remains a small non-random pilot scored against
+one Codex labeler; oracle context means it is not end-to-end performance or independent accuracy.
+Source record hashes and exact utterance spans were verified, and conversation IDs do not overlap
+the train, development, or first test pilot. The 8bd3b69 implementation remains frozen; do not tune
+against this sample. The labeling file and runtime reports are in `/tmp/crms_dialogue_test_v2`.
 
 The elaboration baseline recognizes a small set of equivalent content-free forms, including
 “Could you tell me more?”, “Can you say more?”, and “Could you elaborate?”. These use the same
