@@ -147,6 +147,22 @@ insufficient for broad intent understanding. These are small single-annotator di
 accuracy estimates, an independent evaluation, or evidence of paraphrase transfer. No independently
 reviewed intent model is available.
 
+### Runtime intent routing with supplied context
+
+`python3 experiments/v1_395_runtime_intent_oracle_context.py USER_TURNS.csv` replays the four
+Codex-labeled dev conversations through the existing hand-checked intent router. When supplied
+annotated context state, the preceding assistant question, and prior labeled active-task intent, it
+produced hypotheses for 31/48 classifiable turns (64.6%): 29 selected and 2 ambiguous, with 17
+abstentions. Joint act-and-task-intent agreement with the same annotator was 16/31 (51.6%) among
+hypotheses and 16/29 (55.2%) among selected hypotheses. A context-free ablation hypothesized 16/48
+(33.3%) and matched 7/16 labels (43.8%). This shows explicit context changes which short turns the
+router can classify; it also exposes substantial mismatch, especially between generic
+`answer-clarification` and task-specific `provide-constraint`/`make-reservation` labels. The labels,
+context, and score all come from one Codex annotator, so this is not accuracy, independent
+validation, or end-to-end performance. Its purpose is to guide the next research design: learn
+dialogue act and task intent separately, condition them on typed question/slot and active-task
+context, and preserve ambiguity instead of forcing a task label.
+
 ## Contextual intent: active task and expected slot
 
 Command: `python3 experiments/v1_390_contextual_intent_task_slot_diagnostic.py USER_TURNS.csv`

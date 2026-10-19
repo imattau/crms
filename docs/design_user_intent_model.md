@@ -265,6 +265,20 @@ and controlled-context checks, not accuracy claims: the dev sample is small and 
 annotator as training. The low exact-match coverage makes slot-template or broader frame induction
 the next language-generalization requirement; promoting these candidates would not solve it.
 
+The owner authorized Codex to provide provisional labels in place of a human for this research
+phase. `experiments/v1_395_runtime_intent_oracle_context.py` uses those labels to replay the four
+dev conversations through the current hand-checked router, supplying the annotated context state,
+the preceding assistant question, and prior active-task intent. This raised hypothesis coverage
+from 16/48 (33.3%) without context to 31/48 (64.6%) with context. However, joint agreement with the
+same labeler was only 16/31 (51.6%) of hypotheses, or 16/29 (55.2%) of selected hypotheses. The
+diagnostic shows the current contextual baseline often collapses task-specific moves into generic
+clarification answers; bare confirmations are also conflated with those answers. These results do
+not establish accuracy because both context and comparison labels come from one annotator. The next
+model should predict dialogue act and task intent as separate outputs, use the open question's typed
+slot and active goal as context, and train against contrastive cases where the surface phrase is the
+same but the conversational function differs. Codex may label those cases, with uncertain labels
+left explicit and all evaluation reported as agreement with the Codex annotator.
+
 Once a frame has provenance-recorded training and held-out labels, store it in a versioned `dialogue`
 memory inside the portable SQLite model. Codex may produce the primary labels for both splits under
 the project's authorization. Agreement with those labels is not an accuracy claim; report the
