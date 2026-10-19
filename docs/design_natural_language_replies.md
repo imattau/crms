@@ -172,7 +172,12 @@ learned selection of text.
 ### 3.6 Display
 
 The realised sentence is shown with its sources and status, as in the chat UX doc. `why?` shows
-the plan: each claim, the wording rule used, and the round-trip result.
+the proof: a short answer, source-cited paragraphs for each verified premise and inference step,
+and a clear note when alternative proofs were not enumerated. The renderer verifies the proof
+before writing and parses each emitted claim through `propose_facts`; if a learned wording frame
+is unavailable, it emits the explicit `subject — relation → object` form. A failed check leaves
+the existing inference rendering in place. This explanation path applies to stored-fact proofs,
+not claims quoted from open text.
 
 ## 4. Delivery order
 
@@ -192,8 +197,9 @@ the plan: each claim, the wording rule used, and the round-trip result.
    quoted-evidence display and source-to-fact extraction, but should not block improvements for
    already structured facts.
 5. **Add aggregation and ordering** for multi-claim replies (3.3), starting with same-subject claims.
-6. **Add proof explanations** with connectives (3.3), then expand wording coverage based on measured
-   round-trip failures.
+6. **Expand proof explanation wording** based on measured round-trip failures. The first verified
+   proof renderer is implemented in `crms_explain.py` and is used by `/infer-relation` and the
+   inference `why?` follow-up.
 
 ## 5. Acceptance and tests
 

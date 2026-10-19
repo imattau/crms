@@ -1074,6 +1074,14 @@ answers, uncertainty, abstention, and proof chains. A path-question frame can
 be taught from two grounded question/path-answer pairs, with one-example exact
 wording transfer available after that relation path is licensed.
 
+Verified stored-fact inference proofs can also be explained as cited paragraphs.
+`/infer-relation` and the inference `why?` follow-up use `crms_explain.py`, which
+independently verifies each proof before rendering, checks emitted claims with
+the learned fact-pattern parser, and uses `subject — relation → object` when
+no licensed sentence frame exists. When alternative proofs were not enumerated,
+the explanation says so. This feature explains proofs over stored facts; it does
+not yet explain claims quoted from open-text sources.
+
 This is a bounded first Q&A layer, not general chat or research: it has no
 broad natural-language parser, open-ended path planner, or free-form response
 writer. Research supports explicitly supplied pages and bounded same-origin

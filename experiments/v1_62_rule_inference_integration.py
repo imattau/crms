@@ -47,7 +47,7 @@ def main() -> None:
         process = subprocess.run(
             cli, input="\n".join(commands) + "\n", text=True,
             capture_output=True, check=True, timeout=20)
-        if ("Derived: Ada — ancestor_employed_by → Acme." not in process.stdout
+        if ("Ada — ancestor_employed_by → Acme" not in process.stdout
                 or "parent-transitivity" not in process.stdout
                 or "ancestor-employer" not in process.stdout
                 or "source:one" not in process.stdout

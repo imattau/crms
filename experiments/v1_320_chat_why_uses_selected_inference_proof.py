@@ -51,7 +51,7 @@ def main() -> None:
             raise SystemExit(f"chat failed during proof explanation:\n{output}")
         if "Yes." not in output:
             raise SystemExit(f"natural-language inference did not answer:\n{output}")
-        why_reply = output.rsplit("you> CRMS> Answer: Yes.", 1)[-1]
+        why_reply = output.rsplit("you> CRMS> Yes.", 1)[-1]
         if ("grandparent-rule" not in why_reply
                 or "source:ann-bob" not in why_reply
                 or "source:bob-cara" not in why_reply):

@@ -92,8 +92,9 @@ def main() -> None:
             cli, input="\n".join(commands) + "\n", text=True,
             capture_output=True, check=True, timeout=20).stdout
         if ("CRMS> Yes." not in output
-                or "Rule proof 1:" not in output
-                or "parent-transitivity" not in output):
+                or "Because Nia — parent → Oren and Oren — parent → Pia" not in output
+                or "parent-transitivity" not in output
+                or "three:first" not in output or "three:second" not in output):
             raise SystemExit(f"CLI did not answer through the learned frame and rule:\n{output}")
         loaded = CRMSKnowledgeBase.load(paths["knowledge.json"])
         response = loaded.ask("Is Nia an ancestor of Pia?")

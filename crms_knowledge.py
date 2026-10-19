@@ -6057,6 +6057,19 @@ class CRMSKnowledgeBase:
         memo_key = (sentence, source)
         if memo_key in memo:
             return list(memo[memo_key])
+        structured = re.fullmatch(
+            r"\s*(?P<subject>.+?)\s+—\s+(?P<relation>.+?)\s+→\s+"
+            r"(?P<object>.+?)\s*[.!?]?\s*", sentence)
+        if structured is not None:
+            subject, relation, obj = (self._canonicalize_entity(
+                structured.group(field).strip())
+                for field in ("subject", "relation", "object"))
+            candidate = FactCandidate(
+                subject, relation, obj, source,
+                "<subject> — <relation> → <object>", sentence, True,
+                ({"kind": "structured_claim", "review_required": True},))
+            memo[memo_key] = (candidate,)
+            return [candidate]
         token_matches = word_matches(sentence)
         words = tuple(match.group() for match in token_matches)
         if len(words) > 256:
@@ -8542,6 +8555,22 @@ class CRMSKnowledgeBase:
         return [item["sentence"] for item in self._realize_fact_patterns(
             subject, relation, obj, polarity=polarity)]
 
+    def realize_claim(self, subject: str, relation: str, obj: str, *,
+                      polarity: bool = True) -> list[dict[str, Any]]:
+        """Return source-grounded sentence frames for a verified claim.
+
+        Unlike ``write_fact``, this method does not require the exact claim to
+        already be stored: proof renderers use it after independently checking
+        the claim. The returned frame records identify the wording evidence.
+        """
+        if type(polarity) is not bool:
+            raise ValueError("polarity must be a bool")
+        subject = self._canonicalize_entity(_display(subject, "subject"))
+        obj = self._canonicalize_entity(_display(obj, "object"))
+        relation = " ".join(_tokens(_display(relation, "relation")))
+        return self._realize_fact_patterns(
+            subject, relation, obj, polarity=polarity)
+
     def _realize_fact_patterns(self, subject: str, relation: str, obj: str, *,
                                polarity: bool) -> list[dict[str, Any]]:
         """Return realizations with the source evidence for each wording frame."""
@@ -10922,22 +10951,26 @@ class CRMSKnowledgeBase:
             return QuestionResult(
                 "ambiguous", evidence=evidence, matched_templates=[template],
                 inference_proofs=proofs,
-                request="Positive and negative sources conflict; inspect the cited evidence.")
+                request="Positive and negative sources conflict; inspect the cited evidence.",
+                complete=inferred.complete, expansions=inferred.expansions)
         if negative is not None and inferred.status in {"answered", "ambiguous"}:
             return QuestionResult(
                 "ambiguous", evidence=evidence, matched_templates=[template],
                 inference_proofs=proofs,
-                request="Negative evidence conflicts with a verified rule proof.")
+                request="Negative evidence conflicts with a verified rule proof.",
+                complete=inferred.complete, expansions=inferred.expansions)
         if positive is not None or inferred.status == "answered":
             return QuestionResult(
                 "answered", answer="Yes", candidates=["Yes"], evidence=evidence,
                 matched_templates=[template], truth=True,
-                inference_proofs=proofs)
+                inference_proofs=proofs, complete=inferred.complete,
+                expansions=inferred.expansions)
         if inferred.status == "ambiguous":
             return QuestionResult(
                 "ambiguous", evidence=evidence, matched_templates=[template],
                 inference_proofs=proofs,
-                request="The contextual rule proof has conflicting support.")
+                request="The contextual rule proof has conflicting support.",
+                complete=inferred.complete, expansions=inferred.expansions)
         if negative is not None:
             return QuestionResult(
                 "answered", answer="No", candidates=["No"], evidence=evidence,
@@ -11534,14 +11567,16 @@ class CRMSKnowledgeBase:
                 "answered", answer="Yes", candidates=["Yes"], truth=True,
                 inference_proofs=list(inferred.proofs),
                 matched_templates=[matched_template],
-                language_evidence=language_evidence)
+                language_evidence=language_evidence,
+                complete=inferred.complete, expansions=inferred.expansions)
         if inferred.status == "ambiguous":
             return QuestionResult(
                 "ambiguous", evidence=evidence or None,
                 inference_proofs=list(inferred.proofs),
                 matched_templates=[matched_template],
                 language_evidence=language_evidence,
-                request=inferred.request)
+                request=inferred.request, complete=inferred.complete,
+                expansions=inferred.expansions)
         if inferred.failure_kind == "closed_world_absence":
             schema = self._relation_type_fact(
                 " ".join(frame["relation"]), "closed-world", qualifiers)

@@ -12,12 +12,13 @@ from pathlib import Path
 from typing import Any
 
 from crms_dialogue import CRMSDialogue
+from crms_explain import render_verified_explanation
 from crms_codegen import (
     describe_generated_code, generate_math_python, generate_python,
     generate_unit_conversion_python, natural_language_request,
     render as render_codegen, show_generated_code_evidence,
 )
-from crms_inference import RuleReviewResult
+from crms_inference import InferenceResult, RuleReviewResult
 from crms_knowledge import (CRMSKnowledgeBase, FactCandidate, ResearchResult,
                             _analyze_predicate_spelling,
                             _base_verb_for_surface)
@@ -6548,6 +6549,11 @@ def main() -> int:
                 result = knowledge.infer_relation(
                     *fields[:3], qualifiers=qualifiers, effort=effort)
                 rendered = knowledge.render_inference(result)
+                if result.status == "answered" and result.proofs:
+                    explanation = render_verified_explanation(
+                        knowledge, result.proofs[0], complete=result.complete)
+                    if explanation is not None:
+                        rendered = explanation
                 if qualifiers:
                     rendered += " [context: " + ", ".join(
                         f"{name}={value}" for name, value in sorted(qualifiers.items())) + "]"
@@ -8306,7 +8312,22 @@ def main() -> int:
                 explanation = dialogue.turn(line)
                 if (explanation.response is not None
                         and explanation.response.inference_proofs):
-                    print("CRMS> " + explanation.text)
+                    rendered = render_verified_explanation(
+                        knowledge, explanation.response.inference_proofs[0],
+                        complete=explanation.response.complete is not False,
+                        short_answer=explanation.response.answer)
+                    if rendered is None:
+                        proof = explanation.response.inference_proofs[0]
+                        conclusion = proof.get("conclusion")
+                        fallback = (knowledge.render_inference(InferenceResult(
+                            "answered", conclusion=dict(conclusion),
+                            proofs=(proof,),
+                            complete=explanation.response.complete is not False,
+                            expansions=explanation.response.expansions or 0,
+                            effort_level=current_effort))
+                            if isinstance(conclusion, dict) else explanation.text)
+                        rendered = fallback
+                    print("CRMS> " + rendered)
                     last_research_evidence = None
                     continue
             if last_research_evidence is not None:
