@@ -395,6 +395,28 @@ weighting did not generalize at the selected threshold. The failure argues again
 from either baseline and makes context modeling a research priority rather than a product-ready
 feature. The frozen labels and reports are in `/tmp/crms_dialogue_feasibility_v1/`.
 
+### Multi-turn lexical history follow-up
+
+`experiments/v1_407_context_history_intent_retrieval.py` tests whether a broader cited history
+helps the nearest-example baseline. It verifies citation spans against the original transcript and
+compares content words from the current user turn, latest assistant turn, and up to four prior
+speaker turns, while retaining the same exact state, predecessor, and prior-goal gates. On the same
+development set, a configuration selected by the existing coverage-at-80%-agreement rule covered
+17/124 turns (13.7%) at 14/17 joint act/task agreement (82.4%), versus 15/124 (12.1%) and 13/15
+(86.7%) for v1_406. This is only a modest in-sample increase, with lower agreement.
+
+The parameters were frozen before selecting a second fresh test sample: six unused conversations,
+69 turns, 66 classifiable. The history model selected 0/66. On this same sample, v1_406 selected
+1/66 and matched the single Codex label; exact-surface candidates selected none. Across the two
+fresh samples evaluated for v1_406, it selected 2/149 turns and matched 1; the exact-surface
+baseline selected 0/149. These small, single-labeler results show that lexical history does not
+provide useful transfer at the tested operating point. The broader model needs explicit discourse
+representations—such as the active option set, current referents, open question/slot, task phase,
+and goal transitions—rather than a larger bag of old words. The labeled data and reports are in
+`/tmp/crms_dialogue_feasibility_v1/`; the second test sample was selected before its transcripts
+were inspected. These comparisons remain agreement with one named Codex annotator, not accuracy or
+independent validation.
+
 ### Context is part of intent, not an optional feature
 
 The model should represent a turn's immediate task intent separately from the broader user goal

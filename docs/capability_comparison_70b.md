@@ -158,6 +158,12 @@ These results are component evidence, not a single overall capability score:
   classifiable turns (1.2%), with no act/task/goal agreement; the exact-surface
   baseline selected none. The negative transfer result shows that lexical
   nearest-example retrieval is not an adequate contextual dialogue model. A
+  follow-up that compared up to four cited prior turns covered 17/124 dev turns
+  (82.4% joint agreement) but selected 0/66 classifiable turns on a second fresh
+  test sample. The original matcher selected 1/66 on that sample, agreeing with
+  the primary label, and exact-surface candidates selected none. These small,
+  single-annotator comparisons point to missing explicit discourse state such
+  as referents, open options, and goal transitions. A
   strong 70B-class model is expected to handle a much broader range of
   paraphrases, implicit intent, and dialogue context, though its answers also
   need verification. No 70B model was run for this comparison.

@@ -193,6 +193,27 @@ that context-sensitive dialogue needs broader, more discriminating representatio
 The labeled sheet, selection manifest, and machine-readable reports are in
 `/tmp/crms_dialogue_feasibility_v1/`.
 
+### Multi-turn history intent retrieval
+
+`experiments/v1_407_context_history_intent_retrieval.py` adds similarity over cited prior speaker
+turns to the v1_406 lexical baseline. It validates each character-offset citation against the
+source turn, uses the latest assistant turn plus up to four prior turns, and keeps the same typed
+context/predecessor/active-goal gates. The dev-selected setting (0.45 current-user, 0.15 latest
+assistant, 0.40 broader history; threshold 0.4) covered 17/124 turns (13.7%) with 14/17 (82.4%)
+joint act/task agreement. This improved dev coverage by two turns over v1_406 but lowered agreement
+from 86.7% to 82.4%.
+
+Before inspecting a second new test sample, the setting was frozen and six previously unused test
+conversations were selected (69 turns; 66 classifiable). The history model selected 0/66. On the
+same sample v1_406 selected 1/66 with agreement on that one turn; exact-surface candidates selected
+0/66. Together with the earlier fresh sample, v1_406 selected 2/149 classifiable turns and matched
+1; exact candidates selected 0/149. This is evidence that longer lexical context did not solve
+generalization at these thresholds, not evidence against explicit contextual modeling as a whole.
+The next experiment should represent discourse state directly (for example, open options,
+referents, expected slot, task phase, and goal transitions) and evaluate it on a new frozen sample.
+All results are agreement with one Codex primary annotator; no independent reliability estimate is
+available.
+
 ### Runtime intent routing with supplied context
 
 `python3 experiments/v1_395_runtime_intent_oracle_context.py USER_TURNS.csv` replays labeled turns
