@@ -42,9 +42,18 @@ answers such as a cuisine, party size, or time can only be interpreted as a task
 in context. The remaining 74.9% with no hypothesis is not an error rate. Test-split figures are
 not a held-out quality score because there are no adjudicated labels.
 
+The same diagnostic gives a structural measure of that missing context: 2,220 of the 4,667 turns
+with no hypothesis (47.6%) immediately follow a final assistant transcript line containing a
+question mark. Among unclassified replies of three or fewer word-like tokens, this is 542 of 1,137
+(47.7%); on test it is 233 of 450 unclassified turns (51.8%). This does not prove those replies
+answer the preceding question or identify their correct task intent. It does show that many cases
+the baseline leaves open have visible conversational context that a next model can use and that an
+evaluation should preserve.
+
 The diagnostic is reproducible with
 [`v1_373_taskmaster_intent_baseline_coverage.py`](../experiments/v1_373_taskmaster_intent_baseline_coverage.py).
-It reports coverage by split and explicitly avoids exposing utterance text or claiming correctness.
+It reports coverage by split and the preceding-question cue, without exposing utterance text or
+claiming correctness.
 Next evaluation requires human annotations and should compare context-free and context-aware
 decisions on the same held-out conversations.
 
