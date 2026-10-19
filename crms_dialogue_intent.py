@@ -51,6 +51,11 @@ _TASK_INTENTS = {
     "correct-prior-result", "correct-result", "social-contact",
     "end-interaction", "other-task", "uncertain",
 }
+_GOAL_INTENTS = {
+    "check-availability", "make-reservation", "change-reservation",
+    "cancel-reservation", "correct-prior-result", "correct-result",
+    "seek-information", "provide-information", "other-task",
+}
 _PREDECESSOR_ACTS = {
     "question", "clarification-request", "answer", "confirmation-request",
     "greeting", "action-result", "close", "other", "uncertain",
@@ -104,7 +109,9 @@ def validate_dialogue_intent_memory(payload: Any) -> dict[str, Any]:
         required = {"policy_id", "dialogue_act", "task_intent",
                     "surface_patterns", "context_predicates", "predecessor_act",
                     "runtime_route"}
-        if not isinstance(frame, dict) or set(frame) != required:
+        if (not isinstance(frame, dict)
+                or frozenset(frame) not in {frozenset(required),
+                                            frozenset(required | {"goal_intent"})}):
             raise ValueError("built-in dialogue policy frame has an invalid shape")
         frame_id = frame["policy_id"]
         if (not isinstance(frame_id, str) or not frame_id.strip()
@@ -119,7 +126,9 @@ def validate_dialogue_intent_memory(payload: Any) -> dict[str, Any]:
         required = {"frame_id", "dialogue_act", "task_intent", "surface_patterns",
                     "context_predicates", "predecessor_act", "source_citations",
                     "status", "validation", "runtime_route"}
-        if not isinstance(frame, dict) or set(frame) != required:
+        if (not isinstance(frame, dict)
+                or frozenset(frame) not in {frozenset(required),
+                                            frozenset(required | {"goal_intent"})}):
             raise ValueError("learned dialogue frame has an invalid shape")
         frame_id = frame["frame_id"]
         if (not isinstance(frame_id, str) or not frame_id.strip()
@@ -177,6 +186,11 @@ def _validate_frame_values(frame: dict[str, Any], frame_id: str) -> None:
     if (intent is not None and (not isinstance(intent, str)
                                 or intent not in _TASK_INTENTS)):
         raise ValueError(f"dialogue frame {frame_id} has an unknown task intent")
+    goal_intent = frame.get("goal_intent")
+    if (goal_intent is not None
+            and (not isinstance(goal_intent, str)
+                 or goal_intent not in _GOAL_INTENTS)):
+        raise ValueError(f"dialogue frame {frame_id} has an unknown goal intent")
     patterns = _strings(frame["surface_patterns"],
                         f"{frame_id}.surface_patterns", maximum=100,
                         nonempty=True)
@@ -263,20 +277,24 @@ class CRMSDialogueIntentModel:
                          or frame["predecessor_act"] == predecessor_act)]
         if eligible:
             signatures = {(frame["dialogue_act"], frame["task_intent"],
-                           frame["runtime_route"]) for frame in eligible}
+                           frame.get("goal_intent"), frame["runtime_route"])
+                          for frame in eligible}
             if len(signatures) != 1:
                 # A conflict among licensed readings is itself a useful
                 # contextual-intent result. Preserve it as an ambiguity, but
                 # never choose one of the conflicting routes.
-                by_signature: dict[tuple[str, str | None, str | None], str] = {}
+                by_signature: dict[
+                    tuple[str, str | None, str | None, str | None], str] = {}
                 for item in sorted(eligible, key=lambda value: value["frame_id"]):
                     signature = (item["dialogue_act"], item["task_intent"],
+                                 item.get("goal_intent"),
                                  item["runtime_route"])
                     by_signature.setdefault(signature, item["frame_id"])
                 alternatives = tuple(
                     f"{act} / {task_intent or 'unspecified'}"
-                    f" (frame {frame_id}; route {route or 'none'})"
-                    for (act, task_intent, route), frame_id
+                    f" (goal {goal_intent or 'unspecified'}; frame {frame_id}; "
+                    f"route {route or 'none'})"
+                    for (act, task_intent, goal_intent, route), frame_id
                     in sorted(by_signature.items(), key=lambda pair: str(pair[0]))
                 )
                 evidence_refs = sorted({
@@ -285,6 +303,7 @@ class CRMSDialogueIntentModel:
                 return {
                     "dialogue_act": "uncertain",
                     "task_intent": None,
+                    "goal_intent": None,
                     "decision": "ambiguous",
                     "matched_frame": "ambiguous-portable-frames",
                     "context_predicates": tuple(sorted({
@@ -306,6 +325,7 @@ class CRMSDialogueIntentModel:
             return {
                 "dialogue_act": frame["dialogue_act"],
                 "task_intent": frame["task_intent"],
+                "goal_intent": frame.get("goal_intent"),
                 "decision": "selected",
                 "matched_frame": frame["frame_id"],
                 "context_predicates": tuple(frame["context_predicates"]),

@@ -88,13 +88,16 @@ or `uncertain`. These are observations, not claims that the move is appropriate.
 
 ## User act and intent annotation
 
-For each row in `user_turns_to_label.csv`, annotate both fields:
+For each row in `user_turns_to_label.csv`, annotate the dialogue act and immediate task intent.
+When context supports it, also annotate the broad goal that organizes the current task:
 
 - `dialogue_act`: what this utterance does in the exchange (for example, asks a question, supplies a
   requested detail, corrects an earlier answer, accepts a clarification, or closes contact).
 - `task_intent`: the user's immediate goal in the current task (for example, obtain information,
   make or change a reservation, provide a constraint, resolve ambiguity, correct the result, or
   continue the current topic).
+- `goal_intent`: the broader outcome that remains active across turns. For example, `make-reservation`
+  can remain the goal while a user asks for an address or provides party-size constraints.
 
 Choose one value from each list:
 
@@ -102,6 +105,10 @@ Choose one value from each list:
 |---|---|
 | `dialogue_act` | `question`, `request-action`, `provide-information`, `answer-clarification`, `acknowledgement`, `confirm`, `reject`, `correction`, `continuation-request`, `greeting`, `thanks`, `farewell`, `other`, `uncertain` |
 | `task_intent` | `check-availability`, `make-reservation`, `change-reservation`, `cancel-reservation`, `provide-constraint`, `resolve-ambiguity`, `correct-prior-result`, `seek-information`, `continue-current-task`, `social-contact`, `end-interaction`, `other-task`, `uncertain` |
+| `goal_intent` | `check-availability`, `make-reservation`, `change-reservation`, `cancel-reservation`, `correct-prior-result`, `correct-result`, `seek-information`, `provide-information`, `other-task`, `uncertain` |
+
+Leave `goal_intent` blank when no task goal is active (for example, a standalone greeting). Use
+`uncertain` when a task is underway but the broader goal cannot be identified reliably.
 
 For mixed utterances, choose the act and intent that determine the next expected system action;
 record secondary actions in `annotator_note`. Use `other` only when the utterance is clear but does
@@ -109,11 +116,13 @@ not fit a value. Use `uncertain` when the utterance or context does not support 
 Use `acknowledgement` for receipt tokens such as “okay” or “got it” when they do not themselves
 accept a proposed action or answer a clarification; reserve `confirm` for an explicit acceptance.
 
-Infer `task_intent` from the utterance and preceding context together. Do not assume the same surface
-form always has the same intent: “yes” may accept a proposed time, confirm a summary, or answer a
-polar question; “what about Friday?” may change a reservation constraint or start a new topic. When
-context does not distinguish those readings, mark the intent uncertain. Do not invent a hidden goal
-beyond what the conversation supports.
+Infer `task_intent` and `goal_intent` from the utterance and preceding context together. Task intent
+labels the next action this turn requests; goal intent labels the broader outcome still active. For
+example, “Could you give me the phone number?” can have `task_intent=seek-information` and
+`goal_intent=make-reservation` when the conversation is arranging a booking. A new explicit task can
+replace the prior goal; a social exchange does not automatically erase it. Use `uncertain` when the
+broad goal is ambiguous, and do not infer a hidden goal from the domain alone. As with task intent,
+the same surface form can have different labels depending on context.
 
 Use `context_state` for observable state immediately before the user turn: `opening`,
 `awaiting-user-detail`, `awaiting-confirmation`, `answer-follow-up`, `correction-or-challenge`,
@@ -172,10 +181,11 @@ rows marked `double_label_required=true`, a second annotator fills the correspon
 adjudicator fills `adjudicated_label`, `adjudicator`, and `adjudicated_at`; record explanations in
 `annotator_note`. Do not overwrite a disagreement with the adjudicated result.
 
-In the user worksheet, the primary fields are `dialogue_act`, `task_intent`, `context_state`,
-`predecessor_act`, and `reviewer`; second-rater fields end in `_2`. The adjudicated fields are
-`adjudicated_dialogue_act` and `adjudicated_task_intent`. Use the same reviewer, timestamp, protocol
-version, adjudicator, and note fields as the assistant worksheet.
+In the user worksheet, the primary fields are `dialogue_act`, `task_intent`, `goal_intent`,
+`context_state`, `predecessor_act`, and `reviewer`; second-rater fields end in `_2`. The adjudicated
+fields are `adjudicated_dialogue_act`, `adjudicated_task_intent`, and `adjudicated_goal_intent`.
+Use the same reviewer, timestamp, protocol version, adjudicator, and note fields as the assistant
+worksheet.
 
 ## Evaluation against dialogue comparators
 

@@ -41,6 +41,7 @@ ACTIVE_TASK_INTENTS = {
     "cancel-reservation", "correct-prior-result", "correct-result",
     "seek-information", "provide-information", "other-task",
 }
+GOAL_INTENTS = set(ACTIVE_TASK_INTENTS)
 REQUIRED_COLUMNS = {
     "split", "conversation_id", "user_utterance", "dialogue_act",
     "task_intent", "context_state", "predecessor_act", "reviewer", "citation",
@@ -83,7 +84,12 @@ def induce(rows: list[dict[str, str]], *, min_conversations: int = 2) -> dict:
             row_id = row["source_utterance_index"].strip()
             active_before[(conversation_id, row_id)] = active_task
             prior_intent = row["task_intent"].strip()
-            if prior_intent == "end-interaction":
+            labeled_goal = row.get("goal_intent", "").strip()
+            if labeled_goal:
+                if labeled_goal not in GOAL_INTENTS:
+                    raise ValueError(f"unknown goal intent: {labeled_goal}")
+                active_task = labeled_goal
+            elif prior_intent == "end-interaction":
                 active_task = None
             elif prior_intent in ACTIVE_TASK_INTENTS:
                 active_task = prior_intent
@@ -109,7 +115,10 @@ def induce(rows: list[dict[str, str]], *, min_conversations: int = 2) -> dict:
         if active_task in ACTIVE_TASK_INTENTS:
             predicates = (*predicates,
                           "active_task_" + active_task.replace("-", "_"))
-        signature = (surface, act, intent, predicates, predecessor)
+        goal_intent = row.get("goal_intent", "").strip() or None
+        if goal_intent is not None and goal_intent not in GOAL_INTENTS:
+            raise ValueError(f"unknown goal intent: {goal_intent}")
+        signature = (surface, act, intent, goal_intent, predicates, predecessor)
         groups[signature].append(row)
 
     payload = empty_dialogue_intent_memory()
@@ -117,9 +126,10 @@ def induce(rows: list[dict[str, str]], *, min_conversations: int = 2) -> dict:
     repeated_conflicts = 0
     surface_signatures: dict[str, set[tuple]] = defaultdict(set)
     for signature, examples in groups.items():
-        surface, act, intent, predicates, predecessor = signature
+        surface, act, intent, goal_intent, predicates, predecessor = signature
         conv_ids = sorted({row["conversation_id"].strip() for row in examples})
-        surface_signatures[surface].add((act, intent, predicates, predecessor))
+        surface_signatures[surface].add(
+            (act, intent, goal_intent, predicates, predecessor))
         if len(conv_ids) < min_conversations:
             continue
         frame_hash = hashlib.sha256("\0".join(map(str, signature)).encode()).hexdigest()[:16]
@@ -131,6 +141,7 @@ def induce(rows: list[dict[str, str]], *, min_conversations: int = 2) -> dict:
             "frame_id": f"candidate-{frame_hash}",
             "dialogue_act": act,
             "task_intent": intent,
+            "goal_intent": goal_intent,
             "surface_patterns": [surface],
             "context_predicates": list(predicates),
             "predecessor_act": predecessor,
@@ -160,6 +171,8 @@ def induce(rows: list[dict[str, str]], *, min_conversations: int = 2) -> dict:
             "training_conversation_ids": sorted({
                 row["conversation_id"].strip() for row in train_rows}),
             "active_task_context": "derived from preceding labeled turns per conversation",
+            "goal_intent_labels": ("provided by optional goal_intent column"
+                                   if "goal_intent" in rows[0] else "not supplied"),
             "minimum_distinct_conversations": min_conversations,
             "training_turns": len(train_rows),
             "excluded_uncertain_or_blank_rows": unlabeled,
@@ -195,19 +208,43 @@ def self_test() -> None:
         {**base, "conversation_id": "booking-a", "source_utterance_index": "1",
          "user_utterance": "Book a table", "dialogue_act": "request-action",
          "task_intent": "make-reservation", "context_state": "task-in-progress",
-         "predecessor_act": "other", "citation": "booking-a#turn=1"},
+         "predecessor_act": "other", "citation": "booking-a#turn=1",
+         "goal_intent": "make-reservation"},
         {**base, "conversation_id": "booking-a", "source_utterance_index": "3",
          "user_utterance": "Two people", "dialogue_act": "answer-clarification",
          "task_intent": "make-reservation", "context_state": "awaiting-user-detail",
-         "predecessor_act": "clarification-request", "citation": "booking-a#turn=3"},
+         "predecessor_act": "clarification-request", "citation": "booking-a#turn=3",
+         "goal_intent": "make-reservation"},
         {**base, "conversation_id": "booking-b", "source_utterance_index": "1",
          "user_utterance": "Reserve a table", "dialogue_act": "request-action",
          "task_intent": "make-reservation", "context_state": "task-in-progress",
-         "predecessor_act": "other", "citation": "booking-b#turn=1"},
+         "predecessor_act": "other", "citation": "booking-b#turn=1",
+         "goal_intent": "make-reservation"},
         {**base, "conversation_id": "booking-b", "source_utterance_index": "3",
          "user_utterance": "Two people", "dialogue_act": "answer-clarification",
          "task_intent": "make-reservation", "context_state": "awaiting-user-detail",
-         "predecessor_act": "clarification-request", "citation": "booking-b#turn=3"},
+         "predecessor_act": "clarification-request", "citation": "booking-b#turn=3",
+         "goal_intent": "make-reservation"},
+        {**base, "conversation_id": "mixed-a", "source_utterance_index": "1",
+         "user_utterance": "Book that restaurant", "dialogue_act": "request-action",
+         "task_intent": "make-reservation", "context_state": "task-in-progress",
+         "predecessor_act": "other", "citation": "mixed-a#turn=1",
+         "goal_intent": "make-reservation"},
+        {**base, "conversation_id": "mixed-a", "source_utterance_index": "3",
+         "user_utterance": "Could you just give me the phone number?",
+         "dialogue_act": "request-action", "task_intent": "seek-information",
+         "context_state": "task-in-progress", "predecessor_act": "answer",
+         "citation": "mixed-a#turn=3", "goal_intent": "make-reservation"},
+        {**base, "conversation_id": "mixed-b", "source_utterance_index": "1",
+         "user_utterance": "I want to book it", "dialogue_act": "request-action",
+         "task_intent": "make-reservation", "context_state": "task-in-progress",
+         "predecessor_act": "other", "citation": "mixed-b#turn=1",
+         "goal_intent": "make-reservation"},
+        {**base, "conversation_id": "mixed-b", "source_utterance_index": "3",
+         "user_utterance": "Could you just give me the phone number?",
+         "dialogue_act": "request-action", "task_intent": "seek-information",
+         "context_state": "task-in-progress", "predecessor_act": "answer",
+         "citation": "mixed-b#turn=3", "goal_intent": "make-reservation"},
         {**base, "split": "dev", "conversation_id": "conversation-c",
          "dialogue_act": "reject", "task_intent": "other-task",
          "citation": "source-c#turn=8"},
@@ -218,6 +255,9 @@ def self_test() -> None:
                  if frame["surface_patterns"] == ["thank you"]]
     reservation_party = [frame for frame in frames
                          if frame["surface_patterns"] == ["two people"]]
+    phone_request = [frame for frame in frames
+                     if frame["surface_patterns"]
+                     == ["could you just give me the phone number"]]
     require(len(thank_you) == 1 and thank_you[0]["status"] == "candidate"
             and len(thank_you[0]["source_citations"]) == 2
             and len(reservation_party) == 1
@@ -225,8 +265,13 @@ def self_test() -> None:
             in reservation_party[0]["context_predicates"]
             and len(reservation_party[0]["source_citations"]) == 2,
             "candidate grouping, citation retention, or train-only split failed")
+    require(len(phone_request) == 1
+            and phone_request[0]["task_intent"] == "seek-information"
+            and phone_request[0]["goal_intent"] == "make-reservation"
+            and "active_task_make_reservation" in phone_request[0]["context_predicates"],
+            "candidate induction lost the annotated broad goal")
     require(report["metadata"]["label_status"] == "single-annotator; provisional"
-            and report["metadata"]["candidate_count"] == 2,
+            and report["metadata"]["candidate_count"] == 3,
             "single-labeler provenance or candidate count was lost")
     print("candidate induction uses consistent train-only examples and citations: PASS")
     print("heldout rows do not contaminate candidate induction: PASS")

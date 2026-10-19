@@ -19,6 +19,7 @@ SCHEMAS = {
     "user_intents": (
         ("dialogue_act", "dialogue_act_2", "adjudicated_dialogue_act"),
         ("task_intent", "task_intent_2", "adjudicated_task_intent"),
+        ("goal_intent", "goal_intent_2", "adjudicated_goal_intent"),
         ("context_state", "context_state_2", None),
         ("predecessor_act", "predecessor_act_2", None),
     ),
@@ -37,6 +38,9 @@ ALLOWED_LABELS = {
                     "cancel-reservation", "provide-constraint", "resolve-ambiguity",
                     "correct-prior-result", "seek-information", "continue-current-task",
                     "social-contact", "end-interaction", "other-task", "uncertain"},
+    "goal_intent": {"check-availability", "make-reservation", "change-reservation",
+                    "cancel-reservation", "correct-prior-result", "correct-result",
+                    "seek-information", "provide-information", "other-task", "uncertain"},
     "context_state": {"opening", "awaiting-user-detail", "awaiting-confirmation",
                       "answer-follow-up", "correction-or-challenge", "task-in-progress",
                       "task-complete", "social-exchange", "no-open-task", "uncertain"},
@@ -92,6 +96,7 @@ def _check_annotation_provenance(
         "move_label": "adjudicated_label",
         "dialogue_act": "adjudicated_dialogue_act",
         "task_intent": "adjudicated_task_intent",
+        "goal_intent": "adjudicated_goal_intent",
     }
     for row_number, row in enumerate(rows, 2):
         if any(row[field].strip() for field in primary_fields):
@@ -100,7 +105,7 @@ def _check_annotation_provenance(
                 raise ValueError(
                     f"{name} row {row_number} lacks primary-label provenance")
         second_fields = {field + "_2" for field in primary_fields}
-        if any(row[field].strip() for field in second_fields):
+        if any(row.get(field, "").strip() for field in second_fields):
             if not all(row[field].strip() for field in
                        ("reviewer_2", "reviewed_at_2", "protocol_version_2")):
                 raise ValueError(
@@ -120,6 +125,7 @@ def _check_labels(rows: list[dict[str, str]], fields: set[str], name: str) -> No
                 "move_label": "adjudicated_label",
                 "dialogue_act": "adjudicated_dialogue_act",
                 "task_intent": "adjudicated_task_intent",
+                "goal_intent": "adjudicated_goal_intent",
             }.get(base)
             candidate_fields = [base, base + "_2"]
             if adjudicated_field:
@@ -136,14 +142,14 @@ def _agreement(rows: list[dict[str, str]], first: str, second: str,
                adjudicated: str | None) -> dict[str, Any]:
     audit_rows = [row for row in rows if row["double_label_required"] == "true"]
     pairs = [(row[first].strip(), row[second].strip()) for row in audit_rows
-             if row[first].strip() and row[second].strip()]
+             if row.get(first, "").strip() and row.get(second, "").strip()]
     first_labels = [row[first].strip() for row in rows if row[first].strip()]
     confusion: Counter[tuple[str, str]] = Counter(pairs)
     disagreements = sum(left != right for left, right in pairs)
     adjudicated_disagreements = (
-        sum(bool(row[first].strip() and row[second].strip()
+        sum(bool(row[first].strip() and row.get(second, "").strip()
                  and row[first].strip() != row[second].strip()
-                 and row[adjudicated].strip()) for row in audit_rows)
+                 and row.get(adjudicated, "").strip()) for row in audit_rows)
         if adjudicated else None)
     if pairs:
         observed = sum(left == right for left, right in pairs) / len(pairs)
@@ -156,7 +162,7 @@ def _agreement(rows: list[dict[str, str]], first: str, second: str,
     else:
         observed = None
         kappa = None
-    adjudicated_count = (sum(bool(row[adjudicated].strip()) for row in audit_rows)
+    adjudicated_count = (sum(bool(row.get(adjudicated, "").strip()) for row in audit_rows)
                          if adjudicated else None)
     return {
         "primary_field": first,
@@ -202,12 +208,15 @@ def evaluate(user_path: Path, assistant_path: Path) -> dict[str, Any]:
     assistant_rows = _read_csv(assistant_path, assistant_fields)
     _check_partition_integrity(user_rows, "user-intent sheet")
     _check_partition_integrity(assistant_rows, "assistant-move sheet")
-    _check_labels(user_rows, {"dialogue_act", "task_intent", "context_state",
-                              "predecessor_act"}, "user-intent sheet")
+    user_label_fields = {"dialogue_act", "task_intent", "context_state",
+                         "predecessor_act"}
+    if user_rows and "goal_intent" in user_rows[0]:
+        user_label_fields.add("goal_intent")
+    _check_labels(user_rows, user_label_fields, "user-intent sheet")
     _check_labels(assistant_rows, {"move_label", "predecessor_label"},
                   "assistant-move sheet")
     _check_annotation_provenance(
-        user_rows, {"dialogue_act", "task_intent", "context_state", "predecessor_act"},
+        user_rows, user_label_fields,
         "user-intent sheet")
     _check_annotation_provenance(
         assistant_rows, {"move_label", "predecessor_label"}, "assistant-move sheet")
@@ -216,6 +225,8 @@ def evaluate(user_path: Path, assistant_path: Path) -> dict[str, Any]:
     for label_set, rows, schemas in (
             ("user_intents", user_rows, SCHEMAS["user_intents"]),
             ("assistant_moves", assistant_rows, SCHEMAS["assistant_moves"])):
+        schemas = tuple(schema for schema in schemas
+                        if not rows or schema[0] in rows[0])
         label_metrics[label_set] = [
             _agreement(rows, first, second, adjudicated)
             for first, second, adjudicated in schemas

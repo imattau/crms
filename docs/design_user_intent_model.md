@@ -445,14 +445,26 @@ This is not a general task planner, arbitrary goal stack, or learned task hierar
 sequence is in
 [`v1_402_task_goal_subgoal.py`](../experiments/v1_402_task_goal_subgoal.py).
 
+Portable dialogue frames now accept an optional validated `goal_intent` field as well as immediate
+`task_intent`. Different goal labels for the same surface and context are treated as a conflict and
+abstain; candidate and train-only frames remain inert. The annotation worksheet and candidate
+induction/evaluation formats include the separate goal field, while earlier sheets and model files
+without it remain readable. `experiments/v1_404_dialogue_goal_intent_frames.py` exercises runtime
+goal preservation, subgoal updates, conflict abstention, candidate inertness, and legacy frames.
+Current Taskmaster labels predate this field, so broad-goal induction still needs an explicitly
+identified Codex primary-label pass before it can be evaluated. Such labels are provisional and
+must not be described as an independent human review.
+
 ## Learning and evidence
 
 Use the two Taskmaster sheets in the dialogue pilot:
 
 - Assistant move annotations provide evidence about the response patterns and transitions that
   follow a user act.
-- User-turn annotations separately label dialogue act, contextual task intent, context state, and
-  preceding assistant act.
+- User-turn annotations separately label dialogue act, immediate contextual task intent, broad
+  goal intent, context state, and preceding assistant act. The goal label is still optional in
+  existing pilot files and needs its own Codex primary-label pass before goal-conditioned candidate
+  results are reported.
 
 Taskmaster does not provide these labels. The current feasibility batch has one Codex-authored label
 per turn, while the designated second-rater and adjudication fields remain blank. Use those labels

@@ -43,6 +43,7 @@ def sample_memory() -> dict:
         "frame_id": "clarification-choice-v1",
         "dialogue_act": "answer-clarification",
         "task_intent": "resolve-ambiguity",
+        "goal_intent": "make-reservation",
         "surface_patterns": ["the second option"],
         "context_predicates": ["pending_candidate_choice"],
         "predecessor_act": "clarification-request",
@@ -83,7 +84,9 @@ def main() -> None:
                 and embedded["learned_frames"][0]["status"]
                 == "heldout-validated"
                 and embedded["learned_frames"][0]["validation"]
-                ["train_conversation_ids"] == ["dialogue-a", "dialogue-c"],
+                ["train_conversation_ids"] == ["dialogue-a", "dialogue-c"]
+                and embedded["learned_frames"][0]["goal_intent"]
+                == "make-reservation",
                 "portable model changed contextual frame or validation metadata")
 
         installed = install_model_database(database, root / "installed")

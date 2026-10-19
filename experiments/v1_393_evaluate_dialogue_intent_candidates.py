@@ -85,11 +85,17 @@ def evaluate(candidate_report: dict, rows: list[dict[str, str]]) -> dict:
             row_id = row["source_utterance_index"].strip()
             active_before[(conversation_id, row_id)] = active_task
             intent = row["task_intent"].strip()
-            if intent == "end-interaction":
+            labeled_goal = row.get("goal_intent", "").strip()
+            if labeled_goal:
+                if labeled_goal not in ACTIVE_TASK_INTENTS:
+                    raise ValueError(f"unknown goal intent: {labeled_goal}")
+                active_task = labeled_goal
+            elif intent == "end-interaction":
                 active_task = None
             elif intent in ACTIVE_TASK_INTENTS:
                 active_task = intent
     matched = confident = exact_pair = act_matches = intent_matches = 0
+    goal_labeled = goal_matches = 0
     conflicts = 0
     predictions = []
     for row in labeled:
@@ -108,14 +114,16 @@ def evaluate(candidate_report: dict, rows: list[dict[str, str]]) -> dict:
                     and set(frame["context_predicates"]) <= context
                     and (frame["predecessor_act"] is None
                          or frame["predecessor_act"] == predecessor)]
-        signatures = {(frame["dialogue_act"], frame["task_intent"])
+        signatures = {(frame["dialogue_act"], frame["task_intent"],
+                       frame.get("goal_intent"))
                       for frame in eligible}
         matched += bool(eligible)
         if len(signatures) > 1:
             conflicts += 1
             predictions.append({
                 "citation": row["citation"], "surface": row["user_utterance"],
-                "label": [row["dialogue_act"], row["task_intent"]],
+                "label": [row["dialogue_act"], row["task_intent"],
+                          row.get("goal_intent") or None],
                 "prediction": "ambiguous-candidate-conflict",
                 "alternatives": [list(sig) for sig in sorted(signatures)],
             })
@@ -123,15 +131,19 @@ def evaluate(candidate_report: dict, rows: list[dict[str, str]]) -> dict:
         if len(signatures) != 1:
             continue
         confident += 1
-        predicted_act, predicted_intent = next(iter(signatures))
+        predicted_act, predicted_intent, predicted_goal = next(iter(signatures))
         actual_act, actual_intent = row["dialogue_act"].strip(), row["task_intent"].strip()
         act_matches += predicted_act == actual_act
         intent_matches += predicted_intent == actual_intent
         exact_pair += (predicted_act, predicted_intent) == (actual_act, actual_intent)
+        actual_goal = row.get("goal_intent", "").strip()
+        if actual_goal:
+            goal_labeled += 1
+            goal_matches += predicted_goal == actual_goal
         predictions.append({
             "citation": row["citation"], "surface": row["user_utterance"],
-            "label": [actual_act, actual_intent],
-            "prediction": [predicted_act, predicted_intent],
+            "label": [actual_act, actual_intent, actual_goal or None],
+            "prediction": [predicted_act, predicted_intent, predicted_goal],
             "matches_primary_label": (predicted_act, predicted_intent)
             == (actual_act, actual_intent),
             "candidate_citations": sorted({citation for frame in eligible
@@ -155,6 +167,9 @@ def evaluate(candidate_report: dict, rows: list[dict[str, str]]) -> dict:
         "act_agreement_on_unique_matches": act_matches / confident if confident else None,
         "intent_agreement_on_unique_matches": intent_matches / confident if confident else None,
         "joint_agreement_on_unique_matches": exact_pair / confident if confident else None,
+        "goal_intent_labeled_matches": goal_labeled,
+        "goal_intent_agreement_on_labeled_matches": (
+            goal_matches / goal_labeled if goal_labeled else None),
         "runtime_effect": "none; candidate frames remain inert",
         "predictions": predictions,
     }
@@ -172,6 +187,7 @@ def self_test() -> None:
             "learned_frames": [{
                 "frame_id": "candidate-thanks", "dialogue_act": "thanks",
                 "task_intent": "social-contact", "surface_patterns": ["thank you"],
+                "goal_intent": "make-reservation",
                 "context_predicates": ["task_in_progress"],
                 "predecessor_act": "answer",
                 "source_citations": ["train-a#turn=2", "train-b#turn=4"],
@@ -182,6 +198,7 @@ def self_test() -> None:
     rows = [{
         "split": "dev", "conversation_id": "dev-a", "user_utterance": "Thank you!",
         "dialogue_act": "thanks", "task_intent": "social-contact",
+        "goal_intent": "make-reservation",
         "context_state": "task-in-progress", "predecessor_act": "answer",
         "reviewer": "codex-ai-test", "citation": "dev-a#turn=3",
         "source_utterance_index": "1",
@@ -195,7 +212,9 @@ def self_test() -> None:
     result = evaluate(candidate_report, rows)
     require(result["candidate_matched_turns"] == 1
             and result["unique_candidate_predictions"] == 1
-            and result["joint_agreement_on_unique_matches"] == 1.0,
+            and result["joint_agreement_on_unique_matches"] == 1.0
+            and result["goal_intent_labeled_matches"] == 1
+            and result["goal_intent_agreement_on_labeled_matches"] == 1.0,
             "offline candidate agreement calculation failed")
     leaked = [dict(rows[0], conversation_id="train-a")]
     try:

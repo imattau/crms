@@ -899,6 +899,7 @@ def classify_user_intent(
         return UserIntentHypothesis(
             dialogue_act=portable["dialogue_act"],
             task_intent=portable["task_intent"],
+            goal_intent=portable.get("goal_intent"),
             decision=portable["decision"],
             matched_frame=portable["matched_frame"],
             context_predicates=portable["context_predicates"],
