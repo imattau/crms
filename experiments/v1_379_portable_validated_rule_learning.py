@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import asdict
 from pathlib import Path
 import sqlite3
 import subprocess
@@ -13,6 +14,8 @@ PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
 from crms_knowledge import CRMSKnowledgeBase
+from crms_conversation import respond
+from crms_dialogue import CRMSDialogue
 from crms_model import CRMSModel
 from crms_package import (
     export_model_database,
@@ -21,6 +24,7 @@ from crms_package import (
     model_database_research_stats,
 )
 from crms_research import CRMSSQLiteResearchIndex
+from crms_rule_proof import verify_inference_proof
 
 
 def require(condition: bool, message: str) -> None:
@@ -135,6 +139,37 @@ def main() -> None:
             "Nia", "ancestor", "Pia", record_use=False) is not None,
             "installed model did not restore its verified derived case")
 
+        # A second, never-practiced composition must reach the verified rule
+        # through natural-language chat, not through a typed inference command.
+        restored.add_fact("Pax", "parent", "Qin", "probe:chat-left")
+        restored.add_fact("Qin", "parent", "Rae", "probe:chat-right")
+        chat_dialogue = CRMSDialogue(restored)
+        chat_answer = respond(chat_dialogue, "Is Pax an ancestor of Rae?")
+        require(chat_answer.status == "answered"
+                and chat_answer.response is not None
+                and chat_answer.response.truth is True
+                and chat_answer.response.inference_proofs
+                and "learned-parent-chain" in json.dumps(
+                    chat_answer.response.inference_proofs),
+                f"natural-language chat did not transfer the packaged rule: "
+                f"{chat_answer}")
+        chat_proof = chat_answer.response.inference_proofs[0]
+        proof_check = verify_inference_proof(
+            chat_proof,
+            [asdict(fact) for fact in restored.facts()],
+            [asdict(rule) for rule in restored._inference_rules.values()],
+            expected_conclusion={
+                "subject": "Pax", "relation": "ancestor", "object": "Rae"})
+        require(proof_check.valid,
+                f"natural-language chat proof failed independent verification: "
+                f"{proof_check}")
+        unsupported_chat = respond(
+            CRMSDialogue(restored), "Is Pax an ancestor of Qin?")
+        require(unsupported_chat.status != "answered"
+                or unsupported_chat.response is None
+                or unsupported_chat.response.truth is not True,
+                "chat answered an unsupported one-edge ancestor query")
+
         packaged_index = CRMSSQLiteResearchIndex.load(installed["research_index"])
         source_hit = next((hit for hit in packaged_index.search(
             "Ada parent Bea", limit=5) if hit.document_id == "train:one"), None)
@@ -161,6 +196,8 @@ def main() -> None:
 
     print("held-out-validated inference rule survives portable SQLite packaging: PASS")
     print("new conclusion remains proof-backed and the practiced case retains lineage: PASS")
+    print("unpracticed composition transfers through natural-language chat with a verified proof: PASS")
+    print("one-edge near-miss abstains in natural-language chat: PASS")
     print("embedded source text remains searchable with resolvable citations: PASS")
     print("interactive portable chat uses the installed learned rule: PASS")
 

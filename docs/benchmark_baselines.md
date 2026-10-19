@@ -1301,6 +1301,8 @@ documents, validates it on two source-held-out documents, and explicitly accepts
 then applied to a new unlabeled chain, and the verified derivation is retained as a separate case.
 Packaging the learned knowledge and source text into one SQLite model preserves the rule's
 validation examples, the derived case's rule lineage, and searchable citations. After installation,
-both the API and interactive chat derive the new conclusion with the validated rule. This is an
-end-to-end persistence result for one controlled rule shape; it does not establish open-domain rule
-induction quality or natural-language intent learning.
+the API and `/infer-relation` CLI command derive the practiced conclusion. The experiment now also
+adds a separate, never-practiced chain and asks about it through ordinary natural-language chat. Its
+proof passes the independent verifier, while a one-edge near-miss abstains. This closes a bounded
+rule-to-chat integration gap; it remains one controlled rule shape and does not establish
+open-domain rule induction quality or natural-language intent learning.
