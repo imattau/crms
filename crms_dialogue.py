@@ -113,6 +113,11 @@ _BARE_YES_NO_RE = re.compile(
     r"understood|no|nope|nah|not really)"
     r"(?:[, ]+(?:please|thanks|thank you))?[.!? ]*$",
     flags=re.IGNORECASE)
+_RECALL_LAST_QUESTION_RE = re.compile(
+    r"^(?:what\s+(?:did\s+i|was\s+my)\s+(?:just\s+)?(?:ask|last\s+question)"
+    r"|what\s+was\s+(?:the\s+)?(?:last|previous)\s+question"
+    r"|repeat\s+(?:my|the)\s+(?:last|previous)\s+question)[?!. ]*$",
+    flags=re.IGNORECASE)
 _FOLLOWUP_ENTITY_RE = re.compile(
     r"^(?:and\s+)?what about\s+(.+?)[?!.]*$|^and\s+(.+?)[?!.]*$",
     flags=re.IGNORECASE)
@@ -279,6 +284,9 @@ class CRMSDialogue:
         # Names extracted from the most recently quoted source passage are
         # discourse candidates only; they never become facts or answer evidence.
         self.source_mentions: list[dict[str, str]] = []
+        # The one entity the user named and the shown source confirmed; it
+        # is the preferred referent for a bare pronoun. Not persisted.
+        self.topic_entity: str | None = None
         # Ordinal selection is valid only for citations actually shown as a list.
         self.presented_sources: list[dict[str, str]] = []
         # Conversation memory that outlives a refused turn. ``clear`` drops
@@ -540,6 +548,7 @@ class CRMSDialogue:
         self.last_timeline_subject = None
         self.last_timeline_order_by = None
         self.source_mentions = []
+        self.topic_entity = None
         self.presented_sources = []
         self.pending_dialogue_slot = None
         self.open_dialogue_question = None
@@ -758,6 +767,22 @@ class CRMSDialogue:
                 options.setdefault(binding[0], resolved)
             self._pronoun_options = list(options.items())
 
+        # A source-confirmed topic is the discourse anchor for a bare
+        # referential follow-up. Do this before probing which bindings happen
+        # to have stored answers: evidence availability must not pull "it"
+        # back to an older entity that is easier to answer about. The answer
+        # path still checks that the resulting claim is supported for this
+        # named entity.
+        if (self.topic_entity and self.topic_entity in entities
+                and all(match.group(0).casefold() in
+                        {"it", "its", "this", "that"}
+                        for match in pronouns)):
+            resolved = question
+            for match in reversed(pronouns):
+                resolved = (resolved[:match.start()] + self.topic_entity
+                            + resolved[match.end():])
+            return resolved, None
+
         supported: dict[tuple[str, ...], list[tuple[str, tuple[Any, ...]]]] = {}
         seen: set[tuple[str, tuple[str, ...]]] = set()
         for resolved, binding in alternatives:
@@ -895,8 +920,21 @@ class CRMSDialogue:
                 entity = match.group().strip()
                 words = tuple(word.casefold() for word in
                               _WORD_RE.findall(entity))
-                if not words or words[0] in common_sentence_starts:
+                if not words:
                     continue
+                if words[0] in common_sentence_starts:
+                    # "The Eiffel Tower": a leading function word is not part
+                    # of the name. The remaining capitalised words were not
+                    # sentence-initial, so they are a proper-noun phrase.
+                    if len(words) == 1:
+                        continue
+                    entity = entity.split(None, 1)[1]
+                    words = words[1:]
+                    if words[0] in common_sentence_starts:
+                        continue
+                    leading_stripped = True
+                else:
+                    leading_stripped = False
                 # A capitalized modifier in an indefinite noun phrase ("a
                 # French restaurant", "an Italian cafe") is usually a type
                 # descriptor, not a discourse entity. Keep this conservative:
@@ -908,7 +946,8 @@ class CRMSDialogue:
                     if (re.search(r"\b(?:a|an)\s+$", prefix, re.IGNORECASE)
                             and re.match(r"\s+[a-z]", suffix)):
                         continue
-                if len(words) == 1 and match.start() == 0:
+                if (len(words) == 1 and match.start() == 0
+                        and not leading_stripped):
                     continue
                 key = tuple(word.casefold() for word in _WORD_RE.findall(entity))
                 mentions.setdefault(key, {
@@ -916,7 +955,9 @@ class CRMSDialogue:
                     "citation": str(source.get("citation", "")),
                     "title": str(source.get("title", "source")),
                 })
-        keys = sorted(mentions, key=lambda key: (len(key), key))
+        # Keep sentence order: the first-named entity is normally the topic
+        # of the sentence, so it is the most natural referent for "it".
+        keys = list(mentions)
         filtered = []
         for key in keys:
             contained = any(
@@ -927,6 +968,58 @@ class CRMSDialogue:
             if not contained:
                 filtered.append(mentions[key])
         return filtered[:100]
+
+    @staticmethod
+    def _question_entity_phrases(question: str) -> list[str]:
+        """Capitalised name phrases the user typed, excluding the first word.
+
+        The first word of a question is capitalised by position ("Where",
+        "Who"), so it is never taken as a name.
+        """
+        phrases: list[str] = []
+        for match in re.finditer(
+                r"\b[A-Z][\w’'-]*(?:\s+[A-Z][\w’'-]*)*", question):
+            if match.start() == 0:
+                continue
+            phrase = match.group().strip()
+            if phrase.casefold() in {"i", "i'm", "i’m"}:
+                continue
+            phrases.append(phrase)
+        return phrases
+
+    def _question_entity_mentions(
+            self, question: str, source_sentences: list[dict[str, Any]]
+            ) -> list[dict[str, str]]:
+        """Entities the user named that the shown source text also contains.
+
+        A name the user typed and the quoted sentence confirms is the topic
+        of the exchange. It leads the referent list ahead of names that only
+        happen to occur inside the sentence (a place, a date holder).
+        """
+        found: list[dict[str, str]] = []
+        for phrase in self._question_entity_phrases(question):
+            needle = phrase.casefold()
+            for item in source_sentences:
+                text = item.get("text")
+                if isinstance(text, str) and needle in text.casefold():
+                    found.append({
+                        "entity": phrase,
+                        "citation": str(item.get("citation", "")),
+                        "title": str(item.get("title", "source")),
+                    })
+                    break
+        return found
+
+    def _merge_mentions(self, *groups: list[dict[str, str]]
+                        ) -> list[dict[str, str]]:
+        merged: dict[tuple[str, ...], dict[str, str]] = {}
+        for group in groups:
+            for item in group:
+                key = tuple(word.casefold() for word in
+                            _WORD_RE.findall(item.get("entity", "")))
+                if key:
+                    merged.setdefault(key, item)
+        return list(merged.values())[:100]
 
     def _remember_evidence(self, response: QuestionResult) -> None:
         self.source_mentions = []
@@ -1352,6 +1445,14 @@ class CRMSDialogue:
             target_candidates = [target] if target is not None else []
         if not target_candidates and target is not None:
             target_candidates = [target]
+        if not target_candidates and not target_is_pronoun:
+            swapped = self._swap_named_question_entity(target_phrase)
+            if swapped is not None:
+                # Re-enter the normal pipeline with the full question so the
+                # same source checks and context updates apply.
+                carried = self.turn(swapped, research_index=research_index)
+                carried.question = message
+                return carried
         if not target_candidates:
             return DialogueTurn(
                 "unknown", message, self.last_question or
@@ -1463,6 +1564,28 @@ class CRMSDialogue:
         self._remember_evidence(response)
         return DialogueTurn("answered", message, resolved_question,
                             response=response, research=research, text=text)
+
+    def _swap_named_question_entity(self, target_phrase: str) -> str | None:
+        """Carry the last question to a newly named entity ("and Italy?").
+
+        Works for source-backed turns where no fact-store entity exists. It
+        needs a capitalised target and exactly one name in the previous
+        question; the rewritten question is then answered (or refused) on its
+        own evidence, so a wrong swap cannot invent an answer.
+        """
+        if not self.last_question or not self.source_mentions:
+            # Only source-backed turns: a fact-frame follow-up to an entity
+            # the knowledge base does not know must still ask, not guess.
+            return None
+        target = re.sub(r"^(?:the|a|an)\s+", "", target_phrase.strip(),
+                        flags=re.IGNORECASE)
+        if not target or not target[:1].isupper():
+            return None
+        previous = self._question_entity_phrases(self.last_question)
+        previous = [p for p in dict.fromkeys(previous)]
+        if len(previous) != 1:
+            return None
+        return self.last_question.replace(previous[0], target, 1)
 
     def _resolve_possessive_property_followup(
             self, message: str, *, research_index: Any | None = None
@@ -1590,10 +1713,8 @@ class CRMSDialogue:
                           "supplied sources; please write it out.")
         return None, None
 
-    def turn(self, question: str, *, research_index: Any | None = None) -> DialogueTurn:
-        question = question.strip()
-        if not question:
-            raise ValueError("question must be a non-empty string")
+    def _quick_reply(self, question: str) -> "DialogueTurn | None":
+        """Replies that need no knowledge lookup: thanks, help, small talk."""
         if _THANKS_RE.fullmatch(question):
             return DialogueTurn("smalltalk", question, question, text="You're welcome.")
         if _HELP_RE.fullmatch(question):
@@ -1612,6 +1733,19 @@ class CRMSDialogue:
                 "clarify", question, question,
                 text=("I don't have an open yes/no question in this conversation. "
                       "What would you like to ask or confirm?"))
+        if _RECALL_LAST_QUESTION_RE.fullmatch(question):
+            if self.last_question:
+                return DialogueTurn(
+                    "smalltalk", question, question,
+                    text=f"Your last question was: {self.last_question}")
+            return DialogueTurn(
+                "smalltalk", question, question,
+                text="I have no earlier question in this conversation.")
+        return None
+
+    def _source_ordinal_turn(self, question: str, research_index: Any | None
+                             ) -> "DialogueTurn | None":
+        """Select a numbered source result, or explain why none can be."""
         ordinal_match = _SOURCE_ORDINAL_FOLLOWUP_RE.fullmatch(question)
         if ordinal_match and self.presented_sources and research_index is not None:
             ordinal = ordinal_match.group("ordinal").casefold()
@@ -1660,6 +1794,18 @@ class CRMSDialogue:
                         "source or entity you want to follow up on.")
             return DialogueTurn("clarify", question, self.last_question or question,
                                 text=text)
+        return None
+
+    def turn(self, question: str, *, research_index: Any | None = None) -> DialogueTurn:
+        question = question.strip()
+        if not question:
+            raise ValueError("question must be a non-empty string")
+        quick = self._quick_reply(question)
+        if quick is not None:
+            return quick
+        ordinal_turn = self._source_ordinal_turn(question, research_index)
+        if ordinal_turn is not None:
+            return ordinal_turn
         repaired = self._repair_entity_reference(
             question, research_index=research_index)
         if repaired is not None:
@@ -1907,8 +2053,13 @@ class CRMSDialogue:
                         and item["text"].strip()
                         and item["text"].strip() in text)
                 ]
-                self.source_mentions = self._source_entity_mentions(
-                    visible_source_sentences)
+                named = self._question_entity_mentions(
+                    resolved, visible_source_sentences)
+                self.source_mentions = self._merge_mentions(
+                    named,
+                    self._source_entity_mentions(visible_source_sentences))
+                self.topic_entity = (named[0]["entity"]
+                                     if len(named) == 1 else None)
                 if (_SOURCE_LIST_REQUEST_RE.search(question)
                         and visible_source_sentences):
                     self.presented_sources = [
@@ -1935,12 +2086,22 @@ class CRMSDialogue:
         """Save only the small dialogue state; knowledge is stored separately."""
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
+        topic_reference = next((
+            {"entity": item["entity"], "citation": item["citation"]}
+            for item in self.source_mentions
+            if self.topic_entity
+            and isinstance(item.get("entity"), str)
+            and item["entity"].casefold()
+                == self.topic_entity.casefold()
+            and item.get("citation")
+        ), None)
         destination.write_text(
-            json.dumps({"format_version": 20, "last_entity": self.last_entity,
+            json.dumps({"format_version": 21, "last_entity": self.last_entity,
                         "subject_entity": self.subject_entity,
                         "object_entity": self.object_entity,
                         "last_question": self.last_question,
                         "source_mentions": self.source_mentions,
+                        "topic_reference": topic_reference,
                         "presented_sources": self.presented_sources,
                         "last_selected_answer": self.last_selected_answer,
                         "last_writing_subject": self.last_writing_subject,
@@ -1972,7 +2133,7 @@ class CRMSDialogue:
              ) -> "CRMSDialogue":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
         if payload.get("format_version") not in (
-                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20):
+                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21):
             raise ValueError("unsupported dialogue-state format version")
         dialogue = cls(knowledge, intent_model=intent_model)
         pending_dialogue_slot = payload.get("pending_dialogue_slot")
@@ -2125,6 +2286,19 @@ class CRMSDialogue:
                         "title": indexed_title or title,
                     })
             dialogue.source_mentions = verified_mentions
+            topic_reference = payload.get("topic_reference")
+            if topic_reference is not None:
+                if (not isinstance(topic_reference, dict)
+                        or not isinstance(topic_reference.get("entity"), str)
+                        or not topic_reference["entity"].strip()
+                        or not isinstance(topic_reference.get("citation"), str)
+                        or not topic_reference["citation"].strip()):
+                    raise ValueError("stored topic reference is malformed")
+                if any(item["entity"].casefold()
+                       == topic_reference["entity"].casefold()
+                       and item["citation"] == topic_reference["citation"]
+                       for item in verified_mentions):
+                    dialogue.topic_entity = topic_reference["entity"]
             presented_sources = payload.get("presented_sources", [])
             if not isinstance(presented_sources, list) or len(presented_sources) > 3:
                 raise ValueError("stored presented source list is malformed")

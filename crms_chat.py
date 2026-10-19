@@ -10323,9 +10323,15 @@ def main() -> int:
         ))
         specialist_route_abstained = (
             where_route_used and where_evidence is None)
+        # Judge evidence against the question the dialogue actually answered.
+        # A follow-up such as "when was it completed?" is resolved to a named
+        # entity first; gating the raw wording would accept any sentence with
+        # a matching relation term, whichever entity it is about.
+        gate_question = (turn.resolved_question
+                         if turn.resolved_question else line)
         fallback_gate_eligible = (
             turn.status in {"unknown", "sources_found"}
-            and supports_question_type(line)
+            and supports_question_type(gate_question)
             and not has_structured_response
             and not has_review_candidates
             and not has_realized_answer
@@ -10351,14 +10357,14 @@ def main() -> int:
                 turn.research.query_expansions
                 if turn.research is not None else [])
             gate_rows.extend(_top_retrieved_sentence_evidence(
-                index, line, licensed_predicates=licensed_predicates))
+                index, gate_question, licensed_predicates=licensed_predicates))
             quoted = re.search(r"[“\"]([^”\"]+)[”\"]", turn.text)
             if quoted and not any(str(row.get("text", "")).strip()
                                   == quoted.group(1).strip()
                                   for row in gate_rows):
                 gate_rows.insert(0, {"text": quoted.group(1)})
             decision = gate_quoted_evidence(
-                line, gate_rows, licensed_predicates=licensed_predicates)
+                gate_question, gate_rows, licensed_predicates=licensed_predicates)
             selected = decision.get("evidence")
             if decision["status"] == "accepted" and selected is not None:
                 title = selected.get("title") or selected.get("source_title") or "source"
