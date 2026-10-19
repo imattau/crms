@@ -137,6 +137,41 @@ to evaluate multi-turn dialogue across topic switches and restarts, and measure
 creative quality separately from scripted route and template correctness.
 No overall capability or parity claim follows from this run.
 
+## Post-grounding cross-domain rerun (2026-10-20)
+
+Code snapshot: commit `57c7892` (`Bind pronoun evidence to the nearest topic`).
+The tree also contained the pre-existing modified large-corpus report and
+untracked dialogue artifacts; those were not used by these selected scripts.
+
+Command:
+
+```sh
+python3 run_experiments.py --match 327 --match 242 --match 376 --match 357 \
+  --match 207 --match 389 --match 413 --match 414 --timeout 300
+```
+
+All 10 selected diagnostics passed in 11.27 seconds. This reruns language
+transfer, the phrase-grid recombination benchmark, sentence-focused retrieval,
+cross-domain list/math/code composition, grounded translation, proof-backed
+reasoning, creative story revision, source-topic follow-ups, and citation-backed
+topic persistence. The results show no regression in these probes after the
+dialogue grounding changes; they are not a broad task-suite accuracy estimate.
+
+Direct metric outputs on this snapshot:
+
+| Probe | Current result | Limit |
+| --- | --- | --- |
+| `v1_327` paraphrase layer | Dev 73/78, held 44/45, unseen 42/44 correct; zero wrong; 8 abstentions across held/unseen; controlled negatives refused 37/37 | Small authored sets; phrase coverage is not open-domain language understanding |
+| `v1_242` phrase-grid learning | 0/30, 0/28, 0/24 correct at 1, 2, 4 examples; 16/16 at 8 and 8/8 at 12; zero wrong; all 10 authored unseen wordings abstained | Synthetic phrase grid; a supervision/coverage threshold, not broad recombination |
+| `v1_376` reasoning graph | 35-hop chain and depth-9 binary tree answered with verified proofs; diamond answer marked incomplete at the 64-proof cap; conflict ambiguous; open-world misses unknown; cycle-backed self-relation ambiguous; irreflexive self-link denied | Engine-level graph benchmark; natural-language routing and real-corpus premise coverage remain separate gaps |
+
+This snapshot supports continuing the shared benchmark and the source-disjoint
+learning work. It does not establish parity with a 70B-class assistant. The
+next high-value experiment remains natural-source procedure learning with
+independently written requests, an unseen composition, and an independent
+validator; keep source attribution, labeler decisions, and generalization
+results separate.
+
 ## Active/passive exact-predicate morphology
 
 Commands: `python3 experiments/v1_416_regular_es_gate_morphology.py` and
