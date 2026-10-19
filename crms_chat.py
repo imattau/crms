@@ -15,6 +15,7 @@ from crms_dialogue import CRMSDialogue
 from crms_conversation import is_farewell, respond as respond_conversation
 from crms_feedback import (
     AnswerFeedbackStore, collect_feedback_refs,
+    collect_math_feedback_refs,
     collect_translation_feedback_refs, render_feedback_refs,
 )
 from crms_explain import render_verified_explanation
@@ -8847,7 +8848,13 @@ def main() -> int:
             math_result = math_model.ask(
                 line, grounded_cardinals=rules.grounded_cardinal_phrases())
         if math_result is not None:
-            print(f"CRMS> {render_math(math_result)}")
+            math_text = render_math(math_result)
+            print(f"CRMS> {math_text}")
+            math_refs = collect_math_feedback_refs(math_result)
+            remember_feedback(
+                {"question": line, "answer": math_text,
+                 "evidence": math_refs}
+                if math_refs else None)
             continue
         if _unsupported_mathematical_proof_request(line):
             print("CRMS> I don't have a verified proof rule for that "

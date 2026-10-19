@@ -18,9 +18,11 @@ sys.path.insert(0, str(ROOT))
 
 from crms_feedback import (
     AnswerFeedbackStore, collect_feedback_refs,
-    collect_translation_feedback_refs, feedback_answer_id, render_feedback_refs,
+    collect_math_feedback_refs, collect_translation_feedback_refs,
+    feedback_answer_id, render_feedback_refs,
 )
 from crms_knowledge import CRMSKnowledgeBase
+from crms_math import CRMSMath
 from crms_translation import CRMSTranslation
 
 
@@ -74,6 +76,19 @@ def main() -> None:
             "translation evidence fingerprint was not deterministic")
     require("aligned example ids:" in render_feedback_refs(translation_refs),
             "translation feedback did not display its aligned-example references")
+
+    math = CRMSMath()
+    math.teach("What is 2 plus 3?", "5")
+    math.teach("What is 5 plus 3?", "8")
+    math_result = math.ask("What is 7 plus 3?")
+    math_refs = collect_math_feedback_refs(math_result)
+    require(len(math_refs) == 1 and math_refs[0]["kind"] == "math_derivation",
+            f"math feedback did not identify the exact derivation: {math_refs}")
+    require(math_refs == collect_math_feedback_refs(math_result),
+            "math derivation fingerprint was not deterministic")
+    require(collect_math_feedback_refs(SimpleNamespace(
+                status="unknown", value=None, expression=None)) == [],
+            "unknown math output was offered as answer feedback")
     fact_ref = next((item for item in refs if item["kind"] == "fact"), None)
     require(fact_ref is not None
             and fact_ref["subject"] == "Ada"
@@ -276,9 +291,34 @@ def main() -> None:
                         for item in events[0]["evidence"]),
                 f"translation correction lost its model-frame attribution: {events}")
 
+    with tempfile.TemporaryDirectory(prefix="crms-math-feedback-chat-") as directory:
+        root = Path(directory)
+        math.save(root / "math.json")
+        args = [sys.executable, str(ROOT / "crms_chat.py"),
+                "--knowledge", str(root / "knowledge.json"),
+                "--feedback-db", str(root / "feedback.sqlite3"),
+                "--dialogue-state", str(root / "dialogue.json"),
+                "--rules", str(root / "rules.json"),
+                "--rule-session", str(root / "rule-session.json"),
+                "--math", str(root / "math.json"),
+                "--math-session", str(root / "math-session.json"),
+                "--translations", str(root / "translations.json"),
+                "--translation-session", str(root / "translation-session.json")]
+        run = subprocess.run(
+            args, input="What is 7 plus 3?\n/right\n/feedback\n/quit\n",
+            text=True, capture_output=True, timeout=30)
+        require(run.returncode == 0, run.stderr or run.stdout)
+        events = AnswerFeedbackStore(root / "feedback.sqlite3").recent(1)
+        require(len(events) == 1
+                and any(item["kind"] == "math_derivation"
+                        for item in events[0]["evidence"]),
+                f"math feedback lost its derivation attribution: {events}")
+
     print("answer feedback attribution: direct facts, rule, and source refs PASS")
     print("translation feedback ties to deterministic aligned-frame evidence: PASS")
     print("interactive translation feedback persists its frame attribution: PASS")
+    print("math feedback ties to deterministic expression and licensed evidence: PASS")
+    print("interactive math feedback persists its derivation attribution: PASS")
     print("SQLite persistence, deterministic IDs, duplicate suppression: PASS")
     print("conflicting feedback retained for review without changing knowledge: PASS")
     print("wrong proof feedback suspends only validated learned rules: PASS")

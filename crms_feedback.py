@@ -183,6 +183,48 @@ def collect_translation_feedback_refs(result: Any) -> list[dict[str, Any]]:
              "sources": example_ids}]
 
 
+def collect_math_feedback_refs(result: Any) -> list[dict[str, Any]]:
+    """Identify the exact expression and licensed evidence for a math answer."""
+    if (getattr(result, "status", None) != "answered"
+            or getattr(result, "value", None) is None
+            or getattr(result, "expression", None) is None):
+        return []
+    examples = [dict(row) for row in (getattr(result, "examples", ()) or ())
+                if isinstance(row, Mapping)]
+    number_evidence = [dict(row) for row in
+                       (getattr(result, "number_evidence", ()) or ())
+                       if isinstance(row, Mapping)]
+    unit_evidence = [dict(row) for row in
+                     (getattr(result, "unit_evidence", ()) or ())
+                     if isinstance(row, Mapping)]
+    payload = {
+        "expression": repr(result.expression),
+        "value": str(result.value),
+        "operation": getattr(result, "operation", None),
+        "unit": getattr(result, "unit", None),
+        "examples": examples,
+        "number_evidence": number_evidence,
+        "unit_evidence": unit_evidence,
+        "symbolic_terms": list(getattr(result, "symbolic_terms", ()) or ()),
+        "solutions": [str(value) for value in
+                      (getattr(result, "solutions", ()) or ())],
+    }
+    derivation_id = hashlib.sha256(
+        _canonical_json(payload).encode("utf-8")).hexdigest()
+    refs = [{"kind": "math_derivation", "id": derivation_id}]
+    source_ids = set()
+    for row in number_evidence + unit_evidence:
+        for key in ("sources", "source", "citation", "document_id"):
+            value = row.get(key)
+            if isinstance(value, (list, tuple, set)):
+                source_ids.update(str(item) for item in value if item)
+            elif value:
+                source_ids.add(str(value))
+    refs.extend({"kind": "source", "id": value}
+                for value in sorted(source_ids))
+    return refs
+
+
 def render_feedback_refs(evidence_refs: Iterable[Mapping[str, Any]]) -> str:
     """Render feedback references so a user can identify the proposition used."""
     rendered = []
