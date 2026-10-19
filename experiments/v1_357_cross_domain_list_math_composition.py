@@ -169,7 +169,8 @@ def main() -> None:
         ]
         run = subprocess.run(
             command,
-            input=(f"Write Python code to {REQUEST_VARIANTS[1]}\nExplain that code\n"
+            input=("Could you please write me a Python function that "
+                   f"{REQUEST_VARIANTS[1]}?\nExplain that code\n"
                    "Show the examples for that code\n/quit\n"),
             text=True, capture_output=True, cwd=root, check=False, timeout=30)
         require(run.returncode == 0

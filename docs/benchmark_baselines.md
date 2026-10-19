@@ -42,8 +42,8 @@ sequence before an exact learned `x*x+3` map. The request route also accepts
 wording variants keep the same typed operations and evidence. The generated artifact returns
 `[19, 19, 7, 4]` for `[4, 1, 4, 2]`, records list-stage, math-stage, and outer
 composition provenance, checks both component artifacts and four composed
-probes, and answers ordinary chat requests for generation, explanation, and
-examples. The same learned sequence also composes with `x divided by 2`,
+probes, and answers a polite function request followed by explanation and
+evidence questions. The same learned sequence also composes with `x divided by 2`,
 preserving exact `Fraction` outputs and the second formula's provenance.
 Missing list or math support abstains. This checks two formula crossings with
 one learned sequence, not arbitrary task planning or broader coding parity.
