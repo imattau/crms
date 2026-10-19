@@ -111,6 +111,9 @@ Findings from the review that change the design:
   resolution still does not consult entity kind. An ordinal follow-up cannot select a hidden result:
   when the preceding brief did not show a numbered list, CRMS now says that and asks for more
   results or an entity name. Selecting among a numbered set of sources remains unsupported.
+  The mention heuristic also skips a single capitalized modifier in an indefinite phrase such as
+  “a French restaurant” when it is followed by a lowercase noun. This avoids one common false
+  referent, but is not named-entity recognition; source-derived referents remain provisional.
 - **The chat loop still post-processes every turn** (count routes, source routes) in a file of about
   10,000 lines.
 - **Chat learning is explicit.** Every `/teach-*` command teaches content. No command teaches a

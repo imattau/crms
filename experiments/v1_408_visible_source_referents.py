@@ -23,10 +23,10 @@ def main() -> None:
     with tempfile.TemporaryDirectory(prefix="crms-visible-referents-") as folder:
         root = Path(folder)
         (root / "bistro.txt").write_text(
-            "Bistro Alder serves handmade pasta and has outdoor seating near the river.",
+            "Bistro Alder is an Italian restaurant that serves handmade pasta and has outdoor seating near the river.",
             encoding="utf-8")
         (root / "cafe.txt").write_text(
-            "Cafe Birch serves pastries and has indoor seating near the river.",
+            "Cafe Birch is a French restaurant that serves pastries and has indoor seating near the river.",
             encoding="utf-8")
         index = CRMSResearchIndex()
         index.add_directory(str(root))
@@ -35,13 +35,11 @@ def main() -> None:
         first = respond(dialogue, "Find me a restaurant near the river.",
                         research_index=index)
         require(first.status == "sources_found"
-                and "Cafe Birch serves pastries" in first.text,
+                and "Cafe Birch is a French restaurant" in first.text,
                 f"controlled setup did not quote the expected first result: {first.text!r}")
         mentions = {item["entity"] for item in dialogue.source_mentions}
-        require("Cafe Birch" in mentions,
-                f"visible source entity was not retained: {mentions}")
-        require("Bistro Alder" not in mentions,
-                f"an unshown source became a referent: {mentions}")
+        require(mentions == {"Cafe Birch"},
+                f"source referents included an adjective or unshown source: {mentions}")
 
         for query in ("What about the second one?",
                       "Tell me about the second one.",
@@ -57,7 +55,7 @@ def main() -> None:
         follow_up = respond(dialogue, "Can you tell me more about that one?",
                             research_index=index)
         require(follow_up.status == "sources_found"
-                and "Cafe Birch serves pastries" in follow_up.text,
+                and "Cafe Birch is a French restaurant" in follow_up.text,
                 f"visible source follow-up did not resolve to Cafe Birch: {follow_up.text!r}")
         require("Which entity do you mean?" not in follow_up.text,
                 f"one visible referent incorrectly caused ambiguity: {follow_up.text!r}")

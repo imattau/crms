@@ -878,6 +878,17 @@ class CRMSDialogue:
                               _WORD_RE.findall(entity))
                 if not words or words[0] in common_sentence_starts:
                     continue
+                # A capitalized modifier in an indefinite noun phrase ("a
+                # French restaurant", "an Italian cafe") is usually a type
+                # descriptor, not a discourse entity. Keep this conservative:
+                # missing a candidate causes a clarification; retaining a
+                # descriptor can create a false referent and misbind follow-ups.
+                if len(words) == 1:
+                    prefix = text[max(0, match.start() - 8):match.start()]
+                    suffix = text[match.end():match.end() + 48]
+                    if (re.search(r"\b(?:a|an)\s+$", prefix, re.IGNORECASE)
+                            and re.match(r"\s+[a-z]", suffix)):
+                        continue
                 if len(words) == 1 and match.start() == 0:
                     continue
                 key = tuple(word.casefold() for word in _WORD_RE.findall(entity))
