@@ -561,6 +561,16 @@ Everest in?" regressed) and was removed. Typos: replace an out-of-vocabulary wor
 with the unique vocabulary word at edit distance 1 (including transposition) and **echo the
 correction** to the user. Typo alone added 4 correct on dev and 4 on held.
 
+Question-frame learning also supports a narrower, evidence-backed active-to-passive recombination:
+two varied examples of `Who created X?` can license `X was created by whom?` for a held-out object.
+Only the same single-token regular `-ed` predicate is transformed; the answer still comes from a
+separately stored fact, and the trace retains the frame-training sources. Unsupported verbs,
+missing auxiliaries, role swaps, and one-example frames abstain. If matching positive and negative
+facts conflict, both active and passive question forms return ambiguity with both polarities in the
+evidence. `experiments/v1_347_grounded_passive_question_recombination.py` exercises this in memory
+and after JSON and SQLite save/load. This is a bounded frame recombination capability, not general
+voice conversion.
+
 ### 3.5 Seed equivalence pack (closed, inspectable, revocable)
 
 The gate removes wrong answers but also rejects legitimate paraphrases that share no word with the

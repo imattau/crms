@@ -3808,6 +3808,19 @@ class CRMSKnowledgeBase:
                     changed = side[:start] + replacement + side[end:]
                     variants.add((changed, suffix) if side_index == 0
                                  else (prefix, changed))
+        # Active/passive voice preserves the same agent/patient relation.
+        # Derive a bounded passive "X was created by whom?" from an already
+        # licensed active "Who created X?" frame only when the exact verb
+        # form is a regular past/participle ending in -ed. This is a role
+        # permutation of grounded wording, not a predicate synonym.
+        if (not suffix and len(prefix) == 2 and prefix[0] == "who"):
+            passive_verbs = {prefix[1]}
+            passive_verbs.update(
+                phrase[0] for phrase in forms
+                if len(phrase) == 1 and phrase[0].endswith("ed"))
+            for verb in passive_verbs:
+                if len(verb) > 3 and verb.endswith("ed"):
+                    variants.add(((), ("was", verb, "by", "whom")))
         return variants
 
     def _is_grounded_progressive_question(
@@ -12638,6 +12651,38 @@ class CRMSKnowledgeBase:
                     }
                     matched_frame_transformations[json.dumps(
                         transform, sort_keys=True, ensure_ascii=False)] = transform
+                if (answer_field == "subject" and len(prefix) == 2
+                        and prefix[0] == "who" and not suffix
+                        and not frame_prefix and len(frame_suffix) == 4
+                        and frame_suffix[0] == "was"
+                        and frame_suffix[2:] == ("by", "whom")
+                        and frame_suffix[1].endswith("ed")):
+                    passive_verb = frame_suffix[1]
+                    supporting_examples = []
+                    for example_words in entities:
+                        example_entity = _tokens(" ".join(example_words))
+                        example_facts = [fact for fact in self._facts.values()
+                                         if _tokens(fact.relation) == relation_tokens
+                                         and _tokens(fact.object) == example_entity]
+                        supporting_examples.append({
+                            "bound_entity": " ".join(example_words),
+                            "sources": sorted({source for fact in example_facts
+                                               for source in fact.sources}),
+                        })
+                    transform = {
+                        "kind": "active_to_passive_subject_question_frame",
+                        "rule": ("licensed regular -ed active predicate becomes "
+                                 "a passive by-phrase; object remains bound and "
+                                 "the agent remains the answer"),
+                        "predicate": passive_verb,
+                        "licensed_frame": " ".join(
+                            prefix + ("{object}",) + suffix),
+                        "derived_frame": "{object} was " + passive_verb
+                                         + " by whom",
+                        "supporting_examples": supporting_examples,
+                    }
+                    matched_frame_transformations[json.dumps(
+                        transform, sort_keys=True, ensure_ascii=False)] = transform
                 if (len(prefix) == 5
                         and prefix[:3] == ("who", "is", "the")
                         and prefix[-1] == "of"
@@ -12903,6 +12948,7 @@ class CRMSKnowledgeBase:
 
         answers: dict[tuple[str, ...], str] = {}
         evidence_by_key: dict[tuple[Any, ...], FactEvidence] = {}
+        direct_negative_evidence: dict[tuple[Any, ...], dict[str, Any]] = {}
         inference_proofs: list[dict[str, Any]] = []
         inference_evidence: dict[tuple[Any, ...], dict[str, Any]] = {}
         inference_conflict = False
@@ -13118,8 +13164,13 @@ class CRMSKnowledgeBase:
             for fact in evidence:
                 value = fact.subject if answer_field == "subject" else fact.object
                 answers.setdefault(_tokens(value), value)
-                evidence_by_key[(fact.subject, fact.relation, fact.object,
-                                 fact.qualifiers)] = fact
+                fact_key = self._fact_key(
+                    fact.subject, fact.relation, fact.object, fact.qualifiers)
+                evidence_by_key[fact_key] = fact
+                negative = self._negative_facts.get(fact_key)
+                if negative is not None:
+                    direct_negative_evidence[fact_key] = (
+                        asdict(negative) | {"polarity": "negative"})
             relation_key = _tokens(relation)
             if not self._relation_has_inference_schema(
                     " ".join(relation_key), requested_qualifiers):
@@ -13258,13 +13309,25 @@ class CRMSKnowledgeBase:
                 language_evidence=language_evidence,
                 request=("I recognize the taught question frame, but no matching "
                          "fact is stored for the requested entity or value."))
-        evidence_output = [asdict(evidence_by_key[key])
-                           for key in sorted(evidence_by_key)]
+        evidence_output = [
+            asdict(evidence_by_key[key])
+            | ({"polarity": "positive"} if direct_negative_evidence else {})
+            for key in sorted(evidence_by_key)]
         evidence_output.extend(inference_evidence[key]
                                for key in sorted(inference_evidence))
+        evidence_output.extend(direct_negative_evidence[key]
+                               for key in sorted(direct_negative_evidence))
         proof_by_key = {repr(proof): proof for proof in inference_proofs}
         inference_proofs = [proof_by_key[key] for key in sorted(proof_by_key)]
         candidates = [answers[key] for key in sorted(answers)]
+        if direct_negative_evidence:
+            return QuestionResult(
+                "ambiguous", candidates=candidates, evidence=evidence_output,
+                matched_templates=templates,
+                inference_proofs=inference_proofs,
+                language_evidence=language_evidence,
+                request=("Positive and negative source-backed evidence conflict "
+                         "for this answer."))
         if inference_conflict:
             return QuestionResult(
                 "ambiguous", candidates=candidates, evidence=evidence_output,
