@@ -76,12 +76,13 @@ open-ended software generation.
 
 Command: `python3 experiments/v1_355_learned_sequence_connective_codegen.py`
 
-Four base phrases teach sorting and reversal for two object phrases. Two
-separate compound instruction patterns then establish order-sensitive uses of
-`then`. For both compound rules, six all-distinct inputs initially leave two
-procedures consistent; CRMS requests `[0, 0]`, and the teacher's output resolves
-the ambiguity. A control with only one grounded compound still abstains on a
-new sequence crossing. With two compound contexts, the held-out instruction
+Five base phrases teach sorting and reversal for two object phrases and
+duplicate removal for a third. Two separate compound instruction patterns
+then establish order-sensitive uses of `then`. For both compound rules, six
+all-distinct inputs initially leave two procedures consistent; CRMS requests
+`[0, 0]`, and the teacher's output resolves the ambiguity. A control with
+only one grounded compound still abstains on new sequence crossings, including
+the new operation pair. With two compound contexts, the held-out instruction
 `sort the list then reverse the list` produces `[4, 4, 2, 1]` for the input
 `[4, 1, 4, 2]` through the learned `then` connective.
 
@@ -89,11 +90,15 @@ The standalone code artifact executes and passes its parity cases. Its
 provenance retains the two component phrases and both compound examples. The
 actual chat CLI accepts `Write Python code to sort the list then reverse the
 list`, then answers `Explain that code` and `Show the examples for that code`
-from the generated artifact. Unsupported connective, operation, and modifier
-variants abstain and produce no code. This is a learned, reviewable composition
-of known list procedures; it does not show zero-shot programming or broad
-natural-language understanding. The control flow and source count are local
-CRMS results; no external 70B model was run on this fixture.
+from the generated artifact. With no example of the unique→sort pair, the same
+learned connective also composes “remove duplicate values then sort the list”
+and generates executable code returning `[1, 2, 4]` for `[4, 1, 4, 2]`; the
+artifact cites both component procedures and both connective examples.
+Unsupported connective, operation, and modifier variants abstain and produce
+no code. This is reusable composition over known list procedures, not zero-shot
+programming or broad natural-language understanding. The control flow and
+source count are local CRMS results; no external 70B model was run on this
+fixture.
 
 ## Cross-surface question transfer v1
 

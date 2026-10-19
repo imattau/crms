@@ -20,6 +20,7 @@ BASE_PHRASES = (
     ("reverse the list", "reverse"),
     ("sort the values", "sort"),
     ("reverse the values", "reverse"),
+    ("remove duplicate values", "unique"),
 )
 COMPOUND_PHRASES = (
     "sort the list then reverse the values",
@@ -35,18 +36,33 @@ def require(condition: bool, message: str) -> None:
 
 
 def transformed(values: list[int], first: str, second: str) -> list[int]:
-    intermediate = sorted(values) if first == "sort" else list(reversed(values))
-    return sorted(intermediate) if second == "sort" else list(reversed(intermediate))
+    def apply(items: list[int], operation: str) -> list[int]:
+        if operation == "sort":
+            return sorted(items)
+        if operation == "reverse":
+            return list(reversed(items))
+        if operation == "unique":
+            return list(dict.fromkeys(items))
+        raise ValueError(f"unknown fixture operation: {operation}")
+
+    return apply(apply(values, first), second)
+
+
+def apply_named(values: list[int], operation: str) -> list[int]:
+    if operation == "sort":
+        return sorted(values)
+    if operation == "reverse":
+        return list(reversed(values))
+    if operation == "unique":
+        return list(dict.fromkeys(values))
+    raise ValueError(f"unknown fixture operation: {operation}")
 
 
 def main() -> None:
     model = CRMSModel(max_composition_depth=2, max_workers=1)
     for phrase, operation in BASE_PHRASES:
-        examples = [
-            (list(values), sorted(values) if operation == "sort"
-             else list(reversed(values)))
-            for values in (*INPUTS, DUPLICATE_PROBE)
-        ]
+        examples = [(list(values), apply_named(list(values), operation))
+                    for values in (*INPUTS, DUPLICATE_PROBE)]
         learned = model.teach(phrase, examples)
         require(learned.status == "learned" and learned.candidate_count == 1,
                 f"base operation was not uniquely learned: {phrase}: {learned}")
@@ -77,8 +93,7 @@ def main() -> None:
     # One compound does not license the connective in a new crossing.
     one_compound = CRMSModel(max_composition_depth=2, max_workers=1)
     for phrase, operation in BASE_PHRASES:
-        examples = [(list(values), sorted(values) if operation == "sort"
-                     else list(reversed(values)))
+        examples = [(list(values), apply_named(list(values), operation))
                     for values in (*INPUTS, DUPLICATE_PROBE)]
         require(one_compound.teach(phrase, examples).status == "learned",
                 f"single-compound control failed to learn {phrase}")
@@ -97,6 +112,12 @@ def main() -> None:
             and generate_python(one_compound, HELD_OUT) is None,
             f"one compound licensed an unsupported connective crossing: "
             f"{before_learning}")
+    new_operation_crossing = "remove duplicate values then sort the list"
+    require(one_compound.predict(
+        new_operation_crossing, TEST_INPUT).status != "ok"
+            and generate_python(one_compound, new_operation_crossing) is None,
+            "one compound licensed a new operation crossing without enough "
+            "connective evidence")
 
     # Two independent component-pair contexts license the sequential
     # connective. The requested phrase is not itself a teaching phrase.
@@ -113,6 +134,22 @@ def main() -> None:
             f"sequence proof lost its component or rule evidence: "
             f"{prediction.evidence_phrases}")
 
+    # The same learned connective now composes a different known operation
+    # with sorting. No compound example contains this operation pair.
+    unique_then_sort = model.predict(new_operation_crossing, TEST_INPUT)
+    expected_new_output = [1, 2, 4]
+    new_evidence = {
+        "remove duplicate values", "sort the list",
+        COMPOUND_PHRASES[0], COMPOUND_PHRASES[1],
+    }
+    require(unique_then_sort.status == "ok"
+            and unique_then_sort.output == expected_new_output
+            and unique_then_sort.matched_templates
+            == ["learned_sequence:then"]
+            and new_evidence <= set(unique_then_sort.evidence_phrases),
+            f"learned connective did not transfer to a new operation pair: "
+            f"{unique_then_sort}")
+
     artifact = generate_python(model, HELD_OUT)
     require(artifact is not None
             and set(artifact.evidence_phrases) == expected_evidence,
@@ -125,6 +162,17 @@ def main() -> None:
             and transform([3, -1, 3, 2]) == [3, 3, 2, -1]
             and namespace["validate_examples"](),
             "generated sequence code disagreed with the learned procedure")
+    new_artifact = generate_python(model, new_operation_crossing)
+    require(new_artifact is not None
+            and set(new_artifact.evidence_phrases) == new_evidence,
+            f"new operation crossing did not produce a traceable artifact: "
+            f"{new_artifact}")
+    new_namespace: dict[str, object] = {}
+    exec(compile(new_artifact.source, "<crms-unique-sort>", "exec"),
+         new_namespace)
+    require(new_namespace["transform"](TEST_INPUT) == expected_new_output
+            and new_namespace["validate_examples"](),
+            "generated unique-then-sort code failed behavioral validation")
     repeated = generate_python(model, HELD_OUT)
     require(repeated is not None
             and repeated.provenance_id == artifact.provenance_id,
@@ -159,6 +207,17 @@ def main() -> None:
                 f"natural-language code request/follow-ups failed: "
                 f"{chat.stdout}\n{chat.stderr}")
 
+        second_chat = subprocess.run(
+            command,
+            input=(f"Write Python code to {new_operation_crossing}\n/quit\n"),
+            text=True, capture_output=True, check=False, timeout=30)
+        require(second_chat.returncode == 0
+                and "Generated Python for 'remove duplicate values then sort the list'"
+                    in second_chat.stdout
+                and all(phrase in second_chat.stdout for phrase in new_evidence),
+                f"terminal new-operation composition failed: "
+                f"{second_chat.stdout}\n{second_chat.stderr}")
+
     for unsupported in (
             "sort the list or reverse the list",
             "rotate the list then reverse the list",
@@ -171,6 +230,8 @@ def main() -> None:
     print("contrastive input resolved both compound rules: [0, 0]")
     print("one-compound control abstained; two independent contexts licensed then: PASS")
     print("held-out sort→reverse: correct output, four evidence phrases, verified code: PASS")
+    print("same connective transferred to unseen unique→sort pair: correct output, "
+          "four evidence phrases, verified code: PASS")
     print("terminal code request, explanation, and evidence follow-up: PASS")
     print("unsupported connective, operation, and modifier: abstained; no code: PASS")
 
