@@ -2008,7 +2008,10 @@ class CRMSKnowledgeBase:
 
         This is an explicit practice operation: only complete, unambiguous
         inference results are recorded. Derived cases never enter ``facts``
-        and therefore cannot become proof leaves.
+        and therefore cannot become proof leaves. If storage capacity prevents
+        retaining the requested case, the inference result is still returned;
+        callers should verify retention with ``retrieve_derived_case`` before
+        reporting that write-back occurred.
         """
         normalized_qualifiers = self._normalize_qualifiers(qualifiers)
         result = self.infer_relation(
@@ -2089,6 +2092,8 @@ class CRMSKnowledgeBase:
         incomplete searches, unsupported frames, and composed questions with
         multiple conclusions are returned without derived-case write-back.
         The normal practice path independently reruns and verifies the proof.
+        The returned boolean is true only when the verified case is actually
+        retained and can be retrieved under the configured storage cap.
         """
         result = self.ask(
             question, qualifiers=qualifiers,
@@ -2145,9 +2150,16 @@ class CRMSKnowledgeBase:
             conclusion["subject"], conclusion["relation"],
             conclusion["object"], qualifiers=dict(next(iter(scopes))),
             max_expansions=max_inference_expansions, max_depth=max_depth)
+        retained_case = self.retrieve_derived_case(
+            conclusion["subject"], conclusion["relation"],
+            conclusion["object"], qualifiers=dict(next(iter(scopes))),
+            max_expansions=max_inference_expansions, max_depth=max_depth,
+            record_use=False)
         retained = (practiced.status == "answered" and practiced.complete
                     and any(_is_derived_proof(proof)
-                            for proof in practiced.proofs))
+                            for proof in practiced.proofs)
+                    and retained_case is not None
+                    and retained_case.get("status") == "verified")
         return result, retained
 
     def retrieve_derived_case(self, subject: str, relation: str,

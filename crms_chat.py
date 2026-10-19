@@ -6237,8 +6237,8 @@ def main() -> int:
                         print("Auto-practice stored the verified inference as a "
                               "separate derived case.")
                     else:
-                        print("Auto-practice skipped: the answer did not resolve "
-                              "to one unique, proof-backed conclusion.")
+                        print("Auto-practice retained no derived case: the answer "
+                              "was not eligible or storage is disabled.")
             except (TypeError, ValueError) as error:
                 print(f"Could not answer with that context: {error}")
             continue
@@ -6602,10 +6602,17 @@ def main() -> int:
                         f"{name}={value}" for name, value in sorted(qualifiers.items())) + "]"
                 print(f"CRMS> {rendered}")
                 if result.status == "answered" and result.complete:
-                    if any(proof.get("kind") in {"rule", "schema"}
-                           for proof in result.proofs):
+                    derived = any(proof.get("kind") in {"rule", "schema"}
+                                  for proof in result.proofs)
+                    retained_case = (knowledge.retrieve_derived_case(
+                        *fields[:3], qualifiers=qualifiers, record_use=False)
+                        if derived else None)
+                    if derived and retained_case is not None:
                         knowledge.save(args.knowledge)
                         print("Verified derivation stored as a separate derived case.")
+                    elif derived:
+                        print("The inference is verified, but no derived case was retained "
+                              "because storage is disabled or the case was evicted.")
                     else:
                         print("No derived case stored: this result is directly taught.")
             except (TypeError, ValueError) as error:
@@ -6624,7 +6631,7 @@ def main() -> int:
                     print("Verified answer stored as a separate derived case.")
                 else:
                     print("No derived case stored: the answer was not one unique, "
-                          "proof-backed inference.")
+                          "proof-backed inference, or storage is disabled.")
             except (TypeError, ValueError) as error:
                 print(f"Could not practice that question: {error}")
             continue
@@ -6644,7 +6651,7 @@ def main() -> int:
                     print("Verified answer stored as a separate derived case.")
                 else:
                     print("No derived case stored: the answer was not one unique, "
-                          "proof-backed inference.")
+                          "proof-backed inference, or storage is disabled.")
             except (OSError, TypeError, ValueError) as error:
                 print(f"Could not practice that answer: {error}")
             continue
@@ -9866,8 +9873,8 @@ def main() -> int:
                     print("Auto-practice stored the verified inference as a "
                           "separate derived case.")
                 else:
-                    print("Auto-practice skipped: the answer did not resolve to "
-                          "one unique, proof-backed conclusion.")
+                    print("Auto-practice retained no derived case: the answer "
+                          "was not eligible or storage is disabled.")
             except (OSError, TypeError, ValueError) as error:
                 print(f"Auto-practice could not retain this answer: {error}")
         if (turn.research and turn.research.status == "needs_review"

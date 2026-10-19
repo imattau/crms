@@ -15,8 +15,9 @@ from crms_research import CRMSResearchIndex
 PROJECT = Path(__file__).resolve().parents[1]
 
 
-def seed(*, contextual: bool = False) -> CRMSKnowledgeBase:
-    kb = CRMSKnowledgeBase()
+def seed(*, contextual: bool = False,
+         max_derived_cases: int = 1_000) -> CRMSKnowledgeBase:
+    kb = CRMSKnowledgeBase(max_derived_cases=max_derived_cases)
     rows = [("Ada", "Engine", "London", "2024", "a"),
             ("Bea", "Compiler", "Paris", "2025", "b"),
             ("Cal", "Device", "Rome", "2024", "c")]
@@ -91,6 +92,14 @@ def main() -> None:
             or direct.derived_cases()):
         raise SystemExit("directly taught fact was written as a derived case")
 
+    disabled = seed(max_derived_cases=0)
+    disabled_answer, disabled_retained = disabled.practice_question(
+        "Who designed in Rome?")
+    if (disabled_answer.status != "answered" or disabled_retained
+            or disabled.derived_cases()):
+        raise SystemExit(
+            "zero-cap question practice reported an answer as retained")
+
     ambiguous = seed()
     ambiguous.add_fact("Dana", "designed", "Device", "d-design")
     ambiguous.add_fact("Device", "located in", "Rome", "d-location")
@@ -122,6 +131,29 @@ def main() -> None:
         restored = CRMSKnowledgeBase.load(knowledge_path)
         if len(restored.derived_cases()) != 1 or len(restored.facts()) != 6:
             raise SystemExit("CLI practice did not persist a separate derived artifact")
+
+        disabled_path = root / "disabled-knowledge.json"
+        disabled_cli_kb = seed(max_derived_cases=0)
+        disabled_cli_kb.save(disabled_path)
+        disabled_process = subprocess.run(
+            [sys.executable, str(PROJECT / "crms_chat.py"),
+             "--knowledge", str(disabled_path),
+             "--index", str(index_path),
+             "--dialogue-state", str(root / "disabled-dialogue.json"),
+             "--rules", str(root / "disabled-rules.json")],
+            input=("/practice-question Who designed in Rome?\n"
+                   "/practice-inference Cal|designed in|Rome\n/quit\n"),
+            text=True, capture_output=True, check=True, timeout=20)
+        disabled_output = disabled_process.stdout.casefold()
+        if ("verified answer stored as a separate derived case."
+                in disabled_output
+                or disabled_output.count("no derived case was retained") != 1
+                or disabled_output.count("no derived case stored") != 1):
+            raise SystemExit("zero-cap CLI practice claimed write-back:\n"
+                             + disabled_process.stdout)
+        disabled_restored = CRMSKnowledgeBase.load(disabled_path)
+        if disabled_restored.derived_cases():
+            raise SystemExit("zero-cap CLI persisted a derived case")
 
         natural_knowledge_path = root / "natural-knowledge.json"
         natural_index_path = root / "natural-index.json"
