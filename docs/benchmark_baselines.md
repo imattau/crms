@@ -177,6 +177,15 @@ annotations, so this remains a partial-oracle replay. On dev-v4 it hypothesized 
 selected 63, and matched both labels on 52/68 (76.5%); 5 were ambiguous. The different method
 changes coverage and abstention, so its scores are not directly comparable with v1_395.
 
+After further dev-only changes to question typing and preference/reservation answers, the same
+transcript-derived replay at commit `ea523b1` hypothesized 66/124 classifiable turns, selected all
+66, and matched both labels on 58/66 (87.9%); it abstained on 58. The preceding transcript-typed
+replay at `144f8c9` matched 52/68 (76.5%). These are in-sample results: the same development labels
+guided the new rules. The replay still receives annotated open-question presence, predecessor act,
+and prior task intent, so it is not end-to-end performance or independent accuracy. Remaining
+disagreements suggest that active task intent does not yet distinguish a user's broad goal from a
+current subgoal, such as selecting a restaurant during a reservation flow.
+
 ### Frozen contextual-intent test pilot
 
 After commit `5afd9f5`, six complete conversations were labeled from the source corpus `test` split

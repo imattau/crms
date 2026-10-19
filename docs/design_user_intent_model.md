@@ -72,6 +72,23 @@ dev turns are now matched, with no newly mismatched dev predictions in that repl
 are in-sample fit because the examples guided the rules; no held-out score is claimed. The focused
 checks live in `experiments/v1_396_open_question_task_intent.py`.
 
+The next dev review found that yes/no question typing missed discourse-prefaced prompts (“Sure, did
+you need a reservation?”), prompts followed by examples (“Did you have preferences? For example,
+outdoor seating...”), and declarative reservation summaries awaiting approval (“So I have a
+reservation for five at 8pm”). CRMS now recognizes those as open questions/confirmations. An
+affirmative answer to a reservation offer enters the reservation task; declining it keeps the current
+task. A bare “yes” to a preference question asks for the actual preferences, while “no” continues
+without inventing values. A “Should I book this now?” prompt is typed as a confirmation. These
+behaviors are covered in `v1_396_open_question_task_intent.py`.
+
+On the same dev-v4 labels, the transcript-derived replay at commit `ea523b1` hypothesized 66/124
+classifiable turns, selected all 66, and matched both labels on 58/66 (87.9%); 58 turns abstained.
+The preceding replay at `144f8c9` matched 52/68 (76.5%). This is development-set fit: the labels
+guided these rules, and the replay still receives oracle open-question presence, predecessor act, and
+prior task intent. It is neither an end-to-end dialogue result nor independent accuracy evidence.
+The remaining disagreements point to an unresolved distinction between the broad user goal and the
+current subgoal, especially when selecting a restaurant within a reservation task.
+
 The first test pilot still measures commit `5afd9f5`; a second, disjoint test sample has since
 been evaluated on the implementation frozen at `8bd3b69`, as described below.
 
