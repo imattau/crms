@@ -58,8 +58,9 @@ expressions.
 
 **Measure:** exact result accuracy, derivation validity, supported-phrasing
 coverage, abstention on malformed or unsupported inputs, and runtime/memory
-bounds. Compare against a 70B-class model on the same answerable and
-must-abstain set, scoring exactness separately from explanation quality.
+bounds. Qualitatively compare the task breadth, answer presentation, and
+follow-up interaction a user can expect from a strong 70B-class assistant;
+keep any local exactness benchmark separate from published model scores.
 
 ### 2.2 Coding
 
@@ -78,8 +79,10 @@ surface without a threat and correctness review.
 
 **Measure:** held-out functional cases, test-passing rate, semantic equivalence
 to the learned procedure, wording transfer, and false-positive rate on
-unsupported requests. Compare with a 70B-class model on identical prompts and
-tests; score runnable correctness separately from explanation and code style.
+unsupported requests. Qualitatively compare code breadth, the information and
+format a user receives, and the revision interaction with a strong
+70B-class assistant; score runnable correctness separately from explanation
+and code style.
 
 ### 2.3 Language translation
 
@@ -98,9 +101,9 @@ clarification, not silently ranked as truth.
 
 **Measure:** held-out sentence adequacy, exact slot preservation, register
 compliance, ambiguity handling, and abstention for unseen translated slots.
-Compare against a 70B-class model using the same bilingual examples and test
-sentences, with human review for meaning and fluency; exact-match alone is not
-a sufficient translation metric.
+Qualitatively compare language coverage, fluency, register adaptation, and
+clarification behavior with a strong 70B-class assistant. Use human review for
+meaning and fluency; exact-match alone is not a sufficient translation metric.
 
 ## 3. Cross-domain composition
 
@@ -145,23 +148,25 @@ must disclose the incomplete stage rather than presenting a complete-looking
 answer. Start with two-stage tasks and held-out combinations; do not infer
 general composability from success on isolated domains.
 
-## 4. Evaluation against large-model comparators
+## 4. Qualitative comparison with large-model assistants
 
-Use pinned, versioned task sets and record model name/version, prompt, settings,
-date, and scoring method for every external comparison. Give the CRMS and
-70B-class systems the same task information and allowed tools. Separate:
+Use published model documentation and reports to describe typical capabilities
+and interaction patterns. Compare these with observed CRMS behavior on its
+own controlled experiments and runtime sessions. Focus on:
 
 - capability coverage: which tasks each system can attempt;
 - correctness on shared answerable cases;
 - uncertainty quality on unsupported and ambiguous cases;
 - evidence or explanation quality;
-- latency and memory/resource use.
+- answer form, conversational continuity, latency, and memory/resource use.
 
-Report per-domain and aggregate results, including sample size and confidence
-intervals where applicable. A strength in transparent evidence or resource
-use does not imply answer-quality parity. State a parity claim only for a
-defined task distribution where the measured results support it; otherwise
-publish the specific gaps and retain the roadmap status as incomplete.
+A live external model run is optional; do not block roadmap work on obtaining
+or running one. If a direct comparison is later useful, record model/version,
+prompt, settings, date, and scoring method, then report per-domain results and
+sample size. A strength in transparent evidence or resource use does not
+imply answer-quality parity. Publish specific gaps and retain the roadmap
+status as incomplete unless a defined task distribution supports a narrower
+parity claim.
 
 ## 5. Delivery order
 
@@ -172,8 +177,9 @@ publish the specific gaps and retain the roadmap status as incomplete.
 3. Improve math phrasing and exactness, code composition and functional
    validation, and translation alignment as independent workstreams.
 4. Re-run cross-domain compositions only after their component contracts pass.
-5. Compare with pinned 70B-class systems on shared tasks and publish measured
-   gaps. Do not use the comparator as a source of unreviewed training targets.
+5. Maintain a qualitative comparison with published 70B-class capabilities
+   and observed user interactions. A pinned shared-task comparison is optional
+   and should not be used as a source of unreviewed training targets.
 
 The existing focused experiments (`v1_206`, `v1_207`, `v1_217`, and `v1_268`)
 are useful component checks, but do not yet constitute the domain-wide or

@@ -157,10 +157,12 @@ and knowledge—while retaining explicit evidence and verification. Progress
 should be reported as task-specific coverage, correctness, abstention, and
 interaction quality. No parity claim is supported by the current measurements.
 
-## Suggested interaction evaluation
+## Optional future interaction evaluation
 
-For a later direct benchmark, use the same task text and source context for
-CRMS and one pinned comparator. Include natural follow-ups, corrections, and
+The qualitative comparison above is sufficient for roadmap direction; it does
+not depend on running a large model. If a later direct evaluation would answer
+a specific open question, use the same task text and source context for CRMS
+and one pinned comparator. Include natural follow-ups, corrections, and
 requests for concise versus detailed output. Score:
 
 1. whether every requested part was answered;

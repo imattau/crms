@@ -5,16 +5,14 @@
 CRMS has focused, reproducible checks for natural-language transfer,
 recombination, retrieval, math, coding, translation, and proof-backed
 reasoning, but these results are not a shared cross-domain score and do not
-establish equivalence to a large language model. The current container exposes
-an `ollama` executable but no reachable Ollama service (`ollama list` failed to
-connect to `127.0.0.1:11434` under the available runtime permissions), and no
-direct 70B-class comparator outputs are recorded here. A qualitative
-capability and interaction comparison, based on published model reports and
-the CRMS component results, is in
-[`capability_comparison_70b.md`](capability_comparison_70b.md). A direct
-head-to-head score still requires a pinned model/runtime on the same held-out
-tasks and context. Report component results and unsupported cases separately;
-make no parity claim.
+establish equivalence to a large language model. A qualitative capability and
+interaction comparison, based on published model reports and the CRMS
+component results, is in
+[`capability_comparison_70b.md`](capability_comparison_70b.md). It compares
+what a strong large instruction model can typically attempt, how it presents
+answers, and how it handles follow-ups against CRMS's measured behavior. No
+live large-model run is required. Report CRMS component results and
+unsupported cases separately; make no parity claim.
 
 ## Grounded math-to-list-code composition
 
