@@ -26,6 +26,8 @@ def require(condition: bool, message: str) -> None:
 
 
 def main() -> None:
+    require(len(FEATURE_NAMES) == 15 and len(set(FEATURE_NAMES)) == 15,
+            "ranker feature schema is not 15 unique named features")
     training = []
     sources = []
     for number in range(24):

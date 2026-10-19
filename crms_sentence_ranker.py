@@ -17,7 +17,7 @@ from typing import Any, Iterable, Mapping, Sequence
 from crms_nl_gate import _answer_type, _question_mentions, _stem, _tokens
 
 
-VERSION = 1
+VERSION = 2
 WH_TYPES = ("WHO", "WHEN", "WHERE", "MEASURE", "COUNT", "DEF", "NAME")
 FEATURE_NAMES = (
     "idf_weighted_question_coverage",
@@ -27,7 +27,6 @@ FEATURE_NAMES = (
     "named_mention_coverage",
     "log_sentence_length",
     "paragraph_first_sentence",
-    "normalized_matched_idf",
     "log_candidate_count",
     *(f"wh_type_{kind.casefold()}" for kind in WH_TYPES),
 )
@@ -72,7 +71,7 @@ def feature_vector(question: str, candidate: Mapping[str, Any], *,
                    candidate_count: int,
                    candidate_documents: Sequence[str] | None = None
                    ) -> tuple[float, ...]:
-    """Compute the named, deterministic 16-feature representation."""
+    """Compute the named, deterministic 15-feature representation."""
     if type(candidate_count) is not int or candidate_count < 1:
         raise ValueError("candidate_count must be a positive integer")
     sentence = str(candidate.get("text", ""))
@@ -122,14 +121,12 @@ def feature_vector(question: str, candidate: Mapping[str, Any], *,
     mention_coverage = mention_hits / len(mentions) if mentions else 1.0
     length = math.log1p(len(sentence_words)) / math.log1p(100.0)
     first_sentence = float(bool(candidate.get("paragraph_first_sentence", False)))
-    normalized_idf = (sum(idfs[term] for term in matched) /
-                      (max(total_idf, 1e-12)))
     candidate_log = math.log1p(candidate_count) / math.log1p(15.0)
     kind = _answer_type(question)
     type_flags = tuple(float(kind == value) for value in WH_TYPES)
     features = (coverage, fraction, proximity,
                 float(_typed_span(question, sentence)), mention_coverage,
-                length, first_sentence, normalized_idf, candidate_log,
+                length, first_sentence, candidate_log,
                 *type_flags)
     if len(features) != len(FEATURE_NAMES):
         raise AssertionError("ranker feature schema is inconsistent")
@@ -183,7 +180,8 @@ class SentenceRanker:
                 or parameter_values["l2"] < 0):
             raise ValueError("invalid stored training parameters")
 
-    def probability(self, features: Sequence[float]) -> float:
+    def score(self, features: Sequence[float]) -> float:
+        """Return the logistic score; it is not a calibrated probability."""
         if len(features) != len(self.weights):
             raise ValueError("feature vector does not match ranker schema")
         score = self.bias + sum(weight * value
@@ -236,7 +234,8 @@ def fit_ranker(rows: Iterable[tuple[Sequence[float], int]], *,
             for features, label in raw_data]
     if not data or any(len(features) != len(FEATURE_NAMES)
                        for features, _label in data):
-        raise ValueError("training rows must contain 16 features and binary labels")
+        raise ValueError(
+            f"training rows must contain {len(FEATURE_NAMES)} features and binary labels")
     if (not training_source_ids
             or any(not isinstance(source, str) or not source.strip()
                    for source in training_source_ids)):
@@ -288,9 +287,9 @@ def _score_candidates(question: str,
     for row in candidates:
         features = feature_vector(question, row, candidate_count=len(candidates),
                                   candidate_documents=texts)
-        scored.append({**row, "ranker_probability": model.probability(features),
+        scored.append({**row, "ranker_score": model.score(features),
                        "ranker_features": dict(zip(FEATURE_NAMES, features))})
-    scored.sort(key=lambda row: (-row["ranker_probability"],
+    scored.sort(key=lambda row: (-row["ranker_score"],
                                  str(row.get("citation", "")),
                                  str(row.get("text", "")).casefold()))
     return scored
@@ -320,7 +319,7 @@ def select_ranked_candidate(question: str,
     ranked = rank_candidates(question, candidates, model,
                              licensed_predicates=licensed_predicates)
     return (ranked[0] if ranked
-            and ranked[0]["ranker_probability"] >= model.threshold else None)
+            and ranked[0]["ranker_score"] >= model.threshold else None)
 
 
 def rank_gated_candidates(question: str, candidates: Sequence[Mapping[str, Any]],
@@ -335,5 +334,5 @@ def rank_gated_candidates(question: str, candidates: Sequence[Mapping[str, Any]]
     ranked = rank_candidates(question, candidates, model,
                              licensed_predicates=licensed_predicates)
     selected = (ranked[0] if ranked
-                and ranked[0]["ranker_probability"] >= model.threshold else None)
+                and ranked[0]["ranker_score"] >= model.threshold else None)
     return ranked, selected

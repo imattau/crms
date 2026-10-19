@@ -448,19 +448,21 @@ choosing among sentences the gate has already accepted.
   loop inside the project's provenance rules. Training on self-made cloze questions from CRMS's own
   source text was tested and works (high precision, lower coverage, see above); training on
   reviewed answers and ledger feedback is still untested.
-- Update the README so it states plainly that a small learned ranker exists (it currently says no
-  AI model is needed or downloaded; a shipped weights record is not a download, but the wording
-  must not imply there are no learned weights).
+- The README now distinguishes the optional learned ranker pilot from an external AI model:
+  normal chat does not use the pilot, and CRMS does not require a model download.
 
-**Pilot implementation status (2026-10-19).** `crms_sentence_ranker.py` now provides a small,
+**Pilot implementation status (2026-10-19).** `crms_sentence_ranker.py` provides a small,
 versioned logistic model, deterministic training, source IDs and a training-data digest, named
-feature traces, and threshold abstention. Its public ranking path first applies the unchanged
-quoted-evidence gate. `experiments/v1_345_sentence_ranker_pilot.py` checks those mechanics on a
-controlled fixture. This is not the ranker-quality evaluation described above: it does not use
-FTS-retrieved training and test candidates, does not measure fresh-corpus accuracy or latency, and
-is not connected to normal chat. Model scores are not calibrated probabilities yet. Keep the
-ranker disabled in chat until those conditions are measured; its results must not be described as
-an improvement to user-facing accuracy.
+feature traces, and threshold abstention. Schema v2 has 15 non-duplicated features; the earlier
+16-feature schema contained two identical IDF-coverage features. The output is explicitly a
+monotonic logistic score, not a calibrated probability. Its public ranking path first applies the
+unchanged quoted-evidence gate. `experiments/v1_345_sentence_ranker_pilot.py` checks those
+mechanics on a controlled fixture. The initial FTS-backed, disjoint-window SimpleWiki evaluation
+is now recorded in `benchmark_baselines.md`: the gate and ranker tied on 40 generated questions,
+including 16 with multiple gate-passing candidates. That is no evidence of a quality gain; the
+sample is too small and narrow for a deployment decision. Keep the ranker disabled in chat until
+larger independent corpora show a gain specifically on multi-candidate questions, and do not
+describe the pilot as improving user-facing accuracy.
 
 *Staged route.* (1) The feature-based ranker tested here. (2) A learned table of wording
 equivalences that is only ever a proposal for human review (section 3.6). (3) Embeddings as a
@@ -784,10 +786,12 @@ Each step: add a benchmark family or reuse the sets above, record the numbers in
    did (section 2.7: 74 to 83% precision on fresh articles depending on the training draw, against
    71% for the gate layer; a ranker trained only on CRMS's own cloze questions reached 79 to 90%
    at lower coverage). The
-   project owner has allowed a bounded learned ranker (section 2.7). Next: test it with less
-   training data (a learning curve), on the hand-written sets, on other text, and on FTS-supplied
-   candidates with latency; try training it on CRMS's own reviewed answers and ledger feedback
-   instead of an external dataset; and update the README wording. Until it ships, prefer abstaining
+   project owner has allowed a bounded learned ranker (section 2.7). An initial 40-question FTS
+   SimpleWiki evaluation tied the gate on both total answers and the 16 multi-candidate cases
+   (details in `benchmark_baselines.md`); this does not yet establish a gain. Next: test it with
+   more training data and independent held-out windows, on the hand-written sets and other text;
+   try training it on CRMS's own reviewed answers and ledger feedback
+   instead of an external dataset. Until it ships, prefer abstaining
    when several sentences pass, with role-order checks from 3.3 or corroboration by an independent
    second source as non-learned alternatives.
 10. **Pin the engine version in benchmarks.** Results moved between runs when the working tree

@@ -30,7 +30,8 @@ CRMS takes the opposite approach:
   and ways of asking questions, and it checks what it learned before trusting
   it.
 - **It runs on an ordinary computer.** No graphics card, no cloud service, and
-  no AI model downloaded from anywhere.
+  no external AI model is required or downloaded. An inspectable learned
+  sentence-ranker pilot exists, but normal chat does not use it.
 
 ## What it can do today
 

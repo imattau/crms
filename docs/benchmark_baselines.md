@@ -540,3 +540,25 @@ entity name. This is demonstrated transfer from repeated evidence, not broad lan
 read-only sample of four 1,000-document windows in SimpleWiki produced zero predicate alignments,
 and the expanded 5,000-document/60,000-sentence scan also produced zero, so corpus-derived transfer
 remains sparse in the sampled real corpus.
+
+## Gate-preserving sentence ranker on FTS candidates (initial sample)
+
+Command: `python3 experiments/v1_346_fts_sentence_ranker_evaluation.py --docs-per-window 100 --train-examples 40 --test-examples 40 --json-out /tmp/crms-ranker-fts-eval-v2.json`
+
+Read-only run on the 285,478-document SimpleWiki SQLite index. Training and test questions were
+generated from disjoint 100-document windows (offsets 20,000 and 220,000); test-window documents
+were excluded from the training candidate pool. Training produced 70 candidate rows (15 positive)
+from 40 generated questions. On 40 held-out generated questions, both the unchanged gate and the
+ranker answered 39 correctly, abstained once, and answered none incorrectly. Of 16 questions with
+at least two gate-passing candidates, both answered 15 correctly and abstained on one (100%
+precision among answers, 93.75% coverage). The ranker therefore showed no measured selection gain
+over the gate in this sample. Removing the target article left 15 questions with other-source
+candidates: 14 abstained and one selected a sentence that did not contain the generated gold
+answer. Median selector time was 0.41 ms for the ranker and 0.24 ms for the gate; the whole
+question-generation and FTS evaluation took 150.7 seconds, which is not chat latency.
+
+This is a narrow mechanism/evaluation check, not a quality result: questions are self-generated
+WHO clozes from leading-subject sentences, labels are weakly derived from those sentences, and only
+one small training/test draw was used. The ranker remains disabled in chat. Broader generated
+question types, multiple disjoint draws, human-written questions, and non-Wikipedia domains remain
+unmeasured.
