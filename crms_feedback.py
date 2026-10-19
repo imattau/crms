@@ -182,7 +182,13 @@ def collect_summary_feedback_refs(summary: Any) -> list[dict[str, Any]]:
 
 def collect_timeline_feedback_refs(result: Any) -> list[dict[str, Any]]:
     """Collect fact and wording-source lineage from written timeline events."""
+    return collect_writing_feedback_refs(result)
+
+
+def collect_writing_feedback_refs(result: Any) -> list[dict[str, Any]]:
+    """Collect claim, wording, and proof lineage from grounded writing output."""
     evidence_rows = []
+    proofs = []
     for statement in getattr(result, "statements", ()) or ():
         if not isinstance(statement, Mapping):
             continue
@@ -192,9 +198,31 @@ def collect_timeline_feedback_refs(result: Any) -> list[dict[str, Any]]:
         frame = statement.get("frame_evidence")
         if isinstance(frame, Mapping):
             evidence_rows.append(frame)
+        if statement.get("sources"):
+            evidence_rows.append({"sources": statement["sources"]})
+        if statement.get("rules"):
+            evidence_rows.extend({"rule_id": rule_id}
+                                 for rule_id in statement["rules"])
+        proofs.extend(statement.get("proofs", ()) or ())
+    for conflict in getattr(result, "conflicts", ()) or ():
+        if not isinstance(conflict, Mapping):
+            continue
+        for key in ("positive", "negative"):
+            row = conflict.get(key)
+            if isinstance(row, Mapping):
+                evidence_rows.append(row)
+        conflict_evidence = conflict.get("evidence", ()) or ()
+        for item in conflict_evidence:
+            if isinstance(item, Mapping):
+                evidence_rows.extend(
+                    row for row in (item.get("positive"), item.get("negative"))
+                    if isinstance(row, Mapping))
+        proofs.extend(conflict.get("inference_proofs", ()) or ())
     if not evidence_rows:
-        return []
-    return collect_feedback_refs(response={"evidence": evidence_rows})
+        if not proofs:
+            return []
+    return collect_feedback_refs(response={
+        "evidence": evidence_rows, "inference_proofs": proofs})
 
 
 def collect_translation_feedback_refs(result: Any) -> list[dict[str, Any]]:

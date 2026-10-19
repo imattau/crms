@@ -52,7 +52,7 @@ migrates without discarding its event history. A new natural-language turn clear
 opposite post-restart signals remain a reviewable conflict.
 `experiments/v1_367_persistent_feedback_context.py` checks those behaviors. The feedback system now
 covers direct facts, inference, translation, math, code generation, extractive summaries, paper
-authors/results, and timelines. Translation feedback fingerprints the aligned frame and examples;
+authors/results, entity summaries, and timelines. Translation feedback fingerprints the aligned frame and examples;
 math feedback fingerprints the expression, exact result, and licensed operator/number/unit evidence;
 code feedback identifies the generated artifact and its recorded instruction examples and parity
 cases; research feedback retains exact source citations and query-expansion licenses; timeline

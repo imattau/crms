@@ -19,6 +19,7 @@ from crms_feedback import (
     collect_math_feedback_refs,
     collect_summary_feedback_refs,
     collect_timeline_feedback_refs,
+    collect_writing_feedback_refs,
     collect_translation_feedback_refs, render_feedback_refs,
 )
 from crms_explain import render_verified_explanation
@@ -7208,6 +7209,11 @@ def main() -> int:
             try:
                 result = knowledge.write_about(fields[0], qualifiers=qualifiers)
                 print(f"CRMS> {result.text}")
+                writing_refs = collect_writing_feedback_refs(result)
+                remember_feedback(
+                    {"question": line, "answer": result.text,
+                     "evidence": writing_refs}
+                    if writing_refs else None)
             except (TypeError, ValueError) as error:
                 print(f"Could not write about {fields[0]}: {error}")
             continue
@@ -10249,11 +10255,14 @@ def main() -> int:
             if part_number == part_total:
                 print(f"Processed all {part_total} question parts separately.")
         answer_refs = collect_feedback_refs(turn.response, turn.research)
+        answer_refs.extend(collect_writing_feedback_refs(turn.writing))
         evidence_backed_answer = bool(
             (turn.response is not None
              and turn.response.status == "answered")
             or (turn.research is not None
-                and (turn.research.source_sentences or turn.research.passages)))
+                and (turn.research.source_sentences or turn.research.passages))
+            or (turn.writing is not None
+                and (turn.writing.statements or turn.writing.conflicts)))
         if evidence_backed_answer and answer_refs:
             remember_feedback({
                 "question": turn.resolved_question or line,

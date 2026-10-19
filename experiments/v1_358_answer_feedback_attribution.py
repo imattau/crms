@@ -21,6 +21,7 @@ from crms_feedback import (
     collect_feedback_refs,
     collect_math_feedback_refs, collect_translation_feedback_refs,
     collect_summary_feedback_refs, collect_timeline_feedback_refs,
+    collect_writing_feedback_refs,
     feedback_answer_id, render_feedback_refs,
 )
 from crms_knowledge import CRMSKnowledgeBase
@@ -142,6 +143,7 @@ def main() -> None:
         timeline_kb.teach_fact_pattern(
             f"{subject} founded {obj}.", subject=subject, relation="founded",
             obj=obj, source=source, predicate_phrase="founded")
+        timeline_kb.teach_about_frame(f"Tell me about {subject}", entity=subject)
     timeline_kb.add_fact("Ada", "founded", "Acme", "event:2012",
                          qualifiers={"year": "2012"})
     timeline_result = timeline_kb.write_timeline("Ada")
@@ -154,6 +156,11 @@ def main() -> None:
             and ("source", "event:2012") in {
                 (item["kind"], item["id"]) for item in timeline_refs},
             f"timeline feedback omitted fact or wording-source lineage: {timeline_refs}")
+    about_refs = collect_writing_feedback_refs(timeline_kb.write_about("Ada"))
+    require(any(item["kind"] == "fact" and item.get("subject") == "Ada"
+                and "event:2012" in item.get("sources", ())
+                for item in about_refs),
+            f"entity writing feedback omitted source-backed claims: {about_refs}")
     fact_ref = next((item for item in refs if item["kind"] == "fact"), None)
     require(fact_ref is not None
             and fact_ref["subject"] == "Ada"
@@ -482,20 +489,23 @@ def main() -> None:
                 "--translation-session", str(root / "translation-session.json")]
         run = subprocess.run(
             args,
-            input="Write a timeline for Ada ordered by year.\n"
-                  "/wrong\n/feedback\n/quit\n",
+            input=("Write a timeline for Ada ordered by year.\n/wrong\n"
+                   "/write-about Ada\n/right\nTell me about Ada\n/wrong\n"
+                   "/feedback\n/quit\n"),
             text=True, capture_output=True, timeout=30)
         require(run.returncode == 0, run.stderr or run.stdout)
-        events = AnswerFeedbackStore(root / "feedback.sqlite3").recent(1)
-        require(len(events) == 1
-                and any(item["kind"] == "fact"
-                        and item.get("subject") == "Ada"
-                        and item.get("object") == "Acme"
-                        for item in events[0]["evidence"])
-                and any(item["kind"] == "source"
-                        and item["id"] == "event:2012"
-                        for item in events[0]["evidence"]),
-                f"timeline feedback lost its exact claim/frame attribution: {events}")
+        events = AnswerFeedbackStore(root / "feedback.sqlite3").events()
+        require(len(events) == 3
+                and all(any(item["kind"] == "fact"
+                            and item.get("subject") == "Ada"
+                            and item.get("object") == "Acme"
+                            for item in event["evidence"])
+                        and any(item["kind"] == "source"
+                                and item["id"] == "event:2012"
+                                for item in event["evidence"])
+                        for event in events),
+                f"grounded writing feedback lost claim/source attribution: {events}\n"
+                f"chat output: {run.stdout}")
 
     print("answer feedback attribution: direct facts, rule, and source refs PASS")
     print("translation feedback ties to deterministic aligned-frame evidence: PASS")
@@ -508,7 +518,7 @@ def main() -> None:
     print("interactive summary feedback persists cited sources: PASS")
     print("paper author and main-result feedback retain exact citations: PASS")
     print("timeline feedback retains fact and wording-source lineage: PASS")
-    print("interactive timeline feedback persists cited fact attribution: PASS")
+    print("interactive timeline and entity-writing feedback retain claims: PASS")
     print("SQLite persistence, deterministic IDs, duplicate suppression: PASS")
     print("conflicting feedback retained for review without changing knowledge: PASS")
     print("wrong proof feedback suspends only validated learned rules: PASS")
