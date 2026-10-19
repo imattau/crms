@@ -129,6 +129,8 @@ def induce(rows: list[dict[str, str]], *, min_conversations: int = 2) -> dict:
             "labeler": next(iter(codex_reviewers)),
             "label_status": "single-annotator; provisional",
             "source_split": "train only",
+            "training_conversation_ids": sorted({
+                row["conversation_id"].strip() for row in train_rows}),
             "minimum_distinct_conversations": min_conversations,
             "training_turns": len(train_rows),
             "excluded_uncertain_or_blank_rows": unlabeled,

@@ -138,6 +138,10 @@ persistence, and train-only frames remain inert. Candidate induction is now avai
 `experiments/v1_392_induce_dialogue_intent_candidates.py`; on the 563-turn single-Codex-label batch
 it produced 15 exact-surface candidates, all inert, with citations and typed context. This is not
 an accuracy or paraphrase-transfer result, and no independently reviewed intent model is available.
+An offline check with `experiments/v1_393_evaluate_dialogue_intent_candidates.py` on one disjoint,
+Codex-labeled 16-turn dev conversation matched 3 turns (18.75% coverage); all 3 matched the same
+annotator's labels. The other 13 turns abstained. This is a small label-agreement diagnostic, not an
+accuracy estimate or an independent evaluation.
 
 ## Contextual intent: active task and expected slot
 

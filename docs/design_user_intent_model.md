@@ -245,6 +245,12 @@ candidates from 563 turns. It excluded 23 `social-exchange` turns and turns with
 predecessors, and recorded 21 repeated surfaces whose labels or contexts conflict. This is a first
 learning-path diagnostic, not a quality result: all examples are from train conversations, the
 labels have one annotator, and exact-surface repetition does not demonstrate paraphrase transfer.
+`experiments/v1_393_evaluate_dialogue_intent_candidates.py` checks candidate matching on disjoint
+dev conversations and rejects train/evaluation conversation overlap. A provisional, Codex-labeled
+16-turn dev conversation yielded 3 unique candidate matches (18.75% coverage); all 3 matched its
+primary labels, and the other 13 turns had no candidate. Because the same annotator produced both
+sets and the sample is one conversation, this is label agreement on a tiny sample—not accuracy or
+evidence of broad generalization.
 
 Once a frame has provenance-recorded training and held-out labels, store it in a versioned `dialogue`
 memory inside the portable SQLite model. Codex may produce the primary labels for both splits under
