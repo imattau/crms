@@ -8,6 +8,7 @@ Definition of success: exact references survive reload and no knowledge is mutat
 from __future__ import annotations
 
 import sys
+import subprocess
 import tempfile
 from pathlib import Path
 from types import SimpleNamespace
@@ -16,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from crms_feedback import AnswerFeedbackStore, collect_feedback_refs
+from crms_knowledge import CRMSKnowledgeBase
 
 
 def require(condition: bool, message: str) -> None:
@@ -78,9 +80,97 @@ def main() -> None:
         require([row["verdict"] for row in reloaded.recent(1)] == ["right"],
                 "bounded recent-event query returned the wrong event")
 
+    kb = CRMSKnowledgeBase()
+    kb.add_fact("Nia", "parent", "Oren", "family:no")
+    kb.add_fact("Oren", "parent", "Pia", "family:op")
+    kb.add_inference_rule("learned-grandparent", "parent", "parent",
+                          "grandparent")
+    kb.add_inference_rule("teacher-rule", "parent", "parent",
+                          "great-grandparent")
+    key = ("learned", "grandparent")
+    kb._inference_rule_validation[key] = {"status": "validated"}
+    before = kb.infer_relation("Nia", "grandparent", "Pia")
+    require(before.status == "answered" and before.proofs,
+            "validated learned rule did not support the answer before feedback")
+    changed = kb.flag_inference_rule_from_feedback(
+        "learned-grandparent", {
+            "answer_id": "feedback-1", "question": "Is Nia a grandparent of Pia?",
+            "answer": "Yes."})
+    require(changed, "wrong feedback did not flag a validated learned rule")
+    after = kb.infer_relation("Nia", "grandparent", "Pia")
+    require(after.status == "unknown",
+            "rule awaiting review still contributed to inference")
+    require(after.request is not None
+            and "user marked an answer" in after.request
+            and "feedback-1" in after.request,
+            "abstention misrepresented the feedback as proven evidence")
+    item = kb.list_inference_rules()[0]
+    require(item["status"] == "needs_review"
+            and item["validation"]["suspension_reason"] == "user_feedback"
+            and item["validation"]["feedback_reports"][0]["answer_id"]
+                == "feedback-1",
+            "feedback suspension was not visible with its reason")
+    require(not kb.flag_inference_rule_from_feedback(
+        "learned-grandparent", {
+            "answer_id": "feedback-1", "question": "Is Nia a grandparent of Pia?",
+            "answer": "Yes."}),
+        "duplicate feedback was applied twice to the rule")
+    require(not kb.flag_inference_rule_from_feedback(
+        "teacher-rule", {
+            "answer_id": "feedback-2", "question": "q", "answer": "a"}),
+        "unknown/teacher rule was altered")
+    with tempfile.TemporaryDirectory(prefix="crms-rule-feedback-") as directory:
+        path = Path(directory) / "knowledge.json"
+        kb.save(path)
+        restored = CRMSKnowledgeBase.load(path)
+        restored_rule = restored.list_inference_rules()[0]
+        require(restored_rule["status"] == "needs_review"
+                and restored_rule["validation"]["feedback_reports"][0]["answer_id"]
+                    == "feedback-1",
+                "feedback-based rule suspension did not persist")
+
+    with tempfile.TemporaryDirectory(prefix="crms-feedback-chat-") as directory:
+        root = Path(directory)
+        chat_kb = CRMSKnowledgeBase()
+        chat_kb.add_fact("Nia", "parent", "Oren", "family:no")
+        chat_kb.add_fact("Oren", "parent", "Pia", "family:op")
+        chat_kb.add_inference_rule("learned-grandparent", "parent", "parent",
+                                   "grandparent")
+        chat_kb._inference_rule_validation[key] = {
+            "status": "validated", "validation_source_prefix": "holdout:"}
+        knowledge_path = root / "knowledge.json"
+        chat_kb.save(knowledge_path)
+        args = [sys.executable, str(ROOT / "crms_chat.py"),
+                "--knowledge", str(knowledge_path),
+                "--feedback-db", str(root / "feedback.sqlite3"),
+                "--dialogue-state", str(root / "dialogue.json"),
+                "--rules", str(root / "rules.json"),
+                "--math", str(root / "math.json"),
+                "--math-session", str(root / "math-session.json"),
+                "--translations", str(root / "translations.json"),
+                "--translation-session", str(root / "translation-session.json")]
+        commands = ("/infer-relation Nia|grandparent|Pia\n/wrong\n"
+                    "/inference-rules\n/infer-relation Nia|grandparent|Pia\n/quit\n")
+        run = subprocess.run(args, input=commands, text=True, capture_output=True,
+                             timeout=30)
+        require(run.returncode == 0, run.stderr or run.stdout)
+        for phrase in ("Suspended validated learned rule(s) for review",
+                       "learned-grandparent [needs_review]",
+                       "user marked an answer using it wrong", "Feedback "):
+            require(phrase in run.stdout,
+                    f"interactive feedback omitted {phrase!r}: {run.stdout}")
+        require("contradictory source-backed evidence" not in run.stdout,
+                "user feedback was described as a verified source counterexample")
+        persisted = CRMSKnowledgeBase.load(knowledge_path).list_inference_rules()[0]
+        require(persisted["status"] == "needs_review",
+                "interactive feedback did not persist rule review status")
+
     print("answer feedback attribution: direct facts, rule, and source refs PASS")
     print("SQLite persistence, deterministic IDs, duplicate suppression: PASS")
     print("conflicting feedback retained for review without changing knowledge: PASS")
+    print("wrong proof feedback suspends only validated learned rules: PASS")
+    print("rule feedback reason persists; teacher and duplicate signals are protected: PASS")
+    print("interactive /wrong suspension and evidence-honest abstention: PASS")
 
 
 if __name__ == "__main__":

@@ -1312,6 +1312,41 @@ class CRMSKnowledgeBase:
                 if self._inference_rule_validation.get(key, {}).get(
                     "status", "validated") != "needs_review"]
 
+    def flag_inference_rule_from_feedback(
+            self, rule_id: str, feedback: Mapping[str, Any]) -> bool:
+        """Suspend a validated learned rule after explicit answer rejection.
+
+        User feedback is a review signal, not a proof that the rule is false.
+        Teacher-supplied rules and rules already awaiting review are left alone.
+        A fresh held-out validation and acceptance replaces this validation
+        record and can restore the learned rule.
+        """
+        key = _tokens(_display(rule_id, "rule id"))
+        if key not in self._inference_rules:
+            return False
+        current = self._inference_rule_validation.get(key)
+        if not isinstance(current, dict) or current.get("status") != "validated":
+            return False
+        answer_id = feedback.get("answer_id")
+        question = feedback.get("question")
+        answer = feedback.get("answer")
+        if not all(isinstance(value, str) and value.strip()
+                   for value in (answer_id, question, answer)):
+            raise ValueError("feedback must identify its answer and question")
+        reports = list(current.get("feedback_reports", []))
+        if any(isinstance(item, Mapping)
+               and item.get("answer_id") == answer_id for item in reports):
+            return False
+        reports.append({"answer_id": answer_id.strip(),
+                        "question": question.strip(),
+                        "answer": answer.strip()})
+        updated = copy.deepcopy(current)
+        updated["status"] = "needs_review"
+        updated["suspension_reason"] = "user_feedback"
+        updated["feedback_reports"] = reports
+        self._inference_rule_validation[key] = updated
+        return True
+
     def list_inference_rules(self) -> list[dict[str, Any]]:
         """List rules with their validation status and counterexample records."""
         rows = []
@@ -1916,14 +1951,38 @@ class CRMSKnowledgeBase:
                     _tokens(rule.rule_id)].get("counterexamples", [])
                 for source in counterexample.get("negative_sources", [])
             })
-            source_text = (" Counterexample source(s): " + ", ".join(sources) + "."
-                           if sources else "")
+            reports = sorted({
+                (str(report.get("answer_id", "")),
+                 str(report.get("question", "")))
+                for rule in suspended_rules
+                for report in self._inference_rule_validation[
+                    _tokens(rule.rule_id)].get("feedback_reports", [])
+                if isinstance(report, Mapping)
+            })
+            reasons = []
+            if reports:
+                reasons.append("a user marked an answer using it wrong")
+            if sources:
+                reasons.append("contradictory source-backed evidence")
+            if not reasons:
+                reasons.append("an earlier review flag")
+            detail_lines = []
+            if sources:
+                detail_lines.append("Counterexample source(s): "
+                                    + ", ".join(sources) + ".")
+            if reports:
+                detail_lines.extend(
+                    "Feedback " + (answer_id or "unknown")
+                    + (f" on {question}" if question else "") + "."
+                    for answer_id, question in reports)
             result = replace(
                 result,
                 request=("A previously validated rule for this relation is "
-                         "suspended after contradictory source-backed evidence. "
-                         "Review or correct the evidence, then revalidate the rule "
-                         "before using it." + source_text),
+                         "suspended for review after " + " and ".join(reasons)
+                         + ". Review the report and revalidate the rule before "
+                         "using it."
+                         + (("\n" + "\n".join(detail_lines))
+                            if detail_lines else "")),
                 reason_code="rule_needs_review",
                 failure_kind="rule_needs_review")
         return replace(result, language_evidence=language_evidence,

@@ -27,23 +27,29 @@ learning, "dreaming"), re-expressed without vectors.
 
 ### Current implementation checkpoint: answer feedback
 
-The chat now accepts `/right` and `/wrong` immediately after an evidence-backed answer, and `/feedback`
-lists the ten newest signals with their attached references. It writes
-an append-only event to a separate SQLite feedback database (`crms_feedback.sqlite3` by default)
-and captures the exact fact/source identifiers and inference rule identifiers available on that
-answer. Repeating the same verdict for the same answer is deduplicated; opposite verdicts are both
-retained and surfaced as a conflict for review. The command reports the references it attached.
-This is an input signal for future review and ledger work: it does **not** change fact acceptance,
-rule status, or answer ranking. Feedback whose answer has no attributable evidence is refused.
+The chat accepts `/right` and `/wrong` immediately after an evidence-backed answer, and `/feedback`
+lists the ten newest signals with their attached references. It writes an append-only event to a
+separate SQLite feedback database (`crms_feedback.sqlite3` by default) and captures the exact
+fact/source identifiers and inference rule identifiers available on that answer. Repeating the
+same verdict for the same answer is deduplicated; opposite verdicts are both retained and surfaced
+as a conflict for review. The command reports the references it attached. Feedback whose answer
+has no attributable evidence is refused.
+
+An explicit `/wrong` on a proof that used validated, automatically learned inference rules marks
+those learned rules `needs_review`, records the feedback id and answer, and excludes them from
+subsequent inference. Teacher-supplied rules and facts are unchanged. This is a reversible review
+state, not a proof that the rule is false: a fresh held-out validation and acceptance is required to
+restore a learned rule. `/right` records the signal but does not yet increase a rule or fact weight.
+Conflicting `/right` and `/wrong` feedback is logged without applying a new rule-state change.
 
 `experiments/v1_358_answer_feedback_attribution.py` checks stable attribution, persistence,
 duplicate suppression, and retention of contradictory signals. Temporary-store interactive chat
 runs verified `/wrong` on both a cited direct answer and `/infer-relation`, including its premise
-sources. Inference `why?` follow-ups also retain proof lineage. Remaining work includes persisting
+sources, and confirmed that a validated learned rule is withheld and its status persists after
+reload. Inference `why?` follow-ups also retain proof lineage. Remaining work includes persisting
 the immediate answer context across chat restarts, covering feedback on every specialized answer
-route, and connecting reviewed feedback to the evidence-ledger policy below. Until those steps are
-implemented, the feedback log is inspectable storage for learning signals, not a self-modifying
-rule or fact learner.
+route, connecting `/right` to evidence-ledger confirmation, and measuring revision/abstention on a
+larger noisy-feedback benchmark.
 
 ## 0. Ground rules (read first)
 

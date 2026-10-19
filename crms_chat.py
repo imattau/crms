@@ -5246,12 +5246,29 @@ def main() -> int:
                 print("CRMS> I recorded the conflicting feedback for review; "
                       "neither signal changes stored knowledge automatically.")
             else:
+                flagged_rules = []
+                if line == "/wrong":
+                    for item in last_feedback_record["evidence"]:
+                        if (item["kind"] == "rule"
+                                and knowledge.flag_inference_rule_from_feedback(
+                                    item["id"], {
+                                        "answer_id": feedback_id,
+                                        "question": last_feedback_record["question"],
+                                        "answer": last_feedback_record["answer"],
+                                    })):
+                            flagged_rules.append(item["id"])
+                    if flagged_rules:
+                        knowledge.save(args.knowledge)
                 evidence_summary = ", ".join(
                     f"{item['kind']}={item['id']}"
                     for item in last_feedback_record["evidence"])
                 print("CRMS> I recorded your feedback against "
                       f"{evidence_summary}. "
-                      "It will inform review; it does not change facts or rules by itself.")
+                      "It does not change facts by itself.")
+                if flagged_rules:
+                    print("CRMS> Suspended validated learned rule(s) for review: "
+                          + ", ".join(flagged_rules)
+                          + ". Revalidate and accept the rule to restore it.")
             continue
         if line == "/feedback":
             events = feedback_store.recent(10)
@@ -6513,6 +6530,10 @@ def main() -> int:
                           f"{counterexample['relation']} → "
                           f"{counterexample['object']} "
                           f"(negative sources: {sources}).")
+                for report in validation.get("feedback_reports", []):
+                    print("  User feedback: an answer using this rule was marked wrong "
+                          f"for {report.get('question', 'an unspecified question')} "
+                          f"(feedback {report.get('answer_id', 'unknown')}).")
             continue
         if line == "/suggest-inference-rules" or line.startswith("/suggest-inference-rules "):
             fields = [value.strip() for value in
