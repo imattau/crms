@@ -1,9 +1,12 @@
 # Design: contextual user intent
 
-**Status:** research design. CRMS does not yet have a learned user-intent model. The current
-`crms_conversation.py` recognizes a small set of anchored, content-free phrases; `CRMSDialogue`
-tracks recent entities and question/clarification state. These mechanisms do not constitute general
-contextual intent understanding.
+**Status:** research design with a narrow runtime baseline. User intent is part of the CRMS model
+capability, and it must be interpreted from the current utterance together with explicit discourse
+context. CRMS has hand-checked contextual rules and a portable dialogue-frame resolver, but it does
+not yet have an induced, independently validated user-intent model. The resolver supports exact
+surface patterns with typed context and predecessor conditions; this is a routing seam, not general
+contextual intent understanding. Reusable, reviewed frames belong in the distributable model, while
+live discourse context and turn-level hypotheses belong in session state.
 
 ## Current contextual baseline
 
