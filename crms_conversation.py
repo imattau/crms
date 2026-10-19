@@ -440,6 +440,37 @@ def classify_act(text: str) -> str | None:
     return None
 
 
+def _open_question_task_intent(dialogue: CRMSDialogue,
+                               open_question: dict[str, str]) -> str:
+    """Resolve a short answer's task from the open prompt and active goal.
+
+    The active task is session context; an explicit task named in the current
+    assistant prompt can start a more specific phase before the user's answer
+    supplies it. Search-constraint slots under an information-seeking task are
+    reported as constraints rather than inheriting the broad task label.
+    """
+    prompt = " ".join(open_question.get("prompt", "").casefold().split())
+    if (re.search(r"\b(?:cancel|cancell?ing)\b", prompt)
+            and re.search(r"\breserv(?:e|ation|ations)\b", prompt)):
+        return "cancel-reservation"
+    if (re.search(r"\b(?:change|modify|update)\b", prompt)
+            and re.search(r"\breserv(?:e|ation|ations)\b", prompt)):
+        return "change-reservation"
+    if (re.search(r"\b(?:book|booking)\b", prompt)
+            or (re.search(r"\bmake\b", prompt)
+                and re.search(r"\breserv(?:ation|ations)\b", prompt))):
+        return "make-reservation"
+
+    active_task = dialogue.active_task_intent
+    slot = open_question.get("expected_slot", "unknown")
+    search_constraint_slots = {
+        "location", "party_size", "date_time", "seating", "cuisine",
+    }
+    if active_task == "seek-information" and slot in search_constraint_slots:
+        return "provide-constraint"
+    return active_task or "continue-current-task"
+
+
 def is_farewell(text: str) -> bool:
     return classify_act(text) == "farewell"
 
@@ -609,8 +640,8 @@ def classify_user_intent(
                 or is_short_detail):
             return UserIntentHypothesis(
                 dialogue_act="answer-clarification",
-                task_intent=(dialogue.active_task_intent
-                             or "continue-current-task"),
+                task_intent=_open_question_task_intent(
+                    dialogue, open_question),
                 decision="selected",
                 matched_frame="answer-to-open-dialogue-question",
                 context_predicates=("pending_assistant_question",

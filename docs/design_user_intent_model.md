@@ -31,6 +31,18 @@ licenses a matching portable frame, survives reload, remains bounded, and clears
 or reset; `experiments/v1_365_contextual_clarification_intent.py` checks the existing clarification
 behavior.
 
+Short answers to a typed open assistant question now resolve task intent using both the saved active
+task and explicit task wording in that question. For example, a party-size answer during restaurant
+search is `provide-constraint`; an open prompt that asks when to make a reservation establishes
+`make-reservation` before the answer; explicit change or cancellation wording selects the matching
+task. The implementation is the bounded `_open_question_task_intent` rule in
+`crms_conversation.py`, checked by `experiments/v1_396_open_question_task_intent.py`. It does not
+infer tasks from arbitrary natural language or resolve the dialogue-act distinction between a
+generic clarification answer, an information provision, and a confirmation. On the four-conversation
+Codex-labeled dev replay, it changed joint label agreement from 51.6% to 54.8% among hypothesized
+turns (55.2% to 58.6% among selected turns), with coverage unchanged at 31/48. This is a small
+single-annotator agreement change, not an accuracy claim or evidence of broad intent understanding.
+
 The elaboration baseline recognizes a small set of equivalent content-free forms, including
 “Could you tell me more?”, “Can you say more?”, and “Could you elaborate?”. These use the same
 context policy as “Tell me more”: continue the current grounded topic, or ask which accepted entity

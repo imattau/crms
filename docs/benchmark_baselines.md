@@ -153,15 +153,16 @@ reviewed intent model is available.
 Codex-labeled dev conversations through the existing hand-checked intent router. When supplied
 annotated context state, the preceding assistant question, and prior labeled active-task intent, it
 produced hypotheses for 31/48 classifiable turns (64.6%): 29 selected and 2 ambiguous, with 17
-abstentions. Joint act-and-task-intent agreement with the same annotator was 16/31 (51.6%) among
-hypotheses and 16/29 (55.2%) among selected hypotheses. A context-free ablation hypothesized 16/48
-(33.3%) and matched 7/16 labels (43.8%). This shows explicit context changes which short turns the
-router can classify; it also exposes substantial mismatch, especially between generic
-`answer-clarification` and task-specific `provide-constraint`/`make-reservation` labels. The labels,
-context, and score all come from one Codex annotator, so this is not accuracy, independent
-validation, or end-to-end performance. Its purpose is to guide the next research design: learn
-dialogue act and task intent separately, condition them on typed question/slot and active-task
-context, and preserve ambiguity instead of forcing a task label.
+abstentions. After `v1_396` added bounded task resolution from the open prompt and typed slot, joint
+act-and-task-intent agreement with the same annotator was 17/31 (54.8%) among hypotheses and 17/29
+(58.6%) among selected hypotheses. The pre-change figures were 16/31 (51.6%) and 16/29 (55.2%).
+A context-free ablation hypothesized 16/48 (33.3%) and matched 7/16 labels (43.8%). Coverage did
+not change, and substantial mismatch remains, especially generic `answer-clarification` versus
+task-specific act labels and task changes not explicit in the preceding prompt. The labels, context,
+and score all come from one Codex annotator, so this is not accuracy, independent validation, or
+end-to-end performance. The change is a bounded rule, not learned generalization. The next research
+step remains separate dialogue-act and task-intent prediction, conditioned on typed question/slot
+and active-task context, with ambiguity preserved instead of forcing a task label.
 
 ## Contextual intent: active task and expected slot
 
