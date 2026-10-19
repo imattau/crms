@@ -135,7 +135,21 @@ chat startup, repacking, malformed-frame rejection, and legacy packaging without
 `experiments/v1_384_contextual_dialogue_frame_resolution.py` verifies that a held-out-validated
 literal frame routes only when its context and predecessor match, its citation survives state
 persistence, and train-only frames remain inert. The runtime still recognizes exact phrase matches
-only; no frame induction or human-labeled model is available, so this is not an accuracy result.
+only; no frame induction or independently reviewed intent model is available, so this is not an
+accuracy result.
+
+## Contextual intent: active task and expected slot
+
+Command: `python3 experiments/v1_390_contextual_intent_task_slot_diagnostic.py USER_TURNS.csv`
+
+On the 563-turn, 40-conversation single-Codex-label feasibility batch, there were eight repeated
+normalized user surfaces with multiple annotated act/intent pairs. A coarse partition by
+`context_state + predecessor_act` put six surfaces into internally consistent context buckets;
+the exploratory `active task + expected slot` signature also put six there and reduced rows in
+conflicted buckets from 10 to 9. The remaining ambiguous surfaces included “yes” and “San
+Francisco, California.” The features are small lexical cues from the latest assistant turn and
+recent user statements. This is descriptive label-consistency evidence only; it does not establish
+label correctness, held-out generalization, or improved runtime intent recognition.
 
 ## Balanced phrase recombination from three demonstrations
 

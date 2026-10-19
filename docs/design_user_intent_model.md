@@ -108,9 +108,20 @@ previous act. The report is reproducible with
 [`v1_387_contextual_intent_ambiguity.py`](../experiments/v1_387_contextual_intent_ambiguity.py).
 
 The next evaluation should compare context-free and context-aware decisions on the same held-out
-conversations, with the pending question and expected slot represented explicitly. The AI labels
-can guide candidate development and label-conditioned evaluation; report that comparison as
-agreement with the annotator, and do not treat it as independent correctness evidence.
+conversations, with the pending question, expected slot, and active task represented explicitly.
+The first context-feature diagnostic over the same 563 turns used lexical cues from the latest
+assistant question and recent user statements. On the eight repeated surfaces with conflicting
+act/intent labels, coarse `context_state + predecessor_act` partitioned six consistently; the new
+`active task + expected slot` signature also partitioned six, with one fewer row left in conflicted
+contexts (9 rather than 10). The two unresolved surfaces remained `yes` and `San Francisco,
+California`. This is a small descriptive result, not evidence that the feature set improves runtime
+accuracy. It supports representing the current question's expected slot and the active goal as
+separate typed context, while showing that keyword cues and the single-rater labels are too weak to
+license routing. The diagnostic is reproducible with
+[`v1_390_contextual_intent_task_slot_diagnostic.py`](../experiments/v1_390_contextual_intent_task_slot_diagnostic.py).
+
+The AI labels can guide candidate development and label-conditioned evaluation; report that
+comparison as agreement with the annotator, and do not treat it as independent correctness evidence.
 
 ## Why intent belongs in the model
 
