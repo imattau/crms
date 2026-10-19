@@ -1124,6 +1124,26 @@ class CRMSDialogue:
             visible_research = ResearchResult(
                 status=research.status, source_sentences=visible_sentences,
                 query=research.query)
+        if re.match(r"\s*how\s+many\b", resolved, flags=re.IGNORECASE):
+            quantity_words = {
+                "zero", "one", "two", "three", "four", "five", "six",
+                "seven", "eight", "nine", "ten", "eleven", "twelve",
+                "thirteen", "fourteen", "fifteen", "sixteen", "seventeen",
+                "eighteen", "nineteen", "twenty", "thirty", "forty",
+                "fifty", "sixty", "seventy", "eighty", "ninety", "hundred",
+                "thousand", "million", "billion", "dozen", "dozens",
+            }
+            has_quantity = bool(re.search(
+                r"\b\d+(?:[,.]\d+)*(?:\s*%|\s*(?:km|m|cm|mm|kg|g|lb|lbs))?\b",
+                quoted_text, flags=re.IGNORECASE)) or bool(
+                    quantity_words & {word.casefold()
+                                      for word in _WORD_RE.findall(quoted_text)})
+            if not has_quantity:
+                self.clear()
+                return DialogueTurn(
+                    "unknown", question, resolved,
+                    text=("The quoted source does not state a quantity, so I "
+                          "can't answer a ‘how many’ question from it."))
         missing = self._unanchored_question_entities(
             resolved, quoted_text, visible_research, research_index)
         if not missing:

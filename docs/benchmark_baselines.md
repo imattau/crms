@@ -183,17 +183,21 @@ semantic parser.
 Command: `python3 experiments/v1_435_dialogue_visible_evidence_anchor.py`.
 
 A varied corpus probe put the Eiffel Tower and Colosseum, and both
-"It was completed" sentences, in the same paragraph. After an explicit
-Colosseum switch, retrieval displayed the Eiffel Tower's 1889 sentence. The
-guard accepted it because a different, undisplayed candidate citation had a
-Colosseum antecedent. The guard now checks only citations included in the
-rendered reply. In the same-paragraph case CRMS abstains rather than attributing
-1889 to the Colosseum; the separate-paragraph control remains free of Eiffel
-leakage. The focused dialogue regressions `v1_412`, `v1_413`, `v1_414`,
-`v1_426`, `v1_427`, and `v1_418` also pass on this working tree. This closes
-the false citation-license path, but not retrieval ranking: a same-paragraph
-topic switch can still abstain where a stronger sentence selector should find
-the correct 80 CE sentence.
+"It was completed" sentences, in the same paragraph. Initially the Colosseum
+switch displayed the Eiffel Tower's 1889 sentence. Two changes address this:
+the evidence gate checks only citations shown in the reply, and retrieval now
+binds a sentence-initial pronoun to the nearest preceding explicit sentence
+subject rather than any entity mentioned somewhere in the paragraph. The
+same-paragraph transcript now selects 80 CE for the Colosseum, switches back to
+1889 for the Eiffel Tower, and keeps both follow-ups on the current topic. A
+constructed negative confirms an unseen 80 CE citation cannot license a
+visible 1889 citation. The same work exposed a related plausibility failure:
+"How many people could Italy hold?" quoted "Rome is the capital of Italy."
+CRMS now abstains when a `how many` reply contains no quantity. The separate-
+paragraph control and focused dialogue regressions `v1_412`, `v1_413`,
+`v1_414`, `v1_423`, `v1_426`, `v1_427`, and `v1_418` pass on this working tree.
+These are small authored fixtures; they test topic grounding and one answer
+type, not broad coreference or semantic answerability.
 
 ## Failed entity follow-up must not leave a stale explanation target
 

@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from crms_conversation import respond
 from crms_dialogue import CRMSDialogue
-from crms_knowledge import CRMSKnowledgeBase
+from crms_knowledge import CRMSKnowledgeBase, ResearchResult
 from crms_research import CRMSResearchIndex
 
 
@@ -37,25 +37,47 @@ def main() -> None:
         "The Eiffel Tower is in Paris. It was completed in 1889. "
         "The Colosseum is in Rome. It was completed in 80 CE.")
     turns = run_case(same_paragraph,
-                     ("And the Colosseum?", "When was it completed?"))
-    for number, turn in enumerate(turns[1:], 2):
-        require("1889" not in turn.text,
-                f"turn {number} attributed Eiffel evidence to the Colosseum: {turn!r}")
-    require(turns[1].status != "sources_found",
-            "an unseen Colosseum citation licensed the displayed Eiffel sentence")
-    require(turns[2].status == "unknown",
-            f"pronoun without a valid current topic did not abstain: {turns[2]!r}")
+                     ("And the Colosseum?", "When was it completed?",
+                      "And the Eiffel Tower?", "When was it completed?"))
+    for number, turn in enumerate(turns[1:3], 2):
+        require("80 CE" in turn.text and "1889" not in turn.text,
+                f"turn {number} did not keep the nearest Colosseum antecedent: {turn!r}")
+    for number, turn in enumerate(turns[3:], 4):
+        require("1889" in turn.text and "80 CE" not in turn.text,
+                f"turn {number} did not return to the Eiffel Tower evidence: {turn!r}")
+
+    with tempfile.TemporaryDirectory(prefix="crms-visible-anchor-gate-") as folder:
+        Path(folder, "travel.txt").write_text(same_paragraph, encoding="utf-8")
+        index = CRMSResearchIndex()
+        index.add_directory(folder)
+        knowledge = CRMSKnowledgeBase()
+        retrieved = knowledge.research("When was the Colosseum completed?", index)
+        right = next((item for item in retrieved.source_sentences or []
+                      if "80 CE" in item["text"]), None)
+        wrong_result = knowledge.research(
+            "When was the Eiffel Tower completed?", index)
+        wrong = next((item for item in wrong_result.source_sentences or []
+                      if "1889" in item["text"]), None)
+        require(wrong is not None and right is not None,
+                "fixture did not retrieve the wrong and correct citations")
+        synthetic_candidates = ResearchResult(
+            status="sources_found", source_sentences=[wrong, right])
+        checked = CRMSDialogue(knowledge)._reject_unanchored_source_answer(
+            "When was it completed?", "When was Colosseum completed?",
+            "Source text: " + wrong["text"], synthetic_candidates, index)
+        require(checked is not None and checked.status == "unknown",
+                "an undisplayed correct citation licensed the visible wrong date")
 
     separate_paragraphs = (
         "The Eiffel Tower is in Paris. It was completed in 1889.\n\n"
         "The Colosseum is in Rome. It was completed in 80 CE.")
     controls = run_case(separate_paragraphs, ("And the Colosseum?",))
-    require("1889" not in controls[1].text,
-            f"separate-paragraph topic switch leaked Eiffel evidence: {controls[1]!r}")
+    require("80 CE" in controls[1].text and "1889" not in controls[1].text,
+            f"separate-paragraph topic switch did not select Colosseum evidence: {controls[1]!r}")
 
-    print("unseen candidate citation cannot license displayed pronoun sentence: PASS")
-    print("same-paragraph cross-topic follow-up abstains safely: PASS")
-    print("separate-paragraph topic switch has no cross-topic leakage: PASS")
+    print("nearest explicit subject selects the correct same-paragraph date: PASS")
+    print("undisplayed citation cannot license the visible wrong date: PASS")
+    print("separate-paragraph topic switch selects the correct evidence: PASS")
 
 
 if __name__ == "__main__":

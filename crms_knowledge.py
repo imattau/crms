@@ -7667,7 +7667,7 @@ class CRMSKnowledgeBase:
             named_anchor_tokens.update(_tokens(term))
 
         def pronoun_sentence_is_anchored(sentence: Mapping[str, Any]) -> bool:
-            """Keep a short ``it`` sentence when its named antecedent is local."""
+            """Keep a short ``it`` sentence only under the nearest named subject."""
             text = str(sentence.get("text", ""))
             if not named_anchor_tokens or not re.match(
                     r"\s*(?:it|its)\b", text, flags=re.IGNORECASE):
@@ -7689,8 +7689,31 @@ class CRMSKnowledgeBase:
             paragraph_end = document.text.find("\n\n", start)
             if paragraph_end < 0:
                 paragraph_end = len(document.text)
-            paragraph = document.text[paragraph_start:paragraph_end]
-            return named_anchor_tokens.issubset(set(_tokens(paragraph)))
+            # A paragraph can introduce several entities, each followed by
+            # an "It ..." sentence. Presence somewhere in the paragraph is
+            # not enough to bind the pronoun. Find the nearest preceding
+            # sentence with an explicit subject and require that subject to
+            # match the question's named anchor.
+            prefix = document.text[paragraph_start:start]
+            subject_pattern = re.compile(
+                r"^\s*(?:(?:the|a|an)\s+)?"
+                r"(?P<subject>[A-Z][\w’'-]*(?:\s+[A-Z][\w’'-]*){0,5})"
+                r"\s+(?P<verb>is|was|are|were|has|have|had|can|could|"
+                r"will|would|did|does|do|became|built|created|designed|"
+                r"invented|won|founded|worked|lived|stood|stands|flows|"
+                r"lies|located|opened|contains|includes|held|holds|"
+                r"reached|produced|served)\b",
+                flags=re.IGNORECASE)
+            for prior_sentence in reversed(re.split(r"(?<=[.!?])\s+", prefix)):
+                match = subject_pattern.match(prior_sentence)
+                if match is None:
+                    continue
+                subject = match.group("subject")
+                if subject.casefold() in {
+                        "it", "he", "she", "they", "this", "that"}:
+                    continue
+                return named_anchor_tokens.issubset(set(_tokens(subject)))
+            return False
 
         if named_anchor_tokens:
             source_sentences = [
