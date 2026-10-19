@@ -369,8 +369,14 @@ chat-level routing path:
   `functional` relation types retain their specific integrity-conflict checks. The reasoning
   contract verifies both the untyped cycle warning (including a natural-language yes/no query)
   and the declared-schema path. Conflict with an explicit negative fact remains correctly
-  ambiguous. The remaining design gap is source-backed proposal and review of relation constraints;
-  current declarations are explicit teacher input.
+  ambiguous. A bounded source-backed proposal path now recognizes only an explicit affirmative
+  sentence naming a relation and one supported schema type, such as `The relation "parent of" is
+  irreflexive.` It enters the existing cited-fact review queue; it is not stored until accepted, and
+  acceptance retains the source citation used by integrity checks. Negated, conditional, and
+  ambiguous unquoted multiword statements are rejected by the extractor. This is not general
+  constraint discovery: relation labels and observed graph shapes do not imply a schema. Broader
+  linguistic variants, independent-source corroboration, and ordinary chat review wording remain
+  open.
 - **Reported timings remain below 0.1 seconds** for these cases, including 3,000 facts with
   two-level rules. This is evidence that a higher default could be affordable, but not a
   substitute for measuring adversarial branching and memory use.
@@ -386,8 +392,9 @@ The remaining issues are:
   `/teach-relation-type` path stores cited declarations for irreflexive, asymmetric, functional,
   transitive, symmetric, and closed-world behavior. The reasoning contract verifies constraint
   conflicts, cyclic-support ambiguity without a declaration, and persistence. CRMS must not infer
-  constraints from a relation label. A source-backed proposal-and-review path for constraints is
-  still future work.
+  constraints from a relation label. A narrow explicit-source proposal-and-review path is tested by
+  `experiments/v1_349_reviewed_relation_schema_proposals.py`; automatic constraint discovery,
+  broader source wording, and corroboration policies remain future work.
 - **Query-local tabling is implemented.** The inference call memoizes complete positive proof sets
   by goal and remaining depth. `v1_309` checks two reused recursive subgoals on a converging graph,
   verifies the resulting proof independently, and confirms that fact retraction is visible to the

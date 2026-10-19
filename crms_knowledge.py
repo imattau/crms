@@ -6593,12 +6593,66 @@ class CRMSKnowledgeBase:
 
     def propose_facts_from_hit(self, sentence: str, *,
                                research_index: Any, hit: Any) -> list[FactCandidate]:
-        """Propose facts only from a sentence present in a verified source hit."""
+        """Propose cited facts, including explicit relation-schema claims.
+
+        Relation types are proposed only when a source sentence explicitly
+        names both a relation and one supported schema type. The proposal is
+        still an ordinary review-only fact candidate; relation names alone do
+        not imply integrity constraints.
+        """
         citation = research_index.citation(hit)
         excerpt = research_index.resolve_citation(citation)
         if sentence not in excerpt:
             raise ValueError("candidate sentence is not contained in the cited passage")
-        return self.propose_facts(sentence, source=citation)
+        proposals = self.propose_facts(sentence, source=citation)
+        schema = self._propose_explicit_relation_type(sentence, citation)
+        if schema is not None:
+            key = (schema.subject.casefold(), schema.relation.casefold(),
+                   schema.object.casefold(), schema.source,
+                   schema.polarity, schema.qualifiers)
+            proposals = [candidate for candidate in proposals
+                         if (candidate.subject.casefold(),
+                             candidate.relation.casefold(),
+                             candidate.object.casefold(), candidate.source,
+                             candidate.polarity, candidate.qualifiers) != key]
+            proposals.append(schema)
+        return sorted(proposals, key=lambda candidate: (
+            candidate.subject.casefold(), candidate.relation.casefold(),
+            candidate.object.casefold(), candidate.polarity,
+            candidate.source))
+
+    @staticmethod
+    def _propose_explicit_relation_type(
+            sentence: str, source: str) -> FactCandidate | None:
+        """Extract only a literal, affirmative relation-type declaration."""
+        schema_pattern = (
+            r"transitive|symmetric|irreflexive|asymmetric|functional|"
+            r"closed[- ]world")
+        pattern = re.compile(
+            r"\s*the\s+relation\s+(?:"
+            r"\"(?P<double>[^\"\r\n]+)\"|"
+            r"'(?P<single>[^'\r\n]+)'|"
+            r"(?P<bare>[\w][\w'-]*)"
+            r")\s+is\s+(?P<schema>" + schema_pattern +
+            r")(?:\s+relation)?\s*[.!?]?\s*\Z",
+            re.IGNORECASE)
+        match = pattern.fullmatch(sentence)
+        if match is None:
+            return None
+        relation = next((match.group(name) for name in
+                         ("double", "single", "bare")
+                         if match.group(name) is not None), "").strip()
+        relation_type = match.group("schema").casefold().replace(" ", "-")
+        if not relation or not _tokens(relation):
+            return None
+        return FactCandidate(
+            relation, "has relation type", relation_type, source,
+            "explicit relation schema declaration", sentence, True,
+            ({"kind": "relation_type_schema_discovery",
+              "method": "explicit relation declaration sentence",
+              "review_required": True,
+              "declared_relation_type": relation_type,
+              "sources": [source]},))
 
     @staticmethod
     def _realize_question_from_passive_source(
