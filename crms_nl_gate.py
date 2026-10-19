@@ -227,6 +227,37 @@ def _role_order_mismatch(question: str, sentence: str,
     return False
 
 
+def _where_anchor_is_located_entity(sentence: str,
+                                    mentions: list[list[str]]) -> bool:
+    """Require a named WHERE anchor to occur before the locative relation.
+
+    A target can appear only as the destination of an unrelated subject
+    ("The Colosseum is in Rome, Italy"). That sentence supports where the
+    Colosseum is, but does not answer where Italy is. This conservative role
+    check handles direct subject-first clauses and abstains on other forms.
+    """
+    words = [word.casefold() for word in _tokens(sentence)]
+    relation_words = {
+        "in", "at", "near", "located", "based", "lies", "situated",
+        "through", "across", "along", "within", "born", "work", "worked",
+        "works", "working", "live", "lived", "lives", "living", "from",
+    }
+    relation_positions = [index for index, word in enumerate(words)
+                          if word in relation_words]
+    if not relation_positions:
+        return False
+    first_relation = min(relation_positions)
+    for group in mentions:
+        anchor = [word.casefold() for word in group if word.casefold() not in _STOP]
+        if not anchor:
+            continue
+        for start in range(len(words) - len(anchor) + 1):
+            if words[start:start + len(anchor)] == anchor:
+                if start < first_relation:
+                    return True
+    return False
+
+
 def _check_candidate(question: str, sentence: str,
                      licensed_predicates: list[dict[str, Any]]
                      ) -> tuple[bool, list[str], int]:
@@ -296,6 +327,10 @@ def _check_candidate(question: str, sentence: str,
                 r"across|along|within|born|work(?:s|ed|ing)?|live(?:s|d|ing)?|from)\b",
                 sentence, flags=re.IGNORECASE):
             reasons.append("no locative relation in sentence")
+        if (kind == "WHERE" and mentions
+                and not _where_anchor_is_located_entity(sentence, mentions)):
+            reasons.append(
+                "named entity appears as a location, not as the located subject")
         requested_place_type = re.search(
             r"\bwhich\s+(?P<type>institute|university|laboratory|"
             r"research\s+center|observatory)\b",

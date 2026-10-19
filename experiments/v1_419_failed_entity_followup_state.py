@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from crms_dialogue import CRMSDialogue
 from crms_knowledge import CRMSKnowledgeBase
+from crms_nl_gate import gate_quoted_evidence
 from crms_research import CRMSResearchIndex
 
 
@@ -21,6 +22,19 @@ def require(condition: bool, message: str) -> None:
 
 
 def main() -> None:
+    unrelated_location = gate_quoted_evidence(
+        "Where is Italy?",
+        [{"text": "The Colosseum is an amphitheatre in Rome, Italy."}])
+    require(unrelated_location["status"] == "rejected"
+            and any("not as the located subject" in reason
+                    for reason in unrelated_location["reasons"]),
+            f"a location mention was mistaken for its subject: {unrelated_location!r}")
+    related_location = gate_quoted_evidence(
+        "Where is the Colosseum?",
+        [{"text": "The Colosseum is an amphitheatre in Rome, Italy."}])
+    require(related_location["status"] == "accepted",
+            f"valid subject-first location evidence was rejected: {related_location!r}")
+
     with tempfile.TemporaryDirectory(prefix="crms-failed-followup-") as folder:
         root = Path(folder)
         docs = root / "docs"
@@ -101,17 +115,19 @@ def main() -> None:
                 and "amphitheatre" not in replies[3]
                 and "iron tower" not in replies[3],
                 f"CLI why? replayed evidence for an earlier entity: {replies[3]!r}")
-        require("colosseum" in replies[4].casefold()
-                and "quoted evidence" in replies[4].casefold(),
-                f"CLI pronoun did not use Italy as topic with clear evidence limits: {replies[4]!r}")
-        require("used this quoted source sentence as evidence" in replies[5].casefold()
-                and "colosseum" in replies[5].casefold()
+        require("where is italy" not in replies[4].casefold()
+                and "won't guess" in replies[4].casefold()
+                and "not as the located subject" in replies[4].casefold(),
+                f"CLI treated a mention as an answer about Italy: {replies[4]!r}")
+        require("won't guess" in replies[5].casefold()
+                and "not as the located subject" in replies[5].casefold()
                 and "iron tower" not in replies[5].casefold(),
-                f"CLI why? did not explain the latest source-only turn: {replies[5]!r}")
+                f"CLI why? failed to explain the evidence rejection: {replies[5]!r}")
 
     print("failed entity follow-up preserves topic but clears stale answer: PASS")
     print("why? does not replay the prior entity's answer: PASS")
     print("full CLI topic-switch and failed-follow-up sequence: PASS")
+    print("location gate distinguishes target subject from a place mention: PASS")
 
 
 if __name__ == "__main__":

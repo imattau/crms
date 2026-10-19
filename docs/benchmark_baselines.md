@@ -184,6 +184,16 @@ and asks what the user wants to know; a following “it” binds to that topic, 
 not claim that all elliptical topic changes are understood; unsupported
 switches still need clarification or abstention.
 
+The same sequence exposed a source-role error: “The Colosseum is … in Rome,
+Italy” was accepted as an answer to “Where is Italy?” because the target name
+and a locative phrase appeared somewhere in the sentence. The evidence gate
+now requires the named WHERE anchor to precede the locative relation in the
+sentence. It accepts the same evidence for “Where is the Colosseum?” and
+rejects it for Italy, while the reported Everest and Turing location questions
+remain supported. This conservative subject-first check may abstain on valid
+inverted or relative-clause wording; those forms need separately licensed role
+patterns.
+
 ## Grounded math-to-list-code composition
 
 Command: `python3 experiments/v1_356_grounded_math_list_composition.py`
