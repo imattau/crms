@@ -1621,3 +1621,22 @@ it does not show independence across publishers, robust paraphrase handling, or
 general rule induction over naturally occurring text. The next evaluation must
 use naturally occurring, independently sourced instructions and independently
 written requests while retaining these controls.
+
+## Cited doctest span retrieval across research indexes (2026-10-20)
+
+Command: `python3 experiments/v1_432_cited_doctest_rule_learning.py`.
+
+Research search now returns a complete short doctest paragraph when a matched
+sentence belongs to one, preserving the prompt and result in the citation.
+The experiment searches and resolves exact citations through both the
+in-memory and SQLite-backed indexes. It also covers CRLF documents and
+whitespace-only blank separators. Both official documentation examples remain
+positive-only; after two separately identified, unattributed teacher contrasts,
+the learned sort rule passes three held-out lists, its generated Python passes
+independent checks, and unsupported rotation remains unlicensed.
+
+Runtime result: all focused checks passed; `v1_430` and `v1_431` also passed
+when rerun alongside it. This validates citation spans and one bounded
+teacher-guided rule path. It does not demonstrate induction from source text
+alone, broad coding skill, or natural-language transfer across diverse
+instructions.
