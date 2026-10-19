@@ -113,6 +113,73 @@ def _proof_fact_keys(proof: Any) -> set[tuple[Any, ...]]:
     return found
 
 
+def _proof_rule_ids(proof: Any) -> set[str]:
+    found: set[str] = set()
+    stack = [proof]
+    while stack:
+        node = stack.pop()
+        if not isinstance(node, Mapping):
+            continue
+        rule = node.get("rule")
+        if isinstance(rule, Mapping) and rule.get("rule_id"):
+            found.add(str(rule["rule_id"]))
+        premises = node.get("premises", ())
+        if isinstance(premises, (list, tuple)):
+            stack.extend(premises)
+    return found
+
+
+def _source_statistics(sources: Iterable[str], research_index: Any | None,
+                       origin_map: Mapping[str, str] | None
+                       ) -> tuple[tuple[str, ...], tuple[str, ...], int | None,
+                                  bool | None, bool, bool]:
+    source_values = tuple(sorted(set(str(source) for source in sources
+                                     if str(source).strip())))
+    documents = tuple(sorted({_document(source) for source in source_values}))
+    origins = tuple(sorted({_origin_for_source(document, research_index, origin_map)
+                            for document in documents}))
+    teacher = "teacher" in origins
+    external_origins = {origin for origin in origins if origin != "teacher"}
+    support_hashes: list[tuple[str, str]] = []
+    unresolved_external = False
+    for source in source_values:
+        document = _document(source)
+        origin = _origin_for_source(document, research_index, origin_map)
+        if origin == "teacher":
+            continue
+        if research_index is None or "#sha256=" not in source:
+            unresolved_external = True
+            continue
+        try:
+            cited_text = research_index.resolve_citation(source)
+        except (KeyError, ValueError, OSError):
+            unresolved_external = True
+            continue
+        digest = hashlib.sha256(
+            " ".join(_tokens(cited_text)).encode("utf-8")).hexdigest()
+        support_hashes.append((origin, digest))
+    copied: bool | None
+    independent_origins: int | None
+    if not source_values:
+        copied, independent_origins, available = None, None, False
+    elif not unresolved_external:
+        owners: dict[str, set[str]] = {}
+        for origin, digest in support_hashes:
+            owners.setdefault(digest, set()).add(origin)
+        copied = any(len(supporting_origins) > 1
+                     for supporting_origins in owners.values())
+        independent_origins = len({min(supporting_origins)
+                                    for supporting_origins in owners.values()})
+        available = True
+    elif len(external_origins) <= 1:
+        independent_origins = len(external_origins)
+        copied = False
+        available = True
+    else:
+        copied, independent_origins, available = None, None, False
+    return (documents, origins, independent_origins, copied, teacher, available)
+
+
 def _stable_id(fact: Mapping[str, Any], polarity: bool) -> str:
     payload = json.dumps(
         _fact_key(fact, polarity), sort_keys=True, ensure_ascii=False,
@@ -158,59 +225,9 @@ def support_report(knowledge_base: Any, *, min_dependents: int = 3,
                 "object": fact.object, "qualifiers": fact.qualifiers,
             }
             key = _fact_key(fact_map, polarity)
-            documents = tuple(sorted({_document(source) for source in fact.sources
-                                      if _document(source)}))
-            origins = tuple(sorted({_origin_for_source(source, research_index, origin_map)
-                                    for source in documents}))
-            teacher = "teacher" in origins
-            external_origins = {origin for origin in origins
-                                if origin != "teacher"}
-            support_hashes: list[tuple[str, str]] = []
-            unresolved_external = False
-            for source in fact.sources:
-                document = _document(source)
-                origin = _origin_for_source(document, research_index, origin_map)
-                if origin == "teacher":
-                    continue
-                if research_index is None or "#sha256=" not in str(source):
-                    unresolved_external = True
-                    continue
-                try:
-                    cited_text = research_index.resolve_citation(str(source))
-                except (KeyError, ValueError, OSError):
-                    unresolved_external = True
-                    continue
-                digest = hashlib.sha256(
-                    " ".join(_tokens(cited_text)).encode("utf-8")).hexdigest()
-                support_hashes.append((origin, digest))
-            copied = None
-            if not unresolved_external:
-                hashes_by_origin: dict[str, set[str]] = {}
-                for origin, digest in support_hashes:
-                    hashes_by_origin.setdefault(origin, set()).add(digest)
-                hashes_by_origin = {origin: hashes for origin, hashes in
-                                    hashes_by_origin.items() if origin != "teacher"}
-                owners: dict[str, set[str]] = {}
-                for origin, hashes in hashes_by_origin.items():
-                    for digest in hashes:
-                        owners.setdefault(digest, set()).add(origin)
-                copied = any(len(owners_for_hash) > 1
-                             for owners_for_hash in owners.values())
-                # A verbatim statement copied across origins contributes once.
-                independent_origin_set = {
-                    min(owners_for_hash)
-                    for owners_for_hash in owners.values()
-                }
-                independent_origins = len(independent_origin_set)
-                origin_count_available = True
-            elif len(external_origins) <= 1:
-                # Copies cannot raise a count of one known external origin.
-                independent_origins = len(external_origins)
-                origin_count_available = True
-                copied = False
-            else:
-                independent_origins = None
-                origin_count_available = False
+            (documents, origins, independent_origins, copied, teacher,
+             origin_count_available) = _source_statistics(
+                fact.sources, research_index, origin_map)
             dependent_cases = dependencies.get(key, set())
             risk = ("thin" if len(dependent_cases) >= min_dependents
                     and origin_count_available
@@ -223,5 +240,41 @@ def support_report(knowledge_base: Any, *, min_dependents: int = 3,
                 "fact", _stable_id(fact_map, polarity), label,
                 len(dependent_cases), documents, origins, independent_origins,
                 copied, teacher, risk, origin_count_available))
+
+    rule_dependents: dict[str, set[str]] = {}
+    for case in verified_cases:
+        case_id = json.dumps(case.get("conclusion", {}), sort_keys=True,
+                             ensure_ascii=False)
+        for proof in case.get("proofs", ()):
+            for rule_id in _proof_rule_ids(proof):
+                rule_dependents.setdefault(rule_id, set()).add(case_id)
+    for rule in getattr(knowledge_base, "_inference_rules", {}).values():
+        validation = getattr(knowledge_base, "_inference_rule_validation", {}).get(
+            _tokens(rule.rule_id), {})
+        sources = set()
+        for field in ("training_positive_examples", "positive_examples"):
+            for example in validation.get(field, ()):
+                if not isinstance(example, Mapping):
+                    continue
+                for fact in example.values():
+                    if isinstance(fact, Mapping):
+                        sources.update(str(source) for source in fact.get("sources", ()))
+        (documents, origins, independent_origins, copied, teacher,
+         origin_count_available) = _source_statistics(
+            sources, research_index, origin_map)
+        dependents = rule_dependents.get(rule.rule_id, set())
+        risk = ("thin" if len(dependents) >= min_dependents
+                and origin_count_available
+                and independent_origins < min_origins else "unassessed")
+        label = (f"Rule {rule.rule_id}: {rule.first_relation} then "
+                 f"{rule.second_relation} ⇒ {rule.conclusion_relation}")
+        if rule.third_relation:
+            label = (f"Rule {rule.rule_id}: {rule.first_relation} then "
+                     f"{rule.second_relation} then {rule.third_relation} ⇒ "
+                     f"{rule.conclusion_relation}")
+        rows.append(SupportRow(
+            "rule", hashlib.sha256(rule.rule_id.encode("utf-8")).hexdigest()[:20],
+            label, len(dependents), documents, origins, independent_origins,
+            copied, teacher, risk, origin_count_available))
     return sorted(rows, key=lambda row: (
         -row.dependents, row.label.casefold(), row.item_id))

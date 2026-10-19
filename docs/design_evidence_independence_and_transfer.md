@@ -3,9 +3,9 @@
 **Audience:** the developer (human or AI) implementing this.
 **Status:** staged. Section 3 has a deterministic first implementation in
 `experiments/v1_315_cross_surface_question_transfer.py` with its baseline recorded in
-`benchmark_baselines.md`. A read-only fact-to-derived-case dependency and independent-origin
-report is implemented in `crms_support_report.py` and covered by
-`experiments/v1_344_fact_support_dependency_report.py`. Rule/frame dependents and section 2's
+`benchmark_baselines.md`. A read-only fact/rule dependency and independent-origin report is
+implemented in `crms_support_report.py` and covered by
+`experiments/v1_344_fact_support_dependency_report.py`. Frame dependents and section 2's
 source-reliability ledger remain proposed.
 **Origin:** diagnostics and test designs taken from the HPM working paper ("Human Learning as
 Hierarchical Pattern Modelling", included in the HPM Learning Agent repo), re-expressed for
@@ -59,7 +59,10 @@ so verbatim copies across origins count as one independent statement. Without re
 multiple origins remain unassessed rather than being assumed independent. It flags a fact as thin
 only when at least the configured number of verified derived cases depend on it and the available
 independent-origin count is below the configured minimum. Other rows say `unassessed`, not `ok`.
-The report uses exact proof leaves and does not change facts, derived cases, weights, or answers.
+Accepted inference rules report the stored positive training and holdout evidence and count
+verified derived cases whose proof cites the rule ID. Manually installed rules without saved
+validation provenance remain unassessed. Frame dependents are not yet counted. The report uses
+exact proof leaves and does not change facts, rules, derived cases, weights, or answers.
 
 These diagnostics supplement recombination, rule discovery, reasoning, and evidence validation;
 they do not replace them.

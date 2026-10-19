@@ -60,6 +60,45 @@ def main() -> None:
     require(before_facts == after_facts and before_cases == after_cases,
             "read-only report mutated accepted facts or derived cases")
 
+    learned = CRMSKnowledgeBase()
+    for group, prefix in (("training", "train:"), ("holdout", "holdout:")):
+        for number in range(2):
+            subject, middle, target = (f"{group}{number}A", f"{group}{number}B",
+                                       f"{group}{number}C")
+            source = f"{prefix}{number}"
+            learned.add_fact(subject, "parent", middle, source)
+            learned.add_fact(middle, "parent", target, source)
+            learned.add_fact(subject, "ancestor", target, source)
+    review = learned.review_inference_rules("holdout:")
+    candidate_number = next(number for number, item in enumerate(review.reviews, 1)
+                            if (item.candidate.first_relation,
+                                item.candidate.second_relation,
+                                item.candidate.conclusion_relation)
+                            == ("parent", "parent", "ancestor"))
+    accepted = learned.accept_inference_rule_candidate(
+        candidate_number, "accepted-parent-chain", "holdout:")
+    require(accepted.accepted, f"source-backed rule acceptance failed: {accepted}")
+    for index in range(3):
+        subject, middle, target = (f"probe{index}A", f"probe{index}B",
+                                   f"probe{index}C")
+        learned.add_fact(subject, "parent", middle, f"probe:{index}:left")
+        learned.add_fact(middle, "parent", target, f"probe:{index}:right")
+        result = learned.practice_relation(subject, "ancestor", target)
+        require(result.status == "answered", f"accepted rule did not derive: {result}")
+    learned_rows = support_report(learned, min_dependents=3)
+    rule_row = next(row for row in learned_rows
+                    if row.item_kind == "rule"
+                    and row.label.startswith("Rule accepted-parent-chain:"))
+    require(rule_row.dependents == 3,
+            f"rule use in verified cases was not counted: {rule_row}")
+    require(set(rule_row.source_documents) >= {"train:0", "train:1",
+                                               "holdout:0", "holdout:1"},
+            f"stored train/holdout provenance was not reported: {rule_row}")
+    require(rule_row.independent_origins is None
+            and not rule_row.origin_count_available
+            and rule_row.risk == "unassessed",
+            f"unresolvable rule citations were overstated: {rule_row}")
+
     with tempfile.TemporaryDirectory(prefix="crms-v1-344-") as folder:
         index = CRMSSQLiteResearchIndex(Path(folder) / "research.sqlite")
         index.add_document("copy-a", "Copy A", "A parent of B.",
@@ -114,6 +153,7 @@ def main() -> None:
     print("PASS: teacher support and thin-support flag are reported")
     print("PASS: teacher support does not count as an external origin")
     print("PASS: deterministic report leaves facts and derived cases unchanged")
+    print("PASS: accepted rule records training/holdout support and derived dependents")
     print("PASS: citation text detects copies across distinct URL origins")
     print("PASS: unresolved multi-origin citations stay unassessed")
     print("PASS: configured origin mappings group related publishers")
