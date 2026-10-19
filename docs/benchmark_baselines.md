@@ -842,3 +842,22 @@ checker; tampering with the proof form is rejected. Unregistered schema names
 and proof forms are refused. The existing `v1_349`, `v1_350`, and `v1_351`
 schema-proposal, inference, explanation, and scope tests also pass. This is a
 consistency and proof-contract regression, not automatic schema learning.
+
+## Cross-shape reasoning graph baseline
+
+Command: `python3 experiments/v1_376_reasoning_graph_benchmark.py`
+
+The experiment checks nine cases: 35-hop recursion, a depth-9 path in a 2,047-node binary tree,
+a ten-layer diamond, direct positive/negative conflict, negative-only evidence, a complete miss,
+an expansion-limited search, a cycle-backed self-relation, and a declared irreflexive denial.
+Positive proofs and constraint denials are checked independently; each semantic result is replayed
+to check deterministic status, bounds, shortest proof depth, proof count, reason and proof content. All nine matched their
+expected status and completeness in the current run. Negative-only evidence remained `unknown`;
+the budget-limited case remained incomplete with `expansion_limit`; the diamond returned 64 proofs
+with `proof_limit`; and the cycle returned an ambiguity rather than an unqualified self-relation.
+
+On this local run, with `tracemalloc` enabled, the 35-hop chain took 78 ms and peaked at 212 KiB;
+the tree took 997 ms and peaked at 6,616 KiB; and the proof-capped diamond took 348 ms and peaked at
+556 KiB. These are machine- and instrumentation-specific observations, not performance thresholds.
+The initial graph matrix improves coverage over the focused regressions, but does not yet include
+larger adversarial branching graphs, nonlinear recursive joins, or a broad query distribution.

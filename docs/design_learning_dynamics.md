@@ -540,10 +540,13 @@ The remaining issues are:
 
 ### 8.2 Recommended implementation order
 
-1. **Broaden the reasoning benchmark.** The focused regressions now cover chains through 35 rule
-   applications, a 2,047-node tree, repeated recursive subgoals, proof caps, shortest paths, and
-   retraction between calls. Add larger branching graphs and report rule depth, expansions, proof
-   count, elapsed time, peak memory, and termination reason before raising limits further.
+1. **Broaden the reasoning benchmark.** `experiments/v1_376_reasoning_graph_benchmark.py` now gives
+   an initial cross-shape baseline: a 35-hop recursive chain, a 2,047-node tree, a proof-capped
+   diamond, explicit contradiction, negative-only and complete misses, an expansion-limited query,
+   a cyclic self-relation, and a declared integrity denial. It checks deterministic semantic replay
+   and independently verifies positive proofs and denials. It records search bounds, shortest proof
+   depth, expansions, proof count, elapsed time, peak traced memory, and termination reason. Larger and more adversarial
+   branching graphs still need measurement before raising search limits further.
 2. **Extend variable queries and inverse relations.** Indexed joins now cover extensional rules,
    a common self-recursive form in either supported endpoint orientation, and mutually recursive
    linear rules for both answer directions. Next, evaluate nonlinear recursion and selective join
@@ -562,10 +565,11 @@ The focused regression `experiments/v1_310_recursive_reasoning_default_depth.py`
 proofs independently, and checks that explicitly requesting depth 8 still reports an incomplete
 search. `experiments/v1_309_long_transitivity_proofs.py` additionally checks memoized overlapping
 recursive subgoals, a ten-layer proof-capped diamond, shortest-path selection, and fact retraction
-between inference calls. These complement, but do not replace, a broader deterministic benchmark
-covering recursive rules across chain and branching graph sizes, cycles and planted contradictions,
-and positive, negative, unknown, and budget-exhausted queries. Record answer status, shortest proof
-length, proofs materialized, expansion count, elapsed time, peak memory, and termination reason.
+between inference calls. `experiments/v1_376_reasoning_graph_benchmark.py` adds an initial
+deterministic status/resource matrix, including cycles, explicit contradictions, open-world
+negative-only evidence, complete misses, and budget exhaustion. It complements rather than replaces
+larger branching graphs and adversarial recursive joins. Continue recording answer status, shortest
+proof length, proofs materialized, expansion count, elapsed time, peak memory, and termination reason.
 Score correctness and abstention separately: an unknown caused by a documented budget is not a
 false answer, but remains a completeness failure for cases whose proof fits the declared target
 limits.
