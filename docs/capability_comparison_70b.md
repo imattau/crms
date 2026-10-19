@@ -89,6 +89,8 @@ These results are component evidence, not a single overall capability score:
   sequence with a second formula that returns exact fractions. It also checks
   deterministic provenance, refusal when either stage lacks support, a polite
   natural-language function request, and chat explanation/evidence follow-ups.
+  It also checks that stage-specific failures suggest the right next step and
+  that an explanation after a failed generation does not reuse stale code.
   This demonstrates reuse across two
   cross-domain combinations, not the planning breadth or interaction
   flexibility of a 70B+ model.

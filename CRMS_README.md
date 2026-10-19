@@ -4594,6 +4594,9 @@ two-stage pattern, not general task planning. Its request parser accepts
 “then”, “and then”, and “After [list stage], map … over each value” formulations
 while requiring the same learned operation support. See
 `experiments/v1_357_cross_domain_list_math_composition.py`.
+When a stage is unsupported, chat names whether the list procedure or math
+expression needs support and offers a relevant next step. A failed generation
+also clears the prior artifact from code explanation/evidence follow-ups.
 After generating code in the current chat session, a user can ask “Explain that
 code” or “What does it do?” to inspect its learned operation, aligned examples,
 and recorded parity checks. The explanation is rendered from the typed artifact

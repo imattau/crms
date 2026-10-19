@@ -10,8 +10,8 @@ PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
 from crms_codegen import (
-    describe_generated_code, generate_list_then_math_python, render,
-    show_generated_code_evidence,
+    describe_generated_code, diagnose_list_then_math_support,
+    generate_list_then_math_python, render, show_generated_code_evidence,
 )
 from crms_knowledge import CRMSKnowledgeBase
 from crms_math import CRMSMath
@@ -148,6 +148,15 @@ def main() -> None:
             and generate_list_then_math_python(
                 rules, math, REQUEST.replace("x plus 3", "x zarg 3")) is None,
             "unsupported list or math component did not abstain")
+    math_gap = diagnose_list_then_math_support(
+        rules, math, REQUEST.replace("x plus 3", "x zarg 3"))
+    list_gap = diagnose_list_then_math_support(
+        rules, math,
+        "rotate the list then apply x times x plus 3 to each value")
+    require(math_gap is not None and "list step is supported" in math_gap
+            and "math expression" in math_gap
+            and list_gap is not None and "first list step" in list_gap,
+            "composition abstention did not identify its unsupported stage")
 
     with tempfile.TemporaryDirectory(prefix="crms-cross-domain-chat-") as folder:
         root = Path(folder)
@@ -171,14 +180,23 @@ def main() -> None:
             command,
             input=("Could you please write me a Python function that "
                    f"{REQUEST_VARIANTS[1]}?\nExplain that code\n"
-                   "Show the examples for that code\n/quit\n"),
+                   "Show the examples for that code\n"
+                   "Write Python code to sort the list then apply x zarg 3 to "
+                   "each value\nExplain that code\n"
+                   "Write Python code to rotate the list then apply x times x "
+                   "plus 3 to each value\n/quit\n"),
             text=True, capture_output=True, cwd=root, check=False, timeout=30)
         require(run.returncode == 0
                 and "Generated composed Python" in run.stdout
                 and "Both stages" in run.stdout
                 and "Evidence for generated artifact crms-code-v1-" in run.stdout
                 and "sort the list then reverse the values" in run.stdout
-                and "plus" in run.stdout and "times" in run.stdout,
+                and "plus" in run.stdout and "times" in run.stdout
+                and "The list step is supported, but I couldn't resolve the "
+                    "math expression" in run.stdout
+                and "There is no recent generated code artifact to explain."
+                    in run.stdout
+                and "I couldn't resolve the first list step" in run.stdout,
                 f"natural-language composed chat flow failed:\n"
                 f"{run.stdout}\n{run.stderr}")
 

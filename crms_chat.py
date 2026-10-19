@@ -14,7 +14,8 @@ from typing import Any
 from crms_dialogue import CRMSDialogue
 from crms_explain import render_verified_explanation
 from crms_codegen import (
-    describe_generated_code, generate_list_then_math_python,
+    describe_generated_code, diagnose_list_then_math_support,
+    generate_list_then_math_python,
     generate_mapped_math_python,
     generate_math_python, generate_python,
     generate_unit_conversion_python, natural_language_request,
@@ -5327,13 +5328,18 @@ def main() -> int:
         if line in {"/help", "/help all"}:
             print(HELP if line == "/help all" else HELP_SHORT)
             continue
-        if last_generated_code is not None:
-            if _natural_code_evidence_request(line):
+        if _natural_code_evidence_request(line):
+            if last_generated_code is not None:
                 print("CRMS> " + show_generated_code_evidence(last_generated_code))
-                continue
-            if _natural_code_explanation_request(line):
+            else:
+                print("CRMS> There is no recent generated code artifact to show examples for.")
+            continue
+        if _natural_code_explanation_request(line):
+            if last_generated_code is not None:
                 print("CRMS> " + describe_generated_code(last_generated_code))
-                continue
+            else:
+                print("CRMS> There is no recent generated code artifact to explain.")
+            continue
         if line == "/reset":
             dialogue.clear()
             pending_candidates = []
@@ -8408,6 +8414,13 @@ def main() -> int:
                 rules, math_model, code_instruction,
                 grounded_cardinals=rules.grounded_cardinal_phrases())
             if generated_code is None:
+                support_message = diagnose_list_then_math_support(
+                    rules, math_model, code_instruction,
+                    grounded_cardinals=rules.grounded_cardinal_phrases())
+                if support_message is not None:
+                    last_generated_code = None
+                    print("CRMS> " + support_message)
+                    continue
                 generated_code = generate_python(rules, code_instruction)
             if generated_code is None:
                 generated_code = generate_mapped_math_python(
@@ -8422,6 +8435,8 @@ def main() -> int:
                     math_model, code_instruction)
             if generated_code is not None:
                 last_generated_code = generated_code
+            else:
+                last_generated_code = None
             print(f"CRMS> {render_codegen(generated_code, code_instruction)}")
             continue
         latest_topic = _natural_latest_research_request(line)

@@ -825,12 +825,9 @@ def generate_mapped_math_python(
         evidence_details=scalar.evidence_details)
 
 
-def generate_list_then_math_python(
-        model: CRMSModel, math_model: CRMSMath, instruction: str, *,
-        grounded_cardinals: dict[
-            tuple[str, ...], tuple[int, tuple[str, ...]]] | None = None
-        ) -> GeneratedCode | None:
-    """Compose a learned list procedure with an exact learned math mapping."""
+def _split_list_then_math_instruction(
+        instruction: str) -> tuple[str, str] | None:
+    """Parse the supported two-stage request shapes without resolving them."""
     suffix = (
         r"\s*(?:apply|map)\s+(.+?)\s+(?:to|over)\s+each\s+"
         r"(?:integer|number|value|item)(?:\s+in\s+(?:the\s+)?"
@@ -845,12 +842,52 @@ def generate_list_then_math_python(
             instruction, flags=re.IGNORECASE)
     if match is None:
         return None
-    list_instruction, expression = match.group(1).strip(), match.group(2).strip()
+    return match.group(1).strip(), match.group(2).strip()
+
+
+def diagnose_list_then_math_support(
+        model: CRMSModel, math_model: CRMSMath, instruction: str, *,
+        grounded_cardinals: dict[
+            tuple[str, ...], tuple[int, tuple[str, ...]]] | None = None
+        ) -> str | None:
+    """Return a grounded next-step message for a recognized failed composition."""
+    parts = _split_list_then_math_instruction(instruction)
+    if parts is None:
+        return None
+    list_instruction, expression = parts
     list_artifact = generate_python(model, list_instruction)
+    if list_artifact is None:
+        return ("I couldn't resolve the first list step to a supported learned "
+                "procedure. Teach that operation with input/output examples "
+                "or rephrase it using a procedure CRMS already knows.")
     math_instruction = f"apply {expression} to each value in the list"
     math_artifact = generate_mapped_math_python(
         math_model, math_instruction, grounded_cardinals=grounded_cardinals)
-    if list_artifact is None or math_artifact is None:
+    if math_artifact is None:
+        return ("The list step is supported, but I couldn't resolve the math "
+                "expression using learned exact operators. Teach the missing "
+                "operator with examples or rephrase it with operators CRMS "
+                "already knows.")
+    return None
+
+
+def generate_list_then_math_python(
+        model: CRMSModel, math_model: CRMSMath, instruction: str, *,
+        grounded_cardinals: dict[
+            tuple[str, ...], tuple[int, tuple[str, ...]]] | None = None
+        ) -> GeneratedCode | None:
+    """Compose a learned list procedure with an exact learned math mapping."""
+    parts = _split_list_then_math_instruction(instruction)
+    if parts is None:
+        return None
+    list_instruction, expression = parts
+    list_artifact = generate_python(model, list_instruction)
+    if list_artifact is None:
+        return None
+    math_instruction = f"apply {expression} to each value in the list"
+    math_artifact = generate_mapped_math_python(
+        math_model, math_instruction, grounded_cardinals=grounded_cardinals)
+    if math_artifact is None:
         return None
 
     def rename_names(source: str, names: dict[str, str]) -> str:
