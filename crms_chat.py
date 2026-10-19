@@ -5267,7 +5267,6 @@ def main() -> int:
     last_summary_scoped_hit = None
     last_research_evidence: dict | None = None
     last_answer_had_inference_proof = False
-    last_user_intent = None
     last_feedback_record: dict[str, Any] | None = None
     latest_research_documents: list[dict] = []
     current_effort = "standard"
@@ -5475,12 +5474,12 @@ def main() -> int:
                 print(f"Reasoning effort set to {current_effort} for this session.")
             continue
         if line == "/intent":
-            if last_user_intent is None:
+            if dialogue.last_intent_hypothesis is None:
                 print("CRMS> I don't have an inspectable intent hypothesis for the last turn.")
             else:
                 print("CRMS> Last turn's intent hypothesis "
                       "(hand-checked runtime rules; not learned):")
-                print(json.dumps(asdict(last_user_intent),
+                print(json.dumps(asdict(dialogue.last_intent_hypothesis),
                                  ensure_ascii=False, indent=2))
             continue
         explanation_followup = _natural_research_explanation_request(line)
@@ -8940,7 +8939,6 @@ def main() -> int:
         turn = respond_conversation(
             dialogue, line, research_index=index,
             pending_claims=len(pending_candidates))
-        last_user_intent = turn.intent_hypothesis
         compound_pronoun_focus: str | None = None
         if (compound_part is not None
                 and turn.resolved_question

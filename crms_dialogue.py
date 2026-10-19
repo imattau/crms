@@ -143,6 +143,7 @@ class CRMSDialogue:
         self.pending_result: QuestionResult | None = None
         self.last_question: str | None = None
         self.last_selected_answer: str | None = None
+        self.last_intent_hypothesis: UserIntentHypothesis | None = None
         self.last_writing_subject: str | None = None
         self.last_writing_request: str | None = None
         self.last_timeline_subject: str | None = None
@@ -157,6 +158,7 @@ class CRMSDialogue:
         self.object_entity = None
         self.last_question = None
         self.last_selected_answer = None
+        self.last_intent_hypothesis = None
         self.last_writing_subject = None
         self.last_writing_request = None
         self.last_timeline_subject = None
@@ -1385,7 +1387,7 @@ class CRMSDialogue:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(
-            json.dumps({"format_version": 8, "last_entity": self.last_entity,
+            json.dumps({"format_version": 9, "last_entity": self.last_entity,
                         "subject_entity": self.subject_entity,
                         "object_entity": self.object_entity,
                         "last_question": self.last_question,
@@ -1397,7 +1399,10 @@ class CRMSDialogue:
                         "last_timeline_order_by": self.last_timeline_order_by,
                         "pending_question": self.pending_question,
                         "pending_result": asdict(self.pending_result)
-                        if self.pending_result else None},
+                        if self.pending_result else None,
+                        "last_intent_hypothesis": (
+                            asdict(self.last_intent_hypothesis)
+                            if self.last_intent_hypothesis else None)},
                        ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8")
 
@@ -1405,7 +1410,7 @@ class CRMSDialogue:
     def load(cls, knowledge: CRMSKnowledgeBase, path: str, *,
              research_index: Any | None = None) -> "CRMSDialogue":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
-        if payload.get("format_version") not in (1, 2, 3, 4, 5, 6, 7, 8):
+        if payload.get("format_version") not in (1, 2, 3, 4, 5, 6, 7, 8, 9):
             raise ValueError("unsupported dialogue-state format version")
         dialogue = cls(knowledge)
         last_question = payload.get("last_question")
@@ -1510,4 +1515,53 @@ class CRMSDialogue:
                 raise ValueError("stored pending clarification is malformed")
             dialogue.pending_question = pending_question
             dialogue.pending_result = QuestionResult(**pending_result)
+        raw_intent = payload.get("last_intent_hypothesis")
+        if raw_intent is not None:
+            intent_fields = {
+                "dialogue_act", "task_intent", "decision", "matched_frame",
+                "context_predicates", "alternatives", "selected_value", "basis",
+            }
+            if (not isinstance(raw_intent, dict)
+                    or set(raw_intent) != intent_fields):
+                raise ValueError("stored intent hypothesis is malformed")
+            dialogue_act = raw_intent.get("dialogue_act")
+            task_intent = raw_intent.get("task_intent")
+            decision = raw_intent.get("decision")
+            matched_frame = raw_intent.get("matched_frame")
+            context_predicates = raw_intent.get("context_predicates", [])
+            alternatives = raw_intent.get("alternatives", [])
+            selected_value = raw_intent.get("selected_value")
+            basis = raw_intent.get("basis")
+            if (not isinstance(dialogue_act, str) or not dialogue_act.strip()
+                    or len(dialogue_act) > 80
+                    or (task_intent is not None
+                        and (not isinstance(task_intent, str)
+                             or len(task_intent) > 120))
+                    or not isinstance(decision, str)
+                    or decision not in {"selected", "ambiguous", "unlicensed"}
+                    or (matched_frame is not None
+                        and (not isinstance(matched_frame, str)
+                             or len(matched_frame) > 120))
+                    or not isinstance(context_predicates, list)
+                    or len(context_predicates) > 16
+                    or any(not isinstance(value, str) or len(value) > 120
+                           for value in context_predicates)
+                    or not isinstance(alternatives, list) or len(alternatives) > 32
+                    or any(not isinstance(value, str) or len(value) > 512
+                           for value in alternatives)
+                    or (selected_value is not None
+                        and (not isinstance(selected_value, str)
+                             or len(selected_value) > 512))
+                    or basis != "hand_checked_runtime_rule"):
+                raise ValueError("stored intent hypothesis is malformed")
+            dialogue.last_intent_hypothesis = UserIntentHypothesis(
+                dialogue_act=dialogue_act,
+                task_intent=task_intent,
+                decision=decision,
+                matched_frame=matched_frame,
+                context_predicates=tuple(context_predicates),
+                alternatives=tuple(alternatives),
+                selected_value=selected_value,
+                basis=basis,
+            )
         return dialogue

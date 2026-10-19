@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 import tempfile
@@ -172,6 +173,30 @@ def main() -> None:
                 and '"selected_value": "the Difference Engine"' in completed.stdout
                 and "hand-checked runtime rules; not learned" in completed.stdout,
                 f"/intent did not expose the selected contextual intent: {completed.stdout}")
+        restarted = subprocess.run(
+            command, input="/intent\nGoodbye\n", text=True,
+            capture_output=True, check=True, timeout=30)
+        require("Last turn's intent hypothesis" in restarted.stdout
+                and '"selected_value": "the Difference Engine"' in restarted.stdout,
+                f"saved intent hypothesis was lost on restart: {restarted.stdout}")
+        state_path = root / "dialogue.json"
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        legacy_state = {key: value for key, value in state.items()
+                        if key != "last_intent_hypothesis"}
+        legacy_state["format_version"] = 8
+        state_path.write_text(json.dumps(legacy_state), encoding="utf-8")
+        legacy_dialogue = CRMSDialogue.load(knowledge, str(state_path))
+        require(legacy_dialogue.last_intent_hypothesis is None,
+                "legacy dialogue state did not load without an intent hypothesis")
+        state_path.write_text(json.dumps(state), encoding="utf-8")
+        state["last_intent_hypothesis"]["basis"] = "unverified"
+        state_path.write_text(json.dumps(state), encoding="utf-8")
+        try:
+            CRMSDialogue.load(knowledge, str(state_path))
+        except ValueError:
+            pass
+        else:
+            raise SystemExit("tampered intent-state basis was trusted")
 
     print("yes/no with an open choice preserves clarification state: PASS")
     print("ordinal selection after acknowledgement resolves the original candidates: PASS")
@@ -179,6 +204,9 @@ def main() -> None:
     print("unanchored yes/no asks for context instead of querying the corpus: PASS")
     print("terminal interaction retains context across the clarification sequence: PASS")
     print("/intent exposes the last turn's contextual hypothesis on demand: PASS")
+    print("saved intent hypothesis survives a chat restart: PASS")
+    print("legacy dialogue state loads without intent metadata: PASS")
+    print("tampered saved intent hypothesis is rejected: PASS")
 
 
 if __name__ == "__main__":

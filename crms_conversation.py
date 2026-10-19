@@ -176,6 +176,7 @@ def respond(dialogue: CRMSDialogue, text: str, *,
 
     def with_intent(turn: DialogueTurn) -> DialogueTurn:
         turn.intent_hypothesis = intent
+        dialogue.last_intent_hypothesis = intent
         return turn
 
     mixed_greeting = _MIXED_GREETING_RE.fullmatch(text.strip())

@@ -18,7 +18,9 @@ retrieval. It also distinguishes an explanation follow-up after a grounded answe
 (when known), decision, matched frame, context predicates, alternatives, selected value, and that the
 basis is a hand-checked runtime rule. It is inspectable but not learned or corpus-licensed;
 unsupported turns have no hypothesis. `/intent` exposes the last hypothesis on demand in the
-interactive chat without adding diagnostics to ordinary answers. Regression coverage is in
+interactive chat without adding diagnostics to ordinary answers. The last hypothesis is saved in
+the versioned dialogue state and validated when reloaded, so the diagnostic survives a restart.
+Regression coverage is in
 `experiments/v1_365_contextual_clarification_intent.py`.
 
 ## Why intent belongs in the model
