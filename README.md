@@ -63,6 +63,8 @@ Other things it can currently do:
   session-closing farewells without treating them as source searches. Greetings
   report the facts and source documents actually loaded.
 - Hold simple conversations that remember what you were just talking about.
+- Recall a small set of user-provided task details, such as a requested location,
+  time, party size, seating, cuisine, or restaurant choice, during the same session.
 
 ## What it can't do (yet)
 
@@ -76,8 +78,8 @@ Being honest about limits is part of the project:
 - Its understanding of wording is **narrow**. It can miss a question that a
   person would find obviously similar to one it handled.
 - Conversation is still **limited**. It retains a bounded clarification
-  question and can continue one topic's accepted facts, while general task-slot
-  tracking and open-ended dialogue remain incomplete.
+  question and a small set of session-only task details, but it cannot track
+  arbitrary task slots, fill forms, or sustain open-ended dialogue.
 - It sometimes picks the **wrong sentence** from a document. It labels these
   as quoted evidence, but it is a known weakness.
 - Long creative writing, long reasoning, and broad general knowledge remain

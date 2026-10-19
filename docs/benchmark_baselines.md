@@ -156,7 +156,9 @@ exposes predicates such as `awaiting_slot_location` to the portable dialogue-fra
 `experiments/v1_388_open_dialogue_question_state.py` checks slot inference, persistence, migration
 from state format 14, context-conditioned frame selection, and retention of six supported
 user-provided task-slot values in session state. It verifies those values stay separate from facts,
-survive reload, and clear on full reset; arbitrary turns are not yet parsed into slots.
+survive reload, and clear on full reset; direct “What time did I give you?”-style questions return
+the saved value and its original clarification prompt. Missing values abstain without falling
+through to factual retrieval. Arbitrary turns are not yet parsed into slots.
 
 ## Balanced phrase recombination from three demonstrations
 

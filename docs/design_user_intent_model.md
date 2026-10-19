@@ -51,8 +51,10 @@ Typed slots are exposed to portable intent frames through predicates such as
 A short reply is interpreted against that question and recorded in the intent trace. For the
 bounded task slots (location, party size, date/time, seating, cuisine, and restaurant choice), its
 user-provided value and the prompting question are retained in session state, displayed by `/intent`,
-and kept out of factual knowledge. This is session context, not learned intent knowledge or robust
-slot extraction from arbitrary turns, and it does not support free-form source summaries.
+and kept out of factual knowledge. Direct questions such as “What time did I give you?” can recall
+that session value together with the prompt that elicited it; a missing value abstains without
+falling through to factual retrieval. This is session context, not learned intent knowledge or
+robust slot extraction from arbitrary turns, and it does not support free-form source summaries.
 Yes/no answers have a separate `awaiting_yes_no_answer` predicate and are not treated as action
 confirmations. The sequence and reload checks are in
 [`v1_375_contextual_elaboration_slot.py`](../experiments/v1_375_contextual_elaboration_slot.py)

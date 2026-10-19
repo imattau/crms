@@ -94,8 +94,9 @@ Findings from the review that change the design:
   version 16, with legacy state loading). A bounded assistant clarification is retained as an
   explicit question-under-discussion (QUD), including whether it expects detail or yes/no and a
   bounded expected-slot type exposed to licensed intent frames. Answers to six supported task-slot
-  questions are retained in session state with their prompting question; offers are transient. The
-  active task label supplies only a
+  questions are retained in session state with their prompting question and can be recalled by a
+  direct follow-up; missing values abstain instead of querying factual memory. Offers are transient.
+  The active task label supplies only a
   `task_in_progress` context predicate to licensed frames.
 - **Entity recognition is partly widened.** `_source_entity_mentions` retains capitalised names from
   quoted sentences as candidates; `_canonical_entity` and `_known_entity_surfaces` still look only at

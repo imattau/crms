@@ -65,6 +65,39 @@ _OVERVIEW_RE = re.compile(
 _EXPLANATION_FOLLOWUP_RE = re.compile(
     r"^(?:why(?: is that)?|how do you know(?: that)?|what supports that)"
     r"[?!. ]*$", re.IGNORECASE)
+_SESSION_SLOT_RECALL_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("date_time", re.compile(
+        r"^(?:what|which)\s+(?:time|date|day)\s+(?:did i|have i)\s+"
+        r"(?:give(?: you)?|say(?: to you)?|tell you|ask for|choose|select)$|"
+        r"^when\s+(?:did i|have i)\s+(?:say|tell you|choose|select)$",
+        re.IGNORECASE)),
+    ("location", re.compile(
+        r"^(?:what|which)\s+(?:city|location|area)\s+(?:did i|have i)\s+"
+        r"(?:give(?: you)?|say(?: to you)?|tell you|choose|ask for)$|"
+        r"^where\s+(?:did i|have i)\s+(?:say|tell you|choose|select)$",
+        re.IGNORECASE)),
+    ("party_size", re.compile(
+        r"^(?:how many people|what party size|what number of people)\s+"
+        r"(?:did i|have i)\s+(?:say|give(?: you)?|tell you|ask for)$",
+        re.IGNORECASE)),
+    ("seating", re.compile(
+        r"^(?:what|which)\s+seating(?: preference)?\s+(?:did i|have i)\s+"
+        r"(?:say|give|tell you|request|ask for|choose)$",
+        re.IGNORECASE)),
+    ("cuisine", re.compile(
+        r"^(?:what|which)\s+(?:cuisine|food)\s+(?:did i|have i)\s+"
+        r"(?:say|give|tell you|request|ask for|choose)$",
+        re.IGNORECASE)),
+    ("restaurant_choice", re.compile(
+        r"^(?:what|which)\s+restaurant\s+(?:did i|have i)\s+"
+        r"(?:say|give|tell you|choose|select|pick)$",
+        re.IGNORECASE)),
+)
+_SESSION_SLOT_LABELS = {
+    "date_time": "date or time", "location": "location",
+    "party_size": "party size", "seating": "seating preference",
+    "cuisine": "cuisine", "restaurant_choice": "restaurant choice",
+}
 _ELABORATION_TOPIC_REPLY_RE = re.compile(
     r"^(?:about\s+)?(?P<topic>[\w][\w '&’.-]{0,118})[.! ]*$",
     re.IGNORECASE)
@@ -84,6 +117,15 @@ def _elaboration_topic_reply(text: str) -> re.Match[str] | None:
             or _YES_NO_QUESTION_RE.fullmatch(stripped)):
         return None
     return _ELABORATION_TOPIC_REPLY_RE.fullmatch(stripped)
+
+
+def _session_slot_recall(text: str) -> str | None:
+    """Recognize a direct question about one bounded session task value."""
+    normalized = " ".join(text.strip().rstrip("?.! ").split())
+    for slot, pattern in _SESSION_SLOT_RECALL_PATTERNS:
+        if pattern.fullmatch(normalized):
+            return slot
+    return None
 _MODAL_REQUEST_RE = re.compile(
     r"^(?:can|could|would|will)\s+(?:you|i|we)\s+"
     r"(?P<verb>[a-z]+)\b(?:\s+.+)?[?.! ]*$", re.IGNORECASE)
@@ -836,6 +878,31 @@ def respond(dialogue: CRMSDialogue, text: str, *,
                 text=("That does not say which one. Please choose: "
                       f"{numbered}.")))
         dialogue.pending_binding = None
+    recalled_slot = _session_slot_recall(text)
+    if recalled_slot is not None and dialogue.pending_result is None:
+        saved_slot = dialogue.session_slots.get(recalled_slot)
+        # Do not let explanation or correction follow-ups attach this dialogue
+        # answer to an older fact answer.
+        dialogue.last_answered = None
+        dialogue.last_question = None
+        dialogue.last_selected_answer = None
+        intent = UserIntentHypothesis(
+            dialogue_act="question",
+            task_intent="seek-information",
+            decision="selected",
+            matched_frame="session-slot-recall",
+            context_predicates=((f"has_session_slot_{recalled_slot}",)
+                                if saved_slot else ()),
+            selected_value=None,
+        )
+        if saved_slot:
+            reply = (f'You told me “{saved_slot["value"]}” when I asked: '
+                     f'“{saved_slot["question"]}” (session context, not a verified fact).')
+        else:
+            label = _SESSION_SLOT_LABELS[recalled_slot]
+            reply = (f"I haven't saved a {label} from this conversation to recall.")
+        return with_intent(DialogueTurn(
+            "answered", text, text, text=reply))
     correction = (_CORRECTION_RE.fullmatch(text.strip())
                   if act is None and dialogue.pending_result is None else None)
     if correction is not None and dialogue.last_question is not None:

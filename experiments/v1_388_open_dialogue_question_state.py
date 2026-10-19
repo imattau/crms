@@ -8,7 +8,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from crms_conversation import classify_user_intent, respond
+from crms_conversation import (_session_slot_recall, classify_user_intent,
+                               respond)
 from crms_dialogue import CRMSDialogue, infer_open_question_slot
 from crms_dialogue_intent import (CRMSDialogueIntentModel,
                                   empty_dialogue_intent_memory)
@@ -87,6 +88,40 @@ def main() -> None:
             "a short detail was not retained as session-only task context")
     require(len(kb._facts) == 1,
             "a session task parameter was incorrectly stored as a fact")
+    for wording, expected in (
+            ("What time did I give you?", "date_time"),
+            ("Which city did I say?", "location"),
+            ("How many people did I say?", "party_size"),
+            ("What seating did I request?", "seating"),
+            ("What cuisine did I choose?", "cuisine"),
+            ("Which restaurant did I pick?", "restaurant_choice")):
+        require(_session_slot_recall(wording) == expected,
+                f"session-slot recall missed {wording!r}")
+    require(_session_slot_recall("Who wrote Python?") is None,
+            "an unrelated factual question became a session-slot recall")
+    detail.last_answered = {
+        "question": "Who wrote the first algorithm?", "answer": "Ada Lovelace"}
+    detail.last_question = "Who wrote the first algorithm?"
+    recalled = respond(detail, "What time did I give you?")
+    require(recalled.status == "answered"
+            and recalled.intent_hypothesis is not None
+            and recalled.intent_hypothesis.matched_frame == "session-slot-recall"
+            and "7 pm" in recalled.text
+            and "What time should I use?" in recalled.text
+            and "not a verified fact" in recalled.text
+            and detail.last_answered is None and detail.last_question is None,
+            f"session-only recall did not answer from the saved slot: {recalled}")
+    missing_recall = respond(CRMSDialogue(kb), "What time did I give you?")
+    require("haven't saved a date or time" in missing_recall.text
+            and missing_recall.research is None and missing_recall.response is None,
+            "a missing session value fell through to factual retrieval")
+    fact_after_recall = respond(detail, "Who wrote the first algorithm?")
+    require(fact_after_recall.status == "answered"
+            and fact_after_recall.response is not None
+            and fact_after_recall.response.answer == "Ada Lovelace",
+            "session-slot recall interfered with a normal fact question")
+    require(len(kb._facts) == 1,
+            "recalling a user parameter changed factual knowledge")
     slot_context_memory = empty_dialogue_intent_memory()
     slot_context_memory["builtin_policy"].append({
         "policy_id": "continue-with-known-time",

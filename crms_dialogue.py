@@ -277,7 +277,7 @@ class CRMSDialogue:
         if question is None or not isinstance(value, str):
             return
         slot = question.get("expected_slot", "unknown")
-        value = value.strip()
+        value = " ".join(value.split())
         if slot not in _SESSION_SLOT_TYPES or not value or len(value) > 256:
             return
         self.session_slots[slot] = {
