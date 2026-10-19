@@ -1010,6 +1010,52 @@ class CRMSDialogue:
                     break
         return found
 
+    def _unanchored_question_entities(self, question: str,
+                                      quoted_text: str) -> list[str]:
+        """Find named query entities absent from the evidence shown to users.
+
+        Source retrieval can find a sentence about a related entity because
+        both share terms such as a relation or event. A source-only sentence
+        must name the queried entity (or include its named antecedent in the
+        rendered excerpt) before it can be presented as evidence for that
+        entity. This deliberately prefers an abstention over a plausible but
+        misattributed quotation.
+        """
+        missing = []
+        alias_records = self.knowledge._entity_alias_records()
+        for entity in self._question_entity_phrases(question):
+            entity_tokens = tuple(token.casefold() for token in
+                                  _WORD_RE.findall(entity))
+            accepted_surfaces = {entity}
+            canonical = alias_records.get(entity_tokens)
+            if canonical and isinstance(canonical.get("entity"), str):
+                accepted_surfaces.add(canonical["entity"])
+            for alias, record in alias_records.items():
+                if (tuple(token.casefold() for token in
+                          _WORD_RE.findall(str(record.get("entity", ""))))
+                        == entity_tokens):
+                    accepted_surfaces.add(" ".join(alias))
+            if not any(re.search(
+                    r"(?<!\w)" + re.escape(surface) + r"(?!\w)",
+                    quoted_text, flags=re.IGNORECASE)
+                       for surface in accepted_surfaces):
+                missing.append(entity)
+        return missing
+
+    def _reject_unanchored_source_answer(
+            self, question: str, resolved: str, quoted_text: str
+            ) -> DialogueTurn | None:
+        missing = self._unanchored_question_entities(resolved, quoted_text)
+        if not missing:
+            return None
+        self.clear()
+        names = ", ".join(missing)
+        return DialogueTurn(
+            "unknown", question, resolved,
+            text=(f"The source I found does not name {names}, so I can't "
+                  "safely attribute it to that entity. Please provide a "
+                  "source that names it or rephrase the question."))
+
     def _merge_mentions(self, *groups: list[dict[str, str]]
                         ) -> list[dict[str, str]]:
         merged: dict[tuple[str, ...], dict[str, str]] = {}
@@ -1858,6 +1904,11 @@ class CRMSDialogue:
                 research = self.knowledge.research(expanded, research_index)
                 response = research.response
                 text = self.knowledge.render_research_brief(research)
+                if research.status in {"sources_found", "needs_review"}:
+                    rejected = self._reject_unanchored_source_answer(
+                        question, expanded, text)
+                    if rejected is not None:
+                        return rejected
                 result = DialogueTurn(research.status, question, expanded,
                                       response=response, research=research,
                                       text=text)
@@ -2024,6 +2075,11 @@ class CRMSDialogue:
             research = self.knowledge.research(resolved, research_index)
             response = research.response
             text = self.knowledge.render_research_brief(research)
+            if research.status in {"sources_found", "needs_review"}:
+                rejected = self._reject_unanchored_source_answer(
+                    question, resolved, text)
+                if rejected is not None:
+                    return rejected
             if (research.status == "sources_found" and research_index is not None
                     and _SOURCE_LIST_REQUEST_RE.search(question)):
                 displayable = [item for item in (research.source_sentences or [])
