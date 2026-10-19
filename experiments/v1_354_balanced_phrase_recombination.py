@@ -33,6 +33,14 @@ NEGATIVES = (
     "list reverse values",        # known words in unsupported order
     "reverse please the values",  # unsupported modifier placement
 )
+REVERSE_EXAMPLES = (
+    ([1, 2, 3], [3, 2, 1]),
+    ([4, -1, 7], [7, -1, 4]),
+)
+SORT_EXAMPLES = (
+    ([1, 4, -2], [-2, 1, 4]),
+    ([6, 0, 3], [0, 3, 6]),
+)
 
 
 def require(condition: bool, message: str) -> None:
@@ -70,6 +78,36 @@ def evaluate_cross(phrases: tuple[str, str, str], held_out: str) -> dict:
     return {"held_out": held_out, "permutations": permutation_rows}
 
 
+def evaluate_conflicting_cross() -> None:
+    """Do not select one operation when a crossed phrase fits both."""
+    model = CRMSModel(max_composition_depth=1, max_workers=1)
+    examples = (
+        ("invert the values", REVERSE_EXAMPLES),
+        ("invert the entries", REVERSE_EXAMPLES),
+        ("reverse the list", REVERSE_EXAMPLES),
+        ("flip the list", REVERSE_EXAMPLES),
+        ("invert the items", SORT_EXAMPLES),
+        ("invert the objects", SORT_EXAMPLES),
+        ("sort the list", SORT_EXAMPLES),
+        ("order the list", SORT_EXAMPLES),
+    )
+    for phrase, demonstrations in examples:
+        result = model.teach(phrase, demonstrations)
+        require(result.status == "learned",
+                f"failed to teach collision control {phrase!r}: {result}")
+
+    # Each side is independently grounded, but the unseen crossed phrase
+    # combines an operator and object role that support different behaviors.
+    collision = model.predict("invert the list", [9, -3, 4, 1])
+    require(collision.status == "need_examples"
+            and collision.output is None
+            and collision.language_gaps is not None
+            and collision.language_gaps.get("conflicting_tokens")
+            and collision.language_gaps.get("conflicting_bigrams"),
+            f"conflicting crossed behavior was not exposed for review: "
+            f"{collision}")
+
+
 def main() -> None:
     results = [evaluate_cross(phrases, held_out)
                for phrases, held_out in TRAINING_CROSSES]
@@ -95,6 +133,7 @@ def main() -> None:
     require(evidence_checks == total,
             f"transfer evidence did not name all three teaching phrases: "
             f"{evidence_checks}/{total}")
+    evaluate_conflicting_cross()
 
     print("Balanced phrase recombination: 2 crossed 2x2 patterns")
     print("three demonstrations per pattern; all 6 teaching orders tested")
@@ -105,6 +144,7 @@ def main() -> None:
     print(f"unseen operators/entities/order/modifiers abstained: "
           f"{len(results) * 6 * len(NEGATIVES)}/"
           f"{len(results) * 6 * len(NEGATIVES)}")
+    print("crossed reverse/sort role conflict requests distinguishing examples: PASS")
 
 
 if __name__ == "__main__":

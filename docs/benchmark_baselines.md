@@ -39,7 +39,10 @@ requests. In particular, the broader 4×4 grid in `v1_242` intentionally has
 unbalanced early examples: its first four phrases contain four distinct verbs
 and four distinct nouns, so those examples do not independently repeat the
 word roles. Read the two learning curves together; the example arrangement is
-part of the measured condition.
+part of the measured condition. The experiment also creates overlapping
+reverse/sort language grids where an unseen phrase fits both behaviors; CRMS
+returns `need_examples` with conflicting token and bigram evidence instead of
+choosing one operation.
 
 ## Cross-surface question transfer v1
 
