@@ -544,7 +544,7 @@ read-only sample of four 1,000-document windows in SimpleWiki produced zero pred
 and the expanded 5,000-document/60,000-sentence scan also produced zero, so corpus-derived transfer
 remains sparse in the sampled real corpus.
 
-## Gate-preserving sentence ranker on FTS candidates (initial sample)
+## Gate-preserving sentence ranker on FTS candidates (two disjoint samples)
 
 Command: `python3 experiments/v1_346_fts_sentence_ranker_evaluation.py --docs-per-window 100 --train-examples 40 --test-examples 40 --json-out /tmp/crms-ranker-fts-eval-v2.json`
 
@@ -560,8 +560,19 @@ candidates: 14 abstained and one selected a sentence that did not contain the ge
 answer. Median selector time was 0.41 ms for the ranker and 0.24 ms for the gate; the whole
 question-generation and FTS evaluation took 150.7 seconds, which is not chat latency.
 
-This is a narrow mechanism/evaluation check, not a quality result: questions are self-generated
-WHO clozes from leading-subject sentences, labels are weakly derived from those sentences, and only
-one small training/test draw was used. The ranker remains disabled in chat. Broader generated
-question types, multiple disjoint draws, human-written questions, and non-Wikipedia domains remain
-unmeasured.
+An independent second draw used `--train-offset 50000 --test-offset 200000` with the same window
+and question limits. It generated 40 training and 40 test questions, with 82 training candidate
+rows (25 positive). On the 40 test questions, the gate answered 36 correctly, one incorrectly,
+and abstained on three; the ranker answered 37 correctly, two incorrectly, and abstained once. On
+the 15 multi-candidate questions, the gate answered 12 (11 correct, one wrong) and abstained on
+three, while the ranker answered 14 (12 correct, two wrong) and abstained on one. The ranker thus
+increased multi-candidate coverage from 80% to 93.3%, but lowered precision from 91.7% to 85.7%.
+Median selector time was 0.64 ms for the ranker and 0.45 ms for the gate; evaluation took 119.4
+seconds.
+
+Across these two small draws, the ranker has not shown a safe quality gain: it ties the gate on the
+first and trades more coverage for more errors on the second, at a modest added selector cost. It
+remains disabled in chat. This is still a narrow check: questions are self-generated WHO clozes
+from leading-subject sentences, and labels are weakly derived from those sentences. Broader
+generated question types, larger independent samples, human-written questions, and non-Wikipedia
+domains remain unmeasured.

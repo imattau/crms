@@ -462,12 +462,13 @@ resulting model parameters; record loading rejects changes that do not match the
 candidate-relative IDF features are computed over the gate-passing candidate set. Its public
 ranking path first applies the
 unchanged quoted-evidence gate. `experiments/v1_345_sentence_ranker_pilot.py` checks those
-mechanics on a controlled fixture. The initial FTS-backed, disjoint-window SimpleWiki evaluation
-is now recorded in `benchmark_baselines.md`: the gate and ranker tied on 40 generated questions,
-including 16 with multiple gate-passing candidates. That is no evidence of a quality gain; the
-sample is too small and narrow for a deployment decision. Keep the ranker disabled in chat until
-larger independent corpora show a gain specifically on multi-candidate questions, and do not
-describe the pilot as improving user-facing accuracy.
+mechanics on a controlled fixture. Two FTS-backed, disjoint-window SimpleWiki evaluations are
+recorded in `benchmark_baselines.md`: the gate and ranker tied on the first 40 generated questions,
+including 16 with multiple gate-passing candidates. A second draw increased multi-candidate
+coverage (14/15 vs. 12/15) but reduced precision (85.7% vs. 91.7%) and added one wrong answer; the
+ranker also took slightly longer. These small WHO-cloze samples show no safe quality gain. Keep the
+ranker disabled in chat until larger independent corpora show a gain specifically on
+multi-candidate questions, and do not describe the pilot as improving user-facing accuracy.
 
 *Staged route.* (1) The feature-based ranker tested here. (2) A learned table of wording
 equivalences that is only ever a proposal for human review (section 3.6). (3) Embeddings as a
