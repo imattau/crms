@@ -194,7 +194,9 @@ _ACTIVE_TASK_INTENTS = {
     "cancel-reservation", "correct-prior-result", "correct-result",
     "seek-information", "provide-information", "other-task",
 }
-_TASK_SUBGOAL_INTENTS = {"provide-constraint"}
+_TASK_SUBGOAL_INTENTS = {
+    "check-availability", "provide-constraint", "seek-information",
+}
 _SHOWN_LIMIT = 500
 _ELABORATION_BATCH = 3
 _OVERVIEW_BATCH = 5
@@ -340,11 +342,14 @@ class CRMSDialogue:
                     self.active_task_intent = None
                     self.active_task_subgoal = None
                     self.session_slots = {}
+                elif task_intent == self.active_task_intent:
+                    self.active_task_subgoal = None
+                elif (self.active_task_intent is not None
+                      and task_intent in _TASK_SUBGOAL_INTENTS):
+                    self.active_task_subgoal = task_intent
                 elif task_intent in _ACTIVE_TASK_INTENTS:
                     self.active_task_intent = task_intent
                     self.active_task_subgoal = None
-                elif task_intent in _TASK_SUBGOAL_INTENTS:
-                    self.active_task_subgoal = task_intent
         response = turn.response
         if (turn.status == "answered" and response is not None
                 and response.status == "answered" and turn.resolved_question):
@@ -369,7 +374,8 @@ class CRMSDialogue:
             context.add("current_topic_available")
         if self.last_answered:
             context.add("previous_grounded_answer")
-        if self.active_task_intent is not None or self.session_slots:
+        if (self.active_task_intent is not None or self.active_task_subgoal is not None
+                or self.session_slots):
             context.add("task_in_progress")
         if self.active_task_intent in _ACTIVE_TASK_INTENTS:
             context.add("active_task_" + self.active_task_intent.replace("-", "_"))

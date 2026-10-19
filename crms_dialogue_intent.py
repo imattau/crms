@@ -36,6 +36,7 @@ _CONTEXT_PREDICATES = {
     "active_task_seek_information", "active_task_provide_information",
     "active_task_other_task",
     "active_subgoal_provide_constraint",
+    "active_subgoal_seek_information", "active_subgoal_check_availability",
 }
 _DIALOGUE_ACTS = {
     "question", "request-action", "provide-information", "answer-clarification",

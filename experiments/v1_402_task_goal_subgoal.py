@@ -39,6 +39,27 @@ def main() -> None:
             and "active_subgoal_provide_constraint" in context,
             f"goal and subgoal were not both exposed: {context}")
 
+    followup = CRMSDialogue(CRMSKnowledgeBase())
+    followup.active_task_intent = "make-reservation"
+    # Taskmaster-1 dev, conversation dlg-048c8c7c-f409-4c6b-9737-09582bb04c31,
+    # user turn 16; the turn was labeled seek-information during a reservation.
+    question = respond(followup, "Could you just give me the phone number?")
+    require(question.intent_hypothesis is not None
+            and question.intent_hypothesis.task_intent == "seek-information"
+            and followup.active_task_intent == "make-reservation"
+            and followup.active_task_subgoal == "seek-information",
+            "a venue information question replaced the reservation goal")
+    followup_context, _ = followup.intent_context()
+    require("active_task_make_reservation" in followup_context
+            and "active_subgoal_seek_information" in followup_context,
+            f"information subgoal was not made observable: {followup_context}")
+
+    standalone = CRMSDialogue(CRMSKnowledgeBase())
+    respond(standalone, "Could you just give me the phone number?")
+    require(standalone.active_task_intent == "seek-information"
+            and standalone.active_task_subgoal is None,
+            "information seeking without a parent task was misclassified as a subgoal")
+
     with tempfile.TemporaryDirectory(prefix="crms-goal-subgoal-") as folder:
         state_path = Path(folder) / "dialogue.json"
         dialogue.save(str(state_path))
@@ -65,7 +86,7 @@ def main() -> None:
     require(dialogue.active_task_intent is None
             and dialogue.active_task_subgoal is None,
             "full dialogue reset left goal/subgoal state behind")
-    print("reservation goal survives restaurant-search constraint subgoal: PASS")
+    print("reservation goal survives search and information subgoals: PASS")
     print("goal and subgoal context persist and validate: PASS")
     print("explicit reset clears both levels: PASS")
 
