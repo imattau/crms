@@ -52,6 +52,22 @@ These are useful roadmap items, but should not be implemented as one coupled fea
 These diagnostics supplement recombination, rule discovery, reasoning, and evidence validation;
 they do not replace them.
 
+### 0.2 Real-corpus alignment yield check
+
+The current review-only predicate-alignment learner requires the same two distinct entity pairs
+to appear under both predicate frames. A read-only replay of the local SimpleWiki index found no
+proposals in eight separated windows (125 documents and up to 6,000 sentences per window;
+offsets 0, 5,000, 20,000, 50,000, 100,000, 150,000, 200,000, and 275,000). Reproduce with
+`python3 experiments/v1_343_real_corpus_predicate_alignment_yield.py`.
+
+This is a yield result for these windows, not an estimate of corpus-wide precision or recall. It
+shows that exact shared-pair matching does not yet provide useful self-learning coverage on these
+ordinary encyclopedia slices. Keep its evidence threshold intact. A next discovery mechanism
+should propose role-compatible candidate relations from broader evidence (for example, repeated
+subject/object type combinations), then test them on held-out pairs and present them for review;
+it must not treat type compatibility or lexical similarity as proof of synonymy. Track proposal
+yield, held-out precision, and abstentions separately before using that mechanism in chat.
+
 ## 1. Evidence independence and dependency report
 
 ### 1.1 Purpose
