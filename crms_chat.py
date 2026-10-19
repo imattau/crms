@@ -5200,8 +5200,19 @@ def main() -> int:
     initial_index_state = _index_file_state(args.index)
     if args.index_read_only:
         print(f"Research index opened read-only: {args.index}")
-    dialogue = (CRMSDialogue.load(knowledge, str(args.dialogue_state))
-                if args.dialogue_state.exists() else CRMSDialogue(knowledge))
+    dialogue = CRMSDialogue(knowledge)
+    if args.dialogue_state.exists():
+        try:
+            dialogue = CRMSDialogue.load(knowledge, str(args.dialogue_state))
+        except (ValueError, OSError) as error:
+            stale = args.dialogue_state.with_name(
+                args.dialogue_state.name + ".stale")
+            try:
+                args.dialogue_state.replace(stale)
+                kept = f"saved as {stale}"
+            except OSError:
+                kept = "left in place"
+            print(f"Ignoring saved dialogue state ({error}); {kept}.")
     rules = CRMSModel(
         args.rules, max_composition_depth=args.rule_depth,
         max_add=args.rule_max_add, max_scale=args.rule_max_scale,
