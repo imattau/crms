@@ -468,6 +468,20 @@ chat-level routing path:
   two-level rules. This is evidence that a higher default could be affordable, but not a
   substitute for measuring adversarial branching and memory use.
 
+A fresh runtime pass on 2026-10-19 rechecked `v1_309`, `v1_310`, `v1_330`, `v1_350`,
+`v1_351`, `v1_360`, `v1_349`, `v1_185`, `v1_263`, `v1_320`, and `v1_321`. It exposed a
+chat-level precedence regression: an incomplete rule proof for a `Who ...?` question was being
+replaced by the lexical source route's generic no-match reply. Missing-premise responses now remain
+the answer when no exact source sentence fills the gap. Exact fact-frame matches still enter the
+review queue; unrelated lexical candidates are removed, and the answer-object filter does not
+discard a premise that is valid specifically because an incomplete proof requests it. `v1_263`
+covers the unrelated sentence containing both entities and checks that unsupported polar questions
+do not invent self-loop premises; `v1_296` verifies exact missing-premise review and proof-checked
+rerun after acceptance. The engine-level proof and integrity checks, natural-language abduction
+route, selected-proof explanation, and deterministic effort budgets all pass on the current
+checkout. This fixes the reported routing case; it does not establish broad natural-language
+reasoning coverage.
+
 The remaining issues are:
 
 - **Recursive rules still consume depth per recursive application.** Defaults are now 40 across

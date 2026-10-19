@@ -2072,14 +2072,21 @@ def _follow_missing_premise_sources(
         response: Any, research: ResearchResult | None, text: str
         ) -> str:
     """Attach exact missing-premise source candidates to review state."""
-    if (research is None or response is None
-            or response.reason_code != "missing_premise"
+    if (response is None or response.reason_code != "missing_premise"
             or not response.missing_premises):
         return text
+    if research is None:
+        return knowledge.render_brief(response)
     candidates = _missing_premise_source_candidates(
         knowledge, index, response.missing_premises)
     if not candidates:
-        return text
+        # Do not let a later lexical/specialist route replace the more useful
+        # proof diagnosis or leave unrelated source candidates pending review.
+        research.candidates = []
+        research.source_sentences = []
+        research.passages = []
+        research.status = "unknown"
+        return knowledge.render_brief(response)
     # Replace the general retrieval proposals: only the exact, frame-parsed
     # gap candidates belong in this reasoning follow-through prompt.
     research.candidates = candidates
@@ -9688,7 +9695,9 @@ def main() -> int:
         if (who_question and not conjunctive_who_route_used
                 and turn.status in {"unknown", "sources_found", "needs_review"}
                 and not (turn.response is not None
-                         and turn.response.status in {"answered", "ambiguous"})
+                         and (turn.response.status in {"answered", "ambiguous"}
+                              or turn.response.reason_code
+                                 == "missing_premise"))
                 and (turn.status != "needs_review"
                      or (turn.research is not None
                          and turn.research.candidates))):
@@ -10181,6 +10190,7 @@ def main() -> int:
         has_structured_response = (
             turn.response is not None
             and (turn.response.status == "ambiguous"
+                 or turn.response.reason_code == "missing_premise"
                  or bool(turn.response.inference_proofs)
                  or bool(turn.response.candidates)))
         has_review_candidates = (
@@ -10404,8 +10414,10 @@ def main() -> int:
         if (turn.research and turn.research.status == "needs_review"
                 and turn.research.candidates):
             new_candidates = list(turn.research.candidates)
-            new_candidates = _candidates_matching_who_object(
-                turn.resolved_question or line, new_candidates)
+            if not (turn.response is not None
+                    and turn.response.reason_code == "missing_premise"):
+                new_candidates = _candidates_matching_who_object(
+                    turn.resolved_question or line, new_candidates)
             # A source proposal can coexist with a direct accepted answer
             # because retrieval searches more broadly than the answer route.
             # Keep only candidates tied to at least two meaningful query terms

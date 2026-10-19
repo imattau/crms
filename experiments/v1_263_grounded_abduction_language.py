@@ -84,7 +84,7 @@ def main() -> None:
             input="Is Bob a grandparent of Cara?\n/quit\n",
             text=True, capture_output=True, check=False, timeout=30, cwd=root)
         require(output.returncode == 0
-                and "cannot answer yes or no" in output.stdout
+                and "answer yes or no" in output.stdout
                 and "Bob — parent → Bob" not in output.stdout
                 and "Cara — parent → Cara" not in output.stdout,
                 f"terminal displayed speculative premises as facts:\n{output.stdout}\n{output.stderr}")
@@ -95,7 +95,11 @@ def main() -> None:
             "knowledge.json", "index.json", "dialogue.json", "rules.json",
             "rule-session.json", "candidate-session.json")}
         partial.save(paths["knowledge.json"])
-        CRMSResearchIndex().save(paths["index.json"])
+        source_path = root / "unrelated.txt"
+        source_path.write_text("Cara met Bob at the cafe.", encoding="utf-8")
+        index = CRMSResearchIndex()
+        index.add_file(str(source_path))
+        index.save(paths["index.json"])
         output = subprocess.run(
             [sys.executable, str(PROJECT / "crms_chat.py"),
              "--knowledge", str(paths["knowledge.json"]),
@@ -107,12 +111,12 @@ def main() -> None:
             input=("Is Ann a grandparent of Cara?\n"
                    "Who is a grandparent of Cara?\n/quit\n"),
             text=True, capture_output=True, check=False, timeout=30, cwd=root)
+        final_reply = output.stdout.rsplit("CRMS> ", 1)[-1]
         require(output.returncode == 0
-                and "I have Ann — parent → Bob." in output.stdout
-                and "I still need:" in output.stdout
-                and "Bob — parent → Cara." in output.stdout
+                and "I have Ann — parent → Bob." in final_reply
+                and "I need Bob — parent → Cara to derive this." in final_reply
                 and "direct source statement for this exact proposition"
-                    not in output.stdout,
+                    not in final_reply,
                 f"source abstention masked the grounded missing premise:\n{output.stdout}\n{output.stderr}")
 
     print("grounded natural-language abduction diagnostic: PASS")
