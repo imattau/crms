@@ -31,6 +31,8 @@ def main() -> None:
             "Okay. I'd like to go to the Little Sheep. I'd like to make a reservation.",
             "Okay. Just make a reservation for that first one.",
             "I'm trying to make a reservation at a restaurant in San Francisco.",
+            "I'd like you to book a restaurant for me.",
+            "I would like you to book a restaurant for dinner.",
             "Let's do a reservation at Scoma's for tonight, party of two.",
             "I will go with the first location. Could we set up a reservation "
             "for later tonight for my party of four?"):
@@ -39,16 +41,15 @@ def main() -> None:
                 and hypothesis.task_intent == "make-reservation"
                 and hypothesis.dialogue_act == "request-action",
                 f"explicit reservation request was not recognized: {request!r}: {hypothesis}")
-    how_to = classify_user_intent(
-        CRMSDialogue(CRMSKnowledgeBase()), "How do I make a reservation?")
-    require(how_to is not None and how_to.task_intent == "seek-information",
-            "a question about the reservation process was mistaken for a booking request")
-    polite_how_to = classify_user_intent(
-        CRMSDialogue(CRMSKnowledgeBase()),
-        "Could you please tell me how to make a reservation?")
-    require(polite_how_to is not None
-            and polite_how_to.task_intent == "seek-information",
-            "a polite how-to question was mistaken for a booking request")
+    for how_to_text in (
+            "How do I make a reservation?",
+            "How do I book a restaurant?",
+            "Could you please tell me how to make a reservation?",
+            "Could you tell me how to book a restaurant?"):
+        how_to = classify_user_intent(
+            CRMSDialogue(CRMSKnowledgeBase()), how_to_text)
+        require(how_to is not None and how_to.task_intent == "seek-information",
+                f"a how-to question was mistaken for booking: {how_to_text!r}: {how_to}")
 
     dialogue = CRMSDialogue(CRMSKnowledgeBase())
     dialogue.active_task_intent = "make-reservation"
@@ -124,7 +125,7 @@ def main() -> None:
         dialogue.save(str(state_path))
         state = json.loads(state_path.read_text(encoding="utf-8"))
         valid_state = json.loads(json.dumps(state))
-        require(state["format_version"] == 19
+        require(state["format_version"] == 21
                 and state["active_task_intent"] == "make-reservation"
                 and state["active_task_subgoal"] == "provide-constraint",
                 "saved dialogue omitted the hierarchical task state")
@@ -203,10 +204,24 @@ def main() -> None:
                 in completed.stdout,
                 "interactive chat did not expose the retained goal/subgoal")
 
+        direct_request_command = list(command)
+        dialogue_arg = direct_request_command.index("--dialogue-state") + 1
+        direct_request_command[dialogue_arg] = str(root / "direct-request.json")
+        direct_request = subprocess.run(
+            direct_request_command,
+            input=("I'd like you to book a restaurant for me.\n"
+                   "/intent\n/quit\n"),
+            text=True, capture_output=True, check=True, timeout=30)
+        require("Active goal: make-reservation" in direct_request.stdout
+                and '"matched_frame": "explicit-reservation-request"'
+                    in direct_request.stdout,
+                "natural-language booking request did not set the reservation goal")
+
     print("reservation goal survives search and information subgoals: PASS")
     print("goal and subgoal context persist and validate: PASS")
     print("explicit reset clears both levels: PASS")
     print("interactive chat displays contextual goal and subgoal: PASS")
+    print("natural-language 'book a restaurant' wording sets reservation goal: PASS")
 
 
 if __name__ == "__main__":

@@ -422,6 +422,33 @@ and goal transitions—rather than a larger bag of old words. The labeled data a
 were inspected. These comparisons remain agreement with one named Codex annotator, not accuracy or
 independent validation.
 
+#### Additional-data replication and a runtime language gap (2026-10-20)
+
+To test whether a small increase in training examples helped, I labeled 35 user turns from four
+additional, conversation-disjoint training transcripts under the existing protocol. At the frozen
+history-model setting (threshold 0.4; weights 0.45 user, 0.15 latest assistant, 0.4 prior history),
+the augmented 44-conversation/598-turn training set selected 24/124 development turns (19.4%),
+with 18/24 joint act/task-intent agreement (75.0%). The original 40-conversation/563-turn set
+selected 17/124 (13.7%) with 14/17 agreement (82.4%). Added examples increased coverage but lowered
+agreement on this already-used development sample.
+
+I then labeled 41 turns from four previously unused test conversations, excluding all 30
+conversations in the earlier labeled test files. Two turns were uncertain and excluded by the
+classifier evaluator. With the same frozen threshold and weights, the augmented model selected
+10/39 classifiable turns (25.6%); joint act/task-intent agreement was 2/10 (20.0%), and broad-goal
+agreement was 8/9 where a goal was labeled. Prior task, goal, and context annotations were supplied
+as oracle inputs. These are small agreement diagnostics against one Codex labeler, not accuracy or
+reliability estimates. More examples increased selection without making the predicted immediate
+act and intent reliable; the nearest-example matcher remains unsuitable for runtime routing.
+
+The new turns, label manifests, and reports are in `/tmp/crms_dialogue_intent_aug_v1/`; the prepared
+source sheet digest and exact citation-span verification are recorded in the manifests. No
+independent second labels were created, and the original train/dev/test source sheets were not
+modified. One concrete held-out phrase, “I'd like you to book a restaurant for me,” also received
+no intent hypothesis from the previous runtime. The explicit reservation-request recognizer now
+handles that wording, with “How do I book a restaurant?” retained as an information-seeking
+negative. This repairs one bounded frame; it does not change the negative transfer result above.
+
 ### Context is part of intent, not an optional feature
 
 The model should represent a turn's immediate task intent separately from the broader user goal
