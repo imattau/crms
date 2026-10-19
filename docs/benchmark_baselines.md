@@ -1329,3 +1329,15 @@ kind witnesses. The added natural-language probe asks â€œDoes Nia reach Sydney?â
 verifies the proof; removing the runtime person-kind witness makes the chat path abstain. This
 demonstrates one held-out ternary schema through ordinary language, not general three-premise
 understanding or broad learned-rule coverage.
+
+## Large-corpus language-to-rule transfer through chat
+
+Command: `python3 experiments/v1_297_large_scale_rule_learning.py`
+
+In this generated 1,162-fact corpus, two cited examples teach each sentence-to-relation frame;
+later source claims enter through reviewed extraction. The binary parent-to-ancestor candidate is
+validated on 12 source-held-out examples, while a linked-location decoy is blocked by a held-out
+negative. The 12 unlabeled chains all derive with independently verified proofs. A new natural-
+language chat probe reaches one of those conclusions through the learned rule, and a one-edge
+near-miss does not receive a positive inference. This exercises the full pipeline on a controlled
+corpus, not broad natural-language or open-domain learning quality.

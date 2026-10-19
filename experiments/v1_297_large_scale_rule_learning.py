@@ -18,6 +18,8 @@ PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
 from crms_knowledge import CRMSKnowledgeBase
+from crms_conversation import respond
+from crms_dialogue import CRMSDialogue
 from crms_research import CRMSResearchIndex
 from crms_rule_proof import verify_inference_proof
 
@@ -189,6 +191,34 @@ def main() -> None:
             require(checked.valid, f"independent proof check failed: {checked}")
             proof_count += 1
 
+    # Route a large-corpus, source-extracted held-out conclusion through the
+    # user-facing language path and verify that the learned rule supplied it.
+    chat = respond(
+        CRMSDialogue(kb),
+        "Is Person0052A an ancestor of Person0052C?",
+        research_index=index)
+    require(chat.status == "answered" and chat.response is not None
+            and chat.response.truth is True
+            and chat.response.inference_proofs
+            and "parent-transitivity" in str(chat.response.inference_proofs),
+            f"natural-language chat missed source-learned transfer: {chat}")
+    chat_proof = chat.response.inference_proofs[0]
+    chat_check = verify_inference_proof(
+        chat_proof, facts, rules,
+        expected_conclusion={
+            "subject": "Person0052A", "relation": "ancestor",
+            "object": "Person0052C"})
+    require(chat_check.valid,
+            f"chat proof failed independent verification: {chat_check}")
+    near_miss = respond(
+        CRMSDialogue(kb),
+        "Is Person0052A an ancestor of Person0052B?",
+        research_index=index)
+    require(near_miss.status != "answered"
+            or near_miss.response is None
+            or near_miss.response.truth is not True,
+            f"chat promoted a one-edge near-miss to ancestor: {near_miss}")
+
     print("large-scale language-to-rule learning diagnostic: PASS")
     print(f"facts={len(kb.facts())}; indexed_sources={len(index.documents())}; "
           f"candidates={len(discovery.candidates)}; "
@@ -203,6 +233,8 @@ def main() -> None:
           "one held-out negative blocked installation; runtime abstained")
     print(f"unlabeled_answers=12; independently_verified_proofs={proof_count}; "
           "explicit_review_gate=PASS")
+    print("large-corpus natural-language chat transferred the learned rule with a verified proof: PASS")
+    print("one-edge natural-language near-miss did not produce a positive inference: PASS")
 
 
 if __name__ == "__main__":
