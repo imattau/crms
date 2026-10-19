@@ -162,6 +162,24 @@ was 12/12; immediate-intent and broad-goal agreement were each 11/12 (91.7%). Th
 with the same Codex labeler, not independent accuracy. Low coverage remains the main result; broader
 contextual generalization needs more work.
 
+### Context-gated nearest-example dialogue baseline
+
+`experiments/v1_406_contextual_intent_nearest_neighbor.py` compares labeled training turns by
+content-word Jaccard similarity over both the current user wording and the most recent assistant
+utterance. It requires exact dialogue-state, predecessor, and active-goal matches whenever those
+fields are available; tied conflicting labels abstain and selected examples keep their citations.
+This is an offline comparator only.
+
+On the ten-conversation dev set, the development-only selection rule was to maximize coverage among
+configurations with at least 80% joint act/task-intent agreement. It selected a 0.25 weight for the
+assistant prompt and a 0.4 similarity threshold. That configuration selected 15/124 turns (12.1%),
+with 13/15 (86.7%) joint act/task-intent agreement and 14/15 (93.3%) broad-goal agreement. The
+exact-surface baseline selected 8/124 (6.5%) with 7/8 (87.5%) joint agreement. These remain
+development results against the same single Codex annotator, with prior turn labels supplied as
+oracle context. They suggest the preceding assistant wording adds useful context, but do not
+establish held-out transfer or runtime quality. A fresh conversation-held-out evaluation is still
+required before considering runtime use.
+
 ### Runtime intent routing with supplied context
 
 `python3 experiments/v1_395_runtime_intent_oracle_context.py USER_TURNS.csv` replays labeled turns

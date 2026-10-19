@@ -147,6 +147,15 @@ These results are component evidence, not a single overall capability score:
   appears in the unclassified test split as well (233/450 turns follow an
   assistant line with a question mark), but the correct interpretation remains
   unmeasured. See [`design_user_intent_model.md`](design_user_intent_model.md).
+- `v1_406_contextual_intent_nearest_neighbor.py` is an offline lexical baseline
+  that compares both the user turn and preceding assistant wording while gating
+  on typed dialogue context. On the ten-conversation development set, a
+  dev-selected configuration matched both act and task intent on 13/15 selected
+  turns (86.7%) at 12.1% coverage; the exact-surface baseline covered 6.5% at
+  87.5% agreement. This is a small, single-Codex-label result with oracle prior
+  intent/context, not a direct large-model comparison or runtime result. A
+  strong 70B-class model is expected to handle a much broader range of
+  paraphrases and dialogue context, though its answers also need verification.
 - `v1_386_session_intent_context.py` verifies that selected user intents update
   a bounded active-task label, that social turns preserve it, that an explicit
   close and `/reset` clear it, and that it survives dialogue-state format 17

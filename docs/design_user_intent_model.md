@@ -371,6 +371,15 @@ and controlled-context checks, not accuracy claims: the dev sample is small and 
 annotator as training. The low exact-match coverage makes slot-template or broader frame induction
 the next language-generalization requirement; promoting these candidates would not solve it.
 
+`experiments/v1_406_contextual_intent_nearest_neighbor.py` tests an offline example-retrieval
+alternative that compares both user wording and the preceding assistant turn, gated by labeled
+dialogue state, predecessor, and active goal. On the ten-conversation dev set, a development-only
+configuration selected 15/124 turns at 12.1% coverage, with 13/15 joint act/task-intent agreement
+and 14/15 broad-goal agreement. Exact candidates selected 8/124 at 6.5%, with 7/8 joint agreement.
+These are Codex-label agreement results with prior state supplied as oracle context. They show that
+the assistant's preceding wording adds useful signal on this small sample, but do not establish
+held-out transfer or justify runtime routing. A fresh conversation sample is still required.
+
 The owner authorized Codex to provide provisional labels in place of a human for this research
 phase. `experiments/v1_395_runtime_intent_oracle_context.py` uses those labels to replay the four
 dev conversations through the current hand-checked router, supplying the annotated context state,
@@ -451,9 +460,10 @@ abstain; candidate and train-only frames remain inert. The annotation worksheet 
 induction/evaluation formats include the separate goal field, while earlier sheets and model files
 without it remain readable. `experiments/v1_404_dialogue_goal_intent_frames.py` exercises runtime
 goal preservation, subgoal updates, conflict abstention, candidate inertness, and legacy frames.
-Current Taskmaster labels predate this field, so broad-goal induction still needs an explicitly
-identified Codex primary-label pass before it can be evaluated. Such labels are provisional and
-must not be described as an independent human review.
+The temporary Taskmaster pilot now has a separate Codex-authored `goal_intent` pass for 563 train
+turns and 200 dev/test turns. No independent second annotation exists, so this pass is provisional
+and cannot be described as human-reviewed or independently validated. Its labels are available in
+`/tmp/crms_dialogue_feasibility_v1`; they have not been promoted to distributable model knowledge.
 
 ## Learning and evidence
 
