@@ -70,6 +70,14 @@ def main() -> None:
             == "resolve-ambiguity"
             and acknowledgement.intent_hypothesis.decision == "ambiguous",
             "receipt during a choice was not distinguished from confirmation")
+    pending_why = respond(dialogue, "Why?")
+    require(pending_why.status == "ambiguous"
+            and pending_why.intent_hypothesis is not None
+            and pending_why.intent_hypothesis.task_intent == "seek-information"
+            and pending_why.intent_hypothesis.decision == "ambiguous"
+            and "pending_candidate_choice" in
+            pending_why.intent_hypothesis.context_predicates,
+            "why-follow-up ignored the unresolved candidate context")
     selection = respond(dialogue, "Yeah, the second option please.")
     require(selection.status == "answered"
             and selection.response is not None
@@ -93,6 +101,20 @@ def main() -> None:
             and corrected_choice.intent_hypothesis.basis
             == "hand_checked_runtime_rule",
             "candidate selection did not expose its inspectable intent decision")
+    explanation = respond(corrected_choice_dialogue, "How do you know that?")
+    require(explanation.intent_hypothesis is not None
+            and explanation.intent_hypothesis.task_intent == "seek-information"
+            and explanation.intent_hypothesis.decision == "selected"
+            and "previous_grounded_question" in
+            explanation.intent_hypothesis.context_predicates,
+            "explanation follow-up did not use the grounded answer context")
+    elaboration = respond(corrected_choice_dialogue, "Tell me more.")
+    require(elaboration.intent_hypothesis is not None
+            and elaboration.intent_hypothesis.task_intent
+            == "continue-current-task"
+            and "current_topic_available" in
+            elaboration.intent_hypothesis.context_predicates,
+            "continuation request did not use the current topic")
 
     unanchored = respond(CRMSDialogue(knowledge), "Nope.")
     require(unanchored.status == "clarify"
@@ -114,6 +136,13 @@ def main() -> None:
             and mixed.intent_hypothesis.matched_frame
             == "greeting-plus-content-question",
             "mixed greeting/question did not select the task intent")
+    unanchored_explanation = respond(CRMSDialogue(knowledge), "Why?")
+    require(unanchored_explanation.intent_hypothesis is not None
+            and unanchored_explanation.intent_hypothesis.dialogue_act == "uncertain"
+            and unanchored_explanation.intent_hypothesis.task_intent is None
+            and "no_previous_grounded_answer" in
+            unanchored_explanation.intent_hypothesis.context_predicates,
+            "unanchored why-follow-up invented a task context")
 
     with tempfile.TemporaryDirectory(prefix="crms-contextual-intent-") as folder:
         root = Path(folder)

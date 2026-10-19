@@ -13,10 +13,12 @@ from an unanchored yes/no response; separates an acknowledgement from a confirma
 when a candidate phrase or correction resolves the choice. With multiple supported candidates,
 “yes” or “no” leaves the choice pending and explains that a specific candidate is needed; without
 an open yes/no question, CRMS asks what the user is responding to rather than sending the token to
-retrieval. The hypothesis records its act, task intent (when known), decision, matched frame,
-context predicates, alternatives, selected value, and that the basis is a hand-checked runtime rule.
-It is inspectable but not learned or corpus-licensed; unsupported turns have no hypothesis. Regression
-coverage is in `experiments/v1_365_contextual_clarification_intent.py`.
+retrieval. It also distinguishes an explanation follow-up after a grounded answer from an unanchored
+“why?”, and conditions “tell me more” on a current topic. The hypothesis records its act, task intent
+(when known), decision, matched frame, context predicates, alternatives, selected value, and that the
+basis is a hand-checked runtime rule. It is inspectable but not learned or corpus-licensed;
+unsupported turns have no hypothesis. Regression coverage is in
+`experiments/v1_365_contextual_clarification_intent.py`.
 
 ## Why intent belongs in the model
 

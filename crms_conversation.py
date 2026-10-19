@@ -35,6 +35,9 @@ _BARE_YES_NO_RE = re.compile(
     r"^(?:yes|yeah|yep|yup|sure|certainly|absolutely|no|nope|nah|not really)"
     r"(?:[, ]+(?:please|thanks|thank you))?[.!? ]*$",
     re.IGNORECASE)
+_EXPLANATION_FOLLOWUP_RE = re.compile(
+    r"^(?:why(?: is that)?|how do you know(?: that)?|what supports that)"
+    r"[?!. ]*$", re.IGNORECASE)
 
 
 def classify_act(text: str) -> str | None:
@@ -57,6 +60,34 @@ def classify_user_intent(
     This is an inspectable runtime baseline, not a learned intent model. A
     missing result means the current rules do not classify this turn.
     """
+    if _EXPLANATION_FOLLOWUP_RE.fullmatch(text.strip()):
+        if dialogue.pending_result is not None:
+            return UserIntentHypothesis(
+                dialogue_act="question",
+                task_intent="seek-information",
+                decision="ambiguous",
+                matched_frame="explanation-follow-up",
+                context_predicates=("pending_candidate_choice",),
+                alternatives=tuple(dialogue.pending_result.candidates or ()),
+            )
+        if dialogue.last_question is not None:
+            return UserIntentHypothesis(
+                dialogue_act="question",
+                task_intent="seek-information",
+                decision="selected",
+                matched_frame="explanation-follow-up",
+                context_predicates=("previous_grounded_question",),
+                selected_value=dialogue.last_selected_answer,
+            )
+        return UserIntentHypothesis(
+            dialogue_act="uncertain",
+            task_intent=None,
+            decision="ambiguous",
+            matched_frame="unanchored-explanation-follow-up",
+            context_predicates=("no_previous_grounded_answer",),
+            alternatives=("request-explanation", "ask-new-question"),
+        )
+
     if dialogue.pending_result is not None:
         selected, is_selection = dialogue._select_candidate(text)
         if is_selection:
@@ -101,6 +132,23 @@ def classify_user_intent(
     }
     if act in mappings:
         dialogue_act, task_intent = mappings[act]
+        if act == "elaboration":
+            if dialogue.last_entity or dialogue.source_mentions:
+                return UserIntentHypothesis(
+                    dialogue_act=dialogue_act,
+                    task_intent=task_intent,
+                    decision="selected",
+                    matched_frame=act,
+                    context_predicates=("current_topic_available",),
+                )
+            return UserIntentHypothesis(
+                dialogue_act=dialogue_act,
+                task_intent=None,
+                decision="ambiguous",
+                matched_frame=act,
+                context_predicates=("no_current_topic",),
+                alternatives=("continue-current-task", "introduce-topic"),
+            )
         return UserIntentHypothesis(
             dialogue_act=dialogue_act,
             task_intent=task_intent,
