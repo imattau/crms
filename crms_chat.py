@@ -3442,6 +3442,19 @@ def _natural_research_explanation_request(message: str) -> bool:
             value, flags=re.IGNORECASE) is not None or _method_mechanism_followup(value)
 
 
+def _natural_creative_request(message: str) -> str | None:
+    """Recognize explicit original-writing requests for concise scope replies."""
+    value = message.strip().rstrip(".!?").strip()
+    pattern = re.compile(
+        r"(?:please\s+)?(?:write|compose|create|make|tell)\s+"
+        r"(?:(?:me|us)\s+)?(?:(?:a|an|some)\s+)?"
+        r"(?:(?:short|brief|funny|original|little|haiku)\s+)*"
+        r"(?P<kind>story|poem|haiku|song|joke|lyrics)\b",
+        flags=re.IGNORECASE)
+    match = pattern.match(value)
+    return match.group("kind").casefold() if match else None
+
+
 def _method_mechanism_followup(message: str) -> bool:
     return re.fullmatch(
         r"(?:why|how)\s+(?:does|did|do|is|was|are|were)\s+"
@@ -8274,6 +8287,14 @@ def main() -> int:
                       f"{target_template}")
             except (OSError, ValueError) as error:
                 print(f"Could not infer a safe translation frame: {error}")
+            continue
+        creative_kind = _natural_creative_request(line)
+        if creative_kind is not None:
+            print(
+                "CRMS> I can't generate original creative writing from a "
+                "prompt yet. I can answer from indexed sources, explain "
+                "supported reasoning, or use learned math, code, and "
+                "translation procedures.")
             continue
         translation_result = translation_model.translate(line)
         if translation_result is not None:

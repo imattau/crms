@@ -196,8 +196,16 @@ is small on real text (templates fit about 14% of sentences and 7 questions surv
 still enough for a "try these" prompt. The self-check costs one chat call per candidate, so run it
 once at load time on a bounded number of candidates and store the result.
 
-## 3. Observed but not tested
+## 3. Runtime updates and remaining untested gaps
 
+- **Explicit creative-writing requests:** the terminal now recognizes a narrow
+  imperative form for story, poem, haiku, song, joke, and lyrics requests and
+  gives a direct scope statement instead of presenting a lexical source match
+  as an answer. Factual questions, descriptive questions, and code-writing
+  requests are negative controls in
+  `experiments/v1_353_creative_request_scope.py`. This is scope handling, not
+  creative generation; less direct wording and other open-ended task types
+  remain unsupported.
 - **Evidence follow-up wording:** after a quoted-source answer, `Why?` now
   states that the cited sentence was used as evidence and remains unaccepted,
   instead of describing the interaction as a missing paraphrase rule.
