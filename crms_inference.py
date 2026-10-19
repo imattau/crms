@@ -19,7 +19,10 @@ from crms_text import tokens as normalized_tokens
 
 
 def _key(value: str) -> tuple[str, ...]:
-    return normalized_tokens(value)
+    # Relation parsers may return either ``great-grandparent`` or
+    # ``great grandparent``. Normalize dash variants before tokenization so
+    # every engine comparison uses the same relation key.
+    return normalized_tokens(re.sub(r"[-‐‑‒–—]", " ", value))
 
 
 def _qualifier_key(value: Any) -> tuple[tuple[tuple[str, ...], tuple[str, ...]], ...]:
@@ -448,11 +451,16 @@ def _infer_relation_bounded(
     transitive_edge_index: dict[
         tuple[str, ...], dict[tuple[str, ...], list[tuple[tuple[str, ...], dict[str, Any]]]]
     ] = {}
+    transitive_fact_edge_index: dict[
+        tuple[str, ...], dict[tuple[str, ...], list[tuple[tuple[str, ...], dict[str, Any]]]]
+    ] = {}
     for triple, fact_rows in fact_index.items():
         if triple[1] not in transitive_type_facts:
             continue
         edge_proofs = [{"kind": "fact", "conclusion": display_atom(triple),
                         "fact": fact} for fact in fact_rows]
+        transitive_fact_edge_index.setdefault(triple[1], {}).setdefault(
+            triple[0], []).extend((triple[2], proof) for proof in edge_proofs)
         transitive_edge_index.setdefault(triple[1], {}).setdefault(
             triple[0], []).extend((triple[2], proof) for proof in edge_proofs)
     for triple, cached_proofs in derived_proofs.items():
@@ -462,6 +470,9 @@ def _infer_relation_bounded(
         transitive_edge_index.setdefault(triple[1], {}).setdefault(
             triple[0], []).extend((triple[2], dict(proof)) for proof in cached_proofs)
     for outgoing in transitive_edge_index.values():
+        for rows in outgoing.values():
+            rows.sort(key=lambda item: (item[0], repr(item[1])))
+    for outgoing in transitive_fact_edge_index.values():
         for rows in outgoing.values():
             rows.sort(key=lambda item: (item[0], repr(item[1])))
 
@@ -498,6 +509,7 @@ def _infer_relation_bounded(
         result: list[dict[str, Any]] = []
         relation_key = atom[1]
         outgoing = transitive_edge_index.get(relation_key, {})
+        fact_outgoing = transitive_fact_edge_index.get(relation_key, {})
 
         derived_edge_cache: dict[
             tuple[tuple[str, ...], tuple[str, ...]],
@@ -547,9 +559,13 @@ def _infer_relation_bounded(
             return targets, requires_recursive_search
 
         def edges_from(current: tuple[str, ...],
-                       visited: frozenset[tuple[str, ...]]
+                       visited: frozenset[tuple[str, ...]], *,
+                       include_rule_edges: bool
                        ) -> list[tuple[tuple[str, ...], dict[str, Any]]]:
-            rows = list(outgoing.get(current, ()))
+            rows = list((outgoing if include_rule_edges else
+                         fact_outgoing).get(current, ()))
+            if not include_rule_edges:
+                return rows
             if not rules_by_conclusion.get(relation_key):
                 return rows
             indexed_targets, recursive_search = indexed_rule_targets(current)
@@ -572,53 +588,71 @@ def _infer_relation_bounded(
                             for proof in derived_edge_cache[edge])
             return rows
 
-        queue = deque([(atom[0], [], frozenset({atom[0]}))])
-        shortest_path_length: int | None = None
-        while queue:
-            current, edge_proofs, visited = queue.popleft()
-            if (shortest_path_length is not None
-                    and len(edge_proofs) >= shortest_path_length):
-                continue
-            for next_entity, edge_proof in edges_from(current, visited):
-                if exhausted:
-                    break
-                if next_entity in visited:
+        def search(include_rule_edges: bool) -> list[dict[str, Any]]:
+            nonlocal proofs_truncated
+            found: list[dict[str, Any]] = []
+            queue = deque([(atom[0], [], frozenset({atom[0]}))])
+            shortest_path_length: int | None = None
+            while queue:
+                current, edge_proofs, visited = queue.popleft()
+                if (shortest_path_length is not None
+                        and len(edge_proofs) >= shortest_path_length):
                     continue
-                if not spend():
-                    break
-                next_edges = [*edge_proofs, edge_proof]
-                if next_entity == atom[2] and len(next_edges) >= 2:
-                    if shortest_path_length is None:
-                        shortest_path_length = len(next_edges)
-                    if len(next_edges) != shortest_path_length:
+                for next_entity, edge_proof in edges_from(
+                        current, visited,
+                        include_rule_edges=include_rule_edges):
+                    if exhausted:
+                        break
+                    if next_entity in visited:
                         continue
-                    result.append({
-                        "kind": "schema",
-                        "schema": {
-                            "schema_id": "transitivity-v1",
-                            "schema_type": "transitive",
-                            "relation": relation_displays.get(
-                                relation_key, " ".join(relation_key)),
-                            "validation": {
-                                "status": "validated",
-                                "validator": "builtin-schema-check-v1",
+                    if not spend():
+                        break
+                    next_edges = [*edge_proofs, edge_proof]
+                    if next_entity == atom[2] and len(next_edges) >= 2:
+                        if shortest_path_length is None:
+                            shortest_path_length = len(next_edges)
+                        if len(next_edges) != shortest_path_length:
+                            continue
+                        found.append({
+                            "kind": "schema",
+                            "schema": {
+                                "schema_id": "transitivity-v1",
+                                "schema_type": "transitive",
+                                "relation": relation_displays.get(
+                                    relation_key, " ".join(relation_key)),
+                                "validation": {
+                                    "status": "validated",
+                                    "validator": "builtin-schema-check-v1",
+                                },
                             },
-                        },
-                        "proof_form": "flat-chain-v1",
-                        "relation_type_fact": relation_type_fact,
-                        "conclusion": display_atom((atom[0], relation_key, next_entity)),
-                        "premises": next_edges,
-                    })
-                    if len(result) >= max_proofs_per_goal:
-                        proofs_truncated = True
-                        return result
-                    continue
-                if (shortest_path_length is None
-                        or len(next_edges) < shortest_path_length):
-                    queue.append((next_entity, next_edges,
-                                  visited | {next_entity}))
+                            "proof_form": "flat-chain-v1",
+                            "relation_type_fact": relation_type_fact,
+                            "conclusion": display_atom((
+                                atom[0], relation_key, next_entity)),
+                            "premises": next_edges,
+                        })
+                        if len(found) >= max_proofs_per_goal:
+                            proofs_truncated = True
+                            return found
+                        continue
+                    if (shortest_path_length is None
+                            or len(next_edges) < shortest_path_length):
+                        queue.append((next_entity, next_edges,
+                                      visited | {next_entity}))
+            return found
 
-        return result
+        # Prefer a proof grounded entirely in stored fact edges. Rule-fed
+        # edges are more expensive and are needed only when facts cannot prove
+        # the requested path. A direct proof leaves the alternative set open
+        # whenever same-relation rules could add other edges.
+        result = search(False)
+        if result:
+            if rules_by_conclusion.get(relation_key):
+                proofs_truncated = True
+            return result
+        if exhausted:
+            return result
+        return search(True)
 
     def prove_symmetric(atom: tuple[tuple[str, ...], ...],
                         relation_type_fact: Mapping[str, Any],
@@ -718,22 +752,27 @@ def _infer_relation_bounded(
         if exhausted:
             return proofs
         new_active = active | {atom}
-        applications: list[tuple[InferenceRule, Mapping[str, Any] | None]] = [
-            (rule, None) for rule in rules_by_conclusion.get(atom[1], [])]
-        # Explore grounded base rules before recursive alternatives. An
-        # unproductive recursive branch must not exhaust the shared bound
-        # before a shorter proof is assembled.
-        applications.sort(key=lambda item: (
-            sum(_key(relation) in derivable_relations for relation in (
-                item[0].first_relation, item[0].second_relation,
-                *((item[0].third_relation,) if item[0].third_relation else ()))),
-            item[0].rule_id))
+        applications: list[tuple[InferenceRule, Mapping[str, Any] | None]] = []
+        # Built-in transitivity performs its own fact-only first pass. Run it
+        # before rules that feed the same relation so that a direct chain is
+        # retained without eagerly enumerating rule-derived alternatives.
         applications.extend((InferenceRule(
             "transitivity-v1", " ".join(relation_key), " ".join(relation_key),
             " ".join(relation_key)), type_fact)
             for relation_key, facts_for_type in transitive_type_facts.items()
             if relation_key == atom[1]
             for type_fact in facts_for_type)
+        applications.extend((rule, None)
+                            for rule in rules_by_conclusion.get(atom[1], []))
+        # Explore grounded base rules before recursive alternatives. An
+        # unproductive recursive branch must not exhaust the shared bound
+        # before a shorter proof is assembled.
+        applications.sort(key=lambda item: (
+            0 if item[0].rule_id == "transitivity-v1" else 1,
+            sum(_key(relation) in derivable_relations for relation in (
+                item[0].first_relation, item[0].second_relation,
+                *((item[0].third_relation,) if item[0].third_relation else ()))),
+            item[0].rule_id))
         applications.extend((InferenceRule(
             "symmetry-v1", " ".join(relation_key), " ".join(relation_key),
             " ".join(relation_key)), type_fact)
@@ -751,7 +790,7 @@ def _infer_relation_bounded(
                 if len(proofs) > max_proofs_per_goal:
                     proofs = proofs[:max_proofs_per_goal]
                     proofs_truncated = True
-                if proofs_truncated and len(proofs) >= max_proofs_per_goal:
+                if proofs_truncated:
                     return proofs
                 if exhausted:
                     return proofs
