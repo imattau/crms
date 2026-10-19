@@ -314,6 +314,63 @@ language transfer, or answer selection.
 
 ### Execution sequence
 
+#### Next work cycles
+
+The sequence below is the near-term queue. Keep each cycle small enough to
+review, reproduce, and commit independently. Dialogue stays active alongside
+the core capability work; it is not deferred until the end.
+
+**Cycle 1 — Re-pin the integrated baseline and close one user-visible failure.**
+Run the selected scorecard from a clean scratch location on a recorded commit,
+then add the newest user-reported dialogue transcripts to it. First verify
+that the direct-search intent frame added in `6d35723` reaches useful retrieval
+and cited answers through ordinary chat. In the same cycle, lock the
+Colosseum/Eiffel topic-switch case, source-only referent retention, and `why?`
+targeting as full-turn regressions. Fix only reproduced failures.
+
+**Gate:** the natural-language request reaches the intended evidence route;
+the multi-turn regression has no wrong-entity answer or stale explanation;
+all previously passing short follow-ups and named topic switches remain green.
+The result report names the tested commit and separates answer quality from
+intent-label agreement.
+
+**Cycle 2 — Demonstrate learned recombination beyond the demonstrations.**
+Use a small source-disjoint matrix of learned components, connective rules,
+argument roles, operation order, and values. Drive it through chat, including
+contrastive requests, missing middle steps, and paraphrased instructions. Keep
+the validator independent of the learner and preserve each rule's examples,
+holdout split, status, and lineage. Prefer one new composition that transfers
+over adding several more examples of an existing composition.
+
+**Gate:** at least one genuinely unseen composition succeeds through chat and
+passes the independent validator; a matched unsupported composition abstains;
+the learned rule and its lineage survive save/reload. A direct engine-only
+pass does not meet this gate.
+
+**Cycle 3 — Govern derivation and connect reasoning to the same interaction.**
+Extend proposal-only derived cases through verification, provenance, and
+dependency invalidation. In parallel, use chat regressions for relation
+routing, cycles/integrity constraints, conflict, missing-premise prompts, and
+proof explanations. Keep derived knowledge lower-trust and separate from
+taught/source evidence; do not enable autonomous promotion in this cycle.
+
+**Gate:** tampered or unsupported conclusions are refused; a correction to a
+premise marks its dependent derivations stale; chat and direct proof results
+agree; no incomplete search or conflict is rendered as an unqualified answer.
+
+**Continuing lane — Dialogue and contextual intent.** Keep improving the
+bounded explicit discourse state while the cycles above run. Test topic,
+referent, open-slot, task-phase, user-act, and task-intent updates on
+conversation-held-out flows. Continue the dialogue-move induction pilot as a
+research lane, and only grant it runtime authority if it improves task
+progress or reduces unhelpful turns without increasing inappropriate moves.
+
+**Bounded enabling lane — Portable SQLite model.** Finish the build/copy/
+query/learn/export/reload contract as a time-boxed infrastructure task. Do not
+hold capability experiments hostage to the entire JSON migration: use the
+current supported storage path for experiments and schedule migration work
+when it directly blocks distribution or persistence validation.
+
 1. **Pin a trustworthy end-to-end baseline.** Keep the scorecard small enough
    to run routinely and include fixed positives and negatives for source
    selection, paraphrases, multipart requests, multi-turn context, reasoning,
