@@ -375,8 +375,10 @@ chat-level routing path:
   acceptance retains the source citation used by integrity checks. Negated, conditional, and
   ambiguous unquoted multiword statements are rejected by the extractor. This is not general
   constraint discovery: relation labels and observed graph shapes do not imply a schema. Broader
-  linguistic variants, independent-source corroboration, and ordinary chat review wording remain
-  open.
+  linguistic variants and independent-source corroboration remain open. Natural chat now routes a
+  proposal to review when the question names both the relation and the proposed schema type; the
+  default wording still calls it a source-backed claim rather than explaining that it is an
+  integrity constraint.
 - **Reported timings remain below 0.1 seconds** for these cases, including 3,000 facts with
   two-level rules. This is evidence that a higher default could be affordable, but not a
   substitute for measuring adversarial branching and memory use.
@@ -393,8 +395,9 @@ The remaining issues are:
   transitive, symmetric, and closed-world behavior. The reasoning contract verifies constraint
   conflicts, cyclic-support ambiguity without a declaration, and persistence. CRMS must not infer
   constraints from a relation label. A narrow explicit-source proposal-and-review path is tested by
-  `experiments/v1_349_reviewed_relation_schema_proposals.py`; automatic constraint discovery,
-  broader source wording, and corroboration policies remain future work.
+  `experiments/v1_349_reviewed_relation_schema_proposals.py`, including natural chat review and the
+  detailed explanation renderer; automatic constraint discovery, broader source wording, and
+  corroboration policies remain future work.
 - **Query-local tabling is implemented.** The inference call memoizes complete positive proof sets
   by goal and remaining depth. `v1_309` checks two reused recursive subgoals on a converging graph,
   verifies the resulting proof independently, and confirms that fact retraction is visible to the

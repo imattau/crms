@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -48,13 +50,25 @@ def main() -> None:
             f"schema proposal lost its citation or review marker: {candidate}")
     require(not kb.facts(),
             "schema proposal changed the knowledge store before review")
-    research_result = kb.research("parent relation irreflexive", index)
+    research_result = kb.research(
+        "Is the parent relation irreflexive?", index)
+    require(research_result.status == "needs_review",
+            f"relevant schema candidate did not enter review state: "
+            f"{research_result.status}")
     require(any((item.subject, item.relation, item.object)
                 == ("parent of", "has relation type", "irreflexive")
                 and item.source == candidate.source
                 for item in research_result.candidates or []),
             f"normal source research did not surface the review candidate: "
             f"{research_result}")
+    brief = kb.render_research_brief(research_result)
+    require("supporting claim awaiting review" in brief
+            and sentence in brief,
+            f"default response hid the review status or source sentence: {brief}")
+    detail = kb.render_research(research_result)
+    require("explicit relation schema declaration" in detail
+            and "parent of → irreflexive" in detail,
+            f"detailed review rendering failed: {detail}")
 
     # Only an exact affirmative declaration is recognized. The source parser
     # must not convert negation, conditionals, or an ambiguous bare multiword
@@ -87,6 +101,30 @@ def main() -> None:
             and candidate.source in (checked.request or ""),
             f"accepted source schema did not affect reasoning with provenance: "
             f"{checked}")
+
+    with tempfile.TemporaryDirectory(prefix="crms-relation-schema-review-") as folder:
+        root = Path(folder)
+        chat_kb = CRMSKnowledgeBase()
+        chat_index = CRMSResearchIndex()
+        chat_index.add_document(
+            "schema", "Parent schema", sentence, "schema.txt")
+        chat_kb.save(root / "knowledge.json")
+        chat_index.save(root / "index.json")
+        output = subprocess.run(
+            [sys.executable,
+             str(Path(__file__).resolve().parents[1] / "crms_chat.py"),
+             "--knowledge", str(root / "knowledge.json"),
+             "--index", str(root / "index.json"),
+             "--rules", str(root / "rules.json"),
+             "--dialogue-state", str(root / "dialogue.json"),
+             "--rule-session", str(root / "session.json")],
+            input="Is the parent relation irreflexive?\n"
+                  "/pending-candidates\n/quit\n",
+            text=True, capture_output=True, check=True, timeout=20).stdout
+        require(sentence in output
+                and "supporting claim awaiting review" in output
+                and "1. parent of — has relation type → irreflexive" in output,
+                f"terminal chat did not make the schema reviewable: {output}")
 
     # An unquoted single-token relation remains usable for an explicit source
     # statement, while schema-like labels alone do not become declarations.

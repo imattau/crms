@@ -6651,6 +6651,9 @@ class CRMSKnowledgeBase:
             ({"kind": "relation_type_schema_discovery",
               "method": "explicit relation declaration sentence",
               "review_required": True,
+              "template": "explicit relation schema declaration",
+              "subject": relation,
+              "object": relation_type,
               "declared_relation_type": relation_type,
               "sources": [source]},))
 
@@ -7821,6 +7824,17 @@ class CRMSKnowledgeBase:
                     and _tokens(candidate.subject)
                     == _tokens(definition_subject.group("entity"))):
                 return True
+            if any(item.get("kind") == "relation_type_schema_discovery"
+                   for item in candidate.language_evidence):
+                # For a schema claim, the question must name both its
+                # relation and its proposed type; lexical proximity to only
+                # one side is not enough to interrupt the user for review.
+                relation_terms = set(_tokens(candidate.subject))
+                type_terms = set(_tokens(candidate.object))
+                if (relation_terms & content_terms
+                        and type_terms & content_terms):
+                    return True
+                return False
             expanded_query = tuple(dict.fromkeys(
                 (*query_words, *sorted(expansion_words))))
             if phrase_occurs(relation_words, query_words) or phrase_occurs(
