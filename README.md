@@ -55,8 +55,8 @@ Other things it can currently do:
 - Learn small rules from examples, such as how to reverse or reshape a list of
   numbers.
 - Learn new ways of phrasing questions, with your approval.
-- Compose a short, template-based fictional story from a topic. Its details
-  are explicitly labelled as invented.
+- Compose a short, template-based fictional story from a topic, revise its tone
+  between funny and adventure in the same chat, and label its details as invented.
 - Experiment with an inspectable sentence-ranker pilot. It is not enabled in
   normal chat and does not replace source checks.
 - Handle greetings, thanks, acknowledgements, short follow-up prompts, and
@@ -71,12 +71,13 @@ Being honest about limits is part of the project:
 - It is **not** a general-purpose chatbot. It will not write essays, hold
   open-ended conversations, or know things you haven't given it.
 - Its story writing uses a small fixed narrative grammar; it cannot yet write
-  varied fiction, plans, poems, songs, or revise prose broadly.
+  varied fiction, plans, poems, songs, or revise prose broadly. Story revisions
+  are limited to switching between the two supported tones.
 - Its understanding of wording is **narrow**. It can miss a question that a
   person would find obviously similar to one it handled.
-- Conversation is still **limited**. “Tell me more” asks for a topic or a
-  specific question; it does not yet track which facts have already been shown
-  or reliably elaborate on a previous answer.
+- Conversation is still **limited**. It retains a bounded clarification
+  question and can continue one topic's accepted facts, while general task-slot
+  tracking and open-ended dialogue remain incomplete.
 - It sometimes picks the **wrong sentence** from a document. It labels these
   as quoted evidence, but it is a known weakness.
 - Long creative writing, long reasoning, and broad general knowledge remain

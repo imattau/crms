@@ -93,6 +93,7 @@ def main() -> None:
             "--rule-session", str(root / "rules.json"),
             "--math", str(root / "math.json"),
             "--translations", str(root / "translations.json"),
+            "--feedback-db", str(root / "feedback.sqlite3"),
         ]
         result = subprocess.run(
             command,

@@ -3522,6 +3522,21 @@ def _natural_story_request(message: str) -> tuple[str | None, str] | None:
     return topic, tone
 
 
+def _natural_story_revision(message: str) -> str | None:
+    """Parse a narrow tone revision for the most recently generated story."""
+    match = re.fullmatch(
+        r"\s*(?:(?:please|can you|could you)\s+)?"
+        r"(?:(?:make|rewrite|revise)\s+(?:it|the story)\s+"
+        r"(?:a bit\s+|much\s+|more\s+)?(?P<tone>funny|funnier|adventure|"
+        r"adventurous)|change\s+(?:the\s+)?tone\s+to\s+"
+        r"(?P<tone2>funny|adventure))\s*[.!?]*\s*",
+        message, flags=re.IGNORECASE)
+    if match is None:
+        return None
+    tone = (match.group("tone") or match.group("tone2")).casefold()
+    return "funny" if tone in {"funny", "funnier"} else "adventure"
+
+
 _STORY_UNSUPPORTED_CONSTRAINT_RE = re.compile(
     r"\b(?:based\s+on|according\s+to|in\s+the\s+style\s+of|"
     r"using\s+(?:the\s+)?(?:facts?|sources?|documents?)|"
@@ -5298,6 +5313,7 @@ def main() -> int:
     auto_practice_questions = False
     last_generated_code = None
     pending_story_tone: str | None = None
+    last_story = None
     pending_translation_clarification: tuple[
         str, str, str, tuple[str, ...], str] | None = (
             restored_translation_clarification)
@@ -5347,6 +5363,22 @@ def main() -> int:
                 print(f"Handling {natural_part_total} explicit questions separately.")
         if not line:
             continue
+        story_revision_tone = _natural_story_revision(line)
+        if story_revision_tone is not None and last_story is not None:
+            pending_story_tone = None
+            if story_revision_tone == last_story.tone:
+                print(f"CRMS> The latest story already uses the "
+                      f"{story_revision_tone} tone.")
+                continue
+            try:
+                last_story = generate_short_story(
+                    last_story.topic, tone=story_revision_tone)
+            except ValueError as error:
+                print(f"CRMS> I couldn't revise that story: {error}")
+                continue
+            print(f"CRMS> Revised the story in a {story_revision_tone} tone.\n"
+                  + last_story.render())
+            continue
         if is_farewell(line):
             # Let the existing exit path save every session file and portable model.
             line = "/quit"
@@ -5373,6 +5405,7 @@ def main() -> int:
                 except ValueError as error:
                     print(f"CRMS> I couldn't use that story topic: {error}")
                     continue
+                last_story = story
                 print("CRMS> " + story.render())
                 continue
             pending_story_tone = None
@@ -5687,6 +5720,8 @@ def main() -> int:
         if line == "/reset":
             dialogue.clear()
             dialogue.reset_history()
+            last_story = None
+            pending_story_tone = None
             pending_candidates = []
             pending_question = ""
             _save_pending_candidates(args.candidate_session, args.knowledge,
@@ -8723,6 +8758,7 @@ def main() -> int:
             except ValueError as error:
                 print(f"CRMS> I couldn't use that story topic: {error}")
                 continue
+            last_story = story
             print("CRMS> " + story.render())
             continue
         creative_kind = _natural_creative_request(line)

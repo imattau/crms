@@ -228,11 +228,14 @@ once at load time on a bounded number of candidates and store the result.
   from a small, deterministic story grammar when given a topic. It labels the
   result as fiction with invented details, and asks for a topic when one is
   missing. The optional funny wording selects a comic grammar. Poems, songs,
-  jokes, and other open-ended writing still receive a scope reply. The
-  `experiments/v1_353_creative_request_scope.py` regression checks topic
-  clarification, output structure, factual-route controls, and unsupported
-  creative requests. This is bounded template composition, not general
-  creative generation or large-model-level revision.
+  jokes, and other open-ended writing still receive a scope reply. In-session,
+  “make it funnier” or “make it more adventurous” can revise the latest story
+  on its original topic. The exact supported tone set is bounded, and a repeated
+  request for the current tone is acknowledged without regenerating. The
+  `v1_353_creative_request_scope.py` and `v1_389_story_revision_dialogue.py`
+  regressions check topic clarification, revision, output structure,
+  factual-route controls, and unsupported creative requests. This is bounded
+  template composition and tone revision, not broad creative generation.
 - **Evidence follow-up wording:** after a quoted-source answer, `Why?` now
   states that the cited sentence was used as evidence and remains unaccepted,
   instead of describing the interaction as a missing paraphrase rule.

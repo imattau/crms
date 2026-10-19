@@ -39,6 +39,16 @@ scope and factual-routing controls passed. This checks request routing and
 story-grammar invariants, not human-rated coherence, originality, or parity
 with a large instruction model.
 
+## In-session story tone revision
+
+Command: `python3 experiments/v1_389_story_revision_dialogue.py`
+
+The terminal generates a story, revises the latest story to the other supported
+tone on request, handles a repeated tone request without rerendering, and then
+answers a factual question through the normal source route. This verifies
+session context and route separation for one narrow creative revision. It does
+not measure human-rated quality, originality, or parity with a large model.
+
 ## Capability-comparison status (2026-10-19)
 
 CRMS has focused, reproducible checks for natural-language transfer,

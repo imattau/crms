@@ -111,13 +111,17 @@ meaning and fluency; exact-match alone is not a sufficient translation metric.
 deterministic five-beat fictional story from an inspectable story grammar. A
 funny request selects a comic grammar; a missing topic triggers a clarification
 prompt. The reply marks the details as invented fiction. This generator does
-not use source facts, learn narrative rules from examples, or support poems,
-songs, jokes, and general open-ended writing.
+not use source facts or learn narrative rules from examples. In the same chat,
+users can revise the latest story between the two supported tones (funny and
+adventure); other revision dimensions remain unsupported. Poems, songs, jokes,
+and general open-ended writing are also unsupported.
 
-**Next work:** collect human-written request/ideal-story pairs and score topic
-fit, narrative coherence, requested tone, variety, and follow-up revision.
-Expand story grammar only when held-out requests show that a new beat or
-constraint improves those scores. If factual material is requested, add it as
+**Next work:** collect request/ideal-story pairs and score topic fit, narrative
+coherence, requested tone, variety, and follow-up revision. Compare the current
+two-tone revision against a strong instruction-model interaction qualitatively;
+do not equate deterministic rerendering with human-quality revision. Expand
+story grammar only when held-out requests show that a new beat or constraint
+improves those scores. If factual material is requested, add it as
 separately cited story ingredients and keep invented connective details
 labelled as fiction.
 
