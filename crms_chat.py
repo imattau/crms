@@ -1516,7 +1516,9 @@ def _natural_count_question(message: str) -> tuple[str, str, str] | None:
     return values if all(values) else None
 
 
-def _natural_coordinated_who(message: str) -> tuple[str, tuple[str, ...]] | None:
+def _natural_coordinated_who(
+        message: str, index: CRMSSQLiteResearchIndex | None = None
+        ) -> tuple[str, tuple[str, ...]] | None:
     """Parse a bounded two-to-five object list in a coordinated Who question."""
     match = re.fullmatch(
         r"\s*who\s+(?:(?:did|do|does)\s+)?"
@@ -1526,6 +1528,17 @@ def _natural_coordinated_who(message: str) -> tuple[str, tuple[str, ...]] | None
             "is", "are", "was", "were", "has", "have", "had"}:
         return None
     raw = match.group("objects").strip()
+    # A conjunction inside an exact article title is part of one entity, not
+    # an object-list delimiter. The chat caller supplies the title index so
+    # this lexical split cannot hide an answer for (or falsely partial-match)
+    # a named work such as "Research and Development".
+    if index is not None:
+        title_query = re.sub(r"^(?:a|an|the)\s+", "", raw,
+                             flags=re.IGNORECASE)
+        if (index.exact_title_matches(raw)
+                or (title_query != raw
+                    and index.exact_title_matches(title_query))):
+            return None
     # Commas delimit list items; the final conjunction is optional when a
     # serial comma is used. Preserve ordinary multiword entity names.
     if "," in raw:
@@ -9123,7 +9136,7 @@ def main() -> int:
         realized = None
         who_route_used = False
         conjunctive_who_route_used = False
-        coordinated_who = _natural_coordinated_who(line)
+        coordinated_who = _natural_coordinated_who(line, index=index)
         if (coordinated_who is not None
                 and turn.status in {"unknown", "sources_found", "needs_review"}):
             predicate, objects = coordinated_who

@@ -37,6 +37,17 @@ def main() -> None:
                            "python.txt")
         index.add_document("linux", "Linux", "Linus Torvalds created Linux.",
                            "linux.txt")
+        index.add_document(
+            "research-development", "Research and Development",
+            "Ada Lovelace created Research and Development.", "rd.txt")
+        index.add_document("research", "Research", "Grace Hopper created Research.",
+                           "research.txt")
+        require(_natural_coordinated_who(
+            "Who created Research and Development?", index=index) is None,
+            "exact-title conjunction was parsed as an object list")
+        require(_natural_coordinated_who(
+            "Who created the Research and Development?", index=index) is None,
+            "article-prefixed exact-title conjunction was parsed as a list")
         index.close()
         knowledge_path = root / "knowledge.json"
         CRMSKnowledgeBase().save(knowledge_path)
@@ -47,7 +58,8 @@ def main() -> None:
              "--translations", str(root / "translations.json"),
              "--dialogue-state", str(root / "dialogue.json"),
              "--rule-session", str(root / "rule-session.json")],
-            input="Who created Python, Linux, and Ruby?\n/quit\n", text=True,
+            input=("Who created Python, Linux, and Ruby?\n"
+                   "Who created Research and Development?\n/quit\n"), text=True,
             capture_output=True, cwd=root, timeout=30)
         output = run.stdout + run.stderr
         require(run.returncode == 0 and "Traceback" not in output,
@@ -58,9 +70,15 @@ def main() -> None:
         require("couldn't find evidence for Ruby" in output
                 and "does not answer every part" in output,
                 f"chat failed to disclose the missing item: {output}")
+        exact_title_turn = output.split(
+            "does not answer every part of your question.", maxsplit=1)[-1]
+        require("Ada Lovelace created Research and Development." in exact_title_turn
+                and "Partial source evidence:" not in exact_title_turn,
+                f"exact-title conjunction was incorrectly split: {output}")
 
     print("coordinated Who lists: PASS")
-    print("two/three-item parsing, full supported answers, and missing-item disclosure: PASS")
+    print("two/three-item parsing, full supported answers, missing-item disclosure, "
+          "and exact-title conjunction handling: PASS")
 
 
 if __name__ == "__main__":

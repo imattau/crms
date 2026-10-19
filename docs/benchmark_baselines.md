@@ -107,6 +107,9 @@ with `and` is also split only when it starts with another question form. A secon
 Torvalds and the birthplace route returns exact-title Helsinki evidence. Shared-verb coordination
 (“Who created Python and Linux?”) is not split and remains covered by
 `experiments/v1_325_coordinated_who_lists.py`, which passes its answer-or-disclose-missing checks.
+That fixture also pairs an exact title containing a conjunction (“Research and Development”)
+with a shorter title (“Research”); exact-title lookup keeps the longer entity intact and prevents
+a misleading partial list answer.
 This is a bounded clause-preservation and one role-grounded pronoun-transfer result; it does not
 cover ambiguous or non-Who antecedents or report an aggregate count of successfully answered parts.
 
