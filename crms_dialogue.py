@@ -123,7 +123,7 @@ _FOLLOWUP_ENTITY_RE = re.compile(
     flags=re.IGNORECASE)
 _SOURCE_ORDINAL_FOLLOWUP_RE = re.compile(
     r"^(?:(?:what about|tell me about|tell me more about|"
-    r"can you tell me about|can you tell me more about)\s+)"
+    r"can you tell me about|can you tell me more about)\s+)?"
     r"(?:the\s+)?(?P<ordinal>first|1st|second|2nd|third|3rd|fourth|4th|last|"
     r"other|another)\s+(?:one|option|source|result|item)[?!.]*$",
     flags=re.IGNORECASE)
@@ -1010,8 +1010,10 @@ class CRMSDialogue:
                     break
         return found
 
-    def _unanchored_question_entities(self, question: str,
-                                      quoted_text: str) -> list[str]:
+    def _unanchored_question_entities(
+            self, question: str, quoted_text: str,
+            research: ResearchResult | None = None,
+            research_index: Any | None = None) -> list[str]:
         """Find named query entities absent from the evidence shown to users.
 
         Source retrieval can find a sentence about a related entity because
@@ -1035,17 +1037,71 @@ class CRMSDialogue:
                           _WORD_RE.findall(str(record.get("entity", ""))))
                         == entity_tokens):
                     accepted_surfaces.add(" ".join(alias))
-            if not any(re.search(
+            if any(re.search(
                     r"(?<!\w)" + re.escape(surface) + r"(?!\w)",
                     quoted_text, flags=re.IGNORECASE)
                        for surface in accepted_surfaces):
-                missing.append(entity)
+                continue
+            if self._entity_anchors_source_paragraph(
+                    entity, accepted_surfaces, research, research_index):
+                continue
+            missing.append(entity)
         return missing
 
+    def _entity_anchors_source_paragraph(
+            self, entity: str, accepted_surfaces: set[str],
+            research: ResearchResult | None,
+            research_index: Any | None) -> bool:
+        """Check whether verified citation context names the queried entity.
+
+        Retrieval may return a pronoun sentence without its antecedent. A
+        mention elsewhere in the document cannot license it, so inspect only
+        the paragraph containing the exact cited span and require the name to
+        occur before that span.
+        """
+        if research is None or research_index is None:
+            return False
+        if (self.topic_entity is not None
+                and self.topic_entity.casefold() != entity.casefold()):
+            return False
+        for item in research.source_sentences or []:
+            citation = item.get("citation")
+            if not isinstance(citation, str) or "#sha256=" not in citation:
+                continue
+            try:
+                document_id = citation.split("#sha256=", 1)[0]
+                excerpt = research_index.resolve_citation(citation)
+                document = research_index.document(document_id)
+                offsets = citation.split("&chars=", 1)[1].split("&", 1)[0]
+                start_text, _end_text = offsets.split(":", 1)
+                start = int(start_text)
+            except (AttributeError, IndexError, KeyError, TypeError, ValueError):
+                continue
+            if excerpt != item.get("text"):
+                continue
+            source = document.text
+            if start < 0 or start > len(source):
+                continue
+            previous_break = source.rfind("\n\n", 0, start)
+            paragraph_start = previous_break + 2 if previous_break >= 0 else 0
+            next_paragraph = source.find("\n\n", start)
+            paragraph_end = len(source) if next_paragraph < 0 else next_paragraph
+            paragraph = source[paragraph_start:paragraph_end]
+            relative_start = start - paragraph_start
+            for surface in accepted_surfaces:
+                if any(match.start() < relative_start for match in re.finditer(
+                        r"(?<!\w)" + re.escape(surface) + r"(?!\w)",
+                        paragraph, flags=re.IGNORECASE)):
+                    return True
+        return False
+
     def _reject_unanchored_source_answer(
-            self, question: str, resolved: str, quoted_text: str
+            self, question: str, resolved: str, quoted_text: str,
+            research: ResearchResult | None = None,
+            research_index: Any | None = None
             ) -> DialogueTurn | None:
-        missing = self._unanchored_question_entities(resolved, quoted_text)
+        missing = self._unanchored_question_entities(
+            resolved, quoted_text, research, research_index)
         if not missing:
             return None
         self.clear()
@@ -1438,6 +1494,13 @@ class CRMSDialogue:
             self.last_selected_answer = None
             self.last_writing_subject = None
             self.last_writing_request = None
+        elif (research is not None
+              and research.status in {"sources_found", "needs_review"}
+              and research.source_sentences):
+            # Explaining a valid source-only answer is a read of the current
+            # turn's evidence, not a new failed question. Keep its topic and
+            # citation-backed referents available for the next follow-up.
+            pass
         else:
             self.clear()
         return result
@@ -1802,6 +1865,15 @@ class CRMSDialogue:
                 return DialogueTurn(
                     "smalltalk", question, question,
                     text=f"Your last question was: {self.last_question}")
+            previous_question = next((
+                entry.get("utterance", "") for entry in reversed(self.history)
+                if entry.get("act") == "question"
+                and isinstance(entry.get("utterance"), str)
+                and entry["utterance"].strip()), None)
+            if previous_question:
+                return DialogueTurn(
+                    "smalltalk", question, question,
+                    text=f"Your last question was: {previous_question}")
             return DialogueTurn(
                 "smalltalk", question, question,
                 text="I have no earlier question in this conversation.")
@@ -1858,12 +1930,21 @@ class CRMSDialogue:
                         "source or entity you want to follow up on.")
             return DialogueTurn("clarify", question, self.last_question or question,
                                 text=text)
+        if (ordinal_match and not self.presented_sources
+                and self.pending_result is None
+                and self.pending_binding is None):
+            return DialogueTurn(
+                "clarify", question, self.last_question or question,
+                text=("I don't have a numbered source list open. Which result "
+                      "or entity do you mean?"))
         return None
 
     def turn(self, question: str, *, research_index: Any | None = None) -> DialogueTurn:
         question = question.strip()
         if not question:
             raise ValueError("question must be a non-empty string")
+        prior_topic_entity = self.topic_entity
+        prior_source_mentions = list(self.source_mentions)
         quick = self._quick_reply(question)
         if quick is not None:
             return quick
@@ -1906,7 +1987,7 @@ class CRMSDialogue:
                 text = self.knowledge.render_research_brief(research)
                 if research.status in {"sources_found", "needs_review"}:
                     rejected = self._reject_unanchored_source_answer(
-                        question, expanded, text)
+                        question, expanded, text, research, research_index)
                     if rejected is not None:
                         return rejected
                 result = DialogueTurn(research.status, question, expanded,
@@ -2077,7 +2158,7 @@ class CRMSDialogue:
             text = self.knowledge.render_research_brief(research)
             if research.status in {"sources_found", "needs_review"}:
                 rejected = self._reject_unanchored_source_answer(
-                    question, resolved, text)
+                    question, resolved, text, research, research_index)
                 if rejected is not None:
                     return rejected
             if (research.status == "sources_found" and research_index is not None
@@ -2111,6 +2192,11 @@ class CRMSDialogue:
         else:
             # Unknown, ambiguous, or review-only turns must not leave a stale
             # referent available for an unrelated later pronoun.
+            locally_anchored_topic = bool(
+                research is not None and prior_topic_entity
+                and self._entity_anchors_source_paragraph(
+                    prior_topic_entity, {prior_topic_entity}, research,
+                    research_index))
             self.clear()
             if response is not None and response.status == "ambiguous" and response.candidates:
                 self.pending_question = resolved
@@ -2144,6 +2230,14 @@ class CRMSDialogue:
                 if self.source_mentions:
                     # Keep only entities from text actually quoted this turn;
                     # they are candidate referents, not accepted knowledge.
+                    self.last_question = resolved
+                elif locally_anchored_topic:
+                    # A pronoun-only source sentence may omit its antecedent
+                    # even though the exact citation is in the same paragraph
+                    # as the previously named topic. Keep that topic and its
+                    # already-visible source reference for subsequent turns.
+                    self.topic_entity = prior_topic_entity
+                    self.source_mentions = prior_source_mentions
                     self.last_question = resolved
                 else:
                     # Retain a source-backed acronym as a discourse focus.

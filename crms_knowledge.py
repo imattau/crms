@@ -7684,7 +7684,8 @@ class CRMSKnowledgeBase:
             start = int(span.group(1))
             if not 0 <= start <= len(document.text):
                 return False
-            paragraph_start = document.text.rfind("\n\n", 0, start) + 2
+            previous_break = document.text.rfind("\n\n", 0, start)
+            paragraph_start = previous_break + 2 if previous_break >= 0 else 0
             paragraph_end = document.text.find("\n\n", start)
             if paragraph_end < 0:
                 paragraph_end = len(document.text)
@@ -7781,7 +7782,8 @@ class CRMSKnowledgeBase:
                     return False
                 if start is None or end is None:
                     return False
-                left = document.text.rfind("\n\n", 0, start) + 2
+                previous_break = document.text.rfind("\n\n", 0, start)
+                left = previous_break + 2 if previous_break >= 0 else 0
                 right = document.text.find("\n\n", end)
                 if right < 0:
                     right = len(document.text)
@@ -7884,6 +7886,44 @@ class CRMSKnowledgeBase:
                         context_candidates.append((
                             answer_start - context_end, context_start,
                             context_end, document))
+                    if not context_candidates:
+                        # The retrieval result may contain only the pronoun
+                        # sentence, even though the preceding sentence in its
+                        # source paragraph names the question's entity. Search
+                        # that exact paragraph for the nearest cited-local
+                        # antecedent instead of discarding safe evidence or
+                        # binding it to a mention elsewhere in the document.
+                        try:
+                            document = research_index.document(
+                                str(answer_sentence["document_id"]))
+                        except (AttributeError, KeyError, TypeError, ValueError):
+                            document = None
+                        if document is not None:
+                            left_break = document.text.rfind(
+                                "\n\n", 0, answer_start)
+                            right_break = document.text.find(
+                                "\n\n", answer_start)
+                            paragraph_start = (left_break + 2
+                                               if left_break >= 0 else 0)
+                            if right_break < 0:
+                                right_break = len(document.text)
+                            paragraph = document.text[
+                                paragraph_start:right_break]
+                            for local_start, local_end in _sentence_spans(
+                                    paragraph):
+                                context_start = paragraph_start + local_start
+                                context_end = paragraph_start + local_end
+                                if (context_end > answer_start
+                                        or answer_start - context_end > 500):
+                                    continue
+                                context_text = document.text[
+                                    context_start:context_end]
+                                if not named_anchor_tokens.issubset(
+                                        set(_tokens(context_text))):
+                                    continue
+                                context_candidates.append((
+                                    answer_start - context_end, context_start,
+                                    context_end, document))
                     if context_candidates:
                         _distance, context_start, _context_end, document = min(
                             context_candidates, key=lambda row: (row[0], row[1]))
@@ -8017,7 +8057,12 @@ class CRMSKnowledgeBase:
                     break
         contextual_explanation: dict[str, Any] | None = None
         explanation_question = bool(
-            query_words and query_words[0] in {"how", "why", "explain"})
+            query_words and (
+                query_words[0] in {"why", "explain"}
+                or (query_words[0] == "how" and len(query_words) > 1
+                    and query_words[1] in {
+                        "does", "do", "did", "can", "could", "would",
+                        "should", "is", "are", "was", "were"})))
         if (explanation_question and response.status != "answered"
                 and hits):
             # The best matching sentence can be only the last clause of an
@@ -8036,7 +8081,9 @@ class CRMSKnowledgeBase:
                 document = research_index.document(hit.document_id)
                 if document.pages or hit.start is None or hit.end is None:
                     continue
-                left = document.text.rfind("\n\n", 0, hit.start) + 2
+                previous_break = document.text.rfind(
+                    "\n\n", 0, hit.start)
+                left = previous_break + 2 if previous_break >= 0 else 0
                 right = document.text.find("\n\n", hit.end)
                 if right < 0:
                     right = len(document.text)
@@ -8114,6 +8161,33 @@ class CRMSKnowledgeBase:
                      and abs(row[2] - anchor[2]) <= 2),
                     key=lambda row: (abs(row[2] - anchor[2]), row[3]))
                 selected = [anchor, *nearby[:2]]
+                if (named_anchor_tokens and selected
+                        and re.match(r"\s*(?:it|its)\b", selected[0][5],
+                                     flags=re.IGNORECASE)):
+                    # The explanatory/how-question path rebuilds its own
+                    # extractive result after the earlier answer-sentence
+                    # ranker. Carry the local antecedent through that rebuild
+                    # too, or it would erase the identity context just added
+                    # above.
+                    answer_start = selected[0][3]
+                    previous_anchors = []
+                    for sentence_index, (start, end) in enumerate(
+                            _sentence_spans(paragraph)):
+                        absolute_start = paragraph_start + start
+                        absolute_end = paragraph_start + end
+                        if (absolute_end > answer_start
+                                or answer_start - absolute_end > 500):
+                            continue
+                        text = paragraph[start:end].strip()
+                        if named_anchor_tokens.issubset(set(_tokens(text))):
+                            previous_anchors.append((
+                                0, answer_start - absolute_end, sentence_index,
+                                absolute_start,
+                                absolute_start + len(text), text))
+                    if previous_anchors:
+                        selected.append(min(
+                            previous_anchors,
+                            key=lambda row: (row[1], row[3])))
                 selected.sort(key=lambda row: row[3])
                 answer_text = "\n".join(row[5] for row in selected)
                 if len(answer_text) > 1800:
@@ -8121,7 +8195,11 @@ class CRMSKnowledgeBase:
                     answer_text = selected[0][5]
                 citation_start = min(row[3] for row in selected)
                 citation_end = max(row[4] for row in selected)
+                # The displayed extract must be the exact contiguous source
+                # slice covered by its citation, including original spacing
+                # between selected sentences.
                 cited_excerpt = document.text[citation_start:citation_end]
+                answer_text = cited_excerpt
                 paragraph_hit = SearchHit(
                     hit.document_id, hit.title, hit.location, hit.score,
                     cited_excerpt, citation_start, citation_end,
