@@ -152,6 +152,8 @@ class DialogueTurn:
     # A chat command the conversation layer asks the terminal to run next,
     # always taken from a fixed allowlist, never from user text.
     action: str | None = None
+    # True when this turn added a fact, so the terminal saves the knowledge.
+    learned: bool = False
 
 
 class CRMSDialogue:

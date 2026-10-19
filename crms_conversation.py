@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import re
 from typing import Any
 
@@ -106,6 +107,138 @@ def natural_feedback_verdict(text: str) -> str | None:
         return None
     verdict = " ".join(match.group("verdict").casefold().split())
     return "wrong" if verdict in _NEGATIVE_VERDICTS else "right"
+
+
+_STATEMENT_WORD_RE = re.compile(r"[A-Za-z][A-Za-z'’-]*|\d+")
+_DETERMINERS = {"the", "a", "an", "this", "that", "these", "those", "his", "her",
+                "their", "its", "our", "my", "your", "some", "many", "one", "each",
+                "every", "no", "all", "any"}
+_NAME_CONNECTORS = {"of", "van", "von", "de", "da", "del", "la", "le", "bin", "ibn"}
+_STATEMENT_BLOCKED_FIRST_WORDS = {
+    "what", "who", "whom", "whose", "which", "when", "where", "why", "how",
+    "is", "are", "was", "were", "do", "does", "did", "can", "could", "will",
+    "would", "should", "please", "teach", "tell", "show", "write", "compose",
+    "translate", "explain", "calculate", "solve", "find", "list", "give",
+    "hello", "hi", "hey", "thanks", "thank", "yes", "no", "ok", "okay", "i",
+    "my", "we", "you", "it", "he", "she", "they", "there", "here", "if", "so",
+    "but", "and", "or", "because", "let", "make", "add", "remember", "forget",
+}
+_STATEMENT_BLOCKED_WORDS = {
+    "and", "or", "but", "because", "although", "which", "that", "who", "whom",
+    "if", "when", "while", "not", "never", "i", "you", "we", "me", "us",
+}
+_STATEMENT_LIMIT = 24
+
+
+def parse_statement(text: str) -> tuple[str, str, str] | None:
+    """Split a plain sentence into (subject, relation, object), or return None.
+
+    A deliberately narrow proposal, not a parser: a leading named entity, a
+    short run of lowercase predicate words, and the rest as the object. It
+    only ever proposes; the user confirms before anything is stored.
+    """
+    stripped = text.strip()
+    if (not stripped or stripped.endswith("?") or stripped.startswith("/")
+            or any(mark in stripped for mark in ",;:()\"“”")):
+        return None
+    stripped = stripped.rstrip(".! ")
+    if re.fullmatch(r"[A-Za-z0-9'’ -]+", stripped) is None:
+        return None
+    words = _STATEMENT_WORD_RE.findall(stripped)
+    if len(words) < 3 or len(words) > _STATEMENT_LIMIT:
+        return None
+    if words[0].casefold() in _STATEMENT_BLOCKED_FIRST_WORDS:
+        return None
+    if any(word.casefold() in _STATEMENT_BLOCKED_WORDS for word in words):
+        return None
+    index = 0
+    if words[0].casefold() in {"the", "a", "an"}:
+        index = 1
+    if index >= len(words) or not words[index][:1].isupper():
+        return None
+    end = index
+    while end < len(words):
+        word = words[end]
+        if word[:1].isupper() or word.isdigit():
+            end += 1
+        elif (word.casefold() in _NAME_CONNECTORS and end + 1 < len(words)
+              and words[end + 1][:1].isupper()):
+            end += 1
+        else:
+            break
+    subject = " ".join(words[:end])
+    predicate_end = end
+    while (predicate_end < len(words) and predicate_end - end < 3
+           and words[predicate_end][:1].islower()
+           and words[predicate_end].casefold() not in _DETERMINERS):
+        predicate_end += 1
+    if predicate_end == end or predicate_end >= len(words):
+        return None
+    relation = " ".join(words[end:predicate_end]).casefold()
+    obj = " ".join(words[predicate_end:])
+    if len(obj.split()) > 8:
+        return None
+    return subject, relation, obj
+
+
+def _has_fact(knowledge: Any, subject: str, relation: str, obj: str) -> bool:
+    key = knowledge._fact_key(knowledge._canonicalize_entity(subject), relation,
+                              knowledge._canonicalize_entity(obj))
+    return knowledge._facts.get(key) is not None
+
+
+def _statement_source(sentence: str) -> str:
+    """One shared origin for everything a user tells CRMS, one fragment per statement."""
+    digest = hashlib.sha256(sentence.strip().encode("utf-8")).hexdigest()[:10]
+    return f"told by user#{digest}"
+
+
+def _propose_statement(dialogue: CRMSDialogue, text: str) -> DialogueTurn | None:
+    parsed = parse_statement(text)
+    if parsed is None:
+        return None
+    subject, relation, obj = parsed
+    knowledge = dialogue.knowledge
+    if _has_fact(knowledge, subject, relation, obj):
+        return DialogueTurn(
+            "social", text, text,
+            text=f"I already have that: {subject} — {relation} → {obj}.")
+    dialogue.offers = [{
+        "kind": "confirm_statement", "turns_left": _OFFER_LIFETIME,
+        "sentence": text.strip(), "subject": subject, "relation": relation,
+        "object": obj}]
+    return DialogueTurn(
+        "social", text, text,
+        text=(f"I understood: {subject} — {relation} → {obj}. Shall I remember "
+              "that as something you told me? Say ‘yes’ or ‘no’."))
+
+
+def _learn_statement(dialogue: CRMSDialogue, offer: dict[str, Any],
+                     text: str) -> DialogueTurn:
+    knowledge = dialogue.knowledge
+    subject, relation, obj = offer["subject"], offer["relation"], offer["object"]
+    sentence = offer["sentence"]
+    source = _statement_source(sentence)
+    try:
+        knowledge.add_fact(subject, relation, obj, source)
+    except ValueError as error:
+        return DialogueTurn("social", text, text,
+                            text=f"I could not store that: {error}")
+    lines = [f"Remembered: {subject} — {relation} → {obj} [told by user]."]
+    try:
+        learned_pattern = knowledge.teach_fact_pattern(
+            sentence, subject=subject, relation=relation, obj=obj, source=source)
+    except ValueError:
+        learned_pattern = None
+    if learned_pattern:
+        lines.append("I can now recognise sentences worded like that one.")
+    else:
+        lines.append("I need one more example with different names before I "
+                     "recognise this wording on my own.")
+    lines.append(f"Forget it with: /retract-fact POS|{subject}|{relation}|"
+                 f"{obj}|{source}")
+    return DialogueTurn("learned", text, text, text="\n".join(lines),
+                        learned=True)
 
 
 def offer_pending_review(dialogue: CRMSDialogue) -> str | None:
@@ -382,7 +515,7 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         accepted = _BARE_YES_NO_RE.fullmatch(text.strip()).group(0).casefold()
         said_yes = accepted.split()[0].strip(",.!?") in {
             "yes", "yeah", "yep", "yup", "sure", "certainly", "absolutely"}
-        offer = dialogue.offers.pop(0)
+        offer = dialogue.offers[-1]
         dialogue.offers = []
         intent = UserIntentHypothesis(
             dialogue_act="accept-offer" if said_yes else "decline-offer",
@@ -392,7 +525,11 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             context_predicates=("open_offer",),
             selected_value=offer["kind"],
         )
-        if said_yes:
+        if offer["kind"] == "confirm_statement":
+            reply = (_learn_statement(dialogue, offer, text) if said_yes else
+                     DialogueTurn("social", text, text,
+                                  text="Okay, I won't remember that."))
+        elif said_yes:
             reply = DialogueTurn("social", text, text,
                                  text="Okay, here they are.",
                                  action=offer["action"])
@@ -509,6 +646,19 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         explained = _explain_earlier_answer(dialogue, text, research_index)
         if explained is not None:
             return with_intent(explained)
+    if act is None and dialogue.pending_result is None:
+        proposal = _propose_statement(dialogue, text)
+        if proposal is not None:
+            proposed = bool(dialogue.offers)
+            intent = UserIntentHypothesis(
+                dialogue_act="inform",
+                task_intent="provide-information",
+                decision="ambiguous" if proposed else "selected",
+                matched_frame="user-statement",
+                context_predicates=("plain-statement",),
+                alternatives=("remember", "ignore") if proposed else (),
+            )
+            return with_intent(proposal)
     if act is None:
         turn = dialogue.turn(text, research_index=research_index)
         if dialogue.pending_binding is not None:

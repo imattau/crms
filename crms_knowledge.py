@@ -14689,6 +14689,19 @@ class CRMSKnowledgeBase:
                          f"(predicate: {item['predicate']}; "
                          f"relation: {item['relation']}).")
                 continue
+            if item.get("kind") == "fact_pattern_derived_question_frame":
+                lineage = item.get("lineage") or {}
+                derivation = item.get("derivation") or {}
+                training = ", ".join(
+                    lineage.get("training_source_documents", []))
+                text += (f"\nMatched fact-pattern question frame: "
+                         f"{derivation.get('rule', 'derived from taught sentence patterns')} "
+                         f"(predicate: "
+                         f"{derivation.get('predicate_form', item.get('base_relation'))}; "
+                         f"relation: {item.get('target_relation')}; "
+                         f"artifact {item.get('artifact_id')}; "
+                         f"training sources: {training}).")
+                continue
             if item.get("kind") == "stored_relation_subject_question":
                 text += (f"\nMatched stored-relation subject question: "
                          f"{item['grammar']} "
@@ -14699,6 +14712,11 @@ class CRMSKnowledgeBase:
                 f"{entry['relation']} → {', '.join(entry['surface_forms'])} "
                 f"[sources: {', '.join(entry['sources'])}]"
                 for entry in item.get("support", []))
+            if "canonical_form" not in item:
+                # An evidence kind without its own wording must not stop the
+                # answer from rendering.
+                text += f"\nLanguage evidence: {item.get('kind', 'unspecified')}."
+                continue
             if item.get("kind") == "observed_predicate_form":
                 text += (f"\nObserved predicate form: {item['canonical_form']} → "
                          f"{item['surface_form']} (grounded by {support}).")

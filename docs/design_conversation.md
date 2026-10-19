@@ -187,7 +187,7 @@ state cannot be loaded.
 | `qud` | Question under discussion: relation asked, bound entity, answer slot | "And Ada Lovelace?", "What about X?" | missing |
 | `shown` | Keys of accepted facts already presented (500 at most) | elaboration without repeats | implemented in phase 1 |
 | `offers` | Open proposals with a one-or-two-turn expiry | yes / no / "ok" | partly (open choice only) |
-| `session_facts` | Statements the user made, with speaker and turn as provenance, not accepted | conversational teaching (5.9) | missing |
+| `session_facts` | Statements the user made, with speaker and turn as provenance, not accepted | conversational teaching (5.9) | not built; confirmed statements become permanent facts with a "told by user" source instead |
 | intent hypothesis | Current-turn decision record | routing, `/intent` | exists |
 
 Design decisions:
@@ -233,7 +233,7 @@ Vocabulary follows `UserIntentHypothesis` (`dialogue_act`, `task_intent`) from t
 | clarification choice | "the second one" | `_select_candidate` | pending result | implemented |
 | entity overview | "What do you know about X?" | entity card (5.8) | facts about X | implemented in phase 2 for entities with accepted facts |
 | capability / meta | "What can you do?" | help text | none | implemented; status slots missing |
-| user statement | "Ada wrote the first algorithm." | confirm-and-learn (5.9) | `session_facts` | missing |
+| user statement | "Ada wrote the first algorithm." | confirm-and-learn (5.9) | the sentence | implemented in phase 4 (permanent, confirmed, labelled) |
 | out of scope | "Write me a poem" | scope message | none | partly (stories, scope text) |
 
 ### 4.2 Classification
@@ -344,37 +344,64 @@ relation, a count of mentioning source passages, and an unreviewed-claims sectio
 entities.
 
 ### 5.9 Conversational teaching
-The user states something in a plain sentence; CRMS replies with what it understood and asks before
-storing anything:
+Implemented in phase 4, after the spike this section called for. The user states something in a plain
+sentence; CRMS replies with what it understood and asks before storing anything:
 
 ```
-I understood: Ada Lovelace — wrote — the first published algorithm.
-Remember it for this session, remember it permanently, or ignore it?
+I understood: Ada Lovelace — wrote → the first published algorithm. Shall I remember that as
+something you told me? Say ‘yes’ or ‘no’.
 ```
 
-- Nothing is stored before an explicit answer, and nothing becomes an accepted fact without the
-  existing acceptance gate. The exact gates stay in charge. This agrees with the intent design: a user
-  claim is not a world fact by default.
-- A session statement lives in `session_facts` with speaker `user`, is labelled as told by the user,
-  and does not feed rule discovery until promoted.
-- On conflict with an accepted fact or a cited source, show both with provenance and ask which to
-  keep. Never overwrite silently.
+**Spike results.** Both risks from the first draft were tested before building.
 
-**Feasibility risk found in review.** Two things in the first draft were not checked and are false as
-stated:
+1. *Extraction.* `propose_facts` returns nothing for a fresh wording. A wording pattern is learned by
+   `teach_fact_pattern`, which declines the first example (it needs at least two distinct subjects and
+   objects) and accepts the second; after that an unseen sentence ("Jane Austen wrote Emma.") is
+   proposed. So the first two statements of a new wording cannot be recognised automatically.
+2. *Citation.* A fact whose source is a plain string, not an indexed document, works end to end:
+   it answers questions, is explained by "why?", takes `/right` and `/wrong` feedback, and can be
+   retracted. No transcript document is needed.
 
-1. `propose_facts` only returns candidates from *licensed* fact patterns. In a fresh knowledge base it
-   returned no candidates for "Ada Lovelace wrote the first published algorithm.", "My name is Matt."
-   or "Charles Babbage designed the Analytical Engine." (the same last sentence does produce a claim
-   through the `/source` path, which realises questions from source sentences instead). A user
-   statement therefore needs either a learned pattern for its wording or a different extraction path.
-2. Facts need a citation that resolves. A user's turn is not a document in the research index. A
-   workable route, not tried: append the statement to a session transcript source indexed with a
-   content hash and character offsets, as the Taskmaster pilot does for its transcripts, so the
-   citation resolves like any other.
+**The flow.**
 
-Until a spike shows both work, treat 5.9 as unproven. If no licensed pattern matches, say so and
-offer `/teach-fact`; never guess a relation.
+- `parse_statement` (in `crms_conversation.py`) proposes (subject, relation, object) from a plain
+  sentence: a leading named entity, one to three lowercase predicate words, the rest as the object. It
+  is deliberately narrow. It refuses questions, commands, first-person sentences ("My name is Matt."),
+  anything with punctuation inside, compound or subordinate sentences, and a list of imperative and
+  greeting openers. It only ever proposes; this is not a parser.
+- The proposal opens a `confirm_statement` offer (section 5.6). A bare yes stores it, a bare no
+  discards it, and it lapses after two other turns. Nothing is stored before the yes, and a sentence
+  already known is reported as known instead of proposed.
+- On yes, the fact is added with the source `told by user#<hash of the sentence>`. The part before the
+  `#` is the same for every statement, so source-independence counting sees all user statements as one
+  origin and they cannot inflate rule validation. The reply is labelled "[told by user]", says whether
+  the wording is now recognised or needs one more example, and prints the exact
+  `/retract-fact POS|…` command that forgets it. The terminal saves the knowledge immediately.
+- The told-by-user fact answers questions straight away (a stored-relation question frame needs no
+  extra teaching).
+
+This is a different evidence class from a cited source: it records that the user said it, not that it
+is true. The label travels with the fact into answers ("Sources: told by user") and nothing in
+this flow marks it as corroborated.
+
+**Not done.**
+
+- *Session scope.* The first draft offered "this session / permanently / ignore". Only a permanent
+  confirmed fact exists, because session-only facts would need the terminal's many `knowledge.save`
+  calls to skip them. Open question 2 stands, now with this as the default.
+- *Conflicts.* A statement that contradicts an accepted fact or a source is not detected. A
+  functional-relation conflict would show only at inference time.
+- *First-person statements* and statements with several objects are refused, not handled.
+- *Unconfirmed wording learning.* The wording pattern is taught from the same confirmation; a mistaken
+  parse that the user confirmed teaches a mistaken pattern. Review of learned patterns is the existing
+  `/retract-fact` and pattern tooling, not new here.
+
+**A bug this exposed, fixed.** After a second confirmed statement for a verb, answering a question
+raised `KeyError: 'canonical_form'`: `render` had no branch for the evidence kind
+`fact_pattern_derived_question_frame` and its fallback assumed every other kind had a
+`canonical_form`. It reproduces with `add_fact` and `teach_fact_pattern` alone, so it predates this
+work and would have hit `/teach-fact` users. `render` now has a branch for that kind and a fallback
+that cannot fail.
 
 ## 6. Reply plan and realisation
 
@@ -433,8 +460,9 @@ The numbering is changed from the first draft because phase 0 is largely done.
    (checked by `experiments/v1_374_conversation_offers_and_corrections.py`). Not done: clarification
    questions for two entities with one name and for "multiple equally supported source sentences",
    suggestion offers, and "Are you sure?".
-4. **Conversational teaching.** First a spike on the two risks in 5.9; only then the confirm-and-learn
-   flow with session and permanent scope.
+4. **Conversational teaching.** Done on branch `conversation-phase4`: the spike, then confirm-and-learn
+   with permanent scope only (checked by `experiments/v1_375_conversation_teaching.py`). Session scope,
+   conflict display and first-person statements are not done (5.9).
 5. **Learned frames.** Owned by the dialogue-moves and intent research notes. Decide separately
    whether to add a user-taught route.
 
@@ -451,8 +479,9 @@ bounded history. Out of scope for a different reason: speech and multi-user conv
 1. Is a user-taught conversational frame wanted in addition to corpus-induced frames, given that the
    pilot corpus is restaurant-booking dialogue and the goal is open-domain, LLM-class conversation?
    (A first draft of this document called CRMS a research assistant; that was wrong.)
-2. Should user statements default to session scope or always ask? The design asks every time at
-   first, then allows a setting.
+2. Should user statements be allowed a session-only scope, and should confirmation be asked every time?
+   Phase 4 asks every time and stores permanently; a session scope needs the terminal's saves to skip
+   those facts.
 3. Which corpus should the junk-retrieval baseline use as the standard? The academic model contains
    this project's own source files, which is where the code-snippet replies came from.
 4. Does the intent design's `UserIntentHypothesis` stay the single decision record, so this layer

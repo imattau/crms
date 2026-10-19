@@ -9075,6 +9075,8 @@ def main() -> int:
             pending_claims=len(pending_candidates))
         if turn.action:
             queued_conversation_lines.append(turn.action)
+        if turn.learned:
+            knowledge.save(args.knowledge)
         compound_pronoun_focus: str | None = None
         if (compound_part is not None
                 and turn.resolved_question
