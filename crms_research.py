@@ -2468,6 +2468,8 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
         self.read_only = read_only
         self._term_document_frequency_cache: dict[str, int] = {}
         self._term_document_frequency_data_version: int | None = None
+        self._fts_chunk_key = "CAST(source_fts.chunk_id AS INTEGER)"
+        self._fts_contentless = False
         if read_only:
             if not self.path.is_file():
                 raise FileNotFoundError(self.path)
@@ -2490,6 +2492,7 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
                 if not required <= tables:
                     raise ValueError(
                         "read-only source is missing research-index tables")
+                self._detect_fts_layout()
             except Exception:
                 if hasattr(self, "_db"):
                     self._db.close()
@@ -2545,14 +2548,83 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
             self._db.execute(
                 "CREATE INDEX IF NOT EXISTS source_chunks_document "
                 "ON source_chunks(document_id)")
-            self._db.execute(
-                "CREATE VIRTUAL TABLE IF NOT EXISTS source_fts USING fts5("
-                "chunk_id UNINDEXED, title, body, tokenize='unicode61')")
+            self._create_fts_table()
+            self._detect_fts_layout()
             self._db.commit()
             self._backfill_missing_chunks()
         except sqlite3.OperationalError as error:
             raise RuntimeError(
                 "the active SQLite build must include FTS5 support") from error
+
+    _CONTENTLESS_FTS_SQL = (
+        "CREATE VIRTUAL TABLE IF NOT EXISTS source_fts USING fts5("
+        "chunk_id UNINDEXED, title, body, tokenize='unicode61', "
+        "content='', contentless_delete=1)")
+    _LEGACY_FTS_SQL = (
+        "CREATE VIRTUAL TABLE IF NOT EXISTS source_fts USING fts5("
+        "chunk_id UNINDEXED, title, body, tokenize='unicode61')")
+
+    def _create_fts_table(self) -> None:
+        """Create the passage index without a second copy of the passage text.
+
+        Chunks are substrings of ``source_documents.body``, and queries only use
+        MATCH and bm25, so the index stores terms alone (contentless, keyed by
+        rowid == chunk_id). Builds without ``contentless_delete`` (SQLite
+        < 3.43) fall back to the older layout that stores the text again.
+        """
+        try:
+            self._db.execute(self._CONTENTLESS_FTS_SQL)
+        except sqlite3.OperationalError:
+            self._db.execute(self._LEGACY_FTS_SQL)
+
+    def _detect_fts_layout(self) -> None:
+        """Choose the chunk join key for contentless or legacy indexes."""
+        row = self._db.execute(
+            "SELECT sql FROM sqlite_master WHERE name='source_fts'").fetchone()
+        sql = (row[0] if row else "") or ""
+        self._fts_contentless = "content=''" in sql.replace(" ", "")
+        self._fts_chunk_key = ("source_fts.rowid" if self._fts_contentless
+                               else "CAST(source_fts.chunk_id AS INTEGER)")
+
+    def rebuild_contentless_index(self) -> bool:
+        """Convert a legacy index to the contentless layout, then compact.
+
+        Returns False when the index is already contentless. The rebuilt
+        index tokenises the same chunk text, so MATCH results and bm25 ranks
+        are unchanged.
+        """
+        if self.read_only:
+            raise ValueError("a read-only index cannot be rebuilt")
+        if self._fts_contentless:
+            return False
+        self._db.execute("DROP TABLE source_fts")
+        self._create_fts_table()
+        self._detect_fts_layout()
+        if not self._fts_contentless:
+            raise RuntimeError("SQLite 3.43 or newer is required")
+        last_id = ""
+        while True:
+            documents = self._db.execute(
+                "SELECT document_id,title,body FROM source_documents "
+                "WHERE document_id>? ORDER BY document_id LIMIT ?",
+                (last_id, self.DIRECTORY_BATCH_SIZE)).fetchall()
+            if not documents:
+                break
+            with self._bulk_write_context():
+                for document_id, title, text in documents:
+                    for chunk_id, start, end in self._db.execute(
+                            "SELECT chunk_id,start_offset,end_offset "
+                            "FROM source_chunks WHERE document_id=?",
+                            (document_id,)).fetchall():
+                        self._db.execute(
+                            "INSERT INTO source_fts(rowid,chunk_id,title,body) "
+                            "VALUES(?,?,?,?)",
+                            (chunk_id, chunk_id, title, text[start:end]))
+            last_id = documents[-1][0]
+        self._db.commit()
+        self._term_document_frequency_cache.clear()
+        self._db.execute("VACUUM")
+        return True
 
     def add_document(self, document_id: str, title: str, text: str,
                      location: str | None = None, *, replace: bool = False,
@@ -2606,7 +2678,7 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
         frequency = int(self._db.execute(
             "SELECT count(DISTINCT c.document_id) "
             "FROM source_fts JOIN source_chunks c "
-            "ON c.chunk_id=CAST(source_fts.chunk_id AS INTEGER) "
+            "ON c.chunk_id=" + self._fts_chunk_key + " "
             "WHERE source_fts MATCH ?", (expression,)).fetchone()[0])
         # Bound per-index memory when a long-lived session sees many topics.
         if len(self._term_document_frequency_cache) >= 4096:
@@ -2636,8 +2708,9 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
             "SELECT chunk_id FROM source_chunks WHERE document_id=?",
             (document_id,))]
         if chunk_ids:
+            key = "rowid" if self._fts_contentless else "chunk_id"
             self._db.executemany(
-                "DELETE FROM source_fts WHERE chunk_id=?",
+                f"DELETE FROM source_fts WHERE {key}=?",
                 ((chunk_id,) for chunk_id in chunk_ids))
         self._db.execute(
             "DELETE FROM source_chunks WHERE document_id=?", (document_id,))
@@ -2648,8 +2721,9 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
                 "INSERT INTO source_chunks(document_id,start_offset,end_offset) "
                 "VALUES(?,?,?)", (document_id, start, end))
             self._db.execute(
-                "INSERT INTO source_fts(chunk_id,title,body) VALUES(?,?,?)",
-                (cursor.lastrowid, title, text[start:end]))
+                "INSERT INTO source_fts(rowid,chunk_id,title,body) "
+                "VALUES(?,?,?,?)",
+                (cursor.lastrowid, cursor.lastrowid, title, text[start:end]))
 
     def _backfill_missing_chunks(self) -> None:
         last_id = ""
@@ -2740,7 +2814,7 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
         rows = self._db.execute(
             "SELECT DISTINCT d.document_id,d.title,d.location "
             "FROM source_fts JOIN source_chunks c "
-            "ON c.chunk_id=CAST(source_fts.chunk_id AS INTEGER) "
+            "ON c.chunk_id=" + self._fts_chunk_key + " "
             "JOIN source_documents d ON d.document_id=c.document_id "
             "WHERE source_fts MATCH ? ORDER BY d.document_id",
             (f"title : {phrase}",))
@@ -2795,7 +2869,7 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
             selects.append(
                 "SELECT DISTINCT c.document_id, ? AS term_index, 0.0 AS rank "
                 "FROM source_fts JOIN source_chunks c "
-                "ON c.chunk_id=CAST(source_fts.chunk_id AS INTEGER) "
+                "ON c.chunk_id=" + self._fts_chunk_key + " "
                 "WHERE source_fts MATCH ?")
             parameters.extend((term_index, expression))
         publication_date = "date(substr(d.body,instr(d.body,'Published: ')+11,10))"
@@ -2893,7 +2967,7 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
             "SELECT c.chunk_id,c.document_id,c.start_offset,c.end_offset,"
             + rank_expression +
             "FROM source_fts JOIN source_chunks c "
-            "ON c.chunk_id=CAST(source_fts.chunk_id AS INTEGER) "
+            "ON c.chunk_id=" + self._fts_chunk_key + " "
             "JOIN source_documents d ON d.document_id=c.document_id "
             "WHERE source_fts MATCH ?" + source_filter + "), ranked_chunks AS ("
             "SELECT chunk_id,document_id,start_offset,end_offset,rank,"
