@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -12,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from crms_conversation import classify_user_intent, respond
 from crms_dialogue import CRMSDialogue
 from crms_knowledge import CRMSKnowledgeBase
+from crms_research import CRMSResearchIndex
 
 
 def require(condition: bool, message: str) -> None:
@@ -55,6 +57,27 @@ def main() -> None:
         else:
             raise SystemExit("an unknown persisted dialogue slot was trusted")
 
+        root = Path(folder)
+        knowledge.save(root / "knowledge.json")
+        CRMSResearchIndex().save(root / "index.json")
+        command = [
+            sys.executable,
+            str(Path(__file__).resolve().parents[1] / "crms_chat.py"),
+            "--knowledge", str(root / "knowledge.json"),
+            "--index", str(root / "index.json"),
+            "--rules", str(root / "rules.json"),
+            "--dialogue-state", str(root / "dialogue.json"),
+            "--rule-session", str(root / "rule-session.json"),
+            "--feedback-db", str(root / "feedback.sqlite3"),
+        ]
+        chat = subprocess.run(
+            command, input="Tell me more.\nAda Lovelace\nGoodbye\n",
+            text=True, capture_output=True, check=True, timeout=30)
+        require("Which entity with accepted facts" in chat.stdout
+                and "What I have accepted about Ada Lovelace" in chat.stdout
+                and "Ada Lovelace — wrote → the first algorithm" in chat.stdout,
+                f"interactive chat missed the contextual follow-up: {chat.stdout}")
+
     answer = respond(restored, "Ada Lovelace")
     require(answer.status == "elaborated"
             and "Ada Lovelace — wrote → the first algorithm" in answer.text
@@ -91,6 +114,7 @@ def main() -> None:
 
     print("topic answers use the open contextual intent: PASS")
     print("typed dialogue slot survives restart and rejects unknown values: PASS")
+    print("terminal exchange answers the assistant's follow-up: PASS")
     print("accepted-entity topic answer produces a cited overview: PASS")
     print("unknown topics and explicit cancellation clear the slot: PASS")
     print("a new content question supersedes the pending topic slot: PASS")
