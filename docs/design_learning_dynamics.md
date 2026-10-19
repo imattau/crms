@@ -640,10 +640,15 @@ declared rule data only when the proof format can verify their direction and pro
   SQLite packaging, validation and lineage restoration, embedded searchable source text, and CLI
   use after installation. This verifies persistence for one controlled transitivity rule; it does
   not measure induction quality or resolve portable feedback-weight policy.
-- Statistical proposals for symmetric, functional, inverse, or sub-relation behavior may be useful
-  if they include positive and negative examples and enter the same cited review workflow. They
-  must not install schemas or treat graph shape alone as proof. Separate derivation schemas from
-  integrity constraints in both proposal wording and proof semantics.
+- Report-only symmetric-schema discovery is implemented in
+  `crms_schema_learning.py` and exposed as `/suggest-relation-schemas`. It requires explicit
+  reciprocal positives for support, records explicit negative reverse edges as counterexamples,
+  and reports one-way observations as unknown. It includes citations and independent-origin counts
+  and never installs a declaration. Its `uncontradicted` status describes only the observed,
+  explicitly labeled pairs; there is no held-out schema-validation gate yet. Candidate output must
+  remain a proposal, not evidence that symmetry is generally true. Functional, inverse, and
+  sub-relation proposals remain open, and graph shape alone must not imply any schema. Keep
+  derivation schemas separate from integrity constraints in proposal wording and proof semantics.
 - `experiments/v1_307_sqlite_rule_discovery_scale.py` exercises sparse synthetic stores up to
   300,000 facts and checks in-memory/SQLite parity. That does not establish performance on a full
   288,000-document package: report the package's fact count, connectivity, expansions, and bound

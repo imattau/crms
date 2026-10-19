@@ -29,6 +29,9 @@ from crms_inference import (InferenceRule, InferenceResult,
 from crms_rule_proof import (verify_closed_world_denial,
                              verify_constraint_denial,
                              verify_inference_proof)
+from crms_schema_learning import (
+    RelationSchemaDiscovery, discover_relation_schema_candidates,
+)
 from crms_fact_store import SQLiteFactMap
 from crms_schema import (CLOSED_WORLD_SCHEMA, RELATION_SCHEMA_SPECS,
                          relation_schema_pattern, relation_schema_spec)
@@ -2573,6 +2576,57 @@ class CRMSKnowledgeBase:
             min_support=min_support, max_expansions=max_expansions,
             max_arity=max_arity, research_index=research_index,
             origin_map=origin_map)
+
+    def discover_relation_schemas(self, *, min_support: int = 2,
+                                  max_expansions: int = 100_000,
+                                  research_index: Any | None = None,
+                                  origin_map: Mapping[str, str] | None = None
+                                  ) -> RelationSchemaDiscovery:
+        """Report symmetric-schema hypotheses without installing declarations."""
+        return discover_relation_schema_candidates(
+            (asdict(fact) for fact in self.facts()),
+            negative_facts=(asdict(fact) for fact in self.negative_facts()),
+            min_support=min_support, max_expansions=max_expansions,
+            research_index=research_index, origin_map=origin_map)
+
+    @staticmethod
+    def render_relation_schema_discovery(
+            result: RelationSchemaDiscovery) -> str:
+        completeness = ("complete" if result.complete
+                        else "incomplete: expansion limit reached")
+        if not result.candidates:
+            return (f"Relation-schema discovery {completeness} after "
+                    f"{result.expansions} reverse checks; no symmetric "
+                    "candidates met the support threshold.")
+        lines = [f"Relation-schema discovery {completeness} after "
+                 f"{result.expansions} reverse checks. These are proposals only; "
+                 "missing reverse facts remain unknown."]
+        for candidate in result.candidates:
+            scope = ("; context: " + ", ".join(
+                f"{name}={value}" for name, value in candidate.qualifiers)
+                     if candidate.qualifiers else "")
+            lines.append(
+                f"Candidate [{candidate.status}]: relation "
+                f"{candidate.relation} may be symmetric{scope}; "
+                f"support={len(candidate.positive_examples)}, "
+                f"counterexamples={len(candidate.negative_examples)}, "
+                f"unknown-reverse-pairs={candidate.unknown_reverse_pairs}, "
+                f"{candidate.source_basis.replace(' ', '-')}="
+                f"{len(candidate.independent_sources)}.")
+            for label, examples in (
+                    ("support", candidate.positive_examples),
+                    ("counterexample", candidate.negative_examples)):
+                for example in examples:
+                    first, reverse = example["first"], example["conclusion"]
+                    lines.append(
+                        f"  {label}: {first['subject']} — {first['relation']} → "
+                        f"{first['object']} [{', '.join(first['sources'])}]; "
+                        f"{reverse['subject']} — {reverse['relation']} → "
+                        f"{reverse['object']} [{', '.join(reverse['sources'])}]")
+        lines.append(
+            "No schema was stored. Review the cited examples; if appropriate, "
+            "declare it explicitly with /teach-relation-type.")
+        return "\n".join(lines)
 
     def review_inference_rules(self, validation_source_prefix: str, *,
                                min_support: int = 2,

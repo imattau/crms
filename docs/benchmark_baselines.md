@@ -843,6 +843,17 @@ and proof forms are refused. The existing `v1_349`, `v1_350`, and `v1_351`
 schema-proposal, inference, explanation, and scope tests also pass. This is a
 consistency and proof-contract regression, not automatic schema learning.
 
+## Report-only symmetric-schema candidates
+
+Command: `python3 experiments/v1_380_reciprocal_schema_candidates.py`
+
+The diagnostic finds a symmetry candidate only from explicit reciprocal positive facts. It shows
+explicit negative reverse facts as counterexamples, keeps missing reverse statements unknown, and
+requires multiple independent source origins before describing support as uncontradicted. A
+contradictory pair retains both its positive and negative evidence. Search bounds are reported, and
+the interactive command is verified to leave the knowledge store unchanged. This is a proposal
+generator, not a held-out validation or an automatic schema learner.
+
 ## Cross-shape reasoning graph baseline
 
 Command: `python3 experiments/v1_376_reasoning_graph_benchmark.py`

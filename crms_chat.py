@@ -190,6 +190,8 @@ HELP = """Commands:
                  declare a bounded relation schema in ordinary language
   /suggest-inference-rules [MIN_SUPPORT|HOLDOUT_SOURCE_PREFIX][|arity=3]
                  discover/review rules; arity=3 enables typed three-premise search
+  /suggest-relation-schemas [MIN_SUPPORT]
+                 report reciprocal evidence for symmetric relations; never installs a schema
   /accept-inference-rule N|ID|HOLDOUT_SOURCE_PREFIX[|arity=3]
                  install a candidate only after passing holdout validation
   /inference-rules
@@ -6831,6 +6833,21 @@ def main() -> int:
                     print("Use: /suggest-inference-rules [MIN_SUPPORT|HOLDOUT_SOURCE_PREFIX][|arity=3]")
             except (TypeError, ValueError) as error:
                 print(f"Could not discover inference-rule candidates: {error}")
+            continue
+        if (line == "/suggest-relation-schemas"
+                or line.startswith("/suggest-relation-schemas ")):
+            argument = line[len("/suggest-relation-schemas"):].strip()
+            try:
+                if argument and ("|" in argument or " " in argument):
+                    raise ValueError("use one positive MIN_SUPPORT value")
+                min_support = int(argument) if argument else 2
+                discovery = knowledge.discover_relation_schemas(
+                    min_support=min_support, research_index=index)
+                print("CRMS> " + knowledge.render_relation_schema_discovery(
+                    discovery))
+            except (TypeError, ValueError) as error:
+                print("Could not discover relation-schema candidates: "
+                      f"{error}")
             continue
         if line.startswith("/accept-inference-rule "):
             fields = [value.strip() for value in
