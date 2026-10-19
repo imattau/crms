@@ -292,214 +292,135 @@ coverage; breadth does not compensate for wrong answers or untraceable claims.
 - Do not expand corpus volume as a substitute for improving retrieval,
   recombination, reasoning, dialogue, or task execution.
 
-## Focused execution plan from this checkpoint
+## Focused plan from the current checkpoint (2026-10-20)
 
-Work in short, reviewable slices. Keep the current user-owned working-tree
-changes intact; inspect and test them before incorporating any of them. For
-each slice, add the failure or capability to the fixed scorecard, run a focused
-runtime experiment, then run the relevant regression subset. Commit only the
-slice's files. Avoid broad corpus expansion until the retrieval and answer
-selection metrics improve.
+### Overall alignment
 
-### Overall alignment review (2026-10-20)
+The project is still aimed at the right goal, but it has a trustworthy,
+inspectable substrate rather than a broad integrated assistant. The 70B-class
+reference is useful for identifying the experience gap; no live model run is
+needed to plan against it. Progress should mean more held-out tasks completed
+through ordinary language without increasing unsupported answers or losing
+lineage.
 
-The project remains on track toward its stated goal, with an important
-qualification: it has built a credible inspectable substrate, not yet an
-integrated broad language system. The goal and the priority order still fit the
-evidence. In particular, recombination and learned-rule transfer must remain a
-central capability test; reasoning must remain proof-checked and reachable
-through ordinary language; and dialogue/contextual intent is a first-class
-research area rather than a polish task. The portable SQLite model is an
-enabler for distribution and learning, not the project outcome by itself.
+The central capability bet remains **recombination and self-learning rules**:
+CRMS must combine learned pieces in cases it was not directly shown. Reasoning
+must verify those compositions and remain reachable from chat. **Dialogue and
+contextual intent are a priority research area**, not a final polish phase; the
+conversation state and its regressions can be improved now, while corpus-induced
+moves remain an experiment. SQLite distribution is enabling infrastructure,
+not an end goal. Increasing corpus size cannot compensate for weak retrieval,
+language transfer, or answer selection.
 
-The main planning correction is to sequence by integration risk. Recent chat
-driving found that short follow-ups and named topic switches can work, while an
-unresolved “it” can bind to the wrong entity after a topic switch; source-only
-turns can lose usable context; and “why?” can explain a stale answer. These are
-more urgent than expanding the dialogue-move pilot. Likewise, the recent large
-corpus audit found that volume exposes retrieval and language failures rather
-than fixing them. Fix and measure answer selection before adding more corpus.
+### Execution sequence
 
-The working tree currently contains ongoing changes in `crms_chat.py` and
-`crms_research.py`, plus a user-edited audit report and untracked experiments.
-Treat those as in-progress inputs: inspect their ownership and scope, run their
-focused checks, and do not fold them into a roadmap commit. Preserve the stale
-dialogue-state file and feedback database. The FTS contentless-index work needs
-old/new layout, rebuild, update/delete, and retrieval-parity checks before it
-can count as a storage improvement.
+1. **Pin a trustworthy end-to-end baseline.** Keep the scorecard small enough
+   to run routinely and include fixed positives and negatives for source
+   selection, paraphrases, multipart requests, multi-turn context, reasoning,
+   recombination, and domain tasks. Record commit/tree identity and separate
+   coverage, wrong answers, abstention, completeness, citation/proof validity,
+   and resource cost. Preserve the full transcript for every dialogue failure.
 
-### Immediate sequence
+   **Gate:** every planned change names the probe it should improve and the
+   negative controls it must preserve; reports are reproducible from a clean
+   scratch environment.
 
-1. **Freeze the current checkpoint.** Inspect the in-progress dialogue and
-   research-index diffs and the untracked `v1_411`, `v1_412`, `v1_414`, and
-   `v1_418` experiments. Run each in its documented scratch mode. Record which
-   are user-authored and which are implementation work; do not overwrite or
-   stage user material. For the storage change, compare legacy and contentless
-   indexes across create, reopen, search, replacement, deletion, and clean
-   rebuild. Keep the portable-model source-text and knowledge round trip as a
-   separate release contract.
+2. **Complete the portable knowledge foundation.** Finish the one-file SQLite
+   model contract: searchable source text, knowledge, rules, provenance, and
+   supported learned records travel together; original source files are not
+   required at inference. Verify transactional updates, compatibility paths,
+   export/reload, and a clean-location query. Keep read-only distributable data
+   separate from writable user learning where needed. Keep this bounded to the
+   distribution and persistence contract; it must not displace the capability
+   work that follows.
 
-2. **Close the dialogue correctness loop in actual chat.** Add full-session
-   regression cases for the reported Eiffel/Colosseum pronoun switch, “and
-   [entity]?” after source-only evidence, context retention after unanswered or
-   review-only turns, and “why?” after a topic change. Require paragraph/entity
-   grounding for pronoun-led source sentences; update context from the current
-   turn even when it is source-only; and bind explanations to the latest
-   answer, not an earlier successful one. Include the already-working short
-   follow-ups and explicit named switches as controls.
+   **Gate:** a clean copy works without ingestion files, and supported learning
+   can be saved/exported/reloaded without changing provenance or semantics.
 
-   **Gate:** the whole transcript passes through a fresh CLI process with no
-   wrong-entity citations, stale explanations, or lost valid context. A source
-   quote remains distinct from accepted knowledge.
+3. **Finish the highest-risk chat correctness slice.** Exercise full sessions
+   with topic changes, unresolved pronouns, source-only evidence, failed and
+   review-only answers, and `why?`. Context updates must distinguish “no
+   answer” from “no valid current topic”; pronoun-led source sentences must be
+   tied to the active entity or abstain. Then cover multi-part omissions and
+   unrelated pending candidates. Retain the successful short follow-ups and
+   named switches as controls.
 
-3. **Make end-to-end composition the next capability milestone.** Use one
-   source-disjoint benchmark grid to test learned components, induced rules,
-   argument roles, ordering, values, and unseen combinations through natural
-   language. Pair each success with a near-miss and unsupported-middle-step
-   case. Capture the composed output or proof, independently validate it, and
-   recover its complete component and source lineage. Do not let corpus growth,
-   candidate counts, or a single successful demo stand in for transfer.
+   **Gate:** the complete transcript passes through a fresh chat process; no
+   wrong-entity answer or stale explanation is emitted, and source evidence is
+   clearly distinguished from accepted knowledge.
 
-   **Gate:** at least one held-out unseen composition succeeds through chat;
-   contrastive controls abstain; and the result survives save, load, and
-   portable-model distribution without losing rule status or provenance.
+4. **Prove recombination and learned-rule transfer.** Build a source-disjoint
+   grid that varies components, connective rules, argument roles, order, and
+   values. Test unseen combinations and contrastive near-misses through the
+   natural-language interface. Keep candidate discovery, review, holdout
+   validation, and licensing distinct. Preserve examples, split, status, and
+   lineage for every induced rule.
 
-4. **Advance governed self-learning and reasoning together, but keep their
-   evidence roles separate.** First test derivation as proposal → independent
-   verification → stored derived case. Exercise duplicate suppression,
-   dependency correction/invalidation, and retrieval weighting against taught
-   evidence. In parallel, route ordinary-language questions to the verified
-   reasoning engine and preserve unknown, negative, conflict, missing-premise,
-   and incomplete-search distinctions. Add cycle/integrity regressions and
-   proof explanations only where the tests demonstrate a gap.
+   **Gate:** a learned rule supports at least one genuinely unseen composition
+   through chat, contrastive and unsupported-middle-step cases abstain, and an
+   independent task/proof validator accepts the output. Save/reload preserves
+   the same rule status and lineage. This milestone takes precedence over
+   adding more demos of already-supported combinations.
 
-   **Gate:** derived cases cannot validate themselves; changed premises make
-   descendants stale; chat and direct inference agree; and no cycle or search
-   limit is rendered as an unqualified positive or negative.
+5. **Govern derivation-based self-learning and strengthen reasoning.** Keep
+   write-back as proposal → independent verification → derived record. Test
+   deduplication, retrieval value, dependency invalidation, correction
+   propagation, and trust weighting. In parallel, close reasoning gaps in
+   natural-language routing, cycle/integrity checks, conflict semantics,
+   missing-premise prompts, incomplete search, and proof explanations. Keep
+   taught evidence, source evidence, induced rules, and derived cases separate.
 
-5. **Develop contextual intent and dialogue after state correctness is
-   stable.** Keep user act, task intent, context conditions, and discourse
-   state explicit and separate from factual knowledge. Continue the bounded
-   source-disjoint move pilot with the authorized Codex labeling, but first
-   measure candidate quality and compare against the deterministic baseline.
-   Promote a frame only if held-out conversations show better task progress or
-   fewer unhelpful turns without more inappropriate actions.
+   **Gate:** no derived record validates itself; changed premises stale their
+   dependents; verified chat conclusions agree with direct engine calls; and
+   cycles, conflicts, or search limits are never reported as unqualified
+   truth/falsehood. Retain only stages that reduce errors or improve a measured
+   user outcome.
 
-6. **Broaden math, coding, translation, and writing through the same natural
-   language interface.** Expand one validated request family at a time, each
-   with ordinary paraphrases, negative cases, a task-specific validator, and
-   multi-turn repair. Prioritize compositions across learned components over
-   nominal domain coverage. Mark generated creative content separately from
-   evidence-backed claims.
+6. **Advance contextual intent and dialogue alongside the core work.** First
+   model the current topic, referents, open question/slot, task phase, user act,
+   and task intent as bounded explicit state. Test topic switches, repairs,
+   corrections, clarification, and multi-turn tasks on held-out conversations.
+   Continue one source-disjoint dialogue-move pilot with Codex-attributed
+   primary labels. Compare with deterministic handlers on task progress,
+   inappropriate actions, coverage, abstention, and annotation cost. Label
+   agreement is not accuracy; do not grant candidate frames runtime authority
+   based on surface frequency alone.
 
-7. **Run a release-shaped evaluation.** Query the portable model from a clean
-   location with no external source files. Measure accuracy, wrong answers,
-   abstention, omitted parts, context handling, proof/source validity,
-   recombination transfer, derived-memory behavior, latency, memory, and model
-   size per capability. Compare interaction breadth qualitatively with the
-   70B-class reference; do not require a live model run or claim parity without
-   representative evidence.
+   **Gate:** explicit state prevents the locked topic/stale-answer failures and
+   intent never mutates factual knowledge. A learned move/intent policy ships
+   only if held-out conversations improve task progress or reduce unhelpful
+   turns without increasing inappropriate actions. Otherwise keep it as a
+   research result and continue improving the explicit baseline.
 
-**Progress rule:** treat each milestone as evidence about a specific
-capability. The project is ready to claim broader progress only when held-out
-natural-language tasks compose across knowledge, rules, reasoning, and dialogue
-without trading away traceability or honest uncertainty.
+7. **Broaden math, coding, translation, and creative work through the shared
+   natural-language interface.** Grow one bounded request family at a time.
+   Each needs independently held-out wording, negative cases, a domain-specific
+   validator, provenance, and multi-turn repair. Prioritize cross-component
+   compositions. Mark generated fiction separately from evidence-backed
+   claims; score creative coherence and revision separately from factuality.
 
-### 1. Lock down end-to-end correctness
+   **Gate:** capability is demonstrated in chat on held-out requests, not only
+   by a typed command or curated demo; report accuracy, abstention, and
+   incomplete work for each domain.
 
-First turn the latest dialogue and natural-language findings into repeatable
-chat-level regressions: named topic switch followed by “it”; source-only topic
-switch and follow-up; “why?” after a switch or refusal; wrong-entity sentence
-rejection; explicit multi-part omission; and unrelated pending review state.
-Inspect the uncommitted dialogue tests and report before deciding what to keep.
-The 2026-10-20 topic-anchor test is useful evidence, but does not by itself
-replace a full-session test of every state transition. Add answer-bearing
-sentence selection and relation-paraphrase negatives to the same scorecard.
+8. **Run release-shaped evaluation.** Run the fixed cross-domain suite against
+   the portable model from a clean location. Report package size, latency,
+   memory, and per-capability quality, including accuracy, wrong answers,
+   abstention, completeness, dialogue task progress, and proof/source validity.
 
-**Gate:** known chat regressions pass in a clean scratch session; no wrong-topic
-answer is emitted; unsupported subparts and source-only evidence are labeled
-plainly. Update the benchmark report with working-tree identity and actual
-counts.
+   **Gate:** fixed negatives pass and remaining coverage limits are explicit.
+   Compare breadth and interaction qualitatively with the 70B-class reference;
+   do not claim parity unless representative evidence supports it.
 
-### 2. Make recombination and learned rules the main capability bet
+### Working rules
 
-Extend the current held-out transfer tests around one compact, source-disjoint
-task grid. Vary learned components, connective/rule structure, argument roles,
-ordering, and values independently; include unseen compositions and near-miss
-controls. Use the existing review → holdout validation → acceptance path for
-discovered rules. Prefer experiments that demonstrate a new composition over
-more examples of an already-supported one. Record coverage, precision, and
-abstention separately.
-
-**Gate:** a learned rule works on held-out components and a genuinely unseen
-composition, fails its contrastive controls, and retains recoverable examples,
-validation split, and lineage. A failure narrows the licensed scope rather than
-lowering the acceptance threshold.
-
-### 3. Govern derivation-based learning
-
-Keep `practice` and derived-case storage opt-in while testing deduplication,
-novelty, retrieval usefulness, dependency invalidation, correction propagation,
-and bounded storage on realistic repeated tasks. Derived outputs must remain
-separate from taught/source evidence and be independently reverified before
-reuse. Do not auto-promote generated dialogue, facts, rules, or explanations.
-
-**Gate:** corrections to any dependency make descendants stale or unusable;
-repeated practice does not create unbounded duplicates; a derived case never
-supports itself; and the measure shows a held-out benefit over re-derivation
-without increasing wrong answers. Until then, retain proposal/review semantics.
-
-### 4. Close reasoning integration gaps
-
-Prioritize natural-language routing to verified inference, cycles and declared
-integrity constraints, explicit contradiction/unknown/incomplete distinctions,
-and proof explanations checked against the proof and parsed back to their
-claims. Use graph-shape and budget tests to localize limits. Preserve the
-existing verified graph behavior; do not raise search bounds without a measured
-need.
-
-**Gate:** chat and direct engine agree; each positive conclusion has a verified
-proof; cycles or integrity violations cannot silently yield an ordinary
-positive; and incomplete search is not reported as false or unknown without
-qualification.
-
-### 5. Advance dialogue and contextual intent as a measured research track
-
-Keep explicit discourse state and deterministic handlers as the runtime
-baseline while the topic-switch regressions are being closed. Continue the
-source-disjoint dialogue pilot and Codex labeling under the existing annotation
-protocol. Treat exact-surface frame agreement as candidate yield only; require
-an independent label audit before claiming label quality, and compare any
-contextual frame against the scripted baseline for task progress and
-inappropriate moves. Do not let a dialogue label or user intent become a fact.
-
-**Gate:** learned intent or moves improve held-out task completion or reduce
-unhelpful turns without increasing inappropriate actions; otherwise leave them
-as inspectable research artifacts and improve the explicit baseline.
-
-### 6. Broaden domains only through validated natural-language contracts
-
-For math, coding, translation, and creative writing, expand one bounded request
-family at a time through the shared natural-language interface. Give each a
-held-out set, negative cases, task-specific validator, provenance, and
-multi-turn repair probes. For creative work, measure topic fit, coherence, and
-revision separately from factual grounding. Compose domains only after their
-individual contracts and combined lineage pass.
-
-**Gate:** no domain is called supported based on a command-only demo; the chat
-path handles held-out ordinary wording, reports limits, and passes its own
-validator with measured coverage and abstention.
-
-### 7. Reassess breadth and release readiness
-
-After these slices produce stable results, run the maintained scorecard against
-the portable model from a clean location, without source files that are meant
-to be embedded. Report per-domain correctness, wrong answers, abstention,
-completeness, dialogue task progress, evidence/proof integrity, latency, memory,
-and package size. Compare interaction breadth qualitatively with the documented
-70B-class reference; make no parity claim unless a representative evaluation
-supports it.
-
-**Release gate:** a clean install can query, learn through supported paths,
-export/reload, and reproduce equivalent supported behavior with lineage; the
-fixed negatives pass; and all remaining narrow areas are clearly documented.
+- Inspect existing user-owned changes before touching them; preserve unrelated
+  files and scratch state.
+- Keep each implementation slice reviewable, run its focused runtime checks,
+  then the relevant regressions, and commit the slice when stable.
+- Add every discovered failure to the fixed suite before changing behavior.
+- Do not use more data, candidate counts, or fluent wording as a substitute for
+  held-out transfer, task validation, or evidence.
+- Keep the overall goal in progress until a defined, diverse task distribution
+  demonstrates broad natural-language coverage, reliable interaction, and
+  correct composition across knowledge, rules, reasoning, and dialogue.
