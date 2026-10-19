@@ -1508,7 +1508,14 @@ source-held-out positive examples, rejects a balanced negative holdout, and requ
 kind witnesses. The added natural-language probe asks “Does Nia reach Sydney?” and independently
 verifies the proof; removing the runtime person-kind witness makes the chat path abstain. This
 demonstrates one held-out ternary schema through ordinary language, not general three-premise
-understanding or broad learned-rule coverage.
+understanding or broad learned-rule coverage. The 2026-10-20 extension also practices that
+conclusion into a separate verified derived-case store without adding a fact, checks persistence
+and invalidation after retracting a required source premise, and tests the same schema against
+explicit negative evidence. The inference engine returns `ambiguous/contradiction` for a positive
+rule proof plus explicit negative; ordinary chat does not return a positive answer in that case.
+The focused reasoning-governance suite passed 7/7 (`v1_191`, `v1_192`, `v1_193`, `v1_376`,
+`v1_379`, `v1_415`, `v1_82`). This extends evidence to a second rule shape; it is not broad rule
+learning or open-domain reasoning.
 
 ## Large-corpus language-to-rule transfer through chat
 

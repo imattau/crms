@@ -135,6 +135,17 @@ def main() -> None:
     require(natural_check.valid,
             f"natural-language typed proof did not independently verify: "
             f"{natural_check}")
+
+    fact_count_before_practice = len(kb.facts())
+    practiced = kb.practice_relation("Nia", "reaches", "Sydney")
+    retained = kb.retrieve_derived_case(
+        "Nia", "reaches", "Sydney", record_use=False)
+    require(practiced.status == "answered"
+            and retained is not None
+            and retained["status"] == "verified"
+            and "employment-route" in retained["lineage"]["rule_ids"]
+            and len(kb.facts()) == fact_count_before_practice,
+            "typed rule practice did not retain a separate verified case")
     missing_kind = seeded()
     missing_kind.accept_inference_rule_candidate(
         1, "employment-route", "holdout:", max_arity=3)
@@ -147,6 +158,20 @@ def main() -> None:
             or untyped_chat.response is None
             or untyped_chat.response.truth is not True,
             "natural-language chat ignored a required typed middle witness")
+
+    contradictory = seeded()
+    contradictory.accept_inference_rule_candidate(
+        1, "employment-route", "holdout:", max_arity=3)
+    contradictory.add_negative_fact(
+        "Nia", "reaches", "Sydney", "runtime:explicit-negative")
+    contested = contradictory.infer_relation("Nia", "reaches", "Sydney")
+    conflict_chat = respond(
+        CRMSDialogue(contradictory), "Does Nia reach Sydney?")
+    require(contested.status == "ambiguous"
+            and contested.reason_code == "contradiction"
+            and conflict_chat.response is not None
+            and conflict_chat.response.truth is not True,
+            "typed three-premise proof overrode explicit negative evidence")
 
     contradicted = seeded(negative_holdout=True).review_inference_rules(
         "holdout:", max_arity=3)
@@ -205,10 +230,25 @@ def main() -> None:
                 and saved_rule.middle_kind == "person"
                 and saved_rule.second_middle_kind == "asset",
                 "typed discovered rule lost its schema on reload")
+        persisted_case = persisted.retrieve_derived_case(
+            "Nia", "reaches", "Sydney", record_use=False)
+        require(persisted_case is not None
+                and persisted_case["status"] == "verified"
+                and "employment-route" in persisted_case["lineage"]["rule_ids"],
+                "typed derived case or its proof lineage did not survive reload")
+        require(persisted.remove_fact(
+            "Nia", "employs", "Oren", "runtime:one"),
+            "typed case premise could not be corrected")
+        require(persisted.retrieve_derived_case(
+            "Nia", "reaches", "Sydney", record_use=False) is None
+                and any(case["status"] == "stale_or_conflicted"
+                        for case in persisted.derived_cases()),
+                "typed source correction did not invalidate the derived case")
 
     print("typed three-premise rule discovery diagnostic: PASS")
     print("learned three-premise rule reaches natural-language chat with an independently verified proof: PASS")
-    print("natural-language reasoning abstains when a required kind witness is absent: PASS")
+    print("typed rule practice persists separately and invalidates after source correction: PASS")
+    print("natural-language reasoning abstains when a required kind witness is absent or the claim is contested: PASS")
     print("bounded discovery, explicit kinds, source-heldout validation, negative rejection, proof verification, CLI and persistence: PASS")
 
 
