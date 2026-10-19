@@ -308,7 +308,8 @@ log candidate count -0.55 (fewer plausible candidates means more confidence), wo
 +0.32, summed matched idf +0.23. The answer-span, first-sentence and wh-type inputs are all
 within about 0.2 of zero.
 
-**Results.** All rows use the frozen engine at commit `622fa99`.
+**Results, first training draw.** All rows use the frozen engine at commit `622fa99`. **Read the
+correction under the table before relying on these numbers.**
 
 | Configuration | Sample | Correct | Abstained | Wrong | Wrong-article answered | Precision |
 |---|---|---|---|---|---|---|
@@ -324,17 +325,88 @@ within about 0.2 of zero.
 | Learned ranker, answer if p ≥ 0.4 | tuned | 101 | 81 | 18 | 2 / 100 | 84% |
 | Learned ranker, answer if p ≥ 0.5 | tuned | 91 | 98 | 11 | 2 / 100 | 89% |
 
-At p ≥ 0.3 on the fresh sample it gives 15 more correct answers than the gate layer, 9 fewer wrong
-ones and 6 fewer wrong-article answers. Raising the threshold trades coverage for precision in a
-predictable way, which none of the hand-set rankers did. This is the only addition in this
-document that improved precision on articles it was not tuned on; the training articles and the
-fresh articles are disjoint, and the thresholds were chosen from a fixed grid before looking at
-the fresh sample.
+At p ≥ 0.3 on the fresh sample this draw gave 15 more correct answers than the gate layer, 9 fewer
+wrong ones and 6 fewer wrong-article answers, and raising the threshold traded coverage for
+precision in a predictable way, which none of the hand-set rankers did.
+
+**Correction: the first draw was favourable.** A second, independent random draw of 1,520 SQuAD
+training questions (a different seed, the same procedure and the same test samples) gave a
+weaker result:
+
+| Training draw | Sample | p ≥ | Correct / wrong | Precision | Wrong-article answered |
+|---|---|---|---|---|---|
+| First | fresh | 0.3 | 99 / 25 | 80% | 2 |
+| Second | fresh | 0.3 | 105 / 36 | 74% | 2 |
+| First | fresh | 0.5 | 83 / 17 | 83% | 0 |
+| Second | fresh | 0.5 | 98 / 30 | 77% | 1 |
+| Second | tuned | 0.4 | 111 / 33 | 77% | 3 |
+
+Precision therefore varies by several points with the training sample (74 to 80% at p ≥ 0.3), so
+the gain over the gate layer's 71% is real but modest: about 3 to 9 points of precision with 20
+more correct answers. Any claim of "79 to 83%" should be read as the upper end of a range. The
+ranker still beats every hand-set variant, but the evidence is two training draws, not a
+distribution.
+
+**Training size (SQuAD-labelled questions, fresh sample).** Correct / wrong at p ≥ 0.3 and p ≥ 0.5:
+
+| Training questions | p ≥ 0.3 | p ≥ 0.5 |
+|---|---|---|
+| 100 | 104 / 43 | 96 / 36 |
+| 300 | 105 / 39 | 97 / 34 |
+| 600 | 104 / 35 | 97 / 27 |
+| 1,520 | 105 / 36 | 98 / 30 |
+
+The ranker is data-efficient: 100 labelled questions already give nearly the coverage of 1,520, and
+more data helps precision only slightly. The smaller subsets were taken from the first few training
+articles (not shuffled), so this curve is article-biased and indicative only.
+
+**Self-made training questions (the route that uses only CRMS's own sources).** The decision in
+this section prefers training on data CRMS already holds. I tested that with no human labels and
+no external dataset. For the 38 training articles I made cloze-style questions from their own
+sentences: mask a four-digit year (question starts "When…") or the leading capitalised name
+("Who…"), keep the remaining words with about 40% of the non-capitalised words dropped (so overlap
+with the source is partial, as with real questions), and label only the original sentence as
+correct. 1,500 questions gave 12,040 candidate rows with 1,457 positives. A first attempt with
+template questions (the starter-question templates from the chat UX doc, plus a few more) produced
+only 162 well-formed questions from 7,718 sentences, so cloze generation was used instead. Result
+on the fresh sample, with the SQuAD-labelled ranker from the second draw for comparison; each cell
+is correct / wrong (precision), then wrong-article answers:
+
+| p ≥ | SQuAD-labelled (1,520) | Self-made cloze (1,500) |
+|---|---|---|
+| 0.05 | 109 / 56 (66%), 24 | 90 / 23 (79%), 0 |
+| 0.1 | 109 / 53 (67%), 13 | 80 / 17 (82%), 0 |
+| 0.2 | 108 / 41 (72%), 4 | 74 / 14 (84%), 0 |
+| 0.3 | 105 / 36 (74%), 2 | 69 / 10 (87%), 0 |
+| 0.4 | 102 / 31 (76%), 1 | 66 / 9 (88%), 0 |
+| 0.5 | 98 / 30 (76%), 1 | 64 / 7 (90%), 0 |
+
+On the tuned sample the cloze ranker reached 80% precision at 92 correct (p ≥ 0.3) against 76% at
+114 correct for the SQuAD-labelled one. Training on cloze questions plus 300 SQuAD questions gave
+99 / 31 at p ≥ 0.3, between the two. Findings: (1) a ranker trained purely on CRMS's own source
+text, with no labels from outside, reaches the same precision frontier as the human-labelled one
+(about 79 to 90%, against 71% for the layer) and answers no wrong-article questions at any
+threshold; (2) it is much more cautious, topping out near 90 correct answers instead of 109,
+probably because its training questions are only WHEN and WHO forms and so cover few other
+question types; (3) it removes the dependence on SQuAD and its licence for this component. Broader
+self-made question types (the "What is…", "Where…", measurement and count forms) are the obvious
+next step and were not tested.
+
+**Small hand-written sets (ranker alone).** Applied to the 150 answerable items and 37
+must-refuse items from the three small sets (yes/no items excluded, no typo repair, no engine
+abstention), the SQuAD-trained ranker gave 131 correct, 16 abstained and 3 wrong at p ≥ 0.3, but
+declined only 25 of the 37 must-refuse items; at p ≥ 0.5 it gave 126 correct and 0 wrong and
+declined 33 of 37. The cloze-trained ranker gave 131 correct, 3 wrong and 25 of 37 declined at both
+thresholds. So the ranker transfers to short simple sentences, but **it does not preserve the
+layer's refusals**: it answers some unanswerable questions because a candidate passes the gate.
+It must run *inside* the layer, with the engine's abstention and the gate as preconditions, and
+must not replace them. (These figures are not comparable with the earlier full-layer results on the
+same sets, which include the engine's own abstentions, typo repair and yes/no handling.)
 
 **Caveats.**
-- Same kind of text for training and testing (Wikipedia-style paragraphs with SQuAD questions).
-  I did not test other domains, other languages, less training data, or the small hand-written
-  sets.
+- Same kind of text for training and testing (Wikipedia-style paragraphs). I did not test other
+  domains or languages.
+- Self-made data covers only WHEN and WHO forms so far.
 - It scanned every sentence of an article for candidates. At scale, candidates must come from the
   FTS retrieval and the 15-per-question cap, which I did not test, along with latency.
 - Where candidates exist it answers with the chosen sentence directly and does not use the
@@ -344,7 +416,8 @@ the fresh sample.
 
 **Decision (project owner, recorded 2026-10-19).** The earlier rule "no learned similarity model"
 is relaxed for a *bounded* learned component. This was option (B) in the analysis below, adopted
-on the strength of one fresh-sample result; it is a licence to pilot, not a finding that the
+on the strength of the first fresh-sample result (later checks narrowed the gain to a range, see
+above); it is a licence to pilot, not a finding that the
 ranker is proven. The ranker is 16 numbers, deterministic to retrain, CPU-cheap, and restricted to
 choosing among sentences the gate has already accepted.
 
@@ -371,8 +444,10 @@ choosing among sentences the gate has already accepted.
   with latency.
 - Check that shipping weights trained on SQuAD (CC BY-SA 4.0) is acceptable, or train instead on
   data CRMS already holds under its own rules: reviewed answers, accepted facts, and feedback
-  recorded in the evidence ledger. That alternative is untested and is the preferred direction
-  because it keeps the training loop inside the project's provenance rules.
+  recorded in the evidence ledger. This is the preferred direction because it keeps the training
+  loop inside the project's provenance rules. Training on self-made cloze questions from CRMS's own
+  source text was tested and works (high precision, lower coverage, see above); training on
+  reviewed answers and ledger feedback is still untested.
 - Update the README so it states plainly that a small learned ranker exists (it currently says no
   AI model is needed or downloaded; a shipped weights record is not a download, but the wording
   must not imply there are no learned weights).
@@ -696,7 +771,9 @@ Each step: add a benchmark family or reuse the sets above, record the numbers in
    Each needs a fresh-sample measurement before adoption; tuned-sample gains do not count.
 9. **Choosing between gate-passing sentences.** Hand-set ranking (idf overlap with a margin, word
    proximity, answer-span agreement) did not generalise (section 2.6). A 16-weight learned ranker
-   did (section 2.7: 79 to 83% precision on fresh articles against 71% for the gate layer). The
+   did (section 2.7: 74 to 83% precision on fresh articles depending on the training draw, against
+   71% for the gate layer; a ranker trained only on CRMS's own cloze questions reached 79 to 90%
+   at lower coverage). The
    project owner has allowed a bounded learned ranker (section 2.7). Next: test it with less
    training data (a learning curve), on the hand-written sets, on other text, and on FTS-supplied
    candidates with latency; try training it on CRMS's own reviewed answers and ledger feedback
