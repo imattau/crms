@@ -190,9 +190,16 @@ and a locative phrase appeared somewhere in the sentence. The evidence gate
 now requires the named WHERE anchor to precede the locative relation in the
 sentence. It accepts the same evidence for “Where is the Colosseum?” and
 rejects it for Italy, while the reported Everest and Turing location questions
-remain supported. This conservative subject-first check may abstain on valid
-inverted or relative-clause wording; those forms need separately licensed role
-patterns.
+remain supported.
+
+Command: `python3 experiments/v1_420_where_role_variants.py`.
+
+The WHERE role check also recognizes the bounded inversion “In the Himalayas
+lies Mount Everest” and the correlative clause “Bletchley Park is where Alan
+Turing worked”. It still rejects both a destination-only mention and a
+same-entity sentence with no location relation. These are explicit surface
+patterns, not general syntactic parsing; untested clause forms remain outside
+the claim.
 
 ## Grounded math-to-list-code composition
 

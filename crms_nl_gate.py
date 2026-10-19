@@ -237,6 +237,36 @@ def _where_anchor_is_located_entity(sentence: str,
     check handles direct subject-first clauses and abstains on other forms.
     """
     words = [word.casefold() for word in _tokens(sentence)]
+    anchors: list[tuple[int, int]] = []
+    for group in mentions:
+        anchor = [word.casefold() for word in group if word.casefold() not in _STOP]
+        if not anchor:
+            continue
+        for start in range(len(words) - len(anchor) + 1):
+            if words[start:start + len(anchor)] == anchor:
+                anchors.append((start, start + len(anchor)))
+    if not anchors:
+        return False
+
+    # In a correlative clause, the entity after "where" is the located
+    # subject: "Bletchley Park is where Alan Turing worked". An entity before
+    # that clause ("Italy is where the Colosseum stands") is only being
+    # identified as the destination, so it must not pass for a WHERE answer
+    # about Italy itself.
+    where_positions = [index for index, word in enumerate(words)
+                       if word == "where"]
+    if where_positions:
+        where_position = where_positions[0]
+        located_verbs = {
+            "lie", "lies", "lay", "stand", "stands", "stood", "work",
+            "works", "worked", "live", "lives", "lived", "sit", "sits",
+            "sat", "reside", "resides", "resided",
+        }
+        return any(start > where_position
+                   and any(word in located_verbs
+                           for word in words[end:])
+                   for start, end in anchors)
+
     relation_words = {
         "in", "at", "near", "located", "based", "lies", "situated",
         "through", "across", "along", "within", "born", "work", "worked",
@@ -247,14 +277,23 @@ def _where_anchor_is_located_entity(sentence: str,
     if not relation_positions:
         return False
     first_relation = min(relation_positions)
-    for group in mentions:
-        anchor = [word.casefold() for word in group if word.casefold() not in _STOP]
-        if not anchor:
-            continue
-        for start in range(len(words) - len(anchor) + 1):
-            if words[start:start + len(anchor)] == anchor:
-                if start < first_relation:
-                    return True
+    if any(start < first_relation for start, _end in anchors):
+        return True
+
+    # Permit the common locative inversion "In the Himalayas lies Mount
+    # Everest". Require the sentence to open with a locative preposition and
+    # a location verb before the named anchor, so destination-only mentions
+    # later in an ordinary clause remain rejected.
+    inversion_prepositions = {"in", "at", "near", "within", "across", "along"}
+    location_verbs = {
+        "lie", "lies", "lay", "stand", "stands", "stood", "sit", "sits",
+        "sat", "run", "runs", "ran", "rise", "rises", "rose", "exist",
+        "exists", "existed",
+    }
+    if words and words[0] in inversion_prepositions:
+        return any(
+            any(word in location_verbs for word in words[1:start])
+            for start, _end in anchors)
     return False
 
 
