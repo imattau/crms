@@ -85,10 +85,12 @@ These results are component evidence, not a single overall capability score:
   Its constraints and refusal cases are local tests, not broad coding parity.
 - `v1_357_cross_domain_list_math_composition.py` composes a transferred
   sequence rule and a learned exact math expression in one code request. It
-  checks both components, the combined behavior, deterministic provenance,
-  refusal when either stage lacks support, and chat explanation/evidence
-  follow-ups. This demonstrates one reusable cross-domain composition, not the
-  planning breadth or interaction flexibility of a 70B+ model.
+  checks both components, the combined behavior, and recombines the same
+  sequence with a second formula that returns exact fractions. It also checks
+  deterministic provenance, refusal when either stage lacks support, and chat
+  explanation/evidence follow-ups. This demonstrates reuse across two
+  cross-domain combinations, not the planning breadth or interaction
+  flexibility of a 70B+ model.
 - `v1_350` and `v1_351` test direct-edge preference and verified proof
   explanations. The explanation set achieved 31/31 verified and round-tripped
   cases, with structured fallbacks where no learned wording existed. This is

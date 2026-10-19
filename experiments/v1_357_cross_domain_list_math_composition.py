@@ -76,7 +76,9 @@ def trained_math() -> CRMSMath:
             ("What is 2 times 3?", "6"),
             ("What is 4 times 7?", "28"),
             ("What is 2 plus 3?", "5"),
-            ("What is 6 plus 8?", "14")):
+            ("What is 6 plus 8?", "14"),
+            ("What is 2 divided by 2?", "1"),
+            ("What is 4 divided by 2?", "2")):
         result = model.teach(question, answer)
         require(result.status in {"needs_more_examples", "licensed"},
                 f"math operator failed to learn: {result}")
@@ -117,6 +119,24 @@ def main() -> None:
                 == [19, 19, 7, 4]
                 and variant_namespace["validate_examples"](),
                 f"wording variant changed supported task semantics: {variant}")
+    rational_request = (
+        "sort the list then reverse the list then apply x divided by 2 to "
+        "each value")
+    rational_artifact = generate_list_then_math_python(
+        rules, math, rational_request)
+    require(rational_artifact is not None,
+            "the same learned list sequence did not compose with division")
+    rational_namespace: dict[str, object] = {}
+    exec(compile(rational_artifact.source, "<crms-cross-domain-rational>", "exec"),
+         rational_namespace)
+    from fractions import Fraction
+    require(rational_namespace["transform"]([4, 1, 4, 2])
+            == [Fraction(2), Fraction(2), Fraction(1), Fraction(1, 2)]
+            and rational_namespace["validate_examples"]()
+            and rational_namespace["COMPOSITION_PROVENANCE"]["math_map_provenance"]
+                ["expression_artifact_id"]
+                == rational_namespace["MATH_MAP_PROVENANCE"]["expression_artifact_id"],
+            "division composition lost exact fractions or math lineage")
     evidence = show_generated_code_evidence(artifact)
     require("learned list procedure" in describe_generated_code(artifact)
             and "Generated composed Python" in render(artifact, REQUEST)
@@ -166,6 +186,8 @@ def main() -> None:
           "outer lineage retained: PASS")
     print("standalone output, composed probes, determinism, unsupported-stage "
           "abstention: PASS")
+    print("same learned sequence recombined with a second formula; exact "
+          "fractional output and lineage: PASS")
     print("natural-language chat generation, explanation, and evidence: PASS")
 
 
