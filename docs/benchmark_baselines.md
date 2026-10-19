@@ -169,6 +169,14 @@ not learned generalization; frozen exact-phrase candidates still cover only 5.6%
 should induce dialogue-act and task-intent frames conditioned on typed question/slot and active task,
 while preserving ambiguity and abstention.
 
+The original replay inferred yes/no versus detail answer type from the coarse annotated context
+state. `python3 experiments/v1_401_transcript_question_type_replay.py USER_TURNS.csv` instead uses
+the latest assistant utterance to infer question type and slot, matching the runtime's prompt-based
+typing. It still takes open-question presence, predecessor act, and prior active-task intent from the
+annotations, so this remains a partial-oracle replay. On dev-v4 it hypothesized 68/124 turns (54.8%),
+selected 63, and matched both labels on 52/68 (76.5%); 5 were ambiguous. The different method
+changes coverage and abstention, so its scores are not directly comparable with v1_395.
+
 ### Frozen contextual-intent test pilot
 
 After commit `5afd9f5`, six complete conversations were labeled from the source corpus `test` split
@@ -202,6 +210,17 @@ intent change, the replay at `8bd3b69` hypothesized 31/68 classifiable turns (45
 all 31, and matched both labels on 23/31 (74.2%). The context-free comparison hypothesized 13/68
 (19.1%) and matched 12/13. The inert train-only candidate memory matched four turns (5.9% coverage),
 all four agreeing with the provisional labels; it remains inactive at runtime.
+
+A follow-up replay used the transcript-derived question typing and the later dev-only code at
+`144f8c9`. It hypothesized 35/68 turns (51.5%), selected all 35, and matched both labels on 25/35
+(71.4%). The context-free comparison again hypothesized 13/68 and matched 12. This replaces neither
+the original v1_395 result nor the labels: it is a second analysis of the same small sample using a
+more realistic question-type source, while open-question presence, predecessor act, and preceding
+active-task intent remain supplied by the provisional annotations. The updated result still does not
+measure a fully autonomous transcript replay or independent accuracy. It yields four more hypotheses
+and two more label matches than the earlier replay, but a lower match rate among hypotheses; this
+shows that higher coverage alone does not resolve contextual intent. No code was tuned from this
+replay; keep the sample frozen for future development.
 
 These results are provisional agreement with one Codex annotator, not accuracy or independent
 validation. The sample is small and non-random, and the runtime replay was given annotated context

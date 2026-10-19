@@ -97,7 +97,16 @@ one Codex labeler; oracle context means it is not end-to-end performance or inde
 Source record hashes and exact utterance spans were verified, and conversation IDs do not overlap
 the train, development, or first test pilot. The evaluation used `8bd3b69` before the subsequent
 dev-only preference-intent change; this sample remains frozen and was not used to tune that change.
-The labeling file and runtime reports are in `/tmp/crms_dialogue_test_v2`.
+The labeling file and initial runtime reports are in `/tmp/crms_dialogue_test_v2`.
+
+A follow-up replay used `v1_401_transcript_question_type_replay.py` with code at `144f8c9` and
+inferred yes/no versus detail from the transcript's preceding assistant prompt. It hypothesized
+35/68 classifiable turns (51.5%), selected all 35, and matched both labels on 25/35 (71.4%). This is
+a second analysis of the same sample, not a new holdout: question type is transcript-derived, but
+open-question presence, predecessor act, and preceding task intent still come from provisional
+labels. It produced four more hypotheses and two more label matches than the earlier replay, but a
+lower match rate among hypotheses. The evaluation method was developed and checked on dev before
+this replay; no code was tuned from this result.
 
 The elaboration baseline recognizes a small set of equivalent content-free forms, including
 “Could you tell me more?”, “Can you say more?”, and “Could you elaborate?”. These use the same

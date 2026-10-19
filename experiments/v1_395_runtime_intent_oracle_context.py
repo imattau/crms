@@ -16,7 +16,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from crms_conversation import classify_user_intent
+from crms_conversation import _YES_NO_QUESTION_RE, classify_user_intent
 from crms_dialogue import CRMSDialogue, infer_open_question_slot
 from crms_dialogue_intent import CRMSDialogueIntentModel
 from crms_knowledge import CRMSKnowledgeBase
@@ -30,7 +30,8 @@ ACTIVE_TASKS = {
 
 
 def make_dialogue(row: dict[str, str], active_task: str | None,
-                  knowledge: CRMSKnowledgeBase, *, oracle_context: bool = True
+                  knowledge: CRMSKnowledgeBase, *, oracle_context: bool = True,
+                  question_type_from_prompt: bool = False
                   ) -> CRMSDialogue:
     dialogue = CRMSDialogue(knowledge, intent_model=CRMSDialogueIntentModel())
     if not oracle_context:
@@ -42,6 +43,9 @@ def make_dialogue(row: dict[str, str], active_task: str | None,
             r"(?im)^ASSISTANT:\s*(.+?)\s*$", row["preceding_context"])
         prompt = assistant_turns[-1] if assistant_turns else ""
         answer_kind = "yes-no" if state == "awaiting-confirmation" else "detail"
+        if question_type_from_prompt:
+            answer_kind = ("yes-no" if _YES_NO_QUESTION_RE.fullmatch(prompt.strip())
+                           else "detail")
         dialogue.open_dialogue_question = {
             "prompt": prompt[:512], "answer_kind": answer_kind,
             "expected_slot": infer_open_question_slot(prompt, answer_kind),
@@ -56,7 +60,7 @@ def make_dialogue(row: dict[str, str], active_task: str | None,
     return dialogue
 
 
-def evaluate(path: Path) -> dict:
+def evaluate(path: Path, *, question_type_from_prompt: bool = False) -> dict:
     with path.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
     if not rows:
@@ -104,14 +108,17 @@ def evaluate(path: Path) -> dict:
                row["source_utterance_index"].strip())
         active = active_before.get(key)
         context_free = classify_user_intent(
-            make_dialogue(row, active, knowledge, oracle_context=False),
+            make_dialogue(row, active, knowledge, oracle_context=False,
+                          question_type_from_prompt=question_type_from_prompt),
             row["user_utterance"])
         if context_free is not None:
             context_free_hypothesized += 1
             context_free_matches += (
                 context_free.dialogue_act, context_free.task_intent
             ) == (row["dialogue_act"].strip(), row["task_intent"].strip())
-        dialogue = make_dialogue(row, active, knowledge)
+        dialogue = make_dialogue(
+            row, active, knowledge,
+            question_type_from_prompt=question_type_from_prompt)
         hypothesis = classify_user_intent(dialogue, row["user_utterance"])
         expected = (row["dialogue_act"].strip(), row["task_intent"].strip())
         if hypothesis is None:
@@ -138,10 +145,16 @@ def evaluate(path: Path) -> dict:
             "matched_frame": hypothesis.matched_frame if hypothesis else None,
         })
     counts.update({
-        "experiment": "v1_395_runtime_intent_oracle_context",
+        "experiment": ("v1_401_transcript_question_type_replay"
+                       if question_type_from_prompt else
+                       "v1_395_runtime_intent_oracle_context"),
         "labeler": next(iter(reviewers)),
         "evaluation_basis": "agreement with one provisional Codex labeler",
-        "context_basis": "oracle context_state and predecessor labels, plus prior labeled task intent",
+        "context_basis": (
+            "oracle open-question presence, predecessor act, and prior labeled task intent; "
+            "question type and slot inferred from the preceding assistant prompt"
+            if question_type_from_prompt else
+            "oracle context_state and predecessor labels, plus prior labeled task intent"),
         "scope_warning": "not end-to-end performance, independent review, or accuracy",
         "coverage": counts["hypothesized"] / len(eligible) if eligible else 0,
         "agreement_given_hypothesis": {
@@ -171,8 +184,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("labels", type=Path)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--question-type-from-prompt", action="store_true",
+                        help="infer open-question type from the latest assistant prompt")
     args = parser.parse_args()
-    report = evaluate(args.labels)
+    report = evaluate(args.labels,
+                      question_type_from_prompt=args.question_type_from_prompt)
     encoded = json.dumps(report, ensure_ascii=False, indent=2)
     if args.output:
         args.output.write_text(encoded + "\n", encoding="utf-8")
