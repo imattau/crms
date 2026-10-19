@@ -414,3 +414,42 @@ the goal but cannot substitute for transfer, task completion, or safe context.
 - Work in small reviewable slices; run the focused runtime check and nearby
   regressions, then commit only the intended files. Preserve concurrent and
   user-owned changes.
+
+### Immediate checkpoint
+
+The next work should stay on the integration path, not widen into another
+standalone corpus scan:
+
+1. **Close the dialogue regression loop.** Re-run the full topic-switch
+   transcripts from a clean process at a recorded revision. Review the current
+   topic-anchor and page-title-coreference changes against the wrong-entity
+   negative case, then add or fix only behavior demonstrated by those
+   transcripts. Do not clear valid source-backed context merely because the
+   previous reply was not an accepted fact.
+2. **Lock the end-to-end dialogue contract.** Cover topic switch, pronoun
+   follow-up, source-only answer, unanswered turn, `why?`, elliptical topic
+   change, and save/reload. Keep the last answer eligible for explanation
+   separate from the active topic and referents. This makes dialogue progress
+   measurable without letting it silently alter fact status.
+3. **Return to recombination and learned-rule transfer.** Use ordinary chat to
+   test a genuinely unseen composition from learned components, plus a
+   contrastive near-miss and missing-step case. Verify the result with an
+   independent task check and preserve rule examples, holdout boundary, and
+   lineage. This is the next capability advance after the dialogue gate, not
+   a larger set of demonstrations of an existing composition.
+4. **Treat role/type corpus discovery as exploratory until it earns a gate.**
+   The current uncommitted `v1_335` probe change qualifies selected entities by
+   page title, but its printed “predicate-head/page-type check” count currently
+   equals the full typed-support count; it does not establish that such a
+   filter ran. Do not use those counts to license relation equivalence. First
+   make the diagnostic name and computation agree, then test cited positive
+   and negative examples across ambiguous page titles and held-out documents.
+   Promote a discovery signal only if it rejects the known false alignment
+   without discarding valid cases such as `capital of`.
+
+**Near-term completion condition:** the clean-process dialogue suite has no
+wrong-entity answers or stale explanations, and one held-out recombination
+works through chat with an independent validation and recoverable lineage.
+Then use the same fixed suite to decide whether the next investment should be
+reasoning integrity/routing or the dialogue-intent pilot. Do not declare the
+broader goal complete at this checkpoint.
