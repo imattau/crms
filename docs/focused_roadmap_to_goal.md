@@ -423,23 +423,27 @@ the goal but cannot substitute for transfer, task completion, or safe context.
 The next work should stay on the integration path, not widen into another
 standalone corpus scan:
 
-1. **Close the dialogue regression loop.** Re-run the full topic-switch
-   transcripts from a clean process at a recorded revision. Review the current
-   topic-anchor and page-title-coreference changes against the wrong-entity
-   negative case, then add or fix only behavior demonstrated by those
-   transcripts. Do not clear valid source-backed context merely because the
-   previous reply was not an accepted fact.
-2. **Lock the end-to-end dialogue contract.** Cover topic switch, pronoun
-   follow-up, source-only answer, unanswered turn, `why?`, elliptical topic
-   change, and save/reload. Keep the last answer eligible for explanation
-   separate from the active topic and referents. This makes dialogue progress
-   measurable without letting it silently alter fact status.
-3. **Return to recombination and learned-rule transfer.** Use ordinary chat to
+1. **Close the observed dialogue coverage gaps.** The new 30-turn transcript
+   (`v1_427`) and focused regressions pass their safety checks: topic switches
+   do not leak Colosseum/Eiffel evidence, `why?` follows the latest answer,
+   and history updates across abstention. Through the same transcript, fix
+   only demonstrated gaps: recovery to a source-indexed entity after an
+   unrelated abstention; paragraph-local linking of “Eiffel Tower” to “the
+   tower” when the named subject is explicit; and possessive follow-up
+   resolution such as “What is its capital?”. Extend the same multi-turn test
+   with save/reload and a negative case that tries to transfer an antecedent
+   across paragraphs.
+2. **Advance recombination and self-learning rule transfer.** Use ordinary chat to
    test a genuinely unseen composition from learned components, plus a
    contrastive near-miss and missing-step case. Verify the result with an
    independent task check and preserve rule examples, holdout boundary, and
-   lineage. This is the next capability advance after the dialogue gate, not
-   a larger set of demonstrations of an existing composition.
+   lineage. Do not count more demonstrations of an existing composition as
+   transfer. Keep this core capability active alongside the dialogue work.
+3. **Strengthen reasoning on the composition path.** Reuse the unseen
+   compositions to exercise proof and task validators, then target explicit
+   integrity constraints, contradiction handling, missing premises, and
+   incomplete-search reporting. Preserve independence between the learner and
+   validator; a derivation cannot validate itself.
 4. **Keep role/type corpus discovery exploratory until it earns a gate.**
    The `v1_335` diagnostic now describes its metric as typed support after
    page-title disambiguation; it does not claim to apply a separate
@@ -451,8 +455,9 @@ standalone corpus scan:
    negative examples, including valid cases such as `capital of`.
 
 **Near-term completion condition:** the clean-process dialogue suite has no
-wrong-entity answers or stale explanations, and one held-out recombination
-works through chat with an independent validation and recoverable lineage.
-Then use the same fixed suite to decide whether the next investment should be
-reasoning integrity/routing or the dialogue-intent pilot. Do not declare the
-broader goal complete at this checkpoint.
+wrong-entity answers or stale explanations, its known coverage gaps are
+measured, and one held-out recombination works through chat with independent
+validation and recoverable lineage. Continue the contextual-intent and
+dialogue-move pilot as a priority research track; compare it with the explicit
+baseline before granting it runtime authority. Do not declare the broader goal
+complete at this checkpoint.

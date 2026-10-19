@@ -216,6 +216,25 @@ numbered-institute control still passes in `v1_329`. These are explicit
 surface patterns, not general syntactic parsing; untested clause forms remain
 outside the claim.
 
+## Thirty-turn multi-topic dialogue transcript
+
+Command: `python3 experiments/v1_427_dialogue_multiturn_transcript.py`.
+
+Runtime replay on the 2026-10-20 code at `175ca7b`, using a fresh temporary
+source index and dialogue state. All 30 turns completed without a crash. The
+Eiffel Tower → Colosseum switch kept the Colosseum's `80 CE` and `50,000
+spectators` evidence local; `why?` followed the capacity answer; history recall
+updated after an unanswered turn; and the final `why?` did not reuse stale
+evidence. Nearby regressions `v1_426` and `v1_419` also passed.
+
+The transcript is a two-paragraph diagnostic, not a representative dialogue
+benchmark. It exposes these remaining coverage gaps: returning to an indexed
+entity after an unrelated abstention is rejected; “Who built the Eiffel Tower?”
+does not connect the named entity to “the tower” in the same paragraph; and
+“What is its capital?” does not resolve its possessive referent. These abstain
+instead of producing a wrong answer in this run, but they limit recovery and
+language coverage. Keep safety and coverage as separate measurements.
+
 ## Grounded math-to-list-code composition
 
 Command: `python3 experiments/v1_356_grounded_math_list_composition.py`
