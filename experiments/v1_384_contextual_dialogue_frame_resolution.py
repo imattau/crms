@@ -116,6 +116,40 @@ def main() -> None:
             or wrong_predecessor_intent.basis != "portable_dialogue_model",
             "context frame ignored its predecessor condition")
 
+    # Conflicting licensed readings for the same wording and context must be
+    # surfaced as ambiguity, never silently discarded or routed by tie-break.
+    conflicting_memory = empty_dialogue_intent_memory()
+    conflicting_memory["builtin_policy"].extend((
+        {
+            "policy_id": "continue-reading-a",
+            "dialogue_act": "social",
+            "task_intent": "social-contact",
+            "surface_patterns": ["Keep this thread moving"],
+            "context_predicates": [],
+            "predecessor_act": None,
+            "runtime_route": "reaction",
+        },
+        {
+            "policy_id": "continue-reading-b",
+            "dialogue_act": "continuation-request",
+            "task_intent": "continue-current-task",
+            "surface_patterns": ["Keep this thread moving"],
+            "context_predicates": [],
+            "predecessor_act": None,
+            "runtime_route": "elaboration",
+        },
+    ))
+    conflicting = CRMSDialogue(
+        knowledge, intent_model=CRMSDialogueIntentModel(conflicting_memory))
+    ambiguous = classify_user_intent(conflicting, "Keep this thread moving")
+    require(ambiguous is not None
+            and ambiguous.decision == "ambiguous"
+            and ambiguous.dialogue_act == "uncertain"
+            and ambiguous.basis == "portable_dialogue_model"
+            and ambiguous.runtime_route is None
+            and len(ambiguous.alternatives) == 2,
+            f"conflicting licensed readings were not preserved safely: {ambiguous}")
+
     with tempfile.TemporaryDirectory(prefix="crms-intent-resolution-") as temporary:
         root = Path(temporary)
         knowledge.save(root / "knowledge.json")
@@ -164,6 +198,7 @@ def main() -> None:
     print("same elaboration wording abstains without its required context: PASS")
     print("validated frame requires context/predecessor and normalizes case: PASS")
     print("candidate/train-only frame has no runtime effect: PASS")
+    print("conflicting licensed frames remain ambiguous and do not route: PASS")
     print("chat and state preserve the model basis; legacy intent state loads: PASS")
 
 

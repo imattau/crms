@@ -239,7 +239,37 @@ class CRMSDialogueIntentModel:
             signatures = {(frame["dialogue_act"], frame["task_intent"],
                            frame["runtime_route"]) for frame in eligible}
             if len(signatures) != 1:
-                return None
+                # A conflict among licensed readings is itself a useful
+                # contextual-intent result. Preserve it as an ambiguity, but
+                # never choose one of the conflicting routes.
+                by_signature: dict[tuple[str, str | None, str | None], str] = {}
+                for item in sorted(eligible, key=lambda value: value["frame_id"]):
+                    signature = (item["dialogue_act"], item["task_intent"],
+                                 item["runtime_route"])
+                    by_signature.setdefault(signature, item["frame_id"])
+                alternatives = tuple(
+                    f"{act} / {task_intent or 'unspecified'}"
+                    f" (frame {frame_id}; route {route or 'none'})"
+                    for (act, task_intent, route), frame_id
+                    in sorted(by_signature.items(), key=lambda pair: str(pair[0]))
+                )
+                evidence_refs = sorted({
+                    citation for item in eligible
+                    for citation in item["evidence_refs"]})[:32]
+                return {
+                    "dialogue_act": "uncertain",
+                    "task_intent": None,
+                    "decision": "ambiguous",
+                    "matched_frame": "ambiguous-portable-frames",
+                    "context_predicates": tuple(sorted({
+                        predicate for item in eligible
+                        for predicate in item["context_predicates"]})),
+                    "alternatives": alternatives[:16],
+                    "selected_value": None,
+                    "basis": "portable_dialogue_model",
+                    "evidence_refs": tuple(evidence_refs),
+                    "runtime_route": None,
+                }
             # Prefer the most context-specific license; stable ID ordering is
             # only a tie-break between frames that authorize the same action.
             frame = sorted(eligible, key=lambda item: (
