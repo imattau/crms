@@ -146,29 +146,42 @@ unsupported cases alongside capability results.
 
 ## Immediate work packets
 
-1. **Answer-bearing retrieval:** add a fixed chat regression for the Sydney
-   Opera House example alongside direct-entity, wrong-paragraph, and missing-
-   relation negatives. Correct selection must preserve the source sentence and
-   citation, and must abstain if the only named-entity sentence does not answer
-   the question. Keep lexical retrieval, relation fit, entity identity, and
-   answer-type checks separately observable.
-2. **Context after source-only answers:** replay “What is the capital of
-   France?” followed by “and Italy?”, plus an explicit topic switch and `why?`.
-   Retain only entities and answers actually shown to the user. An unsupported
-   follow-up must not borrow a prior answer or explain an unrelated turn.
-3. **Independent dialogue set:** add author-held-out transcripts and varied
-   paragraph/entity layouts for pronouns, multiple entities, repairs, history,
-   and ordinal references. Keep current curated transcripts as regression
-   controls, not the generalization score.
-4. **Source-derived procedure transfer:** expand proposal quality and source
-   independence before adding more hand labels. Keep quoted, negated,
-   contrastive, metalinguistic, and unrelated prose as negative controls. Make
-   labeler effort and the distinction between source evidence and supervision
-   visible.
-5. **Unseen composition plus proof checks:** join a learned procedure with a
-   verified reasoning step in ordinary chat. Check missing premises, explicit
-   negatives, conflicts, cycles/integrity violations, and budget exhaustion;
-   keep derived write-back review-only until correction and invalidation pass.
+1. **Close the wrong-referent and context-lifecycle failures.** Freeze the
+   reported Eiffel Tower/Colosseum transcript, including `why?` after the
+   failed “and the Colosseum?” turn. Require pronoun-led source sentences to
+   have a local, explicit entity/paragraph link; recency or answerability alone
+   cannot bind them. Preserve visible source context through source-only
+   answers and recoverable abstentions, replace it on a named topic switch, and
+   bind `why?` to the immediately relevant answer or failure. Add “and Italy?”
+   after a source-only answer. Test full transcripts and save/reload, not only
+   resolver helpers.
+2. **Measure dialogue generalization.** Keep the hand-authored cases above as
+   regressions, then evaluate author-held-out conversations and varied
+   paragraph layouts with multiple entities, interruptions, corrections,
+   history questions, and ordinal references. Report wrong referents, wrong
+   answer sentences, omissions, clarification, abstention, citation support,
+   and task completion separately. Fix confident errors before adding more
+   intent or dialogue machinery.
+3. **Advance source-derived self-learning rules.** Extend beyond current
+   teacher-labeled phrase and connective examples using complete-document and
+   source-disjoint holdouts. Keep source evidence, extracted candidates,
+   teacher/labeler decisions, accepted rules, and independent validation
+   distinct. Include quoted, negated, contrastive, metalinguistic, unrelated,
+   and misleading prose. Report proposal precision and labeler effort; do not
+   call cue matching or supervised alignment autonomous learning.
+4. **Join unseen recombination to verified reasoning.** Send a held-out
+   composition through ordinary chat, procedure/rule selection, an independent
+   result checker, and proof verification where applicable. Test missing
+   premises, explicit negatives, conflicts, cycles/integrity violations, and
+   search exhaustion. Keep derived write-back review-only, lineage-complete,
+   and invalidated after source correction until its governance gates pass.
+5. **Use the scorecard to choose one breadth slice.** After packets 1–4 have
+   clean-process evidence, choose the largest measured user loss and strengthen
+   one bounded task in math, coding, translation, or creative work. Define
+   held-out language, negative cases, an independent checker or human rubric,
+   and repair behavior before implementation. Defer broader SQLite packaging
+   until record and correction lifecycles are stable; then validate a copied
+   model with source files unavailable.
 
 **Checkpoint (2026-10-20):** the answer-selection slice now passes six focused
 chat experiments, including the Sydney Opera House designer sentence, wrong
