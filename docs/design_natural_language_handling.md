@@ -418,14 +418,15 @@ same sets, which include the engine's own abstentions, typo repair and yes/no ha
 is relaxed for a *bounded* learned component. This was option (B) in the analysis below, adopted
 on the strength of the first fresh-sample result (later checks narrowed the gain to a range, see
 above); it is a licence to pilot, not a finding that the
-ranker is proven. The ranker is 16 numbers, deterministic to retrain, CPU-cheap, and restricted to
-choosing among sentences the gate has already accepted.
+ranker is proven. The current pilot has 15 named features, is deterministic to retrain and
+CPU-cheap, and is restricted to choosing among sentences the gate has already accepted. The
+earlier 16-feature experiment is retained below as historical benchmark evidence.
 
 *Allowed*
 - A learned component that **proposes or ranks** candidates. It may never be the source of a fact
   and never the final judge of acceptance: the evidence gate, the proof checks and the abstention
   threshold still decide what is returned, so every answer still traces to a cited source.
-- Small, readable models whose inputs are named features (the 16-weight form tested here), stored
+- Small, readable models whose inputs are named features (the current 15-weight pilot), stored
   as a **reviewable, versioned record** that records its training data, training procedure and
   date, and that can be listed, replaced or removed like other learned items. The `why?` view
   should be able to show the feature values behind a choice.
@@ -797,16 +798,16 @@ Each step: add a benchmark family or reuse the sets above, record the numbers in
       step is evidence that also requires compatible subject and object classes, with review.
    Each needs a fresh-sample measurement before adoption; tuned-sample gains do not count.
 9. **Choosing between gate-passing sentences.** Hand-set ranking (idf overlap with a margin, word
-   proximity, answer-span agreement) did not generalise (section 2.6). A 16-weight learned ranker
-   did (section 2.7: 74 to 83% precision on fresh articles depending on the training draw, against
-   71% for the gate layer; a ranker trained only on CRMS's own cloze questions reached 79 to 90%
-   at lower coverage). The
-   project owner has allowed a bounded learned ranker (section 2.7). An initial 40-question FTS
-   SimpleWiki evaluation tied the gate on both total answers and the 16 multi-candidate cases
-   (details in `benchmark_baselines.md`); this does not yet establish a gain. Next: test it with
-   more training data and independent held-out windows, on the hand-written sets and other text;
-   try training it on CRMS's own reviewed answers and ledger feedback
-   instead of an external dataset. Until it ships, prefer abstaining
+   proximity, answer-span agreement) did not generalise (section 2.6). The historical 16-feature
+   ranker improved precision on two SQuAD-based draws, but its gain varied by draw and the current
+   15-feature pilot has not shown a gain on FTS candidates: the initial 40-question SimpleWiki
+   evaluation tied the gate overall and on its 16 multi-candidate questions (details in
+   `benchmark_baselines.md`). Keep it out of normal chat. Before considering integration, evaluate
+   multiple independent draws with human-written questions and additional domains, report wrong,
+   abstained and wrong-source answers separately, and establish whether it helps specifically when
+   multiple candidates pass the gate. Compare absolute-threshold selection with a top-versus-runner-
+   up margin, since the logistic score is not calibrated. Training on CRMS-reviewed answers and
+   ledger feedback is also untested. Until a repeatable gain is demonstrated, prefer abstaining
    when several sentences pass, with role-order checks from 3.3 or corroboration by an independent
    second source as non-learned alternatives.
 10. **Pin the engine version in benchmarks.** Results moved between runs when the working tree
