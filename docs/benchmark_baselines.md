@@ -148,6 +148,20 @@ active goal. Exact-surface candidate coverage remains too low for broad dialogue
 These are single-annotator label-agreement diagnostics, not accuracy estimates, independent review,
 or evidence of paraphrase transfer. No independently reviewed intent model is available.
 
+### Broad-goal labels
+
+The user-intent pilot now carries a separate `goal_intent` label. Codex supplied a provisional,
+contextual primary-label pass for the 563 training turns and 200 dev/test turns across 16 disjoint
+conversations. The labels track the active task across information requests and constraints; blanks
+mean there is no task goal, while `uncertain` means the broader goal could not be established. No
+second annotator reviewed this pass.
+
+With the 40 training conversations frozen, goal-aware exact-surface induction still produced 13
+inert candidates. On 192 classifiable dev/test turns, 12 matched (6.25% coverage). Act agreement
+was 12/12; immediate-intent and broad-goal agreement were each 11/12 (91.7%). This is agreement
+with the same Codex labeler, not independent accuracy. Low coverage remains the main result; broader
+contextual generalization needs more work.
+
 ### Runtime intent routing with supplied context
 
 `python3 experiments/v1_395_runtime_intent_oracle_context.py USER_TURNS.csv` replays labeled turns

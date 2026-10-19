@@ -86,7 +86,7 @@ def evaluate(candidate_report: dict, rows: list[dict[str, str]]) -> dict:
             active_before[(conversation_id, row_id)] = active_task
             intent = row["task_intent"].strip()
             labeled_goal = row.get("goal_intent", "").strip()
-            if labeled_goal:
+            if labeled_goal and labeled_goal != "uncertain":
                 if labeled_goal not in ACTIVE_TASK_INTENTS:
                     raise ValueError(f"unknown goal intent: {labeled_goal}")
                 active_task = labeled_goal
@@ -137,7 +137,7 @@ def evaluate(candidate_report: dict, rows: list[dict[str, str]]) -> dict:
         intent_matches += predicted_intent == actual_intent
         exact_pair += (predicted_act, predicted_intent) == (actual_act, actual_intent)
         actual_goal = row.get("goal_intent", "").strip()
-        if actual_goal:
+        if actual_goal and actual_goal != "uncertain":
             goal_labeled += 1
             goal_matches += predicted_goal == actual_goal
         predictions.append({
@@ -168,6 +168,8 @@ def evaluate(candidate_report: dict, rows: list[dict[str, str]]) -> dict:
         "intent_agreement_on_unique_matches": intent_matches / confident if confident else None,
         "joint_agreement_on_unique_matches": exact_pair / confident if confident else None,
         "goal_intent_labeled_matches": goal_labeled,
+        "goal_intent_uncertain_labels": sum(
+            row.get("goal_intent", "").strip() == "uncertain" for row in rows),
         "goal_intent_agreement_on_labeled_matches": (
             goal_matches / goal_labeled if goal_labeled else None),
         "runtime_effect": "none; candidate frames remain inert",
@@ -205,6 +207,7 @@ def self_test() -> None:
     }, {
         "split": "dev", "conversation_id": "dev-a", "user_utterance": "Goodbye",
         "dialogue_act": "farewell", "task_intent": "end-interaction",
+        "goal_intent": "uncertain",
         "context_state": "task-complete", "predecessor_act": "close",
         "reviewer": "codex-ai-test", "citation": "dev-a#turn=4",
         "source_utterance_index": "3",
@@ -214,7 +217,8 @@ def self_test() -> None:
             and result["unique_candidate_predictions"] == 1
             and result["joint_agreement_on_unique_matches"] == 1.0
             and result["goal_intent_labeled_matches"] == 1
-            and result["goal_intent_agreement_on_labeled_matches"] == 1.0,
+            and result["goal_intent_agreement_on_labeled_matches"] == 1.0
+            and result["goal_intent_uncertain_labels"] == 1,
             "offline candidate agreement calculation failed")
     leaked = [dict(rows[0], conversation_id="train-a")]
     try:

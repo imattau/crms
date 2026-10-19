@@ -85,7 +85,7 @@ def induce(rows: list[dict[str, str]], *, min_conversations: int = 2) -> dict:
             active_before[(conversation_id, row_id)] = active_task
             prior_intent = row["task_intent"].strip()
             labeled_goal = row.get("goal_intent", "").strip()
-            if labeled_goal:
+            if labeled_goal and labeled_goal != "uncertain":
                 if labeled_goal not in GOAL_INTENTS:
                     raise ValueError(f"unknown goal intent: {labeled_goal}")
                 active_task = labeled_goal
@@ -116,6 +116,8 @@ def induce(rows: list[dict[str, str]], *, min_conversations: int = 2) -> dict:
             predicates = (*predicates,
                           "active_task_" + active_task.replace("-", "_"))
         goal_intent = row.get("goal_intent", "").strip() or None
+        if goal_intent == "uncertain":
+            goal_intent = None
         if goal_intent is not None and goal_intent not in GOAL_INTENTS:
             raise ValueError(f"unknown goal intent: {goal_intent}")
         signature = (surface, act, intent, goal_intent, predicates, predecessor)
@@ -245,6 +247,8 @@ def self_test() -> None:
          "dialogue_act": "request-action", "task_intent": "seek-information",
          "context_state": "task-in-progress", "predecessor_act": "answer",
          "citation": "mixed-b#turn=3", "goal_intent": "make-reservation"},
+        {**base, "conversation_id": "goal-uncertain", "source_utterance_index": "1",
+         "goal_intent": "uncertain", "citation": "goal-uncertain#turn=1"},
         {**base, "split": "dev", "conversation_id": "conversation-c",
          "dialogue_act": "reject", "task_intent": "other-task",
          "citation": "source-c#turn=8"},
@@ -259,7 +263,8 @@ def self_test() -> None:
                      if frame["surface_patterns"]
                      == ["could you just give me the phone number"]]
     require(len(thank_you) == 1 and thank_you[0]["status"] == "candidate"
-            and len(thank_you[0]["source_citations"]) == 2
+            and len(thank_you[0]["source_citations"]) == 3
+            and thank_you[0].get("goal_intent") is None
             and len(reservation_party) == 1
             and "active_task_make_reservation"
             in reservation_party[0]["context_predicates"]
