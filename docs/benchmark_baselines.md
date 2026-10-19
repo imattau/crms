@@ -884,11 +884,15 @@ expected status and completeness in the current run. Negative-only evidence rema
 the budget-limited case remained incomplete with `expansion_limit`; the diamond returned 64 proofs
 with `proof_limit`; and the cycle returned an ambiguity rather than an unqualified self-relation.
 
-On this local rerun, with `tracemalloc` enabled, the 35-hop chain took 35 ms and peaked at 211 KiB;
-the tree took 636 ms and peaked at 6,617 KiB; and the proof-capped diamond took 267 ms and peaked at
-556 KiB. These are machine- and instrumentation-specific observations, not performance thresholds.
-The gap between the short chain and the larger tree suggests branching and join work deserves more
-attention than simply raising recursive depth; it does not isolate the cause of the tree's latency.
+Before the inference normalization cache, a local run with `tracemalloc` enabled measured 35 ms for
+the 35-hop chain (211 KiB peak), 636 ms for the tree (6,617 KiB), and 267 ms for the proof-capped
+diamond (556 KiB). After adding a bounded 65,536-entry cache for pure token normalization in
+`crms_inference.py`, the same cases measured 28 ms (198 KiB), 321 ms (6,257 KiB), and 246 ms
+(548 KiB). A `cProfile` replay of the tree fell from 0.390 s / 1.82 million calls to 0.144 s / 0.63
+million calls. These are machine- and instrumentation-specific observations, not performance
+thresholds. The improvement confirms repeated normalization was a significant cost; the remaining
+profile is led by proof expansion and repeated fact-triple verification, which should be profiled
+before further search changes.
 The initial graph matrix improves coverage over the focused regressions, but does not yet include
 larger adversarial branching graphs, nonlinear recursive joins, or a broad query distribution.
 

@@ -10,6 +10,7 @@ into the source fact store.
 from __future__ import annotations
 
 from collections import deque
+from functools import lru_cache
 import re
 import json
 from dataclasses import asdict, dataclass, replace
@@ -62,6 +63,7 @@ def _evidence_basis(research_index: Any | None,
     return "source documents"
 
 
+@lru_cache(maxsize=65_536)
 def _key(value: str) -> tuple[str, ...]:
     # Relation parsers may return either ``great-grandparent`` or
     # ``great grandparent``. Normalize dash variants before tokenization so
