@@ -250,13 +250,19 @@ def show_generated_code_evidence(result: GeneratedCode) -> str:
     lines = [f"Evidence for generated artifact {result.provenance_id}:"]
     if result.domain == "list":
         for row in result.evidence_details:
+            source = (f" [Source: {row['source_id']}]"
+                      if row.get("source_id") else " [Source not recorded]")
             lines.append(
-                f"'{row['phrase']}': {row['input']} -> {row['output']}")
+                f"'{row['phrase']}': {row['input']} -> {row['output']}"
+                f"{source}")
     elif result.domain == "list_math_map":
         for row in result.evidence_details:
             if "input" in row:
+                source = (f" [Source: {row['source_id']}]"
+                          if row.get("source_id") else " [Source not recorded]")
                 lines.append(
-                    f"'{row['phrase']}': {row['input']} -> {row['output']}")
+                    f"'{row['phrase']}': {row['input']} -> {row['output']}"
+                    f"{source}")
             elif row.get("kind") == "grounded_number":
                 lines.append(
                     f"Grounded number '{row['phrase']}' = {row['value']} "
@@ -321,9 +327,9 @@ def generate_python(model: CRMSModel, instruction: str) -> GeneratedCode | None:
         procedure = tuple(Step(item["operation"], item["parameters"])
                           for item in predictions[0].procedure)
     example_records = [
-        {"phrase": phrase, "input": inputs, "output": outputs}
+        record
         for phrase in sorted(evidence_phrases)
-        for inputs, outputs in model._examples.get(phrase, [])
+        for record in model.example_records(phrase)
     ]
     examples = [(item["input"], item["output"]) for item in example_records]
     if procedure is None or not examples:
@@ -338,9 +344,9 @@ def generate_python(model: CRMSModel, instruction: str) -> GeneratedCode | None:
         for step in procedure
     ]
     literal = json.dumps(descriptors, sort_keys=True, separators=(",", ":"))
-    example_literal = json.dumps(
-        example_records,
-        sort_keys=True, separators=(",", ":"))
+    # The standalone source is Python; repr preserves None for demonstrations
+    # whose provenance was not recorded instead of emitting JSON's null.
+    example_literal = repr(example_records)
     validation_inputs = [inputs for inputs, _ in examples]
     validation_inputs.extend([[], [0], [1, -1, 2], [3, 3, -2, 0]])
     validation_examples = []

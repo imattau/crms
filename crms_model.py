@@ -88,11 +88,14 @@ def _rule_database_payload(path: Path) -> dict[str, Any]:
                          "no_fit_cases"):
                 payload[kind] = auxiliary.get(kind, [])
             expected_digest = payload.pop("memory_sha256", None)
+            legacy_digest = hashlib.sha256(json.dumps(
+                payload, ensure_ascii=False,
+                separators=(",", ":")).encode("utf-8")).hexdigest()
+            canonical_digest = hashlib.sha256(json.dumps(
+                payload, ensure_ascii=False, sort_keys=True,
+                separators=(",", ":")).encode("utf-8")).hexdigest()
             if (not isinstance(expected_digest, str)
-                    or hashlib.sha256(json.dumps(
-                        payload, ensure_ascii=False,
-                        separators=(",", ":")).encode("utf-8")).hexdigest()
-                    != expected_digest):
+                    or expected_digest not in {legacy_digest, canonical_digest}):
                 raise ValueError("SQLite rule memory integrity check failed")
             return payload
         finally:
@@ -141,7 +144,7 @@ def _write_rule_database(path: Path, payload: dict[str, Any]) -> None:
                                    "accepted_primitives",
                                    "accepted_primitive_artifacts", "no_fit_cases"}}
         settings["memory_sha256"] = hashlib.sha256(json.dumps(
-            payload, ensure_ascii=False,
+            payload, ensure_ascii=False, sort_keys=True,
             separators=(",", ":")).encode("utf-8")).hexdigest()
         connection.execute("INSERT INTO rule_store_settings VALUES (1,?)",
                            (json.dumps(settings, ensure_ascii=False,
@@ -909,6 +912,7 @@ class LearnResult:
     candidate_outputs: list[list[int]] | None = None
     candidate_procedures: list[list[dict[str, Any]]] | None = None
     evidence_phrases: list[str] | None = None
+    evidence_sources: list[str] | None = None
     proposed_procedures: list[list[dict[str, Any]]] | None = None
     search_complete: bool = True
     search_expansions: int = 0
@@ -3396,6 +3400,9 @@ class CRMSModel:
         self._accepted_primitive_artifacts: dict[
             tuple, dict[str, Any]] = {}
         self._examples: dict[str, list[tuple[list[int], list[int]]]] = {}
+        # Parallel to _examples by phrase. None means that the demonstration
+        # was not attributed to a source; never infer a source from its text.
+        self._example_sources: dict[str, list[str | None]] = {}
         self._procedures: dict[str, tuple[Step, ...]] = {}
         # Keep a bounded index of instructions whose latest complete search
         # found no procedure. Their demonstrations remain in ``_examples``.
@@ -3427,6 +3434,29 @@ class CRMSModel:
         if not isinstance(instruction, str) or not instruction.strip():
             raise ValueError('instruction must be a non-empty string')
         return ' '.join(instruction.casefold().split())
+
+    def example_sources(self, instruction: str) -> list[str]:
+        """Return distinct source identifiers recorded for an instruction.
+
+        Unattributed demonstrations are omitted; callers must not interpret an
+        empty list as proof that no source existed.
+        """
+        key = self._canonical_instruction_storage_key(
+            self._clean_instruction(instruction))
+        return sorted({source for source in self._example_sources.get(key, [])
+                       if source is not None})
+
+    def example_records(self, instruction: str) -> list[dict[str, Any]]:
+        """Return copied demonstrations with their recorded source IDs."""
+        key = self._canonical_instruction_storage_key(
+            self._clean_instruction(instruction))
+        examples = self._examples.get(key, [])
+        sources = self._example_sources.get(key, [None] * len(examples))
+        return [
+            {"phrase": key, "input": list(inputs), "output": list(outputs),
+             "source_id": sources[index]}
+            for index, (inputs, outputs) in enumerate(examples)
+        ]
 
     @staticmethod
     def _instruction_sequence(instruction: str) -> list[str]:
@@ -5512,20 +5542,36 @@ class CRMSModel:
     def teach(self, instruction: str,
               examples: Iterable[tuple[Iterable[int], Iterable[int]]],
               *, replace: bool = False,
+              source_ids: Iterable[str | None] | None = None,
               _use_language_prior: bool = True) -> LearnResult:
         """Add demonstrations, infer a procedure, and store only a unique fit.
 
         Each example is `(input_values, expected_output_values)`. If evidence
         is ambiguous or outside the rule library, no rule is committed.
+        Optional source_ids identify the document or teacher record for each
+        demonstration; omitted IDs remain explicitly unknown.
         """
         key = self._canonical_instruction_storage_key(
             self._clean_instruction(instruction))
         supplied = [(self._clean_values(x), self._clean_values(y)) for x, y in examples]
+        if isinstance(source_ids, str):
+            raise ValueError('source_ids must be a sequence with one ID per example')
+        supplied_sources = ([None] * len(supplied) if source_ids is None
+                            else list(source_ids))
+        if (len(supplied_sources) != len(supplied)
+                or any(source is not None
+                       and (not isinstance(source, str) or not source.strip()
+                            or len(source.strip()) > 2048)
+                       for source in supplied_sources)):
+            raise ValueError('source_ids must align with examples and contain strings of 1 to 2048 characters or None')
+        supplied_sources = [source.strip() if isinstance(source, str) else None
+                            for source in supplied_sources]
         if not supplied:
             return LearnResult('need_examples', key, 0, 0,
                                request='Please provide an input list and its intended output.')
         if replace:
             self._examples[key] = []
+            self._example_sources[key] = []
             self._procedures.pop(key, None)
             self._no_fit_records.pop(key, None)
             self._candidate_space_cache.pop(key, None)
@@ -5535,6 +5581,7 @@ class CRMSModel:
             self._retrieve_rule_prior(key) if _use_language_prior else (None, []))
         evidence = self._examples.setdefault(key, [])
         evidence.extend(supplied)
+        self._example_sources.setdefault(key, []).extend(supplied_sources)
         candidates = self._candidate_space_for_examples(key, evidence)
         if self._last_search_complete:
             known_behaviors = {_semantic_key(procedure) for procedure in candidates}
@@ -5580,7 +5627,8 @@ class CRMSModel:
                                    'One procedure fits all stored examples.'
                                ),
                                evidence_phrases=sorted(set(prior_sources))
-                               if prior_used else None)
+                               if prior_used else None,
+                               evidence_sources=self.example_sources(key) or None)
         self._procedures.pop(key, None)
         self._no_fit_records.pop(key, None)
         self._invalidate_language_indexes()
@@ -5663,7 +5711,8 @@ class CRMSModel:
                 request='There are no stored demonstrations for this instruction.')
         snapshot = [(list(inputs), list(outputs))
                     for inputs, outputs in examples]
-        return self.teach(key, snapshot, replace=True)
+        sources = list(self._example_sources.get(key, [None] * len(snapshot)))
+        return self.teach(key, snapshot, replace=True, source_ids=sources)
 
     def predict(self, instruction: str, values: Iterable[int]) -> Prediction:
         key = self._clean_instruction(instruction)
@@ -6791,6 +6840,9 @@ class CRMSModel:
             'vsa_min_similarity': self.vsa_min_similarity,
             'vsa_min_margin': self.vsa_min_margin,
             'examples': {phrase: examples for phrase, examples in self._examples.items()},
+            'example_sources': {
+                phrase: sources for phrase, sources in self._example_sources.items()
+            },
             'procedures': {phrase: _procedure_dict(proc)
                            for phrase, proc in self._procedures.items()},
             'accepted_primitives': self.accepted_primitive_candidates(),
@@ -6955,13 +7007,18 @@ class CRMSModel:
             if stored != configured:
                 raise ValueError(f'memory {name} differs; initialize with matching retrieval settings')
         raw_examples = payload.get('examples', {})
+        raw_example_sources = payload.get('example_sources', {})
         raw_procedures = payload.get('procedures', {})
         raw_accepted_primitives = payload.get('accepted_primitives', [])
         raw_accepted_primitive_artifacts = payload.get(
             'accepted_primitive_artifacts', [])
         raw_no_fit_cases = payload.get('no_fit_cases', [])
-        if not isinstance(raw_examples, dict) or not isinstance(raw_procedures, dict):
+        if (not isinstance(raw_examples, dict)
+                or not isinstance(raw_example_sources, dict)
+                or not isinstance(raw_procedures, dict)):
             raise ValueError('stored examples and procedures must be objects')
+        if not set(raw_example_sources) <= set(raw_examples):
+            raise ValueError('stored example source metadata references an unknown instruction')
         if (not isinstance(raw_accepted_primitives, list)
                 or len(raw_accepted_primitives) > 64):
             raise ValueError('stored accepted primitive list is malformed or oversized')
@@ -7051,6 +7108,7 @@ class CRMSModel:
             accepted_artifacts_by_key[key] = copy.deepcopy(artifact)
 
         examples_by_phrase = {}
+        sources_by_phrase = {}
         for phrase, examples in raw_examples.items():
             if self._clean_instruction(phrase) != phrase or not isinstance(examples, list):
                 raise ValueError('stored example association has an invalid phrase or examples')
@@ -7060,6 +7118,18 @@ class CRMSModel:
                     raise ValueError('stored example must contain input and output lists')
                 parsed.append((self._clean_values(example[0]), self._clean_values(example[1])))
             examples_by_phrase[phrase] = parsed
+            raw_sources = raw_example_sources.get(phrase, [None] * len(parsed))
+            if (not isinstance(raw_sources, list)
+                    or len(raw_sources) != len(parsed)
+                    or any(source is not None
+                           and (not isinstance(source, str) or not source.strip()
+                                or len(source.strip()) > 2048)
+                           for source in raw_sources)):
+                raise ValueError('stored example source metadata is malformed')
+            sources_by_phrase[phrase] = [
+                source.strip() if isinstance(source, str) else None
+                for source in raw_sources
+            ]
 
         procedures_by_phrase = {}
         for phrase, raw_steps in raw_procedures.items():
@@ -7181,6 +7251,7 @@ class CRMSModel:
 
         # Replace live memory only after every persisted association validates.
         self._examples = examples_by_phrase
+        self._example_sources = sources_by_phrase
         self._procedures = procedures_by_phrase
         self._accepted_primitives = {
             key: descriptor

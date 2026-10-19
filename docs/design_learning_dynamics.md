@@ -704,3 +704,27 @@ correct intent resolution, useful clarification, and inappropriate action rates 
 artifacts may contain validated frames and transition knowledge, but session-specific discourse
 state stays local. A learned intent prediction must not alter factual evidence or accepted
 knowledge by itself.
+
+## 9. Provenance for transformation-rule demonstrations
+
+Transformation procedures are learned from input/output examples. Historically,
+the rule memory retained those pairs and generated artifacts cited instruction
+phrases, but not the origin of each demonstration. That made source-disjoint
+evaluation and correction audits weaker than the fact/rule paths.
+
+`CRMSModel.teach(..., source_ids=...)` now accepts one optional opaque source ID
+per demonstration. The IDs are stored alongside the examples, survive JSON and
+SQLite round trips, and appear in generated code's evidence records. The
+`example_sources()` and `example_records()` methods expose the recorded lineage.
+Old memories without this field load with `source_id=None`; CRMS must never
+infer or fabricate provenance. Source IDs identify origin only: they do not
+establish source independence, truth, or rule validity, and they do not affect
+candidate search or licensing.
+
+The initial runtime check uses fixture IDs and demonstrates only persistence,
+artifact traceability, and a held-out composition. It is not yet a transfer
+result from independent natural-language documents. The chat teaching flow does
+not yet collect a source ID. Before a source-disjoint recombination claim, wire
+the teaching path to a cited source or clearly attributed teacher example,
+record source-disjoint training/validation/test partitions, and verify the
+composed result with a validator that did not produce the examples.

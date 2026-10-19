@@ -1546,3 +1546,23 @@ a semantic relation verifier: it may abstain when a source uses an unlicensed
 alias or paraphrase, and it does not establish that a sentence entails the
 requested relation. Retrieval and relation-answerability evaluation remain
 necessary.
+
+## Transformation-rule example provenance (2026-10-20)
+
+Command: `python3 experiments/v1_428_procedure_example_provenance.py`.
+
+`CRMSModel.teach` now accepts optional per-example `source_ids`. They remain
+parallel to the demonstrations through JSON and SQLite persistence, are
+available through `example_records()`, and are embedded in generated-code
+evidence. Old rule memories load with missing provenance left unknown. The
+experiment checks a held-out list composition, exact parity of the emitted
+artifact, JSON/SQLite round trips, legacy loading, and rejection of source lists
+that do not align with the examples.
+
+Runtime result: all checks passed. The source identifiers in this experiment
+are fixture labels authored for the test; the task is still a plumbing and
+lineage check, not a source-disjoint transfer result. The `/teach-rule` chat
+path does not yet capture source identifiers, and the existing recombination
+scores remain bounded synthetic results. The next gate must exercise this
+lineage from source-backed examples through ordinary chat on genuinely held-out
+documents and independently written requests.

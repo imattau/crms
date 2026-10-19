@@ -350,6 +350,13 @@ the goal but cannot substitute for transfer, task completion, or safe context.
    Retain each rule's examples, source lineage, holdout result, status, and
    tested scope.
 
+   **Lineage prerequisite now partly implemented:** `CRMSModel.teach` accepts
+   optional per-example source IDs, preserves them through JSON/SQLite memory,
+   and includes them in generated-code evidence. The fixture check
+   `v1_428_procedure_example_provenance.py` validates this plumbing. It does not
+   yet provide chat-level source attribution or a source-disjoint transfer
+   result; keep those as explicit blockers to the gate below.
+
    **Gate:** at least one genuinely unseen composition works through ordinary
    chat, passes an independent task validator, and survives save/reload with
    lineage intact; near-miss and unsupported cases abstain. Prefer one new
@@ -438,11 +445,14 @@ standalone corpus scan:
    v1_355, v1_357, and v1_424 witnesses already demonstrate unseen sequences,
    contrastive teaching, chat generation, independent exact-output checks,
    and an unsupported-middle-step refusal. Their small synthetic list and
-   math distributions do not meet the source-disjoint transfer gate. Build
-   the next evaluation around held-out source documents and independently
-   written natural-language requests, with unseen component combinations,
-   role/order changes, near-misses, and missing stages. Keep the learner and
-   task validator independent; retain examples, validation split, and lineage.
+   math distributions do not meet the source-disjoint transfer gate. Procedure
+   example provenance is now preserved by the model API and generated artifact
+   (`v1_428`), but its source IDs are test fixtures and `/teach-rule` does not
+   yet collect them. Build the next evaluation around actual source-backed
+   teaching examples and held-out documents, with independently written
+   natural-language requests, unseen component combinations, role/order
+   changes, near-misses, and missing stages. Keep the learner and task validator
+   independent; retain examples, validation split, and lineage.
    Do not count more synthetic demonstrations of the same connective as
    evidence of broad transfer.
 3. **Strengthen reasoning on the composition path.** Reuse the unseen
