@@ -297,6 +297,35 @@ def _where_anchor_is_located_entity(sentence: str,
     return False
 
 
+def _has_locative_predicate(sentence: str) -> bool:
+    """Require a bounded location-bearing predicate, not any ``in`` phrase."""
+    text = " ".join(_tokens(sentence)).casefold()
+    preposition = r"(?:in|at|near|on|within|by|through|across|along|from|to)"
+    explicit = (
+        rf"\b(?:located|based|situated|born|resides?|lives?|lived|"
+        rf"works?|worked|lies|lie|stands?|stood|sits?|sat)\s+{preposition}\b",
+        rf"\b(?:flows?|flowed|runs?|ran|passes?|passed|cross(?:es|ed)|"
+        rf"extends?|extended|borders?|originates?|originated)\s+{preposition}\b",
+        rf"\b(?:is|are|was|were|be|been|being)\s+{preposition}\b",
+        # Nominal locatives such as "The Colosseum is an amphitheatre in Rome".
+        rf"\b(?:is|are|was|were)\s+(?:a|an|the)\s+"
+        rf"[\w'-]+\s+{preposition}\b",
+    )
+    if any(re.search(pattern, text) for pattern in explicit):
+        return True
+    words = text.split()
+    if (words and words[0] in {"in", "at", "near", "within", "across", "along"}
+            and re.search(
+                r"\b(?:lie|lies|lay|stand|stands|stood|sit|sits|sat|run|runs|ran|"
+                r"rise|rises|rose|exist|exists|existed)\b", text)):
+        return True
+    # A where-clause expresses the place relation after its target:
+    # "Bletchley Park is where Alan Turing worked".
+    return bool(re.search(
+        r"\bwhere\b.{0,100}\b(?:lie|lies|lay|stand|stands|stood|sit|sits|sat|"
+        r"work|works|worked|live|lives|lived|reside|resides|resided)\b", text))
+
+
 def _check_candidate(question: str, sentence: str,
                      licensed_predicates: list[dict[str, Any]]
                      ) -> tuple[bool, list[str], int]:
@@ -361,19 +390,28 @@ def _check_candidate(question: str, sentence: str,
                        and word.casefold() not in mention_terms]
         if not capitalized:
             reasons.append("no named answer span")
-        if kind == "WHERE" and not re.search(
-                r"\b(?:in|at|near|located|based|lies|situated|through|"
-                r"across|along|within|born|work(?:s|ed|ing)?|live(?:s|d|ing)?|from)\b",
-                sentence, flags=re.IGNORECASE):
-            reasons.append("no locative relation in sentence")
-        if (kind == "WHERE" and mentions
-                and not _where_anchor_is_located_entity(sentence, mentions)):
-            reasons.append(
-                "named entity appears as a location, not as the located subject")
         requested_place_type = re.search(
             r"\bwhich\s+(?P<type>institute|university|laboratory|"
             r"research\s+center|observatory)\b",
             question, flags=re.IGNORECASE)
+        has_locative = (kind == "WHERE"
+                        and _has_locative_predicate(sentence))
+        if kind == "WHERE" and not has_locative and requested_place_type:
+            # Specialized "at which institute/university..." questions may
+            # name the venue before the event predicate ("researchers at X
+            # studied Y"). Retain the type and nearby preposition as the role
+            # check; ordinary WHERE questions do not get this relaxation.
+            requested_type = re.escape(
+                " ".join(_tokens(requested_place_type.group("type"))))
+            has_locative = bool(re.search(
+                rf"\b(?:at|in|near)\b.{{0,60}}\b{requested_type}\b",
+                sentence, re.IGNORECASE))
+        if kind == "WHERE" and not has_locative:
+            reasons.append("no location-bearing predicate in sentence")
+        if (kind == "WHERE" and mentions
+                and not _where_anchor_is_located_entity(sentence, mentions)):
+            reasons.append(
+                "named entity appears as a location, not as the located subject")
         if requested_place_type is not None:
             type_tokens = [word.casefold() for word in
                            _tokens(requested_place_type.group("type"))]

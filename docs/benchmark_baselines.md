@@ -197,9 +197,13 @@ Command: `python3 experiments/v1_420_where_role_variants.py`.
 The WHERE role check also recognizes the bounded inversion “In the Himalayas
 lies Mount Everest” and the correlative clause “Bletchley Park is where Alan
 Turing worked”. It still rejects both a destination-only mention and a
-same-entity sentence with no location relation. These are explicit surface
-patterns, not general syntactic parsing; untested clause forms remain outside
-the claim.
+same-entity sentence with no location relation, including “Italy is discussed
+in The History of Europe”. A location preposition alone is not enough; the
+sentence also needs a bounded location-bearing predicate. Typed “at which
+institute” questions retain their narrower venue construction, and the prior
+numbered-institute control still passes in `v1_329`. These are explicit
+surface patterns, not general syntactic parsing; untested clause forms remain
+outside the claim.
 
 ## Grounded math-to-list-code composition
 

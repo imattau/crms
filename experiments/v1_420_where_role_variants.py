@@ -30,6 +30,8 @@ def main() -> None:
         ("Where is Italy?",
          "The Colosseum is an amphitheatre in Rome, Italy."),
         ("Where is Italy?",
+         "Italy is discussed in The History of Europe."),
+        ("Where is Italy?",
          "Italy is where the Colosseum stands."),
         ("Where does Alan Turing work?",
          "Alan Turing designed the Turing machine."),
