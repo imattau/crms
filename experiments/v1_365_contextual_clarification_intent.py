@@ -165,8 +165,8 @@ def main() -> None:
         CRMSDialogue(knowledge), "Could you reserve a table for two?")
     require(action_request is not None
             and action_request.dialogue_act == "request-action"
-            and action_request.task_intent == "other-task",
-            "action request was mislabeled as a request for information")
+            and action_request.task_intent == "make-reservation",
+            "reservation action request did not receive its specific task intent")
     bare_yes = classify_user_intent(CRMSDialogue(knowledge), "Yes")
     require(bare_yes is not None and bare_yes.decision == "ambiguous"
             and bare_yes.task_intent is None,

@@ -176,6 +176,9 @@ class UserIntentHypothesis:
     basis: str = "hand_checked_runtime_rule"
     evidence_refs: tuple[str, ...] = ()
     runtime_route: str | None = None
+    # Long-lived user objective when it differs from this turn's immediate
+    # task intent (for example, reserve a restaurant while asking its address).
+    goal_intent: str | None = None
 
 
 _HISTORY_LIMIT = 12
@@ -327,6 +330,7 @@ class CRMSDialogue:
             trace_entry = {
                 "dialogue_act": str(intent_hypothesis.dialogue_act)[:80],
                 "task_intent": intent_hypothesis.task_intent,
+                "goal_intent": getattr(intent_hypothesis, "goal_intent", None),
                 "decision": str(intent_hypothesis.decision)[:40],
                 "matched_frame": intent_hypothesis.matched_frame,
                 "context_predicates": list(intent_hypothesis.context_predicates)[:20],
@@ -338,6 +342,10 @@ class CRMSDialogue:
             del self.intent_trace[:-_INTENT_TRACE_LIMIT]
             task_intent = intent_hypothesis.task_intent
             if intent_hypothesis.decision == "selected":
+                goal_intent = getattr(intent_hypothesis, "goal_intent", None)
+                if goal_intent in _ACTIVE_TASK_INTENTS:
+                    self.active_task_intent = goal_intent
+                    self.active_task_subgoal = None
                 if task_intent == "end-interaction":
                     self.active_task_intent = None
                     self.active_task_subgoal = None
@@ -1814,7 +1822,7 @@ class CRMSDialogue:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(
-            json.dumps({"format_version": 18, "last_entity": self.last_entity,
+            json.dumps({"format_version": 19, "last_entity": self.last_entity,
                         "subject_entity": self.subject_entity,
                         "object_entity": self.object_entity,
                         "last_question": self.last_question,
@@ -1849,7 +1857,7 @@ class CRMSDialogue:
              ) -> "CRMSDialogue":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
         if payload.get("format_version") not in (
-                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18):
+                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19):
             raise ValueError("unsupported dialogue-state format version")
         dialogue = cls(knowledge, intent_model=intent_model)
         pending_dialogue_slot = payload.get("pending_dialogue_slot")
@@ -1926,16 +1934,22 @@ class CRMSDialogue:
             "dialogue_act", "task_intent", "decision", "matched_frame",
             "context_predicates", "selected_value", "basis", "evidence_refs",
         }
+        current_trace_keys = trace_keys | {"goal_intent"}
         if not isinstance(intent_trace, list) or len(intent_trace) > _INTENT_TRACE_LIMIT:
             raise ValueError("stored intent trace is malformed")
         for entry in intent_trace:
-            if not isinstance(entry, dict) or set(entry) != trace_keys:
+            if (not isinstance(entry, dict)
+                    or frozenset(entry) not in {frozenset(trace_keys),
+                                                 frozenset(current_trace_keys)}):
                 raise ValueError("stored intent trace entry is malformed")
             if (not isinstance(entry["dialogue_act"], str)
                     or len(entry["dialogue_act"]) > 80
                     or entry["task_intent"] is not None
                     and (not isinstance(entry["task_intent"], str)
                          or entry["task_intent"] not in _INTENT_TASKS)
+                    or entry.get("goal_intent") is not None
+                    and (not isinstance(entry["goal_intent"], str)
+                         or entry["goal_intent"] not in _ACTIVE_TASK_INTENTS)
                     or not isinstance(entry["decision"], str)
                     or entry["decision"] not in {"selected", "ambiguous", "unlicensed"}
                     or entry["matched_frame"] is not None
@@ -2070,8 +2084,12 @@ class CRMSDialogue:
                 intent_fields.remove("evidence_refs")
             if isinstance(raw_intent, dict) and "runtime_route" not in raw_intent:
                 intent_fields.remove("runtime_route")
+            allowed_intent_field_sets = {
+                frozenset(intent_fields),
+                frozenset(intent_fields | {"goal_intent"}),
+            }
             if (not isinstance(raw_intent, dict)
-                    or set(raw_intent) != intent_fields):
+                    or frozenset(raw_intent) not in allowed_intent_field_sets):
                 raise ValueError("stored intent hypothesis is malformed")
             dialogue_act = raw_intent.get("dialogue_act")
             task_intent = raw_intent.get("task_intent")
@@ -2083,6 +2101,7 @@ class CRMSDialogue:
             basis = raw_intent.get("basis")
             evidence_refs = raw_intent.get("evidence_refs", [])
             runtime_route = raw_intent.get("runtime_route")
+            goal_intent = raw_intent.get("goal_intent")
             if (not isinstance(dialogue_act, str) or not dialogue_act.strip()
                     or len(dialogue_act) > 80
                     or (task_intent is not None
@@ -2112,6 +2131,9 @@ class CRMSDialogue:
                              or runtime_route not in {
                                  "greeting", "farewell", "thanks",
                                  "acknowledgement", "reaction", "elaboration"}))
+                    or (goal_intent is not None
+                        and (not isinstance(goal_intent, str)
+                             or goal_intent not in _ACTIVE_TASK_INTENTS))
                     or not isinstance(basis, str)
                     or basis not in {"hand_checked_runtime_rule",
                                      "portable_dialogue_model"}):
@@ -2127,6 +2149,7 @@ class CRMSDialogue:
                 basis=basis,
                 evidence_refs=tuple(evidence_refs),
                 runtime_route=runtime_route,
+                goal_intent=goal_intent,
             )
         history = payload.get("history", [])
         if (not isinstance(history, list) or len(history) > _HISTORY_LIMIT

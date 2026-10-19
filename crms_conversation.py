@@ -206,7 +206,7 @@ def _session_slot_correction(text: str) -> tuple[str, str] | None:
     return None
 _MODAL_REQUEST_RE = re.compile(
     r"^(?:can|could|would|will)\s+(?:you|i|we)\s+"
-    r"(?P<verb>[a-z]+)\b(?:\s+.+)?[?.! ]*$", re.IGNORECASE)
+    r"(?:please\s+)?(?P<verb>[a-z]+)\b(?:\s+.+)?[?.! ]*$", re.IGNORECASE)
 _INFORMATION_REQUEST_VERBS = {
     "check", "confirm", "describe", "explain", "find", "give", "hear",
     "list", "read", "repeat", "say", "search", "see", "show", "tell",
@@ -222,19 +222,54 @@ _EXPLICIT_RESERVATION_REQUEST_RE = re.compile(
     r"^(?:(?:i|we)\s+(?:(?:need|want)\s+(?:to\s+)?|"
     r"(?:would|could)\s+like\s+to\s+)"
     r"(?:make|place|book|reserve|set\s+up)\s+(?:(?:a|the)\s+)?"
-    r"(?:reservation|booking|table)\b|"
+    r"(?:(?:dinner|lunch)\s+)?(?:reservation|booking|table)\b|"
     r"(?:i|we)['’]d\s+like\s+to\s+(?:make|place|book|reserve|set\s+up)\s+"
-    r"(?:(?:a|the)\s+)?(?:reservation|booking|table)\b|"
-    r"(?:i|we)\s+(?:need|want)\s+(?:a|the)\s+reservation\b|"
+    r"(?:(?:a|the)\s+)?(?:(?:dinner|lunch)\s+)?"
+    r"(?:reservation|booking|table)\b|"
+    r"(?:i|we)\s+(?:need|want)\s+(?:(?:a|the)\s+)?"
+    r"(?:(?:dinner|lunch)\s+)?reservation\b|"
     r"(?:i|we)\s+(?:am|was)\s+(?:trying|looking|hoping)\s+to\s+"
     r"(?:make|place|book|reserve|set\s+up)\s+(?:(?:a|the)\s+)?"
-    r"(?:reservation|booking|table)\b|"
+    r"(?:(?:dinner|lunch)\s+)?(?:reservation|booking|table)\b|"
     r"(?:can|could|would)\s+we\s+(?:please\s+)?"
     r"(?:make|place|book|reserve|set\s+up)\s+(?:(?:a|the)\s+)?"
-    r"(?:reservation|booking|table)\b|"
+    r"(?:(?:dinner|lunch)\s+)?(?:reservation|booking|table)\b|"
     r"(?:let['’]s|please)\s+(?:make|place|book|reserve|set\s+up)\s+"
-    r"(?:(?:a|the)\s+)?(?:reservation|booking|table)\b)"
+    r"(?:(?:a|the)\s+)?(?:(?:dinner|lunch)\s+)?"
+    r"(?:reservation|booking|table)\b)"
     r".*[.! ]*$", re.IGNORECASE)
+_RESERVATION_COMMITMENT_RE = re.compile(
+    r"\b(?:i|we)(?:['’]d|\s+(?:would|could))\s+"
+    r"(?:like|love|want)\s+to\s+(?:make|place|book|reserve|set\s+up|do)\s+"
+    r"(?:(?:a|the)\s+)?(?:(?:dinner|lunch)\s+)?"
+    r"(?:reservation|booking|table)\b|"
+    r"\b(?:i|we)\s+(?:need|want)\s+(?:to\s+)?"
+    r"(?:make|place|book|reserve|set\s+up|do)\s+"
+    r"(?:(?:a|the)\s+)?(?:(?:dinner|lunch)\s+)?"
+    r"(?:reservation|booking|table)\b|"
+    r"\b(?:i|we)(?:['’]ll|\s+will)\s+(?:make|place|book|reserve|set\s+up)\s+"
+    r"(?:(?:a|the)\s+)?(?:(?:dinner|lunch)\s+)?"
+    r"(?:reservation|booking|table)\b|"
+    r"\b(?:i|we)(?:['’]m|\s+am|\s+was)\s+"
+    r"(?:trying|looking|hoping)\s+to\s+(?:make|place|book|reserve|set\s+up)\s+"
+    r"(?:(?:a|the)\s+)?(?:(?:dinner|lunch)\s+)?"
+    r"(?:reservation|booking|table)\b|"
+    r"\b(?:let['’]s)\s+(?:do|make|place|book|reserve|set\s+up)\s+"
+    r"(?:(?:a|the)\s+)?(?:(?:dinner|lunch)\s+)?"
+    r"(?:reservation|booking|table)\b|"
+    r"(?:^|[.!?]\s+)(?:(?:okay|ok)[, ]+)?(?:just\s+)?"
+    r"(?:make|place|book|reserve|set\s+up)\s+(?:(?:a|the)\s+)?"
+    r"(?:(?:dinner|lunch)\s+)?(?:reservation|booking|table)\b|"
+    r"\b(?:can|could|would)\s+(?:we|you|i)\s+(?:please\s+)?"
+    r"(?:make|place|book|reserve|set\s+up)\s+(?:(?:a|the)\s+)?"
+    r"(?:(?:dinner|lunch)\s+)?(?:reservation|booking|table)\b",
+    re.IGNORECASE)
+_RESERVATION_REQUEST_QUESTION_RE = re.compile(
+    r"(?:^|[.!?]\s+)(?:can|could|would)\s+(?:we|you|i)\s+"
+    r"(?:please\s+)?(?:make|place|book|reserve|set\s+up)\s+"
+    r"(?:(?:a|the)\s+)?(?:(?:dinner|lunch)\s+)?"
+    r"(?:reservation|booking|table)\b",
+    re.IGNORECASE)
 
 
 def natural_feedback_verdict(text: str) -> str | None:
@@ -819,10 +854,26 @@ def classify_user_intent(
     # Recognize a bounded, explicit booking request in ordinary declarative
     # wording. Questions about how reservations work stay information requests.
     reservation_request = text.strip()
+    reservation_commitment = bool(_RESERVATION_COMMITMENT_RE.search(
+        reservation_request))
     is_reservation_request = bool(
-        _EXPLICIT_RESERVATION_REQUEST_RE.fullmatch(reservation_request))
-    is_request_question = bool(re.match(
-        r"^(?:can|could|would)\s+we\b", reservation_request, re.IGNORECASE))
+        _EXPLICIT_RESERVATION_REQUEST_RE.fullmatch(reservation_request)
+        or reservation_commitment)
+    is_request_question = bool(
+        _RESERVATION_REQUEST_QUESTION_RE.search(reservation_request))
+    trailing_clause = re.split(r"(?<=[.!?])\s+", reservation_request)[-1].strip()
+    trailing_request = _MODAL_REQUEST_RE.fullmatch(trailing_clause)
+    if (reservation_commitment and trailing_request is not None
+            and trailing_request.group("verb").casefold()
+            in _INFORMATION_REQUEST_VERBS):
+        return UserIntentHypothesis(
+            dialogue_act="request-action",
+            task_intent="seek-information",
+            goal_intent="make-reservation",
+            decision="selected",
+            matched_frame="reservation-goal-with-information-request",
+            context_predicates=("direct-user-request",),
+        )
     if (is_reservation_request
             and ("?" not in reservation_request or is_request_question)):
         return UserIntentHypothesis(
@@ -831,6 +882,7 @@ def classify_user_intent(
             decision="selected",
             matched_frame="explicit-reservation-request",
             context_predicates=("direct-user-request",),
+            goal_intent="make-reservation",
         )
 
     # Portable dialogue frames are additive: built-in content-free and

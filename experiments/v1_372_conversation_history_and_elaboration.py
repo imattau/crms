@@ -128,7 +128,7 @@ def main() -> None:
         state = root / "dialogue.json"
         live.save(str(state))
         payload = json.loads(state.read_text(encoding="utf-8"))
-        require(payload["format_version"] == 18 and payload["shown"]
+        require(payload["format_version"] == 19 and payload["shown"]
                 and payload["last_answered"]["answer"] == "Charles Babbage"
                 and payload["history"][-1]["act"] == "elaboration"
                 and payload["intent_trace"][-1]["task_intent"]
@@ -216,7 +216,7 @@ def main() -> None:
     print("a refusal clears referents but not conversation memory: PASS")
     print("'why?' after a refusal explains the earlier answer and names it: PASS")
     print("history is bounded; clear() keeps it and /reset wipes it: PASS")
-    print("state version 18 round-trips; versions 11 and 9 load; tampering is rejected: PASS")
+    print("state version 19 round-trips; versions 11 and 9 load; tampering is rejected: PASS")
 
 
 if __name__ == "__main__":

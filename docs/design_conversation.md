@@ -91,7 +91,7 @@ Findings from the review that change the design:
   clarification, writing and timeline fields, `source_mentions` (names quoted from sources, kept as
   candidate referents), `last_intent_hypothesis`, a bounded intent trace and active task-intent label,
   `pending_dialogue_slot`, `open_dialogue_question`, `history`, `last_answered` and `shown` (format
-  version 18, with legacy state loading). Active task context separates the broad goal from the
+  version 19, with legacy state loading). Active task context separates the broad goal from the
   current modeled subgoal, preserving a reservation goal while the user asks about venue details or
   supplies a search constraint. A bounded assistant clarification is retained as an
   explicit question-under-discussion (QUD), including whether it expects detail or yes/no and a
@@ -456,7 +456,7 @@ The numbering is changed from the first draft because phase 0 is largely done.
    `him` and `she` to the right referent.
 1. **Discourse state.** Turn history, `last_answered`, `shown`, active task intent, a bounded
   turn-intent trace, session task-slot values, and the current assistant clarification QUD are
-  saved in dialogue-state format version 18 with older versions still loading. A single typed
+  saved in dialogue-state format version 19 with older versions still loading. A single typed
    `elaboration_topic` slot also
    persists and is validated; see `experiments/v1_375_contextual_elaboration_slot.py`,
    `experiments/v1_386_session_intent_context.py`, and

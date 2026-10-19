@@ -25,7 +25,7 @@ recent bounded intent trace without adding diagnostics to ordinary answers. Sele
 retained in inspectable session state; ambiguous or unlicensed hypotheses cannot replace the
 active goal. Social turns preserve it, while an explicit end-interaction or `/reset` clears it. This
 is a context predicate for licensed frames, not broad task-slot understanding or authorization to
-act. The trace and last hypothesis are saved in dialogue-state format 18 and validated when reloaded.
+act. The trace and last hypothesis are saved in dialogue-state format 19 and validated when reloaded.
 `experiments/v1_386_session_intent_context.py` checks that the active-task predicate actually
 licenses a matching portable frame, survives reload, remains bounded, and clears on explicit end
 or reset; `experiments/v1_365_contextual_clarification_intent.py` checks the existing clarification
@@ -147,7 +147,7 @@ The runtime now also retains one typed open dialogue slot:
 which entity with accepted facts to elaborate on. A bare entity name is then classified as an answer
 to that question and routed to the accepted-fact overview; an unmatched name gets a clarification,
 not a corpus lookup. A new question supersedes the slot, and “never mind” cancels it. This bounded
-slot is persisted in dialogue-state format 18 and rejects unknown slot values on load. The exact
+slot is persisted in dialogue-state format 19 and rejects unknown slot values on load. The exact
 assistant clarification prompt is retained as a bounded QUD with a `detail` or `yes-no` answer kind
 and an expected-slot type such as `location`, `party_size`, `date_time`, `seating`, or `cuisine`.
 Typed slots are exposed to portable intent frames through predicates such as
@@ -432,13 +432,17 @@ confirmation gates.
 The runtime now stores the broad active goal separately from a narrow current subgoal. For example,
 while `make-reservation` is the user's goal, a restaurant-preference answer can be recorded as the
 `provide-constraint` subgoal without replacing the reservation goal. Both are exposed to contextual
-intent frames and `/intent`, and both are bounded, session-only state. Dialogue-state format 18
+intent frames and `/intent`, and both are bounded, session-only state. Dialogue-state format 19
 persists the subgoal; older saves load with no subgoal. The current subgoal vocabulary is limited to
 `provide-constraint`, `seek-information`, and `check-availability`, and a subgoal is set only when a
-broad goal is already active. A Taskmaster-1 development turn asking for a restaurant's phone number
-is labeled `seek-information` while the conversation is handling a reservation; with no active goal,
-the same request starts a `seek-information` goal. This is not a general task planner, arbitrary goal
-stack, or learned task hierarchy. The focused sequence is in
+broad goal is already active. The turn hypothesis now has an optional `goal_intent` alongside its
+immediate `task_intent`, so one turn can retain both an overall objective and the action needed now.
+A Taskmaster-1 development turn asking for a restaurant's phone number is labeled
+`seek-information` while the conversation is handling a reservation; with no active goal, the same
+request starts a `seek-information` goal. A mixed turn that says it will book and asks for the
+address can encode `make-reservation` as the goal and `seek-information` as the immediate intent.
+This is not a general task planner, arbitrary goal stack, or learned task hierarchy. The focused
+sequence is in
 [`v1_402_task_goal_subgoal.py`](../experiments/v1_402_task_goal_subgoal.py).
 
 ## Learning and evidence

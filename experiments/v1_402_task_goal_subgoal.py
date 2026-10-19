@@ -26,7 +26,14 @@ def main() -> None:
             "I need to make a reservation for an Italian restaurant in San Francisco.",
             "I'd like to book a table for tonight.",
             "Could we please set up a reservation?",
-            "Let's reserve a table."):
+            "Let's reserve a table.",
+            "Hi, I need to make a dinner reservation in San Francisco.",
+            "Okay. I'd like to go to the Little Sheep. I'd like to make a reservation.",
+            "Okay. Just make a reservation for that first one.",
+            "I'm trying to make a reservation at a restaurant in San Francisco.",
+            "Let's do a reservation at Scoma's for tonight, party of two.",
+            "I will go with the first location. Could we set up a reservation "
+            "for later tonight for my party of four?"):
         hypothesis = classify_user_intent(CRMSDialogue(CRMSKnowledgeBase()), request)
         require(hypothesis is not None
                 and hypothesis.task_intent == "make-reservation"
@@ -36,6 +43,12 @@ def main() -> None:
         CRMSDialogue(CRMSKnowledgeBase()), "How do I make a reservation?")
     require(how_to is not None and how_to.task_intent == "seek-information",
             "a question about the reservation process was mistaken for a booking request")
+    polite_how_to = classify_user_intent(
+        CRMSDialogue(CRMSKnowledgeBase()),
+        "Could you please tell me how to make a reservation?")
+    require(polite_how_to is not None
+            and polite_how_to.task_intent == "seek-information",
+            "a polite how-to question was mistaken for a booking request")
 
     dialogue = CRMSDialogue(CRMSKnowledgeBase())
     dialogue.active_task_intent = "make-reservation"
@@ -83,11 +96,35 @@ def main() -> None:
             and standalone.active_task_subgoal is None,
             "information seeking without a parent task was misclassified as a subgoal")
 
+    mixed = CRMSDialogue(CRMSKnowledgeBase())
+    mixed_turn = respond(
+        mixed,
+        "Okay. So, I'll make a reservation at that restaurant. "
+        "Could you please tell me the address so I can write it down?")
+    require(mixed_turn.intent_hypothesis is not None
+            and mixed_turn.intent_hypothesis.task_intent == "seek-information"
+            and mixed_turn.intent_hypothesis.goal_intent == "make-reservation"
+            and mixed.active_task_intent == "make-reservation"
+            and mixed.active_task_subgoal == "seek-information",
+            "a mixed booking goal and information request was collapsed to one intent")
+
     with tempfile.TemporaryDirectory(prefix="crms-goal-subgoal-") as folder:
         state_path = Path(folder) / "dialogue.json"
+        mixed_state_path = Path(folder) / "mixed-dialogue.json"
+        mixed.save(str(mixed_state_path))
+        restored_mixed = CRMSDialogue.load(
+            CRMSKnowledgeBase(), str(mixed_state_path))
+        require(restored_mixed.last_intent_hypothesis is not None
+                and restored_mixed.last_intent_hypothesis.goal_intent
+                == "make-reservation"
+                and restored_mixed.active_task_intent == "make-reservation"
+                and restored_mixed.active_task_subgoal == "seek-information",
+                "mixed intent goal did not survive state persistence")
+
         dialogue.save(str(state_path))
         state = json.loads(state_path.read_text(encoding="utf-8"))
-        require(state["format_version"] == 18
+        valid_state = json.loads(json.dumps(state))
+        require(state["format_version"] == 19
                 and state["active_task_intent"] == "make-reservation"
                 and state["active_task_subgoal"] == "provide-constraint",
                 "saved dialogue omitted the hierarchical task state")
@@ -96,14 +133,38 @@ def main() -> None:
                 and restored.active_task_subgoal == "provide-constraint",
                 "goal/subgoal state did not survive reload")
 
-        state["active_task_subgoal"] = "unlicensed-action"
-        state_path.write_text(json.dumps(state), encoding="utf-8")
+        legacy_goal_state = json.loads(json.dumps(valid_state))
+        legacy_goal_state["format_version"] = 18
+        legacy_goal_state.pop("active_task_subgoal", None)
+        if legacy_goal_state.get("last_intent_hypothesis"):
+            legacy_goal_state["last_intent_hypothesis"].pop("goal_intent", None)
+        for entry in legacy_goal_state.get("intent_trace", []):
+            entry.pop("goal_intent", None)
+        state_path.write_text(json.dumps(legacy_goal_state), encoding="utf-8")
+        legacy_restored = CRMSDialogue.load(CRMSKnowledgeBase(), str(state_path))
+        require(legacy_restored.active_task_intent == "make-reservation"
+                and legacy_restored.active_task_subgoal is None,
+                "format 18 dialogue state did not migrate without goal/subgoal metadata")
+
+        invalid_subgoal = json.loads(json.dumps(valid_state))
+        invalid_subgoal["active_task_subgoal"] = "unlicensed-action"
+        state_path.write_text(json.dumps(invalid_subgoal), encoding="utf-8")
         try:
             CRMSDialogue.load(CRMSKnowledgeBase(), str(state_path))
         except ValueError:
             pass
         else:
             raise AssertionError("unknown task subgoal was accepted")
+
+        invalid_goal = json.loads(json.dumps(valid_state))
+        invalid_goal["last_intent_hypothesis"]["goal_intent"] = "unlicensed-goal"
+        state_path.write_text(json.dumps(invalid_goal), encoding="utf-8")
+        try:
+            CRMSDialogue.load(CRMSKnowledgeBase(), str(state_path))
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("unknown goal intent was accepted from saved state")
 
     dialogue.reset_history()
     require(dialogue.active_task_intent is None
@@ -130,11 +191,16 @@ def main() -> None:
         completed = subprocess.run(
             command,
             input=("I need to make a reservation for an Italian restaurant in "
-                   "San Francisco.\nCould you just give me the phone number?\n"
-                   "/intent\n/quit\n"),
+                   "San Francisco.\nOkay. So, I'll make a reservation at that "
+                   "restaurant. Could you please tell me the address so I can "
+                   "write it down?\n/intent\nCould you just give me the phone "
+                   "number?\n/intent\n/quit\n"),
             text=True, capture_output=True, check=True, timeout=30)
         require("Active goal: make-reservation" in completed.stdout
-                and "Current subgoal: seek-information" in completed.stdout,
+                and "Current subgoal: seek-information" in completed.stdout
+                and '"goal_intent": "make-reservation"' in completed.stdout
+                and '"matched_frame": "reservation-goal-with-information-request"'
+                in completed.stdout,
                 "interactive chat did not expose the retained goal/subgoal")
 
     print("reservation goal survives search and information subgoals: PASS")
