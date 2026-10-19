@@ -1753,26 +1753,32 @@ instruction alignment, or general paraphrase transfer.
 
 Command: `python3 experiments/v1_436_source_derived_rule_phrase_review.py`.
 
-The experiment retrieves a sentence stating “A simple ascending sort” and a
-matching Python `sorted()` doctest, plus an independently hosted pandas
-sentence stating “Sort values ascending order.” It proposes the normalized
-phrase `sort values ascending` for the operation `sort`, retaining the exact
-prose and code citations. The evidence comes from the [Python Sorting HOWTO](https://docs.python.org/3/howto/sorting.html)
-and [pandas Series.sort_values documentation](https://pandas.pydata.org/docs/reference/api/pandas.Series.sort_values.html).
+The experiment now proposes two narrow mappings. It retrieves prose stating
+“A simple ascending sort” and an independently hosted pandas sentence stating
+“Sort values ascending order,” paired with a Python `sorted()` doctest. It also
+retrieves NumPy prose stating “Reverse the order of elements” and a Python
+`reversed()` doctest. The exact citations are retained. Sources:
+[Python Sorting HOWTO](https://docs.python.org/3/howto/sorting.html),
+[pandas Series.sort_values](https://pandas.pydata.org/docs/reference/api/pandas.Series.sort_values.html),
+[Python Data Structures](https://docs.python.org/3/tutorial/datastructures.html),
+and [NumPy `flip`](https://numpy.org/doc/stable/reference/generated/numpy.flip.html).
 
-The candidate is inert and marked `needs_review`. The experiment confirms it
-does not alter the rule store until Codex explicitly reviews and teaches the
-mapping through chat. The accepted rule persists its code-example citation,
-phrase-source citation, and reviewer label. It passes three held-out numeric
-lists; descending wording remains unsupported. A tampered code/output pair
-and two documents assigned to the same source origin do not produce a valid
-candidate.
+Both candidates are inert and marked `needs_review`. Codex explicitly reviews
+and teaches the mappings through chat. The sort mapping uses one cited pair and
+two Codex-labeled contrast examples; the reverse mapping needs one cited pair
+and seven Codex-labeled examples before the procedure learner finds a unique
+fit. Accepted rules persist the code citation, phrase citation, and reviewer
+label. Each passes three held-out numeric lists. Direction controls keep
+descending wording unsupported by the ascending rule and reject descending
+prose as support for that candidate. A tampered code/output pair and two
+documents assigned to the same source origin do not produce a valid sort
+proposal.
 
-Runtime result: all proposal, review, provenance, persistence, and negative
-checks passed. This is one bounded, cue-based proposal pattern—not general
-phrase induction. The extraction logic remains experiment-local, its cue
-normalization is hand-specified, and a Codex review plus contrast examples are
-still needed before the mapping is learned.
+Runtime result: `v1_436` passed; the adjacent `v1_431`, `v1_433`, and `v1_434`
+also passed in the same run (4/4). This is still a cue-based experiment with
+explicit human review and substantial labeler effort for reverse. It does not
+establish autonomous phrase induction, general language learning, or a
+production review feature.
 
 ## Procedure evidence and labeler provenance (2026-10-20)
 
