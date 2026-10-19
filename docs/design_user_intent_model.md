@@ -192,6 +192,11 @@ Represent a user-intent hypothesis as an inspectable record, not a latent state:
 The record is a per-turn decision over the current discourse state, not a user-level identity label.
 Retain alternatives and the context predicates that would distinguish them; do not force a single
 intent when the context is insufficient.
+The portable frame schema preserves the corpus distinctions `make-reservation`,
+`check-availability`, and `provide-constraint` (along with the other Taskmaster task labels); it
+does not collapse them into a generic task label merely because runtime routing is not yet
+implemented. `experiments/v1_391_dialogue_intent_taxonomy.py` checks representability and confirms
+that candidate frames remain inert.
 
 The minimum context state should remain bounded and typed: recent acts, the current question under
 discussion, the active task/topic, open required slots, pending clarification or offer, and the

@@ -32,13 +32,16 @@ _CONTEXT_PREDICATES = {
 }
 _DIALOGUE_ACTS = {
     "question", "request-action", "provide-information", "answer-clarification",
-    "confirmation", "acknowledgement", "correction", "greeting", "thanks",
-    "farewell", "continuation-request", "social", "uncertain",
+    "confirmation", "confirm", "acknowledgement", "correction", "reject",
+    "greeting", "thanks", "farewell", "continuation-request", "social",
+    "other", "uncertain",
 }
 _TASK_INTENTS = {
-    "seek-information", "provide-information", "continue-current-task",
-    "resolve-ambiguity", "correct-result", "social-contact", "end-interaction",
-    "other-task",
+    "check-availability", "make-reservation", "change-reservation",
+    "cancel-reservation", "provide-constraint", "seek-information",
+    "provide-information", "continue-current-task", "resolve-ambiguity",
+    "correct-prior-result", "correct-result", "social-contact",
+    "end-interaction", "other-task", "uncertain",
 }
 _PREDECESSOR_ACTS = {
     "question", "clarification-request", "answer", "confirmation-request",
