@@ -118,6 +118,7 @@ Then type `/help` for a short guide. A good first session:
 ## Learn more
 
 - [CRMS_README.md](CRMS_README.md) - the detailed technical documentation.
+- [docs/design_domain_expansion.md](docs/design_domain_expansion.md) - the staged roadmap for natural-language math, coding, translation, cross-domain tasks, and capability comparisons.
 - [CONTRIBUTING.md](CONTRIBUTING.md) - how to help.
 
 ## Contributing
