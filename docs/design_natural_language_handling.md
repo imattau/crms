@@ -606,6 +606,15 @@ mentions, toward the two-pair threshold. `experiments/v1_260_corpus_only_predica
 `v1_334_independent_alignment_evidence_retention.py` exercise report-only discovery, explicit
 acceptance, held-out transfer, and this source-retention rule.
 
+The portable boundary is covered by
+[`v1_415_portable_predicate_transfer.py`](../experiments/v1_415_portable_predicate_transfer.py):
+an accepted `passes through` alignment is packaged with its source documents,
+then used to retrieve a canonical `flows through` sentence for a held-out
+entity after the original index is removed. The same request abstains without
+the accepted alignment, and a wrong relation remains explicitly
+non-answering. This closes a packaging check for one learned predicate family;
+the low real-corpus alignment yield below remains unchanged.
+
 Real-corpus yield remains the open problem. On the 285,478-document SimpleWiki index, a read-only
 10,000-document/400,000-sentence sample produced 19 relation-frame proposals but zero predicate
 alignments, even when the retained frames were checked for any cross-document shared pair. Do not

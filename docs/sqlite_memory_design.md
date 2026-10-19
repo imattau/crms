@@ -59,6 +59,17 @@ Implement a versioned SQLite memory store and a one-way importer from existing J
 
 The transformation-rule substore and fact graph are implemented: they persist separate rows, preserve JSON import/export, are readable by chat through `--rules` and `--knowledge`, and are retained as SQL tables in portable packages. Learned language-frame records are now individually stored and validated in `knowledge_records`, indexed by section and semantic anchor. Their internal payload remains JSON until stable query patterns justify further normalization.
 
+`experiments/v1_415_portable_predicate_transfer.py` now checks that a reviewed
+corpus predicate alignment survives packaging with embedded source text. Two
+independent source pairs propose the alignment; explicit acceptance records it
+without adding a fact. The portable model is installed after the original
+index is removed, and the accepted wording retrieves a canonical sentence for
+a held-out entity. An empty-knowledge control abstains on that wording, while
+an unlicensed relation remains a non-answer even when a related sentence is
+available. This verifies this one learned-language record through the portable
+path; it does not establish general synonym induction or broad paraphrase
+coverage.
+
 ### Phase 2 — Backend compatibility interfaces
 
 Route fact and rule operations through narrow repository interfaces while retaining the current in-memory API and `SQLiteFactMap` behavior. Add SQLite implementations for durable writes and indexed reads. First run old JSON and new SQLite backends against the same fixture and compare answers, proofs, rule candidates, and retrieval ordering. Keep the JSON backend as a rollback option while parity gaps are fixed.
