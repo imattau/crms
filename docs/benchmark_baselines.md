@@ -158,7 +158,9 @@ from state format 14, context-conditioned frame selection, and retention of six 
 user-provided task-slot values in session state. It verifies those values stay separate from facts,
 survive reload, and clear on full reset; direct “What time did I give you?”-style questions return
 the saved value and its original clarification prompt. Missing values abstain without falling
-through to factual retrieval. Arbitrary turns are not yet parsed into slots.
+through to factual retrieval. Explicit slot-named corrections update the saved value and retain the
+correction utterance; if no value exists, CRMS asks for the named detail. Arbitrary turns are not yet
+parsed into slots.
 
 ## Balanced phrase recombination from three demonstrations
 

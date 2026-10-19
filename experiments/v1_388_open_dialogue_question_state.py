@@ -9,7 +9,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from crms_conversation import (_session_slot_recall, classify_user_intent,
-                               respond)
+                               _session_slot_correction, respond)
 from crms_dialogue import CRMSDialogue, infer_open_question_slot
 from crms_dialogue_intent import (CRMSDialogueIntentModel,
                                   empty_dialogue_intent_memory)
@@ -52,9 +52,9 @@ def main() -> None:
         state_path = Path(folder) / "dialogue.json"
         dialogue.save(str(state_path))
         saved = json.loads(state_path.read_text(encoding="utf-8"))
-        require(saved["format_version"] == 16
+        require(saved["format_version"] == 17
                 and saved["open_dialogue_question"]["prompt"] == original_prompt,
-                "typed open question was not persisted in state format 16")
+                "typed open question was not persisted in state format 17")
         restored = CRMSDialogue.load(kb, str(state_path))
         require(restored.open_dialogue_question == dialogue.open_dialogue_question,
                 "open question did not survive state reload")
@@ -120,8 +120,67 @@ def main() -> None:
             and fact_after_recall.response is not None
             and fact_after_recall.response.answer == "Ada Lovelace",
             "session-slot recall interfered with a normal fact question")
+    corrected = respond(detail, "Actually, change the time to 8:30 pm.")
+    require(corrected.intent_hypothesis is not None
+            and corrected.intent_hypothesis.matched_frame == "session-slot-correction"
+            and corrected.intent_hypothesis.selected_value == "8:30 pm"
+            and detail.session_slots["date_time"]["value"] == "8:30 pm"
+            and detail.session_slots["date_time"]["updated_by"]
+            == "Actually, change the time to 8:30 pm."
+            and "session-only date or time" in corrected.text
+            and len(kb._facts) == 1,
+            "an explicit slot correction did not update session context safely")
+    updated_recall = respond(detail, "What time did I give you?")
+    require("8:30 pm" in updated_recall.text
+            and "Actually, change the time to 8:30 pm." in updated_recall.text,
+            "slot recall did not reflect its explicit correction")
+
+    correction_with_question = CRMSDialogue(kb)
+    correction_with_question.open_dialogue_question = {
+        "prompt": "Where should I search?", "answer_kind": "detail",
+        "expected_slot": "location"}
+    provided_by_correction = respond(
+        correction_with_question, "Set the location to San Jose.")
+    require(provided_by_correction.intent_hypothesis is not None
+            and provided_by_correction.intent_hypothesis.matched_frame
+            == "session-slot-correction"
+            and correction_with_question.session_slots["location"]["value"]
+            == "San Jose"
+            and correction_with_question.open_dialogue_question is None,
+            "an explicitly typed answer did not fill its matching open question")
+
+    missing_correction = respond(CRMSDialogue(kb), "Change the city to San Jose.")
+    require("What location should I use?" in missing_correction.text
+            and missing_correction.status == "clarify"
+            and missing_correction.intent_hypothesis is not None
+            and missing_correction.intent_hypothesis.decision == "ambiguous",
+            "a correction with no prior slot did not ask a targeted clarification")
+    require(missing_correction.intent_hypothesis is not None
+            and missing_correction.intent_hypothesis.matched_frame
+            == "session-slot-correction"
+            and missing_correction.text.endswith("?"),
+            "missing slot correction did not preserve a question for the user")
+    provided_missing = CRMSDialogue(kb)
+    respond(provided_missing, "Change the city to San Jose.")
+    answered_missing = respond(provided_missing, "San Jose")
+    require(answered_missing.intent_hypothesis is not None
+            and provided_missing.session_slots["location"]["value"] == "San Jose",
+            "the targeted missing-slot clarification did not capture the supplied value")
     require(len(kb._facts) == 1,
             "recalling a user parameter changed factual knowledge")
+    for wording, expected in (
+            ("Actually, change the time to 8:30 pm.",
+             ("date_time", "8:30 pm")),
+            ("Set the city to San Jose.", ("location", "San Jose")),
+            ("Update the party size to 3.", ("party_size", "3")),
+            ("Change the seating to indoor instead.", ("seating", "indoor")),
+            ("Correct the cuisine to Thai.", ("cuisine", "Thai")),
+            ("Change the restaurant choice to Nopa.",
+             ("restaurant_choice", "Nopa"))):
+        require(_session_slot_correction(wording) == expected,
+                f"session-slot correction missed {wording!r}")
+    require(_session_slot_correction("Actually, make it 8:30 pm.") is None,
+            "an unnamed correction was assigned to an arbitrary task slot")
     slot_context_memory = empty_dialogue_intent_memory()
     slot_context_memory["builtin_policy"].append({
         "policy_id": "continue-with-known-time",
@@ -146,7 +205,8 @@ def main() -> None:
         detail.save(str(slot_state))
         payload = json.loads(slot_state.read_text(encoding="utf-8"))
         require(payload["session_slots"]["date_time"] == {
-                    "value": "7 pm", "question": "What time should I use?"},
+                    "value": "8:30 pm", "question": "What time should I use?",
+                    "updated_by": "Actually, change the time to 8:30 pm."},
                 "session task-slot value or prompt was not persisted")
         restored_slots = CRMSDialogue.load(kb, str(slot_state))
         require(restored_slots.session_slots == detail.session_slots
@@ -337,6 +397,14 @@ def main() -> None:
                 "format 15 state did not migrate without session slot values")
 
         payload["format_version"] = 16
+        payload["session_slots"] = {
+            "date_time": {"value": "7 pm", "question": "What time?"}}
+        state_path.write_text(json.dumps(payload), encoding="utf-8")
+        migrated_legacy_slot = CRMSDialogue.load(kb, str(state_path))
+        require(migrated_legacy_slot.session_slots["date_time"]["updated_by"] == "",
+                "format 16 slot migration invented update provenance")
+
+        payload["format_version"] = 17
         payload["open_dialogue_question"] = {
             "prompt": "What time?", "answer_kind": "detail",
             "expected_slot": "not-a-slot"}
@@ -348,7 +416,7 @@ def main() -> None:
         else:
             raise SystemExit("unknown expected slot was accepted")
 
-        payload["format_version"] = 16
+        payload["format_version"] = 17
         payload["open_dialogue_question"] = {
             "prompt": "Where?", "answer_kind": "detail",
             "expected_slot": "location"}

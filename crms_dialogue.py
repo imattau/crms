@@ -271,7 +271,7 @@ class CRMSDialogue:
         # they are never inserted into factual knowledge.
         self.session_slots: dict[str, dict[str, Any]] = {}
 
-    def remember_session_slot(self, value: str) -> None:
+    def remember_session_slot(self, value: str, *, user_turn: str | None = None) -> None:
         """Retain a bounded answer to the current typed clarification."""
         question = self.open_dialogue_question
         if question is None or not isinstance(value, str):
@@ -283,6 +283,7 @@ class CRMSDialogue:
         self.session_slots[slot] = {
             "value": value,
             "question": question["prompt"],
+            "updated_by": " ".join((user_turn or value).split())[:512],
         }
 
     def record_turn(self, utterance: str, act: str,
@@ -1773,7 +1774,7 @@ class CRMSDialogue:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(
-            json.dumps({"format_version": 16, "last_entity": self.last_entity,
+            json.dumps({"format_version": 17, "last_entity": self.last_entity,
                         "subject_entity": self.subject_entity,
                         "object_entity": self.object_entity,
                         "last_question": self.last_question,
@@ -1807,7 +1808,7 @@ class CRMSDialogue:
              ) -> "CRMSDialogue":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
         if payload.get("format_version") not in (
-                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16):
+                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17):
             raise ValueError("unsupported dialogue-state format version")
         dialogue = cls(knowledge, intent_model=intent_model)
         pending_dialogue_slot = payload.get("pending_dialogue_slot")
@@ -1850,14 +1851,20 @@ class CRMSDialogue:
             raise ValueError("stored session task slots are malformed")
         validated_session_slots: dict[str, dict[str, Any]] = {}
         for slot, record in session_slots.items():
+            if (payload.get("format_version") < 17
+                    and isinstance(record, dict)
+                    and set(record) == {"value", "question"}):
+                record = {**record, "updated_by": ""}
             if (not isinstance(record, dict)
-                    or set(record) != {"value", "question"}
+                    or set(record) != {"value", "question", "updated_by"}
                     or not isinstance(record["value"], str)
                     or not record["value"].strip()
                     or len(record["value"]) > 256
                     or not isinstance(record["question"], str)
                     or not record["question"].strip()
-                    or len(record["question"]) > _HISTORY_QUESTION_LIMIT):
+                    or len(record["question"]) > _HISTORY_QUESTION_LIMIT
+                    or not isinstance(record["updated_by"], str)
+                    or len(record["updated_by"]) > 512):
                 raise ValueError("stored session task slot is malformed")
             validated_session_slots[slot] = dict(record)
         dialogue.session_slots = validated_session_slots

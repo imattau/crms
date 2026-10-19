@@ -68,19 +68,23 @@ or `uncertain`. These are observations, not claims that the move is appropriate.
 
 1. Use the CSV's `split` field; never move a conversation between partitions after seeing model
    results.
-2. Annotators work independently and do not see CRMS predictions or one another's labels.
-3. Double-label at least 20% of conversation IDs within each split. The preparation tool marks a
-   deterministic sample in `double_label_required`; label every assistant turn from those
-   conversations independently with a second annotator. Keep both original labels and the
-   adjudicated value. This selects whole conversations, so no context is divided between the audit
-   pool and single-rater pool.
-4. Report raw agreement and a chance-adjusted measure (Krippendorff's alpha for nominal labels, or
-   Cohen's kappa for exactly two raters), the confusion matrix, class counts, and the fraction marked
-   `uncertain`. Do not merge classes solely to raise agreement; document any taxonomy change and
-   relabel the affected material.
+2. Codex supplies the primary labels for this project. It must read the complete conversation
+   context available in the cited transcript, apply these definitions consistently, retain exact
+   utterance citations, and use `uncertain` when the evidence does not support a stable decision.
+   Do not inspect CRMS predictions while producing the primary labels.
+3. The preparation tool marks a deterministic 20% sample in `double_label_required`. This is an
+   optional independent-review pool, not a blocker for primary labeling or candidate induction.
+   Leave second-rater and adjudication columns empty unless a genuinely independent review is done;
+   a second pass by the same model is not independent. Keep original and adjudicated labels if such
+   a review occurs.
+4. When an independent review is available, report raw agreement and a chance-adjusted measure
+   (Krippendorff's alpha for nominal labels, or Cohen's kappa for exactly two raters), the confusion
+   matrix, class counts, and the fraction marked `uncertain`. Do not merge classes solely to raise
+   agreement; document any taxonomy change and relabel the affected material. Without that review,
+   report comparisons as agreement with the named primary annotator, not accuracy or reliability.
 5. Keep label provenance: annotator identifier, timestamp, protocol version, original label,
-   adjudicated label, and citation. Automated proposals may prioritize review but are never gold
-   labels and must remain distinguishable from human judgments.
+   adjudicated label when present, and citation. These labels may support research, but do not treat
+   them as independent evidence that their own interpretations are correct.
 
 ## User act and intent annotation
 
@@ -123,8 +127,8 @@ Keep act and intent separate. For example, “At 7 pm” can be a `provide-infor
 Mark uncertainty independently for either field. The second-rater and adjudication columns use the
 same conversation-level audit sample as the assistant sheet.
 
-The prepared sheets have 7,312 assistant-turn rows and 6,227 user-turn rows, so labeling every row
-is a substantial effort.
+The prepared sheets have 7,312 assistant-turn rows and 6,227 user-turn rows. Label the selected
+pilot corpus first, then expand when the initial coverage and error analysis justify the work.
 Use `experiments/v1_382_dialogue_feasibility_batch.py` to create a deterministic smaller batch
 from whole conversations in the existing train partition. It copies the cited transcripts, leaves
 all label and reviewer fields blank, and marks a deterministic 20% of selected conversations for
@@ -140,10 +144,10 @@ python3 experiments/v1_382_dialogue_feasibility_batch.py \
   /tmp/crms_dialogue_feasibility_v1 --conversations 40
 ```
 
-Begin with this batch and check class coverage, disagreement, and annotation time before expanding.
+Begin with this batch and check class coverage, uncertainty, and labeling time before expanding.
 Keep dev and test sealed from frame induction and policy tuning. If a target class has too few
-independently supported examples, report it as underpowered rather than borrowing turns across the
-split. The sampler refuses annotated inputs and never uses CRMS predictions as labels.
+supported examples, report it as underpowered rather than borrowing turns across the split. The
+sampler refuses annotated inputs and never uses CRMS predictions as labels.
 
 ### AI annotation provenance
 

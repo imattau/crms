@@ -91,7 +91,7 @@ Findings from the review that change the design:
   clarification, writing and timeline fields, `source_mentions` (names quoted from sources, kept as
   candidate referents), `last_intent_hypothesis`, a bounded intent trace and active task-intent label,
   `pending_dialogue_slot`, `open_dialogue_question`, `history`, `last_answered` and `shown` (format
-  version 16, with legacy state loading). A bounded assistant clarification is retained as an
+  version 17, with legacy state loading). A bounded assistant clarification is retained as an
   explicit question-under-discussion (QUD), including whether it expects detail or yes/no and a
   bounded expected-slot type exposed to licensed intent frames. Answers to six supported task-slot
   questions are retained in session state with their prompting question and can be recalled by a
@@ -453,7 +453,7 @@ The numbering is changed from the first draft because phase 0 is largely done.
    `him` and `she` to the right referent.
 1. **Discourse state.** Turn history, `last_answered`, `shown`, active task intent, a bounded
    turn-intent trace, session task-slot values, and the current assistant clarification QUD are
-   saved in dialogue-state format version 16 with older versions still loading. A single typed
+   saved in dialogue-state format version 17 with older versions still loading. A single typed
    `elaboration_topic` slot also
    persists and is validated; see `experiments/v1_375_contextual_elaboration_slot.py`,
    `experiments/v1_386_session_intent_context.py`, and
@@ -461,8 +461,9 @@ The numbering is changed from the first draft because phase 0 is largely done.
    QUD and can license contextual intent frames; the clarification response is recorded as a
    user-provided value in the intent trace and never becomes a fact. Elaboration moved here because
    `shown` needs it. Selected clarification values are retained as session-only task slots; CRMS
-   does not yet use them to fill forms or execute actions. `session_facts` and entity kinds for
-   source-derived names remain future work.
+   can be recalled and explicitly corrected by naming their slot, with the correction turn recorded
+   as provenance. CRMS does not yet use them to fill forms or execute actions. `session_facts` and
+   entity kinds for source-derived names remain future work.
 2. **Follow-ups.** Done on branch `conversation-phase2`: a numbered choice for an ambiguous pronoun
    and the entity overview (checked by
    `experiments/v1_373_conversation_binding_and_overview.py`). Elliptical turns already existed. Not

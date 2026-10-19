@@ -93,10 +93,44 @@ _SESSION_SLOT_RECALL_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
         r"(?:say|give|tell you|choose|select|pick)$",
         re.IGNORECASE)),
 )
+_SESSION_SLOT_CORRECTION_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("date_time", re.compile(
+        r"^(?:actually[, ]+)?(?:change|set|update|correct)\s+(?:the\s+)?"
+        r"(?:date|time|day|date and time)\s+(?:to|as)\s+(?P<value>.+)$",
+        re.IGNORECASE)),
+    ("location", re.compile(
+        r"^(?:actually[, ]+)?(?:change|set|update|correct)\s+(?:the\s+)?"
+        r"(?:location|city|area)\s+(?:to|as)\s+(?P<value>.+)$",
+        re.IGNORECASE)),
+    ("party_size", re.compile(
+        r"^(?:actually[, ]+)?(?:change|set|update|correct)\s+(?:the\s+)?"
+        r"(?:party size|number of people)\s+(?:to|as)\s+(?P<value>.+)$",
+        re.IGNORECASE)),
+    ("seating", re.compile(
+        r"^(?:actually[, ]+)?(?:change|set|update|correct)\s+(?:the\s+)?"
+        r"(?:seating|seating preference)\s+(?:to|as)\s+(?P<value>.+)$",
+        re.IGNORECASE)),
+    ("cuisine", re.compile(
+        r"^(?:actually[, ]+)?(?:change|set|update|correct)\s+(?:the\s+)?"
+        r"(?:cuisine|food preference)\s+(?:to|as)\s+(?P<value>.+)$",
+        re.IGNORECASE)),
+    ("restaurant_choice", re.compile(
+        r"^(?:actually[, ]+)?(?:change|set|update|correct)\s+(?:the\s+)?"
+        r"(?:restaurant|restaurant choice)\s+(?:to|as)\s+(?P<value>.+)$",
+        re.IGNORECASE)),
+)
 _SESSION_SLOT_LABELS = {
     "date_time": "date or time", "location": "location",
     "party_size": "party size", "seating": "seating preference",
     "cuisine": "cuisine", "restaurant_choice": "restaurant choice",
+}
+_SESSION_SLOT_QUESTIONS = {
+    "date_time": "What date or time should I use?",
+    "location": "What location should I use?",
+    "party_size": "How many people should I plan for?",
+    "seating": "What seating preference should I use?",
+    "cuisine": "What cuisine should I use?",
+    "restaurant_choice": "Which restaurant should I use?",
 }
 _ELABORATION_TOPIC_REPLY_RE = re.compile(
     r"^(?:about\s+)?(?P<topic>[\w][\w '&’.-]{0,118})[.! ]*$",
@@ -125,6 +159,23 @@ def _session_slot_recall(text: str) -> str | None:
     for slot, pattern in _SESSION_SLOT_RECALL_PATTERNS:
         if pattern.fullmatch(normalized):
             return slot
+    return None
+
+
+def _session_slot_correction(text: str) -> tuple[str, str] | None:
+    """Parse a correction only when it names a supported session-slot type."""
+    normalized = " ".join(text.strip().split())
+    if "?" in normalized or "\n" in normalized:
+        return None
+    for slot, pattern in _SESSION_SLOT_CORRECTION_PATTERNS:
+        match = pattern.fullmatch(normalized.rstrip(".! "))
+        if match is None:
+            continue
+        value = " ".join(match.group("value").strip().rstrip(".! ").split())
+        if value.casefold().endswith(" instead"):
+            value = value[:-len(" instead")].rstrip()
+        if value and len(value) <= 256:
+            return slot, value
     return None
 _MODAL_REQUEST_RE = re.compile(
     r"^(?:can|could|would|will)\s+(?:you|i|we)\s+"
@@ -697,7 +748,8 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         if (intent is not None and intent.decision == "selected"
                 and intent.dialogue_act == "answer-clarification"
                 and dialogue.open_dialogue_question is not None):
-            dialogue.remember_session_slot(intent.selected_value or "")
+            dialogue.remember_session_slot(
+                intent.selected_value or "", user_turn=text)
             dialogue.open_dialogue_question = None
         elif (turn.status == "clarify" and turn.text.rstrip().endswith("?")
               and not dialogue.offers and dialogue.pending_result is None
@@ -822,7 +874,8 @@ def respond(dialogue: CRMSDialogue, text: str, *,
 
     if (intent is not None and intent.decision == "selected"
             and intent.dialogue_act == "answer-clarification"
-            and dialogue.open_dialogue_question is not None):
+            and dialogue.open_dialogue_question is not None
+            and _session_slot_correction(text) is None):
         prompt = (dialogue.open_dialogue_question or {}).get("prompt", "")
         value = intent.selected_value or text.strip()
         return with_intent(DialogueTurn(
@@ -896,13 +949,65 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             selected_value=None,
         )
         if saved_slot:
-            reply = (f'You told me “{saved_slot["value"]}” when I asked: '
-                     f'“{saved_slot["question"]}” (session context, not a verified fact).')
+            reply = (f'The current saved {_SESSION_SLOT_LABELS[recalled_slot]} is '
+                     f'“{saved_slot["value"]}”. ')
+            if saved_slot.get("updated_by"):
+                reply += f'You last supplied it as: “{saved_slot["updated_by"]}”. '
+            reply += (f'The original question was: “{saved_slot["question"]}”. '
+                      "This is session context, not a verified fact.")
         else:
             label = _SESSION_SLOT_LABELS[recalled_slot]
             reply = (f"I haven't saved a {label} from this conversation to recall.")
         return with_intent(DialogueTurn(
             "answered", text, text, text=reply))
+    slot_correction = _session_slot_correction(text)
+    if slot_correction is not None and dialogue.pending_result is None:
+        slot, value = slot_correction
+        label = _SESSION_SLOT_LABELS[slot]
+        open_question = dialogue.open_dialogue_question
+        answering_open_slot = bool(
+            open_question is not None
+            and open_question.get("expected_slot") == slot)
+        saved_slot = dialogue.session_slots.get(slot)
+        if answering_open_slot:
+            dialogue.remember_session_slot(value, user_turn=text)
+            dialogue.open_dialogue_question = None
+            reply = f"Got it. I'll use “{value}” as your session-only {label}."
+            decision = "selected"
+            contexts = (f"awaiting_slot_{slot}",)
+        elif saved_slot is not None:
+            old_value = saved_slot["value"]
+            saved_slot["value"] = value
+            saved_slot["updated_by"] = " ".join(text.split())[:512]
+            if dialogue.open_dialogue_question is not None:
+                dialogue.open_dialogue_question = None
+            reply = (f"Updated your session-only {label} from “{old_value}” "
+                     f"to “{value}”.")
+            decision = "selected"
+            contexts = (f"has_session_slot_{slot}",)
+        else:
+            if dialogue.open_dialogue_question is not None:
+                dialogue.open_dialogue_question = None
+            reply = (f"I don't have a saved {label} to change. Give me that "
+                     f"detail when I ask for it. {_SESSION_SLOT_QUESTIONS[slot]}")
+            decision = "ambiguous"
+            contexts = ()
+        dialogue.last_answered = None
+        dialogue.last_question = None
+        dialogue.last_selected_answer = None
+        intent = UserIntentHypothesis(
+            dialogue_act="correction",
+            task_intent=("correct-result" if decision == "selected"
+                         else "resolve-ambiguity"),
+            decision=decision,
+            matched_frame="session-slot-correction",
+            context_predicates=contexts,
+            selected_value=value if decision == "selected" else None,
+        )
+        act = "correction"
+        return with_intent(DialogueTurn(
+            "social" if decision == "selected" else "clarify",
+            text, text, text=reply))
     correction = (_CORRECTION_RE.fullmatch(text.strip())
                   if act is None and dialogue.pending_result is None else None)
     if correction is not None and dialogue.last_question is not None:

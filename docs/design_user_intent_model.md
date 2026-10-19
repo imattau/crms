@@ -25,7 +25,7 @@ recent bounded intent trace without adding diagnostics to ordinary answers. Sele
 retained in inspectable session state; ambiguous or unlicensed hypotheses cannot replace the
 active goal. Social turns preserve it, while an explicit end-interaction or `/reset` clears it. This
 is a context predicate for licensed frames, not broad task-slot understanding or authorization to
-act. The trace and last hypothesis are saved in dialogue-state format 16 and validated when reloaded.
+act. The trace and last hypothesis are saved in dialogue-state format 17 and validated when reloaded.
 `experiments/v1_386_session_intent_context.py` checks that the active-task predicate actually
 licenses a matching portable frame, survives reload, remains bounded, and clears on explicit end
 or reset; `experiments/v1_365_contextual_clarification_intent.py` checks the existing clarification
@@ -43,7 +43,7 @@ The runtime now also retains one typed open dialogue slot:
 which entity with accepted facts to elaborate on. A bare entity name is then classified as an answer
 to that question and routed to the accepted-fact overview; an unmatched name gets a clarification,
 not a corpus lookup. A new question supersedes the slot, and “never mind” cancels it. This bounded
-slot is persisted in dialogue-state format 16 and rejects unknown slot values on load. The exact
+slot is persisted in dialogue-state format 17 and rejects unknown slot values on load. The exact
 assistant clarification prompt is retained as a bounded QUD with a `detail` or `yes-no` answer kind
 and an expected-slot type such as `location`, `party_size`, `date_time`, `seating`, or `cuisine`.
 Typed slots are exposed to portable intent frames through predicates such as
@@ -53,7 +53,9 @@ bounded task slots (location, party size, date/time, seating, cuisine, and resta
 user-provided value and the prompting question are retained in session state, displayed by `/intent`,
 and kept out of factual knowledge. Direct questions such as “What time did I give you?” can recall
 that session value together with the prompt that elicited it; a missing value abstains without
-falling through to factual retrieval. This is session context, not learned intent knowledge or
+falling through to factual retrieval. Explicit corrections such as “Change the time to 8:30 pm”
+update only the named slot; if it has no saved value, CRMS asks for that detail instead. The update
+utterance is retained as provenance. This is session context, not learned intent knowledge or
 robust slot extraction from arbitrary turns, and it does not support free-form source summaries.
 Yes/no answers have a separate `awaiting_yes_no_answer` predicate and are not treated as action
 confirmations. The sequence and reload checks are in
@@ -226,8 +228,11 @@ between the two routes, and executes only the selected route. The short yes/no c
 matched-frame evidence and never changes factual knowledge. This handles an explicit model conflict;
 it does not resolve general paraphrase or task-slot ambiguity.
 
-Once a frame has independent human-reviewed training and held-out labels, store it in a versioned
-`dialogue` memory inside the portable SQLite model. Keep the record explicit and auditable:
+Once a frame has provenance-recorded training and held-out labels, store it in a versioned `dialogue`
+memory inside the portable SQLite model. Codex may produce the primary labels for both splits under
+the project's authorization. Agreement with those labels is not an accuracy claim; report the
+single-annotator limitation, and add independent review when available. Keep the record explicit
+and auditable:
 
 - stable frame ID, dialogue act, task intent, and realization or match pattern;
 - named slots and typed context/predecessor predicates;
@@ -274,13 +279,14 @@ Use the two Taskmaster sheets in the dialogue pilot:
 - User-turn annotations separately label dialogue act, contextual task intent, context state, and
   preceding assistant act.
 
-Taskmaster does not provide these labels. The current feasibility batch has one AI-authored label
-per turn, while the designated second-rater and adjudication fields remain blank. Treat those labels
-as provisional error-analysis targets; do not calculate inter-rater agreement or use them as held-out
-validation evidence. Train or induce on train conversations only; use dev to select frame/context
-policies; hold test conversations untouched until evaluation. For licensed dialogue frames, retain
-independent annotator labels and adjudication. To test transfer, repeat on another independently
-collected corpus and report domain shift rather than pooling the corpora blindly.
+Taskmaster does not provide these labels. The current feasibility batch has one Codex-authored label
+per turn, while the designated second-rater and adjudication fields remain blank. Use those labels
+for candidate induction and provisional comparisons; do not calculate inter-rater agreement or
+describe agreement with the same annotator as independent held-out validation. Train or induce on
+train conversations only; use dev to select frame/context policies; keep test conversations unseen
+until evaluation. Record that test labels share the primary annotator and interpret results
+accordingly. To test transfer, repeat on another independently collected corpus and report domain
+shift rather than pooling the corpora blindly.
 
 ## Evaluation and capability comparison
 
@@ -301,8 +307,8 @@ capability comparator, not a label oracle.
 
 1. Finalize the annotation schema; use AI labels for early error analysis and obtain independent
    review before treating the feasibility batch as an evaluation set.
-2. Measure the current scripted baseline on independently reviewed examples. The existing
-   single-AI comparison is development evidence only.
+2. Measure the current scripted baseline against the primary labels, reporting agreement rather
+   than accuracy. Add an independent review set if stronger quality claims are needed.
 3. Induce user act/intent frames from train examples and learn context predicates only where the
    labels support them.
 4. Compare lexical-only and contextual models on held-out conversations.

@@ -44,9 +44,12 @@ Keep these distinct:
 3. **Policy approval:** the selected domain, corpus, tone, and move are acceptable for this product.
 
 Holdout and cross-source gates can test generalization and reduce memorization. They cannot validate
-the labeler's interpretation or choose the right corpus. Record label provenance and require human
-review of a sample before treating induced frames as licensed. A model may propose labels, but its
-proposals are not independent validation of those labels.
+the labeler's interpretation or choose the right corpus. For this project, Codex is authorized to
+produce the primary labels; record that provenance and mark uncertain cases instead of forcing a
+choice. These labels can drive candidate induction and evaluation against the named annotator. They
+are not independent validation of their own interpretation, so report that limitation and keep
+corpus-derived frames behind the separate context and policy gates. A human annotator is not a
+prerequisite for continuing the research.
 
 ## Sequence modeling
 
@@ -88,13 +91,13 @@ moves add value over the current explicit handlers.
 - Choose one bounded domain and a licensed, documented corpus; do not mix subtitles, forums, and
   support transcripts as if they represented one policy.
 - Start with four move classes: greet, acknowledge, clarify-request, and close.
-- Label examples with a recorded annotator identity and retain exact source/utterance citations.
-  Codex may provide primary labels when the project owner authorizes it; the existing
-  40-conversation feasibility batch is such a set (563 user turns and 650 assistant turns). These
-  labels can support candidate induction and error analysis without waiting for human annotation.
-  Comparisons against them measure agreement with the named annotator, not correctness or
-  conversational appropriateness. Do not fill second-rater or adjudication fields with another
-  pass from the same model.
+- Have Codex provide primary labels, recording its identity and retaining exact
+  source/utterance citations. The existing 40-conversation feasibility batch is such a set (563 user
+  turns and 650 assistant turns); continue labeling the selected pilot corpus rather than waiting
+  for a human annotator. Comparisons against these labels measure agreement with the named
+  annotator, not correctness or conversational appropriateness. Keep second-rater and adjudication
+  fields empty unless a genuinely independent review is performed; a repeated Codex pass is not
+  independent review.
 - Split train and holdout by source document, not utterance, to avoid leakage between adjacent turns.
 - Learn realization frames and, separately, a small set of move-sequence templates. Context
   conditions remain explicit and reviewed.
@@ -111,10 +114,10 @@ python3 experiments/v1_363_prepare_taskmaster_dialogue_pilot.py \
 
 The tool writes one indexed text source per complete conversation,
 `assistant_turns_to_label.csv`, and `user_turns_to_label.csv`. Both sheets include preceding turns,
-blank human-label fields, separate second-rater and adjudication columns, SHA-256/character-offset
+blank primary-label fields, separate second-rater and adjudication columns, SHA-256/character-offset
 citations, and the original file digest, conversation ID, and utterance index. By default, it
 indexes the complete corpus but samples 500 distinct conversations from the
-`restaurant-table` domain for human annotation (`--annotation-domain` and
+`restaurant-table` domain for annotation (`--annotation-domain` and
 `--annotation-dialogues` can change this). It creates deterministic 80/10/10 splits by conversation
 ID and refuses to overwrite an existing output directory. CRMS currently uses absolute paths as
 file-ingestion document IDs, so moving a prepared directory means reindexing it and regenerating
@@ -169,6 +172,7 @@ are useful baselines, not examples of corpus-induced dialogue moves. Source-quot
 the dialogue layer are candidate referents only and are not accepted facts. They persist only when
 their citation resolves against the currently loaded index. A follow-up must still be supported by
 the existing answer path or lead to a clarification request. The immediate research step is to
-compare this baseline with human-labeled, source-disjoint move frames in one explicitly selected
-domain, then decide from coverage, appropriateness, abstention, and annotation cost whether Path B
-deserves further implementation.
+compare this baseline with Codex-labeled, source-disjoint move frames in one explicitly selected
+domain, then decide from coverage, appropriateness, abstention, and labeling cost whether Path B
+deserves further implementation. Report label agreement as provisional evidence, not ground truth;
+independent validation can be added where the results justify its cost.

@@ -99,7 +99,7 @@ def main() -> None:
         state = Path(folder) / "dialogue.json"
         live.save(str(state))
         payload = json.loads(state.read_text(encoding="utf-8"))
-        require(payload["format_version"] == 16
+        require(payload["format_version"] == 17
                 and payload["active_task_intent"] == "seek-information"
                 and len(payload["intent_trace"]) == 1,
                 "saved state omitted active task or intent trace")
