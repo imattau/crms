@@ -635,6 +635,11 @@ declared rule data only when the proof format can verify their direction and pro
 - Feedback capture now feeds a per-user evidence ledger. Only held-out-validated learned rules have
   adjustable review weights; facts and teacher-supplied rules are protected. These weights are not
   yet used for answer selection or portable model updates.
+- `experiments/v1_379_portable_validated_rule_learning.py` now checks the full learned-rule
+  distribution seam: source-held-out acceptance, proof-backed practice on a new chain, portable
+  SQLite packaging, validation and lineage restoration, embedded searchable source text, and CLI
+  use after installation. This verifies persistence for one controlled transitivity rule; it does
+  not measure induction quality or resolve portable feedback-weight policy.
 - Statistical proposals for symmetric, functional, inverse, or sub-relation behavior may be useful
   if they include positive and negative examples and enter the same cited review workflow. They
   must not install schemas or treat graph shape alone as proof. Separate derivation schemas from

@@ -874,3 +874,16 @@ disconnected query remained a complete unknown, explicit depth and expansion lim
 incomplete, a cycle-backed self-relation remained ambiguous, and the behavior survived a SQLite
 round trip. This covers the exact self-composition shape with directly joinable two-premise seed
 rules; other nonlinear recursion still uses the bounded fallback.
+
+## Source-validated rule learning through portable-model distribution
+
+Command: `python3 experiments/v1_379_portable_validated_rule_learning.py`
+
+This integration diagnostic learns a `parent + parent -> ancestor` candidate from two training
+documents, validates it on two source-held-out documents, and explicitly accepts it. The rule is
+then applied to a new unlabeled chain, and the verified derivation is retained as a separate case.
+Packaging the learned knowledge and source text into one SQLite model preserves the rule's
+validation examples, the derived case's rule lineage, and searchable citations. After installation,
+both the API and interactive chat derive the new conclusion with the validated rule. This is an
+end-to-end persistence result for one controlled rule shape; it does not establish open-domain rule
+induction quality or natural-language intent learning.
