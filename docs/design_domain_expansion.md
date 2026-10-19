@@ -143,13 +143,17 @@ surface accepts a small set of equivalent orderings (“then”, “and then”,
 the same learned procedure and math evidence.
 
 Within the list-procedure domain, `experiments/v1_355_learned_sequence_connective_codegen.py`
-now checks a three-clause unseen composition (remove duplicates → sort → reverse)
-at the default bounded rule depth.
+now checks unseen three- and four-clause compositions (remove duplicates →
+sort → reverse; then remove duplicates again) at the default bounded rule
+depth. The four-clause case is checked on four held-out lists, including an
+empty list and duplicate/negative values, as generated code and through a
+natural-language chat request. An unsupported middle operation still
+abstains and emits no code.
 An exact sort/reverse normal form removes a false ambiguity between the compact
 two-clause sort operation and the explicit three-clause sequence. The executable
-artifact preserves the three operation phrases and the two independent examples
-that license `then`. This advances bounded recombination depth; it does not
-provide general task planning or arbitrary-length composition.
+artifact preserves every contributing operation and the two independent
+examples that license `then`. This advances bounded recombination depth; it does
+not provide general task planning or arbitrary-length composition.
 
 Each composition must retain the lineage of every contributing frame, rule,
 fact, and intermediate result. If one stage is unsupported, the whole result

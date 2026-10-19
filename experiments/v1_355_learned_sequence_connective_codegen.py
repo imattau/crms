@@ -29,7 +29,15 @@ COMPOUND_PHRASES = (
 HELD_OUT = "sort the list then reverse the list"
 THREE_STAGE = ("remove duplicate values then sort the list then "
                "reverse the values")
+FOUR_STAGE = ("remove duplicate values then sort the list then reverse "
+              "the values then remove duplicate values")
 TEST_INPUT = [4, 1, 4, 2]
+FOUR_STAGE_INPUTS = (
+    [4, 1, 4, 2, 4],
+    [-1, -1, 2, 0, 2],
+    [3, 3, 1, 2, 1],
+    [],
+)
 
 
 def require(condition: bool, message: str) -> None:
@@ -189,6 +197,27 @@ def main() -> None:
             and three_stage_evidence <= set(three_stage.evidence_phrases),
             f"three-stage sequence failed or lost evidence: {three_stage}")
 
+    # Sequence composition should scale beyond the original three-clause
+    # example while keeping every operation grounded and evidence-linked.
+    def four_stage_expected(values: list[int]) -> list[int]:
+        unique = list(dict.fromkeys(values))
+        return list(dict.fromkeys(list(reversed(sorted(unique)))))
+
+    four_stage_evidence = {
+        "remove duplicate values", "sort the list", "reverse the values",
+        COMPOUND_PHRASES[0], COMPOUND_PHRASES[1],
+    }
+    four_stage_results = [model.predict(FOUR_STAGE, values)
+                          for values in FOUR_STAGE_INPUTS]
+    require(all(result.status == "ok"
+                and result.output == four_stage_expected(values)
+                and result.matched_templates == ["learned_sequence:then"]
+                and four_stage_evidence <= set(result.evidence_phrases)
+                for result, values in zip(four_stage_results,
+                                          FOUR_STAGE_INPUTS)),
+            f"four-stage sequence failed, lost evidence, or changed semantics: "
+            f"{four_stage_results}")
+
     artifact = generate_python(model, HELD_OUT)
     require(artifact is not None
             and set(artifact.evidence_phrases) == expected_evidence,
@@ -223,6 +252,19 @@ def main() -> None:
     require(three_stage_namespace["transform"](TEST_INPUT) == [4, 2, 1]
             and three_stage_namespace["validate_examples"](),
             "generated three-stage code failed behavioral validation")
+    four_stage_artifact = generate_python(model, FOUR_STAGE)
+    require(four_stage_artifact is not None
+            and four_stage_evidence <= set(four_stage_artifact.evidence_phrases),
+            f"four-stage composition did not generate traceable code: "
+            f"{four_stage_artifact}")
+    four_stage_namespace: dict[str, object] = {}
+    exec(compile(four_stage_artifact.source, "<crms-four-stage>", "exec"),
+         four_stage_namespace)
+    require(all(four_stage_namespace["transform"](values)
+                == four_stage_expected(values)
+                for values in FOUR_STAGE_INPUTS)
+            and four_stage_namespace["validate_examples"](),
+            "generated four-stage code failed held-out behavioral checks")
     repeated = generate_python(model, HELD_OUT)
     require(repeated is not None
             and repeated.provenance_id == artifact.provenance_id,
@@ -279,10 +321,23 @@ def main() -> None:
                 f"terminal three-stage composition failed: "
                 f"{third_chat.stdout}\n{third_chat.stderr}")
 
+        fourth_chat = subprocess.run(
+            command,
+            input=(f"Write Python code to {FOUR_STAGE}\n/quit\n"),
+            text=True, capture_output=True, check=False, timeout=30)
+        require(fourth_chat.returncode == 0
+                and f"Generated Python for '{FOUR_STAGE}'" in fourth_chat.stdout
+                and all(phrase in fourth_chat.stdout
+                        for phrase in four_stage_evidence),
+                f"terminal four-stage composition failed: "
+                f"{fourth_chat.stdout}\n{fourth_chat.stderr}")
+
     for unsupported in (
             "sort the list or reverse the list",
             "rotate the list then reverse the list",
-            "sort please the list then reverse the list"):
+            "sort please the list then reverse the list",
+            "remove duplicate values then rotate the list then reverse the "
+            "values then remove duplicate values"):
         require(model.predict(unsupported, TEST_INPUT).status != "ok"
                 and generate_python(model, unsupported) is None,
                 f"unsupported sequence was answered or rendered: {unsupported}")
@@ -295,6 +350,9 @@ def main() -> None:
           "four evidence phrases, verified code: PASS")
     print("three-stage unique→sort→reverse recombination: correct output, five "
           "evidence phrases, verified code and natural-language chat: PASS")
+    print("four-stage unique→sort→reverse→unique recombination: four held-out "
+          "inputs, traceable code, natural-language chat; unknown middle stage "
+          "abstained: PASS")
     print("terminal code request, explanation, and evidence follow-up: PASS")
     print("unsupported connective, operation, and modifier: abstained; no code: PASS")
 
