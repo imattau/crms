@@ -24,6 +24,7 @@ from crms_inference import (InferenceRule, InferenceResult,
                             RuleAcceptanceResult, RuleDiscoveryResult,
                             RuleReview, RuleReviewResult, RuleValidation,
                             discover_rule_candidates, infer_relation,
+                            reasoning_budget,
                             validate_rule_candidate)
 from crms_rule_proof import verify_inference_proof
 from crms_fact_store import SQLiteFactMap
@@ -36,6 +37,12 @@ from crms_text import (casefold_nfc, tokens as normalized_tokens,
 
 
 _MAX_COORDINATED_WRITING_CLAIMS = 8
+_STRUCTURED_PREDICATE_FIELDS = {
+    # These are explicit normalized SimpleWiki field schemas, not an open
+    # synonym list. They can supervise an alternate prose predicate only
+    # when one exact sentence states the same endpoint pair.
+    "capital": ("capital of", "object"),
+}
 _KNOWLEDGE_JSON_CHUNK = 64 * 1024
 _FACT_DB_APPLICATION_ID = int.from_bytes(b"CRMF", "big")
 _FACT_DB_VERSION = 1
@@ -475,6 +482,26 @@ def _tokens(text: str) -> tuple[str, ...]:
     return normalized_tokens(text)
 
 
+def _path_question_tokens(text: str) -> tuple[str, ...]:
+    """Normalize English singular possessives for learned path frames."""
+    return _tokens(re.sub(r"(?<=\w)[’']s\b", "", text,
+                          flags=re.IGNORECASE))
+
+
+def _indefinite_article_for(noun_phrase: str) -> str | None:
+    """Choose a/an with a small, inspectable English onset rule."""
+    match = re.search(r"[A-Za-z]+", noun_phrase.strip())
+    if match is None:
+        return None
+    word = match.group().casefold()
+    if word.startswith(("heir", "honest", "honor", "hour")):
+        return "an"
+    if word.startswith(("eul", "eup", "euro", "one", "once", "uni",
+                        "use", "user", "usual", "utility", "utensil", "ufo")):
+        return "a"
+    return "an" if word[0] in "aeiou" else "a"
+
+
 def _proof_leaf_sources(proof: Mapping[str, Any]) -> set[str]:
     if proof.get("kind") == "fact":
         fact = proof.get("fact", {})
@@ -653,6 +680,87 @@ def _analyze_predicate_spelling(base: str, surface: str
     return context, removed, ending
 
 
+def _past_participle_for_surface(surface: tuple[str, ...]
+                                 ) -> tuple[str, ...] | None:
+    """Form a past participle from a bounded active past-tense form."""
+    if len(surface) != 1:
+        return None
+    word = surface[0]
+    if word.endswith("ed"):
+        return surface
+    for lemma, forms in _IRREGULAR_VERB_PARADIGMS.items():
+        if lemma == "be":
+            continue
+        past = forms[2] if len(forms) > 2 else None
+        if past is not None and past.endswith("ing"):
+            past = None
+        participle = (forms[3] if len(forms) > 3
+                      and not forms[3].endswith("ing") else past)
+        if word == past and participle:
+            return (participle,)
+    return None
+
+
+def _is_past_participle(surface: tuple[str, ...]) -> bool:
+    """Check that a passive pattern contains a listed participle form."""
+    if len(surface) != 1:
+        return False
+    word = surface[0]
+    if word.endswith("ed"):
+        return True
+    for lemma, forms in _IRREGULAR_VERB_PARADIGMS.items():
+        if lemma == "be":
+            continue
+        past = forms[2] if len(forms) > 2 else None
+        if past is not None and past.endswith("ing"):
+            past = None
+        participle = (forms[3] if len(forms) > 3
+                      and not forms[3].endswith("ing") else past)
+        if word == participle:
+            return True
+    return False
+
+
+def _base_verb_for_surface(surface: tuple[str, ...]
+                           ) -> tuple[str, ...] | None:
+    """Recover a single-word base from a listed or bounded regular form."""
+    if len(surface) != 1:
+        return None
+    word = surface[0]
+    lemma = next((candidate for candidate, forms in
+                  _IRREGULAR_VERB_PARADIGMS.items()
+                  if word in forms and candidate != word and candidate != "be"
+                  and not word.endswith("ing")), None)
+    if lemma is not None:
+        return (lemma,)
+    possible_bases = {word[:-1], word[:-2],
+                      word[:-3] + "y" if word.endswith("ied") else word[:-3]}
+    return next(((base,) for base in sorted(possible_bases)
+                 if base and _analyze_predicate_spelling(base, word) is not None),
+                None)
+
+
+def _past_tense_for_participle(surface: tuple[str, ...]
+                               ) -> tuple[str, ...] | None:
+    """Map a bounded participle to its active simple-past form."""
+    if len(surface) != 1:
+        return None
+    word = surface[0]
+    if word.endswith("ed"):
+        return surface
+    for lemma, forms in _IRREGULAR_VERB_PARADIGMS.items():
+        if lemma == "be" or len(forms) < 3:
+            continue
+        past = forms[2]
+        if past.endswith("ing"):
+            continue
+        participle = (forms[3] if len(forms) > 3
+                      and not forms[3].endswith("ing") else past)
+        if word == participle:
+            return (past,)
+    return None
+
+
 _COUNTERFACTUAL_SLOTS = {
     "\x00start": "start",
     "\x00target": "target",
@@ -817,6 +925,9 @@ class CRMSKnowledgeBase:
         ] = {}
         self._facts_by_relation_object: dict[
             tuple[tuple[str, ...], tuple[str, ...]], set[tuple[Any, ...]]
+        ] = {}
+        self._facts_by_object: dict[
+            tuple[str, ...], set[tuple[Any, ...]]
         ] = {}
         self._inference_rules: dict[tuple[str, ...], InferenceRule] = {}
         self._inference_rule_validation: dict[tuple[str, ...], dict[str, Any]] = {}
@@ -992,6 +1103,7 @@ class CRMSKnowledgeBase:
         obj = _tokens(fact.object)
         self._facts_by_relation_subject.setdefault((relation, subject), set()).add(key)
         self._facts_by_relation_object.setdefault((relation, obj), set()).add(key)
+        self._facts_by_object.setdefault(obj, set()).add(key)
 
     @staticmethod
     def _discard_index_key(
@@ -1010,10 +1122,50 @@ class CRMSKnowledgeBase:
         # the source instance's shared index dictionaries during a rebuild.
         self._facts_by_relation_subject = {}
         self._facts_by_relation_object = {}
+        self._facts_by_object = {}
         if isinstance(self._facts, SQLiteFactMap):
             return
         for key, fact in self._facts.items():
             self._index_fact(key, fact)
+
+    def _proof_fact_is_present(self, candidate: Mapping[str, Any]) -> bool:
+        """Check exact proof evidence through the keyed fact store."""
+        if isinstance(self._facts, SQLiteFactMap):
+            return self._facts.contains_evidence(candidate)
+        candidate_qualifiers = self._normalize_qualifiers(
+            dict(candidate.get("qualifiers", ())))
+        key = self._fact_key(
+            *(str(candidate.get(field, ""))
+              for field in ("subject", "relation", "object")),
+            candidate_qualifiers)
+        if not all(key):
+            return False
+        stored = self._facts.get(key)
+        if stored is None:
+            return False
+        return (
+            tuple(sorted(stored.sources)) == tuple(sorted(
+                str(source) for source in candidate.get("sources", ())))
+            and self._qualifiers_equal(stored.qualifiers, candidate_qualifiers)
+        )
+
+    def _matching_fact_rows(
+            self, store, subject: str, relation: str, obj: str
+            ) -> list[FactEvidence]:
+        """Fetch exact-triple evidence without decoding an entire SQL store."""
+        subject_key, relation_key, object_key = (
+            _tokens(subject), _tokens(relation), _tokens(obj))
+        if isinstance(store, SQLiteFactMap):
+            return list(store.lookup_triple(subject_key, relation_key, object_key))
+        if store is self._facts:
+            candidate_keys = self._facts_by_relation_subject.get(
+                (relation_key, subject_key), ())
+            return [store[key] for key in sorted(candidate_keys)
+                    if len(key) >= 3 and key[2] == object_key]
+        return [fact for fact in store.values()
+                if (_tokens(fact.subject), _tokens(fact.relation),
+                    _tokens(fact.object))
+                == (subject_key, relation_key, object_key)]
 
     @staticmethod
     def _has_qualifiers(fact: FactEvidence,
@@ -1128,6 +1280,8 @@ class CRMSKnowledgeBase:
                 self._discard_index_key(
                     self._facts_by_relation_object,
                     (_tokens(old.relation), _tokens(old.object)), key)
+                self._discard_index_key(
+                    self._facts_by_object, _tokens(old.object), key)
         return True
 
     def _retract_context_fact_pattern_support(
@@ -1350,9 +1504,15 @@ class CRMSKnowledgeBase:
 
     def infer_relation(self, subject: str, relation: str, obj: str, *,
                        qualifiers: Mapping[str, str] | None = None,
-                       max_expansions: int = 10_000,
-                       max_depth: int = 8) -> InferenceResult:
+                       max_expansions: int | None = None,
+                       max_depth: int | None = None,
+                       effort: str = "standard") -> InferenceResult:
         """Check a derived triple using explicit rules without storing it."""
+        budget = reasoning_budget(effort)
+        max_expansions = (budget.max_expansions if max_expansions is None else
+                          min(max_expansions, budget.max_expansions))
+        max_depth = (budget.max_depth if max_depth is None else
+                     min(max_depth, budget.max_depth))
         subject_query = _display(subject, "subject")
         object_query = _display(obj, "object")
         alias_records = self._entity_alias_records()
@@ -1386,13 +1546,14 @@ class CRMSKnowledgeBase:
         integrity_constrained = bool(constrained_types.intersection(
             {("irreflexive",), ("asymmetric",)}))
         disk_backed = isinstance(self._facts, SQLiteFactMap)
-        cached = (None if integrity_constrained else
+        cached = (None if integrity_constrained or budget.level == "thorough" else
                   self._reuse_derived_case_for_query(
                       subject, relation, obj,
                       max_expansions=max_expansions, max_depth=max_depth,
                       qualifiers=normalized_qualifiers))
         if cached is not None:
-            return replace(cached, language_evidence=language_evidence)
+            return replace(cached, language_evidence=language_evidence,
+                           effort_level=budget.level)
         rules = list(self._inference_rules.values())
         if disk_backed:
             fact_rows, negative_rows, rule_rows = self._sqlite_inference_snapshot(
@@ -1413,21 +1574,78 @@ class CRMSKnowledgeBase:
             negative_facts=negative_rows,
             qualifiers=normalized_qualifiers,
             verified_derived_proofs=verified_derived_proofs,
-            max_expansions=max_expansions, max_depth=max_depth)
+            max_expansions=max_expansions, max_depth=max_depth,
+            max_candidates=budget.max_candidates,
+            max_proofs=budget.max_proofs, effort_level=budget.level)
+        verified_proof_count = 0
         if result.proofs:
             facts = fact_rows
+
             for proof in result.proofs:
                 check = verify_inference_proof(
                     proof, facts, rule_rows, expected_conclusion=result.conclusion,
-                    expected_qualifiers=normalized_qualifiers)
+                    expected_qualifiers=normalized_qualifiers,
+                    fact_lookup=self._proof_fact_is_present,
+                    max_depth=budget.max_depth,
+                    max_nodes=budget.max_verifier_nodes)
                 if not check.valid:
+                    checks = (("Independent proof verification: rejected "
+                               f"the proof ({check.reason})."),) if (
+                                   budget.level == "thorough") else ()
                     return InferenceResult(
                         "unknown", request=("The independent proof checker rejected "
                                              f"the inference: {check.reason}"),
                         complete=False, reason_code="proof_rejected",
                         failure_kind="proof_rejected",
+                        effort_level=budget.level,
+                        effort_checks=checks,
                         language_evidence=language_evidence)
-        return replace(result, language_evidence=language_evidence)
+                verified_proof_count += 1
+        effort_checks = ()
+        if budget.level == "thorough":
+            independent_origins = {
+                source.split("#", 1)[0]
+                for source in result.source_documents if source
+            }
+            if result.proofs:
+                corroboration = (
+                    f"Corroboration: {len(independent_origins)} distinct source "
+                    f"origin(s) support the verified proof set.")
+                proof_check = (
+                    f"Independent proof verification: "
+                    f"{verified_proof_count}/{len(result.proofs)} proof tree(s) verified.")
+            else:
+                corroboration = (
+                    "Corroboration: no completed proof was available to corroborate.")
+                proof_check = (
+                    "Independent proof verification: no proof tree was produced.")
+            if result.status == "ambiguous":
+                conflict_check = "Conflict scan: conflicting or invalid support was found."
+            elif result.status == "answered" and result.complete:
+                conflict_check = (
+                    "Conflict scan: no contradiction or integrity violation was found "
+                    "in the checked scope.")
+            elif result.proofs:
+                conflict_check = (
+                    "Conflict scan: no conflict was found before search ended; "
+                    "the scan is incomplete.")
+            else:
+                conflict_check = (
+                    "Conflict scan: no proved conclusion was available to check.")
+            if result.missing_premises:
+                missing_check = (
+                    f"Missing-premise follow-through: "
+                    f"{len(result.missing_premises)} supported rule gap(s) identified.")
+            elif result.failure_kind == "no_applicable_rule":
+                missing_check = (
+                    "Missing-premise follow-through: no applicable rule to continue.")
+            else:
+                missing_check = (
+                    "Missing-premise follow-through: no specific missing premise found.")
+            effort_checks = (corroboration, conflict_check, proof_check,
+                             missing_check)
+        return replace(result, language_evidence=language_evidence,
+                       effort_level=budget.level, effort_checks=effort_checks)
 
     def abduce_relation(self, subject: str, relation: str, obj: str, *,
                         candidates: Iterable[FactCandidate],
@@ -1437,7 +1655,7 @@ class CRMSKnowledgeBase:
                         max_candidates: int = 20,
                         max_subsets: int = 500,
                         max_search_expansions: int = 10_000,
-                        max_depth: int = 8) -> AbductionResult:
+                        max_depth: int = 40) -> AbductionResult:
         """Find minimal, citation-backed pending-fact sets that prove a goal.
 
         Candidate sentences and citations are revalidated against the supplied
@@ -1601,7 +1819,9 @@ class CRMSKnowledgeBase:
         for proof in case["proofs"]:
             check = verify_inference_proof(
                 proof, facts, rules, expected_conclusion=case["conclusion"],
-                expected_qualifiers=qualifiers, max_depth=max_depth)
+                expected_qualifiers=qualifiers,
+                fact_lookup=self._proof_fact_is_present,
+                max_depth=max_depth)
             if check.valid:
                 verified.append(copy.deepcopy(proof))
         if not verified:
@@ -1642,6 +1862,7 @@ class CRMSKnowledgeBase:
                            proof, facts, rules,
                            expected_conclusion=case["conclusion"],
                            expected_qualifiers=qualifiers,
+                           fact_lookup=self._proof_fact_is_present,
                            max_depth=max_depth).valid]
             # A partial/corrupt set cannot stand in for a complete subsearch.
             if proofs and len(checked) == len(proofs):
@@ -1651,7 +1872,7 @@ class CRMSKnowledgeBase:
     def practice_relation(self, subject: str, relation: str, obj: str, *,
                           qualifiers: Mapping[str, str] | None = None,
                           max_expansions: int = 10_000,
-                          max_depth: int = 8) -> InferenceResult:
+                          max_depth: int = 40) -> InferenceResult:
         """Derive and persist an independently verified result as a separate case.
 
         This is an explicit practice operation: only complete, unambiguous
@@ -1728,7 +1949,7 @@ class CRMSKnowledgeBase:
             self, question: str, *,
             qualifiers: Mapping[str, str] | None = None,
             max_inference_expansions: int = 10_000,
-            max_depth: int = 8) -> tuple[QuestionResult, bool]:
+            max_depth: int = 40) -> tuple[QuestionResult, bool]:
         """Answer a question and explicitly retain one verified inference.
 
         Ordinary ``ask()`` remains read-only. This opt-in operation practices
@@ -1802,7 +2023,7 @@ class CRMSKnowledgeBase:
                               obj: str, *,
                               qualifiers: Mapping[str, str] | None = None,
                               max_expansions: int = 10_000,
-                              max_depth: int = 8,
+                              max_depth: int = 40,
                               record_use: bool = True) -> dict[str, Any] | None:
         """Return a stored derived case only while its proof is currently valid."""
         if type(record_use) is not bool:
@@ -1844,6 +2065,7 @@ class CRMSKnowledgeBase:
                     proof, facts, rules,
                     expected_conclusion=current.conclusion,
                     expected_qualifiers=normalized_qualifiers,
+                    fact_lookup=self._proof_fact_is_present,
                     max_depth=max_depth)
                 if check.valid:
                     valid.append(copy.deepcopy(proof))
@@ -1867,6 +2089,7 @@ class CRMSKnowledgeBase:
                     proof, facts, rules,
                     expected_conclusion=case["conclusion"],
                     expected_qualifiers=normalized_qualifiers,
+                    fact_lookup=self._proof_fact_is_present,
                     max_depth=max_depth)
                 if check.valid:
                     valid.append(proof)
@@ -2059,9 +2282,16 @@ class CRMSKnowledgeBase:
                     "candidate expansions; no candidates met the support threshold.")
         lines = [f"Rule discovery {completeness} after {result.expansions} candidate expansions."]
         for candidate in result.candidates:
+            coverage = (
+                f"coverage={len(candidate.positive_examples)}/"
+                f"{candidate.possible_examples} "
+                f"({candidate.support_coverage:.1%})"
+                if candidate.support_coverage is not None
+                else "coverage=unavailable")
             lines.append(
                 f"Candidate [{candidate.status}]: {CRMSKnowledgeBase._rule_candidate_chain(candidate)}; "
                 f"support={len(candidate.positive_examples)}, "
+                f"{coverage}, "
                 f"counterexamples={len(candidate.negative_examples)}, "
                 f"independent-sources={len(candidate.independent_sources)}.")
             for label, examples in (("support", candidate.positive_examples),
@@ -2089,12 +2319,25 @@ class CRMSKnowledgeBase:
             heldout_negative = len(validation.negative_examples) if validation else 0
             unknown = validation.unknown_endpoint_pairs if validation else 0
             source_count = len(validation.independent_sources) if validation else 0
+            training_coverage = (
+                f"{len(candidate.positive_examples)}/"
+                f"{candidate.possible_examples} "
+                f"({candidate.support_coverage:.1%})"
+                if candidate.support_coverage is not None
+                else "unavailable")
+            heldout_total = heldout_positive + heldout_negative + unknown
+            heldout_coverage = (
+                f"{heldout_positive}/{heldout_total} "
+                f"({heldout_positive / heldout_total:.1%})"
+                if heldout_total else "unavailable")
             lines.append(
                 f"Candidate {number} [{candidate.status}; holdout={heldout_status}]: "
                 f"{CRMSKnowledgeBase._rule_candidate_chain(candidate)}; "
                 f"train-positive={len(candidate.positive_examples)}, "
+                f"train-coverage={training_coverage}, "
                 f"train-negative={len(candidate.negative_examples)}, "
                 f"holdout-positive={heldout_positive}, "
+                f"holdout-coverage={heldout_coverage}, "
                 f"holdout-negative={heldout_negative}, holdout-unlabeled={unknown}, "
                 f"independent-sources={source_count}.")
             for label, examples in (
@@ -2111,10 +2354,13 @@ class CRMSKnowledgeBase:
     @staticmethod
     def render_inference(result: InferenceResult) -> str:
         """Render an inferred result together with explicit supporting facts."""
+        completion = "complete" if result.complete else "incomplete"
+        status_line = (f"Reasoning effort: {result.effort_level}; "
+                       f"search {completion} after {result.expansions} expansions.")
         if result.status == "unknown":
             if result.failure_kind == "no_applicable_rule":
-                return "No inference rule or derivation schema applies to this query."
-            if result.failure_kind == "missing_premise":
+                text = "No inference rule or derivation schema applies to this query."
+            elif result.failure_kind == "missing_premise":
                 lines = [
                     "A rule applies, but no complete premise chain supports "
                     "this conclusion."]
@@ -2126,9 +2372,10 @@ class CRMSKnowledgeBase:
                         f"{missing.get('subject', '?')} — "
                         f"{missing.get('relation', '?')} → "
                         f"{missing.get('object', '?')}.")
-                return "\n".join(lines)
-            return result.request or "No explicit rule proof supports this conclusion."
-        if result.status == "ambiguous":
+                text = "\n".join(lines)
+            else:
+                text = result.request or "No explicit rule proof supports this conclusion."
+        elif result.status == "ambiguous":
             text = result.request or "The inference is ambiguous."
         else:
             assert result.conclusion is not None
@@ -2157,7 +2404,10 @@ class CRMSKnowledgeBase:
 
         for number, proof in enumerate(result.proofs, 1):
             text += f"\nProof {number}: {CRMSKnowledgeBase._render_inference_step(proof)}."
-        return text
+        if result.effort_level == "thorough":
+            for check in result.effort_checks:
+                text += "\n" + check
+        return text + "\n" + status_line
 
     @staticmethod
     def _render_inference_step(proof: Mapping[str, Any]) -> str:
@@ -3293,9 +3543,60 @@ class CRMSKnowledgeBase:
             forms: set[tuple[str, ...]],
             morphology: Mapping[tuple[str, ...], Mapping[str, Any]] | None = None
             ) -> set[tuple[tuple[str, ...], tuple[str, ...]]]:
-        """Generate frame variants from grounded forms and licensed progressive syntax."""
+        """Generate frame variants from grounded forms and licensed syntax."""
         variants = {(prefix, suffix)}
         replacements = set(forms)
+        # In do-support questions the predicate is in its infinitive form:
+        # ``What did Y create?``. A source-backed irregular form such as
+        # ``made`` is evidence for the same canonical relation, but does not
+        # literally occur in that frame. Transfer it to ``make`` only when the
+        # irregular form was explicitly learned for this relation and the
+        # frame contains the regular infinitive corresponding to the canonical
+        # past form (create -> created). This adds a traceable frame variant;
+        # it does not add a fact or a free-standing synonym.
+        if (isinstance(morphology, dict)
+                and any(auxiliary in prefix for auxiliary in {"did", "do", "does"})
+                and len(relation) == 1):
+            canonical = relation[0]
+            for observed, evidence in tuple(morphology.items()):
+                if (len(observed) != 1
+                        or evidence.get("kind") != "observed_predicate_form"):
+                    continue
+                observed_word = observed[0]
+                lemma = next((lemma for lemma, forms_ in
+                              _IRREGULAR_VERB_PARADIGMS.items()
+                              if observed_word in forms_ and lemma != observed_word),
+                             None)
+                if lemma is None or lemma == canonical:
+                    continue
+                licensed_side = None
+                for side_index, side in enumerate((prefix, suffix)):
+                    for position, token in enumerate(side):
+                        if (token == canonical
+                                or _analyze_predicate_spelling(token, canonical)):
+                            licensed_side = (side_index, side, position, token)
+                            break
+                    if licensed_side is not None:
+                        break
+                if licensed_side is None:
+                    continue
+                side_index, side, position, _licensed_form = licensed_side
+                changed = side[:position] + (lemma,) + side[position + 1:]
+                variant = ((changed, suffix) if side_index == 0
+                           else (prefix, changed))
+                variants.add(variant)
+                support = [dict(item) for item in evidence.get("support", [])]
+                morphology[(lemma,)] = {
+                    "kind": "irregular_do_support_question_transfer",
+                    "canonical_form": " ".join(relation),
+                    "surface_form": lemma,
+                    "observed_form": observed_word,
+                    "licensed_frame": " ".join(
+                        prefix + ("{bound_entity}",) + suffix),
+                    "derived_frame": " ".join(
+                        variant[0] + ("{bound_entity}",) + variant[1]),
+                    "support": support,
+                }
         # English progressive questions place "is" before a grounded -ing
         # predicate ("Who admired X?" -> "Who is admiring X?"). Only add
         # this structure when the predicate form itself came from an induced,
@@ -3303,6 +3604,16 @@ class CRMSKnowledgeBase:
         for side_index, side in enumerate((prefix, suffix)):
             replacements = set(forms)
             if side_index == 0:
+                # A singular WH subject can form a present-perfect question
+                # with ``has + regular past participle``: ``Who discovered X?``
+                # -> ``Who has discovered X?``. The predicate itself must be
+                # the exact licensed single-token -ed form; this is a bounded
+                # aspect transformation, not a new predicate alignment.
+                if (prefix[:1] in {("who",), ("what",)}
+                        and len(prefix) == 2 and prefix[1:] in forms):
+                    replacements.update(
+                        ("has",) + phrase for phrase in forms
+                        if len(phrase) == 1 and phrase[0].endswith("ed"))
                 # Reviewed nominal relation forms such as "creator of" can
                 # replace a verb in a learned question frame only when the
                 # auxiliary and article are restored: "Who created X?" ->
@@ -3332,7 +3643,7 @@ class CRMSKnowledgeBase:
                 # the same reviewed nominal relation: ``Who is the creator
                 # of X?`` / ``Who are the creators of X?``. Generate only
                 # regular plural spelling from the observed singular noun.
-                if (prefix[0] in {"who", "what"}
+                if (prefix and prefix[0] in {"who", "what"}
                         and len(prefix) >= 5
                         and prefix[1:3] == ("is", "the")
                         and prefix[-1] == "of"):
@@ -4339,6 +4650,16 @@ class CRMSKnowledgeBase:
             canonical_relation_text = (
                 " ".join(canonical_relation) if spelling_evidence is not None
                 else surface_relation_text)
+            subject_is_article_led = bool(re.match(
+                r"\s*(?:the|a|an)\s+", subject, flags=re.IGNORECASE))
+            object_words = obj.split()
+            object_is_name_shaped = (
+                2 <= len(object_words) <= 4
+                and object_words[0].casefold() not in {"the", "a", "an"}
+                and all(word[:1].isupper() for word in object_words))
+            possible_role_reversal = (
+                passive is None and subject_is_article_led
+                and object_is_name_shaped)
             evidence = ({
                 "kind": "surface_relation_discovery",
                 "method": ("passive by-phrase role normalization"
@@ -4353,8 +4674,15 @@ class CRMSKnowledgeBase:
                 "sources": [source],
                 "canonical_relation": canonical_relation_text,
                 "morphology_support": spelling_evidence,
-                "warning": ("Entity boundaries and predicate role are heuristic; "
-                            "confirm the cited sentence before accepting."),
+                **({"role_direction_suspicion":
+                    "article-led subject with a multiword proper-name object",
+                    "warning": ("This active clause has an article-led subject "
+                                "and a multiword proper-name object; check whether "
+                                "the roles are reversed before accepting.")}
+                   if possible_role_reversal else
+                   {"warning": ("Entity boundaries and predicate role are "
+                                "heuristic; confirm the cited sentence before "
+                                "accepting.")}),
             },)
             candidate = FactCandidate(
                 self._canonicalize_entity(subject),
@@ -4401,9 +4729,11 @@ class CRMSKnowledgeBase:
         """Find repeated source-grounded relation frames without prior teaching.
 
         Discovery is deliberately report-only. It groups narrow heuristic
-        sentence parses only when they share one literal template and have
-        distinct subjects, objects, and source documents. These are not proof
-        that a source entails the claims; acceptance remains explicit.
+        sentence parses only when they share a compatible predicate/argument
+        template and have distinct subjects, objects, and source documents.
+        Bounded lowercase-object parses and passive forms require additional
+        guards below; these proposals are not proof that a source entails the
+        claims, and acceptance remains explicit.
         """
         if (type(minimum_examples) is not int or not 2 <= minimum_examples <= 20
                 or type(maximum_documents) is not int
@@ -4417,7 +4747,8 @@ class CRMSKnowledgeBase:
             raise ValueError("corpus frame discovery bounds are outside supported limits")
         source_rows = research_index.source_list(
             limit=maximum_documents, offset=document_offset)
-        grouped: dict[tuple[Any, ...], dict[tuple[Any, ...], dict[str, Any]]] = {}
+        grouped: dict[tuple[Any, ...],
+                      dict[tuple[Any, ...], list[dict[str, Any]]]] = {}
         morphology_rules = self._licensed_predicate_spelling_rules()
         bare_support_cache: dict[str, list[dict[str, str]]] = {}
         processed_sentences = 0
@@ -4470,27 +4801,181 @@ class CRMSKnowledgeBase:
                         bare_predicate_support_cache=bare_support_cache)
                 for candidate in candidates:
                     relation_tokens_for_review = _tokens(candidate.relation)
+                    evidence = next((item for item in candidate.language_evidence
+                                     if item.get("kind")
+                                     == "surface_relation_discovery"), {})
+                    # A page title is not enough to license a reusable
+                    # relation frame for a sentence whose grammatical subject
+                    # is only a pronoun. The title can identify a likely
+                    # entity for retrieval, but it does not prove that the
+                    # pronoun refers to that entity in this sentence. Keep
+                    # these claims searchable and available for human review;
+                    # do not generalize their predicate/argument pattern.
+                    if evidence.get("page_title_coreference"):
+                        continue
+                    method = str(evidence.get("method", ""))
                     relation_words_for_review = (
                         _RESEARCH_STOPWORDS
                         | {"he", "her", "hers", "him", "his", "its",
                            "me", "my", "our", "ours", "she", "them",
                            "their", "theirs", "they", "us", "we", "you",
                            "your", "yours"})
+                    numeric_subject = re.match(
+                        r"\s*(?:\d+|zero|one|two|three|four|five|six|seven|"
+                        r"eight|nine|ten|eleven|twelve|thirteen|fourteen|"
+                        r"fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\b",
+                        candidate.subject, flags=re.IGNORECASE)
+                    object_tokens_for_boundary = _tokens(candidate.object)
+                    sentence_tokens_for_boundary = _tokens(sentence)
+                    object_is_complete = bool(
+                        object_tokens_for_boundary
+                        and len(sentence_tokens_for_boundary)
+                            >= len(object_tokens_for_boundary)
+                        and sentence_tokens_for_boundary[
+                            -len(object_tokens_for_boundary):]
+                            == object_tokens_for_boundary)
+                    if not object_is_complete:
+                        # A narrow nominal complement is part of the object
+                        # phrase ("Supreme Commander of NATO Europe"). Extend
+                        # only a source-matched `of ...` tail; other trailing
+                        # material remains a boundary error until parsed.
+                        object_match = re.search(
+                            re.escape(candidate.object), sentence,
+                            flags=re.IGNORECASE)
+                        if object_match is not None:
+                            tail = sentence[object_match.end():].rstrip(" .!?;:")
+                            if (re.match(r"^\s+of\s+\S", tail, re.IGNORECASE)
+                                    and len(_tokens(tail)) <= 6
+                                    and not re.search(r"\b(?:and|or|but)\b",
+                                                      tail, re.IGNORECASE)):
+                                expanded_object = (
+                                    candidate.object + tail[0:]
+                                    if tail.startswith(" ") else
+                                    candidate.object + " " + tail)
+                                expanded_evidence = tuple({
+                                    **item,
+                                    "object": expanded_object,
+                                    "object_phrase": expanded_object,
+                                } for item in candidate.language_evidence)
+                                candidate = replace(
+                                    candidate, object=expanded_object,
+                                    language_evidence=expanded_evidence)
+                                object_tokens_for_boundary = _tokens(
+                                    candidate.object)
+                                sentence_tokens_for_boundary = _tokens(sentence)
+                                object_is_complete = bool(
+                                    object_tokens_for_boundary
+                                    and len(sentence_tokens_for_boundary)
+                                        >= len(object_tokens_for_boundary)
+                                    and sentence_tokens_for_boundary[
+                                        -len(object_tokens_for_boundary):]
+                                        == object_tokens_for_boundary)
+                    relation_has_determiner = bool(
+                        set(relation_tokens_for_review) & {"a", "an", "the"})
+                    object_starts_boundary = bool(
+                        _tokens(candidate.object)
+                        and _tokens(candidate.object)[0] in {
+                            "is", "are", "was", "were", "has", "have",
+                            "had", "do", "does", "did", "in", "at",
+                            "on", "into", "onto", "through", "across",
+                            "along", "from", "to", "with", "by", "over",
+                            "under", "near", "beside", "within", "without",
+                        })
+                    subject_match = re.search(
+                        rf"(?<!\w){re.escape(candidate.subject)}(?!\w)",
+                        sentence, flags=re.IGNORECASE)
+                    subject_is_prep_complement = False
+                    if subject_match is not None:
+                        before_subject = sentence[:subject_match.start()].rstrip()
+                        previous_word = re.search(r"([A-Za-z]+)$", before_subject)
+                        subject_is_prep_complement = bool(
+                            previous_word and previous_word.group(1).casefold()
+                            in {"of", "in", "at", "on", "from", "near",
+                                "within", "inside", "outside", "behind"})
                     if (candidate.relation != "is-a"
                             and (not re.fullmatch(
-                                r"[A-Za-z][A-Za-z’'-]*(?:\s+[A-Za-z][A-Za-z’'-]*){0,6}",
+                                r"[A-Za-z][A-Za-z’'-]*(?:\s+[A-Za-z][A-Za-z’'-]*){0,3}",
                                 candidate.relation)
+                                or numeric_subject is not None
+                                or relation_has_determiner
+                                or object_starts_boundary
+                                or subject_is_prep_complement
+                                or not object_is_complete
                                 or (relation_tokens_for_review
                                     and set(relation_tokens_for_review)
                                     <= relation_words_for_review)
+                                or "versus" in relation_tokens_for_review
                                 or (relation_tokens_for_review[-1].endswith("ing")
                                     and not set(relation_tokens_for_review)
                                     & {"is", "are", "was", "were", "be",
                                        "been", "being", "has", "have", "had"}))):
                         continue
-                    evidence = next((item for item in candidate.language_evidence
-                                     if item.get("kind")
-                                     == "surface_relation_discovery"), {})
+                    # Corpus frame mining cannot safely resolve event-list
+                    # prefixes, quoted titles, noun-as-verb boundary errors,
+                    # or passive-agent role reversal yet. Keep those source
+                    # sentences searchable and available to explicit review,
+                    # but do not let their shapes become reusable rules.
+                    if (re.match(r"\s*(?:\d{1,4}\s*[–—-]|[\"'‘“])", sentence)
+                            or (method == "passive by-phrase role normalization"
+                                and not evidence.get("morphology_support"))
+                            or "that" in relation_tokens_for_review
+                            or set(relation_tokens_for_review) <= {
+                                "across", "along", "among", "around", "at",
+                                "behind", "below", "beside", "between", "beyond",
+                                "by", "despite", "during", "for", "from", "in",
+                                "inside", "into", "near", "of", "off", "on",
+                                "onto", "over", "through", "to", "under", "until",
+                                "upon", "with", "within", "without", "such", "as",
+                                "versus", "vs", "years",
+                            }):
+                        continue
+                    subject_tokens = _tokens(candidate.subject)
+                    object_tokens = _tokens(candidate.object)
+                    generic_pronouns = {
+                        "i", "me", "my", "we", "us", "our", "you",
+                        "your", "he", "him", "his", "she", "her",
+                        "it", "they", "them", "their", "there",
+                        "this", "that", "these", "those",
+                    }
+                    if (not subject_tokens or not object_tokens
+                            or any(token in generic_pronouns
+                                   for token in subject_tokens)
+                            or any(token in generic_pronouns
+                                   for token in object_tokens)
+                            or len(object_tokens) > 8
+                            or re.search(r"\b(?:and|or)\b", sentence,
+                                         flags=re.IGNORECASE)
+                            or (candidate.relation in {
+                                "connect", "connects", "connected", "link",
+                                "links", "linked", "join", "joins", "joined",
+                            } and re.search(r"\bwith\b", sentence,
+                                            flags=re.IGNORECASE))):
+                        continue
+                    if candidate.relation == "is-a":
+                        # Copular type frames are especially vulnerable to
+                        # pronoun subjects, existential "there is" clauses,
+                        # dangling example complements, and coordinated
+                        # predicates whose second class was parsed as an
+                        # adjunct. Keep those sentences available for normal
+                        # retrieval, but do not turn them into learned frames.
+                        if (subject_tokens[0] in {
+                                "finally", "however", "militarily", "therefore",
+                                "currently", "generally", "usually", "also",
+                                "moreover", "instead", "consequently",
+                            }
+                                or any(token in {"who", "which", "that"}
+                                       for token in object_tokens)
+                                or object_tokens[-1:] in {
+                                    ("located",), ("based",), ("called",),
+                                    ("known",), ("named",), ("described",),
+                                    ("considered",), ("used",),
+                                }
+                                or re.match(r"\s*there\s+(?:is|are|was|were)\b",
+                                            sentence, flags=re.IGNORECASE)
+                                or re.search(r"\b(?:and|or)\b", sentence,
+                                             flags=re.IGNORECASE)
+                                or object_tokens[-1:] in {("example",), ("examples",)}):
+                            continue
                     if (("," in sentence or ";" in sentence)
                             and evidence.get("method")
                             != "single bounded nominal appositive with unique core parse"):
@@ -4502,7 +4987,7 @@ class CRMSKnowledgeBase:
                                  + ("<object>",)),
                            candidate.polarity)
                     pair = (_tokens(candidate.subject), _tokens(candidate.object))
-                    grouped.setdefault(key, {}).setdefault(pair, {
+                    row = {
                         "subject": candidate.subject,
                         "relation": candidate.relation,
                         "object": candidate.object,
@@ -4512,17 +4997,30 @@ class CRMSKnowledgeBase:
                         "source": citation,
                         "document_id": document.document_id,
                         "polarity": candidate.polarity,
-                    })
+                    }
+                    pair_rows = grouped.setdefault(key, {}).setdefault(pair, [])
+                    # Keep a small, deterministic set of independent source
+                    # rows for each exact pair. The alignment miner needs to
+                    # choose different documents on both sides; retaining
+                    # only the first occurrence can hide that evidence when
+                    # it happens to be in a document containing both forms.
+                    if (len(pair_rows) < 8
+                            and all(existing["document_id"]
+                                    != document.document_id
+                                    for existing in pair_rows)):
+                        pair_rows.append(row)
             if processed_sentences >= maximum_sentences:
                 break
 
         proposals: list[dict[str, Any]] = []
         for (relation_tokens, template, polarity), rows in sorted(grouped.items()):
-            support = [rows[key] for key in sorted(rows)]
+            support = [row for pair in sorted(rows)
+                       for row in sorted(rows[pair],
+                                         key=lambda item: item["document_id"])]
             subjects = {_tokens(row["subject"]) for row in support}
             objects = {_tokens(row["object"]) for row in support}
             documents = {row["document_id"] for row in support}
-            if (len(support) < minimum_examples
+            if (len(rows) < minimum_examples
                     or len(subjects) < minimum_examples
                     or len(objects) < minimum_examples
                     or len(documents) < minimum_examples):
@@ -4599,21 +5097,192 @@ class CRMSKnowledgeBase:
         self.__dict__.update(staged.__dict__)
         return proposal
 
+    @staticmethod
+    def _structured_field_spans(text: str) -> list[tuple[str, str, int, int]]:
+        """Return supported exact infobox key/value lines and their spans."""
+        rows = []
+        offset = 0
+        in_infobox = False
+        assignment = re.compile(r"^[ \t]*([\w -]{1,48})[ \t]*=[ \t]*(.*)$")
+        for line in text.splitlines(keepends=True):
+            content = line.rstrip("\r\n")
+            if not in_infobox:
+                in_infobox = bool(re.match(r"^[ \t]*Infobox\b", content, re.I))
+                offset += len(line)
+                continue
+            match = assignment.match(content)
+            if match is not None:
+                field = " ".join(match.group(1).casefold().split())
+                if field in _STRUCTURED_PREDICATE_FIELDS:
+                    leading = len(content) - len(content.lstrip())
+                    rows.append((field, match.group(2).strip(),
+                                 offset + leading, offset + len(content)))
+            offset += len(line)
+        return rows
+
+    def _propose_structured_predicate_alignments(
+            self, research_index: Any, *, minimum_pairs: int,
+            maximum_documents: int, maximum_sentences: int,
+            maximum_proposals: int, document_offset: int
+            ) -> list[dict[str, Any]]:
+        """Use explicit infobox fields as labels for matching prose frames.
+
+        A proposal needs at least two training pairs and one held-out pair.
+        For each page, the field value and a complete sentence must identify
+        the same exact subject/object pair; the sentence's predicate may then
+        differ from the field's canonical relation. This remains review-only.
+        """
+        grouped: dict[tuple[str, str], dict[
+            tuple[tuple[str, ...], tuple[str, ...]], dict[str, dict[str, Any]]]] = {}
+        processed_sentences = 0
+        morphology_rules = self._licensed_predicate_spelling_rules()
+        source_rows = research_index.source_list(
+            limit=maximum_documents, offset=document_offset)
+        for source_row in source_rows:
+            document = research_index.document(source_row[0])
+            if _is_code_source(document.location):
+                continue
+            field_spans = self._structured_field_spans(document.text)
+            if not field_spans:
+                continue
+            digest = hashlib.sha256(document.text.encode("utf-8")).hexdigest()
+            title_tokens = _tokens(document.title)
+            if not title_tokens:
+                continue
+            for start, end in _sentence_spans(document.text):
+                if processed_sentences >= maximum_sentences:
+                    break
+                sentence = document.text[start:end].strip()
+                if not sentence or sentence[-1:] not in {".", "!", "?"}:
+                    continue
+                processed_sentences += 1
+                lower_sentence = sentence.casefold()
+                if document.title.casefold() not in lower_sentence:
+                    continue
+                for field, value, field_start, field_end in field_spans:
+                    value = value.strip()
+                    if (not value or len(value) > 100
+                            or value.casefold() in {"unknown", "none", "n/a"}
+                            or value.casefold() not in lower_sentence):
+                        continue
+                    canonical_relation, title_role = (
+                        _STRUCTURED_PREDICATE_FIELDS[field])
+                    subject = (document.title if title_role == "subject"
+                               else value)
+                    obj = (document.title if title_role == "object"
+                           else value)
+                    sentence_start, sentence_end = start, end
+                    field_citation = (f"{document.document_id}#sha256={digest}"
+                                      f"&chars={field_start}:{field_end}")
+                    sentence_citation = (f"{document.document_id}#sha256={digest}"
+                                         f"&chars={sentence_start}:{sentence_end}")
+                    candidates = self._discover_surface_relation_candidates(
+                        sentence, source=sentence_citation,
+                        research_index=research_index,
+                        morphology_rules=morphology_rules)
+                    matches = [candidate for candidate in candidates
+                               if (candidate.polarity is True
+                                   and _tokens(candidate.subject) == _tokens(subject)
+                                   and _tokens(candidate.object) == _tokens(obj))]
+                    if len(matches) != 1:
+                        continue
+                    candidate = matches[0]
+                    predicate = next((str(item.get("predicate_phrase", ""))
+                                      for item in candidate.language_evidence
+                                      if item.get("kind")
+                                      == "surface_relation_discovery"),
+                                     candidate.relation)
+                    if (_tokens(predicate) == _tokens(canonical_relation)
+                            or not predicate.strip()):
+                        continue
+                    # This field currently has one mechanically generated
+                    # question construction. Do not suggest coordinated
+                    # variants such as "capital and largest city of" until
+                    # CRMS can preserve their conjunction semantics.
+                    if (canonical_relation == "capital of"
+                            and not re.fullmatch(
+                                r"capital city of", predicate,
+                                flags=re.IGNORECASE)):
+                        continue
+                    pair = (_tokens(subject), _tokens(obj))
+                    key = (canonical_relation, predicate)
+                    row = {
+                        "subject": subject,
+                        "object": obj,
+                        "canonical_field": field,
+                        "canonical_sentence": document.text[field_start:field_end],
+                        "canonical_source": field_citation,
+                        "canonical_document_id": document.document_id,
+                        "canonical_predicate": field,
+                        "alias_sentence": sentence,
+                        "alias_source": sentence_citation,
+                        "alias_document_id": document.document_id,
+                        "alias_predicate": predicate,
+                    }
+                    grouped.setdefault(key, {}).setdefault(pair, {})[
+                        document.document_id] = row
+            if processed_sentences >= maximum_sentences:
+                break
+
+        proposals = []
+        minimum_total = max(3, minimum_pairs)
+        for (canonical, predicate), pair_rows in sorted(grouped.items()):
+            rows = [row for pair in sorted(pair_rows)
+                    for _document_id, row in sorted(pair_rows[pair].items())]
+            if len(rows) < minimum_total:
+                continue
+            # Keep at least two varied examples for learning and reserve a
+            # separate page for transfer validation. With larger groups,
+            # reserve the final quarter (at least one example).
+            holdout_count = max(1, len(rows) // 4)
+            training_rows = rows[:-holdout_count]
+            holdout_rows = rows[-holdout_count:]
+            if (len(training_rows) < 2
+                    or len({_tokens(row["object"]) for row in training_rows}) < 2
+                    or len({_tokens(row["subject"]) for row in training_rows}) < 2):
+                continue
+            support = training_rows + holdout_rows
+            payload = {
+                "evidence_kind": "structured_field_prose",
+                "relation": canonical,
+                "predicate_phrase": predicate,
+                "support": support,
+                "training_support": training_rows,
+                "holdout_support": holdout_rows,
+                "distinct_pairs": len({(_tokens(row["subject"]),
+                                         _tokens(row["object"]))
+                                        for row in support}),
+                "canonical_documents": len({row["canonical_document_id"]
+                                             for row in support}),
+                "alias_documents": len({row["alias_document_id"]
+                                         for row in support}),
+                "review_required": True,
+            }
+            proposal_id = hashlib.sha256(json.dumps(
+                payload, sort_keys=True, ensure_ascii=False,
+                separators=(",", ":")).encode("utf-8")).hexdigest()[:24]
+            proposals.append({"proposal_id": proposal_id, **payload})
+        return sorted(proposals, key=lambda item: (
+            item["relation"], item["predicate_phrase"],
+            item["proposal_id"]))[:maximum_proposals]
+
     def propose_corpus_predicate_alignments(
             self, research_index: Any, *, minimum_pairs: int = 2,
             maximum_documents: int = 1000, maximum_sentences: int = 20_000,
             maximum_proposals: int = 100,
             document_offset: int = 0) -> list[dict[str, Any]]:
-        """Find repeated corpus-only predicate alignments by shared entity pairs.
+        """Find reviewed predicate alignments from prose and structured fields.
 
         Two independently parsed predicate frames are candidates for one
         relation when the same distinct subject/object pairs recur in separate
-        documents. This is report-only evidence, not automatic synonym
-        acceptance; the user chooses the canonical relation during review.
+        documents. A bounded allowlist of explicit infobox fields can also
+        supervise an alternate prose predicate when the same exact pair is
+        stated in a complete sentence. Both routes are report-only; the user
+        reviews the canonical relation before acceptance.
         """
         if (type(minimum_pairs) is not int or not 2 <= minimum_pairs <= 20
                 or type(maximum_documents) is not int
-                or not 1 <= maximum_documents <= 10_000
+                or not 1 <= maximum_documents <= 300_000
                 or type(maximum_sentences) is not int
                 or not 1 <= maximum_sentences <= 1_000_000
                 or type(maximum_proposals) is not int
@@ -4623,18 +5292,21 @@ class CRMSKnowledgeBase:
             raise ValueError("corpus predicate alignment bounds are outside supported limits")
         frames = self.propose_corpus_relation_frames(
             research_index, minimum_examples=minimum_pairs,
-            maximum_documents=maximum_documents,
-            maximum_sentences=maximum_sentences,
+            maximum_documents=min(maximum_documents, 10_000),
+            maximum_sentences=min(maximum_sentences, 1_000_000),
             maximum_proposals=1000, document_offset=document_offset)
-        by_relation: dict[tuple[str, ...], dict[tuple[tuple[str, ...],
-                                                       tuple[str, ...]], dict[str, Any]]] = {}
+        by_relation: dict[tuple[str, ...], dict[
+            tuple[tuple[str, ...], tuple[str, ...]], list[dict[str, Any]]]] = {}
         for frame in frames:
             if frame["polarity"] is not True:
                 continue
             relation = tuple(_tokens(frame["relation"]))
             for row in frame["support"]:
                 pair = (_tokens(row["subject"]), _tokens(row["object"]))
-                by_relation.setdefault(relation, {}).setdefault(pair, row)
+                pair_rows = by_relation.setdefault(relation, {}).setdefault(pair, [])
+                if all(existing["document_id"] != row["document_id"]
+                       for existing in pair_rows):
+                    pair_rows.append(row)
 
         proposals: list[dict[str, Any]] = []
         relations = sorted(by_relation)
@@ -4645,11 +5317,16 @@ class CRMSKnowledgeBase:
                 shared = set(by_relation[left_relation]) & set(by_relation[right_relation])
                 aligned = []
                 for pair in sorted(shared):
-                    left = by_relation[left_relation][pair]
-                    right = by_relation[right_relation][pair]
-                    if left["document_id"] == right["document_id"]:
-                        continue
-                    aligned.append((pair, left, right))
+                    independent_rows = sorted(
+                        ((left, right)
+                         for left in by_relation[left_relation][pair]
+                         for right in by_relation[right_relation][pair]
+                         if left["document_id"] != right["document_id"]),
+                        key=lambda rows: (rows[0]["document_id"],
+                                         rows[1]["document_id"]))
+                    if independent_rows:
+                        left, right = independent_rows[0]
+                        aligned.append((pair, left, right))
                 if len(aligned) < minimum_pairs:
                     continue
                 left_documents = {left["document_id"] for _, left, _ in aligned}
@@ -4701,7 +5378,19 @@ class CRMSKnowledgeBase:
                     payload, sort_keys=True, ensure_ascii=False,
                     separators=(",", ":")).encode("utf-8")).hexdigest()[:24]
                 proposals.append({"proposal_id": proposal_id, **payload})
-        return sorted(proposals, key=lambda item: (
+        structured = self._propose_structured_predicate_alignments(
+            research_index, minimum_pairs=minimum_pairs,
+            maximum_documents=maximum_documents,
+            maximum_sentences=maximum_sentences,
+            maximum_proposals=maximum_proposals,
+            document_offset=document_offset)
+        existing_shapes = {(item["relation"], item["predicate_phrase"])
+                           for item in proposals}
+        proposals.extend(item for item in structured
+                         if (item["relation"], item["predicate_phrase"])
+                         not in existing_shapes)
+        unique = {item["proposal_id"]: item for item in proposals}
+        return sorted(unique.values(), key=lambda item: (
             item["relation"], item["predicate_phrase"],
             item["proposal_id"]))[:maximum_proposals]
 
@@ -4724,6 +5413,12 @@ class CRMSKnowledgeBase:
         if proposal is None:
             raise ValueError("corpus predicate alignment is stale or unsupported")
         staged = copy.deepcopy(self)
+        if proposal.get("evidence_kind") == "structured_field_prose":
+            accepted = staged._accept_structured_predicate_alignment(
+                proposal, research_index)
+            self.__dict__.clear()
+            self.__dict__.update(staged.__dict__)
+            return accepted
         validated = []
         for row in proposal["support"]:
             parsed_rows = []
@@ -4768,6 +5463,112 @@ class CRMSKnowledgeBase:
         self.__dict__.clear()
         self.__dict__.update(staged.__dict__)
         return proposal
+
+    def _accept_structured_predicate_alignment(
+            self, proposal: dict[str, Any], research_index: Any
+            ) -> dict[str, Any]:
+        """Revalidate metadata/prose pairs, learn on training pages, test holdout."""
+        if proposal.get("relation") != "capital of":
+            raise ValueError("no reviewed question frame exists for this field relation")
+        predicate = str(proposal.get("predicate_phrase", ""))
+        if not re.fullmatch(r"capital(?: city)? of", predicate, flags=re.I):
+            raise ValueError("the capital-field question form is not licensed")
+        support = proposal.get("support", [])
+        training = proposal.get("training_support", [])
+        holdout = proposal.get("holdout_support", [])
+        if (len(support) < 3 or len(training) < 2 or not holdout
+                or len({(_tokens(row["subject"]), _tokens(row["object"]))
+                        for row in training}) < 2):
+            raise ValueError("structured alignment needs varied training and a held-out page")
+
+        validated = []
+        morphology = self._licensed_predicate_spelling_rules()
+        for row in support:
+            document = research_index.document(row["alias_document_id"])
+            if document.title != row["object"]:
+                raise ValueError("structured-field title no longer matches the proposal")
+            field_excerpt = research_index.resolve_citation(row["canonical_source"])
+            if row["canonical_sentence"] not in field_excerpt:
+                raise ValueError("structured field no longer matches its citation")
+            field_match = re.fullmatch(
+                r"\s*capital\s*=\s*(.+?)\s*", row["canonical_sentence"],
+                flags=re.IGNORECASE)
+            if (field_match is None
+                    or _tokens(field_match.group(1)) != _tokens(row["subject"])):
+                raise ValueError("capital field no longer supports the proposed city")
+            sentence_excerpt = research_index.resolve_citation(row["alias_source"])
+            if row["alias_sentence"] not in sentence_excerpt:
+                raise ValueError("prose example no longer matches its citation")
+            parses = self._discover_surface_relation_candidates(
+                row["alias_sentence"], source=row["alias_source"],
+                research_index=research_index, morphology_rules=morphology)
+            matches = [candidate for candidate in parses
+                       if (candidate.polarity is True
+                           and _tokens(candidate.subject) == _tokens(row["subject"])
+                           and _tokens(candidate.object) == _tokens(row["object"])
+                           and _tokens(next((str(item.get("predicate_phrase", ""))
+                                             for item in candidate.language_evidence
+                                             if item.get("kind")
+                                             == "surface_relation_discovery"), ""))
+                               == _tokens(predicate))]
+            if len(matches) != 1:
+                raise ValueError("prose pair no longer has one exact source parse")
+            validated.append(row)
+
+        training_ids = {row["alias_document_id"] for row in training}
+        holdout_ids = {row["alias_document_id"] for row in holdout}
+        if training_ids & holdout_ids:
+            raise ValueError("training and held-out pages must be disjoint")
+        for row in validated:
+            self.add_fact(row["subject"], proposal["relation"], row["object"],
+                          row["canonical_source"])
+            self.add_fact(row["subject"], proposal["relation"], row["object"],
+                          row["alias_source"])
+        for row in training:
+            question = f"What city is the {predicate} {row['object']}?"
+            self.teach_question(
+                question, relation=proposal["relation"],
+                answer_field="subject", bound_entity=row["object"],
+                answer=row["subject"])
+            self.teach_fact_pattern(
+                row["alias_sentence"], subject=row["subject"],
+                relation=proposal["relation"], obj=row["object"],
+                predicate_phrase=predicate, source=row["alias_source"])
+
+        expected_template = (f"what city is the {predicate} "
+                             "{object}")
+        heldout_checks = []
+        for heldout in holdout:
+            heldout_question = f"What city is the {predicate} {heldout['object']}?"
+            result = self.ask(heldout_question)
+            expected_sources = {heldout["canonical_source"],
+                                heldout["alias_source"]}
+            observed_sources = {source for evidence in result.evidence or []
+                                for source in evidence.get("sources", ())}
+            valid_sources = sorted(observed_sources.intersection(expected_sources))
+            if (result.status != "answered"
+                    or result.answer != heldout["subject"]
+                    or expected_template not in (result.matched_templates or [])
+                    or not valid_sources):
+                raise ValueError(
+                    "accepted training examples failed a held-out "
+                    "question-frame check")
+            heldout_checks.append({
+                "question": heldout_question,
+                "answer": result.answer,
+                "source": valid_sources[0],
+                "matched_template": expected_template,
+                "heldout_document": heldout["alias_document_id"],
+            })
+        first_check = heldout_checks[0]
+        return {
+            **proposal,
+            "heldout_validation": {
+                **first_check,
+                "checks": heldout_checks,
+                "training_documents": sorted(training_ids),
+            },
+        }
 
     def propose_predicate_form_alignments(
             self, research_index: Any, *, minimum_facts: int = 2,
@@ -5546,6 +6347,15 @@ class CRMSKnowledgeBase:
             object_text = direct.group("object").strip()
             query_predicate = direct.group("predicate").casefold()
             predicates = {query_predicate}
+            # Closed irregular morphology is a grammatical alignment, not a
+            # synonym guess. The source clause must still fill the requested
+            # object role (or provide an explicit passive by-agent) below.
+            irregular_base = _base_verb_for_surface((query_predicate,))
+            irregular_lemma = (irregular_base[0] if irregular_base else
+                               query_predicate)
+            predicates.update(
+                form for lemma, forms in _IRREGULAR_VERB_PARADIGMS.items()
+                if lemma == irregular_lemma for form in forms)
             irregular_family = {
                 tuple(_tokens(item.get("text", "")))
                 for item in query_expansions
@@ -7013,11 +7823,18 @@ class CRMSKnowledgeBase:
         """Give a concise, grounded default reply; diagnostics stay in render()."""
         if result.status == "answered":
             text = ""
+            # A multi-edge path proves the answer through several facts; none
+            # of its leaves alone states the answer. Only realize a leaf as a
+            # declarative when the proof is a single fact and no rule-derived
+            # proof is carrying the conclusion.
+            has_composite_proof = (
+                bool(result.inference_proofs)
+                or any(len(proof) > 1 for proof in result.proofs or []))
             # A truth-valued question needs a truth-valued answer. Do not
             # realize its supporting triple as a declarative, which can be
             # ungrammatical when the stored relation is a bare form ("X create
             # Y") and can obscure an explicit negative answer.
-            if result.truth is None:
+            if result.truth is None and not has_composite_proof:
                 # Use a sentence only when an accepted, varied source frame
                 # licenses it.
                 for fact in result.evidence or []:
@@ -7029,7 +7846,8 @@ class CRMSKnowledgeBase:
                         if sentences:
                             text = sentences[0]
                             break
-            if (result.truth is None and not text and result.evidence):
+            if (result.truth is None and not has_composite_proof
+                    and not text and result.evidence):
                 # If no varied sentence frame is licensed yet, a single-token
                 # predicate from the matched grounded question can still be
                 # realized as a plain fact sentence. Keep this fallback narrow:
@@ -7313,6 +8131,18 @@ class CRMSKnowledgeBase:
             return []
         realizations = self._realize_fact_pattern(
             subject, relation, obj, polarity=polarity)
+        if _tokens(relation) == _tokens("is-a"):
+            article = _indefinite_article_for(obj)
+            if article is not None:
+                article_pattern = re.compile(
+                    r"(?P<copula>\b(?:is|are|was|were)\s+)"
+                    r"(?:a|an)(?P<space>\s+)"
+                    r"(?=" + re.escape(obj) + r"(?:\b|$))",
+                    flags=re.IGNORECASE)
+                realizations = [article_pattern.sub(
+                    lambda match: match.group("copula") + article
+                    + match.group("space"), sentence)
+                    for sentence in realizations]
         if not normalized_qualifiers:
             return realizations
         context = "context: " + ", ".join(
@@ -8080,6 +8910,20 @@ class CRMSKnowledgeBase:
                 self._normalize_qualifiers(dict(fact.qualifiers))))
         return [self._negative_facts[key] for key in sorted(self._negative_facts)]
 
+    def _facts_for_object(self, obj: str) -> list[FactEvidence]:
+        """Return positive facts for an object using the endpoint index."""
+        object_key = _tokens(self._canonicalize_entity(obj))
+        if isinstance(self._facts, SQLiteFactMap):
+            candidates = self._facts.lookup_object(object_key)
+        else:
+            keys = self._facts_by_object.get(object_key, ())
+            candidates = (self._facts[key] for key in keys)
+        return sorted(
+            (fact for fact in candidates
+             if _tokens(fact.object) == object_key),
+            key=lambda fact: (fact.subject.casefold(), fact.relation.casefold(),
+                              fact.object.casefold()))
+
     def _find_fact(self, relation: str, bound_field: str,
                    bound_value: str, answer: str,
                    qualifiers: tuple[tuple[str, str], ...] = ()
@@ -8661,6 +9505,161 @@ class CRMSKnowledgeBase:
                 continue
             frames[key] = examples
             active_induced[key] = proposal
+
+        # A licensed active fact sentence already supplies a checked mapping
+        # from its surface predicate to a canonical relation. Derive the two
+        # elementary endpoint questions from that structure instead of making
+        # the teacher repeat the same mapping as question/answer examples.
+        # These frames are rebuilt from current fact-pattern support on every
+        # ask, so retracting a source removes the derived language rule.
+        for pattern_key, pair_sources in self._fact_pattern_examples.items():
+            template, relation = pattern_key
+            active_svo = template == (
+                "<subject>", "<predicate>", "<object>")
+            passive_svo = template == (
+                "<object>", "was", "<predicate>", "by", "<subject>")
+            if (not self._fact_pattern_is_licensed(pattern_key, pair_sources)
+                    or not self._fact_pattern_polarities.get(pattern_key, True)
+                    or not (active_svo or passive_svo)):
+                continue
+            for predicate in sorted(self._fact_pattern_predicates.get(
+                    pattern_key, set())):
+                predicate_sources = self._fact_pattern_predicate_sources.get(
+                    pattern_key, {}).get(predicate, {})
+                supported_pairs = []
+                for pair, example_sources in pair_sources.items():
+                    aligned_sources = predicate_sources.get(pair, set())
+                    sources = sorted(set(example_sources).intersection(aligned_sources))
+                    if not sources:
+                        continue
+                    subject_key, object_key = pair
+                    supported_fact = self._facts.get(self._fact_key(
+                        " ".join(subject_key), " ".join(relation),
+                        " ".join(object_key)))
+                    if (supported_fact is None
+                            or not set(supported_fact.sources).intersection(sources)):
+                        continue
+                    supported_pairs.append({
+                        "subject": " ".join(subject_key),
+                        "object": " ".join(object_key),
+                        "sources": sorted(set(supported_fact.sources)
+                                          .intersection(sources)),
+                    })
+                if (len(supported_pairs) < 2
+                        or len({item["subject"] for item in supported_pairs}) < 2
+                        or len({item["object"] for item in supported_pairs}) < 2):
+                    continue
+
+                if active_svo:
+                    derived: list[
+                        tuple[str, tuple[str, ...], tuple[str, ...], str]
+                    ] = [("subject", ("who",) + predicate, (), "object")]
+                    lemma = _base_verb_for_surface(predicate)
+                    if lemma:
+                        derived.append(("object", ("what", "did"), lemma,
+                                        "subject"))
+                    participle = _past_participle_for_surface(predicate)
+                    if participle:
+                        derived.extend((
+                            ("subject", ("who", "was"),
+                             participle + ("by",), "object"),
+                            ("object", ("what", "was") + participle + ("by",),
+                             (), "subject"),
+                        ))
+                else:
+                    if not _is_past_participle(predicate):
+                        continue
+                    derived = [
+                        ("subject", ("who", "was"), predicate + ("by",),
+                         "object"),
+                        ("object", ("what", "was") + predicate + ("by",),
+                         (), "subject"),
+                    ]
+                    active_past = _past_tense_for_participle(predicate)
+                    if active_past:
+                        derived.append(("subject", ("who",) + active_past,
+                                        (), "object"))
+                    lemma = _base_verb_for_surface(predicate)
+                    if lemma:
+                        derived.append(("object", ("what", "did"), lemma,
+                                        "subject"))
+
+                for answer_field, prefix, suffix, bound_field in derived:
+                    active_to_passive = (
+                        active_svo and prefix[:2] in {
+                            ("who", "was"), ("what", "was")})
+                    passive_to_active = (
+                        passive_svo and (
+                            (prefix[:1] == ("who",)
+                             and prefix[1:2] != ("was",))
+                            or prefix[:2] == ("what", "did")))
+                    frame_key = (json.dumps(list(relation), ensure_ascii=False),
+                                 answer_field, prefix, suffix)
+                    if frame_key in frames or frame_key in active_induced:
+                        continue
+                    examples = {}
+                    for item in supported_pairs:
+                        entity = item[bound_field]
+                        examples.setdefault(_tokens(entity), set()).add(entity)
+                    if len(examples) < 2:
+                        continue
+                    lineage_sources = sorted({source for item in supported_pairs
+                                              for source in item["sources"]})
+                    derivation = {
+                        "kind": (
+                            "passive_to_active_subject_question"
+                            if passive_to_active and answer_field == "subject" else
+                            "passive_to_active_object_question"
+                            if passive_to_active else
+                            "active_to_passive_subject_question"
+                            if active_to_passive and answer_field == "subject" else
+                            "active_to_passive_object_question"
+                            if active_to_passive else
+                            "fact_pattern_subject_question"
+                            if active_svo and answer_field == "subject" else
+                            "fact_pattern_do_support_object_question"
+                            if active_svo else
+                            "fact_pattern_passive_subject_question"
+                            if answer_field == "subject" else
+                            "fact_pattern_passive_object_question"),
+                        "predicate_form": " ".join(predicate),
+                        "rule": (
+                            "who + learned active past + object"
+                            if passive_to_active and answer_field == "subject" else
+                            "what + did + subject + learned verb lemma"
+                            if passive_to_active else
+                            "who + was + object + learned participle + by"
+                            if active_to_passive and answer_field == "subject" else
+                            "what + was + learned participle + by + subject"
+                            if active_to_passive and answer_field == "object" else
+                            "who + active predicate + object"
+                            if active_svo and answer_field == "subject" else
+                            "what + did + subject + learned verb lemma"
+                            if active_svo else
+                            "who + was + object + predicate + by"
+                            if answer_field == "subject" else
+                            "what + was + predicate + by + subject"),
+                        "licensed_sentence_pattern": " ".join(template),
+                        "derived_question_frame": " ".join(
+                            prefix + ("{" + bound_field + "}",) + suffix),
+                        "supporting_examples": supported_pairs,
+                    }
+                    artifact_id = "fact-pattern-question:" + hashlib.sha256(
+                        json.dumps([frame_key, lineage_sources], sort_keys=True,
+                                   ensure_ascii=False).encode("utf-8")).hexdigest()[:20]
+                    frames[frame_key] = examples
+                    active_induced[frame_key] = {
+                        "artifact_id": artifact_id,
+                        "base_relation": " ".join(relation),
+                        "target_relation": " ".join(relation),
+                        "lineage": {
+                            "training_source_documents": sorted({
+                                source.split("#", 1)[0] for source in lineage_sources}),
+                            "training_sources": lineage_sources,
+                            "holdout_source_documents": [],
+                        },
+                        "derivation": derivation,
+                    }
         return frames, active_induced
 
     def _ask_multi_qualified_question(
@@ -9982,8 +10981,13 @@ class CRMSKnowledgeBase:
                 store, "relation_keys") else
                 (key[1] for key in store))
         }
+        closed_world_facts = (
+            self._facts.lookup(
+                _tokens("has relation type"), _tokens("closed-world"), "object")
+            if isinstance(self._facts, SQLiteFactMap)
+            else self._facts.values())
         stored_relations.update(
-            _tokens(fact.subject) for fact in self._facts.values()
+            _tokens(fact.subject) for fact in closed_world_facts
             if (_tokens(fact.relation) == _tokens("has relation type")
                 and _tokens(fact.object) == _tokens("closed-world")
                 and self._qualifiers_equal(fact.qualifiers, qualifiers)))
@@ -10172,15 +11176,16 @@ class CRMSKnowledgeBase:
             (subject_words, object_words, *_spans) = matches[0]
             subject_entity = _tokens(self._canonicalize_entity(" ".join(subject_words)))
             object_entity = _tokens(self._canonicalize_entity(" ".join(object_words)))
-            key = (subject_entity, relation_tokens, object_entity)
-            positive_facts = [fact for fact in self._facts.values()
-                              if self._fact_key(fact.subject, fact.relation,
-                                                fact.object) == key
-                              and self._has_qualifiers(fact, requested_qualifiers)]
-            negative_facts = [fact for fact in self._negative_facts.values()
-                              if self._fact_key(fact.subject, fact.relation,
-                                                fact.object) == key
-                              and self._has_qualifiers(fact, requested_qualifiers)]
+            positive_facts = [
+                fact for fact in self._matching_fact_rows(
+                    self._facts, " ".join(subject_entity),
+                    " ".join(relation_tokens), " ".join(object_entity))
+                if self._has_qualifiers(fact, requested_qualifiers)]
+            negative_facts = [
+                fact for fact in self._matching_fact_rows(
+                    self._negative_facts, " ".join(subject_entity),
+                    " ".join(relation_tokens), " ".join(object_entity))
+                if self._has_qualifiers(fact, requested_qualifiers)]
             positive = positive_facts[0] if positive_facts else None
             negative = negative_facts[0] if negative_facts else None
             template_text = " ".join(template)
@@ -11284,6 +12289,7 @@ class CRMSKnowledgeBase:
         matched_morphology: dict[str, dict[str, Any]] = {}
         matched_aliases: dict[str, dict[str, Any]] = {}
         matched_induced_frames: dict[str, dict[str, Any]] = {}
+        matched_frame_transformations: dict[str, dict[str, Any]] = {}
         optional_frame_evidence = self._optional_question_word_evidence(
             requested_qualifiers)
         matched_optional_frame_evidence: dict[str, dict[str, Any]] = {}
@@ -11351,8 +12357,11 @@ class CRMSKnowledgeBase:
                 if inferred.status == "ambiguous":
                     return QuestionResult(
                         "ambiguous", inference_proofs=list(inferred.proofs),
-                        request="The rule search found conflicting support for this relation.",
-                        complete=inferred.complete, expansions=inferred.expansions)
+                        request=(inferred.request or
+                                 "The rule search found conflicting support for this relation."),
+                        complete=inferred.complete,
+                        reason_code=inferred.reason_code,
+                        expansions=inferred.expansions)
                 if inferred.failure_kind == "missing_premise":
                     details = []
                     supported_premises: dict[tuple[str, str, str], None] = {}
@@ -11441,6 +12450,69 @@ class CRMSKnowledgeBase:
                 template = " ".join(frame_prefix + ("{" + bound_field + "}",)
                                      + frame_suffix)
                 match = (answer_field, relation, evidence, template, bound)
+                if (prefix[:1] in {("who",), ("what",)}
+                        and len(prefix) == 2
+                        and prefix[1:] == relation_tokens
+                        and frame_prefix == (prefix[0], "has") + prefix[1:]
+                        and not frame_suffix):
+                    supporting_examples = []
+                    for example_words in entities:
+                        example_entity = _tokens(" ".join(example_words))
+                        example_facts = [fact for fact in self._facts.values()
+                                         if _tokens(fact.relation) == relation_tokens
+                                         and _tokens(
+                                             fact.object if bound_field == "object"
+                                             else fact.subject) == example_entity]
+                        supporting_examples.append({
+                            "bound_entity": " ".join(example_words),
+                            "sources": sorted({source for fact in example_facts
+                                               for source in fact.sources}),
+                        })
+                    transform = {
+                        "kind": "regular_perfect_aspect_question_frame",
+                        "rule": "singular WH subject + has + regular -ed participle",
+                        "licensed_frame": " ".join(prefix),
+                        "derived_frame": " ".join(frame_prefix),
+                        "supporting_examples": supporting_examples,
+                    }
+                    matched_frame_transformations[json.dumps(
+                        transform, sort_keys=True, ensure_ascii=False)] = transform
+                if (len(prefix) == 5
+                        and prefix[:3] == ("who", "is", "the")
+                        and prefix[-1] == "of"
+                        and frame_prefix == ("who", relation_tokens[-1])
+                        and not frame_suffix):
+                    noun = prefix[-2]
+                    noun_stem = (noun[:-2] if noun.endswith(("er", "tor"))
+                                 and len(noun) > 3 else "")
+                    verb = relation_tokens[-1]
+                    verb_stem = verb[:-2] if verb.endswith("ed") else ""
+                    if noun_stem and noun_stem == verb_stem:
+                        supporting_examples = []
+                        for example_words in entities:
+                            example_entity = _tokens(" ".join(example_words))
+                            example_facts = [fact for fact in self._facts.values()
+                                             if _tokens(fact.relation) == relation_tokens
+                                             and _tokens(
+                                                 fact.object if bound_field == "object"
+                                                 else fact.subject) == example_entity]
+                            supporting_examples.append({
+                                "bound_entity": " ".join(example_words),
+                                "sources": sorted({source for fact in example_facts
+                                                   for source in fact.sources}),
+                            })
+                        transform = {
+                            "kind": "regular_agent_noun_to_verb_question_frame",
+                            "rule": "agent noun -er/-or and past verb -ed share a stem",
+                            "noun": noun,
+                            "verb": verb,
+                            "stem": noun_stem,
+                            "licensed_frame": " ".join(prefix),
+                            "derived_frame": " ".join(frame_prefix),
+                            "supporting_examples": supporting_examples,
+                        }
+                        matched_frame_transformations[json.dumps(
+                            transform, sort_keys=True, ensure_ascii=False)] = transform
                 used_items = list(used_optional_evidence)
                 used_items.extend(
                     item for item in optional_frame_evidence.get(key, [])
@@ -11462,13 +12534,23 @@ class CRMSKnowledgeBase:
                             item, sort_keys=True, ensure_ascii=False)] = item
                 if key in induced_frames:
                     proposal = induced_frames[key]
-                    matched_induced_frames[template] = {
-                        "kind": "induced_question_frame",
-                        "artifact_id": proposal["artifact_id"],
-                        "base_relation": proposal["base_relation"],
-                        "target_relation": proposal["target_relation"],
-                        "lineage": copy.deepcopy(proposal["lineage"]),
-                    }
+                    if proposal.get("derivation"):
+                        matched_induced_frames[template] = {
+                            "kind": "fact_pattern_derived_question_frame",
+                            "artifact_id": proposal["artifact_id"],
+                            "base_relation": proposal["base_relation"],
+                            "target_relation": proposal["target_relation"],
+                            "lineage": copy.deepcopy(proposal["lineage"]),
+                            "derivation": copy.deepcopy(proposal["derivation"]),
+                        }
+                    else:
+                        matched_induced_frames[template] = {
+                            "kind": "induced_question_frame",
+                            "artifact_id": proposal["artifact_id"],
+                            "base_relation": proposal["base_relation"],
+                            "target_relation": proposal["target_relation"],
+                            "lineage": copy.deepcopy(proposal["lineage"]),
+                        }
                 for predicate, rule_evidence in morphology_by_relation.get(
                         relation_tokens, {}).items():
                     in_prefix = any(
@@ -11667,6 +12749,210 @@ class CRMSKnowledgeBase:
         inference_failure_kinds: set[str] = set()
         missing_premises: dict[str, dict[str, Any]] = {}
         inference_budget = max_inference_expansions
+
+        def indexed_rule_answers(answer_field: str, relation: str, bound: str
+                                  ) -> tuple[list[str], int, bool] | None:
+            """Find bounded answers through indexed base and linear joins.
+
+            Besides extensional rules, this evaluates the common recursive
+            form ``edge + relation -> relation`` (subject answers) or its
+            inverse ``relation + edge -> relation`` (object answers) to a
+            bounded least fixed point. Other derived premises use the ordinary
+            bounded entity scan or report incomplete search.
+            """
+            relation_key = _tokens(relation)
+            target_rules = [rule for rule in self._inference_rules.values()
+                            if _tokens(rule.conclusion_relation) == relation_key]
+            if not target_rules:
+                return None
+            qualifier_key = tuple(requested_qualifiers)
+            lookup_cache: dict[tuple[tuple[str, ...], str, tuple[str, ...]],
+                               list[FactEvidence]] = {}
+            work = 0
+            scan_exhausted = False
+            candidate_keys: dict[tuple[str, ...], str] = {}
+
+            def premise_is_extensional(premise_relation: str) -> bool:
+                key = _tokens(premise_relation)
+                if self._relation_has_inference_schema(
+                        premise_relation, qualifier_key):
+                    return False
+                if self._relation_type_fact(
+                        premise_relation, "symmetric", qualifier_key) is not None:
+                    return False
+                return not any(
+                    len(case.get("conclusion", {})) >= 3
+                    and _tokens(case["conclusion"].get("relation", "")) == key
+                    and self._normalize_qualifiers(
+                        dict(case.get("qualifiers", ()))) == qualifier_key
+                    for case in self._derived_cases.values())
+
+            base_rules = []
+            recursive_rules = []
+            for rule in target_rules:
+                if rule.third_relation is not None:
+                    premise_relations = [rule.first_relation,
+                                         rule.second_relation,
+                                         rule.third_relation]
+                    if not all(premise_is_extensional(item)
+                               for item in premise_relations):
+                        return None
+                    base_rules.append(rule)
+                    continue
+                recursive_positions = [
+                    field for field in ("first_relation", "second_relation")
+                    if _tokens(getattr(rule, field)) == relation_key]
+                if not recursive_positions:
+                    if not all(premise_is_extensional(item) for item in
+                               (rule.first_relation, rule.second_relation)):
+                        return None
+                    base_rules.append(rule)
+                    continue
+                if len(recursive_positions) != 1:
+                    return None
+                recursive_field = recursive_positions[0]
+                if ((answer_field == "subject"
+                     and recursive_field != "second_relation")
+                        or (answer_field == "object"
+                            and recursive_field != "first_relation")):
+                    return None
+                edge_relation = (rule.first_relation if answer_field == "subject"
+                                 else rule.second_relation)
+                if not premise_is_extensional(edge_relation):
+                    return None
+                recursive_rules.append(rule)
+
+            def facts_at(relation_name: str, bound_field: str,
+                         value: str) -> list[FactEvidence]:
+                nonlocal work, scan_exhausted
+                rel_key = _tokens(relation_name)
+                value_key = _tokens(self._canonicalize_entity(value))
+                cache_key = (rel_key, bound_field, value_key)
+                if cache_key in lookup_cache:
+                    return lookup_cache[cache_key]
+                if isinstance(self._facts, SQLiteFactMap):
+                    rows = self._facts.lookup(rel_key, value_key, bound_field)
+                else:
+                    index = (self._facts_by_relation_object
+                             if bound_field == "object"
+                             else self._facts_by_relation_subject)
+                    keys = index.get((rel_key, value_key), ())
+                    rows = (self._facts[key] for key in keys)
+                remaining = max(0, inference_budget - work)
+                scanned = []
+                for fact in rows:
+                    if len(scanned) >= remaining:
+                        scan_exhausted = True
+                        break
+                    scanned.append(fact)
+                matches = [fact for fact in scanned
+                           if _tokens(fact.relation) == rel_key
+                           and _tokens(fact.object if bound_field == "object"
+                                       else fact.subject) == value_key
+                           and self._qualifiers_equal(
+                               fact.qualifiers, qualifier_key)]
+                work += len(scanned)
+                lookup_cache[cache_key] = matches
+                return matches
+
+            def has_kind(entity: str, kind: str) -> bool:
+                return any(_tokens(fact.object) == _tokens(kind)
+                           for fact in facts_at("is-a", "subject", entity))
+
+            for rule in base_rules:
+                if rule.third_relation is None:
+                    if answer_field == "subject":
+                        # X -first-> M -second-> bound
+                        for tail in facts_at(rule.second_relation, "object", bound):
+                            middle = tail.subject
+                            if (rule.middle_kind is not None
+                                    and not has_kind(middle, rule.middle_kind)):
+                                continue
+                            for head in facts_at(
+                                    rule.first_relation, "object", middle):
+                                candidate_keys[_tokens(head.subject)] = head.subject
+                                if len(candidate_keys) > 256:
+                                    return (sorted(candidate_keys.values()),
+                                            work, False)
+                    else:
+                        # bound -first-> M -second-> X
+                        for head in facts_at(rule.first_relation, "subject", bound):
+                            middle = head.object
+                            if (rule.middle_kind is not None
+                                    and not has_kind(middle, rule.middle_kind)):
+                                continue
+                            for tail in facts_at(
+                                    rule.second_relation, "subject", middle):
+                                candidate_keys[_tokens(tail.object)] = tail.object
+                                if len(candidate_keys) > 256:
+                                    return (sorted(candidate_keys.values()),
+                                            work, False)
+                    continue
+
+                first_kind = rule.middle_kind or ""
+                second_kind = rule.second_middle_kind or ""
+                if answer_field == "subject":
+                    # X -first-> M1 -second-> M2 -third-> bound
+                    for tail in facts_at(rule.third_relation, "object", bound):
+                        middle2 = tail.subject
+                        if not has_kind(middle2, second_kind):
+                            continue
+                        for middle_edge in facts_at(
+                                rule.second_relation, "object", middle2):
+                            middle1 = middle_edge.subject
+                            if not has_kind(middle1, first_kind):
+                                continue
+                            for head in facts_at(
+                                    rule.first_relation, "object", middle1):
+                                candidate_keys[_tokens(head.subject)] = head.subject
+                                if len(candidate_keys) > 256:
+                                    return (sorted(candidate_keys.values()),
+                                            work, False)
+                else:
+                    # bound -first-> M1 -second-> M2 -third-> X
+                    for head in facts_at(rule.first_relation, "subject", bound):
+                        middle1 = head.object
+                        if not has_kind(middle1, first_kind):
+                            continue
+                        for middle_edge in facts_at(
+                                rule.second_relation, "subject", middle1):
+                            middle2 = middle_edge.object
+                            if not has_kind(middle2, second_kind):
+                                continue
+                            for tail in facts_at(
+                                    rule.third_relation, "subject", middle2):
+                                candidate_keys[_tokens(tail.object)] = tail.object
+                                if len(candidate_keys) > 256:
+                                    return (sorted(candidate_keys.values()),
+                                            work, False)
+            # Close the supported linear recursive form. Each pass adds at
+            # least one distinct entity or terminates; fact lookup is cached
+            # and charged to the same caller-visible scan budget.
+            changed = True
+            while recursive_rules and changed:
+                changed = False
+                current = list(candidate_keys.values())
+                for rule in recursive_rules:
+                    for middle in current:
+                        if (rule.middle_kind is not None
+                                and not has_kind(middle, rule.middle_kind)):
+                            continue
+                        if answer_field == "subject":
+                            edges = facts_at(rule.first_relation, "object", middle)
+                            additions = (edge.subject for edge in edges)
+                        else:
+                            edges = facts_at(rule.second_relation, "subject", middle)
+                            additions = (edge.object for edge in edges)
+                        for answer in additions:
+                            key = _tokens(answer)
+                            if key not in candidate_keys:
+                                candidate_keys[key] = answer
+                                changed = True
+                                if len(candidate_keys) > 256:
+                                    return (sorted(candidate_keys.values()),
+                                            work, False)
+            return sorted(candidate_keys.values()), work, not scan_exhausted
+
         for answer_field, relation, evidence, _template, bound in matches:
             for fact in evidence:
                 value = fact.subject if answer_field == "subject" else fact.object
@@ -11678,10 +12964,19 @@ class CRMSKnowledgeBase:
                     " ".join(relation_key), requested_qualifiers):
                 continue
             known = all_known_entities()
+            possible_answers = list(known.values())
             if len(known) > 256:
-                inference_incomplete = True
-                continue
-            for possible_answer in known.values():
+                indexed = indexed_rule_answers(answer_field, relation, bound)
+                if indexed is None:
+                    inference_incomplete = True
+                    continue
+                possible_answers, candidate_work, candidate_complete = indexed
+                inference_budget -= candidate_work
+                if not candidate_complete or inference_budget < 1:
+                    inference_incomplete = True
+                if inference_budget < 1:
+                    continue
+            for possible_answer in possible_answers:
                 if inference_budget < 1:
                     inference_incomplete = True
                     break
@@ -11734,6 +13029,8 @@ class CRMSKnowledgeBase:
                                  for key in sorted(matched_aliases))
         language_evidence.extend(matched_induced_frames[key]
                                  for key in sorted(matched_induced_frames))
+        language_evidence.extend(matched_frame_transformations[key]
+                                 for key in sorted(matched_frame_transformations))
         language_evidence.extend(matched_optional_frame_evidence[key]
                                  for key in sorted(matched_optional_frame_evidence))
         if not answers:
@@ -11881,7 +13178,7 @@ class CRMSKnowledgeBase:
                 or _tokens(result.answer or "") != _tokens(answer)):
             raise ValueError("question example is not supported by one unique fact path")
 
-        words = _tokens(question)
+        words = _path_question_tokens(question)
         entity_words = _tokens(bound_entity)
         positions = [index for index in range(len(words) - len(entity_words) + 1)
                      if words[index:index + len(entity_words)] == entity_words]
@@ -11913,7 +13210,7 @@ class CRMSKnowledgeBase:
                           qualifiers: Mapping[str, str] | None = None
                           ) -> QuestionResult:
         """Resolve a learned frame, then execute its grounded relation path."""
-        words = _tokens(_display(question, "question"))
+        words = _path_question_tokens(_display(question, "question"))
         results: list[tuple[QuestionResult, str]] = []
         for (relations, prefix, suffix), entities in self._path_question_examples.items():
             key = (relations, prefix, suffix)

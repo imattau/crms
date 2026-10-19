@@ -77,6 +77,7 @@ def main() -> None:
         root = Path(folder)
         print("SQLite facts | median composed-answer latency (3 warm runs)")
         for count in (1_000, 100_000, 1_000_000):
+            print(f"starting {count:,}-fact case", flush=True)
             milliseconds, total = profile(count, root)
             print(f"{total:>12,} | {milliseconds:>8.2f} ms", flush=True)
 

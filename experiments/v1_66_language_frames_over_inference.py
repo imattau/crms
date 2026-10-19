@@ -85,12 +85,15 @@ def main() -> None:
             "/teach-polar Is Ada an ancestor of Cal?|Ada|ancestor|Cal|yes",
             "/teach-polar Is Dee an ancestor of Fay?|Dee|ancestor|Fay|yes",
             "Is Nia an ancestor of Pia?",
+            "why?",
             "/quit",
         ]
         output = subprocess.run(
             cli, input="\n".join(commands) + "\n", text=True,
             capture_output=True, check=True, timeout=20).stdout
-        if "Answer: Yes." not in output or "parent-transitivity" not in output:
+        if ("CRMS> Yes." not in output
+                or "Rule proof 1:" not in output
+                or "parent-transitivity" not in output):
             raise SystemExit(f"CLI did not answer through the learned frame and rule:\n{output}")
         loaded = CRMSKnowledgeBase.load(paths["knowledge.json"])
         response = loaded.ask("Is Nia an ancestor of Pia?")

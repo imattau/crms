@@ -10,7 +10,8 @@ PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
 from crms_chat import (  # noqa: E402
-    _exact_title_location_evidence, _natural_where_lookup)
+    _exact_title_location_evidence, _natural_where_lookup,
+    _natural_who_evidence)
 from crms_knowledge import CRMSKnowledgeBase  # noqa: E402
 from crms_research import CRMSSQLiteResearchIndex  # noqa: E402
 
@@ -53,6 +54,21 @@ def main() -> None:
         index.add_document(
             "family", "Family notes", "Cara is a parent of Dan.",
             "family.txt")
+        index.add_document(
+            "quarn", "Quarn Beacon", "Bree Hollis created Quarn Beacon.",
+            "quarn.txt")
+
+        if _natural_who_evidence(index, "Who created?") is not None:
+            raise SystemExit(
+                "entity-less Who question returned an arbitrary source sentence")
+        bounded_creator = _natural_who_evidence(
+            index, "Who created Python?")
+        if (bounded_creator is None
+                or bounded_creator.get("text")
+                != "Ada Lovelace created Python."):
+            raise SystemExit(
+                "bounded Who question did not preserve its full source sentence: "
+                f"{bounded_creator}")
 
         knowledge = CRMSKnowledgeBase()
         count_result = knowledge.research(
@@ -90,11 +106,22 @@ def main() -> None:
                    for candidate in parent_candidates):
             raise SystemExit(
                 f"parent-of relation was not retained: {parent_candidates}")
+        reversed_candidates = knowledge._discover_surface_relation_candidates(
+            "The Quarn Beacon designed Bree Hollis.", source="fixture:roles")
+        role_warning = next((item for candidate in reversed_candidates
+                             for item in candidate.language_evidence
+                             if item.get("role_direction_suspicion")), None)
+        if role_warning is None or not role_warning.get("review_required"):
+            raise SystemExit(
+                "article-led subject and name-shaped object did not surface a "
+                f"role-direction warning: {reversed_candidates}")
 
         knowledge_path = root / "knowledge.json"
         knowledge.save(knowledge_path)
         turns = [
             "Who created Python?",
+            "Who created?",
+            "What created Quarn Beacon?",
             "Who created Linux?",
             "How many Nobel Prizes did Marie Curie win?",
             "Did Marie Curie win a Nobel Prize?",
@@ -121,6 +148,17 @@ def main() -> None:
             raise SystemExit(
                 "conjunctive Who question did not disclose the missing part:\n"
                 + result.stdout)
+        if "Which thing do you mean? Please include the object" not in result.stdout:
+            raise SystemExit(
+                "underspecified Who question did not ask for its missing object:\n"
+                + result.stdout)
+        if ("your question asks ‘what’" not in result.stdout
+                or "Did you mean ‘who’ created it?" not in result.stdout
+                or "Review candidate" in result.stdout
+                   and "Bree Hollis — created → Quarn Beacon" in result.stdout):
+            raise SystemExit(
+                "What/Who role mismatch did not trigger clarification:\n"
+                + result.stdout)
         if ("Mount Everest is located in the Himalayas." not in result.stdout
                 or "Alan Turing worked at Bletchley Park." not in result.stdout):
             raise SystemExit(
@@ -137,8 +175,11 @@ def main() -> None:
                 + result.stdout)
 
         print("PASS: named-entity questions exclude competing subjects")
+        print("PASS: underspecified Who questions abstain; matched evidence keeps the full sentence")
+        print("PASS: person-shaped source subject prompts on a What question")
         print("PASS: location answers work from mixed-document sentences")
         print("PASS: parent-of extraction remains relational")
+        print("PASS: suspicious active-clause role direction is flagged for review")
         print("PASS: matching do-support questions return cited yes evidence")
         print("PASS: conjunctive Who reply discloses a missing answer")
         print("PASS: repeated pending-candidate turns complete without crashing")

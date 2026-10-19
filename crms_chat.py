@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import asdict
+from dataclasses import asdict, replace
 import copy
 import hashlib
 import json
@@ -19,9 +19,11 @@ from crms_codegen import (
 )
 from crms_inference import RuleReviewResult
 from crms_knowledge import (CRMSKnowledgeBase, FactCandidate, ResearchResult,
-                            _analyze_predicate_spelling)
+                            _analyze_predicate_spelling,
+                            _base_verb_for_surface)
 from crms_math import CRMSMath, render as render_math
 from crms_model import CRMSModel, Prediction
+from crms_nl_gate import gate_quoted_evidence, supports_question_type
 from crms_package import (
     export_model_database, install_model_database, inspect_model_database,
     model_database_has_research, model_database_rule_settings,
@@ -35,7 +37,7 @@ from crms_question_role_induction import (
     propose_active_role_alternation_frames,
 )
 from crms_research import (
-    CRMSResearchIndex, CRMSSQLiteResearchIndex, SearchHit,
+    CRMSResearchIndex, CRMSSQLiteResearchIndex, ExactTitleMatch, SearchHit,
     _RESEARCH_STOPWORDS, _is_code_source, _is_imported_structured_metadata,
     _research_query_terms,
     _sentence_context_kind, _sentence_spans,
@@ -49,6 +51,8 @@ from crms_translation import (
 
 HELP = """Commands:
   /help          show this guide
+  /effort quick|standard|thorough
+                 set session-only reasoning and evidence-check depth
   /source PATH|URL add a supported local file or capture one HTTP(S) page
   /source-dir PATH [--replace|--verify]
                  recursively index text/markup, tables, slides, chats, HTML, DOCX, ODT, EPUB, and PDFs
@@ -98,9 +102,9 @@ HELP = """Commands:
                  find repeated zero-frame sentence patterns across indexed sources
   /accept-corpus-frame SELECTOR[|DOC_OFFSET]
                  accept one source-separated frame and its cited example facts
-  /suggest-corpus-alignments [DOC_OFFSET]
+  /suggest-corpus-alignments [DOC_OFFSET|MAX_DOCS]
                  find repeated corpus-only predicate alignments; report-only
-  /accept-corpus-alignment SELECTOR[|DOC_OFFSET]
+  /accept-corpus-alignment SELECTOR[|DOC_OFFSET|MAX_DOCS]
                  accept a reviewed corpus predicate alignment from cited pairs
   /suggest-question-role-rules
                  report active subject/object role alternations; report-only
@@ -168,7 +172,7 @@ HELP = """Commands:
                  install a candidate only after passing holdout validation
   Accept rule candidate N as "ID" using held-out source prefix "PREFIX".
                  accept through the same source-separated validation gate
-  /infer-relation SUBJECT|RELATION|OBJECT
+  /infer-relation SUBJECT|RELATION|OBJECT[|name=value,...][|effort=quick/standard/thorough]
                  check a derived triple with cited rule premises
   /abduce SUBJECT|RELATION|OBJECT[|KEY=VALUE,...]
                  find bounded cited hypotheses from the latest pending candidates
@@ -584,9 +588,263 @@ def _natural_definition_topic(message: str) -> str | None:
 
 
 def _exact_title_hits(index: CRMSSQLiteResearchIndex,
-                      title: str) -> list[SearchHit]:
-    return [hit for hit in index.search(title, limit=50, context_chars=240)
-            if hit.title.casefold() == title.casefold()]
+                      title: str) -> list[ExactTitleMatch]:
+    return index.exact_title_matches(title)
+
+
+def _infobox_field_rows(document: Any, field: str
+                        ) -> list[tuple[str, int, int]]:
+    """Read one exact key from the leading normalized infobox block."""
+    rows = []
+    infobox_line = re.compile(r"^[ \t]*Infobox\b", re.IGNORECASE)
+    assignment = re.compile(r"^[ \t]*([\w -]{1,48})[ \t]*=[ \t]*(.*)$")
+    offset = 0
+    in_infobox = False
+    for line in document.text.splitlines(keepends=True):
+        content = line.rstrip("\r\n")
+        if not in_infobox:
+            in_infobox = infobox_line.match(content) is not None
+            offset += len(line)
+            continue
+        if not content.strip():
+            offset += len(line)
+            continue
+        assignment_match = assignment.match(content)
+        if assignment_match is not None:
+            key = " ".join(assignment_match.group(1).casefold().split())
+            value = assignment_match.group(2).strip()
+            if (key == field and value
+                    and value.casefold() not in {"unknown", "n/a", "none"}):
+                leading = len(content) - len(content.lstrip())
+                rows.append((value, offset + leading, offset + len(content)))
+            offset += len(line)
+            continue
+        # Normalized SimpleWiki infoboxes may contain unlabelled continuation
+        # lines between fields. Keep scanning the exact-title document, but
+        # only accept an exact key assignment and require all occurrences to
+        # agree before using its value.
+        offset += len(line)
+    return rows
+
+
+def _natural_who_structured_field_evidence(
+        index: CRMSSQLiteResearchIndex, question: str
+        ) -> dict[str, Any] | None:
+    """Answer bounded agent questions from an exact-title infobox field.
+
+    The field-to-role map is explicit and finite. The source field is quoted
+    and cited; this path does not turn the value into an accepted fact.
+    """
+    direct = re.fullmatch(
+        r"\s*who\s+(?:(?:did|do|does)\s+)?"
+        r"(?P<predicate>[a-z][\w’'-]*)\s+(?P<object>.+?)\s*[?!.]?\s*",
+        question, flags=re.IGNORECASE)
+    nominal = re.fullmatch(
+        r"\s*who\s+(?:is|was)\s+(?:the\s+)?"
+        r"(?P<predicate>[a-z][\w’'-]*)\s+of\s+(?P<object>.+?)\s*[?!.]?\s*",
+        question, flags=re.IGNORECASE)
+    match = nominal or direct
+    if match is None:
+        return None
+    field_by_predicate = {
+        "design": "designer", "designed": "designer", "designer": "designer",
+        "create": "creator", "created": "creator", "creator": "creator",
+        "invent": "inventor", "invented": "inventor", "inventor": "inventor",
+        "found": "founder", "founded": "founder", "founder": "founder",
+        "write": ("author", "writer"), "wrote": ("author", "writer"),
+        "written": ("author", "writer"), "author": ("author", "writer"),
+    }
+    predicate = match.group("predicate").casefold()
+    fields = field_by_predicate.get(predicate)
+    if fields is None:
+        return None
+    if isinstance(fields, str):
+        fields = (fields,)
+    entity = re.sub(r"^(?:the|a|an)\s+", "", match.group("object").strip(),
+                    flags=re.IGNORECASE)
+    entity_tokens = tuple(normalized_tokens(entity))
+    if not entity_tokens:
+        return None
+    hits = [hit for hit in index.search(entity, limit=100, context_chars=240)
+            if tuple(normalized_tokens(hit.title)) == entity_tokens
+            and not _is_code_source(hit.location)]
+    # Multiple exact-title records with potentially different metadata need
+    # entity clarification rather than a best-hit guess.
+    unique_documents = {hit.document_id: hit for hit in hits}
+    if len(unique_documents) != 1:
+        return None
+    hit = next(iter(unique_documents.values()))
+    document = index.document(hit.document_id)
+    field_rows = [row for field in fields
+                  for row in _infobox_field_rows(document, field)]
+    distinct_values = {normalized_tokens(value): value
+                       for value, _start, _end in field_rows}
+    if len(distinct_values) != 1:
+        return None
+    value, start, end = field_rows[0]
+    source_field = document.text[start:end]
+    field = next((field for field in fields
+                  if re.match(rf"\s*{re.escape(field)}\s*=", source_field,
+                              flags=re.IGNORECASE)), fields[0])
+    evidence = _cited_sentence_evidence(
+        index, hit, start, end,
+        tuple(dict.fromkeys((*entity_tokens, field, *normalized_tokens(value)))))
+    if evidence is None:
+        return None
+    evidence["structured_metadata"] = True
+    evidence["realized_answer"] = {
+        "text": f"{value} is listed as the {field} of {entity}.",
+        "source_title": hit.title or "source",
+        "citation": evidence["citation"],
+        "method": "exact-title structured-field realization",
+        "field_text": source_field,
+        "stored_as_fact": False,
+    }
+    return evidence
+
+
+def _natural_capital_field_evidence(
+        index: CRMSSQLiteResearchIndex, question: str
+        ) -> dict[str, Any] | None:
+    """Read a country's explicit capital field for a bounded question."""
+    match = re.fullmatch(
+        r"\s*(?:what|which(?:\s+city)?)\s+(?:is|was)\s+"
+        r"(?:the\s+)?capital(?:\s+city)?\s+of\s+"
+        r"(?P<entity>.+?)\s*[?!.]?\s*",
+        question, flags=re.IGNORECASE)
+    if match is None:
+        return None
+    entity = re.sub(r"^(?:the|a|an)\s+", "", match.group("entity").strip(),
+                    flags=re.IGNORECASE)
+    entity_tokens = tuple(normalized_tokens(entity))
+    if not entity_tokens:
+        return None
+    hits = [hit for hit in index.search(entity, limit=100, context_chars=240)
+            if tuple(normalized_tokens(hit.title)) == entity_tokens
+            and not _is_code_source(hit.location)]
+    unique_documents = {hit.document_id: hit for hit in hits}
+    if len(unique_documents) != 1:
+        return None
+    hit = next(iter(unique_documents.values()))
+    document = index.document(hit.document_id)
+    field_rows = _infobox_field_rows(document, "capital")
+    distinct_values = {normalized_tokens(value): value
+                       for value, _start, _end in field_rows}
+    if len(distinct_values) != 1:
+        return None
+    value, start, end = field_rows[0]
+    source_field = document.text[start:end]
+    evidence = _cited_sentence_evidence(
+        index, hit, start, end,
+        tuple(dict.fromkeys((*entity_tokens, "capital",
+                             *normalized_tokens(value)))))
+    if evidence is None:
+        return None
+    evidence["structured_metadata"] = True
+    evidence["realized_answer"] = {
+        "text": f"{value} is listed as the capital of {entity}.",
+        "source_title": hit.title or "source",
+        "citation": evidence["citation"],
+        "method": "exact-title structured-field realization",
+        "field_text": source_field,
+        "stored_as_fact": False,
+    }
+    return evidence
+
+
+def _natural_birthplace_field_evidence(
+        index: CRMSSQLiteResearchIndex, entity: str
+        ) -> dict[str, Any] | None:
+    """Read an exact-title person's explicit birthplace field."""
+    entity_tokens = tuple(normalized_tokens(entity))
+    if not entity_tokens:
+        return None
+    hits = [hit for hit in index.search(entity, limit=100, context_chars=240)
+            if tuple(normalized_tokens(hit.title)) == entity_tokens
+            and not _is_code_source(hit.location)]
+    documents = {hit.document_id: hit for hit in hits}
+    if len(documents) != 1:
+        return None
+    hit = next(iter(documents.values()))
+    document = index.document(hit.document_id)
+    field_rows = _infobox_field_rows(document, "birth_place")
+    values = {normalized_tokens(value): value
+              for value, _start, _end in field_rows}
+    if len(values) != 1:
+        return None
+    value, start, end = field_rows[0]
+    evidence = _cited_sentence_evidence(
+        index, hit, start, end,
+        tuple(dict.fromkeys((*entity_tokens,
+                             *normalized_tokens(document.text[start:end]),
+                             *normalized_tokens(value)))))
+    if evidence is None:
+        return None
+    evidence["structured_metadata"] = True
+    evidence["realized_answer"] = {
+        "text": f"The source lists {entity}'s birthplace as {value}.",
+        "source_title": hit.title or "source",
+        "citation": evidence["citation"],
+        "method": "exact-title structured-field realization",
+        "field_text": document.text[start:end],
+        "stored_as_fact": False,
+    }
+    return evidence
+
+
+def _natural_type_field_evidence(
+        index: CRMSSQLiteResearchIndex, question: str
+        ) -> dict[str, Any] | None:
+    """Read an exact-title type/class/kind field for a bounded question."""
+    match = re.fullmatch(
+        r"\s*(?:what\s+(?:type|kind)(?:\s+of\s+[\w’'-]+)?\s+is\s+"
+        r"(?P<entity_a>.+?)|what\s+is\s+the\s+(?:type|kind)\s+of\s+"
+        r"(?P<entity_b>.+?))\s*[?!.]?\s*",
+        question, flags=re.IGNORECASE)
+    if match is None:
+        return None
+    entity = re.sub(r"^(?:a|an|the)\s+", "",
+                    (match.group("entity_a") or match.group("entity_b")).strip(),
+                    flags=re.IGNORECASE)
+    entity_tokens = tuple(normalized_tokens(entity))
+    if not entity_tokens:
+        return None
+    hits = [hit for hit in index.search(entity, limit=100, context_chars=240)
+            if tuple(normalized_tokens(hit.title)) == entity_tokens
+            and not _is_code_source(hit.location)]
+    documents = {hit.document_id: hit for hit in hits}
+    if len(documents) != 1:
+        return None
+    hit = next(iter(documents.values()))
+    document = index.document(hit.document_id)
+    fields = ("type", "class", "kind", "entity type")
+    field_rows = [(field, value, start, end)
+                  for field in fields
+                  for value, start, end in _infobox_field_rows(document, field)
+                  if len(normalized_tokens(value)) <= 8]
+    values = {normalized_tokens(value): value
+              for _field, value, _start, _end in field_rows}
+    if len(values) != 1:
+        return None
+    field, value, start, end = field_rows[0]
+    evidence = _cited_sentence_evidence(
+        index, hit, start, end,
+        tuple(dict.fromkeys((*entity_tokens,
+                             *normalized_tokens(document.text[start:end]),
+                             *normalized_tokens(value)))))
+    if evidence is None:
+        return None
+    evidence["structured_metadata"] = True
+    evidence["realized_answer"] = {
+        "text": f"The source lists {entity}'s type as {value}.",
+        "source_title": hit.title or "source",
+        "citation": evidence["citation"],
+        "method": "exact-title structured-field realization",
+        "field_text": document.text[start:end],
+        "field_name": field,
+        "stored_as_fact": False,
+    }
+    return evidence
 
 
 def _exact_title_definition(index: CRMSSQLiteResearchIndex,
@@ -595,23 +853,189 @@ def _exact_title_definition(index: CRMSSQLiteResearchIndex,
     hits = _exact_title_hits(index, topic)
     if len(hits) != 1:
         return None
-    summary = index.summarize(topic, limit=20, precomputed_hits=hits)
     title_pattern = re.compile(
-        r"^\s*" + re.escape(topic) +
-        r"(?:\s*\([^)]*\))?\s+(?:is|are|was|were|means|refers\s+to)\b",
+        r"^\s*(?:the\s+)?" + re.escape(topic) +
+        r"(?:\s*\([^)]*\))?\s+(?:(?:is|are|was|were)\s+"
+        r"(?:a|an|the)\s+|means\s+|refers\s+to\s+)",
         flags=re.IGNORECASE)
-    definitions = [sentence for sentence in summary.sentences
-                   if title_pattern.search(sentence.text)]
-    if len(definitions) != 1:
+    hit = hits[0]
+    document = index.document(hit.document_id)
+    definitions = [(start, end, document.text[start:end])
+                   for start, end in _sentence_spans(document.text)
+                   if title_pattern.search(document.text[start:end])]
+    if not definitions:
         return None
-    sentence = definitions[0]
+    # An exact-title page can state a definition more than once in its lead.
+    # Use the first grammatical title-led definition; do not treat later
+    # repetitions as conflicting claims or select one by lexical score.
+    definitions.sort(key=lambda item: item[0])
+    start, end, text = definitions[0]
+    if _sentence_context_kind(text, document.text, start) != "assertion":
+        return None
+    evidence = _cited_sentence_evidence(
+        index, hit, start, end, tuple(normalized_tokens(topic)))
+    if evidence is None:
+        return None
     return {
-        "document_id": sentence.document_id,
-        "title": sentence.title,
-        "location": sentence.location,
-        "text": sentence.text,
-        "citation": sentence.citation,
+        "document_id": evidence["document_id"],
+        "title": evidence["title"],
+        "location": evidence["location"],
+        "text": text,
+        "citation": evidence["citation"],
     }
+
+
+def _natural_superlative_question(message: str
+                                 ) -> tuple[str, str] | None:
+    """Parse bounded category-superlative questions without guessing a class."""
+    which = re.fullmatch(
+        r"\s*which\s+(?P<category>[a-z][\w-]*(?:\s+[a-z][\w-]*){0,2})\s+"
+        r"(?:is|are|was|were)\s+(?:the\s+)?"
+        r"(?P<degree>largest|biggest|smallest)\s*[?!.]?\s*",
+        message, flags=re.IGNORECASE)
+    what = re.fullmatch(
+        r"\s*what\s+is\s+(?:the\s+)?"
+        r"(?P<degree>largest|biggest|smallest)\s+"
+        r"(?P<category>[a-z][\w-]*(?:\s+[a-z][\w-]*){0,2})\s*[?!.]?\s*",
+        message, flags=re.IGNORECASE)
+    match = which or what
+    if match is None:
+        return None
+    return match.group("category").strip(), match.group("degree").casefold()
+
+
+def _natural_superlative_evidence(
+        index: CRMSSQLiteResearchIndex, message: str, *,
+        maximum_hits: int = 250) -> dict[str, Any] | None:
+    """Find a title-led sentence that explicitly names a category extreme.
+
+    This deliberately supports only direct copular patterns such as
+    ``Jupiter is the largest planet``. It will not answer from phrases like
+    ``largest celestial body to be so`` or ``third largest chain``.
+    """
+    parsed = _natural_superlative_question(message)
+    if parsed is None:
+        return None
+    category, degree = parsed
+    if (type(maximum_hits) is not int or not 1 <= maximum_hits <= 1000):
+        raise ValueError("superlative retrieval bound is outside supported limits")
+    category_words = tuple(normalized_tokens(category))
+    if not category_words:
+        return None
+    query = " ".join((degree, *category_words))
+    matches: dict[tuple[str, ...], dict[str, Any]] = {}
+    for hit in index.search(query, limit=maximum_hits, context_chars=240):
+        if _is_code_source(hit.location):
+            continue
+        document = index.document(hit.document_id)
+        exact_slice = (0 <= hit.start < hit.end
+                       and document.text[hit.start:hit.end] == hit.snippet)
+        if exact_slice:
+            spans = [(hit.start + start, hit.start + end)
+                     for start, end in _sentence_spans(hit.snippet)]
+        else:
+            spans = _sentence_spans(document.text)
+        title = hit.title.split("(", 1)[0].strip()
+        if not title:
+            continue
+        pattern = re.compile(
+            r"^\s*(?:the\s+)?" + re.escape(title)
+            + r"\s+(?:is|was)\s+the\s+" + re.escape(degree)
+            + r"\s+" + r"\s+".join(map(re.escape, category_words))
+            + r"\b", flags=re.IGNORECASE)
+        for start, end in spans:
+            sentence = document.text[start:end]
+            if (not pattern.search(sentence)
+                    or _sentence_context_kind(sentence, document.text, start)
+                        != "assertion"):
+                continue
+            evidence = _cited_sentence_evidence(
+                index, hit, start, end,
+                tuple(dict.fromkeys((*category_words, degree,
+                                     *normalized_tokens(title)))))
+            if evidence is not None:
+                matches.setdefault(tuple(normalized_tokens(title)), evidence)
+    if len(matches) != 1:
+        return None
+    return next(iter(matches.values()))
+
+
+def _natural_when_question(message: str) -> tuple[str, str] | None:
+    match = re.fullmatch(
+        r"\s*when\s+did\s+(?P<subject>.+?)\s+"
+        r"(?P<predicate>[a-z][\w’'-]*)\s*[?!.]?\s*",
+        message, flags=re.IGNORECASE)
+    if match is None:
+        return None
+    subject, predicate = match.group("subject", "predicate")
+    return subject.strip(), predicate.casefold()
+
+
+def _natural_when_evidence(index: CRMSSQLiteResearchIndex,
+                           message: str) -> dict[str, Any] | None:
+    """Find a sentence that states the named subject, action, and a date."""
+    parsed = _natural_when_question(message)
+    if parsed is None:
+        return None
+    subject, predicate = parsed
+    subject_terms = tuple(normalized_tokens(subject))
+    predicate_terms = tuple(normalized_tokens(predicate))
+    if not subject_terms or len(predicate_terms) != 1:
+        return None
+    query = " ".join(subject_terms)
+    dated = re.compile(
+        r"\b(?:in|on|during)\s+(?:(?:January|February|March|April|May|June|"
+        r"July|August|September|October|November|December)\s+)?"
+        r"(?:\d{1,2},?\s+)?(?:1[0-9]{3}|20[0-9]{2})\b", re.I)
+    found: dict[str, list[dict[str, Any]]] = {}
+    for hit in index.search(query, limit=100, context_chars=240):
+        if not set(subject_terms) <= set(hit.matched_terms) or _is_code_source(hit.location):
+            continue
+        document = index.document(hit.document_id)
+        spans = (_sentence_spans(hit.snippet)
+                 if 0 <= hit.start < hit.end
+                 and document.text[hit.start:hit.end] == hit.snippet
+                 else _sentence_spans(document.text))
+        base_offset = hit.start if spans and document.text[hit.start:hit.end] == hit.snippet else 0
+        for local_start, local_end in spans:
+            start, end = base_offset + local_start, base_offset + local_end
+            sentence = document.text[start:end]
+            if _sentence_context_kind(sentence, document.text, start) != "assertion":
+                continue
+            words = tuple(normalized_tokens(sentence))
+            positions = [i for i in range(len(words) - len(subject_terms) + 1)
+                         if words[i:i + len(subject_terms)] == subject_terms]
+            if len(positions) != 1:
+                continue
+            subj_end = positions[0] + len(subject_terms)
+            date_match = dated.search(sentence)
+            if date_match is None:
+                continue
+            date_words = tuple(normalized_tokens(date_match.group()))
+            date_pos = next((i for i in range(len(words) - len(date_words) + 1)
+                             if words[i:i + len(date_words)] == date_words), -1)
+            if date_pos <= subj_end:
+                continue
+            relation_positions = [i for i in range(subj_end, date_pos)
+                                  if words[i] == predicate_terms[0]
+                                  or (predicate_terms[0] == "end"
+                                      and words[i] in {"ends", "ended"})
+                                  or _base_verb_for_surface((words[i],)) == predicate_terms
+                                  or _analyze_predicate_spelling(
+                                      predicate_terms[0], words[i]) is not None]
+            if not relation_positions:
+                continue
+            between = words[subj_end:date_pos]
+            if any(token in {"not", "never", "n't", "didn't", "doesn't", "wasn't"}
+                   for token in between):
+                continue
+            evidence = _cited_sentence_evidence(
+                index, hit, start, end, tuple(hit.matched_terms))
+            if evidence is not None:
+                found.setdefault(date_match.group(), []).append(evidence)
+    if len(found) != 1:
+        return {"conflicts": found} if found else None
+    return next(iter(found.values()))[0]
 
 
 def _natural_where_lookup(message: str) -> tuple[str, str] | None:
@@ -666,6 +1090,27 @@ def _candidates_relevant_to_answer(
         if len(query_terms & set(_research_query_terms(
             f"{candidate.subject} {candidate.relation} "
             f"{candidate.object}"))) >= 2]
+
+
+def _candidates_matching_who_object(
+        question: str, candidates: list[FactCandidate]
+        ) -> list[FactCandidate]:
+    """Keep direct Who proposals tied to the object named by the question."""
+    match = re.fullmatch(
+        r"\s*who\s+(?:(?:did|do|does)\s+)?"
+        r"[a-z][\w’'-]*\s+(?P<object>.+?)\s*[?!.]?\s*",
+        question, flags=re.IGNORECASE)
+    if match is None:
+        return candidates
+    requested = set(normalized_tokens(
+        re.sub(r"^(?:the|a|an)\s+", "", match.group("object").strip(),
+               flags=re.IGNORECASE)))
+    if not requested:
+        return []
+    minimum_overlap = 1 if len(requested) == 1 else (len(requested) + 1) // 2
+    return [candidate for candidate in candidates
+            if len(requested & set(normalized_tokens(candidate.object)))
+            >= minimum_overlap]
 
 
 def _natural_typed_relation_source_evidence(
@@ -1000,8 +1445,193 @@ def _natural_object_wh_source_evidence(
     return None
 
 
+def _natural_count_question(message: str) -> tuple[str, str, str] | None:
+    """Parse a bounded active ``how many`` question into object, subject, verb."""
+    match = re.fullmatch(
+        r"\s*how\s+many\s+(?P<object>.+?)\s+"
+        r"(?:did|do|does|have|has)\s+(?P<subject>.+?)\s+"
+        r"(?P<predicate>[a-z][\w’'-]*)\s*[?!.]?\s*",
+        message, flags=re.IGNORECASE)
+    if match is None:
+        return None
+    values = tuple(match.group(name).strip()
+                   for name in ("object", "subject", "predicate"))
+    return values if all(values) else None
+
+
+def _natural_coordinated_who(message: str) -> tuple[str, tuple[str, ...]] | None:
+    """Parse a bounded two-to-five object list in a coordinated Who question."""
+    match = re.fullmatch(
+        r"\s*who\s+(?:(?:did|do|does)\s+)?"
+        r"(?P<predicate>[a-z][\w’'-]*)\s+(?P<objects>.+?)\s*[?!.]?\s*",
+        message, flags=re.IGNORECASE)
+    if match is None or match.group("predicate").casefold() in {
+            "is", "are", "was", "were", "has", "have", "had"}:
+        return None
+    raw = match.group("objects").strip()
+    # Commas delimit list items; the final conjunction is optional when a
+    # serial comma is used. Preserve ordinary multiword entity names.
+    if "," in raw:
+        chunks = [part.strip() for part in raw.split(",") if part.strip()]
+        if chunks and chunks[-1].casefold().startswith("and "):
+            chunks[-1] = chunks[-1][4:].strip()
+        elif chunks and re.match(r"^and\s+", chunks[-1], re.I):
+            chunks[-1] = re.sub(r"^and\s+", "", chunks[-1], flags=re.I)
+        objects = chunks
+    else:
+        pair = re.fullmatch(r"(?P<first>.+?)\s+and\s+(?P<second>.+)", raw,
+                            flags=re.IGNORECASE)
+        objects = ([pair.group("first").strip(), pair.group("second").strip()]
+                   if pair is not None else [raw])
+    objects = [re.sub(r"^(?:a|an|the)\s+", "", item,
+                      flags=re.IGNORECASE).strip() for item in objects]
+    if not 2 <= len(objects) <= 5 or any(not item for item in objects):
+        return None
+    if len({tuple(normalized_tokens(item)) for item in objects}) != len(objects):
+        return None
+    return match.group("predicate"), tuple(objects)
+
+
+def _split_explicit_compound_questions(message: str) -> tuple[str, ...]:
+    """Split only independently phrased question clauses, never shared-verb lists."""
+    starts_question = (r"(?:also\s*,?\s+)?(?:who|whom|what|which|where|when|why|how|"
+                       r"is|are|was|were|do|does|did|can|could|has|have|had)\b")
+    pieces = re.split(
+        rf"(?<=[?])\s+(?={starts_question})|"
+        rf",?\s+and\s+(?={starts_question})",
+        message.strip(), flags=re.IGNORECASE)
+    normalized = []
+    for piece in pieces:
+        piece = re.sub(r"^also\s*,?\s+", "", piece.strip(), flags=re.IGNORECASE)
+        if piece:
+            normalized.append(piece)
+    if (not 2 <= len(normalized) <= 5
+            or any(re.match(rf"\s*{starts_question}", piece,
+                            flags=re.IGNORECASE) is None
+                   for piece in normalized)):
+        return ()
+    return tuple(normalized)
+
+
+def _natural_count_evidence(index: CRMSSQLiteResearchIndex,
+                            message: str) -> dict[str, Any] | None:
+    """Return only count evidence with the asked entity, object and relation."""
+    parsed = _natural_count_question(message)
+    if parsed is None:
+        return None
+    object_text, subject_text, predicate = parsed
+    subject_terms = tuple(normalized_tokens(subject_text))
+    object_terms = tuple(normalized_tokens(object_text))
+    predicate_terms = tuple(normalized_tokens(predicate))
+    if not subject_terms or not object_terms or len(predicate_terms) != 1:
+        return None
+    query = " ".join((*subject_terms, *object_terms))
+    quantity_words = {
+        "zero", "one", "two", "three", "four", "five", "six", "seven",
+        "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen",
+        "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty",
+        "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety",
+        "hundred", "thousand", "million", "billion",
+    }
+    evidence_by_count: dict[str | None, list[dict[str, Any]]] = {}
+    required_terms = set(subject_terms) | set(object_terms)
+    for hit in index.search(query, limit=100, context_chars=240):
+        if not required_terms <= set(hit.matched_terms) or _is_code_source(hit.location):
+            continue
+        document = index.document(hit.document_id)
+        if (0 <= hit.start < hit.end
+                and document.text[hit.start:hit.end] == hit.snippet):
+            spans = [(hit.start + start, hit.start + end)
+                     for start, end in _sentence_spans(hit.snippet)]
+        else:
+            spans = _sentence_spans(document.text)
+        for start, end in spans:
+            sentence = document.text[start:end]
+            if _sentence_context_kind(sentence, document.text, start) != "assertion":
+                continue
+            words = tuple(normalized_tokens(sentence))
+
+            def occurrences(phrase: tuple[str, ...]) -> list[int]:
+                return [position for position in range(len(words) - len(phrase) + 1)
+                        if words[position:position + len(phrase)] == phrase]
+
+            subjects = occurrences(subject_terms)
+            objects = occurrences(object_terms)
+            if len(subjects) != 1 or len(objects) != 1:
+                continue
+            subject_end = subjects[0] + len(subject_terms)
+            object_start = objects[0]
+            if subject_end >= object_start:
+                continue
+            relation_positions = []
+            for position in range(subject_end, object_start):
+                surface = words[position]
+                base = _base_verb_for_surface((surface,))
+                if (surface == predicate_terms[0]
+                        or base == predicate_terms
+                        or _analyze_predicate_spelling(
+                            predicate_terms[0], surface) is not None):
+                    relation_positions.append(position)
+            if not relation_positions:
+                continue
+            between = words[subject_end:object_start]
+            if any(token in {
+                    "not", "never", "no", "without", "n't", "didn't",
+                    "doesn't", "don't", "hasn't", "haven't", "isn't",
+                    "aren't", "wasn't", "weren't", "can't", "cannot",
+            } for token in between):
+                continue
+            quantity = None
+            quantity_start = max(subject_end, object_start - 4)
+            quantity_candidates = [
+                token for token in words[quantity_start:object_start]
+                if (token.isdigit() or token.replace(",", "").isdigit()
+                    or token in quantity_words)
+            ]
+            if quantity_candidates:
+                quantity = quantity_candidates[-1]
+            matched = tuple(sorted(
+                required_terms | {words[position] for position in relation_positions}))
+            evidence = _cited_sentence_evidence(index, hit, start, end, matched)
+            if evidence is None:
+                continue
+            evidence_by_count.setdefault(quantity, []).append(evidence)
+    if not evidence_by_count:
+        return None
+    explicit_counts = {
+        count: rows for count, rows in evidence_by_count.items()
+        if count is not None
+    }
+    if len(explicit_counts) > 1:
+        return {
+            "conflicting_counts": sorted(
+                str(value) for value in explicit_counts),
+            "evidence": [item for value in sorted(explicit_counts, key=str)
+                         for item in explicit_counts[value]],
+        }
+    if explicit_counts:
+        quantity, evidence = next(iter(explicit_counts.items()))
+    else:
+        quantity, evidence = None, evidence_by_count[None]
+    evidence.sort(key=lambda item: (len(item["text"]), item["document_id"],
+                                   item["citation"]))
+    selected = dict(evidence[0])
+    selected["quantity"] = quantity
+    selected["supporting_source_count"] = len({
+        item["document_id"] for item in evidence})
+    return selected
+
+
 def _natural_polar_claim(message: str) -> tuple[str, str, str, str] | None:
     """Parse bounded copular-relation and do-support yes/no questions."""
+    passive = re.fullmatch(
+        r"\s*(?:is|are|was|were)\s+(?P<object>.+?)\s+"
+        r"(?P<relation>[a-z][\w’'-]*)\s+by\s+(?P<subject>.+?)\s*[?!.]?\s*",
+        message, flags=re.IGNORECASE)
+    if passive is not None:
+        return (passive.group("subject").strip(),
+                passive.group("relation").strip(),
+                passive.group("object").strip(), "passive")
     copular = re.fullmatch(
         r"\s*(?P<aux>is|are|was|were)\s+(?P<subject>.+?)\s+"
         r"(?:(?:the|a|an)\s+)?(?P<relation>[a-z][\w’'-]*(?:\s+"
@@ -1017,16 +1647,20 @@ def _natural_polar_claim(message: str) -> tuple[str, str, str, str] | None:
         r"[A-Z][\w’'-]*(?:\s+(?:(?:van|von|de|del|da|di|la|le)\s+)?"
         r"[A-Z][\w’'-]*)*")
     active = re.fullmatch(
-        rf"\s*(?P<aux>(?i:did|do|does))\s+(?P<subject>{proper_name})\s+"
+        rf"\s*(?P<aux>(?i:did|do|does))\s+"
+        rf"(?P<subject>(?:the\s+)?{proper_name})\s+"
         r"(?P<relation>[a-z][\w’'-]*)"
-        r"(?:\s+(?P<preposition>at|in|on|for|to|from|with|of))?\s+"
+        r"(?:\s+(?P<preposition>through|into|across|along|within|near|"
+        r"from|to|in|at|on|for|with|of))?\s+"
         r"(?P<object>.+?)\s*[?!.]?\s*",
         message)
     if active is not None:
+        subject = re.sub(r"^(?:the|a|an)\s+", "",
+                         active.group("subject").strip(), flags=re.IGNORECASE)
         relation = active.group("relation").strip()
         if active.group("preposition"):
             relation += " " + active.group("preposition").strip()
-        return (active.group("subject").strip(),
+        return (subject,
                 relation,
                 active.group("object").strip(), active.group("aux"))
     return None
@@ -1057,24 +1691,43 @@ def _natural_polar_evidence(
     query = " ".join((subject, object_))
     candidates: dict[tuple[Any, ...], FactCandidate] = {}
     required_entity_terms = set(wanted_subject) | set(wanted_object)
+    exact_title_hits = _exact_title_hits(index, subject)
+    exact_title_document_ids = {hit.document_id for hit in exact_title_hits}
+    exact_title_is_unique = len(exact_title_document_ids) == 1
     for hit in index.search(query, limit=100, context_chars=240):
         if not required_entity_terms <= set(hit.matched_terms):
             continue
         if _is_code_source(hit.location):
             continue
         document = index.document(hit.document_id)
+        allowed_subject_forms = {wanted_subject}
+        if (exact_title_is_unique
+                and hit.document_id in exact_title_document_ids
+                and len(wanted_subject) > 1):
+            # Article prose often uses only the surname after the title has
+            # established the person's identity. Permit that local alias only
+            # inside the unique exact-title article, never across search hits.
+            title_entity = tuple(normalized_tokens(
+                hit.title.split("(", 1)[0].strip()))
+            if title_entity == wanted_subject:
+                allowed_subject_forms.add((wanted_subject[-1],))
         for start, end in _sentence_spans(document.text):
             sentence = document.text[start:end]
             if not sentence.strip():
                 continue
             if _sentence_context_kind(sentence, document.text, start) != "assertion":
                 continue
-            sentence_words = set(normalized_tokens(sentence))
-            if not required_entity_terms <= sentence_words:
+            sentence_terms = tuple(normalized_tokens(sentence))
+            subject_in_sentence = any(
+                any(sentence_terms[position:position + len(form)] == form
+                    for position in range(len(sentence_terms) - len(form) + 1))
+                for form in allowed_subject_forms)
+            if (not subject_in_sentence
+                    or not set(wanted_object) <= set(sentence_terms)):
                 continue
             matched_terms = tuple(sorted(
                 (set(wanted_subject) | set(wanted_relation) | set(wanted_object))
-                & sentence_words))
+                & set(sentence_terms)))
             if not matched_terms:
                 continue
             evidence = _cited_sentence_evidence(
@@ -1092,7 +1745,14 @@ def _natural_polar_evidence(
                                 or _analyze_predicate_spelling(left, right) is not None
                                 for left, right in zip(wanted_relation,
                                                        relation_words))))
-                if (tuple(normalized_tokens(candidate.subject)) != wanted_subject
+                candidate_subject = entity_terms(candidate.subject)
+                subject_matches = (candidate_subject == wanted_subject
+                                   or (exact_title_is_unique
+                                       and hit.document_id
+                                           in exact_title_document_ids
+                                       and candidate_subject
+                                           in allowed_subject_forms))
+                if (not subject_matches
                         or not relation_matches
                         or entity_terms(candidate.object) != wanted_object):
                     continue
@@ -1100,6 +1760,72 @@ def _natural_polar_evidence(
                        relation_words, entity_terms(candidate.object),
                        candidate.polarity)
                 candidates.setdefault(key, candidate)
+            if (exact_title_is_unique
+                    and hit.document_id in exact_title_document_ids):
+                # A title-led biography commonly switches to surname-only
+                # subjects. When the general frame extractor cannot parse
+                # such a sentence, accept only an explicit ordered surface
+                # pattern: local subject alias, inflected requested verb,
+                # requested preposition, and the complete object phrase.
+                relation_start = wanted_relation[0]
+                for subject_form in allowed_subject_forms:
+                    subject_positions = [
+                        position for position in range(
+                            len(sentence_terms) - len(subject_form) + 1)
+                        if sentence_terms[position:position + len(subject_form)]
+                        == subject_form]
+                    for subject_position in subject_positions:
+                        verb_position = subject_position + len(subject_form)
+                        while (verb_position < len(sentence_terms)
+                               and sentence_terms[verb_position] in {
+                                   "do", "does", "did", "not", "never",
+                                   "n't", "don't", "doesn't", "didn't",
+                               }):
+                            verb_position += 1
+                        if verb_position >= len(sentence_terms):
+                            continue
+                        surface_verb = sentence_terms[verb_position]
+                        if (surface_verb != relation_start
+                                and _analyze_predicate_spelling(
+                                    relation_start, surface_verb) is None):
+                            continue
+                        relation_end = verb_position + 1
+                        if (len(wanted_relation) > 1
+                                and sentence_terms[relation_end:
+                                                   relation_end + len(wanted_relation) - 1]
+                                != wanted_relation[1:]):
+                            continue
+                        relation_end += len(wanted_relation) - 1
+                        object_position = relation_end
+                        if (object_position < len(sentence_terms)
+                                and sentence_terms[object_position] in {"a", "an", "the"}):
+                            object_position += 1
+                        if (sentence_terms[object_position:
+                                           object_position + len(wanted_object)]
+                                != wanted_object):
+                            continue
+                        polarity = not any(token in {
+                            "not", "never", "no", "n't", "didn't",
+                            "doesn't", "don't", "isn't", "wasn't",
+                        } for token in sentence_terms[
+                            subject_position + len(subject_form):verb_position])
+                        alias = " ".join(subject_form)
+                        candidate = FactCandidate(
+                            subject, relation, object_, evidence["citation"],
+                            f"<subject> {relation} <object>", sentence, polarity,
+                            language_evidence=({
+                                "kind": "page_title_coreference",
+                                "method": "exact-title local subject alias and ordered predicate",
+                                "page_title": hit.title,
+                                "subject_alias": alias,
+                                "review_required": True,
+                                "warning": ("The source page title licenses the "
+                                            "local surname alias; verify this "
+                                            "quoted relation before storing it."),
+                            },))
+                        key = (wanted_subject, wanted_relation, wanted_object,
+                               polarity)
+                        candidates.setdefault(key, candidate)
     if candidates:
         return [candidates[key] for key in sorted(candidates)]
 
@@ -1341,7 +2067,8 @@ def _render_source_lookup(index: CRMSSQLiteResearchIndex,
     return "\n".join(lines)
 
 
-def _cited_sentence_evidence(index: CRMSSQLiteResearchIndex, hit: SearchHit,
+def _cited_sentence_evidence(
+        index: CRMSSQLiteResearchIndex, hit: SearchHit | ExactTitleMatch,
                              start: int, end: int,
                              matched_terms: tuple[str, ...]
                              ) -> dict[str, Any] | None:
@@ -1373,7 +2100,8 @@ def _cited_sentence_evidence(index: CRMSSQLiteResearchIndex, hit: SearchHit,
             return None
     sentence = document.text[start:end]
     sentence_hit = SearchHit(
-        hit.document_id, hit.title, hit.location, hit.score, sentence,
+        hit.document_id, hit.title, hit.location,
+        getattr(hit, "score", 0.0), sentence,
         start, end, matched_terms, page_number, match_start, match_end)
     try:
         citation = index.citation(sentence_hit)
@@ -1382,6 +2110,39 @@ def _cited_sentence_evidence(index: CRMSSQLiteResearchIndex, hit: SearchHit,
     return {"document_id": hit.document_id, "title": hit.title,
             "location": hit.location, "text": sentence,
             "citation": citation}
+
+
+def _top_retrieved_sentence_evidence(
+        index: CRMSSQLiteResearchIndex, question: str, *,
+        limit: int = 12,
+        licensed_predicates: list[dict[str, Any]] | None = None
+        ) -> list[dict[str, Any]]:
+    """Return exact asserted sentences from the top FTS hits, never a corpus scan."""
+    evidence: dict[tuple[str, str], dict[str, Any]] = {}
+    predicate_forms = sorted({str(record.get("text", "")).strip()
+                              for record in licensed_predicates or []
+                              if record.get("kind") == "licensed_predicate"
+                              and record.get("text")})
+    retrieval_query = " ".join([question, *predicate_forms])
+    for hit in index.search(retrieval_query, limit=limit, context_chars=480):
+        document = index.document(hit.document_id)
+        snippet_is_exact = (0 <= hit.start <= hit.end <= len(document.text)
+                            and document.text[hit.start:hit.end] == hit.snippet)
+        if not snippet_is_exact:
+            continue
+        for local_start, local_end in _sentence_spans(hit.snippet):
+            start = hit.start + local_start
+            end = hit.start + local_end
+            sentence = document.text[start:end]
+            if (_sentence_context_kind(sentence, document.text, start)
+                    != "assertion"):
+                continue
+            row = _cited_sentence_evidence(
+                index, hit, start, end, tuple(hit.matched_terms))
+            if row is not None:
+                key = (hit.document_id, sentence.casefold())
+                evidence.setdefault(key, row)
+    return list(evidence.values())
 
 
 def _exact_title_location_evidence(
@@ -1452,7 +2213,11 @@ def _exact_title_location_evidence(
             if hit.document_id in exact_title_document_ids and len(entity_tokens) > 1:
                 # Exact-title article context licenses its conventional final
                 # name only as the subject alias in that same article.
-                valid_subject_prefixes.add((entity_tokens[-1],))
+                page_name = entity_tokens[-1]
+                valid_subject_prefixes.add((page_name,))
+                valid_subject_prefixes.update(
+                    (page_name, auxiliary)
+                    for auxiliary in ("is", "was", "are", "were"))
             if subject_tokens not in valid_subject_prefixes:
                 continue
             if _sentence_context_kind(
@@ -1633,12 +2398,22 @@ def _natural_who_evidence(index: CRMSSQLiteResearchIndex,
         r"\s*who\s+(?:(?:did|do|does)\s+)?"
         r"(?P<predicate>[a-z][\w’'-]*)\s+(?P<object>.+?)\s*[?!.]?\s*",
         question, flags=re.IGNORECASE)
+    if direct_question is None and len(focus) < 2:
+        # A bare predicate such as “Who created?” has no answer-bearing
+        # object. Do not let the generic lexical fallback choose any sentence
+        # that happens to contain that verb.
+        return None
+    # This lexical fallback needs a bounded object to distinguish a sentence
+    # that answers the question from another sentence that merely shares its
+    # verb. Without one, ``Who created?`` selects an arbitrary corpus claim.
     object_title_terms = set()
     if direct_question is not None:
         direct_object = re.sub(
             r"^(?:a|an|the)\s+", "",
             direct_question.group("object").strip(), flags=re.IGNORECASE)
         object_title_terms = set(normalized_tokens(direct_object))
+        if not object_title_terms:
+            return None
         # Search the exact page family for the requested object. Lead
         # sentences often continue with "it" instead of repeating the title;
         # the ordinary lexical route cannot connect that pronoun to the page.
@@ -1689,6 +2464,9 @@ def _natural_who_evidence(index: CRMSSQLiteResearchIndex,
                     for item in page_answers.values()}),
                 "text": "",
             }
+    structured_evidence = _natural_who_structured_field_evidence(index, question)
+    if structured_evidence is not None:
+        return structured_evidence
     candidates = []
     for hit in index.search(question, limit=100, context_chars=240):
         if not set(focus) <= set(hit.matched_terms):
@@ -1732,9 +2510,8 @@ def _natural_who_evidence(index: CRMSSQLiteResearchIndex,
                 and normalized_tokens(token.group())[0] in focus]
             if not set(focus) <= {term for term, _start, _end in focus_matches}:
                 continue
-            excerpt_end = start + max(end for _term, _start, end in focus_matches)
             evidence = _cited_sentence_evidence(
-                index, hit, start, excerpt_end, focus)
+                index, hit, start, end, focus)
             if evidence is None:
                 continue
             positions = [token_start for _term, token_start, _end
@@ -1744,13 +2521,105 @@ def _natural_who_evidence(index: CRMSSQLiteResearchIndex,
             subject_title_overlap = len(set(name_terms) & title_terms)
             object_title_overlap = len(object_title_terms & title_terms)
             candidates.append((-subject_title_overlap, -object_title_overlap,
-                               span, excerpt_end - start,
+                               span, end - start,
                                hit.title.casefold(),
                                evidence))
     if not candidates:
-        return None
+        return _natural_who_structured_field_evidence(index, question)
     candidates.sort(key=lambda item: item[:5])
     return candidates[0][-1]
+
+
+def _natural_who_surface_relation_candidate(
+        knowledge: CRMSKnowledgeBase, index: CRMSSQLiteResearchIndex,
+        question: str, query_expansions: list[dict[str, Any]] | None = None
+        ) -> FactCandidate | None:
+    """Propose a source-backed relation wording hypothesis for reviewer approval."""
+    match = re.fullmatch(
+        r"\s*who\s+(?P<predicate>[a-z][\w’'-]*)\s+"
+        r"(?P<object>.+?)\s*[?!.]?\s*", question, flags=re.IGNORECASE)
+    if match is None or match.group("predicate").casefold() in {
+            "is", "are", "was", "were", "has", "have", "had"}:
+        return None
+    predicate = match.group("predicate").casefold()
+    requested_object = tuple(normalized_tokens(match.group("object")))
+    if not requested_object:
+        return None
+
+    # A learned relation family already supports this wording; don't turn it
+    # back into a review proposal just because a different route abstained.
+    for record in query_expansions or []:
+        if (record.get("kind") == "licensed_predicate"
+                and tuple(normalized_tokens(record.get("text", "")))
+                    == (predicate,)):
+            return None
+
+    rows = _top_retrieved_sentence_evidence(
+        index, " ".join(requested_object), limit=50)
+    hypotheses: dict[tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...]],
+                     FactCandidate] = {}
+
+    def without_article(tokens: tuple[str, ...]) -> tuple[str, ...]:
+        return (tokens[1:] if tokens[:1] in {("a",), ("an",), ("the",)}
+                else tokens)
+
+    def name_shaped(value: str) -> bool:
+        words = value.split()
+        particles = {"van", "von", "de", "del", "da", "di", "la", "le"}
+        return (2 <= len(words) <= 5
+                and words[0].casefold() not in {"the", "a", "an"}
+                and all(word[:1].isupper()
+                        or word.casefold() in particles for word in words))
+
+    for row in rows:
+        sentence = str(row.get("text", ""))
+        citation = str(row.get("citation", ""))
+        if not sentence or not citation:
+            continue
+        for parsed in knowledge._discover_surface_relation_candidates(
+                sentence, source=citation, research_index=index):
+            source_relation = tuple(normalized_tokens(parsed.relation))
+            if (not parsed.polarity
+                    or without_article(tuple(normalized_tokens(parsed.object)))
+                        != without_article(requested_object)
+                    or not name_shaped(parsed.subject)):
+                continue
+            same_form = (source_relation == (predicate,)
+                         or (len(source_relation) == 1
+                             and (_base_verb_for_surface(source_relation)
+                                  == (predicate,)
+                                  or _base_verb_for_surface((predicate,))
+                                  == source_relation
+                                  or _analyze_predicate_spelling(
+                                      predicate, source_relation[0]) is not None
+                                  or _analyze_predicate_spelling(
+                                      source_relation[0], predicate) is not None)))
+            if same_form:
+                continue
+            alignment = {
+                "kind": "surface_relation_discovery",
+                "method": "question-anchored source relation comparison",
+                "review_required": True,
+                "question": question,
+                "requested_predicate": predicate,
+                "predicate_phrase": parsed.relation,
+                "canonical_relation": parsed.relation,
+                "subject_phrase": parsed.subject,
+                "object_phrase": parsed.object,
+                "sources": [citation],
+                "warning": (f"The question uses '{predicate}', but this source "
+                            f"uses '{parsed.relation}'. The wording link is "
+                            "only a hypothesis; confirm the predicate and both "
+                            "argument roles before adding a language rule."),
+            }
+            candidate = replace(
+                parsed,
+                language_evidence=tuple((*parsed.language_evidence, alignment)))
+            key = (tuple(normalized_tokens(candidate.subject)),
+                   source_relation,
+                   without_article(tuple(normalized_tokens(candidate.object))))
+            hypotheses.setdefault(key, candidate)
+    return next(iter(hypotheses.values())) if len(hypotheses) == 1 else None
 
 
 def _natural_object_wh_form_candidate(
@@ -1856,6 +2725,32 @@ def _reviewable_who_candidates(
         knowledge: CRMSKnowledgeBase, index: CRMSSQLiteResearchIndex,
         question: str, evidence: dict[str, Any]) -> list[FactCandidate]:
     """Propose a reviewed active subject–predicate–object claim when aligned."""
+    def learned_predicate_candidates(
+            predicate: tuple[str, ...], object_words: tuple[str, ...]
+            ) -> list[FactCandidate]:
+        """Prefer accepted canonical frames over a new surface heuristic."""
+        def without_article(words: tuple[str, ...]) -> tuple[str, ...]:
+            return words[1:] if words[:1] in {("a",), ("an",), ("the",)} else words
+
+        aligned = []
+        for candidate in knowledge.propose_facts(
+                evidence["text"], source=evidence["citation"]):
+            if (not candidate.polarity
+                    or without_article(tuple(normalized_tokens(candidate.object)))
+                    != without_article(object_words)):
+                continue
+            canonical = tuple(normalized_tokens(candidate.relation))
+            learned_forms = {canonical}
+            learned_forms.update(
+                tuple(normalized_tokens(str(item.get("surface_form", ""))))
+                for item in candidate.language_evidence
+                if item.get("kind") == "observed_predicate_form"
+                and tuple(normalized_tokens(str(item.get("canonical_form", ""))))
+                    == canonical)
+            if predicate in learned_forms:
+                aligned.append(candidate)
+        return aligned
+
     match = re.fullmatch(
         r"\s*who\s+(?:(?:did|do|does)\s+)?"
         r"(?P<predicate>[a-z][\w’'-]*)\s+(?P<object>.+?)\s*[?!.]?\s*",
@@ -1890,6 +2785,15 @@ def _reviewable_who_candidates(
     object_words = tuple(normalized_tokens(object_text))
     if not predicate or not object_words:
         return []
+    learned = learned_predicate_candidates(predicate, object_words)
+    if learned:
+        unique = {
+            (tuple(normalized_tokens(candidate.subject)),
+             tuple(normalized_tokens(candidate.relation)),
+             tuple(normalized_tokens(candidate.object)), candidate.polarity): candidate
+            for candidate in learned
+        }
+        return [unique[key] for key in sorted(unique)] if len(unique) == 1 else []
     proposed = knowledge._discover_surface_relation_candidates(
         evidence["text"], source=evidence["citation"],
         research_index=index)
@@ -2690,6 +3594,85 @@ def _natural_contrast_pair(message: str) -> tuple[str, str] | None:
             if left and right:
                 return left, right
     return None
+
+
+def _natural_what_subject_query(question: str
+                                ) -> tuple[str, str] | None:
+    """Parse a bounded ``What VERB OBJECT?`` query for role checks.
+
+    This parser only identifies the requested predicate and object. It does
+    not determine whether an entity is a person or thing.
+    """
+    match = re.fullmatch(
+        r"\s*what\s+(?P<predicate>[a-z][\w’'-]*)\s+"
+        r"(?P<object>.+?)\s*[?!.]?\s*",
+        question, flags=re.IGNORECASE)
+    if match is None:
+        return None
+    object_text = re.sub(r"^(?:the|a|an)\s+", "",
+                         match.group("object").strip(), flags=re.IGNORECASE)
+    if not normalized_tokens(object_text):
+        return None
+    return match.group("predicate").casefold(), object_text
+
+
+def _looks_like_named_entity(value: str) -> bool:
+    """Recognize a cautious name-shaped signal, not a person classification."""
+    words = value.split()
+    if (not 2 <= len(words) <= 4
+            or words[0].casefold() in {"the", "a", "an"}):
+        return False
+    return all(word[:1].isupper() and any(char.isalpha() for char in word)
+               for word in words)
+
+
+def _suggest_fact_backed_question_example(
+        knowledge: CRMSKnowledgeBase, question: str) -> str | None:
+    """Offer a grounded teaching example for one unlicensed Who predicate."""
+    match = re.fullmatch(
+        r"\s*who\s+(?:(?:did|do|does)\s+)?"
+        r"(?P<predicate>[a-z][\w’'-]*)\s+(?P<object>.+?)\s*[?!.]?\s*",
+        question, flags=re.IGNORECASE)
+    if match is None:
+        return None
+    predicate = tuple(normalized_tokens(match.group("predicate")))
+    object_text = re.sub(r"^(?:the|a|an)\s+", "", match.group("object").strip(),
+                         flags=re.IGNORECASE)
+    object_tokens = tuple(normalized_tokens(object_text))
+    if not predicate or not object_tokens:
+        return None
+
+    suggestions = {}
+    for fact in knowledge._facts_for_object(object_text):
+        subject_tokens = tuple(normalized_tokens(fact.subject))
+        relation_tokens = tuple(normalized_tokens(fact.relation))
+        fact_object_tokens = tuple(normalized_tokens(fact.object))
+        fact_key = knowledge._fact_key(
+            fact.subject, fact.relation, fact.object,
+            knowledge._normalize_qualifiers(dict(fact.qualifiers)))
+        if (fact.qualifiers or fact_object_tokens != object_tokens
+                or relation_tokens == predicate
+                or fact_key in knowledge._negative_facts):
+            continue
+        canonical_question = f"Who {' '.join(relation_tokens)} {fact.object}?"
+        canonical_result = knowledge.ask(canonical_question)
+        if (canonical_result.status != "answered"
+                or tuple(normalized_tokens(canonical_result.answer or ""))
+                != subject_tokens):
+            continue
+        key = (subject_tokens, relation_tokens, fact_object_tokens)
+        suggestions[key] = (fact.subject, fact.relation, fact.object)
+    if len(suggestions) != 1:
+        return None
+    subject, relation, object_ = next(iter(suggestions.values()))
+    exact_question = question.strip().rstrip(".!?") + "?"
+    teach_prompt = (
+        f'Teach an additional question example: "{exact_question}" '
+        f'=> "{subject}"')
+    return (
+        f"I know {subject} — {relation} → {object_}, but I haven't learned "
+        f"whether ‘{match.group('predicate')}’ has that meaning. If it does, "
+        f"teach it with this fact-backed example: {teach_prompt}")
 
 
 def _answer_contrast_from_sources(
@@ -3512,6 +4495,8 @@ def build_parser() -> argparse.ArgumentParser:
                         help="pending translation clarification (default: next to --translations)")
     parser.add_argument("--index", type=Path, default=None,
                         help="research index to load and update (portable-model sidecar by default with --model-db)")
+    parser.add_argument("--index-read-only", action="store_true",
+                        help="query an existing SQLite research index without modifying it")
     parser.add_argument("--dialogue-state", type=Path,
                         default=Path("crms_dialogue.json"),
                         help="short-term context state (default: %(default)s)")
@@ -4023,6 +5008,12 @@ def main() -> int:
             args.index = args.model_db.with_name(args.model_db.name + ".memories") / "research.sqlite"
         else:
             args.index = Path("crms_research.json")
+    sqlite_index = args.index.suffix.casefold() in {".sqlite", ".sqlite3", ".db"}
+    if args.index_read_only:
+        if not sqlite_index:
+            raise ValueError("--index-read-only requires a SQLite --index path")
+        if not args.index.is_file():
+            raise ValueError("--index-read-only requires an existing SQLite research index")
     if args.candidate_session is None:
         args.candidate_session = args.knowledge.with_name(
             args.knowledge.stem + "_candidate_session.json")
@@ -4052,9 +5043,10 @@ def main() -> int:
         args.translation_session, args.translations, translation_model)
     _save_pending_translation(args.translation_session, args.translations,
                               restored_translation_clarification)
-    sqlite_index = args.index.suffix.casefold() in {".sqlite", ".sqlite3", ".db"}
     index = (
-        CRMSSQLiteResearchIndex.load(args.index)
+        CRMSSQLiteResearchIndex(args.index, read_only=True)
+        if args.index_read_only
+        else CRMSSQLiteResearchIndex.load(args.index)
         if sqlite_index
         else CRMSResearchIndex.load(args.index)
         if args.index.exists()
@@ -4062,6 +5054,8 @@ def main() -> int:
         if sqlite_index
         else CRMSResearchIndex())
     initial_index_state = _index_file_state(args.index)
+    if args.index_read_only:
+        print(f"Research index opened read-only: {args.index}")
     dialogue = (CRMSDialogue.load(knowledge, str(args.dialogue_state))
                 if args.dialogue_state.exists() else CRMSDialogue(knowledge))
     rules = CRMSModel(
@@ -4113,14 +5107,43 @@ def main() -> int:
     last_summary_limit = 5
     last_summary_scoped_hit = None
     last_research_evidence: dict | None = None
+    last_answer_had_inference_proof = False
     latest_research_documents: list[dict] = []
+    current_effort = "standard"
+    queued_natural_parts: list[str] = []
+    natural_part_total = 0
     while True:
-        try:
-            line = input("you> ").strip()
-        except EOFError:
-            line = "/quit"
+        compound_part: tuple[int, int] | None = None
+        if queued_natural_parts:
+            line = queued_natural_parts.pop(0)
+            compound_part = (natural_part_total - len(queued_natural_parts),
+                             natural_part_total)
+            print(f"you> [part {compound_part[0]} of {compound_part[1]}] {line}")
+        else:
+            try:
+                line = input("you> ").strip()
+            except EOFError:
+                line = "/quit"
+            parts = _split_explicit_compound_questions(line)
+            if parts:
+                natural_part_total = len(parts)
+                queued_natural_parts = list(parts[1:])
+                compound_part = (1, natural_part_total)
+                line = parts[0]
+                print(f"Handling {natural_part_total} explicit questions separately.")
         if not line:
             continue
+        if line == "/effort" or line.startswith("/effort "):
+            level = line[len("/effort"):].strip()
+            if level not in {"quick", "standard", "thorough"}:
+                print("Use: /effort quick|standard|thorough")
+            else:
+                current_effort = level
+                print(f"Reasoning effort set to {current_effort} for this session.")
+            continue
+        explanation_followup = _natural_research_explanation_request(line)
+        if not explanation_followup:
+            last_answer_had_inference_proof = False
         previous_latest_documents = latest_research_documents
         latest_research_documents = []
         previous_translation_clarification = pending_translation_clarification
@@ -4209,6 +5232,10 @@ def main() -> int:
             knowledge.close()
             print("CRMS state saved. Goodbye.")
             return 0
+        if args.index_read_only and line.startswith(
+                ("/source-dir ", "/source ", "/crawl ")):
+            print("The research index is read-only; source ingestion is disabled.")
+            continue
         if line in {"/help", "/help all"}:
             print(HELP if line == "/help all" else HELP_SHORT)
             continue
@@ -4767,18 +5794,26 @@ def main() -> int:
                 or line.startswith("/suggest-corpus-alignments ")):
             try:
                 value = line[len("/suggest-corpus-alignments"):].strip()
-                document_offset = int(value) if value else 0
+                bounds = value.split("|") if value else []
+                if len(bounds) > 2:
+                    raise ValueError
+                document_offset = int(bounds[0]) if bounds and bounds[0] else 0
+                maximum_documents = (int(bounds[1])
+                                     if len(bounds) > 1 and bounds[1]
+                                     else 1000)
                 proposals = knowledge.propose_corpus_predicate_alignments(
-                    index, document_offset=document_offset)
+                    index, document_offset=document_offset,
+                    maximum_documents=maximum_documents)
                 if not proposals:
                     print("No repeated corpus-only predicate alignment met the "
-                          "shared-pair and independent-source gates.")
+                          "structured-field or shared-pair evidence gates.")
                 for number, proposal in enumerate(proposals, 1):
                     print(f"{number}. '{proposal['predicate_phrase']}' → "
                           f"'{proposal['relation']}' "
                           f"(pairs={proposal['distinct_pairs']}, "
                           f"canonical sources={proposal['canonical_documents']}, "
-                          f"alternate sources={proposal['alias_documents']})")
+                          f"alternate sources={proposal['alias_documents']}"
+                          f"{', evidence=' + proposal['evidence_kind'] if proposal.get('evidence_kind') else ''})")
                     print(f"   proposal ID: {proposal['proposal_id']}")
                     for row in proposal["support"]:
                         print(f"   Pair: {row['subject']} ↔ {row['object']}")
@@ -4791,21 +5826,27 @@ def main() -> int:
                 if proposals:
                     print("Report only: no facts or language frames changed. "
                           "Review each cited pair, then accept with "
-                          f"/accept-corpus-alignment SELECTOR|{document_offset}.")
+                          f"/accept-corpus-alignment SELECTOR|{document_offset}|{maximum_documents}.")
             except (OSError, TypeError, ValueError, AttributeError) as error:
                 print(f"Could not discover corpus predicate alignments: {error}")
+                print("Use: /suggest-corpus-alignments [DOC_OFFSET|MAX_DOCS]")
             continue
         if line.startswith("/accept-corpus-alignment"):
             fields = line[len("/accept-corpus-alignment"):].strip().split("|")
             try:
                 if (not line.startswith("/accept-corpus-alignment ")
-                        or len(fields) not in {1, 2}
+                        or len(fields) not in {1, 2, 3}
                         or not fields[0].strip()):
                     raise ValueError
                 requested = fields[0].strip()
                 document_offset = int(fields[1]) if len(fields) == 2 else 0
+                if len(fields) == 3:
+                    document_offset = int(fields[1]) if fields[1] else 0
+                maximum_documents = (int(fields[2]) if len(fields) == 3
+                                     else 1000)
                 proposals = knowledge.propose_corpus_predicate_alignments(
-                    index, document_offset=document_offset)
+                    index, document_offset=document_offset,
+                    maximum_documents=maximum_documents)
                 proposal = (proposals[int(requested) - 1]
                             if requested.isdigit()
                             and 1 <= int(requested) <= len(proposals)
@@ -4815,7 +5856,8 @@ def main() -> int:
                     raise ValueError("no current corpus alignment matches that selection")
                 accepted = knowledge.accept_corpus_predicate_alignment(
                     proposal["proposal_id"], index,
-                    document_offset=document_offset)
+                    document_offset=document_offset,
+                    maximum_documents=maximum_documents)
                 knowledge.save(args.knowledge)
                 print(f"Accepted '{accepted['predicate_phrase']}' as wording for "
                       f"'{accepted['relation']}' from "
@@ -4824,9 +5866,9 @@ def main() -> int:
             except (IndexError, OSError, TypeError, ValueError,
                     AttributeError) as error:
                 print(f"Could not accept corpus predicate alignment: {error}")
-                if len(fields) not in {1, 2}:
+                if len(fields) not in {1, 2, 3}:
                     print("Use: /accept-corpus-alignment "
-                          "SELECTOR[|DOC_OFFSET]")
+                          "SELECTOR[|DOC_OFFSET|MAX_DOCS]")
             continue
         if (line == "/suggest-predicate-forms"
                 or line.startswith("/suggest-predicate-forms ")):
@@ -5278,6 +6320,13 @@ def main() -> int:
                     validation = result.review.validation if result.review else None
                     checked = len(validation.positive_examples) if validation else 0
                     sources = len(validation.independent_sources) if validation else 0
+                    holdout_total = (checked + len(validation.negative_examples)
+                                     + validation.unknown_endpoint_pairs
+                                     if validation else 0)
+                    holdout_coverage = (
+                        f"{checked}/{holdout_total} "
+                        f"({checked / holdout_total:.1%})"
+                        if holdout_total else "unavailable")
                     premises = [result.rule.first_relation,
                                 result.rule.second_relation]
                     if result.rule.third_relation is not None:
@@ -5288,7 +6337,7 @@ def main() -> int:
                     print(f"Accepted validated rule {result.rule.rule_id}: "
                           f"{' then '.join(premises)} entails "
                           f"{result.rule.conclusion_relation}{typed} "
-                          f"({checked} held-out positive examples from "
+                          f"(held-out support coverage {holdout_coverage}; "
                           f"{sources} independent sources).")
                 else:
                     print(f"Rule not accepted: {result.request}")
@@ -5345,6 +6394,13 @@ def main() -> int:
                     validation = result.review.validation if result.review else None
                     checked = len(validation.positive_examples) if validation else 0
                     sources = len(validation.independent_sources) if validation else 0
+                    holdout_total = (checked + len(validation.negative_examples)
+                                     + validation.unknown_endpoint_pairs
+                                     if validation else 0)
+                    holdout_coverage = (
+                        f"{checked}/{holdout_total} "
+                        f"({checked / holdout_total:.1%})"
+                        if holdout_total else "unavailable")
                     premises = [result.rule.first_relation,
                                 result.rule.second_relation]
                     if result.rule.third_relation is not None:
@@ -5355,7 +6411,7 @@ def main() -> int:
                     print(f"Accepted validated rule {result.rule.rule_id}: "
                           f"{' then '.join(premises)} entails "
                           f"{result.rule.conclusion_relation}{typed} "
-                          f"({checked} held-out positive examples from "
+                          f"(held-out support coverage {holdout_coverage}; "
                           f"{sources} independent sources).")
                 else:
                     print(f"Rule not accepted: {result.request}")
@@ -5368,20 +6424,32 @@ def main() -> int:
         if line.startswith("/infer-relation "):
             fields = [value.strip() for value in
                       line[len("/infer-relation "):].split("|")]
-            if (len(fields) not in {3, 4} or not all(fields[:3])
-                    or (len(fields) == 4 and not fields[3])):
-                print("Use: /infer-relation SUBJECT|RELATION|OBJECT[|name=value,...]")
+            if (not 3 <= len(fields) <= 5 or not all(fields[:3])
+                    or any(not value for value in fields[3:])):
+                print("Use: /infer-relation SUBJECT|RELATION|OBJECT"
+                      "[|name=value,...][|effort=quick/standard/thorough]")
                 continue
             try:
                 qualifiers = {}
-                if len(fields) == 4:
-                    for item in fields[3].split(","):
-                        name, separator, value = item.partition("=")
-                        if not separator or not name.strip() or not value.strip():
-                            raise ValueError("context must use name=value pairs")
-                        qualifiers[name.strip()] = value.strip()
+                effort = current_effort
+                effort_seen = False
+                for extra in fields[3:]:
+                    if extra.startswith("effort="):
+                        if effort_seen:
+                            raise ValueError("effort may be specified only once")
+                        effort_seen = True
+                        effort = extra.partition("=")[2].strip()
+                    else:
+                        for item in extra.split(","):
+                            name, separator, value = item.partition("=")
+                            if (not separator or not name.strip()
+                                    or not value.strip()):
+                                raise ValueError("context must use name=value pairs")
+                            if name.strip() in qualifiers:
+                                raise ValueError("context names must be unique")
+                            qualifiers[name.strip()] = value.strip()
                 result = knowledge.infer_relation(
-                    *fields[:3], qualifiers=qualifiers)
+                    *fields[:3], qualifiers=qualifiers, effort=effort)
                 rendered = knowledge.render_inference(result)
                 if qualifiers:
                     rendered += " [context: " + ", ".join(
@@ -6635,13 +7703,25 @@ def main() -> int:
                 answer_field, question_words[:start],
                 question_words[start + len(entity_words):])
             existing = candidate_knowledge._question_examples.get(frame_key)
-            if (existing is None or len(existing) < 2
-                    or not candidate_knowledge._question_frame_is_licensed(
-                        frame_key, existing)):
-                print("No already licensed exact question frame matches this "
-                      "example; teach a frame from multiple examples first.")
+            same_relation_license = any(
+                tuple(json.loads(other_key[0]))
+                == tuple(normalized_tokens(relation))
+                and other_key[1] == answer_field
+                and len(examples) >= 2
+                and candidate_knowledge._question_frame_is_licensed(
+                    other_key, examples)
+                for other_key, examples
+                in candidate_knowledge._question_examples.items())
+            exact_frame_licensed = (
+                existing is not None
+                and candidate_knowledge._question_frame_is_licensed(
+                    frame_key, existing))
+            if not (exact_frame_licensed or same_relation_license):
+                print("No already licensed question frame with this relation "
+                      "and answer role matches the example; teach a frame "
+                      "from multiple examples first.")
                 continue
-            if entity_words in existing:
+            if existing is not None and entity_words in existing:
                 print("That entity is already represented in the licensed frame; "
                       "no new example was added.")
                 continue
@@ -7117,14 +8197,25 @@ def main() -> int:
                 args.translation_session, args.translations,
                 pending_translation_clarification)
             continue
-        if (_natural_research_explanation_request(line)
-                and last_research_evidence is not None):
-            print("CRMS> " + _render_research_explanation(
-                index, last_research_evidence, translation_model,
-                question=line))
-            continue
+        if explanation_followup:
+            if last_answer_had_inference_proof:
+                explanation = dialogue.turn(line)
+                if (explanation.response is not None
+                        and explanation.response.inference_proofs):
+                    print("CRMS> " + explanation.text)
+                    last_research_evidence = None
+                    continue
+            if last_research_evidence is not None:
+                print("CRMS> " + _render_research_explanation(
+                    index, last_research_evidence, translation_model,
+                    question=line))
+                continue
         paper_authors_reference = _natural_paper_authors_request(line)
-        if paper_authors_reference is not None:
+        explicit_paper_author_lookup = bool(
+            re.search(r"\b(?:authors?|paper|article|study|publication)\b",
+                      line, flags=re.IGNORECASE))
+        if (paper_authors_reference is not None
+                and explicit_paper_author_lookup):
             dialogue.clear()
             authors_text, last_research_evidence = _render_paper_authors(
                 index, paper_authors_reference)
@@ -7381,9 +8472,108 @@ def main() -> int:
                 dialogue.clear()
             continue
         turn = dialogue.turn(line, research_index=index)
+        compound_pronoun_focus: str | None = None
+        if (compound_part is not None
+                and turn.resolved_question
+                and turn.resolved_question != line):
+            # Dialogue resolution returns a grounded expanded question. Use it
+            # for the chat's source routes as well as the knowledge response.
+            line = turn.resolved_question
+        last_answer_had_inference_proof = bool(
+            turn.response is not None and turn.response.inference_proofs)
         retrieved_source_sentences = (
             list(turn.research.source_sentences or [])
             if turn.research is not None else [])
+        count_question = _natural_count_question(line)
+        count_evidence = None
+        count_route_used = False
+        if (current_effort in {"standard", "thorough"}
+                and count_question is not None
+                and turn.status in {"unknown", "sources_found", "needs_review"}
+                and not (turn.response is not None
+                         and turn.response.status in {"answered", "ambiguous"})):
+            count_route_used = True
+            count_evidence = _natural_count_evidence(index, line)
+            if count_evidence is None:
+                turn.text = (
+                    "I couldn't find a source sentence that states the asked "
+                    "entity, action, and item together, so I can't give a "
+                    "grounded count.")
+                if current_effort == "thorough":
+                    turn.text += ("\nPlausibility check: no sentence matched "
+                                  "all three requested roles.")
+                if turn.research is not None:
+                    turn.research.source_sentences = []
+            elif count_evidence.get("conflicting_counts"):
+                values = ", ".join(count_evidence["conflicting_counts"])
+                source_titles = ", ".join(sorted({
+                    item["title"] for item in count_evidence["evidence"]}))
+                turn.text = (f"The matching source sentences give conflicting "
+                             f"counts ({values}); I can't choose one without "
+                             f"review. Sources: {source_titles}.")
+                if current_effort == "thorough":
+                    turn.text += ("\nPlausibility check: the entity and "
+                                  "relation match, but the count conflicts.")
+                if turn.research is not None:
+                    turn.research.source_sentences = count_evidence["evidence"]
+            else:
+                title = count_evidence["title"]
+                sentence = count_evidence["text"]
+                quantity = count_evidence.get("quantity")
+                if quantity is None:
+                    prefix = ("The source sentence doesn't state an explicit "
+                              "number: ")
+                else:
+                    prefix = "The source states: "
+                turn.text = (f"{prefix}“{sentence}” [Source: {title}; "
+                             "quoted evidence, not an accepted fact]")
+                if current_effort == "thorough":
+                    turn.text += (
+                        f"\nPlausibility check: the named entity, action, "
+                        f"and item align; explicit count: "
+                        f"{quantity if quantity is not None else 'unstated'}.")
+                if turn.research is not None:
+                    turn.research.source_sentences = [count_evidence]
+        superlative_evidence = None
+        superlative_route_used = False
+        if (current_effort in {"standard", "thorough"}
+                and _natural_superlative_question(line) is not None
+                and turn.status in {"unknown", "sources_found", "needs_review"}
+                and not (turn.response is not None
+                         and turn.response.status in {"answered", "ambiguous"})):
+            superlative_route_used = True
+            superlative_evidence = _natural_superlative_evidence(index, line)
+            if superlative_evidence is not None:
+                turn.text = (
+                    f"{superlative_evidence['text']} [Source: "
+                    f"{superlative_evidence['title']}; quoted evidence, "
+                    "not an accepted fact]")
+                if turn.research is not None:
+                    turn.research.source_sentences = [superlative_evidence]
+        when_question = _natural_when_question(line)
+        if (current_effort == "thorough" and when_question is not None
+                and turn.status in {"unknown", "sources_found", "needs_review"}
+                and not (turn.response is not None
+                         and turn.response.status in {"answered", "ambiguous"})):
+            when_evidence = _natural_when_evidence(index, line)
+            if when_evidence is None:
+                turn.text = (
+                    "I couldn't find one source sentence that states the named "
+                    "entity, action, and date together. I can't give a grounded "
+                    "date.\nPlausibility check: no complete subject-action-date "
+                    "match was found.")
+            elif "conflicts" in when_evidence:
+                turn.text = (
+                    "Matching source sentences give different dates, so I can't "
+                    "choose one without review.\nPlausibility check: entity and "
+                    "action matched, but date evidence conflicts.")
+            else:
+                turn.text = (
+                    f"{when_evidence['text']} [Source: {when_evidence['title']}; "
+                    "quoted evidence, not an accepted fact]\nPlausibility check: "
+                    "the named entity, action, and date align.")
+                if turn.research is not None:
+                    turn.research.source_sentences = [when_evidence]
         irregular_form_candidate = None
         irregular_form_route_used = False
         if (turn.status in {"unknown", "sources_found"}
@@ -7841,11 +9031,19 @@ def main() -> int:
                          and turn.response.candidates)):
             where_route_used = True
             entity, predicate = where_query
-            where_evidence = _exact_title_location_evidence(
-                index, entity, predicate)
+            where_evidence = (
+                _natural_birthplace_field_evidence(index, entity)
+                if predicate == "born" else None)
+            if where_evidence is None:
+                where_evidence = _exact_title_location_evidence(
+                    index, entity, predicate)
             if where_evidence is not None:
+                realized_location = where_evidence.get("realized_answer")
+                location_text = (realized_location.get("text")
+                                 if isinstance(realized_location, dict)
+                                 else None)
                 turn.text = (
-                    f"The source says: {where_evidence['text']} "
+                    f"{location_text or 'The source says: ' + where_evidence['text']} "
                     f"[Source: {where_evidence['title']}; quoted evidence, "
                     "not an accepted fact]")
             else:
@@ -7868,18 +9066,10 @@ def main() -> int:
         realized = None
         who_route_used = False
         conjunctive_who_route_used = False
-        coordinated_who = re.fullmatch(
-            r"\s*who\s+(?:(?:did|do|does)\s+)?"
-            r"(?P<predicate>[a-z][\w’'-]*)\s+"
-            r"(?P<first>.+?)\s+and\s+(?P<second>.+?)\s*[?!.]?\s*",
-            line, flags=re.IGNORECASE)
+        coordinated_who = _natural_coordinated_who(line)
         if (coordinated_who is not None
-                and coordinated_who.group("predicate").casefold()
-                not in {"is", "are", "was", "were", "has", "have", "had"}
                 and turn.status in {"unknown", "sources_found", "needs_review"}):
-            predicate = coordinated_who.group("predicate")
-            objects = [coordinated_who.group("first").strip(),
-                       coordinated_who.group("second").strip()]
+            predicate, objects = coordinated_who
             evidence_by_object = [
                 _natural_who_evidence(
                     index, f"Who {predicate} {object_}?",
@@ -7901,14 +9091,14 @@ def main() -> int:
                         rendered.append(
                             f"{object_}: “{sentence}” [Source: {title}]")
                 missing = [object_ for object_, evidence in
-                           zip(objects, evidence_by_object)
-                           if evidence is None]
+                           zip(objects, evidence_by_object) if evidence is None]
                 if missing:
-                    turn.text = (
-                        "Partial source evidence: " + "; ".join(rendered)
-                        + ". I couldn't find evidence for "
-                        + " and ".join(missing)
-                        + ", so this does not answer every part of your question.")
+                    missing_text = (", ".join(missing[:-1]) + " and " + missing[-1]
+                                    if len(missing) > 1 else missing[0])
+                    turn.text = ("Partial source evidence: " + "; ".join(rendered)
+                                 + ". I couldn't find evidence for "
+                                 + missing_text
+                                 + ", so this does not answer every part of your question.")
                 else:
                     turn.text = "Source evidence: " + "; ".join(rendered)
                 conjunctive_who_route_used = True
@@ -7954,6 +9144,54 @@ def main() -> int:
                             who_evidence = dict(source)
                             who_evidence["normalized_question"] = normalized_who_question
                             who_evidence["realized_answer"] = passive_realization
+            surface_relation_candidate = None
+            if (who_evidence is None and turn.research is not None
+                    and not (turn.response is not None
+                             and turn.response.candidates)):
+                surface_relation_candidate = (
+                    _natural_who_surface_relation_candidate(
+                        knowledge, index, line,
+                        turn.research.query_expansions or []))
+            if surface_relation_candidate is not None:
+                who_route_used = True
+                turn.status = "needs_review"
+                existing = list(turn.research.candidates or [])
+                existing_keys = {
+                    (tuple(normalized_tokens(item.subject)),
+                     tuple(normalized_tokens(item.relation)),
+                     tuple(normalized_tokens(item.object)), item.source)
+                    for item in existing
+                }
+                candidate_key = (
+                    tuple(normalized_tokens(surface_relation_candidate.subject)),
+                    tuple(normalized_tokens(surface_relation_candidate.relation)),
+                    tuple(normalized_tokens(surface_relation_candidate.object)),
+                    surface_relation_candidate.source)
+                if candidate_key not in existing_keys:
+                    existing.append(surface_relation_candidate)
+                turn.research.candidates = existing
+                turn.research.status = "needs_review"
+                source_title = index.document(
+                    surface_relation_candidate.source.split("#", 1)[0]).title
+                turn.research.source_sentences = [{
+                    "document_id": surface_relation_candidate.source.split("#", 1)[0],
+                    "title": source_title,
+                    "text": surface_relation_candidate.sentence,
+                    "citation": surface_relation_candidate.source,
+                    "context_kind": "assertion",
+                }]
+                relation_record = next(
+                    (record for record in surface_relation_candidate.language_evidence
+                     if record.get("method")
+                     == "question-anchored source relation comparison"), {})
+                turn.text = (
+                    f"I can't answer with '{relation_record.get('requested_predicate', '')}' "
+                    f"yet: the source uses '{surface_relation_candidate.relation}'. "
+                    f"Review the source-backed candidate "
+                    f"{surface_relation_candidate.subject} — "
+                    f"{surface_relation_candidate.relation} → "
+                    f"{surface_relation_candidate.object} [Source: {source_title}]; "
+                    "confirm that the wording and roles match before teaching this rule.")
             if (who_evidence is not None
                     and not who_evidence.get("ambiguous_pages")
                     and not who_evidence.get("realized_answer")):
@@ -7988,10 +9226,26 @@ def main() -> int:
                     f"I found more than one exact-title source for "
                     f"'{line.strip()}': {page_names}. Which page do you mean?")
             elif who_evidence is not None:
-                reviewable = _reviewable_who_candidates(
-                    knowledge, index,
-                    str(who_evidence.get("normalized_question", line)),
-                    who_evidence)
+                reviewable = ([] if who_evidence.get("structured_metadata")
+                              else _reviewable_who_candidates(
+                                  knowledge, index,
+                                  str(who_evidence.get("normalized_question", line)),
+                                  who_evidence))
+                if (compound_part is not None
+                        and compound_part[0] < compound_part[1]
+                        and queued_natural_parts
+                        and re.search(r"\b(?:he|she|him|her|his|hers)\b",
+                                      queued_natural_parts[0], re.I)
+                        and who_question and len(reviewable) == 1
+                        and reviewable[0].polarity
+                        and reviewable[0].subject.strip()
+                        and re.search(r"[,;]|\b(?:and|or)\b",
+                                      reviewable[0].subject, re.I) is None):
+                    # A uniquely parsed, cited answer to an explicit Who
+                    # question can bind a later pronoun in this same compound
+                    # request. Keep only the agent as discourse focus; the
+                    # entity remains unaccepted knowledge.
+                    compound_pronoun_focus = reviewable[0].subject
                 if (not reviewable and realized is not None
                         and realized.get("method")
                         == "exact-title page-subject passive realization"
@@ -8033,10 +9287,17 @@ def main() -> int:
                     turn.research.status = "needs_review"
                 elif realized is not None:
                     who_route_used = True
-                    turn.text = (
-                        f"{realized['text']} [Source: "
-                        f"{realized['source_title']}; quoted evidence, "
-                        "not an accepted fact]")
+                    if who_evidence.get("structured_metadata"):
+                        turn.text = (
+                            f"{realized['text']} [Source: "
+                            f"{realized['source_title']}; field "
+                            f"“{realized['field_text']}”; quoted structured "
+                            "evidence, not an accepted fact]")
+                    else:
+                        turn.text = (
+                            f"{realized['text']} [Source: "
+                            f"{realized['source_title']}; quoted evidence, "
+                            "not an accepted fact]")
                 elif turn.status != "needs_review":
                     who_route_used = True
                     turn.text = (
@@ -8051,9 +9312,23 @@ def main() -> int:
                     "not an accepted fact]")
             elif turn.status != "needs_review":
                 who_route_used = True
-                turn.text = (
-                    "I couldn't find one source sentence that states who "
-                    "answers that question.")
+                underspecified_who = re.fullmatch(
+                    r"\s*(?:who|whom)\s+(?:(?:did|do|does)\s+)?"
+                    r"[a-z][\w’'-]*\s*[?!.]?\s*",
+                    line, flags=re.IGNORECASE)
+                if underspecified_who is not None:
+                    turn.text = (
+                        "Which thing do you mean? Please include the object "
+                        "you are asking who created or changed.")
+                else:
+                    teaching_prompt = _suggest_fact_backed_question_example(
+                        knowledge, line)
+                    if teaching_prompt is not None:
+                        turn.text = teaching_prompt
+                    else:
+                        turn.text = (
+                            "I couldn't find one source sentence that states who "
+                            "answers that question.")
         object_wh_evidence = None
         object_wh_route_used = False
         if (irregular_form_candidate is None
@@ -8139,6 +9414,47 @@ def main() -> int:
                 turn.text = (
                     f"I found several exact-title sources for "
                     f"{definition_topic}. Which one should I use?")
+        capital_field_evidence = None
+        type_field_evidence = None
+        if (turn.status in {"unknown", "sources_found"}
+                and not (turn.response is not None
+                         and (turn.response.status in {"answered", "ambiguous"}
+                              or turn.response.candidates))):
+            capital_field_evidence = _natural_capital_field_evidence(index, line)
+            if capital_field_evidence is not None:
+                realized = capital_field_evidence["realized_answer"]
+                turn.text = (
+                    f"{realized['text']} [Source: {realized['source_title']}; "
+                    f"field “{realized['field_text']}”; quoted structured "
+                    "evidence, not an accepted fact]")
+                if turn.research is not None:
+                    turn.research.source_sentences = [capital_field_evidence]
+        if (turn.status in {"unknown", "sources_found"}
+                and not (turn.response is not None
+                         and (turn.response.status in {"answered", "ambiguous"}
+                              or turn.response.candidates))):
+            type_field_evidence = _natural_type_field_evidence(index, line)
+            if type_field_evidence is not None:
+                realized = type_field_evidence["realized_answer"]
+                turn.text = (
+                    f"{realized['text']} [Source: {realized['source_title']}; "
+                    f"field “{realized['field_text']}”; quoted structured "
+                    "evidence, not an accepted fact]")
+                if turn.research is not None:
+                    turn.research.source_sentences = [type_field_evidence]
+                    # Structured type metadata is useful symbolic knowledge,
+                    # but source extraction alone must never promote it. Put
+                    # the exact cited field into the same explicit review
+                    # queue used for sentence-derived claims.
+                    type_candidate = FactCandidate(
+                        subject=str(type_field_evidence["title"]),
+                        relation="is-a",
+                        object=str(realized["field_text"]).split("=", 1)[1].strip(),
+                        source=str(type_field_evidence["citation"]),
+                        template="exact-title structured type field",
+                        sentence=str(realized["field_text"]))
+                    turn.research.candidates = [type_candidate]
+                    turn.research.status = "needs_review"
         source_realization = (
             turn.research.realized_answer
             if turn.research is not None else None)
@@ -8147,6 +9463,7 @@ def main() -> int:
                 and turn.response.status == "answered"
                 and turn.response.truth is None
                 and not turn.response.inference_proofs
+                and not turn.response.proofs
                 and not who_route_used and not typed_relation_route_used
                 and not polar_route_used and not where_route_used
                 and not why_route_used and definition_topic is None):
@@ -8170,15 +9487,203 @@ def main() -> int:
                 and not typed_relation_route_used and not polar_route_used
                 and not where_route_used and not why_route_used
                 and not object_wh_route_used
+                and not count_route_used and not superlative_route_used
                 and definition_topic is None):
             turn.text = (
                 f"{source_realization['text']} [Source: "
                 f"{source_realization.get('source_title') or 'source'}; "
                 "quoted evidence, not an accepted fact]")
+        what_subject_query = _natural_what_subject_query(line)
+        if (what_subject_query is not None and turn.research is not None
+                and turn.research.candidates
+                and not (turn.response is not None
+                         and turn.response.status in {"answered", "ambiguous"})):
+            predicate, object_text = what_subject_query
+            requested_object = tuple(normalized_tokens(object_text))
+            role_candidates = [candidate for candidate in
+                               turn.research.candidates
+                               if tuple(normalized_tokens(candidate.relation))
+                               == tuple(normalized_tokens(predicate))
+                               and tuple(normalized_tokens(candidate.object))
+                               == requested_object
+                               and _looks_like_named_entity(candidate.subject)]
+            if role_candidates:
+                names = sorted({candidate.subject for candidate in role_candidates},
+                               key=str.casefold)
+                name_text = ", ".join(names)
+                turn.text = (
+                    f"The matching source names {name_text} as the subject, "
+                    "but your question asks ‘what’. I can't determine from "
+                    "this sentence whether that name refers to a person or "
+                    "a thing. Did you mean ‘who’ created it?")
+                role_keys = {id(candidate) for candidate in role_candidates}
+                turn.research.candidates = [
+                    candidate for candidate in turn.research.candidates
+                    if id(candidate) not in role_keys]
+                if not turn.research.candidates:
+                    turn.research.status = "unknown"
         turn.text = _follow_missing_premise_sources(
             knowledge, index, turn.response, turn.research, turn.text)
-        print(f"CRMS> {turn.text}")
-        if typed_relation_route_used:
+        if polar_claim is not None:
+            if (turn.response is not None
+                    and turn.response.status == "answered"
+                    and turn.response.truth is not None):
+                turn.text = "Yes." if turn.response.truth else "No."
+                polar_evidence = []
+                polar_route_used = True
+            else:
+                if not polar_evidence:
+                    polar_evidence = _natural_polar_evidence(
+                        knowledge, index, polar_claim)
+                polar_truths = {candidate.polarity
+                                for candidate in polar_evidence}
+                polar_route_used = True
+                if len(polar_truths) > 1:
+                    turn.text = (
+                        "The indexed sources conflict on this exact "
+                        "proposition; I can't choose yes or no without review.")
+                elif polar_evidence:
+                    candidate = polar_evidence[0]
+                    title = index.document(
+                        candidate.source.split("#", 1)[0]).title
+                    verdict = "yes" if candidate.polarity else "no"
+                    turn.text = (
+                        f"The source states {verdict}: “{candidate.sentence}” "
+                        f"[Source: {title}; quoted evidence, not an accepted fact]")
+                    if turn.research is None:
+                        turn.research = ResearchResult(status="needs_review")
+                    turn.research.candidates = polar_evidence
+                    turn.research.status = "needs_review"
+                    turn.research.source_sentences = [{
+                        "document_id": candidate.source.split("#", 1)[0],
+                        "title": title, "text": candidate.sentence,
+                        "citation": candidate.source,
+                        "context_kind": "assertion",
+                    }]
+                else:
+                    turn.text = (
+                        "I don't have a direct source statement for this exact "
+                        "proposition, so I can't answer yes or no from the "
+                        "sources I have.")
+                    if turn.research is not None:
+                        turn.research.source_sentences = []
+        quoted_evidence_reply = "quoted evidence" in turn.text.casefold()
+        has_structured_response = (
+            turn.response is not None
+            and (turn.response.status == "ambiguous"
+                 or bool(turn.response.inference_proofs)
+                 or bool(turn.response.candidates)))
+        has_review_candidates = (
+            turn.research is not None and bool(turn.research.candidates))
+        has_realized_answer = (
+            turn.research is not None
+            and turn.research.realized_answer is not None)
+        specialist_route_used = any((
+            who_route_used, typed_relation_route_used, polar_route_used,
+            where_route_used, why_route_used, object_wh_route_used,
+            irregular_form_route_used,
+            count_route_used, superlative_route_used,
+            definition_evidence is not None,
+            superlative_evidence is not None,
+            capital_field_evidence is not None,
+            type_field_evidence is not None,
+        ))
+        specialist_route_abstained = (
+            where_route_used and where_evidence is None)
+        fallback_gate_eligible = (
+            turn.status in {"unknown", "sources_found"}
+            and supports_question_type(line)
+            and not has_structured_response
+            and not has_review_candidates
+            and not has_realized_answer
+            and (not specialist_route_used or specialist_route_abstained))
+        if ((quoted_evidence_reply and not has_structured_response
+             and "candidate facts still need review" not in turn.text.casefold()
+             and "supporting claim awaiting review" not in turn.text.casefold()
+             and not (specialist_route_used
+                      and not specialist_route_abstained))
+                or fallback_gate_eligible):
+            # Research summaries may retain a multi-sentence excerpt as one
+            # row. It is useful for display, but must not count as one
+            # independent candidate beside the exact sentence rows below:
+            # doing so can manufacture a tie from a target sentence plus an
+            # unrelated sentence in the same excerpt.
+            gate_rows = []
+            if turn.research is not None:
+                for row in turn.research.source_sentences or []:
+                    text = str(row.get("text", "")).strip()
+                    if len(_sentence_spans(text)) == 1:
+                        gate_rows.append(row)
+            licensed_predicates = (
+                turn.research.query_expansions
+                if turn.research is not None else [])
+            gate_rows.extend(_top_retrieved_sentence_evidence(
+                index, line, licensed_predicates=licensed_predicates))
+            quoted = re.search(r"[“\"]([^”\"]+)[”\"]", turn.text)
+            if quoted and not any(str(row.get("text", "")).strip()
+                                  == quoted.group(1).strip()
+                                  for row in gate_rows):
+                gate_rows.insert(0, {"text": quoted.group(1)})
+            decision = gate_quoted_evidence(
+                line, gate_rows, licensed_predicates=licensed_predicates)
+            selected = decision.get("evidence")
+            if decision["status"] == "accepted" and selected is not None:
+                title = selected.get("title") or selected.get("source_title") or "source"
+                turn.text = (f"“{selected['text']}” [Source: {title}; "
+                             "quoted evidence, not an accepted fact]")
+                if turn.research is None:
+                    turn.research = ResearchResult(status="sources_found")
+                turn.research.source_sentences = [selected]
+            elif (decision["status"] in {"rejected", "ambiguous"}
+                  and (quoted_evidence_reply or gate_rows)):
+                explanation = ("; ".join(decision.get("reasons", []))
+                               or "the available sentences do not uniquely support it")
+                turn.text = ("I found source text, but it does not support a "
+                             f"grounded answer ({explanation}). I won't guess.")
+                # A rejected sentence can still help the user understand the
+                # miss, provided it is clearly labelled as a near match and
+                # is never retained as answer evidence. Ambiguous matches are
+                # omitted because there is no unique closest sentence.
+                if decision["status"] == "rejected" and selected is not None:
+                    sentence = str(selected.get("text", "")).strip()
+                    if sentence:
+                        title = (selected.get("title")
+                                 or selected.get("source_title"))
+                        if not title:
+                            citation = str(selected.get("citation", ""))
+                            document_id = (str(selected.get("document_id", ""))
+                                           or citation.split("#", 1)[0])
+                            try:
+                                title = index.document(document_id).title
+                            except (KeyError, OSError, ValueError):
+                                title = None
+                        title = str(title or "source")
+                        turn.text += (f"\nClosest source sentence: “{sentence}” "
+                                      f"[Source: {title}; may not answer your question]")
+                if turn.research is None:
+                    turn.research = ResearchResult(status="unknown")
+                turn.research.source_sentences = []
+                turn.research.passages = []
+                turn.research.status = "unknown"
+        if compound_part is None:
+            print(f"CRMS> {turn.text}")
+        else:
+            part_number, part_total = compound_part
+            if compound_pronoun_focus is not None:
+                dialogue.subject_entity = compound_pronoun_focus
+                dialogue.object_entity = None
+                dialogue.last_entity = compound_pronoun_focus
+                dialogue.last_question = line
+            print(f"CRMS> Part {part_number} of {part_total}: {turn.text}")
+            if part_number == part_total:
+                print(f"Processed all {part_total} question parts separately.")
+        if (turn.response is not None
+                and turn.response.status == "answered"
+                and turn.response.inference_proofs):
+            # The selected proof is the explanation context, even when a
+            # separate retrieval route found a lexical sentence this turn.
+            last_research_evidence = None
+        elif typed_relation_route_used:
             source_rows = (turn.research.source_sentences
                            if turn.research is not None else [])
             last_research_evidence = (dict(source_rows[0])
@@ -8203,6 +9708,10 @@ def main() -> int:
             last_research_evidence = why_evidence
         elif definition_evidence is not None:
             last_research_evidence = definition_evidence
+        elif capital_field_evidence is not None:
+            last_research_evidence = capital_field_evidence
+        elif type_field_evidence is not None:
+            last_research_evidence = type_field_evidence
         elif irregular_form_route_used and irregular_form_candidate is not None:
             last_research_evidence = {
                 "document_id": irregular_form_candidate.source.split("#", 1)[0],
@@ -8264,6 +9773,8 @@ def main() -> int:
         if (turn.research and turn.research.status == "needs_review"
                 and turn.research.candidates):
             new_candidates = list(turn.research.candidates)
+            new_candidates = _candidates_matching_who_object(
+                turn.resolved_question or line, new_candidates)
             # A source proposal can coexist with a direct accepted answer
             # because retrieval searches more broadly than the answer route.
             # Keep only candidates tied to at least two meaningful query terms

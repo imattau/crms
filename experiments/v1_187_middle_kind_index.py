@@ -71,9 +71,12 @@ def main() -> None:
     untyped.add_inference_rule("plain-rule", "r1", "r2", "reaches")
     limited_baseline = untyped.infer_relation(
         "Origin", "reaches", "Target", max_expansions=2)
-    require(limited_baseline.status == "unknown" and not limited_baseline.complete
-            and limited_baseline.reason_code == "search_limit",
-            "control query unexpectedly bypassed untyped candidate enumeration")
+    require(limited_baseline.status == "answered"
+            and not limited_baseline.complete
+            and limited_baseline.reason_code == "search_limit"
+            and limited_baseline.limit_kind == "expansion_limit"
+            and limited_baseline.proofs,
+            "untyped control should retain its proof and report incomplete support search")
     baseline = untyped.infer_relation("Origin", "reaches", "Target")
     require(baseline.status == "answered" and baseline.expansions > bounded.expansions,
             f"kind index did not reduce bounded search work: {baseline.expansions} vs "

@@ -1188,6 +1188,55 @@ def _contrastive_probe(
         short_counts = Counter(tuple(output) for output in best_outputs or [])
         dominant_fraction = max(short_counts.values()) / len(procedures)
         if dominant_fraction <= 0.90:
+            # Prefer a familiar, positive, duplicate-free list when it retains
+            # most of the information in the mathematically best probe. Such
+            # inputs make contrastive questions easier to answer and explain
+            # without changing what the teacher is being asked to disambiguate.
+            readable: dict[tuple[int, ...], list[list[int]]] = {}
+            for length in range(3, 9):
+                ascending = list(range(1, length + 1))
+                candidates = [
+                    ascending[offset:] + ascending[:offset]
+                    for offset in range(1, length)
+                ]
+                candidates.append([
+                    value for pair in zip(ascending[1::2], ascending[::2])
+                    for value in pair
+                ] + (ascending[-1:] if length % 2 else []))
+                # Also try one adjacent transposition at a time. This creates
+                # an ordinary-looking permutation while exposing ordering
+                # rules that would agree on a sorted ascending probe.
+                for position in range(length - 1):
+                    swapped = list(ascending)
+                    swapped[position], swapped[position + 1] = (
+                        swapped[position + 1], swapped[position])
+                    candidates.append(swapped)
+                for values in candidates:
+                    if (len(set(values)) != length or min(values) < 1
+                            or max(values) > 8):
+                        continue
+                    signature = tuple(values)
+                    if signature in readable:
+                        continue
+                    readable[signature] = [
+                        _apply_procedure(procedure, values)
+                        for procedure in procedures]
+            readable_options = []
+            minimum_classes = (4 * len(short_counts) + 4) // 5
+            for probe, outputs in readable.items():
+                counts = Counter(tuple(output) for output in outputs)
+                if (len(counts) < minimum_classes
+                        or max(counts.values())
+                           > max(2, 2 * max(short_counts.values()))):
+                    continue
+                score = (-sum(count * count for count in counts.values()),
+                         len(counts), -len(probe))
+                readable_options.append((score, probe, outputs))
+            if readable_options:
+                _score, readable_input, readable_outputs = max(
+                    readable_options, key=lambda item: (item[0],
+                                                         tuple(-value for value in item[1])))
+                best_input, best_outputs = list(readable_input), readable_outputs
             return best_input, best_outputs
 
     # When competing procedures differ by deduplication after a positional
@@ -1665,6 +1714,17 @@ def _semantic_key_uncached(procedure: Iterable[Step]) -> tuple:
         return ('always_empty',)
     raw_steps = _normalize_adjacent_affine_steps(
         _normalize_commuting_value_maps(steps))
+    # Evenness is exactly divisibility by two. Keep one spelling when a
+    # syntax-preserving subsystem (for example nonlinear square handling)
+    # cannot use the compact modular-filter state to recognize the alias.
+    canonical_modular_steps = tuple(
+        Step('keep_evens', {})
+        if (step.operation == 'keep_multiples_k'
+            and abs(step.parameters['k']) == 2)
+        else step
+        for step in raw_steps)
+    if canonical_modular_steps != raw_steps:
+        return _semantic_key(canonical_modular_steps)
     # Adjacent rotations compose by adding their offsets, including when a
     # later positional filter would otherwise force a conservative syntax key.
     rotation_compacted: list[Step] = []
@@ -1777,6 +1837,23 @@ def _semantic_key_uncached(procedure: Iterable[Step]) -> tuple:
         # Squaring is nonlinear. Keep programs containing it syntactically
         # distinct except for exact list-structure commutations. Finite probes
         # are not enough to merge it with value filters or order changes.
+        # Magnitude ordering followed by squaring has the same result as
+        # squaring followed by ascending numeric order: x^2 is nonnegative
+        # and monotone in |x|, and equal-magnitude ties become equal values.
+        for index in range(len(raw_steps) - 1):
+            before, after = raw_steps[index:index + 2]
+            if (before.operation == 'sort_by_magnitude'
+                    and after.operation == 'square_values'):
+                rewritten = list(raw_steps)
+                rewritten[index:index + 2] = [
+                    Step('square_values', {}), Step('sort_ascending', {})]
+                return _semantic_key(rewritten)
+            if (before.operation == 'square_values'
+                    and after.operation == 'sort_by_magnitude'):
+                rewritten = list(raw_steps)
+                rewritten[index:index + 2] = [
+                    Step('square_values', {}), Step('sort_ascending', {})]
+                return _semantic_key(rewritten)
         commuting = {
             'reverse', 'rotate_left_k', 'duplicate_each', 'repeat_each_k',
             'keep_even_positions', 'keep_odd_positions', 'keep_evens',
@@ -1881,6 +1958,17 @@ def _semantic_key_uncached(procedure: Iterable[Step]) -> tuple:
                     break
                 if (left.operation == 'sort_by_magnitude'
                         and right.operation == 'stable_unique'):
+                    normalized[index], normalized[index + 1] = right, left
+                    changed = True
+                    break
+                # A value-only filter keeps the relative input order of all
+                # survivors. Stable magnitude sorting therefore produces
+                # the same ordered subsequence whether filtering happens
+                # before or after the sort. Filters that inspect positions
+                # or the first value are intentionally excluded.
+                if (left.operation == 'sort_by_magnitude'
+                        and right.operation in {
+                            'keep_evens', 'keep_odds', 'keep_multiples_k'}):
                     normalized[index], normalized[index + 1] = right, left
                     changed = True
                     break
@@ -2114,6 +2202,28 @@ def _semantic_key_uncached(procedure: Iterable[Step]) -> tuple:
         # over-approximation; it may miss emptiness, but cannot invent it.
         return ('always_empty',)
     if any(step.operation == 'stable_unique' for step in steps):
+        # Stable deduplication commutes with injective pointwise maps, value
+        # filters, and sorting. For each input list, these operations either
+        # preserve equalities exactly or retain/discard every copy of the same
+        # value together. Keep stable_unique before each commuting operation
+        # as the canonical order. A zero scale is excluded because it can
+        # create duplicates that were absent before the map.
+        stable_unique_commuting = {
+            'double', 'scale_k', 'add_k', 'add_first', 'subtract_first',
+            'keep_evens', 'keep_odds', 'keep_multiples_k',
+            'keep_greater_than_first', 'keep_less_than_first',
+            'sort_ascending', 'sort_descending',
+        }
+        for index in range(1, len(steps)):
+            operation, unique = steps[index - 1:index + 1]
+            if (unique.operation == 'stable_unique'
+                    and operation.operation in stable_unique_commuting
+                    and not (operation.operation == 'scale_k'
+                             and operation.parameters['k'] == 0)):
+                rewritten = list(steps)
+                rewritten[index - 1:index + 1] = [unique, operation]
+                return _semantic_key(rewritten)
+
         # Keep only identities we can prove from the sequence algebra.
         # Deduplication cannot change the first item that survives an
         # order-preserving map/filter followed by first selection.

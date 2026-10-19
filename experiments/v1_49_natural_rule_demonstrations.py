@@ -7,6 +7,7 @@ Run from the project root with:
 from __future__ import annotations
 
 import json
+from collections import Counter
 import subprocess
 import sys
 import tempfile
@@ -19,12 +20,41 @@ from crms_chat import (_natural_rule_demonstration, _natural_rule_demonstrations
                        _natural_rule_feedback, _natural_rule_request,
                        _natural_rule_shared_phrases,
                        _natural_rule_requests)
-from crms_model import CRMSModel
+from crms_model import CRMSModel, Step, _apply_procedure
 
 
 def main() -> None:
     if CRMSModel(max_workers=1).retry("missing instruction").status != "need_examples":
         raise SystemExit("retry without stored examples should request teaching evidence")
+
+    # One reverse example leaves many valid procedures. The follow-up should
+    # use a conventional list while retaining most of the best probe's split.
+    ambiguous = CRMSModel(max_workers=1).teach(
+        "reverse the list", [([1, 2, 3], [3, 2, 1])])
+    if (ambiguous.status != "need_more_examples"
+            or ambiguous.contrastive_input is None
+            or len(ambiguous.contrastive_input) > 8
+            or min(ambiguous.contrastive_input) < 1
+            or max(ambiguous.contrastive_input) > 8
+            or len(set(ambiguous.contrastive_input))
+               != len(ambiguous.contrastive_input)):
+        raise SystemExit(
+            f"ambiguous rule used an awkward contrastive input: {ambiguous}")
+    candidates = [tuple(Step(item["operation"], item.get("parameters", {}))
+                        for item in procedure)
+                  for procedure in ambiguous.candidate_procedures or []]
+    if not candidates:
+        raise SystemExit("ambiguous rule lost its candidate procedures")
+    readable_outputs = [tuple(_apply_procedure(
+        procedure, ambiguous.contrastive_input)) for procedure in candidates]
+    best_outputs = [tuple(_apply_procedure(procedure, [0, -1, 0]))
+                    for procedure in candidates]
+    readable_counts = Counter(readable_outputs)
+    best_counts = Counter(best_outputs)
+    if (len(readable_counts) * 5 < len(best_counts) * 4
+            or max(readable_counts.values()) > 2 * max(best_counts.values())):
+        raise SystemExit(
+            "readable contrastive input lost too much candidate separation")
 
     parsed = _natural_rule_demonstration(
         "Please teach reverse the list [1, 2, 3] -> [3, 2, 1].")
@@ -281,6 +311,7 @@ def main() -> None:
             "--knowledge", str(temp / "knowledge.json"),
             "--index", str(temp / "index.json"),
             "--dialogue-state", str(temp / "dialogue.json"),
+            "--rule-session", str(temp / "rule-session.json"),
             "--rule-depth", "1",
         ]
         first = subprocess.run(
@@ -316,6 +347,7 @@ def main() -> None:
             "--knowledge", str(temp / "knowledge.json"),
             "--index", str(temp / "index.json"),
             "--dialogue-state", str(temp / "dialogue.json"),
+            "--rule-session", str(temp / "rule-session.json"),
             "--rule-depth", "1", "--rule-search-expansions", "1",
         ]
         first = subprocess.run(

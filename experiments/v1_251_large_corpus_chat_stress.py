@@ -54,6 +54,24 @@ def corpus_rows(count: int = 1_200):
     return rows
 
 
+def classify_unknown_reply(reply: str) -> str:
+    """Separate refusals, evidence-only context, clarifications, and answers."""
+    lowered = reply.casefold()
+    if "which meaning should i look up?" in lowered:
+        return "clarification"
+    refusal_markers = (
+        "couldn't find", "don't know", "can't answer", "won't guess",
+        "i do not know", "i don't have a grounded answer",
+        "does not support a grounded answer", "does not establish",
+    )
+    if not any(marker in lowered for marker in refusal_markers):
+        return "other"
+    if ("closest source sentence:" in lowered
+            or "closest related source says:" in lowered):
+        return "abstained_with_related_evidence"
+    return "abstained"
+
+
 def target_queries(count: int = 1_200):
     queries = []
     # Query a spread of the indexed corpus: enough turns to test varied
@@ -73,6 +91,14 @@ def target_queries(count: int = 1_200):
 
 
 def main() -> None:
+    if classify_unknown_reply(
+            "I won't guess.\nClosest source sentence: nearby evidence") != (
+                "abstained_with_related_evidence"):
+        raise SystemExit("related-evidence abstention was misclassified")
+    if classify_unknown_reply("Which meaning should I look up?") != "clarification":
+        raise SystemExit("clarification was incorrectly counted as an abstention")
+    if classify_unknown_reply("The answer is 42.") != "other":
+        raise SystemExit("a direct answer was misclassified as an abstention")
     with tempfile.TemporaryDirectory(prefix="crms-large-corpus-") as folder:
         root = Path(folder)
         sources = root / "sources"
@@ -237,34 +263,34 @@ def main() -> None:
                 for question in gap_queries
             },
             "unknown_query_examples": unknown_queries,
-            "unknown_reply_count": sum(
-                "I don't know this from the sources and facts I have."
-                in response_by_turn[question] for question in unknown_queries),
-            "unknown_replies": {
-                question: response_by_turn[question]
-                for question in unknown_queries
-            },
             "unknown_reply_classifications": {
-                question: (
-                    "spurious clarification" if "Which meaning should I look up?"
-                    in response_by_turn[question]
-                    else "abstained" if any(marker in response_by_turn[question]
-                        for marker in ("couldn't find", "don't know", "can't answer"))
-                    else "other")
+                question: classify_unknown_reply(response_by_turn[question])
                 for question in unknown_queries
             },
+            "unknown_reply_classification_counts": {},
             "unknown_abstention_count": sum(
-                1 for question in unknown_queries
-                if ("couldn't find" in response_by_turn[question]
-                    or "don't know" in response_by_turn[question]
-                    or "can't answer" in response_by_turn[question])
-                and "Which meaning should I look up?"
-                    not in response_by_turn[question]),
+                classify_unknown_reply(response_by_turn[question])
+                in {"abstained", "abstained_with_related_evidence"}
+                for question in unknown_queries),
             "pending_state_probe": {
                 question: response_by_turn[question]
                 for question in gap_queries
             },
         }
+        classification_counts: dict[str, int] = {}
+        for classification in report["unknown_reply_classifications"].values():
+            classification_counts[classification] = (
+                classification_counts.get(classification, 0) + 1)
+        report["unknown_reply_classification_counts"] = classification_counts
+        report["unknown_reply_count"] = sum(
+            classification_counts.get(kind, 0)
+            for kind in ("abstained", "abstained_with_related_evidence"))
+        report["unknown_abstention_gate"] = (
+            report["unknown_abstention_count"] == len(unknown_queries))
+        if not report["unknown_abstention_gate"]:
+            raise SystemExit(
+                "an unsupported query was not clearly abstained: "
+                f"{report['unknown_reply_classifications']}")
         report_path = root / "report.json"
         report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
         if report["expected_answer_sentences_seen"] != report["queries"]:
@@ -331,6 +357,14 @@ def main() -> None:
             != detail["should_find_expected_sentence"]
         }
         report["unexpected_probe_results"] = incorrect_probe_results
+        institute_record_question = gap_queries[11]
+        report["numbered_record_disambiguation_gate"] = (
+            natural_language_targets[institute_record_question]
+            in response_by_turn[institute_record_question])
+        if not report["numbered_record_disambiguation_gate"]:
+            raise SystemExit(
+                "numbered corpus query did not select its matching record: "
+                f"{response_by_turn[institute_record_question]}")
         report["learned_transfer_gate"] = bool(report["learned_transfer_answer"])
         report["unknown_abstention_gate"] = (
             report["unknown_abstention_count"] == len(unknown_queries))

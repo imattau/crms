@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Iterable, Mapping
+from typing import Any, Callable, Iterable, Mapping
 from crms_text import tokens as normalized_tokens
 
 
@@ -42,13 +42,22 @@ def verify_inference_proof(
         rules: Iterable[Mapping[str, Any]], *,
         expected_conclusion: Mapping[str, Any] | None = None,
         expected_qualifiers: Any = (),
+        fact_lookup: Callable[[Mapping[str, Any]], bool] | None = None,
         max_depth: int = 64,
         max_nodes: int = 10_000) -> RuleProofCheck:
     """Validate fact leaves, explicit rules, and fixed schema instances independently."""
     try:
         if max_depth < 1 or max_nodes < 1:
             return RuleProofCheck(False, "verification bounds must be positive")
-        fact_signatures = {_fact_signature(item) for item in facts}
+        fact_signatures = (None if fact_lookup is not None else
+                           {_fact_signature(item) for item in facts})
+
+        def fact_is_present(fact: Mapping[str, Any]) -> bool:
+            if fact_lookup is not None:
+                return bool(fact_lookup(fact))
+            assert fact_signatures is not None
+            return _fact_signature(fact) in fact_signatures
+
         trusted_rules = {_rule_key(item) for item in rules}
         expected_scope = _qualifiers(expected_qualifiers)
         nodes = 0
@@ -71,7 +80,7 @@ def verify_inference_proof(
                 fact = node.get("fact")
                 if not isinstance(fact, Mapping):
                     raise ValueError("fact proof leaf is malformed")
-                if _fact_signature(fact) not in fact_signatures:
+                if not fact_is_present(fact):
                     raise ValueError("proof fact is not present in the snapshot")
                 if _triple(fact) != conclusion_key:
                     raise ValueError("fact leaf does not prove its stated conclusion")
@@ -107,7 +116,7 @@ def verify_inference_proof(
                 relation = schema.get("relation")
                 if not isinstance(relation, str) or not relation.strip() or not _key(relation):
                     raise ValueError("schema relation instance is malformed")
-                if _fact_signature(type_fact) not in fact_signatures:
+                if not fact_is_present(type_fact):
                     raise ValueError("relation-type assertion is not in the fact snapshot")
                 if (_triple(type_fact) != (_key(relation), _key("has relation type"),
                                            _key(schema_spec[0]))
@@ -182,8 +191,8 @@ def verify_inference_proof(
                 kind_facts = node.get("middle_kind_facts")
                 if not isinstance(kind_facts, list) or len(kind_facts) != 2:
                     raise ValueError("three-premise proof must cite both middle-kind facts")
-                _verify_kind_fact(kind_facts[0], fact_signatures, o1, key[5], expected_scope)
-                _verify_kind_fact(kind_facts[1], fact_signatures, o2, key[6], expected_scope)
+                _verify_kind_fact(kind_facts[0], fact_is_present, o1, key[5], expected_scope)
+                _verify_kind_fact(kind_facts[1], fact_is_present, o2, key[6], expected_scope)
                 if node.get("middle_kind_fact") is not None:
                     raise ValueError("three-premise proof has malformed kind evidence")
             else:
@@ -195,7 +204,7 @@ def verify_inference_proof(
                     raise ValueError("premise proofs do not join to the stated conclusion")
                 middle_kind_fact = node.get("middle_kind_fact")
                 if key[5]:
-                    _verify_kind_fact(middle_kind_fact, fact_signatures, o1,
+                    _verify_kind_fact(middle_kind_fact, fact_is_present, o1,
                                       key[5], expected_scope)
                 elif middle_kind_fact is not None:
                     raise ValueError("untyped rule proof contains unexpected kind evidence")
@@ -255,12 +264,13 @@ def _rule_key(rule: Mapping[str, Any]) -> tuple[str, ...]:
                      middle_kind or "", second_middle_kind or "")  # type: ignore[return-value]
 
 
-def _verify_kind_fact(fact: Any, fact_signatures: set[tuple[Any, ...]],
+def _verify_kind_fact(fact: Any,
+                      fact_is_present: Callable[[Mapping[str, Any]], bool],
                       entity: tuple[str, ...], kind: str,
                       expected_scope: Any) -> None:
     if not isinstance(fact, Mapping):
         raise ValueError("typed rule proof is missing its middle-kind fact")
-    if _fact_signature(fact) not in fact_signatures:
+    if not fact_is_present(fact):
         raise ValueError("middle-kind fact is not present in the fact snapshot")
     if (_triple(fact) != (entity, _key("is-a"), _key(kind))
             or _qualifiers(fact.get("qualifiers", ())) != expected_scope):

@@ -12,7 +12,7 @@ from __future__ import annotations
 from collections import deque
 import re
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from itertools import product
 from typing import Any, Iterable, Mapping
 from crms_text import tokens as normalized_tokens
@@ -71,6 +71,36 @@ class InferenceResult:
     missing_premises: tuple[dict[str, Any], ...] = ()
     limit_kind: str | None = None
     memo_hits: int = 0
+    effort_level: str = "standard"
+    effort_checks: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class ReasoningBudget:
+    """Deterministic work limits; wall-clock time never changes the result."""
+
+    level: str
+    max_expansions: int
+    max_depth: int
+    max_candidates: int
+    max_proofs: int
+    max_verifier_nodes: int
+
+
+REASONING_BUDGETS = {
+    "quick": ReasoningBudget("quick", 1_000, 12, 2_000, 8, 2_000),
+    "standard": ReasoningBudget("standard", 10_000, 40, 50_000, 64, 10_000),
+    "thorough": ReasoningBudget("thorough", 50_000, 64, 250_000, 128, 20_000),
+}
+
+
+def reasoning_budget(level: str) -> ReasoningBudget:
+    """Return the named deterministic budget or reject unknown levels."""
+    try:
+        return REASONING_BUDGETS[level]
+    except (KeyError, TypeError) as error:
+        raise ValueError(
+            "effort must be 'quick', 'standard', or 'thorough'") from error
 
 
 def _proof_support(proofs: Iterable[Mapping[str, Any]], *,
@@ -120,6 +150,55 @@ def _proof_support(proofs: Iterable[Mapping[str, Any]], *,
     return support_class, lineage_count, len(source_documents), source_documents
 
 
+def _proof_contains_fact_cycle(proof: Mapping[str, Any]) -> bool:
+    """Return whether a proof's asserted fact edges contain a directed cycle.
+
+    This is a diagnostic for derived self-relations: it does not assume that
+    every relation is irreflexive, but it prevents a cycle-backed proof from
+    being presented as an unqualified answer when no relation schema explains
+    whether that cycle is meaningful.
+    """
+    edges: list[tuple[tuple[str, ...], tuple[str, ...]]] = []
+
+    def collect(node: Mapping[str, Any]) -> None:
+        if node.get("kind") == "fact":
+            fact = node.get("fact", {})
+            if isinstance(fact, Mapping):
+                subject, obj = fact.get("subject"), fact.get("object")
+                if isinstance(subject, str) and isinstance(obj, str):
+                    left, right = _key(subject), _key(obj)
+                    if left and right:
+                        edges.append((left, right))
+            return
+        premises = node.get("premises", ())
+        if isinstance(premises, (list, tuple)):
+            for premise in premises:
+                if isinstance(premise, Mapping):
+                    collect(premise)
+
+    collect(proof)
+    if proof.get("kind") != "rule" or len(set(edges)) < 2:
+        return False
+    adjacency: dict[tuple[str, ...], set[tuple[str, ...]]] = {}
+    for subject, obj in edges:
+        # An explicitly asserted self-edge is a fact about a reflexive pair,
+        # not evidence that a multi-entity path looped back to its start.
+        if subject != obj:
+            adjacency.setdefault(subject, set()).add(obj)
+
+    def reaches_cycle(start: tuple[str, ...], current: tuple[str, ...],
+                      path: frozenset[tuple[str, ...]]) -> bool:
+        for target in adjacency.get(current, ()):
+            if target == start or target in path:
+                return True
+            if reaches_cycle(start, target, path | {target}):
+                return True
+        return False
+
+    return any(reaches_cycle(node, node, frozenset({node}))
+               for node in adjacency)
+
+
 @dataclass(frozen=True)
 class RuleCandidate:
     first_relation: str
@@ -132,6 +211,8 @@ class RuleCandidate:
     third_relation: str | None = None
     middle_kind: str | None = None
     second_middle_kind: str | None = None
+    possible_examples: int = 0
+    support_coverage: float | None = None
 
 
 @dataclass(frozen=True)
@@ -173,14 +254,16 @@ class RuleAcceptanceResult:
     request: str | None = None
 
 
-def infer_relation(
+def _infer_relation_bounded(
         facts: Iterable[Mapping[str, Any]], rules: Iterable[InferenceRule], *,
         subject: str, relation: str, obj: str,
         negative_facts: Iterable[Mapping[str, Any]] = (),
         qualifiers: Mapping[str, str] | Iterable[tuple[str, str]] | None = None,
         verified_derived_proofs: Mapping[
             tuple[tuple[str, ...], ...], Iterable[Mapping[str, Any]]] | None = None,
-        max_expansions: int = 10_000, max_depth: int = 8) -> InferenceResult:
+        max_expansions: int = 10_000, max_depth: int = 40,
+        max_candidates: int = 50_000, max_proofs: int = 64,
+        effort_level: str = "standard") -> InferenceResult:
     """Backward-chain a specified triple with proof, depth, and work bounds.
 
     Only facts in the exact requested qualifier scope can be proof leaves.
@@ -195,6 +278,12 @@ def infer_relation(
     for name, value in (("max_expansions", max_expansions), ("max_depth", max_depth)):
         if not isinstance(value, int) or isinstance(value, bool) or value < 1:
             raise ValueError(f"{name} must be a positive integer")
+    if not isinstance(max_proofs, int) or isinstance(max_proofs, bool) or max_proofs < 1:
+        raise ValueError("max_proofs must be a positive integer")
+    if (not isinstance(max_candidates, int) or isinstance(max_candidates, bool)
+            or max_candidates < 1):
+        raise ValueError("max_candidates must be a positive integer")
+    reasoning_budget(effort_level)
 
     qualifier_scope = _qualifier_key(qualifiers)
     positive = [dict(fact) for fact in facts
@@ -238,6 +327,9 @@ def infer_relation(
         entities.setdefault(triple[2], str(fact["object"]))
     for rows in fact_index.values():
         rows.sort(key=lambda row: tuple(sorted(str(s) for s in row.get("sources", []))))
+    # Keep the complete entity index here. Applying one global, lexical cap
+    # lets unrelated entities evict every useful intermediate for a query.
+    # Candidate bounds are applied later to the narrowed per-rule search set.
     candidates = sorted(entities)
     derived_proofs = verified_derived_proofs or {}
     known_outgoing: dict[tuple[tuple[str, ...], tuple[str, ...]], set[tuple[str, ...]]] = {}
@@ -344,7 +436,7 @@ def infer_relation(
     exhausted = False
     proofs_truncated = False
     limit_kind: str | None = None
-    max_proofs_per_goal = 64
+    max_proofs_per_goal = max_proofs
     def proof_height(proof: Mapping[str, Any]) -> int:
         premises = proof.get("premises", [])
         if not isinstance(premises, list) or not premises:
@@ -381,6 +473,22 @@ def infer_relation(
             return False
         expansions += 1
         return True
+
+    def bounded_candidates(values, *, required=()):
+        """Bound a query-relevant candidate set, preserving required endpoints."""
+        nonlocal exhausted, limit_kind
+        ordered = sorted(set(values))
+        if len(ordered) <= max_candidates:
+            return ordered
+        exhausted = True
+        limit_kind = "candidate_limit"
+        required_values = set(required)
+        selected = set(ordered[:max_candidates]) | required_values
+        if len(selected) > max_candidates:
+            removable = sorted(selected - required_values, reverse=True)
+            for item in removable[:len(selected) - max_candidates]:
+                selected.remove(item)
+        return sorted(selected)
 
     def prove_transitive(atom: tuple[tuple[str, ...], ...],
                          relation_type_fact: Mapping[str, Any],
@@ -445,8 +553,9 @@ def infer_relation(
             if not rules_by_conclusion.get(relation_key):
                 return rows
             indexed_targets, recursive_search = indexed_rule_targets(current)
-            targets = (set(candidates) | {atom[2]}
-                       if recursive_search else indexed_targets)
+            targets = (bounded_candidates(
+                set(candidates) | {atom[2]}, required=(atom[2],))
+                if recursive_search else indexed_targets)
             indexed_targets = {target for target, _proof in rows}
             for target in sorted(targets):
                 if target in visited or target in indexed_targets:
@@ -653,7 +762,7 @@ def infer_relation(
                 # When a premise relation cannot be recursively derived, its
                 # middle entities must occur in direct or verified cached
                 # evidence. Intersect both endpoint indexes where possible.
-                eligible = candidates
+                eligible = None
                 constraints = []
                 if not relation_is_derivable(first_relation):
                     constraints.append(known_outgoing.get((atom[0], first_relation), set()))
@@ -661,7 +770,7 @@ def infer_relation(
                     constraints.append(known_incoming.get((second_relation, atom[2]), set()))
                 if constraints:
                     possible = set.intersection(*(set(items) for items in constraints))
-                    eligible = [candidate for candidate in candidates if candidate in possible]
+                    eligible = possible
                     if not eligible and atom == goal and len(constraints) == 2:
                         first_middles = constraints[0]
                         second_middles = constraints[1]
@@ -694,11 +803,15 @@ def infer_relation(
                                                      atom[2])))
                 if rule.middle_kind is not None:
                     required_kind = _key(rule.middle_kind)
-                    eligible_set = set(eligible)
-                    eligible = [candidate for candidate in candidates
-                                if candidate in eligible_set
-                                and any(_triple_key(fact)[2] == required_kind
-                                        for fact in kind_index.get(candidate, ()))]
+                    eligible_source = candidates if eligible is None else eligible
+                    eligible = [candidate for candidate in eligible_source
+                                if any(_triple_key(fact)[2] == required_kind
+                                       for fact in kind_index.get(candidate, ()))]
+                    eligible = bounded_candidates(eligible)
+                elif eligible is None:
+                    eligible = bounded_candidates(candidates)
+                else:
+                    eligible = bounded_candidates(eligible)
                 for middle_key in eligible:
                     if not spend():
                         return proofs
@@ -772,6 +885,8 @@ def infer_relation(
                 possible_last = known_incoming.get((third_relation, atom[2]), set())
                 second_middles = [candidate for candidate in second_middles
                                   if candidate in possible_last]
+            first_middles = bounded_candidates(first_middles)
+            second_middles = bounded_candidates(second_middles)
             middle_relation_recursive = relation_is_derivable(second_relation)
             for first_middle in first_middles:
                 second_candidates = second_middles
@@ -827,6 +942,7 @@ def infer_relation(
         limit_labels = {
             "depth_limit": "rule-depth limit",
             "expansion_limit": "candidate-expansion limit",
+            "candidate_limit": "candidate limit",
             "proof_limit": "proof-list limit",
         }
         limit_reason = (f"Inference reached its {limit_labels[limit_kind]}; "
@@ -889,7 +1005,7 @@ def infer_relation(
     if not incomplete_search:
         declarations = relation_constraints.get("functional", [])
         if declarations:
-            for candidate_object in candidates:
+            for candidate_object in bounded_candidates(candidates):
                 if candidate_object == goal[2]:
                     continue
                 alternative = prove(
@@ -924,6 +1040,16 @@ def infer_relation(
             lineage_count=support[1], source_count=support[2],
             source_documents=support[3], reason_code="integrity_conflict",
             failure_kind="integrity_conflict")
+    if (goal[0] == goal[2]
+            and any(_proof_contains_fact_cycle(proof) for proof in found)):
+        return InferenceResult(
+            "ambiguous", conclusion, tuple(found),
+            ("The proof returns to its starting entity through a cycle in the "
+             "supporting facts. The relation has no declared integrity schema "
+             "to establish whether this self-relation is valid."),
+            expansions, support_class=support[0], lineage_count=support[1],
+            source_count=support[2], source_documents=support[3],
+            reason_code="cyclic_support", failure_kind="integrity_conflict")
     if conflicting:
         return InferenceResult(
             "ambiguous", conclusion, tuple(found),
@@ -945,6 +1071,27 @@ def infer_relation(
         lineage_count=support[1],
         source_count=support[2], source_documents=support[3],
         memo_hits=memo_hits)
+
+
+def infer_relation(
+        facts: Iterable[Mapping[str, Any]], rules: Iterable[InferenceRule], *,
+        subject: str, relation: str, obj: str,
+        negative_facts: Iterable[Mapping[str, Any]] = (),
+        qualifiers: Mapping[str, str] | Iterable[tuple[str, str]] | None = None,
+        verified_derived_proofs: Mapping[
+            tuple[tuple[str, ...], ...], Iterable[Mapping[str, Any]]] | None = None,
+        max_expansions: int = 10_000, max_depth: int = 40,
+        max_candidates: int = 50_000, max_proofs: int = 64,
+        effort_level: str = "standard") -> InferenceResult:
+    """Run deterministic bounded inference and label its selected effort."""
+    result = _infer_relation_bounded(
+        facts, rules, subject=subject, relation=relation, obj=obj,
+        negative_facts=negative_facts, qualifiers=qualifiers,
+        verified_derived_proofs=verified_derived_proofs,
+        max_expansions=max_expansions, max_depth=max_depth,
+        max_candidates=max_candidates, max_proofs=max_proofs,
+        effort_level=effort_level)
+    return replace(result, effort_level=effort_level)
 
 
 def discover_rule_candidates(
@@ -1026,6 +1173,10 @@ def discover_rule_candidates(
 
     support: dict[tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...]],
                   dict[tuple[tuple[str, ...], tuple[str, ...]], dict[str, Any]]] = {}
+    possible_bindings: dict[
+        tuple[tuple[str, ...], tuple[str, ...]],
+        set[tuple[tuple[str, ...], tuple[str, ...]]],
+    ] = {}
     counterexamples: dict[tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...]],
                           dict[tuple[tuple[str, ...], tuple[str, ...]], dict[str, Any]]] = {}
     displays: dict[tuple[str, ...], str] = {}
@@ -1047,6 +1198,8 @@ def discover_rule_candidates(
                 break
             expansions += 1
             endpoints = (first_key[0], second_key[2])
+            possible_bindings.setdefault(
+                (first_key[1], second_key[1]), set()).add(endpoints)
             binding = (first_key[0], first_key[2], second_key[2])
             conclusion_key = (endpoints[0], endpoints[1], first_scope)
             for conclusion in positive_by_endpoint.get(conclusion_key, []):
@@ -1069,6 +1222,10 @@ def discover_rule_candidates(
     typed_counterexamples: dict[
         tuple[tuple[str, ...], ...],
         dict[tuple[tuple[str, ...], tuple[str, ...]], dict[str, Any]],
+    ] = {}
+    typed_possible_bindings: dict[
+        tuple[tuple[str, ...], ...],
+        set[tuple[tuple[str, ...], tuple[str, ...]]],
     ] = {}
     if max_arity == 3 and complete:
         outgoing: dict[tuple[tuple[str, ...], tuple[str, ...]], list[dict[str, Any]]] = {}
@@ -1127,12 +1284,14 @@ def discover_rule_candidates(
                             second_kind_key = triple_key(second_kind_fact)[2]
                             key = (first_key[1], second_key[1], third_key[1],
                                    first_kind_key, second_kind_key)
+                            endpoints = (first_key[0], third_key[2])
+                            typed_possible_bindings.setdefault(key, set()).add(
+                                endpoints)
                             example = {
                                 "first": first, "second": second, "third": third,
                                 "first_kind": first_kind_fact,
                                 "second_kind": second_kind_fact,
                             }
-                            endpoints = (first_key[0], third_key[2])
                             conclusion_key = (endpoints[0], endpoints[1], first_scope)
                             for conclusion in positive_by_endpoint.get(conclusion_key, ()):
                                 conclusion_relation = triple_key(conclusion)[1]
@@ -1173,11 +1332,15 @@ def discover_rule_candidates(
                   "insufficient-independent-sources"
                   if len(independent_sources) < min_support else
                   "uncontradicted")
+        possible_count = len(possible_bindings.get(key[:2], ()))
         candidates.append(RuleCandidate(
             displays.get(key[0], " ".join(key[0])),
             displays.get(key[1], " ".join(key[1])),
             displays.get(key[2], " ".join(key[2])),
-            ordered_support, ordered_negative, status, independent_sources))
+            ordered_support, ordered_negative, status, independent_sources,
+            possible_examples=possible_count,
+            support_coverage=(len(ordered_support) / possible_count
+                              if complete and possible_count else None)))
     for key, supported in typed_support.items():
         if len(supported) < min_support:
             continue
@@ -1195,6 +1358,7 @@ def discover_rule_candidates(
                   "insufficient-independent-sources"
                   if len(independent_sources) < min_support else
                   "uncontradicted")
+        possible_count = len(typed_possible_bindings.get(key[:-1], ()))
         candidates.append(RuleCandidate(
             displays.get(key[0], " ".join(key[0])),
             displays.get(key[1], " ".join(key[1])),
@@ -1202,14 +1366,22 @@ def discover_rule_candidates(
             ordered_support, ordered_negative, status, independent_sources,
             third_relation=displays.get(key[2], " ".join(key[2])),
             middle_kind=kind_displays.get(key[3], " ".join(key[3])),
-            second_middle_kind=kind_displays.get(key[4], " ".join(key[4]))))
-    candidates.sort(key=lambda candidate: tuple(
-        _key(value) for value in (candidate.first_relation,
-                                  candidate.second_relation,
-                                  candidate.third_relation or "",
-                                  candidate.middle_kind or "",
-                                  candidate.second_middle_kind or "",
-                                  candidate.conclusion_relation)))
+            second_middle_kind=kind_displays.get(key[4], " ".join(key[4])),
+            possible_examples=possible_count,
+            support_coverage=(len(ordered_support) / possible_count
+                              if complete and possible_count else None)))
+    def discovery_order(candidate: RuleCandidate):
+        return (
+            candidate.support_coverage is None,
+            -(candidate.support_coverage or 0.0),
+            tuple(_key(value) for value in (
+                candidate.first_relation, candidate.second_relation,
+                candidate.third_relation or "", candidate.middle_kind or "",
+                candidate.second_middle_kind or "",
+                candidate.conclusion_relation)),
+        )
+
+    candidates.sort(key=discovery_order)
     return RuleDiscoveryResult(complete, tuple(candidates), expansions)
 
 

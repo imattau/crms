@@ -382,15 +382,16 @@ distributional evidence (such as independently grounded subject and object class
 review-only hypotheses and held-out tests that measure both paraphrase recall and false alignment.
 An initial title-lead-only probe found poor endpoint coverage. The expanded probe reads explicit
 `type`/`class`/`kind` infobox fields and title-led leads after infobox blocks, including a bounded
-parenthetical after the title. Across all 285,478 documents it found 148,162 pages with one
-unambiguous coarse type head. Three disjoint 10,000-document relation windows contained 58 frame
-proposals and 215 positive non-`is-a` support rows: 49 subjects and 55 objects had a matching
-unique type, and 14 rows had both. Even with a report-only threshold of one distinct, independently
-sourced pair per wording, no two predicates shared an ordered type signature. The initial
-distributional path therefore has no real-corpus yield in these windows. Better entity linking or
-additional source-grounded category fields remain possible, but they need coverage and held-out
-precision evidence before supporting language rules. `experiments/v1_335_role_type_alignment_probe.py`
-reproduces this read-only measurement.
+parenthetical after the title. A fresh five-window replay across all 285,478 documents found
+148,162 pages with one unambiguous coarse type head and 96 relation-frame proposals. Their 409
+positive non-`is-a` support rows had 78 subjects and 144 objects with a matching unique type, with
+27 rows typed at both endpoints. Even at a report-only threshold of one distinct independently
+sourced pair per wording, no two predicates shared an ordered type signature. The distributional
+path therefore still has no real-corpus yield in these windows; the sample improves endpoint
+coverage but does not change the transfer result. Better entity linking or additional
+source-grounded category fields remain possible, but need held-out precision evidence before they
+support language rules. `experiments/v1_335_role_type_alignment_probe.py` reproduces this read-only
+measurement.
 
 ### 3.7 Pronouns and follow-ups
 

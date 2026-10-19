@@ -147,6 +147,39 @@ def _research_query_focus_terms(query: str) -> frozenset[str]:
     return frozenset()
 
 
+_NON_TERMINAL_ABBREVIATIONS = {
+    "capt", "col", "dr", "gen", "gov", "lt", "mt", "mr", "mrs", "ms",
+    "prof", "rep", "rev", "sen", "sgt", "st",
+}
+_ABBREVIATION_FOLLOWING_PROPER_NOUN = re.compile(
+    r"\s+([A-Z][\w’'-]*)\b")
+
+
+def _is_sentence_boundary(text: str, index: int) -> bool:
+    """Return whether punctuation at index ends a sentence.
+
+    Keep common title and place abbreviations attached to a following
+    capitalized word (``Dr. Lovelace``, ``St. Petersburg``). This is a
+    mechanical boundary rule; it does not parse the sentence meaning.
+    """
+    if not 0 <= index < len(text) or text[index] not in ".!?":
+        return False
+    if text[index] != ".":
+        return True
+    previous_is_digit = index > 0 and text[index - 1].isdigit()
+    next_is_digit = index + 1 < len(text) and text[index + 1].isdigit()
+    if previous_is_digit and next_is_digit:
+        return False
+    token_match = re.search(r"([A-Za-z]+)$", text[max(0, index - 8):index])
+    if (token_match is not None
+            and token_match.group(1).casefold()
+                in _NON_TERMINAL_ABBREVIATIONS):
+        next_word = _ABBREVIATION_FOLLOWING_PROPER_NOUN.match(text, index + 1)
+        if next_word is not None:
+            return False
+    return True
+
+
 def _sentence_spans(text: str) -> list[tuple[int, int]]:
     """Find conservative sentence spans without splitting dotted IDs/decimals."""
     spans: list[tuple[int, int]] = []
@@ -174,19 +207,84 @@ def _sentence_spans(text: str) -> list[tuple[int, int]]:
         next_is_boundary = end == len(text) or text[end].isspace()
         if not next_is_boundary:
             continue
-        if character == ".":
-            previous_is_digit = index > 0 and text[index - 1].isdigit()
-            next_is_digit = (index + 1 < len(text)
-                             and text[index + 1].isdigit())
-            # Keep decimal points and dotted numeric identifiers intact, but
-            # allow a sentence-ending year/number followed by a capitalized
-            # sentence (for example, ``in 1844. It was ...``).
-            if previous_is_digit and next_is_digit:
-                continue
+        # Keep decimal points, dotted numeric identifiers, and common
+        # abbreviations intact while still allowing sentence-final numbers.
+        if not _is_sentence_boundary(text, index):
+            continue
         append(end)
         start = end
     append(len(text))
     return spans
+
+
+def _sentence_span_at(text: str, position: int,
+                      lower_bound: int = 0) -> tuple[int, int]:
+    """Return the conservative sentence span containing one character offset.
+
+    Unlike ``_sentence_spans``, this searches only around a matched term. Large
+    source documents can contain millions of characters, while a search hit
+    usually needs only a handful of local sentence boundaries.
+    """
+    start = lower_bound
+    cursor = position - 1
+    while cursor >= 0:
+        boundary = max(text.rfind("\n", lower_bound, cursor + 1),
+                       text.rfind(".", lower_bound, cursor + 1),
+                       text.rfind("!", lower_bound, cursor + 1),
+                       text.rfind("?", lower_bound, cursor + 1))
+        if boundary < 0:
+            break
+        if text[boundary] == "\n":
+            start = boundary + 1
+            break
+        if not _is_sentence_boundary(text, boundary):
+            cursor = boundary - 1
+            continue
+        end = boundary + 1
+        while end < len(text) and text[end] in "\"'”’)]}":
+            end += 1
+        if end > position:
+            break
+        if (end == len(text) or text[end].isspace()) and not (
+                text[boundary] == "." and boundary > 0
+                and boundary + 1 < len(text)
+                and text[boundary - 1].isdigit()
+                and text[boundary + 1].isdigit()):
+            start = end
+            break
+        cursor = boundary - 1
+
+    end = len(text)
+    cursor = position
+    while cursor < len(text):
+        boundary = min((found for found in (
+            text.find("\n", cursor), text.find(".", cursor),
+            text.find("!", cursor), text.find("?", cursor)) if found >= 0),
+            default=-1)
+        if boundary < 0:
+            break
+        if text[boundary] == "\n":
+            end = boundary
+            break
+        if not _is_sentence_boundary(text, boundary):
+            cursor = boundary + 1
+            continue
+        sentence_end = boundary + 1
+        while sentence_end < len(text) and text[sentence_end] in "\"'”’)]}":
+            sentence_end += 1
+        if (sentence_end == len(text) or text[sentence_end].isspace()) and not (
+                text[boundary] == "." and boundary > 0
+                and boundary + 1 < len(text)
+                and text[boundary - 1].isdigit()
+                and text[boundary + 1].isdigit()):
+            end = sentence_end
+            break
+        cursor = boundary + 1
+    while start < end and text[start].isspace():
+        start += 1
+    while end > start and text[end - 1].isspace():
+        end -= 1
+    return start, end
 
 
 def _sentence_context_kind(sentence: str, document_text: str,
@@ -342,6 +440,15 @@ class SearchHit:
     page_number: int | None = None
     match_start: int | None = None
     match_end: int | None = None
+
+
+@dataclass(frozen=True)
+class ExactTitleMatch:
+    """A source whose title token sequence exactly matches a requested name."""
+
+    document_id: str
+    title: str
+    location: str | None
 
 
 @dataclass(frozen=True)
@@ -1533,6 +1640,21 @@ class CRMSResearchIndex:
         """Return a stored source or raise ``KeyError`` if it is unknown."""
         return self._documents[document_id]
 
+    def exact_title_matches(self, title: str) -> list[ExactTitleMatch]:
+        """Find exact normalized title matches without ranked body retrieval."""
+        wanted = tuple(token.group().casefold() for token in word_matches(title))
+        if not wanted:
+            return []
+        candidates = set.intersection(*(
+            self._title_postings.get(token, set()) for token in wanted))
+        matches = []
+        for document_id in sorted(candidates):
+            document = self._documents[document_id]
+            if document.title.casefold() == title.casefold():
+                matches.append(ExactTitleMatch(
+                    document.document_id, document.title, document.location))
+        return matches
+
     def verify_hit(self, hit: SearchHit) -> SourceDocument:
         """Verify source identity and that the cited span is an exact text slice."""
         document = self._documents.get(hit.document_id)
@@ -1645,18 +1767,33 @@ class CRMSResearchIndex:
             return document.text, 0, len(document.text), None, None, None
         # Prefer one complete source sentence. The offsets remain a verbatim
         # slice of the document, so citations stay independently verifiable.
-        sentence_spans = _sentence_spans(document.text)
         sentence_choices = []
         weights = term_weights or {}
-        for sentence_start, sentence_end in sentence_spans:
+        matched_spans = [span for span in spans
+                         if span[0].casefold() in query_terms]
+        candidate_sentences = []
+        sentence_end = 0
+        span_index = 0
+        while span_index < len(matched_spans):
+            _token, position, _token_end = matched_spans[span_index]
+            if position < sentence_end:
+                span_index += 1
+                continue
+            sentence_span = _sentence_span_at(
+                document.text, position, lower_bound=sentence_end)
+            matching = []
+            while (span_index < len(matched_spans)
+                   and matched_spans[span_index][1] < sentence_span[1]):
+                matching.append(matched_spans[span_index])
+                span_index += 1
+            candidate_sentences.append((sentence_span, matching))
+            sentence_end = sentence_span[1]
+        for (sentence_start, sentence_end), matching in candidate_sentences:
             # Source text sometimes contains a long unpunctuated block (for
             # example, extracted tables or malformed OCR). It is not a useful
             # answer snippet even when it contains the best matching terms.
             if sentence_end - sentence_start > 1000:
                 continue
-            matching = [span for span in spans
-                        if sentence_start <= span[1] < sentence_end
-                        and span[0].casefold() in query_terms]
             if matching:
                 matched_terms = {span[0].casefold() for span in matching}
                 coverage = len(matched_terms)
@@ -1843,6 +1980,7 @@ class CRMSResearchIndex:
                 self._body_spans[key], term_weights={
                     term: math.log(1 + (count - document_frequency[term] + 0.5)
                                    / (document_frequency[term] + 0.5))
+                    * (8.0 if term in focus_terms else 1.0)
                     for term in matched})
             hits.append(SearchHit(
                 document.document_id, document.title, document.location,
@@ -2124,10 +2262,13 @@ class CRMSResearchIndex:
                 # Keep the check lexical: it neither expands query terms nor
                 # changes the source wording. Explicit table and figure
                 # requests retain their dedicated matching rules below.
+                effective_coverage = (
+                    len(covered_terms - focus_terms)
+                    + 2 * len(covered_terms & focus_terms))
                 if (len(original_terms) >= 2
                         and not requests_structured_source
                         and not requests_figure_source
-                        and len(covered_terms & original_terms) < 2):
+                        and effective_coverage < 2):
                     continue
                 if (person_question
                         and len(covered_terms)
@@ -2288,9 +2429,40 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
     CHUNK_TOKENS = 400
     CHUNK_OVERLAP = 50
 
-    def __init__(self, path: str | Path) -> None:
+    def __init__(self, path: str | Path, *, read_only: bool = False) -> None:
         super().__init__()
+        if not isinstance(read_only, bool):
+            raise TypeError("read_only must be a boolean")
         self.path = Path(path).expanduser().resolve()
+        self.read_only = read_only
+        if read_only:
+            if not self.path.is_file():
+                raise FileNotFoundError(self.path)
+            try:
+                self._db = sqlite3.connect(
+                    self.path.as_uri() + "?mode=ro", uri=True)
+                self._db.execute("PRAGMA query_only=ON")
+                current = self._db.execute(
+                    "SELECT value FROM corpus_meta "
+                    "WHERE key='schema_version'").fetchone()
+                if current is None:
+                    raise ValueError(
+                        "read-only source is not a CRMS SQLite research index")
+                if current[0] != str(self.SCHEMA_VERSION):
+                    raise ValueError(
+                        "unsupported read-only SQLite research-index schema")
+                tables = {row[0] for row in self._db.execute(
+                    "SELECT name FROM sqlite_master WHERE type IN ('table','view')")}
+                required = {"source_documents", "source_chunks", "source_fts"}
+                if not required <= tables:
+                    raise ValueError(
+                        "read-only source is missing research-index tables")
+            except Exception:
+                if hasattr(self, "_db"):
+                    self._db.close()
+                raise
+            return
+
         self.path.parent.mkdir(parents=True, exist_ok=True)
         try:
             self._db = sqlite3.connect(str(self.path))
@@ -2500,6 +2672,23 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
             raise KeyError(document_id)
         return self._row_document(row)
 
+    def exact_title_matches(self, title: str) -> list[ExactTitleMatch]:
+        """Use the FTS title column to avoid ranking body passages for a title."""
+        wanted = tuple(token.group().casefold() for token in word_matches(title))
+        if not wanted:
+            return []
+        phrase = '"' + " ".join(wanted).replace('"', '""') + '"'
+        rows = self._db.execute(
+            "SELECT DISTINCT d.document_id,d.title,d.location "
+            "FROM source_fts JOIN source_chunks c "
+            "ON c.chunk_id=CAST(source_fts.chunk_id AS INTEGER) "
+            "JOIN source_documents d ON d.document_id=c.document_id "
+            "WHERE source_fts MATCH ? ORDER BY d.document_id",
+            (f"title : {phrase}",))
+        return [ExactTitleMatch(document_id, actual_title, location)
+                for document_id, actual_title, location in rows
+                if actual_title.casefold() == title.casefold()]
+
     def documents(self) -> list[SourceDocument]:
         rows = self._db.execute(
             "SELECT document_id,title,location,body,pages_json,sha256 "
@@ -2601,6 +2790,7 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
         if type(context_chars) is not int or context_chars < 0:
             raise ValueError("context_chars must be a non-negative integer")
         terms = _research_query_terms(query)
+        focus_terms = _research_query_focus_terms(query)
         count = self.document_count()
         if not terms or count == 0:
             return []
@@ -2618,7 +2808,8 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
                 "ON c.chunk_id=CAST(source_fts.chunk_id AS INTEGER) "
                 "WHERE source_fts MATCH ?", (expression,)).fetchone()[0])
             term_weights[term] = math.log(
-                1 + (count - frequency + 0.5) / (frequency + 0.5))
+                1 + (count - frequency + 0.5) / (frequency + 0.5)) \
+                * (8.0 if term in focus_terms else 1.0)
         quoted = [f'"{term.replace(chr(34), chr(34) * 2)}"'
                   for term in terms]
         expression = " OR ".join(
@@ -2632,7 +2823,8 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
             source_filter = f" AND NOT ({suffix_clauses})"
             parameters.extend(f"%{suffix}" for suffix in sorted(
                 _CODE_SOURCE_SUFFIXES))
-        parameters.append(limit)
+        candidate_chunks_per_document = 4
+        context_margin = 1200
         rank_expression = "bm25(source_fts,0,1.5,1.0) AS rank "
         if programming_query:
             code_suffix_clauses = " OR ".join(
@@ -2649,40 +2841,99 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
             "FROM source_fts JOIN source_chunks c "
             "ON c.chunk_id=CAST(source_fts.chunk_id AS INTEGER) "
             "JOIN source_documents d ON d.document_id=c.document_id "
-            "WHERE source_fts MATCH ?" + source_filter + "), ranked AS ("
+            "WHERE source_fts MATCH ?" + source_filter + "), ranked_chunks AS ("
             "SELECT chunk_id,document_id,start_offset,end_offset,rank,"
             "row_number() OVER (PARTITION BY document_id "
-            "ORDER BY rank ASC,chunk_id ASC) AS document_rank "
-            "FROM chunk_hits) "
-            "SELECT r.document_id,r.rank,r.start_offset,r.end_offset "
-            "FROM ranked r WHERE r.document_rank=1 "
-            "ORDER BY r.rank ASC,r.document_id ASC LIMIT ?")
+            "ORDER BY rank ASC,chunk_id ASC) AS chunk_rank "
+            "FROM chunk_hits), ranked_documents AS ("
+            "SELECT document_id,rank,"
+            "row_number() OVER (ORDER BY rank ASC,document_id ASC) "
+            "AS document_rank FROM ranked_chunks WHERE chunk_rank=1) "
+            "SELECT r.document_id,d.title,d.location,d.pages_json,"
+            "length(d.body),r.rank,"
+            "r.start_offset,r.end_offset,r.chunk_rank,"
+            "max(0,r.start_offset-?) AS context_start,"
+            "substr(d.body,max(1,r.start_offset-?+1),"
+            "r.end_offset-max(0,r.start_offset-?)+?) AS context_text "
+            "FROM ranked_chunks r JOIN ranked_documents rd "
+            "ON rd.document_id=r.document_id "
+            "JOIN source_documents d ON d.document_id=r.document_id "
+            "WHERE rd.document_rank<=? AND r.chunk_rank<=? "
+            "ORDER BY rd.document_rank,r.chunk_rank")
+        parameters.extend((context_margin, context_margin, context_margin,
+                           context_margin, limit, candidate_chunks_per_document))
         rows = self._db.execute(sql, parameters).fetchall()
-        hits = []
-        for document_id, rank, chunk_start, chunk_end in rows:
-            document = self.document(document_id)
-            # FTS chooses one best chunk per document to rank documents, but
-            # the answer-bearing sentence may be in another chunk. Preserve
-            # all query terms found anywhere in the selected document so the
-            # sentence scorer can choose that exact sentence, as it does for
-            # the in-memory index.
-            body_spans = self._token_spans(document.text)
-            title_terms = {token.casefold() for token, _, _
-                           in self._token_spans(document.title)}
-            body_terms = {token.casefold() for token, _, _ in body_spans}
+        title_tokens: dict[str, set[str]] = {}
+        page_offsets_cache: dict[str, list[tuple[int, int, int]]] = {}
+        best_by_document: dict[
+            str, tuple[tuple[float, int, int, int], SearchHit]] = {}
+        for (document_id, title, location, pages_json, document_length, rank,
+             chunk_start,
+             _chunk_end, chunk_rank, context_start, context_text) in rows:
+            spans = self._token_spans(context_text)
+            if not spans:
+                continue
+            known_title_terms = title_tokens.setdefault(
+                title, {token.casefold() for token, _, _
+                        in self._token_spans(title)})
+            context_terms = {token.casefold() for token, _, _ in spans}
             matched = tuple(term for term in terms
-                            if term in body_terms or term in title_terms)
+                            if term in context_terms or term in known_title_terms)
             if not matched:
                 continue
-            snippet, start, end, page_number, match_start, match_end = (
+            local_document = SourceDocument(
+                document_id, title, context_text, location, ())
+            (snippet, local_start, local_end, _page_number,
+             local_match_start, local_match_end) = (
                 CRMSResearchIndex._snippet(
-                    document, set(matched), context_chars, body_spans,
+                    local_document, set(matched), context_chars, spans,
                     term_weights=term_weights))
-            hits.append(SearchHit(
-                document.document_id, document.title, document.location,
-                -float(rank), snippet, start, end, matched, page_number,
-                match_start, match_end))
-        return hits
+            if ((local_start == 0 and context_start > 0)
+                    or (local_end == len(context_text)
+                        and context_start + len(context_text) < document_length)):
+                # The local window clipped a sentence. Do not present that
+                # fragment as a complete source sentence; another candidate
+                # chunk may contain the full sentence.
+                continue
+            if local_match_start is not None:
+                local_match_start += context_start
+                local_match_end += context_start
+            start = context_start + local_start
+            end = context_start + local_end
+            page_number = None
+            if pages_json != "[]" and local_match_start is not None:
+                page_offsets = page_offsets_cache.get(document_id)
+                if page_offsets is None:
+                    page_offsets = []
+                    page_offset = 0
+                    for page_index, page in enumerate(
+                            json.loads(pages_json), start=1):
+                        page_offsets.append((
+                            page_offset, page_offset + len(page), page_index))
+                        page_offset += len(page) + len("\n\f\n")
+                    page_offsets_cache[document_id] = page_offsets
+                page_number = next((page for start, page_end, page
+                                    in page_offsets
+                                    if start <= local_match_start < page_end),
+                                   None)
+            snippet_terms = {token.casefold() for token, _, _
+                             in self._token_spans(snippet)}
+            covered_terms = snippet_terms & set(matched)
+            coverage_score = sum(term_weights.get(term, 1.0)
+                                 for term in covered_terms)
+            hit = SearchHit(
+                document_id, title, location, -float(rank), snippet,
+                start, end, matched, page_number, local_match_start,
+                local_match_end)
+            # The FTS rank identifies promising source chunks; sentence
+            # coverage chooses the answer-bearing excerpt among those chunks.
+            key = (coverage_score, len(covered_terms), -int(chunk_rank), -start)
+            previous = best_by_document.get(document_id)
+            if previous is None or key > previous[0]:
+                best_by_document[document_id] = (key, hit)
+        return [item[1] for item in sorted(
+            best_by_document.values(),
+            key=lambda item: (-item[1].score, item[1].document_id))]
 
     def verify_hit(self, hit: SearchHit) -> SourceDocument:
         document = self.document(hit.document_id)

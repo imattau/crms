@@ -177,6 +177,33 @@ def main() -> None:
             and "ancestor-schema" in (self_ancestor.request or ""),
             f"irreflexive derived self-relation was not reported: {self_ancestor}")
 
+    cyclic_support = CRMSKnowledgeBase()
+    cyclic_support.add_fact("Ann", "parent of", "Bob", "parent-ab")
+    cyclic_support.add_fact("Bob", "parent of", "Ann", "parent-ba")
+    cyclic_support.add_inference_rule(
+        "parent-chain", "parent of", "parent of", "grandparent of")
+    self_grandparent = cyclic_support.infer_relation(
+        "Ann", "grandparent of", "Ann")
+    require(self_grandparent.status == "ambiguous"
+            and self_grandparent.reason_code == "cyclic_support"
+            and "cycle in the supporting facts" in (self_grandparent.request or ""),
+            f"untyped cycle-backed self-relation was presented as certain: "
+            f"{self_grandparent}")
+    chat_self_grandparent = cyclic_support.ask(
+        "Is Ann a grandparent of Ann?")
+    require(chat_self_grandparent.status == "ambiguous"
+            and chat_self_grandparent.reason_code == "cyclic_support"
+            and "cycle in the supporting facts" in
+            (chat_self_grandparent.request or ""),
+            "natural-language yes/no routing hid the cyclic-support warning: "
+            f"{chat_self_grandparent}")
+    explicit_self_relation = CRMSKnowledgeBase()
+    explicit_self_relation.add_fact("Ann", "knows", "Ann", "self-fact")
+    explicit_self_answer = explicit_self_relation.infer_relation(
+        "Ann", "knows", "Ann")
+    require(explicit_self_answer.status == "answered",
+            "cycle diagnostic changed an explicit self-relation into a warning")
+
     asymmetric = CRMSKnowledgeBase()
     for subject, obj in (("A", "B"), ("B", "C"),
                          ("C", "D"), ("D", "A")):
@@ -219,7 +246,9 @@ def main() -> None:
     require(framed_answer.status == "ambiguous"
             and "integrity constraint" in (framed_answer.request or ""),
             f"natural-language inferred question hid the integrity conflict: {framed_answer}")
-    passed_families.append("irreflexive/asymmetric integrity constraints, bounds, persistence")
+    passed_families.append(
+        "cycle-backed self-relation warning, declared irreflexive/asymmetric "
+        "constraints, bounds, persistence")
 
     functional = CRMSKnowledgeBase()
     functional.add_fact("Ann", "works for", "Acme", "job-acme")

@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from crms_research import (
     CRMSSQLiteResearchIndex, CRMSResearchIndex,
     _research_query_focus_terms, _research_query_terms, _sentence_context_kind,
-    _sentence_spans,
+    _sentence_span_at, _sentence_spans,
 )
 from crms_knowledge import CRMSKnowledgeBase
 
@@ -26,6 +26,16 @@ def main() -> None:
     ] != ['“Guido created Python.”', 'Agentless passives remain unassigned.']:
         raise SystemExit(
             f"sentence splitter crossed a closing quote: {quoted_sentences}")
+    abbreviated = "Thompson was born in St. Petersburg. Dr. Ada Lovelace replied."
+    if [abbreviated[start:end]
+            for start, end in _sentence_spans(abbreviated)] != [
+                "Thompson was born in St. Petersburg.",
+                "Dr. Ada Lovelace replied."]:
+        raise SystemExit("sentence splitting broke a place or title abbreviation")
+    local_span = _sentence_span_at(
+        abbreviated, abbreviated.index("Petersburg"))
+    if abbreviated[slice(*local_span)] != "Thompson was born in St. Petersburg.":
+        raise SystemExit("local sentence lookup split a place abbreviation")
     if "can" in _research_query_terms(
             "How can source text be included in a model?"):
         raise SystemExit("a common auxiliary was retained as a content term")

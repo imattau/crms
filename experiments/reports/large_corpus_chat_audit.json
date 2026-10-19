@@ -184,7 +184,7 @@
     "response": "CRMS> Researcher 0000 designed the Vela instrument 0000. [Source: doc-0000.txt; supporting claim awaiting review; not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.",
     "sentence_with_explicit_review_status": true
   },
-  "paraphrase_sentence_hits": 8,
+  "paraphrase_sentence_hits": 7,
   "positive_paraphrase_related_evidence_only_count": 1,
   "positive_paraphrase_probe_count": 11,
   "negative_relation_control_count": 3,
@@ -225,27 +225,27 @@
       "should_find_expected_sentence": true
     },
     "What body of water crosses Nacre City 0133?": {
-      "response": "CRMS> Source text: Fictional Research Record 0133\nThe Serein River 0133 flows through Nacre City 0133.\nSource: doc-0133.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
-      "expected_sentence_found": true,
-      "should_find_expected_sentence": true
-    },
-    "Where does the Serein River 0133 run?": {
-      "response": "CRMS> Source text: Fictional Research Record 0133\nThe Serein River 0133 flows through Nacre City 0133.\nSource: doc-0133.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
-      "expected_sentence_found": true,
-      "should_find_expected_sentence": true
-    },
-    "What did the Meridian Institute 0266 investigate?": {
-      "response": "CRMS> I found relevant source text, but no accepted fact supports an answer yet. Ask \u2018why?\u2019 to see the best matching sentence.",
+      "response": "CRMS> I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: \u201cNacre City 0133 is crossed by Serein River 0133.\u201d [Source: doc-0133.txt; may not answer your question]",
       "expected_sentence_found": false,
       "should_find_expected_sentence": true
     },
+    "Where does the Serein River 0133 run?": {
+      "response": "CRMS> I found source text, but it does not support a grounded answer (no locative relation in sentence; no question-relation term in sentence). I won't guess.\nClosest source sentence: \u201cNacre City 0133 is crossed by Serein River 0133.\u201d [Source: doc-0133.txt; may not answer your question]",
+      "expected_sentence_found": false,
+      "should_find_expected_sentence": true
+    },
+    "What did the Meridian Institute 0266 investigate?": {
+      "response": "CRMS> I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: \u201cResearchers at the Meridian Institute 0266 studied quartz field 0266.\u201d [Source: doc-0266.txt; may not answer your question]",
+      "expected_sentence_found": true,
+      "should_find_expected_sentence": true
+    },
     "What topic was studied by the Meridian Institute 0266?": {
-      "response": "CRMS> Source text: Researchers at the Meridian Institute 0266 studied quartz field 0266.\nSource: doc-0266.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
+      "response": "CRMS> \u201cResearchers at the Meridian Institute 0266 studied quartz field 0266.\u201d [Source: doc-0266.txt; quoted evidence, not an accepted fact]",
       "expected_sentence_found": true,
       "should_find_expected_sentence": true
     },
     "At which institute did researchers study quartz field 0266?": {
-      "response": "CRMS> Source text: Researchers at the Meridian Institute 0266 studied quartz field 0266.\nSource: doc-0266.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
+      "response": "CRMS> \u201cResearchers at the Meridian Institute 0266 studied quartz field 0266.\u201d [Source: doc-0266.txt; quoted evidence, not an accepted fact]",
       "expected_sentence_found": true,
       "should_find_expected_sentence": true
     },
@@ -264,14 +264,13 @@
     "Who invented the Zorblax engine?",
     "What is the population of Nacre City 9999?"
   ],
-  "unknown_reply_count": 1,
-  "unknown_replies": {
-    "Who invented the Zorblax engine?": "CRMS> I couldn't find one source sentence that states who answers that question.",
-    "What is the population of Nacre City 9999?": "CRMS> I don't know this from the sources and facts I have. Add a source or teach the fact."
-  },
   "unknown_reply_classifications": {
     "Who invented the Zorblax engine?": "abstained",
-    "What is the population of Nacre City 9999?": "abstained"
+    "What is the population of Nacre City 9999?": "abstained_with_related_evidence"
+  },
+  "unknown_reply_classification_counts": {
+    "abstained": 1,
+    "abstained_with_related_evidence": 1
   },
   "unknown_abstention_count": 2,
   "pending_state_probe": {
@@ -282,14 +281,16 @@
     "Who is credited with designing the Vela instrument 0133?": "CRMS> Researcher 0133 designed the Vela instrument 0133. [Source: doc-0133.txt; supporting claim awaiting review; not yet an accepted fact]",
     "Who created the Vela instrument 0133?": "CRMS> I couldn't find one source sentence that states who answers that question.",
     "Which waterway runs through Nacre City 0133?": "CRMS> I couldn't find source sentences that support a waterway runs through Nacre City 0133; I don't have a grounded answer for that question.",
-    "What body of water crosses Nacre City 0133?": "CRMS> Source text: Fictional Research Record 0133\nThe Serein River 0133 flows through Nacre City 0133.\nSource: doc-0133.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
-    "Where does the Serein River 0133 run?": "CRMS> Source text: Fictional Research Record 0133\nThe Serein River 0133 flows through Nacre City 0133.\nSource: doc-0133.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
-    "What did the Meridian Institute 0266 investigate?": "CRMS> I found relevant source text, but no accepted fact supports an answer yet. Ask \u2018why?\u2019 to see the best matching sentence.",
-    "What topic was studied by the Meridian Institute 0266?": "CRMS> Source text: Researchers at the Meridian Institute 0266 studied quartz field 0266.\nSource: doc-0266.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
-    "At which institute did researchers study quartz field 0266?": "CRMS> Source text: Researchers at the Meridian Institute 0266 studied quartz field 0266.\nSource: doc-0266.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
+    "What body of water crosses Nacre City 0133?": "CRMS> I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: \u201cNacre City 0133 is crossed by Serein River 0133.\u201d [Source: doc-0133.txt; may not answer your question]",
+    "Where does the Serein River 0133 run?": "CRMS> I found source text, but it does not support a grounded answer (no locative relation in sentence; no question-relation term in sentence). I won't guess.\nClosest source sentence: \u201cNacre City 0133 is crossed by Serein River 0133.\u201d [Source: doc-0133.txt; may not answer your question]",
+    "What did the Meridian Institute 0266 investigate?": "CRMS> I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: \u201cResearchers at the Meridian Institute 0266 studied quartz field 0266.\u201d [Source: doc-0266.txt; may not answer your question]",
+    "What topic was studied by the Meridian Institute 0266?": "CRMS> \u201cResearchers at the Meridian Institute 0266 studied quartz field 0266.\u201d [Source: doc-0266.txt; quoted evidence, not an accepted fact]",
+    "At which institute did researchers study quartz field 0266?": "CRMS> \u201cResearchers at the Meridian Institute 0266 studied quartz field 0266.\u201d [Source: doc-0266.txt; quoted evidence, not an accepted fact]",
     "Who was responsible for orchestrating the Vela instrument 0133?": "CRMS> I couldn't find one source sentence that states who answers that question.",
     "What did researchers at the Meridian Institute 0266 invent?": "CRMS> I couldn't find source sentences that support a did researchers at Meridian Institute 0266 invent; I don't have a grounded answer for that question."
   },
+  "unknown_reply_count": 2,
+  "unknown_abstention_gate": true,
   "exact_answer_gate": "PASS",
   "learned_transfer_answer": true,
   "learned_transfer_candidate_reviewed": true,
@@ -308,14 +309,19 @@
       "expected_sentence_found": false,
       "should_find_expected_sentence": true
     },
-    "What did the Meridian Institute 0266 investigate?": {
-      "response": "CRMS> I found relevant source text, but no accepted fact supports an answer yet. Ask \u2018why?\u2019 to see the best matching sentence.",
+    "What body of water crosses Nacre City 0133?": {
+      "response": "CRMS> I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: \u201cNacre City 0133 is crossed by Serein River 0133.\u201d [Source: doc-0133.txt; may not answer your question]",
+      "expected_sentence_found": false,
+      "should_find_expected_sentence": true
+    },
+    "Where does the Serein River 0133 run?": {
+      "response": "CRMS> I found source text, but it does not support a grounded answer (no locative relation in sentence; no question-relation term in sentence). I won't guess.\nClosest source sentence: \u201cNacre City 0133 is crossed by Serein River 0133.\u201d [Source: doc-0133.txt; may not answer your question]",
       "expected_sentence_found": false,
       "should_find_expected_sentence": true
     }
   },
+  "numbered_record_disambiguation_gate": true,
   "learned_transfer_gate": true,
-  "unknown_abstention_gate": true,
   "negative_relation_controls_abstained": 3,
   "agent_noun_transfer_gate": true,
   "inverse_question_transfer_gate": true,

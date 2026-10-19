@@ -39,6 +39,42 @@ def signature(kb: CRMSKnowledgeBase):
     return result.complete, result.expansions, tuple(candidates)
 
 
+def add_holdout_examples(kb: CRMSKnowledgeBase) -> None:
+    for number in range(2):
+        subject, middle, target = (f"Held{number}A", f"Held{number}B",
+                                   f"Held{number}C")
+        source = f"validation:{number}"
+        kb.add_fact(subject, "parent", middle, source)
+        kb.add_fact(middle, "parent", target, source)
+        kb.add_fact(subject, "ancestor", target, source)
+
+
+def accept_and_recombine(kb: CRMSKnowledgeBase, label: str) -> None:
+    add_holdout_examples(kb)
+    review = kb.review_inference_rules("validation:")
+    matching = [
+        (number, item) for number, item in enumerate(review.reviews, 1)
+        if (item.candidate.first_relation, item.candidate.second_relation,
+            item.candidate.conclusion_relation)
+        == ("parent", "parent", "ancestor")
+    ]
+    if (not review.complete or len(matching) != 1
+            or matching[0][1].validation is None
+            or matching[0][1].validation.status != "validated"
+            or matching[0][1].validation.independent_sources
+               != ("validation:0", "validation:1")):
+        raise SystemExit(f"{label} held-out rule validation failed: {review}")
+    accepted = kb.accept_inference_rule_candidate(
+        matching[0][0], f"{label}-parent-transitivity", "validation:")
+    if not accepted.accepted:
+        raise SystemExit(f"{label} refused a validated rule: {accepted}")
+    kb.add_fact("ProbeA", "parent", "ProbeB", "probe:first")
+    kb.add_fact("ProbeB", "parent", "ProbeC", "probe:second")
+    result = kb.infer_relation("ProbeA", "ancestor", "ProbeC")
+    if (result.status != "answered" or not result.complete or not result.proofs):
+        raise SystemExit(f"{label} accepted rule failed recombination: {result}")
+
+
 def check_pruned_parity() -> None:
     """Keep conclusion labels, counterexamples, scopes and kinds on SQLite."""
     memory = CRMSKnowledgeBase()
@@ -85,7 +121,7 @@ def check_pruned_parity() -> None:
 def main() -> None:
     check_pruned_parity()
     print("SQLite facts | expansions | in-memory ms | SQLite ms (median of 3)")
-    for background in (20_000, 100_000):
+    for background in (20_000, 100_000, 300_000):
         memory = seeded(background)
         expected = signature(memory)
         if (not expected[0] or expected[1] != 2 or len(expected[2]) != 1
@@ -120,7 +156,11 @@ def main() -> None:
             sqlite_ms = statistics.median(durations) * 1000
             print(f"{background + 6:>12,} | {expected[1]:>10,} | "
                   f"{memory_ms:>12.2f} | {sqlite_ms:>9.2f}", flush=True)
+            accept_and_recombine(memory, "memory")
+            accept_and_recombine(sqlite_kb, "SQLite")
             sqlite_kb.close()
+    print("held-out rule validation, explicit acceptance, and novel-chain "
+          "recombination passed in memory and SQLite")
 
 
 if __name__ == "__main__":

@@ -6,6 +6,8 @@ Run from the project root with:
 
 from __future__ import annotations
 
+import sqlite3
+import subprocess
 import sys
 import tempfile
 from dataclasses import replace
@@ -13,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from crms_research import CRMSResearchIndex
+from crms_research import CRMSSQLiteResearchIndex, CRMSResearchIndex
 from crms_knowledge import CRMSKnowledgeBase
 
 
@@ -113,6 +115,68 @@ def main() -> None:
     if (not loaded or loaded[0].document_id != "local"
             or loaded[0].snippet != "A local source has a verifiable passage."):
         raise SystemExit(f"file ingestion or persistence failed: {loaded}")
+
+    with tempfile.TemporaryDirectory(prefix="crms-readonly-index-") as directory:
+        folder = Path(directory)
+        database = folder / "model-research.sqlite"
+        writable = CRMSSQLiteResearchIndex(database)
+        writable.add_document(
+            "source", "Portable model source",
+            "A reviewed fact can be retrieved without changing the model.",
+            "portable-source.txt")
+        writable.add_document(
+            "tavor", "Tavor Engine",
+            "Mira Sol designed Tavor Engine.", "tavor.txt")
+        writable.close()
+        before = database.stat()
+        readonly = CRMSSQLiteResearchIndex(database, read_only=True)
+        readonly_hits = readonly.search("reviewed fact retrieve model", limit=1)
+        if (not readonly_hits
+                or readonly_hits[0].document_id != "source"
+                or readonly.resolve_citation(
+                    readonly.citation(readonly_hits[0]))
+                    != readonly_hits[0].snippet):
+            raise SystemExit("read-only model index lost retrieval or citations")
+        try:
+            readonly.add_document("blocked", "Blocked", "Must not be stored.")
+        except sqlite3.OperationalError:
+            pass
+        else:
+            raise SystemExit("read-only model index accepted a write")
+        readonly.close()
+
+        # Exercise the actual chat runtime against the same source database.
+        # All three source-ingestion commands must be rejected before they
+        # touch local files or attempt network access.
+        corpus = folder / "new-corpus"
+        corpus.mkdir()
+        (corpus / "new.txt").write_text(
+            "This document must not be added.", encoding="utf-8")
+        local_source = folder / "local-source.txt"
+        local_source.write_text("This file must not be added.", encoding="utf-8")
+        knowledge_path = folder / "knowledge.json"
+        chat = subprocess.run(
+            [sys.executable, str(Path(__file__).resolve().parents[1]
+                                 / "crms_chat.py"),
+             "--knowledge", str(knowledge_path),
+             "--index", str(database), "--index-read-only",
+             "--dialogue-state", str(folder / "dialogue.json"),
+             "--rules", str(folder / "rules.json"),
+             "--math", str(folder / "math.json"),
+             "--translations", str(folder / "translations.json")],
+            input=(f"/source-dir {corpus}\n/source {local_source}\n"
+                   "/crawl https://example.invalid|1|0\n"
+                   "Who designed Tavor Engine?\n/quit\n"),
+            text=True, capture_output=True, cwd=folder, timeout=30)
+        if (chat.returncode != 0
+                or chat.stdout.count("research index is read-only") != 3
+                or "Mira Sol designed Tavor Engine." not in chat.stdout):
+            raise SystemExit(
+                "read-only chat did not block ingestion or answer from the "
+                f"existing source text:\n{chat.stdout}\n{chat.stderr}")
+        after = database.stat()
+        if (before.st_size, before.st_mtime_ns) != (after.st_size, after.st_mtime_ns):
+            raise SystemExit("read-only model query modified its SQLite database")
 
     index.add_document("manual", "Replacement", "Updated content only.",
                        replace=True)

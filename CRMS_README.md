@@ -2420,6 +2420,13 @@ documents to construct exact-offset citations. Results rank the best chunk per
 document, so a long book or PDF can be retrieved by its relevant section rather
 than one whole-document score. Version-1 SQLite indexes rebuild their FTS table
 into chunked form on first open while preserving stored documents and citations.
+Existing version-2 indexes can also be opened through
+`CRMSSQLiteResearchIndex("research.sqlite", read_only=True)` for querying or
+reviewing a packaged corpus without running schema migration, backfill, or write
+operations. The chat accepts `--index research.sqlite --index-read-only` to use
+this mode at runtime; `/source`, `/source-dir`, and `/crawl` are disabled in
+that session. Read-only mode rejects missing, non-SQLite, or unsupported
+indexes; omit `--index-read-only` when indexing new sources.
 `/source-dir PATH` recursively indexes UTF-8
 `.txt`, `.md`, `.markdown`, `.rst`, `.csv`, and `.tsv` files, `.xlsx`
 workbooks, `.pptx` presentations, readable `.html`/`.htm`/`.xhtml`,

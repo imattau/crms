@@ -6,6 +6,7 @@ from collections.abc import Iterator, MutableMapping
 import json
 import sqlite3
 from typing import Any
+from crms_text import tokens as normalized_tokens
 
 
 def _freeze(value: Any) -> Any:
@@ -37,6 +38,9 @@ class SQLiteFactMap(MutableMapping):
         connection.execute(
             f"CREATE INDEX IF NOT EXISTS {table}_relation_object "
             f"ON {table}(relation_key, object_key)")
+        connection.execute(
+            f"CREATE INDEX IF NOT EXISTS {table}_relation_subject_object "
+            f"ON {table}(relation_key, subject_key, object_key)")
         connection.execute(
             f"CREATE INDEX IF NOT EXISTS {table}_subject "
             f"ON {table}(subject_key)")
@@ -136,6 +140,52 @@ class SQLiteFactMap(MutableMapping):
             (relation_json, bound_json))
         for (payload,) in cursor:
             yield self._decode_fact(payload)
+
+    def lookup_object(self, object_key: tuple[str, ...]):
+        """Yield facts for one object across all relations via the object index."""
+        encoded = json.dumps(object_key, ensure_ascii=False,
+                             separators=(",", ":"))
+        cursor = self.connection.execute(
+            f"SELECT payload_json FROM {self.table} "
+            "WHERE object_key=? ORDER BY key_json", (encoded,))
+        for (payload,) in cursor:
+            yield self._decode_fact(payload)
+
+    def lookup_triple(self, subject: tuple[str, ...],
+                      relation: tuple[str, ...],
+                      object_: tuple[str, ...]):
+        """Yield exact triple evidence, including all qualifier variants."""
+        encoded = tuple(json.dumps(value, ensure_ascii=False,
+                                   separators=(",", ":"))
+                        for value in (relation, subject, object_))
+        cursor = self.connection.execute(
+            f"SELECT payload_json FROM {self.table} "
+            "WHERE relation_key=? AND subject_key=? AND object_key=? "
+            "ORDER BY key_json", encoded)
+        for (payload,) in cursor:
+            yield self._decode_fact(payload)
+
+    def contains_evidence(self, fact) -> bool:
+        """Check a proof fact by indexed triple key and exact provenance."""
+        key = tuple(normalized_tokens(str(fact.get(field, "")))
+                    for field in ("subject", "relation", "object"))
+        if not all(key):
+            return False
+        try:
+            stored = self[key]
+        except KeyError:
+            return False
+        expected_sources = tuple(sorted(str(source)
+                                        for source in fact.get("sources", ())))
+        stored_sources = tuple(sorted(str(source) for source in stored.sources))
+        expected_qualifiers = tuple(sorted(
+            (normalized_tokens(str(name)), normalized_tokens(str(value)))
+            for name, value in fact.get("qualifiers", ())))
+        stored_qualifiers = tuple(sorted(
+            (normalized_tokens(str(name)), normalized_tokens(str(value)))
+            for name, value in stored.qualifiers))
+        return (stored_sources == expected_sources
+                and stored_qualifiers == expected_qualifiers)
 
     def select_relations(self, relations):
         relation_json = sorted({

@@ -1457,3 +1457,129 @@ before review, and transfers the accepted wording to a chat query over the
 indexed corpus. `experiments/v1_296_large_corpus_predicate_learning.py` passes.
 This is still evidence-based, explicit review rather than an automatic claim
 that every related-looking verb is a synonym.
+
+### Full bundled-corpus natural-language spot check
+
+A read-only copy of the bundled 288,431-document SQLite research index was
+opened in a temporary chat session. `What is the capital city of France?`
+returned the source sentence “The capital of France is Paris.” with a source
+label and the required quoted-evidence/not-accepted-fact status. The first run
+of `Where is Mount Everest located?` failed even though the exact-title page
+contains “Everest is located in the Mahalangur Himal sub-range of the Himalayas
+in the Solukhumbu district of Nepal.” The locative matcher allowed the page's
+final title word as an alias but rejected it when followed by the copula
+“is”. It now accepts that alias plus the finite forms `is`, `was`, `are`, and
+`were` only within the unique exact-title document. The replay then returned
+the exact Everest sentence and source label. The fixture regression
+`experiments/v1_303_exact_title_locative_chat.py` covers both the existing
+Alan Turing case and this title/coreference form.
+
+This confirms two grounded natural-language question paths over the full
+bundled corpus, not broad answer quality or general entity-coreference
+coverage. Search-index installation took 136.06 seconds and generated a
+2.23-GB temporary index; see `docs/sqlite_memory_design.md` for the full-corpus
+inventory and timing.
+
+### Structured metadata field retrieval
+
+A later read-only probe of the bundled SimpleWiki index found that `Who
+designed the Python programming language?` and `What is the capital of
+Germany?` abstained even though their exact-title pages contain `designer =
+Guido van Rossum` and `capital = Berlin`. The prose extractor correctly
+excluded these infobox fields, but no structured-field answer route existed.
+CRMS now recognizes a small explicit set of agent-role fields (designer,
+creator, inventor, founder, and author) and a country `capital` field on one
+exact-title page, cites the exact field span, and labels the answer as quoted
+structured evidence rather than an accepted fact. This path does not infer
+that an arbitrary field such as `manufacturer` means `creator`; multiple
+exact-title records remain unresolved. The checked-in regression is
+`experiments/v1_318_infobox_field_evidence.py`.
+For the spot checks, only the Python-language and Germany pages were copied
+from the 285,478-document bundled SimpleWiki index into temporary scratch
+indexes; the full database was opened read-only and was not modified.
+
+### Explicitly learning alternate question wording
+
+A separate chat regression checks the supported path for a lexical alternative
+when the user can label one example from an accepted fact. After two examples
+license `created`, a teacher labels `Who made Tavel Compass?` with its accepted
+answer. CRMS stores the new question surface under the existing relation,
+answers that wording for a different entity after reload, and continues to
+abstain on `Who crafted ...?`. This is user-supervised frame transfer, not
+zero-shot synonym inference; the benchmark still records lexical transfer as
+an open coverage gap. See
+`experiments/v1_319_additional_synonym_question_frame.py`.
+
+### `Why?` after proof-backed inference
+
+The CLI could let the prior retrieval result take priority over a selected reasoning
+proof. A multi-turn case with an unrelated family-guide sentence followed by
+`Is Ann a grandparent of Cara?` reproduced it: the answer had a valid two-premise
+proof, but `Why?` described the guide passage. The chat now routes this follow-up
+to the dialogue's proof explanation first when the previous answer carried an
+inference proof. `experiments/v1_320_chat_why_uses_selected_inference_proof.py`
+checks that both premise sources and the rule appear in the explanation while
+the unrelated passage does not. Existing `v1_131` explanation, `v1_185`
+reasoning-contract, and `v1_295` natural-language regressions also pass.
+
+### More answerable rule-learning probes
+
+A single example of `reverse the list [1,2,3] -> [3,2,1]` correctly leaves a
+version space open, but the best purely mathematical probe was `[0,-1,0]`.
+The learner now looks for a short, positive, duplicate-free permutation whose
+candidate outputs retain at least 80% of the best probe's distinct classes
+and whose largest class stays bounded relative to the original. In this case
+it asks for the output on `[1,2,3,5,4]`, separating 8 output classes among 15
+candidate procedures. The rule remains unlearned until the teacher supplies
+that output. `experiments/v1_49_natural_rule_demonstrations.py` checks probe
+readability, separation, and persisted CLI learning; the experiment now also
+keeps its pending rule-session file in its temporary directory.
+
+### 1,200-document chat stress replay: abstention metric correction
+
+Command: `python3 experiments/v1_251_large_corpus_chat_stress.py`
+
+The current runtime replay indexed 1,200 generated source documents (7,200 sentences), surfaced
+the exact expected sentence for all 30 baseline questions, kept all three negative relation
+controls from answering, and preserved the embedded source corpus in a portable model after its
+original index and source directory were taken offline. Both unsupported questions were
+appropriately refused. One reply included a closest sentence, but explicitly said it did not
+support a grounded answer and “I won't guess.” The previous report classifier missed that refusal
+because it did not recognize this wording; it now records the result as
+`abstained_with_related_evidence` and requires all unsupported queries to abstain.
+
+Three positive probes remain open: `Which stream passes through Nacre City 0133?` and `Which
+waterway runs through Nacre City 0133?` do not find the corresponding evidence, while `At which
+institute did researchers study quartz field 0266?` detects multiple candidate sentences and
+abstains. These are language and relevance gaps, not failures of source availability; the exact
+sentence appears in the generated corpus. The benchmark keeps them visible instead of counting a
+closest-sentence quote as a correct answer.
+
+### Numbered-record disambiguation follow-up
+
+The 1,200-document replay exposed a gate-level ranking gap: the institute question placed its
+matching record beside the same-topic distractor and records 0000–0009, then abstained because
+several candidates tied. The query's `0266` identifier had been treated as an ordinary omitted
+number instead of an entity constraint. The evidence gate now requires each explicit numeric token
+in the question to occur as a token in the candidate sentence. A rerun selected the exact Meridian
+Institute 0266 sentence, and `experiments/v1_251_large_corpus_chat_stress.py` now makes that
+large-corpus outcome a pass/fail check. The direct runtime gate also mixes the target with ten
+numbered records and a same-ID, wrong-topic distractor. Baseline answers remain 30/30; four other
+positive paraphrase probes remain unresolved, including the stream and waterway relation variants.
+
+### Reviewed predicate transfer and typed-question composition
+
+`python3 experiments/v1_296_large_corpus_predicate_learning.py` now tests the full transfer path
+against the 1,200-document synthetic corpus. Two cross-document subject/object pairs produce a
+report-only alignment between `flows through` and `passes through`; no facts change before explicit
+acceptance. After acceptance, a held-out typed question, `Which river passes through Nacre City
+0000?`, combines the learned relation wording with a separate cited sentence stating that the
+entity is a river. Chat returns the source sentence and exposes the aligned relation and type as
+reviewable candidates, preserving the fact-review boundary.
+
+I also ran the read-only corpus alignment sampler against four 1,000-document windows of the
+285,478-document SimpleWiki index. Each sampled window produced zero predicate-alignment proposals
+(only one to three relation-frame proposals). This shows that repeated exact subject/object pairs
+across separate documents are scarce in those windows, so the current learner cannot yet provide
+broad real-corpus paraphrase transfer. The remaining stream/waterway probes stay unresolved; this
+test does not infer those terms from topic similarity.

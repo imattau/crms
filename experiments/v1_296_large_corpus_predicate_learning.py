@@ -30,6 +30,12 @@ def main() -> None:
             index.add_document(
                 f"alternate-{number:04d}", "Alternate waterway record",
                 sentence, f"alternate-{number:04d}.txt")
+        # Typed questions need an explicit class statement for the same
+        # subject. Keep it in a separate source so the integration test checks
+        # composition of predicate transfer and type grounding.
+        index.add_document(
+            "type-0000", "River classification record",
+            "The Serein River 0000 is a river.", "type-0000.txt")
 
         knowledge = CRMSKnowledgeBase()
         proposals = knowledge.propose_corpus_predicate_alignments(
@@ -77,14 +83,20 @@ def main() -> None:
             raise SystemExit(
                 "chat failed after a reviewed corpus alignment:\n"
                 + run.stderr + run.stdout)
-        if "The Serein River 0000 flows through Nacre City 0000." not in run.stdout:
+        if ("The Serein River 0000 flows through Nacre City 0000." not in run.stdout
+                or "reviewed relation alignment links 'flows through'" not in run.stdout):
             raise SystemExit(
                 "accepted corpus wording did not transfer to the held-out "
                 "natural-language question:\n" + run.stdout)
+        if ("candidate facts still need review" not in run.stdout
+                or "passes through → Nacre City 0000" not in run.stdout):
+            raise SystemExit(
+                "typed relation transfer lost its review boundary:\n"
+                + run.stdout)
         print("PASS: 1,200 mixed documents plus two independent alias records")
         print("PASS: two cross-source entity pairs proposed flows-through alignment")
         print("PASS: no facts changed before explicit acceptance")
-        print("PASS: accepted wording answered a cited held-out chat question")
+        print("PASS: accepted wording and separate type evidence composed with cited source and reviewable fact candidates")
         index.close()
 
 

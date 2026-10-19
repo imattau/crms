@@ -62,6 +62,33 @@ def main() -> None:
     if unknown_person.status != "unknown" or not unknown_person.matched_templates:
         raise SystemExit(f"missing path did not abstain in learned frame: {unknown_person}")
 
+    family = CRMSKnowledgeBase()
+    family_paths = (
+        ("Mara Vell", "Ivo Vell", "Kez Vell"),
+        ("Neris Vale", "Omi Vale", "Pera Vale"),
+        ("Arya Noor", "Jalen Noor", "Sera Noor"),
+    )
+    for grandparent, parent, child in family_paths:
+        family.add_fact(grandparent, "parent", parent,
+                        f"family:{grandparent}:parent")
+        family.add_fact(parent, "parent", child,
+                        f"family:{parent}:parent")
+    for grandparent, _parent, grandchild in family_paths[:2]:
+        question = f"Who are {grandparent}'s grandchildren?"
+        if family.teach_path_question(
+                question, relations=("parent", "parent"),
+                bound_entity=grandparent, answer=grandchild) != (
+                    grandparent == "Neris Vale"):
+            raise SystemExit("possessive path frame licensed at the wrong threshold")
+    for possessive in ("'s", "’s"):
+        question = f"Who are Arya Noor{possessive} grandchildren?"
+        result = family.ask(question)
+        if (result.status != "answered" or result.answer != "Sera Noor"
+                or len(result.proofs or []) != 1
+                or len(result.proofs[0]) != 2):
+            raise SystemExit(
+                f"possessive path query did not return its two-edge proof: {result}")
+
     kb.add_fact("Engine", "located in", "France", "geo:engine")
     kb.add_fact("Compiler", "located in", "Germany", "geo:compiler")
     if kb.teach_path_question(
@@ -107,11 +134,39 @@ def main() -> None:
         asked = subprocess.run(
             cli, input=f"{q_held_out}\n/quit\n", text=True,
             capture_output=True, check=True, timeout=20)
-        if "Answer: United Kingdom." not in asked.stdout or "Proof 1:" not in asked.stdout:
-            raise SystemExit(f"CLI did not answer with the stored path proof:\n{asked.stdout}")
+        if "United Kingdom." not in asked.stdout:
+            raise SystemExit(f"CLI did not render the path answer:\n{asked.stdout}")
+
+        family_path = temp / "family-knowledge.json"
+        family.save(family_path)
+        family_cli = [
+            sys.executable, str(PROJECT / "crms_chat.py"),
+            "--knowledge", str(family_path), "--index", str(index_path),
+            "--dialogue-state", str(temp / "family-dialogue.json"),
+            "--rules", str(temp / "family-rules.json"),
+            "--rule-session", str(temp / "family-rule-session.json"),
+            "--candidate-session", str(temp / "family-candidate-session.json"),
+            "--math", str(temp / "family-math.json"),
+            "--math-session", str(temp / "family-math-session.json"),
+            "--translations", str(temp / "family-translations.json"),
+            "--translation-session", str(temp / "family-translation-session.json"),
+        ]
+        family_chat = subprocess.run(
+            family_cli,
+            input="Who are Arya Noor’s grandchildren?\n/quit\n",
+            text=True, capture_output=True, cwd=temp, check=True, timeout=20)
+        if "Sera Noor" not in family_chat.stdout:
+            raise SystemExit(
+                f"chat did not answer the learned possessive path query:\n"
+                f"{family_chat.stdout}")
+        if "Arya Noor parent Jalen Noor." in family_chat.stdout:
+            raise SystemExit(
+                "chat rendered one leaf fact as if it were the composed path "
+                f"answer:\n{family_chat.stdout}")
 
     print("path-question paraphrase transfer: PASS")
-    print("same-path license, one-example new wording, proof-backed transfer, wording/entity abstention, persistence, CLI: PASS")
+    print("same-path license, possessive variable query, proof-backed transfer, "
+          "wording/entity abstention, persistence, CLI: PASS")
 
 
 if __name__ == "__main__":

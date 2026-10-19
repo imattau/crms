@@ -29,6 +29,12 @@ def main() -> None:
                 "During World War II, Turing worked at Bletchley Park.\n"
                 "He later lived in Manchester.",
                 "fixture://alan-turing")
+            index.add_document(
+                "mount-everest", "Mount Everest",
+                "Infobox mountain\n"
+                "Everest is located in the Mahalangur Himal sub-range of the "
+                "Himalayas in the Solukhumbu district of Nepal.",
+                "fixture://mount-everest")
         finally:
             index.close()
 
@@ -44,7 +50,8 @@ def main() -> None:
         ]
         result = subprocess.run(
             command,
-            input="Where did Alan Turing work?\n/quit\n",
+            input=("Where did Alan Turing work?\n"
+                   "Where is Mount Everest located?\n/quit\n"),
             text=True, capture_output=True, check=False, timeout=30)
         require(result.returncode == 0,
                 f"chat failed: {result.stderr}\n{result.stdout}")
@@ -56,6 +63,13 @@ def main() -> None:
                 f"{result.stdout}")
         require("University of Manchester" not in result.stdout,
                 f"chat combined multiple workplace statements: {result.stdout}")
+        require("Everest is located in the Mahalangur Himal sub-range of the "
+                "Himalayas in the Solukhumbu district of Nepal."
+                in result.stdout
+                and "[Source: Mount Everest; quoted evidence, not an accepted fact]"
+                in result.stdout,
+                "page-title coreference with an intervening copula was missed: "
+                f"{result.stdout}")
 
     print("exact-title locative source retrieval: PASS")
     print("metadata snippets, fronted time adjuncts, and article-local surname "

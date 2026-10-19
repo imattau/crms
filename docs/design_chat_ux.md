@@ -1,7 +1,8 @@
 # Design: chat experience (answer format, dead ends, scope messages, multi-part questions, starter questions)
 
 **Audience:** the developer (human or AI) implementing this.
-**Status:** proposed. Five ideas were prototyped as *wrappers around the unmodified chat* in a scratch
+**Status:** partially implemented. The gate-conditioned closest-sentence behavior in 2.2 and the
+bounded explicit multi-question routing in 2.4 are now in the runtime; the remaining delivery items are proposed. Five ideas were prototyped as *wrappers around the unmodified chat* in a scratch
 folder and measured on small sets (section 2). Everything else in section 3 is observed but not
 tested. The prototype scripts are not committed; the figures are reproducible only by re-writing the
 wrappers, so treat them as evidence for a design, not as a benchmark to cite.
@@ -102,6 +103,14 @@ creator of Python" showed "Python was released in 1991"). Show it only when the 
 it fails, say that sources were found but the closest sentence does not answer the question, and
 show that sentence labelled as such (the wording of that third path was not tested).
 
+**Runtime update:** rejected, uniquely selected evidence now appears as a “Closest source sentence”
+with its source title and an explicit “may not answer your question” label. It is removed from
+`source_sentences` and passage evidence, so it cannot become a cited answer or feed a later
+follow-up as accepted evidence. Ambiguous candidates remain omitted. The runtime regression in
+`experiments/v1_329_runtime_nl_gate.py` checks that this near-match context is shown while the
+existing mismatch abstention and subsequent-turn checks still pass. This is a narrow presentation
+change; it does not establish better answer accuracy or implement the common reply shape in 2.1.
+
 ### 2.3 Scope and intent messages
 
 Idea: recognise requests outside what CRMS does (creative writing, opinion or advice, questions
@@ -150,9 +159,22 @@ questions. Two guards were needed: lower-case/upper-case "Also" must be removed 
 and a split that leaves a fragment shorter than three words (such as "Who developed Linux and
 when?") must not split (the engine already reports that case as partial).
 
-Open: a second part that uses a pronoun ("What did Marie Curie win, and when was she born?") needs
-the entity carried over from the first part; this was not tested. Never split a coordination that
-shares one verb ("Who created Python and Linux?").
+Runtime update: repeated explicit question clauses are now processed as separate turns and each
+reply is labeled “Part N of M.” The parser recognizes question-mark boundaries and `and` only when
+the next clause starts with another question form. A shared-verb coordination such as “Who created
+Python and Linux?” remains intact and uses the existing coordinated-answer route. When a first
+part is a Who question with exactly one cited, parsed positive candidate and the next part contains
+a singular personal pronoun (`he`, `she`, `him`, `her`, `his`, or `hers`), its subject becomes the
+discourse focus; the fact remains unaccepted. Coordinated candidate subjects do not qualify. The
+selected pronoun expansion is also passed into source-specific chat routes. The CLI regression
+`experiments/v1_339_explicit_compound_chat_questions.py` checks the split forms, a Who→“he” birthplace
+follow-up, and the shared-verb guard; `experiments/v1_325_coordinated_who_lists.py` checks that all
+listed objects are answered or explicitly reported missing. This establishes clause preservation
+and one role-grounded pronoun pattern, not general compound-question understanding.
+
+Open: pronoun carry-over for non-Who first parts, plural or ambiguous referents, and broader roles
+still needs evaluation. Results are labeled by part, but the runtime does not yet provide a final
+aggregate count of fully answered versus abstained parts.
 
 ### 2.5 Starter questions after loading sources
 
@@ -198,7 +220,9 @@ once at load time on a bounded number of candidates and store the result.
 1. **Reply shape and source display (2.1)** behind the NL gate, including negation and number-word
    tests for the extractor, and a short source name instead of paths.
 2. **Best sentence by default, gate-conditioned (2.2).**
-3. **Multi-part handling with an explicit "handled N of M parts" line (2.4).**
+3. **Multi-part handling with an explicit "handled N of M parts" line (2.4).** Repeated explicit
+   clauses now run separately and are labeled by part; aggregate success reporting and pronoun
+   carry-over remain open.
 4. **Cause-aware abstention wording (2.3)**, using evidence first and a small rule list second.
 5. **Starter questions with a stored self-check (2.5).**
 6. Then the untested items in section 3, each tried in a scratch folder first.

@@ -162,15 +162,19 @@ def main() -> None:
                         "Who built Bridge?\n/quit\n"),
             text=True, capture_output=True, check=True, timeout=20)
         require("Accepted 1 source-backed question frame(s)" in natural_run.stdout
-                and "Answer: Gus." in natural_run.stdout,
+                and "Gus built Bridge." in natural_run.stdout,
                 "ordinary-language question-frame training did not learn and apply "
                 f"the grounded frame:\n{natural_run.stdout}")
 
     kb.remove_fact("Gus", "built", "Bridge", "build-a")
     stale_answer = kb.ask("Who built Tunnel?")
-    require(stale_answer.status == "unknown"
-            and not stale_answer.matched_templates,
-            "induced frame stayed active after its training source was retracted")
+    require(stale_answer.status == "answered" and stale_answer.answer == "Kim"
+            and not any(item.get("kind") == "induced_question_frame"
+                        for item in stale_answer.language_evidence or [])
+            and any(item.get("kind") == "stored_relation_subject_question"
+                    for item in stale_answer.language_evidence or []),
+            "retracted induced-frame support remained active, or valid direct "
+            f"language support was lost: {stale_answer}")
     try:
         kb.accept_question_frame_proposal(str(proposal["artifact_id"]))
     except ValueError:

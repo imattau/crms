@@ -73,7 +73,11 @@ def main() -> None:
                               "Who developed the Compiler?",
                               "Who developed the trajectory table?", "/accept 1",
                               "/write-about Katherine Johnson", "/quit")) + "\n",
-            text=True, capture_output=True, check=True, timeout=20).stdout
+            text=True, capture_output=True, check=False, cwd=root, timeout=20)
+        if output.returncode != 0:
+            raise SystemExit(f"chat process failed ({output.returncode}):\n"
+                             f"{output.stderr}\n{output.stdout}")
+        output = output.stdout
         if "each example must match one unique indexed source sentence exactly" not in output:
             raise SystemExit(f"unindexed example was not rejected:\n{output}")
         if "same canonical relation and polarity; no change was saved" not in output:
@@ -83,10 +87,10 @@ def main() -> None:
         if "Sourced fact pattern licensed from 3 examples." not in output:
             raise SystemExit(f"valid examples did not license a pattern:\n{output}")
         if ("Question frame licensed from 3 fact-backed examples" not in output
-                or "Answer: Ada Lovelace." not in output
-                or "Answer: Grace Hopper." not in output
+                or "Ada Lovelace developed the Analytical Engine." not in output
+                or "Grace Hopper developed the Compiler." not in output
                 or "Katherine Johnson — designed → the trajectory table" not in output
-                or "Review candidate 1 (positive)" not in output
+                or "1 source claim available for review" not in output
                 or "Accepted positive fact: Katherine Johnson — designed → the trajectory table." not in output
                 or "Katherine Johnson developed the trajectory table." not in output):
             raise SystemExit(f"learned predicate wording did not transfer to QA:\n{output}")
@@ -140,12 +144,13 @@ def main() -> None:
         # canonical fact labels without hiding that mapping from the teacher.
         aligned_index = CRMSResearchIndex()
         aligned_examples = (
-            ("a", "A. Lovelace developed the engine.", "Ada Lovelace",
-             "Analytical Engine", "A. Lovelace", "the engine"),
-            ("g", "G. Hopper developed the compiler.", "Grace Hopper",
-             "Compiler", "G. Hopper", "the compiler"),
-            ("k", "K. Johnson developed the trajectory table.", "Katherine Johnson",
-             "trajectory table", "K. Johnson", "the trajectory table"),
+            ("a", "Ada Lovelace developed the engine.", "Ada Lovelace",
+             "Analytical Engine", "Ada Lovelace", "the engine"),
+            ("g", "Grace Hopper developed the compiler.", "Grace Hopper",
+             "Compiler", "Grace Hopper", "the compiler"),
+            ("k", "Katherine Johnson developed the trajectory table.",
+             "Katherine Johnson", "trajectory table", "Katherine Johnson",
+             "the trajectory table"),
         )
         for document_id, sentence, _subject, _obj, _surface_subject, _surface_obj in aligned_examples:
             aligned_index.add_document(document_id, document_id, sentence)
@@ -168,7 +173,7 @@ def main() -> None:
         aligned_output = subprocess.run(
             aligned_command,
             input=aligned_teach + "\n/quit\n", text=True, capture_output=True,
-            check=True, timeout=20).stdout
+            check=True, cwd=root, timeout=20).stdout
         if "Sourced fact pattern licensed from 2 examples." not in aligned_output:
             raise SystemExit(f"explicit span labels did not license frame:\n{aligned_output}")
         aligned_stored = CRMSKnowledgeBase.load(aligned_knowledge_path)

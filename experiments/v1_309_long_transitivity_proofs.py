@@ -43,7 +43,10 @@ def main() -> None:
     # the verified positive conclusion, label its search incomplete, and keep
     # it out of persistent practice memory.
     recursive = CRMSKnowledgeBase()
-    for index in range(39):
+    # The current default recursion depth is 40. Keep the irrelevant branch
+    # long enough that exhaustive alternatives still hit that bound while
+    # the six-edge target proof is already available.
+    for index in range(99):
         recursive.add_fact(f"Person {index}", "parent", f"Person {index + 1}",
                            f"family:{index}")
     recursive.add_inference_rule(
@@ -96,6 +99,14 @@ def main() -> None:
         expected_conclusion=memoized.conclusion)
     require(checked.valid,
             f"independent verifier rejected memoized proof: {checked}")
+    require(overlapping.remove_fact(
+        "Join", "parent", "Next", "family:Join:Next"),
+        "could not retract the shared subgoal's supporting edge")
+    after_retraction = overlapping.infer_relation(
+        "Root", "ancestor", "End")
+    require(after_retraction.status == "unknown"
+            and not after_retraction.proofs,
+            "a new inference call reused a stale query-local proof cache")
 
     diamond = CRMSKnowledgeBase()
     previous = ["Start"]
@@ -142,6 +153,7 @@ def main() -> None:
     print("2, 8, 9, 12, 20, and 30-edge paths proved and independently verified")
     print("recursive proof retained with an explicit partial-support label: PASS")
     print(f"overlapping recursive subgoals reused ({memoized.memo_hits} memo hits): PASS")
+    print("fact retraction is visible to the next inference call: PASS")
     print(f"ten-layer diamond: {len(branching.proofs)} shortest proof records; PASS")
     print("transitive search selects the two-edge proof before a longer path: PASS")
 

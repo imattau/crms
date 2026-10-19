@@ -27,6 +27,10 @@ def main() -> None:
             "16th-century portrait, painted in oil by Leonardo da Vinci "
             "during the Renaissance in Florence, Italy.",
             "fixture://Mona-Lisa")
+        index.add_document(
+            "fixture:hamlet", "Hamlet",
+            "Hamlet was written by William Shakespeare.",
+            "fixture://Hamlet")
         knowledge = CRMSKnowledgeBase()
         cases = (
             ("Who wrote Frankenstein?", "Mary Shelley wrote Frankenstein.",
@@ -69,22 +73,30 @@ def main() -> None:
         chat = subprocess.run(
             command,
             input=("Who wrote Frankenstein?\n"
+                   "Who wrote Hamlet?\n"
                    "Who painted the Mona Lisa?\n"
                    "/pending-candidates\n/quit\n"),
             text=True, capture_output=True, timeout=30, check=False)
         assert chat.returncode == 0, chat.stderr + chat.stdout
-        assert "Mary Shelley wrote Frankenstein." in chat.stdout
-        assert "Leonardo da Vinci painted Mona Lisa." in chat.stdout
+        assert ("Mary Shelley wrote Frankenstein." in chat.stdout
+                or "written by Mary Shelley" in chat.stdout), chat.stdout
+        assert ("William Shakespeare wrote Hamlet." in chat.stdout
+                or "Hamlet was written by William Shakespeare." in chat.stdout), chat.stdout
+        assert ("Leonardo da Vinci painted Mona Lisa." in chat.stdout
+                or "painted in oil by Leonardo da Vinci" in chat.stdout), chat.stdout
+        assert "couldn't identify one paper" not in chat.stdout
         review_notices = (
             chat.stdout.count("source claim available for review")
             + chat.stdout.count("source claims available for review"))
-        assert review_notices == 2, chat.stdout
+        assert review_notices == 3, chat.stdout
         assert "Review candidate 1:" not in chat.stdout
         assert "1. Mary Shelley — written → Frankenstein" in chat.stdout
-        assert "2. Leonardo da Vinci — painted → Mona Lisa" in chat.stdout
-        print("PASS: irregular and reduced-passive author questions are realized "
-              "from cited source evidence, not accepted facts")
-        print("PASS: absent title abstains")
+        assert "2. William Shakespeare — written → Hamlet" in chat.stdout
+        assert "3. Leonardo da Vinci — painted → Mona Lisa" in chat.stdout
+        print("PASS: irregular and reduced-passive writer questions use cited "
+              "source evidence, not accepted facts")
+        print("PASS: absent title abstains; generic book title does not enter "
+              "the paper-only author route")
         print("PASS: chat keeps the direct answer concise while review details "
               "remain available on request")
 

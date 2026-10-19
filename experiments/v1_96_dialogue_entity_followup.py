@@ -109,7 +109,8 @@ def main() -> None:
              "--rule-session", str(session_path)],
             input="Who designed the Engine?\nWhat about the Compiler?\n/quit\n",
             text=True, capture_output=True, check=True, timeout=20)
-        if "Answer: Ada." not in process.stdout or "Answer: Grace." not in process.stdout:
+        if ("Ada designed Engine." not in process.stdout
+                or "Grace designed Compiler." not in process.stdout):
             raise SystemExit(f"terminal entity follow-up failed:\n{process.stdout}")
 
     print("dialogue entity follow-up diagnostic: PASS")

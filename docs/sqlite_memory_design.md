@@ -71,6 +71,58 @@ Switch new installations to SQLite. Existing JSON-only users are migrated on sta
 
 `crms_package.py` writes normalized fact, rule, derivation, and language-record rows into v4, installs knowledge and rules as SQLite sidecars, and checks they reconstruct compatibility payloads. The package still duplicates knowledge/rule JSON and has not normalized math or translation memories. Keep v1/v2/v3 readers and test older model fixtures when extending the schema.
 
+### Recent measured rule-discovery baseline
+
+The sparse discovery diagnostics compare the same two labeled parent/parent → ancestor examples
+amid disconnected facts. Both paths performed exactly two candidate-join expansions and returned
+the same complete candidate; these numbers isolate the cost of loading/indexing the fact store,
+not dense joins or natural-language extraction. On this machine, the median of three runs was:
+
+| Facts | In-memory discovery (`v1_306`) | SQLite discovery (`v1_307`) |
+|---:|---:|---:|
+| 20,006 | — | 27.90 ms (in-memory comparison: 172.42 ms) |
+| 100,006 | 1,069.03 ms | 148.26 ms |
+
+The separate 10k/50k/100k in-memory scale run measured 73.50/507.71/1,069.03 ms. At 100k,
+indexed SQLite discovery was about 7.2× faster than the in-memory scan in these fixtures. This
+supports using the SQLite-backed model store for growing rule-learning corpora, but does not
+establish end-to-end performance at millions of facts: model loading, dense relation joins,
+source-text retrieval, and validation over large candidate sets still need separate profiles.
+
+### Current local corpus inventory
+
+A read-only inventory of `data/` found about 5.5 GB across the existing corpus indexes and model
+packages. The bundled `crms_project_model_academic_simplewiki.sqlite` is 1,287,307,264 bytes and
+embeds 288,431 searchable source documents (601,822,277 UTF-8 bytes, 597,152,133 Unicode
+characters, and 92,372,919 CRMS word units). Document IDs include 285,478 Simple English Wikipedia
+pages, 2,624 arXiv records, 20 PMC articles, 292 project sources, and 17 conversation/curated
+records. All embedded documents have nonempty text. Original input files are not required by the
+portable package; the small portable-model runtime diagnostic verifies retrieval, learned-memory
+updates, and restart using an embedded corpus after removing its source index.
+
+These are corpus-volume measures, not tokenizer counts or evidence that CRMS has knowledge
+equivalent to a 70-billion-parameter model. Runtime installation and retrieval over the full
+288,431-document package are profiled below, but only for installation and lexical retrieval; the
+portable chat runtime diagnostic uses a small fixture. A later full-corpus chat spot check asked
+two natural-language questions and returned source-backed sentences for both; one exposed and
+then fixed a page-title coreference gap. This is not a broad answer-quality or source-coverage
+evaluation over the full corpus before treating this snapshot as a distributable knowledge
+release.
+
+### Full-corpus installation and retrieval profile
+
+The portable model was installed to a temporary directory and the resulting SQLite research
+index was queried; the source package remained read-only and the temporary sidecar was removed
+afterward. Rebuilding the index for all 288,431 documents took 136.06 seconds and produced a
+2,231,062,528-byte search database. One distinctive arXiv title query (`The Anti-Cloak`) returned
+`arxiv:0807.4973v2` in 30 ms; a common-term query (`April`) returned Simple English Wikipedia
+matches in 201 ms. These are individual lexical-search timings, not an answer-quality benchmark.
+
+The package is self-contained, but first-run installation currently needs roughly 2.2 GB for the
+searchable sidecar and about two minutes on this machine to rebuild it. Repeated starts can reuse
+the materialized sidecar. This confirms full-corpus FTS recovery works, while leaving natural-
+language answer quality over the full corpus and cold-start optimization as separate work.
+
 ## Validation criteria
 
 - Semantic round-trip of facts (including negative facts, multiple citations, qualifiers), rule examples/procedures, rule settings, aliases, language frames, and derived proofs/lineage.

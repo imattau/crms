@@ -219,11 +219,30 @@ wordings. For CRMS this is the measurable form of "recombination works". The ben
 the paraphrase-coverage gap into numbers that can be tracked across commits.
 
 ### 3.2 Design
-New experiment `experiments/v1_NNN_cross_surface_transfer.py`, using the existing experiment
-conventions (runs under `run_experiments.py` in a fresh temporary directory; deterministic; no
-network). It builds a small synthetic fact store and teaches question frames through the same
-public paths the chat uses (not by editing internals), then asks held-out questions through
-`ask()`.
+The first implementation is `experiments/v1_315_cross_surface_question_transfer.py` (run directly;
+it uses deterministic fixtures and no network). It builds invented entities, teaches through the
+public fact and language-learning APIs, then asks held-out questions through `ask()` and selected
+CLI sessions. The specification below is a target for successive benchmark extensions, not a claim
+that every listed condition is already implemented.
+
+Benchmark validity requirements learned during implementation:
+
+- **Separate language transfer from fact lookup.** A question can be answered from a stored fact
+  even when no frame transferred. Record the route and require an explicit derived-frame trace
+  for transfer claims; do not count a direct fact answer as learned language transfer.
+- **Hold out both entities and sources.** Training and test questions must use disjoint entity
+  facts, and the derived-frame lineage must not include the held-out source. Keep test facts
+  available so the benchmark can measure whether the language route can use them.
+- **Teach the intended structure through a real public path.** Passive sentence patterns can be
+  taught through `teach_fact_pattern`; additional question-frame teaching must use an already
+  licensed relation/answer role and a fact-backed example. Do not specify a teaching command the
+  current public API rejects.
+- **Classify answers by route and evidence.** Exact answer text alone is insufficient: require the
+  expected held-out fact as evidence and, for a transfer score, the expected language derivation
+  record. Keep wrong, abstained, direct-evidence, inferred, and transferred outcomes distinct.
+- **Include role-swapped and underspecified negatives.** `What created X?` and `Who created?`
+  must abstain unless a corresponding typed/complete frame is licensed; a plausible sentence is
+  not a correct answer to a structurally different question.
 
 **Relations (start with six):** `created`, `capital of`, `located in`, `discovered`, `parent of`,
 `flows through`. Use invented-but-plausible entity names (for example `Mara Vell`, `the Orrin
@@ -240,17 +259,26 @@ comparable across runs.
 | P (paraphrase) | Different words, same structure | `Who is the creator of X?`, `X was created by whom?` |
 | L (lexical synonym) | Needs a grounded synonym | `Who made X?` |
 | N (near-miss negative) | Looks similar, must NOT be answered | `Who destroyed X?`, `Who created?`, `What created X?` (role swap) |
+| G (additional taught frame) | A separate fact-backed wording explicitly taught in this k regime, evaluated on held-out entities | `Who was the creator of X?` or `X was created by whom?` |
 
-**Teaching regimes.** Run each relation under `k` taught wordings: k = 1 (T only), then add
-wordings from P one at a time (k = 2, 3). Report each separately.
+**Teaching regimes.** Include `k = 0` as the no-question-frame-teaching baseline, reported as
+class B. Then run `k = 1` (T only) and add wordings from P one at a time (`k = 2, 3`). Report each
+separately. Where a regime teaches a source sentence pattern, label it separately from explicit
+question-frame teaching so the measured transfer is attributable to the right learned structure.
 
 **Procedure per (relation, k):**
-1. Create a fresh store with the facts for that relation.
-2. Teach the k wordings via the normal teaching commands/paths.
-3. Ask every held-out question in classes T, S, P, L, N for all 12 entities.
-4. Classify each reply as `correct` (the expected entity, with the right source), `wrong`
-   (a different entity or a confident wrong claim), or `abstained` (any form of "don't know" or
-   evidence-only reply that does not state the answer).
+1. Create a fresh store with distinct training and held-out entity facts.
+2. Teach the k wordings via the supported public teaching paths and record the teaching regime;
+   do not teach a question frame for `k = 0`.
+3. Ask every held-out question in classes B (only at `k = 0`), T, S, P, L, N, and G for held-out
+   entities. G measures entity-slot transfer for additional taught frames; it is distinct from
+   untaught paraphrase transfer.
+4. Classify each reply by both outcome and route: `correct-transfer` requires the expected
+   held-out fact and an explicit transfer derivation; `correct-direct` uses the expected fact but
+   no transfer derivation; `wrong` is a different answer or confident mismatched claim; `abstained`
+   gives no answer. Evidence-only quotations are not correct answers.
+5. For each negative wording, require either a justified alternate licensed route or abstention;
+   specifically list any answer to a role-swapped or underspecified query as a benchmark failure.
 
 ### 3.3 Metrics
 Print one table per run:
@@ -264,18 +292,23 @@ created   1  S      36  ...
 
 and these summaries:
 
-- **Accuracy on T** (control): expected 100%.
-- **Transfer ratio** = correct held-out, untaught S/P/L examples divided by all such examples,
-  divided by `correct(T) / n(T)`. Exclude exact templates used for teaching in that `k` regime;
-  report their trained-template results separately.
-- **Wrong rate on N**: expected **0**.
-- **Wrong rate overall**: reported; any wrong answer on S/P/L is listed individually.
+- **Accuracy on B, T, and G**: B is the untrained canonical baseline; T is canonical wording
+  after explicit frame teaching; G measures the additional taught frames. Report direct, explicitly
+  licensed-frame, and induced-frame routes separately. Correct answer text plus a matching fact is
+  not enough to count as language transfer.
+- **Transfer ratio** = `correct-transfer` held-out, untaught S/P/L examples divided by all such
+  examples, normalized by trained-template accuracy. Exclude exact templates used for teaching in
+  that `k` regime; report their trained-template results separately.
+- **Wrong rate on N**: expected **0**, including entity-less and role-swapped queries.
+- **Wrong rate overall**: reported; list each wrong result with the route and evidence used.
+- **Direct-answer contamination**: report the number answered correctly from direct facts without
+  a transfer trace, but do not count these as transfer successes.
 - **Coverage curve:** transfer ratio versus k, the quantity to watch as recombination improves.
 
 ### 3.4 Pass/fail
 For the first version, record the baseline and fail the experiment only on invariants:
 
-1. T accuracy is 100%.
+1. For `k > 0`, T accuracy is 100%; B is reported without a pass threshold.
 2. Wrong rate on N is 0.
 3. The run is deterministic (a second run gives identical tables).
 

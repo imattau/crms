@@ -87,7 +87,7 @@ def main() -> None:
         )
         require(all(text in output for text in expected_sources),
                 f"source candidates or accepted facts lost exact evidence: {output}")
-        require(output.count("Review candidate 1: ") == 3
+        require(output.count("1 source claim awaiting review") == 3
                 and output.count("Accepted positive fact: ") == 3
                 and "Possible relation alignment for review" in output
                 and "your question uses 'study'" in output
