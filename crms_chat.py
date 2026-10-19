@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from crms_dialogue import CRMSDialogue
+from crms_conversation import is_farewell, respond as respond_conversation
 from crms_feedback import (
     AnswerFeedbackStore, collect_feedback_refs, render_feedback_refs,
 )
@@ -5290,6 +5291,9 @@ def main() -> int:
                 print(f"Handling {natural_part_total} explicit questions separately.")
         if not line:
             continue
+        if is_farewell(line):
+            # Let the existing exit path save every session file and portable model.
+            line = "/quit"
         if (pending_story_tone is not None and not line.startswith("/")
                 and _natural_story_request(line) is None):
             is_new_request = (
@@ -8921,7 +8925,9 @@ def main() -> int:
             else:
                 dialogue.clear()
             continue
-        turn = dialogue.turn(line, research_index=index)
+        turn = respond_conversation(
+            dialogue, line, research_index=index,
+            pending_claims=len(pending_candidates))
         compound_pronoun_focus: str | None = None
         if (compound_part is not None
                 and turn.resolved_question
