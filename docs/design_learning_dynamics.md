@@ -8,7 +8,10 @@ analysis is implemented in `crms_equivalence_dream.py` and covered by
 `experiments/v1_297_equivalence_dream_diagnostic.py`. The evidence ledger and belief-revision
 mechanisms in sections 1 and 4 remain proposed. Prototype results below are design evidence;
 their throwaway code (`ledger.py`, `exp_belief*.py`, `gap_followup.py`, `dream2.py`) is not
-imported.
+imported. Separately, explicit `practice_relation` and `practice_question` can write a complete,
+independently reverified proof to bounded derived-case storage; ordinary `ask()` stays read-only.
+The `practice_question` retained flag is true only when the case can be retrieved and revalidated,
+so a zero storage cap cannot be reported as learning.
 **Origin:** ideas reviewed from the HPM Learning Agent repo (belief weights, demand-driven
 learning, "dreaming"), re-expressed without vectors.
 
