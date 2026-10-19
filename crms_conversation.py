@@ -596,7 +596,7 @@ def respond(dialogue: CRMSDialogue, text: str, *,
     def with_intent(turn: DialogueTurn) -> DialogueTurn:
         turn.intent_hypothesis = intent
         dialogue.last_intent_hypothesis = intent
-        dialogue.record_turn(text, act or "question", turn)
+        dialogue.record_turn(text, act or "question", turn, intent)
         _offer(dialogue, turn)
         return turn
 

@@ -20,11 +20,16 @@ retrieval. It also distinguishes an explanation follow-up after a grounded answe
 “why?”, and conditions “tell me more” on a current topic. The hypothesis records its act, task intent
 (when known), decision, matched frame, context predicates, alternatives, selected value, and that the
 basis is a hand-checked runtime rule. It is inspectable but not learned or corpus-licensed;
-unsupported turns have no hypothesis. `/intent` exposes the last hypothesis on demand in the
-interactive chat without adding diagnostics to ordinary answers. The last hypothesis is saved in
-the versioned dialogue state and validated when reloaded, so the diagnostic survives a restart.
-Regression coverage is in
-`experiments/v1_365_contextual_clarification_intent.py`.
+unsupported turns have no hypothesis. `/intent` exposes the last hypothesis, active task label, and
+recent bounded intent trace without adding diagnostics to ordinary answers. Selected task goals are
+retained in inspectable session state; ambiguous or unlicensed hypotheses cannot replace the
+active goal. Social turns preserve it, while an explicit end-interaction or `/reset` clears it. This
+is a context predicate for licensed frames, not task-slot understanding or authorization to act. The
+trace and last hypothesis are saved in dialogue-state format 13 and validated when reloaded.
+`experiments/v1_386_session_intent_context.py` checks that the active-task predicate actually
+licenses a matching portable frame, survives reload, remains bounded, and clears on explicit end
+or reset; `experiments/v1_365_contextual_clarification_intent.py` checks the existing clarification
+behavior.
 
 The elaboration baseline recognizes a small set of equivalent content-free forms, including
 “Could you tell me more?”, “Can you say more?”, and “Could you elaborate?”. These use the same
@@ -38,7 +43,7 @@ The runtime now also retains one typed open dialogue slot:
 which entity with accepted facts to elaborate on. A bare entity name is then classified as an answer
 to that question and routed to the accepted-fact overview; an unmatched name gets a clarification,
 not a corpus lookup. A new question supersedes the slot, and “never mind” cancels it. This bounded
-slot is persisted in dialogue-state format 12 and rejects unknown slot values on load. It is session
+slot is persisted in dialogue-state format 13 and rejects unknown slot values on load. It is session
 context, not learned intent knowledge, and it does not support free-form source summaries. The
 sequence and reload checks are in
 [`v1_375_contextual_elaboration_slot.py`](../experiments/v1_375_contextual_elaboration_slot.py).

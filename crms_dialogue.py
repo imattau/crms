@@ -118,6 +118,12 @@ class UserIntentHypothesis:
 _HISTORY_LIMIT = 12
 _HISTORY_FIELD_LIMIT = 200
 _HISTORY_QUESTION_LIMIT = 500
+_INTENT_TRACE_LIMIT = 12
+_INTENT_TASKS = {
+    "seek-information", "provide-information", "continue-current-task",
+    "resolve-ambiguity", "correct-result", "social-contact",
+    "end-interaction", "other-task",
+}
 _SHOWN_LIMIT = 500
 _ELABORATION_BATCH = 3
 _OVERVIEW_BATCH = 5
@@ -190,6 +196,10 @@ class CRMSDialogue:
         # referents so a stale pronoun cannot bind; it leaves these alone, and
         # only ``reset_history`` (the explicit /reset) wipes them.
         self.history: list[dict[str, str]] = []
+        # A bounded record of licensed turn-level intent decisions. This is
+        # session context, not shared knowledge or a user profile.
+        self.intent_trace: list[dict[str, Any]] = []
+        self.active_task_intent: str | None = None
         self.last_answered: dict[str, str] | None = None
         self.shown: list[str] = []
         # A pronoun that could mean several entities leaves its candidates
@@ -206,14 +216,35 @@ class CRMSDialogue:
         self.pending_dialogue_slot: str | None = None
 
     def record_turn(self, utterance: str, act: str,
-                    turn: "DialogueTurn") -> None:
-        """Append a bounded record of this turn and remember a grounded answer."""
+                    turn: "DialogueTurn",
+                    intent_hypothesis: Any | None = None) -> None:
+        """Append the turn and licensed intent evidence to bounded session state."""
         self.history.append({
             "act": act[:_HISTORY_FIELD_LIMIT],
             "utterance": utterance.strip()[:_HISTORY_FIELD_LIMIT],
             "status": str(turn.status)[:_HISTORY_FIELD_LIMIT],
         })
         del self.history[:-_HISTORY_LIMIT]
+        if intent_hypothesis is not None:
+            trace_entry = {
+                "dialogue_act": str(intent_hypothesis.dialogue_act)[:80],
+                "task_intent": intent_hypothesis.task_intent,
+                "decision": str(intent_hypothesis.decision)[:40],
+                "matched_frame": intent_hypothesis.matched_frame,
+                "context_predicates": list(intent_hypothesis.context_predicates)[:20],
+                "selected_value": intent_hypothesis.selected_value,
+                "basis": str(intent_hypothesis.basis)[:80],
+                "evidence_refs": list(intent_hypothesis.evidence_refs)[:100],
+            }
+            self.intent_trace.append(trace_entry)
+            del self.intent_trace[:-_INTENT_TRACE_LIMIT]
+            task_intent = intent_hypothesis.task_intent
+            if intent_hypothesis.decision == "selected":
+                if task_intent == "end-interaction":
+                    self.active_task_intent = None
+                elif task_intent in {
+                        "seek-information", "provide-information", "other-task"}:
+                    self.active_task_intent = task_intent
         response = turn.response
         if (turn.status == "answered" and response is not None
                 and response.status == "answered" and turn.resolved_question):
@@ -236,6 +267,8 @@ class CRMSDialogue:
             context.add("current_topic_available")
         if self.last_answered:
             context.add("previous_grounded_answer")
+        if self.active_task_intent is not None:
+            context.add("task_in_progress")
         if self.last_answered or self.last_question:
             context.add("correction_target_available")
         if self.pending_result is not None:
@@ -263,6 +296,9 @@ class CRMSDialogue:
 
     def reset_history(self) -> None:
         self.history = []
+        self.intent_trace = []
+        self.active_task_intent = None
+        self.last_intent_hypothesis = None
         self.last_answered = None
         self.shown = []
         self.offers = []
@@ -1650,7 +1686,7 @@ class CRMSDialogue:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(
-            json.dumps({"format_version": 12, "last_entity": self.last_entity,
+            json.dumps({"format_version": 13, "last_entity": self.last_entity,
                         "subject_entity": self.subject_entity,
                         "object_entity": self.object_entity,
                         "last_question": self.last_question,
@@ -1667,6 +1703,8 @@ class CRMSDialogue:
                             asdict(self.last_intent_hypothesis)
                             if self.last_intent_hypothesis else None),
                         "history": self.history,
+                        "intent_trace": self.intent_trace,
+                        "active_task_intent": self.active_task_intent,
                         "last_answered": self.last_answered,
                         "shown": self.shown,
                         "pending_dialogue_slot": self.pending_dialogue_slot},
@@ -1680,13 +1718,54 @@ class CRMSDialogue:
              ) -> "CRMSDialogue":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
         if payload.get("format_version") not in (
-                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12):
+                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13):
             raise ValueError("unsupported dialogue-state format version")
         dialogue = cls(knowledge, intent_model=intent_model)
         pending_dialogue_slot = payload.get("pending_dialogue_slot")
         if pending_dialogue_slot not in (None, "elaboration_topic"):
             raise ValueError("stored dialogue slot is malformed")
         dialogue.pending_dialogue_slot = pending_dialogue_slot
+        active_task_intent = payload.get("active_task_intent")
+        if (active_task_intent is not None
+                and (not isinstance(active_task_intent, str)
+                     or active_task_intent not in _INTENT_TASKS)):
+            raise ValueError("stored active task intent is malformed")
+        dialogue.active_task_intent = active_task_intent
+        intent_trace = payload.get("intent_trace", [])
+        trace_keys = {
+            "dialogue_act", "task_intent", "decision", "matched_frame",
+            "context_predicates", "selected_value", "basis", "evidence_refs",
+        }
+        if not isinstance(intent_trace, list) or len(intent_trace) > _INTENT_TRACE_LIMIT:
+            raise ValueError("stored intent trace is malformed")
+        for entry in intent_trace:
+            if not isinstance(entry, dict) or set(entry) != trace_keys:
+                raise ValueError("stored intent trace entry is malformed")
+            if (not isinstance(entry["dialogue_act"], str)
+                    or len(entry["dialogue_act"]) > 80
+                    or entry["task_intent"] is not None
+                    and (not isinstance(entry["task_intent"], str)
+                         or entry["task_intent"] not in _INTENT_TASKS)
+                    or not isinstance(entry["decision"], str)
+                    or entry["decision"] not in {"selected", "ambiguous", "unlicensed"}
+                    or entry["matched_frame"] is not None
+                    and (not isinstance(entry["matched_frame"], str)
+                         or len(entry["matched_frame"]) > 512)
+                    or not isinstance(entry["context_predicates"], list)
+                    or len(entry["context_predicates"]) > 20
+                    or any(not isinstance(value, str) or len(value) > 512
+                           for value in entry["context_predicates"])
+                    or entry["selected_value"] is not None
+                    and (not isinstance(entry["selected_value"], str)
+                         or len(entry["selected_value"]) > 512)
+                    or not isinstance(entry["basis"], str)
+                    or len(entry["basis"]) > 80
+                    or not isinstance(entry["evidence_refs"], list)
+                    or len(entry["evidence_refs"]) > 100
+                    or any(not isinstance(value, str) or len(value) > 512
+                           for value in entry["evidence_refs"])):
+                raise ValueError("stored intent trace entry is malformed")
+        dialogue.intent_trace = intent_trace
         last_question = payload.get("last_question")
         if last_question is not None:
             if not isinstance(last_question, str):

@@ -5566,6 +5566,11 @@ def main() -> int:
                           "(hand-checked runtime rules; not learned):")
                 print(json.dumps(asdict(dialogue.last_intent_hypothesis),
                                  ensure_ascii=False, indent=2))
+            print(f"Active task context: {dialogue.active_task_intent or 'none'}")
+            if dialogue.intent_trace:
+                print("Recent intent trace:")
+                print(json.dumps(dialogue.intent_trace[-5:],
+                                 ensure_ascii=False, indent=2))
             continue
         explanation_followup = _natural_research_explanation_request(line)
         if not explanation_followup:

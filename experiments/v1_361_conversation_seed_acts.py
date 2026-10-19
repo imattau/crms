@@ -46,7 +46,7 @@ class ContentDialogue:
         self.calls_recorded: list = []
         self.calls: list[str] = []
 
-    def record_turn(self, utterance, act, turn) -> None:
+    def record_turn(self, utterance, act, turn, intent_hypothesis=None) -> None:
         self.calls_recorded.append((utterance, act))
 
     def elaborate(self):
@@ -109,7 +109,8 @@ def main() -> None:
             [sys.executable, str(script), "--knowledge", str(knowledge_path),
              "--index", str(index_path), "--rules", str(root / "rules.json"),
              "--dialogue-state", str(root / "dialogue.json"),
-             "--rule-session", str(root / "session.json")],
+             "--rule-session", str(root / "session.json"),
+             "--feedback-db", str(root / "feedback.sqlite3")],
             input="hi there\nTell me more\nGoodbye\n",
             text=True, capture_output=True,
             check=True, timeout=20)

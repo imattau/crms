@@ -89,9 +89,11 @@ Findings from the review that change the design:
 - **State was a bag of fields, with additions.** `CRMSDialogue` holds `last_entity`,
   `subject_entity`, `object_entity`, `last_question`, `last_selected_answer`, a pending
   clarification, writing and timeline fields, `source_mentions` (names quoted from sources, kept as
-  candidate referents), `last_intent_hypothesis`, `pending_dialogue_slot`, `history`, `last_answered`
-  and `shown` (format version 12, with legacy intent-state loading). General question-under-discussion state and task slots remain
-  absent; offers are transient.
+  candidate referents), `last_intent_hypothesis`, a bounded intent trace and active task-intent label,
+  `pending_dialogue_slot`, `history`, `last_answered` and `shown` (format version 13, with legacy
+  state loading). General question-under-discussion state and typed task slots remain absent; offers
+  are transient. The active task label supplies only a `task_in_progress` context predicate to
+  licensed frames.
 - **Entity recognition is partly widened.** `_source_entity_mentions` retains capitalised names from
   quoted sentences as candidates; `_canonical_entity` and `_known_entity_surfaces` still look only at
   accepted facts and aliases. Pronoun resolution does not consult entity kind.
@@ -445,11 +447,12 @@ The numbering is changed from the first draft because phase 0 is largely done.
    `experiments/v1_370_conversation_content_free_and_referents.py`). Not done: a general rule for bare
    single-token topics (section 2, rule 1), mixed-turn handling beyond the comma form, and binding
    `him` and `she` to the right referent.
-1. **Discourse state.** Turn history, `last_answered` and `shown` are saved in dialogue-state format
-   version 12 with older versions still loading. A single typed `elaboration_topic` slot also
-   persists and is validated; see `experiments/v1_375_contextual_elaboration_slot.py`. Elaboration
-   moved here because `shown` needs it. Not done: general `qud`/task slots, `session_facts`, and
-   entity kinds for source-derived names.
+1. **Discourse state.** Turn history, `last_answered`, `shown`, active task intent, and a bounded
+   turn-intent trace are saved in dialogue-state format version 13 with older versions still
+   loading. A single typed `elaboration_topic` slot also persists and is validated; see
+   `experiments/v1_375_contextual_elaboration_slot.py` and
+   `experiments/v1_386_session_intent_context.py`. Elaboration moved here because `shown` needs it.
+   Not done: general `qud`/task slots, `session_facts`, and entity kinds for source-derived names.
 2. **Follow-ups.** Done on branch `conversation-phase2`: a numbered choice for an ambiguous pronoun
    and the entity overview (checked by
    `experiments/v1_373_conversation_binding_and_overview.py`). Elliptical turns already existed. Not

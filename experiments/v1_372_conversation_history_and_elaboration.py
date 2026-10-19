@@ -128,9 +128,11 @@ def main() -> None:
         state = root / "dialogue.json"
         live.save(str(state))
         payload = json.loads(state.read_text(encoding="utf-8"))
-        require(payload["format_version"] == 12 and payload["shown"]
+        require(payload["format_version"] == 13 and payload["shown"]
                 and payload["last_answered"]["answer"] == "Charles Babbage"
-                and payload["history"][-1]["act"] == "elaboration",
+                and payload["history"][-1]["act"] == "elaboration"
+                and payload["intent_trace"][-1]["task_intent"]
+                == "continue-current-task",
                 f"saved state lacked the conversation memory: {payload}")
         restored = CRMSDialogue.load(knowledge, str(state))
         require(restored.shown == live.shown and restored.history == live.history
@@ -145,6 +147,8 @@ def main() -> None:
                   if key not in {"history", "last_answered", "shown",
                                  "pending_dialogue_slot"}}
         legacy["format_version"] = 11
+        legacy.pop("intent_trace", None)
+        legacy.pop("active_task_intent", None)
         legacy_intent = legacy.get("last_intent_hypothesis")
         if isinstance(legacy_intent, dict):
             legacy_intent.pop("evidence_refs", None)
@@ -212,7 +216,7 @@ def main() -> None:
     print("a refusal clears referents but not conversation memory: PASS")
     print("'why?' after a refusal explains the earlier answer and names it: PASS")
     print("history is bounded; clear() keeps it and /reset wipes it: PASS")
-    print("state version 12 round-trips; versions 11 and 9 load; tampering is rejected: PASS")
+    print("state version 13 round-trips; versions 11 and 9 load; tampering is rejected: PASS")
 
 
 if __name__ == "__main__":

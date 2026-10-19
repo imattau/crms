@@ -214,6 +214,8 @@ def main() -> None:
         require("Last turn's intent hypothesis" in completed.stdout
                 and '"task_intent": "resolve-ambiguity"' in completed.stdout
                 and '"selected_value": "the Difference Engine"' in completed.stdout
+                and "Active task context: seek-information" in completed.stdout
+                and "Recent intent trace:" in completed.stdout
                 and "hand-checked runtime rules; not learned" in completed.stdout,
                 f"/intent did not expose the selected contextual intent: {completed.stdout}")
         restarted = subprocess.run(
@@ -225,7 +227,8 @@ def main() -> None:
         state_path = root / "dialogue.json"
         state = json.loads(state_path.read_text(encoding="utf-8"))
         legacy_state = {key: value for key, value in state.items()
-                        if key != "last_intent_hypothesis"}
+                        if key not in {"last_intent_hypothesis", "intent_trace",
+                                       "active_task_intent"}}
         legacy_state["format_version"] = 8
         state_path.write_text(json.dumps(legacy_state), encoding="utf-8")
         legacy_dialogue = CRMSDialogue.load(knowledge, str(state_path))
@@ -246,7 +249,7 @@ def main() -> None:
     print("explicit 'I meant' correction resolves the open candidate choice: PASS")
     print("unanchored yes/no asks for context instead of querying the corpus: PASS")
     print("terminal interaction retains context across the clarification sequence: PASS")
-    print("/intent exposes the last turn's contextual hypothesis on demand: PASS")
+    print("/intent exposes the last hypothesis and active task context: PASS")
     print("saved intent hypothesis survives a chat restart: PASS")
     print("legacy dialogue state loads without intent metadata: PASS")
     print("tampered saved intent hypothesis is rejected: PASS")
