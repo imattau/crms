@@ -69,12 +69,13 @@ and [Taskmaster-1 paper](https://aclanthology.org/D19-1459/).
 This is a practical corpus for testing greetings, acknowledgements, clarification, repair, and
 closing in task-oriented exchanges, but it is not a direct sample of research-assistant or open-domain
 conversation. The two-person assistant turns were produced by trained human operators, so this
-measures task-service conventions rather than an existing automated assistant. Label only assistant
-turns for the initial move inventory; keep user turns as context. Split by complete conversation ID
-so no adjacent turn leaks across train and holdout. Treat distinct dialogue IDs as independent
-conversations **within this one collection**, not as independent publisher origins. Any claim that a
-move generalizes beyond this corpus needs replication in a second, separately collected dialogue
-corpus. Preserve the dataset citation and CC BY attribution with every derived evaluation artifact.
+measures task-service conventions rather than an existing automated assistant. Label assistant
+turns for the initial move inventory and label user turns separately for dialogue act and contextual
+task intent. Keep the two label types distinct. Split by complete conversation ID so no adjacent
+turn leaks across train and holdout. Treat distinct dialogue IDs as independent conversations
+**within this one collection**, not as independent publisher origins. Any claim that a move or intent
+generalizes beyond this corpus needs replication in a second, separately collected dialogue corpus.
+Preserve the dataset citation and CC BY attribution with every derived evaluation artifact.
 
 ## Bounded experiment
 
@@ -103,10 +104,11 @@ python3 experiments/v1_363_prepare_taskmaster_dialogue_pilot.py \
   /path/to/woz-dialogs.json /path/to/new-output-directory
 ```
 
-The tool writes one indexed text source per complete conversation and
-`assistant_turns_to_label.csv`, with the preceding turns, an empty move label, reviewer fields,
-SHA-256/character-offset citations, and the original file digest, conversation ID, and utterance
-index. By default, it indexes the complete corpus but samples 500 distinct conversations from the
+The tool writes one indexed text source per complete conversation,
+`assistant_turns_to_label.csv`, and `user_turns_to_label.csv`. Both sheets include preceding turns,
+blank human-label fields, separate second-rater and adjudication columns, SHA-256/character-offset
+citations, and the original file digest, conversation ID, and utterance index. By default, it
+indexes the complete corpus but samples 500 distinct conversations from the
 `restaurant-table` domain for human annotation (`--annotation-domain` and
 `--annotation-dialogues` can change this). It creates deterministic 80/10/10 splits by conversation
 ID and refuses to overwrite an existing output directory. CRMS currently uses absolute paths as
@@ -118,11 +120,12 @@ Of 5,507 records, 5,503 contained turns; four empty records were skipped, five e
 reused conversation IDs were retained under distinct transcript filenames, and 55 blank speaker
 labels were preserved as `UNKNOWN`. The indexed set has 73,195 assistant utterances. The
 restaurant-table annotation sample contains 500 distinct conversation IDs and 7,312 assistant
-utterances, split across 397 train, 49 dev, and 54 test conversations. Every annotation citation
-resolved through CRMS's normal research-index API to the exact assistant utterance. Labels remain
-blank: this is prepared evidence, not an induced or evaluated dialogue model. The corpus has six
-domains; the other five are indexed for future transfer work, not mixed into this first annotation
-study.
+utterances plus 6,227 user utterances, split across 397 train, 49 dev, and 54 test conversations.
+The deterministic 20% second-rater sample covers 101 complete conversations and 1,476 assistant
+turns plus 1,234 user turns. Every user and assistant citation resolved through CRMS's normal
+research-index API to the exact utterance. Labels remain blank: this is prepared evidence, not an
+induced or evaluated dialogue model. The corpus has six domains; the other five are indexed for
+future transfer work, not mixed into this first annotation study.
 
 The proposed 500-transcript scale and 80% held-out target are hypotheses, not acceptance criteria
 until corpus size, class balance, label agreement, and a scripted baseline are measured. In
@@ -133,6 +136,9 @@ Use [dialogue_move_annotation_protocol.md](dialogue_move_annotation_protocol.md)
 definitions, context coding, independent review, agreement reporting, and comparator evaluation.
 The worksheet flags a deterministic 20% conversation-level reliability sample within each split
 and leaves the second-rater and adjudication fields empty until humans complete them.
+The separate [contextual user-intent design](design_user_intent_model.md) makes intent a first-class
+research target distinct from assistant move realization. The pilot now includes user-turn
+annotations because assistant-only labels cannot teach CRMS what users are trying to accomplish.
 
 **Stop or narrow the work** if induced frames do not outperform or materially simplify the scripted
 baseline, if acceptable coverage requires prohibitive annotation, if labels have poor agreement, or

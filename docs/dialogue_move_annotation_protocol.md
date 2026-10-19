@@ -4,6 +4,10 @@
 learning is implemented. The corpus and preparation workflow are described in
 [design_dialogue_moves.md](design_dialogue_moves.md).
 
+The pilot produces two sheets. `assistant_turns_to_label.csv` labels assistant dialogue moves;
+`user_turns_to_label.csv` records user dialogue acts and contextual task intents. These are related
+labels, but they must not be collapsed into one field.
+
 ## Unit and evidence
 
 Annotate one assistant utterance at a time. Read the complete conversation when available; at
@@ -78,7 +82,47 @@ or `uncertain`. These are observations, not claims that the move is appropriate.
    adjudicated label, and citation. Automated proposals may prioritize review but are never gold
    labels and must remain distinguishable from human judgments.
 
-The prepared sheet has 7,312 assistant-turn rows, so labeling every row is a substantial effort.
+## User act and intent annotation
+
+For each row in `user_turns_to_label.csv`, annotate both fields:
+
+- `dialogue_act`: what this utterance does in the exchange (for example, asks a question, supplies a
+  requested detail, corrects an earlier answer, accepts a clarification, or closes contact).
+- `task_intent`: the user's immediate goal in the current task (for example, obtain information,
+  make or change a reservation, provide a constraint, resolve ambiguity, correct the result, or
+  continue the current topic).
+
+Choose one value from each list:
+
+| Field | Allowed values |
+|---|---|
+| `dialogue_act` | `question`, `request-action`, `provide-information`, `answer-clarification`, `confirm`, `reject`, `correction`, `continuation-request`, `greeting`, `thanks`, `farewell`, `other`, `uncertain` |
+| `task_intent` | `check-availability`, `make-reservation`, `change-reservation`, `cancel-reservation`, `provide-constraint`, `resolve-ambiguity`, `correct-prior-result`, `seek-information`, `continue-current-task`, `social-contact`, `end-interaction`, `other-task`, `uncertain` |
+
+For mixed utterances, choose the act and intent that determine the next expected system action;
+record secondary actions in `annotator_note`. Use `other` only when the utterance is clear but does
+not fit a value. Use `uncertain` when the utterance or context does not support a stable label.
+
+Infer `task_intent` from the utterance and preceding context together. Do not assume the same surface
+form always has the same intent: “yes” may accept a proposed time, confirm a summary, or answer a
+polar question; “what about Friday?” may change a reservation constraint or start a new topic. When
+context does not distinguish those readings, mark the intent uncertain. Do not invent a hidden goal
+beyond what the conversation supports.
+
+Use `context_state` for observable state immediately before the user turn: `opening`,
+`awaiting-user-detail`, `awaiting-confirmation`, `answer-follow-up`, `correction-or-challenge`,
+`task-in-progress`, `task-complete`, `social-exchange`, `no-open-task`, or `uncertain`. Use
+`predecessor_act` for the immediately preceding assistant move: `question`, `clarification-request`,
+`answer`, `confirmation-request`, `greeting`, `action-result`, `close`, `other`, or `uncertain`.
+These describe context; they do not imply that the assistant's action was appropriate.
+
+Keep act and intent separate. For example, “At 7 pm” can be a `provide-information` act with a
+`make-reservation` intent; “No, 8 pm” can be a `correct-or-reject` act with the same task intent.
+Mark uncertainty independently for either field. The second-rater and adjudication columns use the
+same conversation-level audit sample as the assistant sheet.
+
+The prepared sheets have 7,312 assistant-turn rows and 6,227 user-turn rows, so labeling every row
+is a substantial effort.
 Begin with a feasibility batch drawn from the existing train partition and its double-label audit.
 Check class coverage, disagreement, and annotation time before expanding. Keep dev and test sealed
 from frame induction and policy tuning. If a target class has too few independently supported
@@ -89,6 +133,10 @@ The worksheet stores the first label in `move_label`, `context_license`, `predec
 `*_2` columns and `reviewer_2`. After independent labels are locked, an adjudicator fills
 `adjudicated_label` and `adjudicator`; record explanations in `annotator_note`. Do not overwrite a
 disagreement with the adjudicated result.
+
+In the user worksheet, the primary fields are `dialogue_act`, `task_intent`, `context_state`,
+`predecessor_act`, and `reviewer`; second-rater fields end in `_2`. The adjudicated fields are
+`adjudicated_dialogue_act` and `adjudicated_task_intent`.
 
 ## Evaluation against dialogue comparators
 

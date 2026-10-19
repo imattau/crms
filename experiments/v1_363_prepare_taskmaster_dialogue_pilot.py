@@ -1,8 +1,8 @@
 """Prepare Taskmaster-1 WOz conversations for human dialogue-move annotation.
 
-This is a data-preparation tool, not a move learner. It keeps each complete
-conversation in one deterministic split, emits citation-bearing assistant-turn
-rows with preceding context, and never guesses dialogue-act labels.
+This is a data-preparation tool, not an act or intent learner. It keeps each
+complete conversation in one deterministic split, emits citation-bearing user
+and assistant turn rows with preceding context, and never guesses labels.
 
 Usage:
     python3 experiments/v1_363_prepare_taskmaster_dialogue_pilot.py \
@@ -189,9 +189,11 @@ def prepare(source_path: Path, output_path: Path, *,
 
     corpus_root = output_path / "corpus"
     annotations_path = output_path / "assistant_turns_to_label.csv"
+    user_annotations_path = output_path / "user_turns_to_label.csv"
     output_path.mkdir(parents=True)
     corpus_root.mkdir()
     annotation_rows: list[dict[str, str]] = []
+    user_annotation_rows: list[dict[str, str]] = []
     split_dialogues = {"train": 0, "dev": 0, "test": 0}
     annotation_splits = {"train": 0, "dev": 0, "test": 0}
     assistant_turns = 0
@@ -231,50 +233,73 @@ def prepare(source_path: Path, output_path: Path, *,
             annotation_ids_written.add(annotation_key)
             annotation_splits[split] += 1
         for position, turn in enumerate(dialogue["utterances"]):
-            if turn["speaker"] != "ASSISTANT":
+            if turn["speaker"] not in {"ASSISTANT", "USER"}:
                 continue
-            assistant_turns += 1
+            if turn["speaker"] == "ASSISTANT":
+                assistant_turns += 1
             if annotation_key not in annotation_ids:
                 continue
-            annotation_assistant_turns += 1
             prior = dialogue["utterances"][:position]
             context = "\n".join(
                 f"{item['speaker']}: {item['text']}" for item in prior[-2:])
             start, end = turn_spans[turn["index"]]
-            annotation_rows.append({
+            common = {
                 "split": split,
                 "conversation_id": conversation_id,
                 "source_record_ordinal": str(record_ordinal),
                 "instruction_id": dialogue["instruction_id"],
                 "utterance_index": str(turn["index"]),
                 "preceding_context": context,
-                "assistant_utterance": turn["text"],
                 "double_label_required": str(annotation_key in double_label_ids).lower(),
-                "move_label": "",
-                "context_license": "",
-                "predecessor_label": "",
-                "reviewer": "",
-                "move_label_2": "",
-                "context_license_2": "",
-                "predecessor_label_2": "",
-                "reviewer_2": "",
-                "adjudicated_label": "",
-                "adjudicator": "",
-                "annotator_note": "",
                 "citation": (f"{document_id}#sha256={digest}"
                              f"&chars={start}:{end}"),
                 "source_file_sha256": source_sha256,
                 "source_conversation_id": conversation_id,
                 "source_utterance_index": str(turn["index"]),
-            })
+            }
+            if turn["speaker"] == "ASSISTANT":
+                annotation_assistant_turns += 1
+                annotation_rows.append(common | {
+                    "assistant_utterance": turn["text"],
+                    "move_label": "",
+                    "context_license": "",
+                    "predecessor_label": "",
+                    "reviewer": "",
+                    "move_label_2": "",
+                    "context_license_2": "",
+                    "predecessor_label_2": "",
+                    "reviewer_2": "",
+                    "adjudicated_label": "",
+                    "adjudicator": "",
+                    "annotator_note": "",
+                })
+            else:
+                user_annotation_rows.append(common | {
+                    "user_utterance": turn["text"],
+                    "dialogue_act": "",
+                    "task_intent": "",
+                    "context_state": "",
+                    "predecessor_act": "",
+                    "reviewer": "",
+                    "dialogue_act_2": "",
+                    "task_intent_2": "",
+                    "context_state_2": "",
+                    "predecessor_act_2": "",
+                    "reviewer_2": "",
+                    "adjudicated_dialogue_act": "",
+                    "adjudicated_task_intent": "",
+                    "adjudicator": "",
+                    "annotator_note": "",
+                })
 
-    if not annotation_rows:
-        raise ValueError("selected annotation sample contains no assistant turns")
-    fieldnames = list(annotation_rows[0])
-    with annotations_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(annotation_rows)
+    if not annotation_rows or not user_annotation_rows:
+        raise ValueError("selected annotation sample needs both user and assistant turns")
+    for path, rows in ((annotations_path, annotation_rows),
+                       (user_annotations_path, user_annotation_rows)):
+        with path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+            writer.writeheader()
+            writer.writerows(rows)
 
     manifest = {
         "dataset": "Taskmaster-1, two-person Wizard-of-Oz dialogues",
@@ -308,6 +333,11 @@ def prepare(source_path: Path, output_path: Path, *,
         "double_label_turn_count": sum(
             1 for row in annotation_rows if row["double_label_required"] == "true"),
         "annotation_file": annotations_path.name,
+        "user_intent_annotation_file": user_annotations_path.name,
+        "user_intent_turn_count": len(user_annotation_rows),
+        "double_label_user_turn_count": sum(
+            1 for row in user_annotation_rows
+            if row["double_label_required"] == "true"),
         "corpus_directory": corpus_root.name,
         "move_classes_for_human_review": list(ASSISTANT_MOVE_CLASSES),
         "labels_assigned_automatically": False,
@@ -330,16 +360,17 @@ def prepare(source_path: Path, output_path: Path, *,
         f"Dataset documentation: {DATASET_README}\n\n"
         f"Paper: {PAPER}\n\n"
         "License: CC BY 4.0. Attribution and the input file digest are recorded in "
-        "manifest.json. The annotation sheet contains no machine-assigned move labels.\n")
+        "manifest.json. User intent and assistant move labels are blank for human review.\n")
     (output_path / "README.md").write_text(attribution, encoding="utf-8")
 
     # Verify that every generated utterance citation resolves through CRMS's
     # normal source index API before presenting the annotation pack as usable.
     index = CRMSResearchIndex()
     index.add_directory(corpus_root)
-    for row in annotation_rows:
+    for row in annotation_rows + user_annotation_rows:
         resolved = index.resolve_citation(row["citation"])
-        if resolved != row["assistant_utterance"]:
+        expected = row.get("assistant_utterance", row.get("user_utterance"))
+        if resolved != expected:
             raise RuntimeError("generated annotation citation failed round-trip")
     return manifest
 
@@ -373,6 +404,7 @@ def main() -> int:
         "annotation_assistant_turn_count", "annotation_dialogues_by_split",
         "double_label_fraction", "double_label_dialogues_by_split",
         "double_label_dialogue_count", "double_label_turn_count",
+        "user_intent_turn_count", "double_label_user_turn_count",
         "labels_assigned_automatically")}, indent=2))
     return 0
 
