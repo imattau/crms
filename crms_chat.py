@@ -3509,7 +3509,7 @@ def _natural_story_request(message: str) -> tuple[str | None, str] | None:
     match = re.fullmatch(
         r"\s*(?:please\s+)?(?:write|compose|create|make|tell)\s+"
         r"(?:(?:me|us)\s+)?(?:(?:a|an|some)\s+)?"
-        r"(?P<modifiers>(?:(?:short|brief|funny|original|little)\s+){0,3})"
+        r"(?P<modifiers>(?:(?:short|brief|funny|mystery|mysterious|original|little)\s+){0,3})"
         r"story(?:\s+(?:about|of)\s+(?P<topic>.+?))?\s*[.!?]*\s*",
         message, flags=re.IGNORECASE)
     if match is None:
@@ -3518,7 +3518,9 @@ def _natural_story_request(message: str) -> tuple[str | None, str] | None:
     if topic is not None:
         topic = topic.strip().strip(" \t\r\n.,!?;:") or None
     modifiers = set(re.findall(r"[a-z]+", match.group("modifiers").casefold()))
-    tone = "funny" if "funny" in modifiers else "adventure"
+    tone = ("funny" if "funny" in modifiers else
+            "mystery" if modifiers & {"mystery", "mysterious"} else
+            "adventure")
     return topic, tone
 
 
@@ -3528,13 +3530,17 @@ def _natural_story_revision(message: str) -> str | None:
         r"\s*(?:(?:please|can you|could you)\s+)?"
         r"(?:(?:make|rewrite|revise)\s+(?:it|the story)\s+"
         r"(?:a bit\s+|much\s+|more\s+)?(?P<tone>funny|funnier|adventure|"
-        r"adventurous)|change\s+(?:the\s+)?tone\s+to\s+"
-        r"(?P<tone2>funny|adventure))\s*[.!?]*\s*",
+        r"adventurous|mystery|mysterious)|change\s+(?:the\s+)?tone\s+to\s+"
+        r"(?P<tone2>funny|adventure|mystery|mysterious))\s*[.!?]*\s*",
         message, flags=re.IGNORECASE)
     if match is None:
         return None
     tone = (match.group("tone") or match.group("tone2")).casefold()
-    return "funny" if tone in {"funny", "funnier"} else "adventure"
+    if tone in {"funny", "funnier"}:
+        return "funny"
+    if tone in {"mystery", "mysterious"}:
+        return "mystery"
+    return "adventure"
 
 
 _STORY_UNSUPPORTED_CONSTRAINT_RE = re.compile(

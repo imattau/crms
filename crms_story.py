@@ -55,6 +55,13 @@ _STORY_GRAMMARS: tuple[tuple[str, tuple[tuple[str, str], ...]], ...] = (
         ("resolution", "She freed the gear, and every clock began keeping time together again."),
         ("change", "The watch stopped in her palm, its hands pointing to the moment she had solved the mystery."),
     )),
+    ("mystery-midnight-library-v1", (
+        ("discovery", "At midnight, Noor found a brass key tucked inside a book marked “{topic}.”"),
+        ("problem", "Every book in the library had lost its final page, and a soft knocking came from the locked map room."),
+        ("attempt", "Noor compared the torn page edges and noticed that each one made a different part of the same map."),
+        ("resolution", "The assembled map opened the room, where a shy archivist returned the missing pages and explained the puzzle."),
+        ("change", "Noor left the key beside the book, ready for the next reader who noticed a mystery."),
+    )),
     ("small-kindness-v1", (
         ("discovery", "Beside a garden gate labelled “{topic},” Eli found a seed glowing like a small green star."),
         ("problem", "The garden was dry, and nobody believed one seed could make a difference."),
@@ -81,11 +88,15 @@ def generate_short_story(topic: str, *, tone: str = "adventure") -> StoryArtifac
     normalized = " ".join(topic.split()).strip(" \t\r\n.,!?;:")
     if not normalized or len(normalized) > 120:
         raise ValueError("story topic must contain 1 to 120 printable characters")
-    if not isinstance(tone, str) or tone.casefold() not in {"adventure", "funny"}:
-        raise ValueError("story tone must be 'adventure' or 'funny'")
+    if not isinstance(tone, str) or tone.casefold() not in {
+            "adventure", "funny", "mystery"}:
+        raise ValueError("story tone must be 'adventure', 'funny', or 'mystery'")
     tone = tone.casefold()
     eligible = [row for row in _STORY_GRAMMARS
-                if (tone == "funny") == row[0].startswith("comic-")]
+                if ((tone == "funny" and row[0].startswith("comic-"))
+                    or (tone == "mystery" and row[0].startswith("mystery-"))
+                    or (tone == "adventure"
+                        and not row[0].startswith(("comic-", "mystery-"))))]
     digest = hashlib.sha256(
         (tone + "\0" + normalized.casefold()).encode("utf-8")).digest()
     template_id, grammar = eligible[int.from_bytes(digest[:4], "big") % len(eligible)]

@@ -49,6 +49,17 @@ answers a factual question through the normal source route. This verifies
 session context and route separation for one narrow creative revision. It does
 not measure human-rated quality, originality, or parity with a large model.
 
+## Mystery story request and revision
+
+Command: `python3 experiments/v1_421_story_mystery_revision.py`.
+
+The CLI recognizes an explicit mystery-story request, selects one of two
+five-beat mystery grammars, and revises the latest story from mystery to funny
+and back to mystery. It preserves the requested topic and invented-fiction
+label, then answers a factual question through the normal source route. This
+adds one bounded creative mode; it is not evidence of human-rated story quality,
+open-ended writing, or broad creative competence.
+
 ## Capability-comparison status (2026-10-19)
 
 CRMS has focused, reproducible checks for natural-language transfer,

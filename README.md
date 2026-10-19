@@ -55,8 +55,9 @@ Other things it can currently do:
 - Learn small rules from examples, such as how to reverse or reshape a list of
   numbers.
 - Learn new ways of phrasing questions, with your approval.
-- Compose a short, template-based fictional story from a topic, revise its tone
-  between funny and adventure in the same chat, and label its details as invented.
+- Compose a short, template-based fictional story from a topic, choose funny,
+  mystery, or adventure, revise among those modes in the same chat, and label
+  its details as invented.
 - Experiment with an inspectable sentence-ranker pilot. It is not enabled in
   normal chat and does not replace source checks.
 - Handle greetings, thanks, acknowledgements, short follow-up prompts, and
@@ -74,7 +75,7 @@ Being honest about limits is part of the project:
   open-ended conversations, or know things you haven't given it.
 - Its story writing uses a small fixed narrative grammar; it cannot yet write
   varied fiction, plans, poems, songs, or revise prose broadly. Story revisions
-  are limited to switching between the two supported tones.
+  are limited to switching among the three supported modes.
 - Its understanding of wording is **narrow**. It can miss a question that a
   person would find obviously similar to one it handled.
 - Conversation is still **limited**. It retains a bounded clarification
