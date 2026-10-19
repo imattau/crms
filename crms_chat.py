@@ -12,7 +12,9 @@ from pathlib import Path
 from typing import Any
 
 from crms_dialogue import CRMSDialogue
-from crms_conversation import is_farewell, respond as respond_conversation
+from crms_conversation import (
+    is_farewell, natural_feedback_verdict, offer_pending_review,
+    respond as respond_conversation)
 from crms_feedback import (
     AnswerFeedbackStore, collect_feedback_refs,
     collect_codegen_feedback_refs,
@@ -5305,9 +5307,14 @@ def main() -> int:
     current_effort = "standard"
     queued_natural_parts: list[str] = []
     natural_part_total = 0
+    # Commands the conversation layer asked to run next (an accepted offer).
+    queued_conversation_lines: list[str] = []
     while True:
         compound_part: tuple[int, int] | None = None
-        if queued_natural_parts:
+        if queued_conversation_lines:
+            line = queued_conversation_lines.pop(0)
+            print(f"you> {line}")
+        elif queued_natural_parts:
             line = queued_natural_parts.pop(0)
             compound_part = (natural_part_total - len(queued_natural_parts),
                              natural_part_total)
@@ -5329,6 +5336,11 @@ def main() -> int:
         if is_farewell(line):
             # Let the existing exit path save every session file and portable model.
             line = "/quit"
+        verdict = natural_feedback_verdict(line)
+        if verdict is not None:
+            # "That's wrong" / "that's right" use the explicit feedback command,
+            # which also explains when there is no recent answer to attach to.
+            line = f"/{verdict}"
         if (pending_story_tone is not None and not line.startswith("/")
                 and _natural_story_request(line) is None):
             is_new_request = (
@@ -9061,6 +9073,8 @@ def main() -> int:
         turn = respond_conversation(
             dialogue, line, research_index=index,
             pending_claims=len(pending_candidates))
+        if turn.action:
+            queued_conversation_lines.append(turn.action)
         compound_pronoun_focus: str | None = None
         if (compound_part is not None
                 and turn.resolved_question
@@ -10478,6 +10492,9 @@ def main() -> int:
                 noun = "claim" if count == 1 else "claims"
                 print(f"{count} source {noun} available for review; "
                       "use /pending-candidates to inspect.")
+                offered = offer_pending_review(dialogue)
+                if offered:
+                    print(offered)
             elif (review_to_show and turn.research is not None
                   and turn.research.status == "needs_review"):
                 rendered_sources = {
@@ -10490,6 +10507,9 @@ def main() -> int:
                     noun = "claim" if count == 1 else "claims"
                     print(f"{count} source {noun} awaiting review; "
                           "use /pending-candidates to inspect.")
+                    offered = offer_pending_review(dialogue)
+                    if offered:
+                        print(offered)
                 else:
                     for number, candidate in review_to_show:
                         polarity = "positive" if candidate.polarity else "negative"

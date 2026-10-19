@@ -42,6 +42,17 @@ _BARE_YES_NO_RE = re.compile(
     r"^(?:yes|yeah|yep|yup|sure|certainly|absolutely|no|nope|nah|not really)"
     r"(?:[, ]+(?:please|thanks|thank you))?[.!? ]*$",
     re.IGNORECASE)
+_CORRECTION_RE = re.compile(
+    r"^(?:(?:no|nope|sorry)[,.!]?\s+)?(?:i\s+meant|i\s+mean)\s+"
+    r"(?P<entity>\S.*?)[?!. ]*$", re.IGNORECASE)
+_VERDICT_RE = re.compile(
+    r"^(?:that|it)(?:\s+is|['’]s)\s+(?P<verdict>"
+    r"(?:not\s+(?:right|correct|true)|wrong|incorrect|false|"
+    r"right|correct|true))[.! ]*$", re.IGNORECASE)
+_NEGATIVE_VERDICTS = {"wrong", "incorrect", "false", "not right",
+                      "not correct", "not true"}
+_REVIEW_HINT = "use /pending-candidates to inspect"
+_OFFER_LIFETIME = 2
 _OVERVIEW_RE = re.compile(
     r"^(?:what\s+do\s+you\s+know\s+about|what\s+can\s+you\s+tell\s+me\s+about|"
     r"tell\s+me\s+what\s+you\s+know\s+about|what\s+is\s+known\s+about)\s+"
@@ -68,6 +79,41 @@ _ACTION_REQUEST_VERBS = {
     "put", "remind", "reserve", "seat", "send", "set", "take", "translate",
     "try", "write",
 }
+
+
+def natural_feedback_verdict(text: str) -> str | None:
+    """Map an explicit verdict about the last answer to ``right`` or ``wrong``.
+
+    Only "that's / it is" plus a verdict word counts. A bare "correct" or
+    "right" is left alone because other prompts use those words as replies.
+    """
+    match = _VERDICT_RE.fullmatch(text.strip())
+    if match is None:
+        return None
+    verdict = " ".join(match.group("verdict").casefold().split())
+    return "wrong" if verdict in _NEGATIVE_VERDICTS else "right"
+
+
+def offer_pending_review(dialogue: CRMSDialogue) -> str | None:
+    """Open an offer to review pending claims and return the line that states it.
+
+    Call it only where a reply has just told the user that claims are waiting.
+    Returns ``None`` when the same offer is already open.
+    """
+    if any(item["kind"] == "review_pending" for item in dialogue.offers):
+        return None
+    dialogue.offers.append({"kind": "review_pending",
+                            "action": "/pending-candidates",
+                            "turns_left": _OFFER_LIFETIME})
+    return "Say ‘yes’ to review them now."
+
+
+def _offer(dialogue: CRMSDialogue, turn: DialogueTurn) -> None:
+    """Offer a review where this reply itself says claims are waiting."""
+    if _REVIEW_HINT in (turn.text or "").casefold():
+        line = offer_pending_review(dialogue)
+        if line:
+            turn.text = f"{turn.text}\n{line}"
 
 
 def _count(value: int, noun: str) -> str:
@@ -272,7 +318,40 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         turn.intent_hypothesis = intent
         dialogue.last_intent_hypothesis = intent
         dialogue.record_turn(text, act or "question", turn)
+        _offer(dialogue, turn)
         return turn
+
+    offers = dialogue.offers
+    answers_offer = bool(
+        offers and dialogue.pending_result is None
+        and dialogue.pending_binding is None
+        and _BARE_YES_NO_RE.fullmatch(text.strip()))
+    if offers and not answers_offer:
+        # Any other turn uses up one of the offer's remaining turns.
+        dialogue.offers = [dict(item, turns_left=item["turns_left"] - 1)
+                           for item in offers if item["turns_left"] > 1]
+    if answers_offer:
+        accepted = _BARE_YES_NO_RE.fullmatch(text.strip()).group(0).casefold()
+        said_yes = accepted.split()[0].strip(",.!?") in {
+            "yes", "yeah", "yep", "yup", "sure", "certainly", "absolutely"}
+        offer = dialogue.offers.pop(0)
+        dialogue.offers = []
+        intent = UserIntentHypothesis(
+            dialogue_act="accept-offer" if said_yes else "decline-offer",
+            task_intent="continue-current-task",
+            decision="selected",
+            matched_frame="offer-" + ("accept" if said_yes else "decline"),
+            context_predicates=("open_offer",),
+            selected_value=offer["kind"],
+        )
+        if said_yes:
+            reply = DialogueTurn("social", text, text,
+                                 text="Okay, here they are.",
+                                 action=offer["action"])
+        else:
+            reply = DialogueTurn("social", text, text,
+                                 text="Okay, I will leave them for now.")
+        return with_intent(reply)
 
     mixed_greeting = _MIXED_GREETING_RE.fullmatch(text.strip())
     if mixed_greeting is not None:
@@ -322,6 +401,25 @@ def respond(dialogue: CRMSDialogue, text: str, *,
                 text=("That does not say which one. Please choose: "
                       f"{numbered}.")))
         dialogue.pending_binding = None
+    correction = (_CORRECTION_RE.fullmatch(text.strip())
+                  if act is None and dialogue.pending_result is None else None)
+    if correction is not None and dialogue.last_question is not None:
+        entity = correction.group("entity").strip()
+        turn = dialogue.turn(f"What about {entity}?",
+                             research_index=research_index)
+        answered = turn.response is not None and turn.response.status == "answered"
+        intent = UserIntentHypothesis(
+            dialogue_act="correction",
+            task_intent="correct-result",
+            decision="selected" if answered else "ambiguous",
+            matched_frame="correction-rebind-entity",
+            context_predicates=("previous_grounded_question",),
+            selected_value=entity,
+        )
+        if answered:
+            turn.text = (f"Understood. Asking again as ‘{turn.resolved_question}’.\n"
+                         f"{turn.text}")
+        return with_intent(turn)
     if act is None:
         overview = _OVERVIEW_RE.fullmatch(text.strip())
         if overview is not None:
@@ -382,6 +480,8 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             reply += f", with {_count(pending_claims, 'claim')} awaiting review"
         reply += (". Ask about an entity or source; ask ‘why?’ to see the "
                   "supporting evidence.")
+        if pending_claims:
+            reply += " Use /pending-candidates to inspect them."
         return with_intent(DialogueTurn("social", text, text, text=reply))
     if act == "farewell":
         return with_intent(DialogueTurn("farewell", text, text, text="Goodbye."))

@@ -149,6 +149,9 @@ class DialogueTurn:
     counterfactual: CounterfactualResult | None = None
     grouped_results: list[dict[str, Any]] | None = None
     intent_hypothesis: UserIntentHypothesis | None = None
+    # A chat command the conversation layer asks the terminal to run next,
+    # always taken from a fixed allowlist, never from user text.
+    action: str | None = None
 
 
 class CRMSDialogue:
@@ -187,6 +190,9 @@ class CRMSDialogue:
         # it is not saved, and any other turn discards it.
         self.pending_binding: dict[str, Any] | None = None
         self._pronoun_options: list[tuple[str, str]] = []
+        # Next steps CRMS has offered, each answerable by a bare yes or no for a
+        # short time. Transient: not saved, and ``clear`` leaves them alone.
+        self.offers: list[dict[str, Any]] = []
 
     def record_turn(self, utterance: str, act: str,
                     turn: "DialogueTurn") -> None:
@@ -212,6 +218,7 @@ class CRMSDialogue:
         self.history = []
         self.last_answered = None
         self.shown = []
+        self.offers = []
 
     def focus_entities(self) -> list[str]:
         """Entities the conversation is currently about, most recent answer first."""
@@ -306,6 +313,8 @@ class CRMSDialogue:
         words = [word for word in words
                  if word not in {"the", "a", "an", "one", "option", "answer",
                                  "it", "is", "that", "i", "mean", "meant"}]
+        if len(words) > 1 and words[0] == "no":
+            words = words[1:]
         ordinals = {"first": 0, "1st": 0, "second": 1, "2nd": 1, "third": 2,
                     "3rd": 2, "fourth": 3, "4th": 3, "last": len(options) - 1}
         if len(words) == 1 and words[0].isdigit():

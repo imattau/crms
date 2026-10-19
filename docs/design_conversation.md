@@ -221,13 +221,13 @@ Vocabulary follows `UserIntentHypothesis` (`dialogue_act`, `task_intent`) from t
 | farewell | "Goodbye" | close and save | none | implemented |
 | thanks | "thanks" | acknowledgement | none | implemented |
 | acknowledgement | "ok" | asks what next, or defers to open choice | open offer | implemented |
-| affirm / deny | "yes", "no" | resolves an open offer; else asks what it answers | `offers` | partly: only during an open choice; otherwise an ambiguous hypothesis |
+| affirm / deny | "yes", "no" | resolves an open offer; else asks what it answers | `offers` | implemented in phase 3 for one offer (review pending claims); an open choice keeps its own yes/no handling |
 | content question | "Who created Python?" | existing question path | n/a | implemented |
 | elliptical follow-up | "And Ada Lovelace?" | carry the last question frame to the new entity (5.1) | last question | exists (`_resolve_entity_followup`) for fact-backed answers; quoted-source answers cannot verify it |
 | elaboration | "Tell me more" | next unshown facts about the focus (5.3) | `shown`, focus entities | implemented in phase 1 for accepted facts; source-only topics still ask a question |
 | justification | "Why?" | existing explanation | `last_answered` | implemented; after a refusal it explains the earlier answer and says which |
 | challenge | "Are you sure?" | re-run with evidence | `history` | missing |
-| correction / repair | "No, I meant …" | rebind the last reference (5.4) | `history`, `salience` | only while a choice is open |
+| correction / repair | "No, I meant …" | re-ask the last question about the named entity (5.4) | `last_question` | implemented in phase 3 for fact-backed questions; records no verdict |
 | clarification choice | "the second one" | `_select_candidate` | pending result | implemented |
 | entity overview | "What do you know about X?" | entity card (5.8) | facts about X | implemented in phase 2 for entities with accepted facts |
 | capability / meta | "What can you do?" | help text | none | implemented; status slots missing |
@@ -284,11 +284,19 @@ about. Still to do: source-only topics (quoted candidates), ordering by the rela
 about, and licensed sentence wording where a frame exists.
 
 ### 5.4 Correction and repair
-"No, I meant X" rebinds the most recent resolved reference or ambiguity candidate and re-runs the
-previous question. It also records a `/wrong` signal against the earlier answer through the existing
-feedback path, so a learned rule used in that proof is suspended exactly as today. "That's wrong" and
-"that's right" map to `/wrong` and `/right`. Contextual corrections during an open choice already
-exist; this extends them to the last answered turn.
+Implemented in phase 3, with one deliberate change from the first draft.
+
+- **"No, I meant X" re-asks, and records nothing.** It carries the previous question to X through the
+  existing entity follow-up and replies "Understood. Asking again as ‘…’." The first draft also
+  recorded a `/wrong` signal against the earlier answer. That was a design error: a correction says
+  CRMS misread the *question*, and the earlier answer may be right for what was asked. A `/wrong`
+  signal can suspend a learned rule that supported it, so it must not be inferred from a correction.
+  Corrections during an open choice keep their existing handling.
+- **"That's wrong" / "that's right" map to `/wrong` and `/right`.** Only an explicit verdict about
+  "that" or "it" counts ("that's incorrect", "it is not right", "that's correct"). A bare "correct",
+  "right" or "wrong" is left alone, because the terminal's review prompts use those words as replies.
+  With no recent evidence-backed answer the existing command explains that. `natural_feedback_verdict`
+  is in `crms_conversation.py`; the rewrite to the command is in the chat loop.
 
 ### 5.5 Clarification as a question
 Extend the numbered-choice mechanism from "multiple candidate answers" to the other ambiguities
@@ -310,6 +318,14 @@ awaiting review. Review it?", "Ask about: Charles Babbage, Grace Hopper." The UX
 **only suggest what is known to work**, checked at suggestion time against an answered question or an
 accepted fact. A yes or no resolves the offer; with no open offer "yes" gets "Yes to what? I asked
 nothing." (the current hypothesis already marks this case ambiguous).
+
+Implemented in phase 3 for one offer. Where the terminal tells the user claims are waiting ("…use
+/pending-candidates to inspect.", and the greeting when claims are pending) it adds "Say ‘yes’ to
+review them now." and opens a `review_pending` offer. A bare yes then replies "Okay, here they are."
+and asks the terminal to run `/pending-candidates` (`DialogueTurn.action`, taken from a fixed
+allowlist and never from user text); no declines it. An offer survives one intervening turn and is gone
+after two, and it is not saved. An open answer choice or pronoun choice takes the yes/no first. The
+"Ask about: …" suggestion needs a check that each suggested entity answers, and is not done.
 
 ### 5.7 Greeting and status
 Implemented. Remaining work: fix the plural and clause-order defect, and add at most one tested
@@ -411,8 +427,11 @@ The numbering is changed from the first draft because phase 0 is largely done.
    `experiments/v1_373_conversation_binding_and_overview.py`). Elliptical turns already existed. Not
    done: kind-based pronoun filtering, elaboration for source-only topics, and the wording of the
    quoted-source follow-up failure.
-3. **Mixed initiative.** Clarification questions beyond numbered candidates, offers, affirm and deny,
-   correction of the last answer wired to `/wrong` and `/right`.
+3. **Mixed initiative.** Done on branch `conversation-phase3`: the review offer with affirm and deny,
+   corrections that re-ask without a verdict, and natural verdicts routed to `/wrong` and `/right`
+   (checked by `experiments/v1_374_conversation_offers_and_corrections.py`). Not done: clarification
+   questions for two entities with one name and for "multiple equally supported source sentences",
+   suggestion offers, and "Are you sure?".
 4. **Conversational teaching.** First a spike on the two risks in 5.9; only then the confirm-and-learn
    flow with session and permanent scope.
 5. **Learned frames.** Owned by the dialogue-moves and intent research notes. Decide separately

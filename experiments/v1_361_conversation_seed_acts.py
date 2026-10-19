@@ -40,6 +40,7 @@ class ContentDialogue:
         self.last_intent_hypothesis = None
         self.last_answered = None
         self.pending_binding = None
+        self.offers: list = []
         self.history: list = []
         self.calls_recorded: list = []
         self.calls: list[str] = []
