@@ -1806,3 +1806,45 @@ meaning link. The labeler declaration is not authenticated, neither labeler nor
 wording citation changes rule selection, and none of these records count as
 independent-source evidence. The natural-language mapping is still a reviewed
 teacher judgment, not autonomous induction.
+
+## Dialogue grounding and follow-up retest (2026-10-20)
+
+Code snapshot: `2a41b96` (`Focus roadmap on dialogue and learning gates`). The
+tracked dialogue implementation was unchanged during this retest. The working
+tree contained unrelated edits to the large-corpus report and the source-rule
+phrase experiment, plus local dialogue/research artifacts; those were not
+inputs to these isolated dialogue scripts.
+
+Runtime commands:
+
+```sh
+python3 experiments/v1_408_visible_source_referents.py
+python3 experiments/v1_409_numbered_source_results.py
+python3 experiments/v1_413_source_topic_followups.py
+python3 experiments/v1_414_persisted_source_topic.py
+python3 experiments/v1_419_failed_entity_followup_state.py
+python3 experiments/v1_422_direct_search_request_results.py
+python3 experiments/v1_426_dialogue_paragraph_grounding.py
+python3 experiments/v1_427_dialogue_multiturn_transcript.py
+python3 experiments/v1_435_dialogue_visible_evidence_anchor.py
+```
+
+All nine scripts passed. Together they exercise visible-only source referents,
+numbered source selection and citation revalidation, named topic switches,
+pronoun follow-ups, paragraph-local antecedent grounding, save/reload, failed
+follow-up cleanup, and `why?` behavior. The CLI subprocess in `v1_419` checks a
+source-only Eiffel Tower → Colosseum → unsupported Italy sequence and confirms
+that a later `why?` does not replay the earlier entity's answer. `v1_435`
+checks same-paragraph topic switches in both directions, rejects a wrong date
+even when a matching citation exists but was not displayed, and checks a
+separate-paragraph control. The `v1_413` history check and `v1_409` ordinal
+selection check also pass. The 30-turn diagnostic in `v1_427` completed
+without a crash and passed topic-switch, history, stale-explanation,
+clarification, and save/reload checks.
+
+These checks cover the previously reported classes of narrow topic-switch and
+context failures, but they do not establish robust open-domain dialogue. The
+30-turn `v1_427` script is a curated diagnostic, not an independently authored
+representative benchmark or a verbatim replay of the earlier user scratch
+session. Add varied document layouts and fresh paraphrased turns before
+treating the dialogue packet as complete.
