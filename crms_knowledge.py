@@ -2412,7 +2412,9 @@ class CRMSKnowledgeBase:
 
     def discover_inference_rules(self, *, min_support: int = 2,
                                  max_expansions: int = 100_000,
-                                 max_arity: int = 2
+                                 max_arity: int = 2,
+                                 research_index: Any | None = None,
+                                 origin_map: Mapping[str, str] | None = None
                                  ) -> RuleDiscoveryResult:
         """Propose chain rules from labeled facts without installing them."""
         def rows(store, *, discovery_positive: bool = False):
@@ -2435,13 +2437,16 @@ class CRMSKnowledgeBase:
             rows(self._facts, discovery_positive=True),
             negative_facts=rows(self._negative_facts),
             min_support=min_support, max_expansions=max_expansions,
-            max_arity=max_arity)
+            max_arity=max_arity, research_index=research_index,
+            origin_map=origin_map)
 
     def review_inference_rules(self, validation_source_prefix: str, *,
                                min_support: int = 2,
                                min_validation_support: int = 2,
                                max_expansions: int = 100_000,
-                               max_arity: int = 2
+                               max_arity: int = 2,
+                               research_index: Any | None = None,
+                               origin_map: Mapping[str, str] | None = None
                                ) -> RuleReviewResult:
         """Discover on non-holdout facts and evaluate on a source-heldout split."""
         prefix = _display(validation_source_prefix, "validation source prefix")
@@ -2460,7 +2465,8 @@ class CRMSKnowledgeBase:
         discovery = discover_rule_candidates(
             training_positive, negative_facts=training_negative,
             min_support=min_support, max_expansions=max_expansions,
-            max_arity=max_arity)
+            max_arity=max_arity, research_index=research_index,
+            origin_map=origin_map)
         reviews = []
         remaining = max_expansions - discovery.expansions
         total_expansions = discovery.expansions
@@ -2475,7 +2481,8 @@ class CRMSKnowledgeBase:
                     validation_facts=validation_positive,
                     validation_negative_facts=validation_negative,
                     min_positive_examples=min_validation_support,
-                    max_expansions=remaining)
+                    max_expansions=remaining, research_index=research_index,
+                    origin_map=origin_map)
                 remaining -= validation.expansions
                 total_expansions += validation.expansions
             complete = complete and validation.complete
@@ -2487,7 +2494,8 @@ class CRMSKnowledgeBase:
             validation_source_prefix: str, *, min_support: int = 2,
             min_validation_support: int = 2,
             max_expansions: int = 100_000,
-            max_arity: int = 2) -> RuleAcceptanceResult:
+            max_arity: int = 2, research_index: Any | None = None,
+            origin_map: Mapping[str, str] | None = None) -> RuleAcceptanceResult:
         """Install only a complete, uncontradicted candidate passing holdout."""
         if (not isinstance(candidate_number, int) or isinstance(candidate_number, bool)
                 or candidate_number < 1):
@@ -2495,7 +2503,8 @@ class CRMSKnowledgeBase:
         review_result = self.review_inference_rules(
             validation_source_prefix, min_support=min_support,
             min_validation_support=min_validation_support,
-            max_expansions=max_expansions, max_arity=max_arity)
+            max_expansions=max_expansions, max_arity=max_arity,
+            research_index=research_index, origin_map=origin_map)
         if not review_result.complete:
             return RuleAcceptanceResult(
                 False, None, None, "Training candidate search was incomplete.")
@@ -2531,6 +2540,7 @@ class CRMSKnowledgeBase:
             "unknown_endpoint_pairs": review.validation.unknown_endpoint_pairs,
             "independent_validation_sources": list(
                 review.validation.independent_sources),
+            "validation_source_basis": review.validation.source_basis,
             "expansions": review.validation.expansions,
         }
         return RuleAcceptanceResult(True, review, rule)
@@ -2589,7 +2599,8 @@ class CRMSKnowledgeBase:
                 f"support={len(candidate.positive_examples)}, "
                 f"{coverage}, "
                 f"counterexamples={len(candidate.negative_examples)}, "
-                f"independent-sources={len(candidate.independent_sources)}.")
+                f"{candidate.source_basis.replace(' ', '-')}="
+                f"{len(candidate.independent_sources)}.")
             for label, examples in (("support", candidate.positive_examples),
                                     ("counterexample", candidate.negative_examples)):
                 for example in examples:
@@ -2635,7 +2646,8 @@ class CRMSKnowledgeBase:
                 f"holdout-positive={heldout_positive}, "
                 f"holdout-coverage={heldout_coverage}, "
                 f"holdout-negative={heldout_negative}, holdout-unlabeled={unknown}, "
-                f"independent-sources={source_count}.")
+                f"{(validation.source_basis if validation else candidate.source_basis).replace(' ', '-')}="
+                f"{source_count}.")
             for label, examples in (
                     ("holdout-positive", validation.positive_examples if validation else ()),
                     ("holdout-negative", validation.negative_examples if validation else ())):

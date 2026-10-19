@@ -75,6 +75,14 @@ unavailable.
 The report uses exact proof leaves and does not change facts, rules, derived cases, weights, or
 answers.
 
+Rule discovery and held-out validation now accept the same optional research index and origin map.
+The chat passes its active index, so sources with indexed locations are grouped by publisher/host
+or corpus path, and resolvable exact-copy citations count once. When several origins cannot be
+checked because citation text is unavailable, the rule remains insufficiently supported. The
+review output labels counts as `independent-origins` when that resolver is active and as
+`source-documents` for document-level API calls without an index; the latter is a weaker proxy,
+not proof of independent publication origins. Paraphrased copying remains undetected.
+
 These diagnostics supplement recombination, rule discovery, reasoning, and evidence validation;
 they do not replace them.
 

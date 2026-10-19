@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import subprocess
 import sys
 import tempfile
@@ -14,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from crms_knowledge import CRMSKnowledgeBase
 from crms_inference import validate_rule_candidate
 from crms_research import CRMSResearchIndex
+from crms_support_report import independent_origin_support
 
 
 PROJECT = Path(__file__).resolve().parents[1]
@@ -37,6 +39,20 @@ def seed() -> CRMSKnowledgeBase:
     add_chain(kb, "Jo", "Kim", "Lou", "holdout:two")
     add_chain(kb, "Nia", "Oren", "Pia", "runtime", label=None)
     return kb
+
+
+def indexed_source(index: CRMSResearchIndex, document_id: str, text: str,
+                   location: str) -> str:
+    index.add_document(document_id, document_id, text, location)
+    digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    return f"{document_id}#sha256={digest}&chars=0:{len(text)}"
+
+
+def add_indexed_chain(kb: CRMSKnowledgeBase, subject: str, middle: str,
+                      target: str, source: str) -> None:
+    kb.add_fact(subject, "parent", middle, source)
+    kb.add_fact(middle, "parent", target, source)
+    kb.add_fact(subject, "ancestor", target, source)
 
 
 def main() -> None:
@@ -93,6 +109,50 @@ def main() -> None:
             or same_source.review.validation.independent_sources
             != ("holdout:one",)):
         raise SystemExit("two sections of one source counted as independent validation")
+
+    origin_index = CRMSResearchIndex()
+    origin_kb = CRMSKnowledgeBase()
+    for number, (subject, middle, target) in enumerate((
+            ("TrainA", "TrainB", "TrainC"),
+            ("TrainD", "TrainE", "TrainF"))):
+        source = indexed_source(
+            origin_index, f"train:{number}",
+            f"{subject} is parent of {middle}; {middle} is parent of {target}; "
+            f"{subject} is ancestor of {target}.",
+            f"https://training-{number}.example/family")
+        add_indexed_chain(origin_kb, subject, middle, target, source)
+    for number, (subject, middle, target) in enumerate((
+            ("HoldA", "HoldB", "HoldC"),
+            ("HoldD", "HoldE", "HoldF"))):
+        source = indexed_source(
+            origin_index, f"holdout:{number}",
+            f"{subject} is parent of {middle}; {middle} is parent of {target}; "
+            f"{subject} is ancestor of {target}.",
+            f"https://same-publisher.example/family/{number}")
+        add_indexed_chain(origin_kb, subject, middle, target, source)
+    origin_review = origin_kb.review_inference_rules(
+        "holdout:", research_index=origin_index)
+    parent_review = next(
+        row for row in origin_review.reviews
+        if (row.candidate.first_relation, row.candidate.second_relation,
+            row.candidate.conclusion_relation) == ("parent", "parent", "ancestor"))
+    if (parent_review.validation is None
+            or parent_review.validation.status != "insufficient-independent-sources"
+            or len(parent_review.validation.positive_examples) != 2
+            or len(parent_review.validation.independent_sources) != 1):
+        raise SystemExit(
+            "two documents from the same publisher counted as independent holdout support")
+
+    copied_index = CRMSResearchIndex()
+    copied_text = "A source states this exact claim."
+    copied_one = indexed_source(copied_index, "copy:one", copied_text,
+                                "https://publisher-one.example/article")
+    copied_two = indexed_source(copied_index, "copy:two", copied_text,
+                                "https://publisher-two.example/article")
+    copy_origins, copy_available, was_copied = independent_origin_support(
+        [copied_one, copied_two], research_index=copied_index)
+    if not copy_available or len(copy_origins) != 1 or was_copied is not True:
+        raise SystemExit("syndicated exact copies counted as independent support")
 
     revised_kb = seed()
     revised = revised_kb.accept_inference_rule_candidate(
@@ -226,7 +286,7 @@ def main() -> None:
             capture_output=True, check=True, timeout=20)
         if ("holdout=validated" not in process.stdout
                 or "Accepted validated rule parent-transitivity" not in process.stdout
-                or "2 independent sources" not in process.stdout
+                or "2 source documents" not in process.stdout
                 or "parent-transitivity [validated]" not in process.stdout
                 or "Nia — ancestor → Pia" not in process.stdout
                 or "Because Nia — parent → Oren and Oren — parent → Pia, "
@@ -239,7 +299,8 @@ def main() -> None:
         validation_record = saved["inference_rules"][0].get("validation", {})
         if (validation_record.get("validation_source_prefix") != "holdout:"
                 or len(validation_record.get("positive_examples", [])) != 2
-                or len(validation_record.get("training_positive_examples", [])) != 2):
+                or len(validation_record.get("training_positive_examples", [])) != 2
+                or validation_record.get("validation_source_basis") != "source documents"):
             raise SystemExit("accepted rule lost its validation provenance")
         loaded = CRMSKnowledgeBase.load(knowledge_path)
         if loaded.infer_relation("Nia", "ancestor", "Pia").status != "answered":

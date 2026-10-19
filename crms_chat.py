@@ -6395,7 +6395,8 @@ def main() -> int:
                         ('"', '"'), ("'", "'"), ("“", "”"), ("‘", "’")}):
                 source_prefix = source_prefix[1:-1].strip()
             try:
-                reviews = knowledge.review_inference_rules(source_prefix)
+                reviews = knowledge.review_inference_rules(
+                    source_prefix, research_index=index)
                 print(f"CRMS> {knowledge.render_rule_reviews(reviews)}")
             except (TypeError, ValueError) as error:
                 print(f"Could not review inference-rule candidates: {error}")
@@ -6407,13 +6408,15 @@ def main() -> int:
                     int(natural_rule_accept.group("number")),
                     natural_rule_accept.group("rule_id").strip(),
                     natural_rule_accept.group("prefix").strip(),
-                    max_arity=int(natural_rule_accept.group("arity") or "2"))
+                    max_arity=int(natural_rule_accept.group("arity") or "2"),
+                    research_index=index)
                 if result.accepted:
                     knowledge.save(args.knowledge)
                     assert result.rule is not None
                     validation = result.review.validation if result.review else None
                     checked = len(validation.positive_examples) if validation else 0
                     sources = len(validation.independent_sources) if validation else 0
+                    source_basis = validation.source_basis if validation else "source documents"
                     holdout_total = (checked + len(validation.negative_examples)
                                      + validation.unknown_endpoint_pairs
                                      if validation else 0)
@@ -6432,7 +6435,7 @@ def main() -> int:
                           f"{' then '.join(premises)} entails "
                           f"{result.rule.conclusion_relation}{typed} "
                           f"(held-out support coverage {holdout_coverage}; "
-                          f"{sources} independent sources).")
+                          f"{sources} {source_basis}).")
                 else:
                     print(f"Rule not accepted: {result.request}")
                     if result.review:
@@ -6476,16 +6479,18 @@ def main() -> int:
                 if max_arity not in {2, 3}:
                     raise ValueError("arity must be 2 or 3")
                 if fields == [""] or not fields:
-                    discovery = knowledge.discover_inference_rules(max_arity=max_arity)
+                    discovery = knowledge.discover_inference_rules(
+                        max_arity=max_arity, research_index=index)
                     print(f"CRMS> {knowledge.render_rule_discovery(discovery)}")
                 elif len(fields) == 1:
                     discovery = knowledge.discover_inference_rules(
-                        min_support=int(fields[0]), max_arity=max_arity)
+                        min_support=int(fields[0]), max_arity=max_arity,
+                        research_index=index)
                     print(f"CRMS> {knowledge.render_rule_discovery(discovery)}")
                 elif len(fields) == 2 and fields[1]:
                     reviews = knowledge.review_inference_rules(
                         fields[1], min_support=int(fields[0]),
-                        max_arity=max_arity)
+                        max_arity=max_arity, research_index=index)
                     print(f"CRMS> {knowledge.render_rule_reviews(reviews)}")
                 else:
                     print("Use: /suggest-inference-rules [MIN_SUPPORT|HOLDOUT_SOURCE_PREFIX][|arity=3]")
@@ -6506,13 +6511,15 @@ def main() -> int:
                 continue
             try:
                 result = knowledge.accept_inference_rule_candidate(
-                    int(fields[0]), fields[1], fields[2], max_arity=max_arity)
+                    int(fields[0]), fields[1], fields[2], max_arity=max_arity,
+                    research_index=index)
                 if result.accepted:
                     knowledge.save(args.knowledge)
                     assert result.rule is not None
                     validation = result.review.validation if result.review else None
                     checked = len(validation.positive_examples) if validation else 0
                     sources = len(validation.independent_sources) if validation else 0
+                    source_basis = validation.source_basis if validation else "source documents"
                     holdout_total = (checked + len(validation.negative_examples)
                                      + validation.unknown_endpoint_pairs
                                      if validation else 0)
@@ -6531,7 +6538,7 @@ def main() -> int:
                           f"{' then '.join(premises)} entails "
                           f"{result.rule.conclusion_relation}{typed} "
                           f"(held-out support coverage {holdout_coverage}; "
-                          f"{sources} independent sources).")
+                          f"{sources} {source_basis}).")
                 else:
                     print(f"Rule not accepted: {result.request}")
                     if result.review:

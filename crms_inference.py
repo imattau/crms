@@ -16,6 +16,44 @@ from dataclasses import asdict, dataclass, replace
 from itertools import product
 from typing import Any, Iterable, Mapping
 from crms_text import tokens as normalized_tokens
+from crms_support_report import independent_origin_support
+
+
+def _independent_sources_from_examples(
+        examples: Iterable[Mapping[str, Any]], *,
+        research_index: Any | None = None,
+        origin_map: Mapping[str, str] | None = None
+        ) -> tuple[str, ...]:
+    sources = [str(source) for example in examples
+               for source in example.get("conclusion", {}).get("sources", ())
+               if str(source).strip()]
+    # Pure inference callers may operate on synthetic source labels with no
+    # document resolver. Preserve their historical document-level behavior;
+    # knowledge-base review supplies the research index for origin/copy checks.
+    index_has_documents = True
+    if research_index is not None:
+        try:
+            index_has_documents = research_index.document_count() > 0
+        except (AttributeError, TypeError, ValueError, OSError):
+            index_has_documents = True
+    if (research_index is None or not index_has_documents) and origin_map is None:
+        return tuple(sorted({source.split("#", 1)[0] for source in sources}))
+    origins, available, _copied = independent_origin_support(
+        sources, research_index=research_index, origin_map=origin_map)
+    return origins if available else ()
+
+
+def _evidence_basis(research_index: Any | None,
+                    origin_map: Mapping[str, str] | None) -> str:
+    if origin_map is not None:
+        return "independent origins"
+    if research_index is not None:
+        try:
+            if research_index.document_count() > 0:
+                return "independent origins"
+        except (AttributeError, TypeError, ValueError, OSError):
+            return "independent origins"
+    return "source documents"
 
 
 def _key(value: str) -> tuple[str, ...]:
@@ -216,6 +254,7 @@ class RuleCandidate:
     second_middle_kind: str | None = None
     possible_examples: int = 0
     support_coverage: float | None = None
+    source_basis: str = "source documents"
 
 
 @dataclass(frozen=True)
@@ -234,6 +273,7 @@ class RuleValidation:
     complete: bool
     expansions: int
     independent_sources: tuple[str, ...] = ()
+    source_basis: str = "source documents"
 
 
 @dataclass(frozen=True)
@@ -1138,7 +1178,8 @@ def discover_rule_candidates(
         negative_facts: Iterable[Mapping[str, Any]] = (),
         min_support: int = 2,
         max_expansions: int = 100_000,
-        max_arity: int = 2) -> RuleDiscoveryResult:
+        max_arity: int = 2, research_index: Any | None = None,
+        origin_map: Mapping[str, str] | None = None) -> RuleDiscoveryResult:
     """Find bounded two- or explicitly typed three-edge chain rules.
 
     A candidate is emitted only with ``min_support`` distinct endpoint pairs.
@@ -1360,12 +1401,9 @@ def discover_rule_candidates(
         ordered_support = tuple(supported[pair] for pair in sorted(supported))
         ordered_negative = tuple(counterexamples.get(key, {})[pair]
                                  for pair in sorted(counterexamples.get(key, {})))
-        independent_sources = tuple(sorted({
-            str(source).split("#", 1)[0]
-            for example in ordered_support
-            for source in example["conclusion"].get("sources", [])
-            if str(source).strip()
-        }))
+        independent_sources = _independent_sources_from_examples(
+            ordered_support, research_index=research_index,
+            origin_map=origin_map)
         status = ("incomplete" if not complete else
                   "contradicted" if ordered_negative else
                   "insufficient-independent-sources"
@@ -1379,19 +1417,17 @@ def discover_rule_candidates(
             ordered_support, ordered_negative, status, independent_sources,
             possible_examples=possible_count,
             support_coverage=(len(ordered_support) / possible_count
-                              if complete and possible_count else None)))
+                              if complete and possible_count else None),
+            source_basis=_evidence_basis(research_index, origin_map)))
     for key, supported in typed_support.items():
         if len(supported) < min_support:
             continue
         ordered_support = tuple(supported[pair] for pair in sorted(supported))
         negative_rows = typed_counterexamples.get(key, {})
         ordered_negative = tuple(negative_rows[pair] for pair in sorted(negative_rows))
-        independent_sources = tuple(sorted({
-            str(source).split("#", 1)[0]
-            for example in ordered_support
-            for source in example["conclusion"].get("sources", [])
-            if str(source).strip()
-        }))
+        independent_sources = _independent_sources_from_examples(
+            ordered_support, research_index=research_index,
+            origin_map=origin_map)
         status = ("incomplete" if not complete else
                   "contradicted" if ordered_negative else
                   "insufficient-independent-sources"
@@ -1408,7 +1444,8 @@ def discover_rule_candidates(
             second_middle_kind=kind_displays.get(key[4], " ".join(key[4])),
             possible_examples=possible_count,
             support_coverage=(len(ordered_support) / possible_count
-                              if complete and possible_count else None)))
+                              if complete and possible_count else None),
+            source_basis=_evidence_basis(research_index, origin_map)))
     def discovery_order(candidate: RuleCandidate):
         return (
             candidate.support_coverage is None,
@@ -1429,7 +1466,8 @@ def _validate_three_premise_rule_candidate(
         validation_facts: list[dict[str, Any]],
         validation_negative_facts: list[dict[str, Any]],
         min_positive_examples: int,
-        max_expansions: int) -> RuleValidation:
+        max_expansions: int, research_index: Any | None = None,
+        origin_map: Mapping[str, str] | None = None) -> RuleValidation:
     if (candidate.third_relation is None or candidate.middle_kind is None
             or candidate.second_middle_kind is None):
         return RuleValidation("malformed-candidate", (), (), 0, True, 0)
@@ -1482,7 +1520,6 @@ def _validate_three_premise_rule_candidate(
     positives: dict[tuple[tuple[str, ...], tuple[str, ...]], dict[str, Any]] = {}
     negatives: dict[tuple[tuple[str, ...], tuple[str, ...]], dict[str, Any]] = {}
     unknown: set[tuple[tuple[str, ...], tuple[str, ...]]] = set()
-    independent_sources: set[str] = set()
     expansions = 0
     complete = True
     for first in validation_facts:
@@ -1519,10 +1556,6 @@ def _validate_three_premise_rule_candidate(
                            "second_kind": type_facts[(second_key[2], second_kind, scope)]}
                 if positive:
                     positives[endpoints] = {**example, "conclusion": positive[0]}
-                    independent_sources.update(
-                        str(source).split("#", 1)[0]
-                        for row in positive for source in row.get("sources", [])
-                        if str(source).strip())
                 if negative:
                     negatives[endpoints] = {**example, "conclusion": negative[0]}
                 if not positive and not negative:
@@ -1534,6 +1567,8 @@ def _validate_three_premise_rule_candidate(
 
     ordered_positive = tuple(positives[key] for key in sorted(positives))
     ordered_negative = tuple(negatives[key] for key in sorted(negatives))
+    independent_sources = _independent_sources_from_examples(
+        ordered_positive, research_index=research_index, origin_map=origin_map)
     if not complete:
         status = "incomplete"
     elif ordered_negative:
@@ -1547,7 +1582,8 @@ def _validate_three_premise_rule_candidate(
         status = "insufficient"
     return RuleValidation(status, ordered_positive, ordered_negative,
                           len(unknown), complete, expansions,
-                          tuple(sorted(independent_sources)))
+                          tuple(sorted(independent_sources)),
+                          _evidence_basis(research_index, origin_map))
 
 
 def validate_rule_candidate(
@@ -1557,7 +1593,9 @@ def validate_rule_candidate(
         validation_facts: Iterable[Mapping[str, Any]],
         validation_negative_facts: Iterable[Mapping[str, Any]],
         min_positive_examples: int = 2,
-        max_expansions: int = 100_000) -> RuleValidation:
+        max_expansions: int = 100_000,
+        research_index: Any | None = None,
+        origin_map: Mapping[str, str] | None = None) -> RuleValidation:
     """Evaluate a proposed chain on a disjoint, labeled validation partition."""
     for name, value in (("min_positive_examples", min_positive_examples),
                         ("max_expansions", max_expansions)):
@@ -1583,7 +1621,8 @@ def validate_rule_candidate(
             candidate, validation_facts=valid_positive,
             validation_negative_facts=valid_negative,
             min_positive_examples=min_positive_examples,
-            max_expansions=max_expansions)
+            max_expansions=max_expansions, research_index=research_index,
+            origin_map=origin_map)
 
     first_relation = _key(candidate.first_relation)
     second_relation = _key(candidate.second_relation)
@@ -1605,7 +1644,6 @@ def validate_rule_candidate(
                if _triple_key(row)[1] == second_relation]
     positive_examples: dict[tuple[tuple[str, ...], tuple[str, ...]], dict[str, Any]] = {}
     negative_examples: dict[tuple[tuple[str, ...], tuple[str, ...]], dict[str, Any]] = {}
-    independent_sources: set[str] = set()
     unknown: set[tuple[tuple[str, ...], tuple[str, ...]]] = set()
     expansions = 0
     complete = True
@@ -1630,11 +1668,6 @@ def validate_rule_candidate(
                 positive_examples[endpoints] = {
                     "first": first, "second": second,
                     "conclusion": positive_labels[0]}
-                independent_sources.update(
-                    str(source).split("#", 1)[0]
-                    for row in positive_labels
-                    for source in row.get("sources", [])
-                    if str(source).strip())
             if negative_labels:
                 negative_examples[endpoints] = {
                     "first": first, "second": second,
@@ -1645,6 +1678,8 @@ def validate_rule_candidate(
             break
     ordered_positive = tuple(positive_examples[key] for key in sorted(positive_examples))
     ordered_negative = tuple(negative_examples[key] for key in sorted(negative_examples))
+    independent_sources = _independent_sources_from_examples(
+        ordered_positive, research_index=research_index, origin_map=origin_map)
     if not complete:
         status = "incomplete"
     elif ordered_negative:
@@ -1658,7 +1693,8 @@ def validate_rule_candidate(
         status = "insufficient"
     return RuleValidation(status, ordered_positive, ordered_negative,
                           len(unknown), complete, expansions,
-                          tuple(sorted(independent_sources)))
+                          tuple(sorted(independent_sources)),
+                          _evidence_basis(research_index, origin_map))
 
 
 def _proof_has_conflict(proof: Mapping[str, Any], negatives: set) -> bool:

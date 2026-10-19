@@ -216,6 +216,33 @@ def _source_statistics(sources: Iterable[str], research_index: Any | None,
     return (documents, origins, independent_origins, copied, teacher, available)
 
 
+def independent_origin_support(
+        sources: Iterable[str], *, research_index: Any | None = None,
+        origin_map: Mapping[str, str] | None = None
+        ) -> tuple[tuple[str, ...], bool, bool | None]:
+    """Return independent support origins, availability, and copy status.
+
+    When citations resolve, exact copied statements across origins count once.
+    If several origins are present but citation text cannot be resolved, the
+    count is unavailable instead of treating document IDs as independent
+    evidence. Teacher-only evidence is available but contributes no external
+    origins.
+    """
+    documents, origins, count, copied, _teacher, available = _source_statistics(
+        sources, research_index, origin_map)
+    if count is None or not available:
+        return (), False, copied
+    # The report's count intentionally excludes teachers and duplicate copies.
+    # Keep a stable, human-readable origin list where possible; if exact-copy
+    # deduplication makes the count smaller than the nominal origin set, expose
+    # only the count to callers rather than pretending to know which publisher
+    # uniquely owns each distinct statement.
+    external = tuple(origin for origin in origins if origin != "teacher")
+    if len(external) != count:
+        external = tuple(f"independent-origin-{i + 1}" for i in range(count))
+    return external, True, copied
+
+
 def _stable_id(fact: Mapping[str, Any], polarity: bool) -> str:
     payload = json.dumps(
         _fact_key(fact, polarity), sort_keys=True, ensure_ascii=False,

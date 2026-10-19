@@ -158,7 +158,10 @@ def main() -> None:
                 and "middle kinds: person, asset" in process.stdout
                 and "holdout=validated" in process.stdout
                 and "Accepted validated rule employment-route" in process.stdout
-                and "Derived: Nia — reaches → Sydney." in process.stdout,
+                and "Because Nia — employs → Oren and Oren — owns → Pike and "
+                    "Pike — located in → Sydney and Oren — is-a → person and "
+                    "Pike — is-a → asset, Nia — reaches → Sydney "
+                    "(rule employment-route)." in process.stdout,
                 f"typed discovery/review/use CLI flow failed:\n"
                 f"{process.stdout}\n{process.stderr}")
         persisted = CRMSKnowledgeBase.load(knowledge_path)
