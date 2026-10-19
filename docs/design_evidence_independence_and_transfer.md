@@ -5,7 +5,8 @@
 `experiments/v1_315_cross_surface_question_transfer.py` with its baseline recorded in
 `benchmark_baselines.md`. A read-only fact/rule dependency and independent-origin report is
 implemented in `crms_support_report.py` and covered by
-`experiments/v1_344_fact_support_dependency_report.py`. Frame dependents and section 2's
+`experiments/v1_344_fact_support_dependency_report.py`. Source-backed sentence-frame examples are
+also reported, but frame dependents, question-frame source lineage, and section 2's
 source-reliability ledger remain proposed.
 **Origin:** diagnostics and test designs taken from the HPM working paper ("Human Learning as
 Hierarchical Pattern Modelling", included in the HPM Learning Agent repo), re-expressed for
@@ -61,8 +62,12 @@ only when at least the configured number of verified derived cases depend on it 
 independent-origin count is below the configured minimum. Other rows say `unassessed`, not `ok`.
 Accepted inference rules report the stored positive training and holdout evidence and count
 verified derived cases whose proof cites the rule ID. Manually installed rules without saved
-validation provenance remain unassessed. Frame dependents are not yet counted. The report uses
-exact proof leaves and does not change facts, rules, derived cases, weights, or answers.
+validation provenance remain unassessed. Source-backed declarative frames report their distinct
+fact-pair examples and resolved sources, but current teaching counts do not track which stored
+claims were later produced through a frame. Explicit question-frame teaching also does not retain
+the exact fact proof that licensed each example, so those frame dependents and origins remain
+unassessed. The report uses exact proof leaves and does not change facts, rules, derived cases,
+weights, or answers.
 
 These diagnostics supplement recombination, rule discovery, reasoning, and evidence validation;
 they do not replace them.

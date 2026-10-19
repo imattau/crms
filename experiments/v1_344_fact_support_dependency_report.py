@@ -147,6 +147,34 @@ def main() -> None:
             distinct_kb, research_index=index) if row.label == "A — parent → B")
         require(distinct.independent_origins == 2 and distinct.copied is False,
                 f"distinct origin statements were not counted: {distinct}")
+
+        frame_kb = CRMSKnowledgeBase()
+        frame_examples = (
+            ("frame-a", "Alice likes tea.", "Alice", "tea",
+             "https://publisher-a.example/facts/alice"),
+            ("frame-b", "Bob likes coffee.", "Bob", "coffee",
+             "https://publisher-b.example/facts/bob"),
+        )
+        licensed = []
+        for document_id, sentence, subject, obj, location in frame_examples:
+            index.add_document(document_id, document_id, sentence, location)
+            hit = next(hit for hit in index.search("likes", limit=30)
+                       if hit.document_id == document_id)
+            citation = index.citation(hit)
+            frame_kb.add_fact(subject, "likes", obj, citation)
+            licensed.append(frame_kb.teach_fact_pattern(
+                sentence, subject=subject, relation="likes", obj=obj,
+                source=citation, predicate_phrase="likes"))
+        require(licensed == [False, True],
+                f"fact-backed frame licensing changed: {licensed}")
+        frame = next(row for row in support_report(
+            frame_kb, research_index=index) if row.item_kind == "frame")
+        require(frame.support_examples == 2
+                and frame.independent_origins == 2
+                and frame.origin_count_available,
+                f"source-backed frame evidence was not reported: {frame}")
+        require(frame.dependents is None and frame.risk == "unassessed",
+                f"frame usage was inferred without a usage link: {frame}")
         index.close()
 
     print("PASS: exact fact leaves link to verified derived dependents")
@@ -158,6 +186,7 @@ def main() -> None:
     print("PASS: unresolved multi-origin citations stay unassessed")
     print("PASS: configured origin mappings group related publishers")
     print("PASS: distinct cited text counts independent origins separately")
+    print("PASS: learned sentence frame reports its fact-backed examples")
 
 
 if __name__ == "__main__":

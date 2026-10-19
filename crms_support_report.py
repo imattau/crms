@@ -23,7 +23,7 @@ class SupportRow:
     item_kind: str
     item_id: str
     label: str
-    dependents: int
+    dependents: int | None
     source_documents: tuple[str, ...]
     origins: tuple[str, ...]
     independent_origins: int | None
@@ -31,6 +31,7 @@ class SupportRow:
     teacher_supported: bool
     risk: str
     origin_count_available: bool = False
+    support_examples: int | None = None
 
 
 def _document(source: Any) -> str:
@@ -276,5 +277,27 @@ def support_report(knowledge_base: Any, *, min_dependents: int = 3,
             "rule", hashlib.sha256(rule.rule_id.encode("utf-8")).hexdigest()[:20],
             label, len(dependents), documents, origins, independent_origins,
             copied, teacher, risk, origin_count_available))
+    for (template, relation), examples in getattr(
+            knowledge_base, "_fact_pattern_examples", {}).items():
+        sources = {source for pair_sources in examples.values()
+                   for source in pair_sources}
+        (documents, origins, independent_origins, copied, teacher,
+         origin_count_available) = _source_statistics(
+            sources, research_index, origin_map)
+        polarity = getattr(knowledge_base, "_fact_pattern_polarities", {}).get(
+            (template, relation), True)
+        surface = " ".join(template).replace("<subject>", "{subject}")
+        surface = surface.replace("<object>", "{object}")
+        polarity_label = "positive" if polarity else "negative"
+        label = (f"Frame {surface} ⇒ {' '.join(relation)} "
+                 f"({polarity_label})")
+        frame_key = json.dumps(
+            [template, relation, polarity], ensure_ascii=False,
+            separators=(",", ":"))
+        item_id = hashlib.sha256(frame_key.encode("utf-8")).hexdigest()[:20]
+        rows.append(SupportRow(
+            "frame", item_id, label, None, documents, origins,
+            independent_origins, copied, teacher, "unassessed",
+            origin_count_available, len(examples)))
     return sorted(rows, key=lambda row: (
-        -row.dependents, row.label.casefold(), row.item_id))
+        -(row.dependents or 0), row.label.casefold(), row.item_id))
