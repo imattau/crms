@@ -56,6 +56,7 @@ COMPOUNDS = (
     ("reverse the list then sort the values", ("reverse", "sort")),
 )
 STABLE_UNIQUE_PHRASE = "keep the first occurrence of each value"
+STABLE_UNIQUE_ALIAS = "keep the first occurrence of every number"
 STABLE_UNIQUE_DOC = (
     "Dictionaries preserve insertion order. Note that updating a key does "
     "not affect the order. Keys added after deletion are inserted at the end.\n"
@@ -90,6 +91,14 @@ COMPOUND_TRAINING_VALUES = (
 HELD_OUT_TEXT = (
     "keep the first occurrence of each value then sort the list "
     "then reverse the values")
+COMPOSITION_WORDING_PROBES = (
+    "Write Python code to keep the first occurrence of every number then "
+    "sort the values then reverse the list",
+    "Write Python code to remove repeated values then sort them ascending "
+    "then reverse the result",
+    "Write Python code to find the unique elements in ascending order then "
+    "reverse them",
+)
 HELD_OUT_VALUES = (
     [6, 2, 6, -1, 2], [4, 4, 0, -3, 1, 0], [9, -2, 9, 3], [],
 )
@@ -249,10 +258,16 @@ def main() -> None:
                 "dictionary-ordering citation did not resolve exactly")
         instruction_citations[STABLE_UNIQUE_PHRASE] = (
             dictionary_instruction_citation)
+        instruction_citations[STABLE_UNIQUE_ALIAS] = (
+            dictionary_instruction_citation)
         for values in STABLE_UNIQUE_VALUES:
             output = apply(list(values), "stable_unique")
             teaching.append(
                 f"/teach-rule {STABLE_UNIQUE_PHRASE}|"
+                f"{','.join(map(str, values))}|{','.join(map(str, output))}||"
+                "codex:labeler-v1|" + dictionary_instruction_citation)
+            teaching.append(
+                f"/teach-rule {STABLE_UNIQUE_ALIAS}|"
                 f"{','.join(map(str, values))}|{','.join(map(str, output))}||"
                 "codex:labeler-v1|" + dictionary_instruction_citation)
 
@@ -396,6 +411,48 @@ def main() -> None:
         require(replay.returncode == 0
                 and artifact.provenance_id in replay.stdout,
                 "fresh chat process did not reproduce the saved artifact")
+
+        wording_results = []
+        for probe_index, wording in enumerate(COMPOSITION_WORDING_PROBES):
+            wording_run = launch(root, [wording])
+            requested_instruction = wording.removeprefix(
+                "Write Python code to ")
+            generated = (wording_run.returncode == 0
+                         and f"Generated Python for '{requested_instruction}'"
+                         in wording_run.stdout)
+            variant_artifact = generate_python(learned, requested_instruction)
+            require(generated == (variant_artifact is not None),
+                    f"chat and direct generator disagreed on wording probe: {wording}")
+            # Keep this measured boundary fixed: the explicitly taught alias
+            # composes, while the two unseen operation vocabularies abstain.
+            require(generated == (probe_index == 0),
+                    f"wording probe crossed its expected coverage boundary: {wording}")
+            validated = False
+            if variant_artifact is not None:
+                variant_namespace: dict[str, object] = {}
+                exec(compile(variant_artifact.source,
+                             "<wording-transfer-probe>", "exec"),
+                     variant_namespace)
+                variant_transform = variant_namespace["transform"]
+                require([variant_transform(values) for values in HELD_OUT_VALUES]
+                        == held_out_outputs,
+                        f"wording transfer generated the wrong procedure: {wording}")
+                validated = True
+            else:
+                diagnosis = learned.predict(
+                    requested_instruction, HELD_OUT_VALUES[0])
+                print(f"  model diagnosis: {diagnosis.status}; "
+                      f"{diagnosis.message}; {diagnosis.request}")
+            wording_results.append((wording, wording_run.returncode, generated,
+                                    validated, wording_run.stdout))
+        for wording, returncode, generated, validated, output in wording_results:
+            result = ("generated and independently checked" if validated else
+                      "abstained" if not generated else
+                      "generated without validation")
+            print(f"composition wording probe {result} (exit {returncode}): "
+                  f"{wording}")
+            if not generated:
+                print("  abstention detail: " + output[-700:].replace("\n", " "))
 
         unsupported_request = (
             "Write Python code to keep the first occurrence of each value "

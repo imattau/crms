@@ -45,7 +45,7 @@ Use full chat transcripts and varied document layouts, not resolver-only checks.
 
 Make recombination and self-learning rules the central capability experiment. Extend the `v1_433` stable-unique → sort → reverse slice with independent examples per component, complete-document holdout, unseen combinations, independently written request wording, varied values/order, and near misses. Keep source text, examples, instruction mapping, connective labels, induced rule, and validator result as distinct provenance-bearing records.
 
-The current `v1_433` result is a useful vertical slice: a three-stage procedure passes four held-out lists and held-out NumPy source documents through chat and a fresh process, with an independent output oracle. However, component instruction mappings and connective supervision remain teacher-attributed; it does not yet prove autonomous rule learning from prose. Recent working-tree wording probes should be reported only after their runtime run is complete, and must distinguish unseen compositions from genuinely unseen wording.
+The current `v1_433` result is a useful vertical slice: a three-stage procedure passes four held-out lists and held-out NumPy source documents through chat and a fresh process, with an independent output oracle. However, component instruction mappings and connective supervision remain teacher-attributed; it does not yet prove autonomous rule learning from prose. Three additional chat wording probes produced one generated procedure, independently checked on four held-out lists, and two honest abstentions; none were wrong. The successful request used a stable-unique component alias that was explicitly taught, so it is evidence of bounded composition with a taught alias, not unseen synonym learning. The other two requests required operation wording absent from the model. The adjacent `v1_431`, `v1_433`, and `v1_434` regressions pass together (3/3).
 
 **Exit:** at least one unseen composition passes ordinary chat, fresh-process reload, and an independent checker on source-disjoint examples. Unsupported, incomplete, or conflicting instructions abstain. Report teacher effort and labeler contribution. Do not describe teacher-assisted alignment as source-only learning.
 
@@ -80,7 +80,7 @@ After the records and learning lifecycle above are stable, complete migration an
 ## Near-term order and scope control
 
 1. Freeze and replay the compact dialogue/chat evaluation slice.
-2. Finish and report the current recombination wording probes, then expand the strongest source-disjoint procedure experiment.
+2. Expand the strongest source-disjoint procedure experiment, retaining the new 1/3 generation and 2/3 abstention wording result as a fixed baseline. Add independently labeled alternate operation requests and measure whether learning their alignment improves coverage without increasing wrong output.
 3. Connect one successful composition to proof/task verification and governed derivation.
 4. Use the scorecard's largest user-visible loss to select the next task: answer-bearing retrieval, paraphrase coverage, dialogue completion, or one bounded domain slice.
 5. Continue intent/dialogue evaluation in parallel; defer production dialogue-move induction until it clears its held-out gate.

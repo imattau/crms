@@ -1734,6 +1734,19 @@ instruction mapping or sequence connective can be induced from source text.
 Those remain teacher-attributed, so the broader source-driven learning gate is
 still open.
 
+Three additional chat wording probes were run against the same saved model and
+then checked against four held-out input lists with the independent oracle.
+`Write Python code to keep the first occurrence of every number then sort the
+values then reverse the list` generated the expected procedure and passed the
+checker. The alternate stable-unique phrase was explicitly taught, so this
+shows composition with a taught component alias, not an unseen synonym. The
+requests using `remove repeated values ... ascending ...` and `find the unique
+elements in ascending order ...` both abstained because their operation
+phrases were not taught; direct generation agreed with chat. Result: 1/3
+wording probes generated and independently checked, 2/3 abstained, 0 wrong.
+This is a useful coverage boundary for the bounded learner, not a general
+paraphrase score.
+
 ## Procedure evidence and labeler provenance (2026-10-20)
 
 Commands:
