@@ -52,9 +52,9 @@ def main() -> None:
         state_path = Path(folder) / "dialogue.json"
         dialogue.save(str(state_path))
         saved = json.loads(state_path.read_text(encoding="utf-8"))
-        require(saved["format_version"] == 17
+        require(saved["format_version"] == 18
                 and saved["open_dialogue_question"]["prompt"] == original_prompt,
-                "typed open question was not persisted in state format 17")
+                "typed open question was not persisted in state format 18")
         restored = CRMSDialogue.load(kb, str(state_path))
         require(restored.open_dialogue_question == dialogue.open_dialogue_question,
                 "open question did not survive state reload")
@@ -414,7 +414,7 @@ def main() -> None:
         require(migrated_legacy_slot.session_slots["date_time"]["updated_by"] == "",
                 "format 16 slot migration invented update provenance")
 
-        payload["format_version"] = 17
+        payload["format_version"] = 18
         payload["open_dialogue_question"] = {
             "prompt": "What time?", "answer_kind": "detail",
             "expected_slot": "not-a-slot"}
@@ -426,7 +426,7 @@ def main() -> None:
         else:
             raise SystemExit("unknown expected slot was accepted")
 
-        payload["format_version"] = 17
+        payload["format_version"] = 18
         payload["open_dialogue_question"] = {
             "prompt": "Where?", "answer_kind": "detail",
             "expected_slot": "location"}

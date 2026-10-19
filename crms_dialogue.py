@@ -194,6 +194,7 @@ _ACTIVE_TASK_INTENTS = {
     "cancel-reservation", "correct-prior-result", "correct-result",
     "seek-information", "provide-information", "other-task",
 }
+_TASK_SUBGOAL_INTENTS = {"provide-constraint"}
 _SHOWN_LIMIT = 500
 _ELABORATION_BATCH = 3
 _OVERVIEW_BATCH = 5
@@ -269,7 +270,11 @@ class CRMSDialogue:
         # A bounded record of licensed turn-level intent decisions. This is
         # session context, not shared knowledge or a user profile.
         self.intent_trace: list[dict[str, Any]] = []
+        # Keep the user's broad objective separate from the current step.
+        # ``active_task_intent`` remains the broad goal for compatibility;
+        # constrained information supplied along the way is a subgoal.
         self.active_task_intent: str | None = None
+        self.active_task_subgoal: str | None = None
         self.last_answered: dict[str, str] | None = None
         self.shown: list[str] = []
         # A pronoun that could mean several entities leaves its candidates
@@ -333,9 +338,13 @@ class CRMSDialogue:
             if intent_hypothesis.decision == "selected":
                 if task_intent == "end-interaction":
                     self.active_task_intent = None
+                    self.active_task_subgoal = None
                     self.session_slots = {}
                 elif task_intent in _ACTIVE_TASK_INTENTS:
                     self.active_task_intent = task_intent
+                    self.active_task_subgoal = None
+                elif task_intent in _TASK_SUBGOAL_INTENTS:
+                    self.active_task_subgoal = task_intent
         response = turn.response
         if (turn.status == "answered" and response is not None
                 and response.status == "answered" and turn.resolved_question):
@@ -364,6 +373,9 @@ class CRMSDialogue:
             context.add("task_in_progress")
         if self.active_task_intent in _ACTIVE_TASK_INTENTS:
             context.add("active_task_" + self.active_task_intent.replace("-", "_"))
+        if self.active_task_subgoal in _TASK_SUBGOAL_INTENTS:
+            context.add("active_subgoal_" +
+                        self.active_task_subgoal.replace("-", "_"))
         if self.last_answered or self.last_question:
             context.add("correction_target_available")
         if self.pending_result is not None:
@@ -404,6 +416,7 @@ class CRMSDialogue:
         self.history = []
         self.intent_trace = []
         self.active_task_intent = None
+        self.active_task_subgoal = None
         self.session_slots = {}
         self.last_intent_hypothesis = None
         self.last_answered = None
@@ -1795,7 +1808,7 @@ class CRMSDialogue:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(
-            json.dumps({"format_version": 17, "last_entity": self.last_entity,
+            json.dumps({"format_version": 18, "last_entity": self.last_entity,
                         "subject_entity": self.subject_entity,
                         "object_entity": self.object_entity,
                         "last_question": self.last_question,
@@ -1814,6 +1827,7 @@ class CRMSDialogue:
                         "history": self.history,
                         "intent_trace": self.intent_trace,
                         "active_task_intent": self.active_task_intent,
+                        "active_task_subgoal": self.active_task_subgoal,
                         "last_answered": self.last_answered,
                         "shown": self.shown,
                         "pending_dialogue_slot": self.pending_dialogue_slot,
@@ -1829,7 +1843,7 @@ class CRMSDialogue:
              ) -> "CRMSDialogue":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
         if payload.get("format_version") not in (
-                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17):
+                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18):
             raise ValueError("unsupported dialogue-state format version")
         dialogue = cls(knowledge, intent_model=intent_model)
         pending_dialogue_slot = payload.get("pending_dialogue_slot")
@@ -1895,6 +1909,12 @@ class CRMSDialogue:
                      or active_task_intent not in _INTENT_TASKS)):
             raise ValueError("stored active task intent is malformed")
         dialogue.active_task_intent = active_task_intent
+        active_task_subgoal = payload.get("active_task_subgoal")
+        if (payload.get("format_version") >= 18
+                and active_task_subgoal not in (None, *_TASK_SUBGOAL_INTENTS)):
+            raise ValueError("stored active task subgoal is malformed")
+        dialogue.active_task_subgoal = (
+            active_task_subgoal if payload.get("format_version") >= 18 else None)
         intent_trace = payload.get("intent_trace", [])
         trace_keys = {
             "dialogue_act", "task_intent", "decision", "matched_frame",

@@ -415,6 +415,17 @@ quoted evidence into accepted knowledge, suspend or teach a rule, or trigger an 
 Actions such as booking or changing stored knowledge still require their existing explicit
 confirmation gates.
 
+## Goal and subgoal context
+
+The runtime now stores the broad active goal separately from a narrow current subgoal. For example,
+while `make-reservation` is the user's goal, a restaurant-preference answer can be recorded as the
+`provide-constraint` subgoal without replacing the reservation goal. Both are exposed to contextual
+intent frames and `/intent`, and both are bounded, session-only state. Dialogue-state format 18
+persists the subgoal; older saves load with no subgoal. The first implementation recognizes only
+the explicitly modeled `provide-constraint` subgoal. It is not a general task planner, arbitrary
+goal stack, or learned task hierarchy. The focused sequence is in
+[`v1_402_task_goal_subgoal.py`](../experiments/v1_402_task_goal_subgoal.py).
+
 ## Learning and evidence
 
 Use the two Taskmaster sheets in the dialogue pilot:
@@ -450,8 +461,11 @@ capability comparator, not a label oracle.
 
 ## Implementation sequence
 
-1. Finalize the annotation schema; use AI labels for early error analysis and obtain independent
-   review before treating the feasibility batch as an evaluation set.
+1. Finalize the annotation schema; Codex may produce the primary labels in place of a human
+   annotator for development and label-conditioned error analysis. Mark these as AI-authored and
+   retain source citations. Do not call agreement with the same labels accuracy or independent
+   validation. If a quality claim requires adjudicated ground truth, use a separate independent
+   review set or report the limitation plainly.
 2. Measure the current scripted baseline against the primary labels, reporting agreement rather
    than accuracy. Add an independent review set if stronger quality claims are needed.
 3. Induce user act/intent frames from train examples and learn context predicates only where the

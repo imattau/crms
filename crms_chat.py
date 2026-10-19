@@ -5599,7 +5599,8 @@ def main() -> int:
                           "(hand-checked runtime rules; not learned):")
                 print(json.dumps(asdict(dialogue.last_intent_hypothesis),
                                  ensure_ascii=False, indent=2))
-            print(f"Active task context: {dialogue.active_task_intent or 'none'}")
+            print(f"Active goal: {dialogue.active_task_intent or 'none'}")
+            print(f"Current subgoal: {dialogue.active_task_subgoal or 'none'}")
             if dialogue.session_slots:
                 print("User-provided task parameters (session only; not facts):")
                 print(json.dumps(dialogue.session_slots,
