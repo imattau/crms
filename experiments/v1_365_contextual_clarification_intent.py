@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from crms_conversation import respond
+from crms_conversation import classify_user_intent, respond
 from crms_dialogue import CRMSDialogue
 from crms_knowledge import CRMSKnowledgeBase
 from crms_research import CRMSResearchIndex
@@ -137,6 +137,49 @@ def main() -> None:
             and mixed.intent_hypothesis.matched_frame
             == "greeting-plus-content-question",
             "mixed greeting/question did not select the task intent")
+    for question, frame in (
+            ("Who designed the Analytical Engine?", "wh-question"),
+            ("Did Ada Lovelace design the Analytical Engine?",
+             "yes-no-question")):
+        hypothesis = classify_user_intent(CRMSDialogue(knowledge), question)
+        require(hypothesis is not None
+                and hypothesis.dialogue_act == "question"
+                and hypothesis.task_intent == "seek-information"
+                and hypothesis.decision == "selected"
+                and hypothesis.matched_frame == frame,
+                f"content question did not receive a bounded intent: {question}")
+    greeting_question = classify_user_intent(CRMSDialogue(knowledge),
+                                              "How are you?")
+    require(greeting_question is not None
+            and greeting_question.dialogue_act == "greeting"
+            and greeting_question.task_intent == "social-contact",
+            "social greeting was misclassified as a content question")
+    information_request = classify_user_intent(
+        CRMSDialogue(knowledge), "Can you tell me which engine Ada designed?")
+    require(information_request is not None
+            and information_request.dialogue_act == "request-action"
+            and information_request.task_intent == "seek-information"
+            and information_request.matched_frame == "modal-request",
+            "information request was collapsed into a generic yes/no question")
+    action_request = classify_user_intent(
+        CRMSDialogue(knowledge), "Could you reserve a table for two?")
+    require(action_request is not None
+            and action_request.dialogue_act == "request-action"
+            and action_request.task_intent == "other-task",
+            "action request was mislabeled as a request for information")
+    bare_yes = classify_user_intent(CRMSDialogue(knowledge), "Yes")
+    require(bare_yes is not None and bare_yes.decision == "ambiguous"
+            and bare_yes.task_intent is None,
+            "bare yes was misclassified as a content question")
+    content_question = respond(CRMSDialogue(knowledge),
+                               "What did Ada Lovelace design?")
+    require(content_question.status == "ambiguous"
+            and content_question.intent_hypothesis is not None
+            and content_question.intent_hypothesis.dialogue_act == "question"
+            and content_question.intent_hypothesis.task_intent
+            == "seek-information"
+            and content_question.intent_hypothesis.matched_frame == "wh-question",
+            "runtime content question did not carry its intent hypothesis")
     unanchored_explanation = respond(CRMSDialogue(knowledge), "Why?")
     require(unanchored_explanation.intent_hypothesis is not None
             and unanchored_explanation.intent_hypothesis.dialogue_act == "uncertain"

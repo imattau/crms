@@ -49,6 +49,25 @@ _OVERVIEW_RE = re.compile(
 _EXPLANATION_FOLLOWUP_RE = re.compile(
     r"^(?:why(?: is that)?|how do you know(?: that)?|what supports that)"
     r"[?!. ]*$", re.IGNORECASE)
+_WH_QUESTION_RE = re.compile(
+    r"^(?:who|whom|whose|what|which|when|where|why|how)\b", re.IGNORECASE)
+_YES_NO_QUESTION_RE = re.compile(
+    r"^(?:am|is|are|was|were|do|does|did|has|have|had|can|could|will|would|"
+    r"shall|should|may|might)\b.+\?\s*$", re.IGNORECASE)
+_MODAL_REQUEST_RE = re.compile(
+    r"^(?:can|could|would|will)\s+(?:you|i|we)\s+"
+    r"(?P<verb>[a-z]+)\b(?:\s+.+)?[?.! ]*$", re.IGNORECASE)
+_INFORMATION_REQUEST_VERBS = {
+    "check", "confirm", "describe", "explain", "find", "give", "hear",
+    "list", "read", "repeat", "say", "search", "see", "show", "tell",
+    "view",
+}
+_ACTION_REQUEST_VERBS = {
+    "add", "book", "bring", "calculate", "cancel", "change", "create",
+    "do", "get", "go", "help", "include", "make", "mind", "order",
+    "put", "remind", "reserve", "seat", "send", "set", "take", "translate",
+    "try", "write",
+}
 
 
 def _count(value: int, noun: str) -> str:
@@ -179,6 +198,34 @@ def classify_user_intent(
             task_intent=task_intent,
             decision="selected",
             matched_frame=act,
+        )
+
+    # Content questions and modal requests need an intent hypothesis too. Keep
+    # this lexical baseline narrow and explicit: it classifies the immediate
+    # speech act without asserting a factual premise or changing the answer path.
+    stripped = text.strip()
+    modal_request = _MODAL_REQUEST_RE.fullmatch(stripped)
+    if modal_request is not None:
+        verb = modal_request.group("verb").casefold()
+        if verb in _INFORMATION_REQUEST_VERBS | _ACTION_REQUEST_VERBS:
+            return UserIntentHypothesis(
+                dialogue_act="request-action",
+                task_intent=("seek-information"
+                             if verb in _INFORMATION_REQUEST_VERBS
+                             else "other-task"),
+                decision="selected",
+                matched_frame="modal-request",
+                context_predicates=("direct-user-request",),
+            )
+    if (_WH_QUESTION_RE.match(stripped)
+            or _YES_NO_QUESTION_RE.fullmatch(stripped)):
+        return UserIntentHypothesis(
+            dialogue_act="question",
+            task_intent="seek-information",
+            decision="selected",
+            matched_frame=("wh-question" if _WH_QUESTION_RE.match(stripped)
+                           else "yes-no-question"),
+            context_predicates=("content-question",),
         )
 
     if _BARE_YES_NO_RE.fullmatch(text.strip()):

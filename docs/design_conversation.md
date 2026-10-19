@@ -77,7 +77,10 @@ Findings from the review that change the design:
   `classify_user_intent` and `respond`, called from the chat loop in place of a direct
   `dialogue.turn`. Each turn it handles carries an inspectable `UserIntentHypothesis` (dialogue act,
   task intent, decision, matched frame, context predicates, alternatives), shown by `/intent`.
-  Basis is `hand_checked_runtime_rule`; nothing is learned.
+  The baseline includes contextual pending-choice and explanation-follow-up handling, plus bounded
+  lexical frames for direct wh/yes-no questions and modal requests. It remains a hand-checked
+  rule set; nothing is learned, and the frames do not recover task intent for short slot answers
+  without context.
 - **Elaboration and conversation memory were added in phase 1** (the baseline described here
   predates it). "Tell me more" lists unshown accepted facts about the focus; it used to return "I can
   look for more grounded information about X…" and show nothing. For a topic that exists only in a

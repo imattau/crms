@@ -25,21 +25,22 @@ Regression coverage is in
 
 ### Corpus coverage diagnostic
 
-The current phrase-level rules were measured against the prepared Taskmaster-1
-`restaurant-table` user-turn sample (6,227 utterances) with a fresh, empty dialogue state for each
-turn. They emitted a hypothesis for 816 turns (13.1%); 489 turns (7.9%) received a selected task
-intent, while 327 remained ambiguous or unlicensed. Hypothesis coverage was 12.9% on train, 15.7%
-on dev, and 12.4% on test; selected-intent coverage was 7.6%, 8.8%, and 8.6% respectively.
-The emitted hypotheses were almost entirely greetings, acknowledgements, thanks, farewells,
-reactions, and ambiguous bare yes/no turns.
+The current rules were measured against the prepared Taskmaster-1 `restaurant-table` user-turn
+sample (6,227 utterances) with a fresh, empty dialogue state for each turn. Before direct-question
+handling, they emitted a hypothesis for 816 turns (13.1%), with 489 selected intents (7.9%). Adding
+bounded wh-question, yes/no-question, and modal-request frames raised this to 1,560 hypotheses
+(25.1%) and 1,233 selected intents (19.8%). Current hypothesis coverage is 25.1% on train, 26.9%
+on dev, and 22.3% on test; selected-intent coverage is 19.9%, 20.0%, and 18.5% respectively. The
+current decisions include seek-information questions and modal requests, in addition to social
+phrases and ambiguous bare yes/no turns.
 
 This is a **coverage diagnostic, not an accuracy result**. The pilot labels are still blank, and
-fresh state deliberately removes the context that the proposed model must use. Turns with no
-hypothesis include ordinary task content; short slot answers such as a cuisine, party size, or time
-can only be interpreted as a task-intent continuation in context. Therefore the 86.9% with no
-hypothesis is not an error rate, but it shows how little of this task-dialogue sample the current
-social-phrase baseline classifies. The test-split numbers are not a held-out quality score because
-there are no adjudicated labels.
+fresh state deliberately removes the context that the proposed model must use. The coverage increase
+shows that ordinary questions and requests were missing from the earlier baseline; it does not show
+that the new labels are correct. Turns with no hypothesis include ordinary task content; short slot
+answers such as a cuisine, party size, or time can only be interpreted as a task-intent continuation
+in context. The remaining 74.9% with no hypothesis is not an error rate. Test-split figures are
+not a held-out quality score because there are no adjudicated labels.
 
 The diagnostic is reproducible with
 [`v1_373_taskmaster_intent_baseline_coverage.py`](../experiments/v1_373_taskmaster_intent_baseline_coverage.py).
