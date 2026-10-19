@@ -51,6 +51,15 @@ development agreement**, not held-out generalization or accuracy. The next evalu
 the implementation and use previously untouched conversations; the primary labels remain from one
 Codex annotator without independent review.
 
+Development labels also showed misses on bounded acknowledgements such as “That sounds nice”,
+“That’ll be good”, “Okay, great”, and “Okay, I got it”. `experiments/v1_398_contextual_acknowledgement_forms.py`
+checks these positive-assessment forms, task-state retention, and that question wording is not
+swallowed. On the same in-sample dev labels, the rules raised hypothesis coverage from 63/124
+(50.8%) to 67/124 (54.0%); joint label agreement was 52/67 (77.6%) among hypotheses and 52/65
+(80.0%) among selected turns. This is a development fit, not an independent quality result. The
+test pilot still measures commit `5afd9f5`; these later changes have not been evaluated on a fresh
+test sample.
+
 The implementation was frozen in commit `5afd9f5` before a first test-split pilot. Six complete,
 non-randomly selected test conversations (66 classifiable turns; two uncertain) yielded 31 runtime
 hypotheses with oracle context (47.0% coverage), 29 selected and 2 ambiguous. Joint agreement with

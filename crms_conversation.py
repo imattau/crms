@@ -19,7 +19,14 @@ _ACTS: tuple[tuple[str, re.Pattern[str]], ...] = (
         r"^(?:goodbye|bye|see\s+you|take\s+care)[?.! ]*$", re.IGNORECASE)),
     ("thanks", re.compile(r"^(?:thanks|thank\s+you|thx)[.! ]*$", re.IGNORECASE)),
     ("acknowledgement", re.compile(
-        r"^(?:ok|okay|got\s+it|understood)[.! ]*$", re.IGNORECASE)),
+        r"^(?:ok|okay|got\s+it|understood|"
+        r"ok(?:ay)?[, ]+(?:great|nice|perfect|i\s+got\s+it))[.! ]*$",
+        re.IGNORECASE)),
+    ("acknowledgement", re.compile(
+        r"^(?:(?:that|it)\s+(?:sounds|looks|seems)\s+"
+        r"(?:good|nice|great|fine|perfect|lovely|wonderful)|"
+        r"that(?:'ll| will)\s+be\s+(?:good|fine|great|perfect))"
+        r"[.! ]*$", re.IGNORECASE)),
     ("elaboration", re.compile(
         r"^(?:(?:(?:can|could|would|will)\s+you\s+)?"
         r"(?:please\s+)?(?:tell\s+me\s+more|say\s+more|go\s+on|"

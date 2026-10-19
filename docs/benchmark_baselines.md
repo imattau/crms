@@ -153,19 +153,17 @@ or evidence of paraphrase transfer. No independently reviewed intent model is av
 `python3 experiments/v1_395_runtime_intent_oracle_context.py USER_TURNS.csv` replays labeled turns
 through the hand-checked router, supplying the annotated context state, preceding assistant question,
 and prior labeled active-task intent. On the ten-conversation development set (124 classifiable
-turns; seven uncertain), it produced 63 hypotheses (50.8% coverage): 61 selected and 2 ambiguous;
-61 turns abstained. Joint act-and-task-intent agreement with the primary Codex labels was 48/63
-(76.2%) among hypotheses and 48/61 (78.7%) among selected turns. A context-free ablation
-hypothesized 33/124 (26.6%) and matched 22/33 labels. These scores are **development-set fit**:
-the prompts and labels from six of these conversations were inspected while designing the new
-search-prompt and `restaurant_type` slot cues, so this is not held-out generalization. The result
-must not be compared as an independent accuracy estimate. It suggests the next experiment should
-freeze the rules and evaluate on untouched test conversations before any further changes. The
-development labels and context are from one Codex annotator; no independent review exists. The
-current implementation remains hand-checked bounded rules, not learned generalization, and exact
-phrase candidates still cover only 5.6% of this set. Longer-term work should induce dialogue-act
-and task-intent frames conditioned on typed question/slot and active task, while preserving
-ambiguity and abstention.
+turns; seven uncertain), the prompt/slot rules produced 63 hypotheses (50.8% coverage), with
+48/63 (76.2%) joint act-and-intent agreement. Adding explicit assessment acknowledgements found
+in the development labels raised this to 67 hypotheses (54.0% coverage) and 52/67 (77.6%) joint
+agreement; 65 were selected, 2 ambiguous, and 57 abstained. Selected-turn joint agreement was
+52/65 (80.0%). The context-free ablation on the current code hypothesized 37/124 (29.8%) and
+matched 26/37 labels (70.3%). These are **development-set fit**: the prompts and labels from these
+conversations guided the rules, so this is not held-out generalization. The labels and context come
+from one Codex annotator, with no independent review. The changes remain hand-checked phrase rules,
+not learned generalization; frozen exact-phrase candidates still cover only 5.6%. Longer-term work
+should induce dialogue-act and task-intent frames conditioned on typed question/slot and active task,
+while preserving ambiguity and abstention.
 
 ### Frozen contextual-intent test pilot
 
@@ -186,7 +184,9 @@ is marked uncertain rather than acknowledged; a reservation goal can start insid
 and “Can you tell me how late ...?” is classified as a request-action rather than a question. Keep
 this test set frozen. Any changes motivated by these cases must be developed on train/dev data and
 checked on a later untouched test sample. The test labels were supplied by Codex under user
-authorization and have no independent human review.
+authorization and have no independent human review. Subsequent phrase-rule changes were developed
+against dev labels; the pilot metrics above apply to commit `5afd9f5`, not the current code. No
+post-change test result is claimed.
 
 ## Contextual intent: active task and expected slot
 
