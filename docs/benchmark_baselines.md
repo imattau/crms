@@ -134,9 +134,10 @@ and holdout conversation IDs. The experiment checks export, installation into th
 chat startup, repacking, malformed-frame rejection, and legacy packaging without dialogue memory.
 `experiments/v1_384_contextual_dialogue_frame_resolution.py` verifies that a held-out-validated
 literal frame routes only when its context and predecessor match, its citation survives state
-persistence, and train-only frames remain inert. The runtime still recognizes exact phrase matches
-only; no frame induction or independently reviewed intent model is available, so this is not an
-accuracy result.
+persistence, and train-only frames remain inert. Candidate induction is now available through
+`experiments/v1_392_induce_dialogue_intent_candidates.py`; on the 563-turn single-Codex-label batch
+it produced 15 exact-surface candidates, all inert, with citations and typed context. This is not
+an accuracy or paraphrase-transfer result, and no independently reviewed intent model is available.
 
 ## Contextual intent: active task and expected slot
 

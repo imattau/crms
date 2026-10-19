@@ -223,10 +223,11 @@ citations. `crms_dialogue_intent.py` rejects unknown context predicates, route/i
 clarification answers without an open question, malformed evidence metadata, and overlapping
 train/holdout conversation IDs. Legacy model versions remain readable.
 
-This is a narrow runtime seam, not learned dialogue competence: there is no frame induction yet,
-surface patterns are exact phrases rather than slot-generalizing templates, and task-oriented
-slots beyond existing dialogue state are not supported. Most ordinary intent recognition still
-uses the hand-checked rules in `crms_conversation.py`. The 40-conversation feasibility batch has
+This is a narrow runtime seam, not learned dialogue competence: an experiment now induces
+exact-surface user-intent candidates from labeled train turns, but it does not generalize wording or
+activate candidates. Surface patterns remain exact phrases rather than slot-generalizing templates,
+and task-oriented slots beyond existing dialogue state are not supported. Most ordinary intent
+recognition still uses the hand-checked rules in `crms_conversation.py`. The 40-conversation batch has
 Codex-authored labels, which the project owner has authorized for candidate induction and
 label-conditioned experiments. No independent second annotation exists, so agreement with these
 labels is not an accuracy or appropriateness claim. If two licensed portable frames match the same
@@ -235,6 +236,15 @@ but select different routes, CRMS now records an ambiguous hypothesis, asks the 
 between the two routes, and executes only the selected route. The short yes/no choice retains the
 matched-frame evidence and never changes factual knowledge. This handles an explicit model conflict;
 it does not resolve general paraphrase or task-slot ambiguity.
+
+`experiments/v1_392_induce_dialogue_intent_candidates.py` groups consistent exact normalized
+surfaces by dialogue act, task intent, supported context, and predecessor; it requires evidence from
+at least two distinct training conversations, retains every supporting utterance citation, and
+emits only inert `candidate` frames. On the current single-Codex-label batch it produced 15
+candidates from 563 turns. It excluded 23 `social-exchange` turns and turns with unsupported
+predecessors, and recorded 21 repeated surfaces whose labels or contexts conflict. This is a first
+learning-path diagnostic, not a quality result: all examples are from train conversations, the
+labels have one annotator, and exact-surface repetition does not demonstrate paraphrase transfer.
 
 Once a frame has provenance-recorded training and held-out labels, store it in a versioned `dialogue`
 memory inside the portable SQLite model. Codex may produce the primary labels for both splits under
