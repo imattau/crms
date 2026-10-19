@@ -92,9 +92,20 @@ agreement. Coverage was especially low for annotated `provide-constraint` turns 
 `make-reservation` turns (7/63, 11.1%). This points to missing contextual slot and task-phase
 handling, rather than a need to add more factual knowledge.
 
+An additional analysis of exact repeated wording found 19 normalized user surfaces repeated across
+conversations; eight had different annotated act/intent pairs. The combination of `context_state`
+and `predecessor_act` separated six of those eight surface ambiguities. Two remained conflicted;
+for example, “yes” and a location response such as “San Francisco, California” can share the same
+coarse `awaiting-user-detail` plus `clarification-request` context while carrying different task
+intents. This small, AI-labeled sample is directional evidence only. It suggests that the next
+context representation needs the pending question or expected slot, not only a phase label and
+previous act. The report is reproducible with
+[`v1_387_contextual_intent_ambiguity.py`](../experiments/v1_387_contextual_intent_ambiguity.py).
+
 The next evaluation should compare context-free and context-aware decisions on the same held-out
-conversations. The AI labels can guide error analysis and prototype development, but must not be
-used as independent agreement evidence or to license learned frames.
+conversations, with the pending question and expected slot represented explicitly. The AI labels
+can guide candidate development and label-conditioned evaluation; report that comparison as
+agreement with the annotator, and do not treat it as independent correctness evidence.
 
 ## Why intent belongs in the model
 
