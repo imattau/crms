@@ -48,6 +48,34 @@ def main() -> None:
     if kb._derived_cases[next(iter(kb._derived_cases))]["retrieval_count"] != retrieval_count:
         raise SystemExit("listing cases incorrectly counted as artifact reuse")
 
+    # Removing one of several sources must preserve and refresh a valid
+    # derivation; removing its final required premise must stale the artifact.
+    supported = CRMSKnowledgeBase()
+    supported.add_fact("Mina", "works at", "Workshop", "source:work-a")
+    supported.add_fact("Mina", "works at", "Workshop", "source:work-b")
+    supported.add_fact("Workshop", "located in", "Oslo", "source:place")
+    supported.add_inference_rule(
+        "work-location", "works at", "located in", "works in")
+    if supported.practice_relation("Mina", "works in", "Oslo").status != "answered":
+        raise SystemExit("independent support setup did not produce a derivation")
+    if not supported.remove_fact(
+            "Mina", "works at", "Workshop", "source:work-a"):
+        raise SystemExit("first source could not be retracted")
+    refreshed = supported.retrieve_derived_case(
+        "Mina", "works in", "Oslo", record_use=False)
+    if (refreshed is None or refreshed["status"] != "verified"
+            or refreshed["lineage"]["sources"]
+                != ["source:place", "source:work-b"]):
+        raise SystemExit("remaining independent source did not refresh the derivation")
+    if not supported.remove_fact(
+            "Mina", "works at", "Workshop", "source:work-b"):
+        raise SystemExit("final source could not be retracted")
+    if supported.retrieve_derived_case(
+            "Mina", "works in", "Oslo", record_use=False) is not None:
+        raise SystemExit("derived case remained available after its premise vanished")
+    if supported.derived_cases()[0]["status"] != "stale_or_conflicted":
+        raise SystemExit("unsupported case was not marked stale after retraction")
+
     with tempfile.TemporaryDirectory() as directory:
         path = Path(directory) / "knowledge.json"
         kb.save(path)
@@ -100,6 +128,7 @@ def main() -> None:
 
     print("proof-backed derived cases diagnostic: PASS")
     print("explicit practice, CLI, no fact promotion, lineage, dedupe, persistence, conflict abstention: PASS")
+    print("source retraction refreshes surviving support and stales the final unsupported case: PASS")
 
 
 if __name__ == "__main__":

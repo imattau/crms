@@ -1306,3 +1306,15 @@ adds a separate, never-practiced chain and asks about it through ordinary natura
 proof passes the independent verifier, while a one-edge near-miss abstains. This closes a bounded
 rule-to-chat integration gap; it remains one controlled rule shape and does not establish
 open-domain rule induction quality or natural-language intent learning.
+
+## Derived-case correction after source retraction
+
+Command: `python3 experiments/v1_72_proof_backed_derived_cases.py`
+
+Explicit practice stores a verified inference separately from source facts and deduplicates
+repeated practice. The experiment now tests correction propagation at the evidence level: retracting
+one citation from a premise with an independent remaining source refreshes the stored proof and
+lineage; retracting the final required premise makes the case unavailable and marks it stale. The
+existing conflict, persistence, and no-fact-promotion checks still pass. This verifies one bounded
+revalidation path; it does not establish general derivation governance, automatic practice, or
+storage-compression safety.
