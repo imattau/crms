@@ -1108,7 +1108,7 @@ class CRMSDialogue:
         names = ", ".join(missing)
         return DialogueTurn(
             "unknown", question, resolved,
-            text=(f"The source I found does not name {names}, so I can't "
+            text=(f"The quoted sentence I found does not name {names}, so I can't "
                   "safely attribute it to that entity. Please provide a "
                   "source that names it or rephrase the question."))
 

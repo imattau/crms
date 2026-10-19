@@ -70,6 +70,13 @@ def main() -> None:
                 and "50,000 spectators" in restored_followup.text,
                 f"paragraph anchor did not survive dialogue reload: {restored_followup!r}")
 
+        mismatched_switch = respond(dialogue, "And Italy?", research_index=index)
+        require(mismatched_switch.status != "answered"
+                and "quoted sentence I found does not name Italy"
+                    in mismatched_switch.text
+                and "50,000 spectators" not in mismatched_switch.text,
+                f"an incompatible entity switch reused the prior answer: {mismatched_switch!r}")
+
         height_dialogue = CRMSDialogue(CRMSKnowledgeBase())
         respond(height_dialogue, "Where is the Eiffel Tower?",
                 research_index=index)

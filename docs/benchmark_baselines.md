@@ -1468,8 +1468,11 @@ ask?” can use the recorded last user question after a failed turn, and that an
 ordinal without an open numbered list asks for clarification. Evidence remains
 quoted source text, not an accepted fact. The focused and nearby topic-anchor,
 source-follow-up, persistence, quoted-evidence, and sentence-retrieval checks
-pass. This remains bounded coverage, not a general answerability classifier,
-dialogue model, or broad semantic ranker.
+pass. An incompatible “And Italy?” after the Colosseum capacity question does
+not reuse the capacity answer; its abstention names the quoted sentence as
+missing the target, rather than claiming the whole source lacks it. This
+remains bounded coverage, not a general answerability classifier, dialogue
+model, or broad semantic ranker.
 
 ## Named-entity grounding for source-only chat answers (2026-10-20)
 
