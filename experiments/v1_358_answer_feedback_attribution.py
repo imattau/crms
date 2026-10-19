@@ -161,6 +161,7 @@ def main() -> None:
                 "--feedback-db", str(root / "feedback.sqlite3"),
                 "--dialogue-state", str(root / "dialogue.json"),
                 "--rules", str(root / "rules.json"),
+                "--rule-session", str(root / "rule-session.json"),
                 "--math", str(root / "math.json"),
                 "--math-session", str(root / "math-session.json"),
                 "--translations", str(root / "translations.json"),
@@ -195,6 +196,7 @@ def main() -> None:
                 "--feedback-db", str(root / "feedback.sqlite3"),
                 "--dialogue-state", str(root / "dialogue.json"),
                 "--rules", str(root / "rules.json"),
+                "--rule-session", str(root / "rule-session.json"),
                 "--math", str(root / "math.json"),
                 "--math-session", str(root / "math-session.json"),
                 "--translations", str(root / "translations.json"),
@@ -204,12 +206,27 @@ def main() -> None:
             text=True, capture_output=True, timeout=30)
         require(run.returncode == 0, run.stderr or run.stdout)
         for phrase in ("Ada Lovelace", "Ada Lovelace — designed → Engine",
-                       "sources: book:12", "/retract-fact POS|SUBJECT|RELATION|OBJECT|SOURCE"):
+                       "sources: book:12", "/retract-feedback 1|FACT_NUMBER|SOURCE_NUMBER"):
             require(phrase in run.stdout,
                     f"direct-fact feedback omitted {phrase!r}: {run.stdout}")
         persisted = CRMSKnowledgeBase.load(knowledge_path)
         require(len(persisted.facts()) == 1 and not persisted.negative_facts(),
                 "wrong feedback silently altered stored facts")
+        retract_args = args
+        retract_run = subprocess.run(
+            retract_args,
+            input="/retract-feedback 1|1|1\n/quit\n",
+            text=True, capture_output=True, timeout=30)
+        require(retract_run.returncode == 0,
+                retract_run.stderr or retract_run.stdout)
+        require("Retracted POS support from book:12" in retract_run.stdout,
+                f"explicit correction did not retract selected support: "
+                f"{retract_run.stdout}")
+        corrected_store = CRMSKnowledgeBase.load(knowledge_path)
+        require(not corrected_store.facts(),
+                "explicit feedback retraction left the selected support stored")
+        require(AnswerFeedbackStore(root / "feedback.sqlite3").event(1) is not None,
+                "explicit retraction deleted its feedback audit event")
 
     print("answer feedback attribution: direct facts, rule, and source refs PASS")
     print("SQLite persistence, deterministic IDs, duplicate suppression: PASS")
@@ -217,7 +234,8 @@ def main() -> None:
     print("wrong proof feedback suspends only validated learned rules: PASS")
     print("rule feedback reason persists; teacher and duplicate signals are protected: PASS")
     print("interactive /wrong suspension and evidence-honest abstention: PASS")
-    print("direct-fact feedback shows proposition/retraction path without mutation: PASS")
+    print("direct-fact feedback is inert until explicit source retraction: PASS")
+    print("selected source retracted; feedback audit retained: PASS")
 
 
 if __name__ == "__main__":

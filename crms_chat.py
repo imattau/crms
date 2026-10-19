@@ -62,6 +62,8 @@ HELP = """Commands:
                  set session-only reasoning and evidence-check depth
   /right | /wrong record feedback on the last evidence-backed answer
   /feedback      inspect recent feedback and its evidence references
+  /retract-feedback N|FACT|SOURCE
+                 retract one explicitly selected source from a fact in feedback N
   /source PATH|URL add a supported local file or capture one HTTP(S) page
   /source-dir PATH [--replace|--verify]
                  recursively index text/markup, tables, slides, chats, HTML, DOCX, ODT, EPUB, and PDFs
@@ -4767,6 +4769,8 @@ def _load_pending_rule(path: Path, rules_path: Path) -> tuple[str, list[int]] | 
     if payload.get("rules_path") != str(rules_path.resolve()):
         return None
     instruction, values = payload.get("instruction"), payload.get("input")
+    if instruction is None and values is None:
+        return None
     if (not isinstance(instruction, str) or not instruction.strip()
             or not isinstance(values, list)
             or any(type(value) is not int for value in values)):
@@ -5277,15 +5281,87 @@ def main() -> int:
                 print("CRMS> No answer feedback has been recorded.")
             else:
                 for event in events:
-                    print(f"CRMS> {event['verdict'].upper()}: "
+                    print(f"CRMS> {event['verdict'].upper()} #{event['feedback_seq']}: "
                           f"{event['question']} => {event['answer']}")
                     print("  Used: " + render_feedback_refs(event["evidence"]))
+                    fact_refs = [item for item in event["evidence"]
+                                 if item.get("kind") == "fact"
+                                 and item.get("subject") and item.get("relation")
+                                 and item.get("object")]
+                    for fact_number, item in enumerate(fact_refs, 1):
+                        qualifiers = item.get("qualifiers", [])
+                        scope = (" [" + ", ".join(
+                            f"{name}={value}" for name, value in qualifiers) + "]"
+                            if qualifiers else "")
+                        print(f"  Fact {fact_number}: {item['subject']} — "
+                              f"{item['relation']} → {item['object']}{scope}")
+                        for source_number, source in enumerate(
+                                item.get("sources", ()), 1):
+                            print(f"    Source {source_number}: {source}")
                     if (event["verdict"] == "wrong"
-                            and any(item.get("kind") == "fact"
-                                    for item in event["evidence"])):
-                        print("  To correct a stored fact, check its polarity and "
-                              "source in /facts, then use /retract-fact "
-                              "POS|SUBJECT|RELATION|OBJECT|SOURCE or NEG|...")
+                            and any(item.get("sources") for item in fact_refs)):
+                        print("  Retract one support with "
+                              f"/retract-feedback {event['feedback_seq']}|"
+                              "FACT_NUMBER|SOURCE_NUMBER")
+            continue
+        if line.startswith("/retract-feedback "):
+            fields = [value.strip() for value in
+                      line[len("/retract-feedback "):].split("|")]
+            if len(fields) != 3 or not all(fields):
+                print("Use: /retract-feedback FEEDBACK_NUMBER|FACT_NUMBER|SOURCE_NUMBER")
+                continue
+            try:
+                feedback_number, fact_number, source_number = map(int, fields)
+                event = feedback_store.event(feedback_number)
+                if event is None or event["verdict"] != "wrong":
+                    print("CRMS> Name an existing WRONG feedback entry from /feedback.")
+                    continue
+                fact_refs = [item for item in event["evidence"]
+                             if item.get("kind") == "fact"
+                             and item.get("subject") and item.get("relation")
+                             and item.get("object")]
+                if not 1 <= fact_number <= len(fact_refs):
+                    print("CRMS> That feedback entry has no fact with that number.")
+                    continue
+                selected_fact = fact_refs[fact_number - 1]
+                sources = selected_fact.get("sources", ())
+                if not 1 <= source_number <= len(sources):
+                    print("CRMS> That fact has no source with that number.")
+                    continue
+                source = sources[source_number - 1]
+                subject = selected_fact["subject"]
+                relation = selected_fact["relation"]
+                obj = selected_fact["object"]
+                qualifiers = dict(selected_fact.get("qualifiers", ()))
+                def has_support(rows: list[Any]) -> bool:
+                    return any(
+                        fact.subject == subject and fact.relation == relation
+                        and fact.object == obj and fact.qualifiers
+                            == tuple(sorted(qualifiers.items()))
+                        and source in fact.sources
+                        for fact in rows)
+                positive = has_support(knowledge.facts())
+                negative = has_support(knowledge.negative_facts())
+                if positive and negative:
+                    print("CRMS> This source supports both polarities. Choose one "
+                          "with /retract-fact POS or NEG and its exact scope.")
+                    continue
+                if not positive and not negative:
+                    print("CRMS> That source no longer supports this fact in the store.")
+                    continue
+                remove = (knowledge.remove_fact if positive
+                          else knowledge.remove_negative_fact)
+                if not remove(subject, relation, obj, source,
+                              qualifiers=qualifiers):
+                    print("CRMS> The selected source support was not retracted.")
+                    continue
+                knowledge.save(args.knowledge)
+                polarity = "POS" if positive else "NEG"
+                print(f"CRMS> Retracted {polarity} support from {source}: "
+                      f"{subject} — {relation} → {obj}. The feedback record remains "
+                      "as the audit trail; teach a corrected fact if you have one.")
+            except (TypeError, ValueError) as error:
+                print(f"Could not retract feedback support: {error}")
             continue
         if not line.startswith("/"):
             last_feedback_record = None

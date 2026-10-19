@@ -234,6 +234,23 @@ class AnswerFeedbackStore:
                  "question": row["question"], "answer": row["answer"],
                  "evidence": json.loads(row["evidence_json"])} for row in rows]
 
+    def event(self, feedback_seq: int) -> dict[str, Any] | None:
+        if (not isinstance(feedback_seq, int) or isinstance(feedback_seq, bool)
+                or feedback_seq < 1):
+            raise ValueError("feedback sequence must be a positive integer")
+        with sqlite3.connect(self.path) as connection:
+            connection.row_factory = sqlite3.Row
+            row = connection.execute(
+                "SELECT feedback_seq,answer_id,verdict,question,answer,evidence_json "
+                "FROM answer_feedback WHERE feedback_seq=?",
+                (feedback_seq,)).fetchone()
+        if row is None:
+            return None
+        return {"feedback_seq": row["feedback_seq"],
+                "answer_id": row["answer_id"], "verdict": row["verdict"],
+                "question": row["question"], "answer": row["answer"],
+                "evidence": json.loads(row["evidence_json"])}
+
     def has_verdict(self, answer_id: str, verdict: str) -> bool:
         if verdict not in {"right", "wrong"}:
             raise ValueError("verdict must be 'right' or 'wrong'")

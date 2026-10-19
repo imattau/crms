@@ -50,9 +50,10 @@ reload. Inference `why?` follow-ups also retain proof lineage. Remaining work in
 the immediate answer context across chat restarts, covering feedback on every specialized answer
 route, connecting `/right` to evidence-ledger confirmation, and measuring revision/abstention on a
 larger noisy-feedback benchmark. Direct-fact feedback stores the structured proposition and its
-supporting source ids; `/feedback` displays them and points to `/retract-fact`. A wrong signal alone
-does not retract or negate a fact: the user must inspect the polarity and source, then issue the
-explicit retraction or correction.
+supporting source ids; `/feedback` displays numbered propositions and citations, and
+`/retract-feedback FEEDBACK|FACT|SOURCE` retracts only the selected source support. A wrong signal
+alone does not retract or negate a fact: the user must inspect the evidence and explicitly choose a
+specific support to remove.
 
 ## 0. Ground rules (read first)
 

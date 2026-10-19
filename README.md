@@ -124,6 +124,8 @@ recent signals, fact propositions, and source references. Feedback is saved in
 `crms_feedback.sqlite3` for review. Marking a proof-based answer wrong temporarily
 suspends validated learned rules used in that proof until they pass held-out
 revalidation; facts and teacher-supplied rules are not changed automatically.
+For a direct fact, `/feedback` gives numbered source support; retract only the
+selected citation with `/retract-feedback FEEDBACK|FACT|SOURCE`.
 
 ## Learn more
 
