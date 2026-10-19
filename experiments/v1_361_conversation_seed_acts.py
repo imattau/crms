@@ -41,6 +41,7 @@ class ContentDialogue:
         self.last_answered = None
         self.pending_binding = None
         self.offers: list = []
+        self.pending_dialogue_slot = None
         self.history: list = []
         self.calls_recorded: list = []
         self.calls: list[str] = []
@@ -115,7 +116,7 @@ def main() -> None:
         require("CRMS state saved. Goodbye." in completed.stdout
                 and (root / "dialogue.json").is_file()
                 and "1 source document loaded" in completed.stdout
-                and "Which entity or source" in completed.stdout
+                and "Which entity with accepted facts" in completed.stdout
                 and "[Source: Conversation bait" not in completed.stdout,
                 f"acts caused junk retrieval or failed to exit: {completed.stdout}")
 
