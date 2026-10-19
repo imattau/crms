@@ -154,8 +154,8 @@ def main() -> None:
             text=True, capture_output=True, check=True, timeout=20)
         require("Stored relation type: arrives-before is transitive" in process.stdout,
                 f"CLI did not expose typed schema declaration:\n{process.stdout}")
-        require("CRMS> Derived:" in process.stdout
-                and "transitivity-v1" in process.stdout
+        require("A — precedes → E" in process.stdout
+                and "precedes — has relation type → transitive" in process.stdout
                 and "schema:teacher" in process.stdout,
                 f"CLI omitted schema-backed inference evidence:\n{process.stdout}")
 

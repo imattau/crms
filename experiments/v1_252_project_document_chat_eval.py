@@ -90,6 +90,11 @@ def main() -> None:
                 in " ".join(by_turn[question].casefold().split())
                 for expected in (expected if isinstance(expected, tuple)
                                  else (expected,)))
+            and "may not answer your question" not in
+                by_turn[question].casefold()
+            and "does not support a grounded answer" not in
+                by_turn[question].casefold()
+            and "quoted evidence" in by_turn[question].casefold()
             for question, (expected, _kind) in cases.items()
         }
         direct_results = [results[question]

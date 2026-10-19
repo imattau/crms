@@ -707,6 +707,26 @@ read-only sample of four 1,000-document windows in SimpleWiki produced zero pred
 and the expanded 5,000-document/60,000-sentence scan also produced zero, so corpus-derived transfer
 remains sparse in the sampled real corpus.
 
+## Project-document question answering and procedural retrieval
+
+Command: `python3 experiments/v1_252_project_document_chat_eval.py`
+
+The terminal indexed the current 318,997-byte `CRMS_README.md` as one source and
+answered all five questions with answer-bearing source text (5/5). The fixed
+set covers a procedural “How can I …?” request, a question about the meaning
+of an absent proposition, a qualitative “How much of …?” question, and two
+questions about model-size claims and induced-frame limits. The procedural
+route retrieved the complete sentence about embedding searchable text without
+the original files; it no longer quotes a mid-sentence fragment before a
+colon. The missing-proposition query now quotes the sentence defining absence
+as unknown, and the qualitative amount query can use the source's explicit
+“substantially” wording without inventing a numeric estimate.
+
+This is a five-question check over one project document, not broad reading
+comprehension. Replies remain quotations marked as evidence rather than
+accepted facts. The evaluator rejects replies that merely append the expected
+sentence as “closest source” while saying it may not answer the question.
+
 ## Gate-preserving sentence ranker on FTS candidates (two disjoint samples)
 
 Command: `python3 experiments/v1_346_fts_sentence_ranker_evaluation.py --docs-per-window 100 --train-examples 40 --test-examples 40 --json-out /tmp/crms-ranker-fts-eval-v2.json`

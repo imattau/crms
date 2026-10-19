@@ -120,9 +120,10 @@ def main() -> None:
                    "/infer-relation Origin|reaches|Target\n/quit\n"),
             text=True, capture_output=True, check=True, timeout=20)
         require("with middle kind relay." in process.stdout
-                and "CRMS> Derived:" in process.stdout
-                and "middle kind: Zulu Relay is-a relay [sources: kind:relay]"
-                in process.stdout,
+                and "Origin — reaches → Target" in process.stdout
+                and "Zulu Relay — is-a → relay [Sources: kind:relay]"
+                in process.stdout
+                and "(rule cli-relay)" in process.stdout,
                 f"typed rule CLI teaching/query failed:\n{process.stdout}")
 
     print("middle-kind index diagnostic: PASS")

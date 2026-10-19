@@ -171,21 +171,20 @@ class SQLiteFactMap(MutableMapping):
                     for field in ("subject", "relation", "object"))
         if not all(key):
             return False
-        try:
-            stored = self[key]
-        except KeyError:
-            return False
         expected_sources = tuple(sorted(str(source)
                                         for source in fact.get("sources", ())))
-        stored_sources = tuple(sorted(str(source) for source in stored.sources))
         expected_qualifiers = tuple(sorted(
             (normalized_tokens(str(name)), normalized_tokens(str(value)))
             for name, value in fact.get("qualifiers", ())))
-        stored_qualifiers = tuple(sorted(
-            (normalized_tokens(str(name)), normalized_tokens(str(value)))
-            for name, value in stored.qualifiers))
-        return (stored_sources == expected_sources
-                and stored_qualifiers == expected_qualifiers)
+        for stored in self.lookup_triple(*key):
+            stored_sources = tuple(sorted(str(source) for source in stored.sources))
+            stored_qualifiers = tuple(sorted(
+                (normalized_tokens(str(name)), normalized_tokens(str(value)))
+                for name, value in stored.qualifiers))
+            if (stored_sources == expected_sources
+                    and stored_qualifiers == expected_qualifiers):
+                return True
+        return False
 
     def select_relations(self, relations):
         relation_json = sorted({

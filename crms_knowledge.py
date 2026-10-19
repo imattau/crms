@@ -1207,6 +1207,17 @@ class CRMSKnowledgeBase:
                                 for name, value in pairs))
         return normalize(actual) == normalize(requested)
 
+    @staticmethod
+    def _scope_is_within(
+            fact_scope: tuple[tuple[str, str], ...],
+            requested_scope: tuple[tuple[str, str], ...]) -> bool:
+        """A fact scope applies when the query contains every required qualifier."""
+        required = {(_tokens(name), _tokens(value))
+                    for name, value in fact_scope}
+        available = {(_tokens(name), _tokens(value))
+                     for name, value in requested_scope}
+        return required <= available
+
     def add_fact(self, subject: str, relation: str, obj: str,
                  source: str, *,
                  qualifiers: Mapping[str, str] | None = None) -> FactEvidence:
@@ -1683,7 +1694,7 @@ class CRMSKnowledgeBase:
         scope = qualifiers
 
         def exact_scope(fact: FactEvidence) -> bool:
-            return self._qualifiers_equal(fact.qualifiers, scope)
+            return self._scope_is_within(fact.qualifiers, scope)
 
         positive_rows = [fact for fact in
                          self._facts.select_relations(active_relations)
@@ -1830,7 +1841,7 @@ class CRMSKnowledgeBase:
             _tokens(fact.object) for fact in type_facts
             if _tokens(fact.subject) == _tokens(relation)
             and _tokens(fact.relation) == _tokens("has relation type")
-            and self._qualifiers_equal(fact.qualifiers, normalized_qualifiers)
+            and self._scope_is_within(fact.qualifiers, normalized_qualifiers)
         }
         integrity_constrained = bool(constrained_types.intersection(
             {("irreflexive",), ("asymmetric",)}))
@@ -9448,14 +9459,14 @@ class CRMSKnowledgeBase:
             and _tokens(fact.object) in {
                 _tokens("transitive"), _tokens("irreflexive"),
                 _tokens("asymmetric"), _tokens("closed-world")}
-            and self._qualifiers_equal(fact.qualifiers, qualifiers)
+            and self._scope_is_within(fact.qualifiers, qualifiers)
             for fact in self._facts.values())
 
     def _relation_type_fact(
             self, relation: str, relation_type: str,
             qualifiers: tuple[tuple[str, str], ...] = ()
             ) -> FactEvidence | None:
-        """Return the exact-scope declaration that licenses a relation type."""
+        """Return a declaration whose scope is covered by the query context."""
         if isinstance(self._facts, SQLiteFactMap):
             candidates = self._facts.lookup(
                 _tokens("has relation type"), _tokens(relation), "subject")
@@ -9465,7 +9476,7 @@ class CRMSKnowledgeBase:
                      if _tokens(fact.subject) == _tokens(relation)
                      and _tokens(fact.relation) == _tokens("has relation type")
                      and _tokens(fact.object) == _tokens(relation_type)
-                     and self._qualifiers_equal(fact.qualifiers, qualifiers)), None)
+                     and self._scope_is_within(fact.qualifiers, qualifiers)), None)
 
     def _inference_relation_names(
             self, qualifiers: tuple[tuple[str, str], ...] = ()) -> list[str]:
@@ -9477,7 +9488,7 @@ class CRMSKnowledgeBase:
                 and _tokens(fact.object) in {
                     _tokens("transitive"), _tokens("irreflexive"),
                     _tokens("asymmetric"), _tokens("closed-world")}
-                and self._qualifiers_equal(fact.qualifiers, qualifiers)))
+                and self._scope_is_within(fact.qualifiers, qualifiers)))
         return sorted(relations, key=_tokens)
 
     def teach_question(self, question: str, *, relation: str,

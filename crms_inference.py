@@ -83,6 +83,13 @@ def _qualifier_key(value: Any) -> tuple[tuple[tuple[str, ...], tuple[str, ...]],
     return tuple(sorted(normalized))
 
 
+def _scope_is_within(fact_scope: Any, query_scope: Any) -> bool:
+    """A fact is usable when every qualifier it requires is present in the query."""
+    required = dict(_qualifier_key(fact_scope))
+    available = dict(query_scope)
+    return all(available.get(name) == value for name, value in required.items())
+
+
 @dataclass(frozen=True)
 class InferenceRule:
     rule_id: str
@@ -309,8 +316,9 @@ def _infer_relation_bounded(
         effort_level: str = "standard") -> InferenceResult:
     """Backward-chain a specified triple with proof, depth, and work bounds.
 
-    Only facts in the exact requested qualifier scope can be proof leaves.
-    Facts from different scopes are never combined.
+    Unscoped facts are general and can be used in any requested scope. Scoped
+    facts are usable only when the requested scope contains their qualifiers.
+    Facts outside the requested scope are never proof leaves.
     A verified positive proof remains usable if later alternative-proof search
     reaches a bound. Such a result is marked incomplete and cannot enter
     persistent practice memory.
@@ -330,9 +338,9 @@ def _infer_relation_bounded(
 
     qualifier_scope = _qualifier_key(qualifiers)
     positive = [dict(fact) for fact in facts
-                if _qualifier_key(fact.get("qualifiers", ())) == qualifier_scope]
+                if _scope_is_within(fact.get("qualifiers", ()), qualifier_scope)]
     negatives = [dict(fact) for fact in negative_facts
-                 if _qualifier_key(fact.get("qualifiers", ())) == qualifier_scope]
+                 if _scope_is_within(fact.get("qualifiers", ()), qualifier_scope)]
     rules = list(rules)
     for rule in rules:
         if not isinstance(rule, InferenceRule):

@@ -50,7 +50,7 @@ from crms_research import (
     _sentence_context_kind, _sentence_spans,
 )
 from crms_story import generate_short_story
-from crms_text import tokens as normalized_tokens
+from crms_text import tokens as normalized_tokens, word_matches
 from crms_translation import (
     CRMSTranslation, infer_shared_slot_templates,
     render as render_translation,
@@ -2208,24 +2208,40 @@ def _top_retrieved_sentence_evidence(
                               if record.get("kind") == "licensed_predicate"
                               and record.get("text")})
     retrieval_query = " ".join([question, *predicate_forms])
-    for hit in index.search(retrieval_query, limit=limit, context_chars=480):
-        document = index.document(hit.document_id)
-        snippet_is_exact = (0 <= hit.start <= hit.end <= len(document.text)
-                            and document.text[hit.start:hit.end] == hit.snippet)
-        if not snippet_is_exact:
-            continue
-        for local_start, local_end in _sentence_spans(hit.snippet):
-            start = hit.start + local_start
-            end = hit.start + local_end
-            sentence = document.text[start:end]
-            if (_sentence_context_kind(sentence, document.text, start)
-                    != "assertion"):
+    retrieval_queries = [retrieval_query]
+    if re.match(r"^how\s+(?:can|do|does|should|would)\b",
+                question.strip(), re.IGNORECASE):
+        # Procedural questions often contain both the requested action and a
+        # distinctive object phrase. The best full-query hit can land on an
+        # incomplete setup clause (for example, text before a colon), so also
+        # retrieve from the final two content terms. This is only a candidate
+        # expansion; the same evidence gate still decides what may be quoted.
+        terms = [match.group().casefold()
+                 for match in word_matches(question)
+                 if match.group().casefold() not in _RESEARCH_STOPWORDS]
+        if len(terms) >= 2:
+            suffix_query = " ".join(terms[-2:])
+            if suffix_query not in retrieval_queries:
+                retrieval_queries.append(suffix_query)
+    for search_query in retrieval_queries:
+        for hit in index.search(search_query, limit=limit, context_chars=480):
+            document = index.document(hit.document_id)
+            snippet_is_exact = (0 <= hit.start <= hit.end <= len(document.text)
+                                and document.text[hit.start:hit.end] == hit.snippet)
+            if not snippet_is_exact:
                 continue
-            row = _cited_sentence_evidence(
-                index, hit, start, end, tuple(hit.matched_terms))
-            if row is not None:
-                key = (hit.document_id, sentence.casefold())
-                evidence.setdefault(key, row)
+            for local_start, local_end in _sentence_spans(hit.snippet):
+                start = hit.start + local_start
+                end = hit.start + local_end
+                sentence = document.text[start:end]
+                if (_sentence_context_kind(sentence, document.text, start)
+                        != "assertion"):
+                    continue
+                row = _cited_sentence_evidence(
+                    index, hit, start, end, tuple(hit.matched_terms))
+                if row is not None:
+                    key = (hit.document_id, sentence.casefold())
+                    evidence.setdefault(key, row)
     return list(evidence.values())
 
 

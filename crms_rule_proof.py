@@ -31,6 +31,13 @@ def _qualifiers(value: Any) -> tuple[tuple[tuple[str, ...], tuple[str, ...]], ..
     return tuple(sorted(normalized))
 
 
+def _scope_is_within(fact_scope: Any, query_scope: Any) -> bool:
+    """An unscoped assertion is general; scoped assertions need query coverage."""
+    required = dict(_qualifiers(fact_scope))
+    available = dict(query_scope)
+    return all(available.get(name) == value for name, value in required.items())
+
+
 @dataclass(frozen=True)
 class RuleProofCheck:
     valid: bool
@@ -84,10 +91,11 @@ def verify_inference_proof(
                     raise ValueError("proof fact is not present in the snapshot")
                 if _triple(fact) != conclusion_key:
                     raise ValueError("fact leaf does not prove its stated conclusion")
-                fact_scope = _qualifiers(fact.get("qualifiers", ()))
-                if fact_scope != expected_scope:
-                    raise ValueError("fact proof has a different qualifier scope")
-                return conclusion_key, fact_scope
+                if not _scope_is_within(fact.get("qualifiers", ()), expected_scope):
+                    raise ValueError("fact proof is outside the requested qualifier scope")
+                # The leaf supports the requested context, even when the fact
+                # itself is general and therefore carries no qualifier.
+                return conclusion_key, expected_scope
             if kind == "schema":
                 schema = node.get("schema")
                 premises = node.get("premises")
@@ -120,7 +128,8 @@ def verify_inference_proof(
                     raise ValueError("relation-type assertion is not in the fact snapshot")
                 if (_triple(type_fact) != (_key(relation), _key("has relation type"),
                                            _key(schema_spec[0]))
-                        or _qualifiers(type_fact.get("qualifiers", ())) != expected_scope):
+                        or not _scope_is_within(
+                            type_fact.get("qualifiers", ()), expected_scope)):
                     raise ValueError("relation-type assertion does not license this schema")
                 cs, cr, co = conclusion_key
                 if schema_id == "transitivity-v1":
@@ -273,7 +282,7 @@ def _verify_kind_fact(fact: Any,
     if not fact_is_present(fact):
         raise ValueError("middle-kind fact is not present in the fact snapshot")
     if (_triple(fact) != (entity, _key("is-a"), _key(kind))
-            or _qualifiers(fact.get("qualifiers", ())) != expected_scope):
+            or not _scope_is_within(fact.get("qualifiers", ()), expected_scope)):
         raise ValueError("middle-kind fact does not establish the declared kind")
 
 

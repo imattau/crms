@@ -26,6 +26,10 @@ zero one two three four five six seven eight nine ten eleven twelve
 thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty thirty
 forty fifty sixty seventy eighty ninety hundred thousand million
 """.split())
+_QUALITATIVE_AMOUNT_WORDS = frozenset("""
+all almost entirely largely little mostly nearly partly partially
+primarily substantially some
+""".split())
 _MEASURE_UNITS = frozenset("""
 metre metres meter meters m km kilometre kilometres kilometer kilometers
 mile miles foot feet ft inch inches cm mm kg kilogram kilograms tonne tonnes
@@ -68,6 +72,9 @@ def _question_mentions(question: str) -> list[list[str]]:
     for index, word in enumerate(words):
         if index == 0 and word.casefold() in _QUESTION_STARTERS:
             continue
+        # Capitalized first-person "I" is a pronoun, not a named entity.
+        if word.casefold() == "i":
+            continue
         if word[:1].isupper():
             current.append(word)
         elif current and word.casefold() in {"van", "von", "de", "da", "del"}:
@@ -108,6 +115,8 @@ def _answer_type(question: str) -> str | None:
         return "MEASURE"
     if re.search(r"\bhow\s+(many|much)\b", q):
         return "COUNT"
+    if re.match(r"^how\s+(?:can|do|does|should|would)\b", q):
+        return "HOW"
     if re.match(r"^(what|define)\s+(is|are)\b", q) or re.match(
             r"^what\s+(does|do)\b", q):
         return "DEF"
@@ -213,9 +222,13 @@ def _check_candidate(question: str, sentence: str,
 
     q_tokens = _tokens(question)
     sentence_tokens = _tokens(sentence)
+    stripped_sentence = sentence.strip()
     q_words = {word.casefold() for word in q_tokens}
     s_words = {word.casefold() for word in sentence_tokens}
     reasons: list[str] = []
+    first_letter = next((char for char in stripped_sentence if char.isalpha()), "")
+    if (first_letter and first_letter.islower()) or stripped_sentence.endswith((":", ";")):
+        reasons.append("source hit is an incomplete sentence")
     # Numbered entities are common in large or synthetic corpora. Treat an
     # explicit numeric identifier in the question as an identity constraint;
     # without this, high-frequency topical terms can tie records 0000–0009
@@ -242,8 +255,21 @@ def _check_candidate(question: str, sentence: str,
         if not re.search(r"\d[\d,.]*\s*" + unit_pattern, sentence, re.IGNORECASE):
             reasons.append("no number with a recognized unit")
     elif kind == "COUNT":
-        if not re.search(r"\d", sentence) and not (_NUMBER_WORDS & s_words):
+        qualitative_fraction = (
+            re.search(r"\bhow\s+much\s+of\b", question, re.IGNORECASE)
+            and bool(_QUALITATIVE_AMOUNT_WORDS & s_words))
+        if (not qualitative_fraction and not re.search(r"\d", sentence)
+                and not (_NUMBER_WORDS & s_words)):
             reasons.append("no explicit count")
+    elif kind == "HOW":
+        procedure_terms = {
+            "create", "copy", "include", "use", "run", "save", "install",
+            "rebuild", "export", "import", "configure", "provide", "enable",
+            "attach", "pass", "select", "open", "write", "set",
+        }
+        procedure_stems = {_stem(term) for term in procedure_terms}
+        if not any(_stem(word) in procedure_stems for word in sentence_tokens):
+            reasons.append("no procedural action stated")
     elif kind in {"WHO", "WHERE"}:
         capitalized = [word for word in sentence_tokens
                        if word[:1].isupper()
@@ -266,15 +292,33 @@ def _check_candidate(question: str, sentence: str,
             if any(word not in s_words for word in type_tokens):
                 reasons.append("requested location type missing")
     elif kind == "DEF":
-        subject = re.search(r"^(?:what\s+(?:is|are|does|do)|define)\s+(.+?)[?.!]?$",
-                            question.strip(), re.IGNORECASE)
-        if subject is not None:
-            subject_tokens = [_stem(word) for word in _tokens(subject.group(1))
-                              if word.casefold() not in _STOP]
-            first_tokens = {_stem(word) for word in sentence_tokens[:6]}
-            if subject_tokens and not all(word in first_tokens
-                                          for word in subject_tokens):
-                reasons.append("definition subject is not in sentence subject position")
+        missing_definition = re.fullmatch(
+            r"what\s+does\s+(?:(?:a|an|the)\s+)?missing\s+(.+?)\s+mean"
+            r"(?:\s+in\s+.+)?",
+            question.strip().rstrip("?.!"), re.IGNORECASE)
+        if missing_definition is not None:
+            concept = [word.casefold() for word in _tokens(
+                missing_definition.group(1)) if word.casefold() not in _STOP]
+            concept_pattern = r"\s+".join(re.escape(word) for word in concept)
+            absence_definition = bool(
+                concept_pattern
+                and re.search(
+                    rf"\babsence\s+of\s+(?:(?:a|an|the)\s+)?{concept_pattern}\b"
+                    rf".{{0,80}}\b(?:is|means|was)\b",
+                    sentence, re.IGNORECASE))
+            if not absence_definition:
+                reasons.append("source does not define the missing concept")
+        else:
+            subject = re.search(
+                r"^(?:what\s+(?:is|are|does|do)|define)\s+(.+?)[?.!]?$",
+                question.strip(), re.IGNORECASE)
+            if subject is not None:
+                subject_tokens = [_stem(word) for word in _tokens(subject.group(1))
+                                  if word.casefold() not in _STOP]
+                first_tokens = {_stem(word) for word in sentence_tokens[:6]}
+                if subject_tokens and not all(word in first_tokens
+                                              for word in subject_tokens):
+                    reasons.append("definition subject is not in sentence subject position")
 
     q_modifiers = {word.casefold() for word in q_tokens
                    if word.casefold() in _SUPERLATIVES}
@@ -305,6 +349,8 @@ def _check_candidate(question: str, sentence: str,
     # question types require some lexical evidence for the requested relation.
     if kind != "DEF" and content and not overlap:
         reasons.append("no question-relation term in sentence")
+    if kind == "HOW" and len(overlap) < 2:
+        reasons.append("too little question detail matches the procedure")
     if kind == "WHO" and _role_order_mismatch(question, sentence, mentions):
         reasons.append("agent, relation, or object appears in the wrong order")
     return not reasons, reasons, len(overlap)

@@ -196,6 +196,18 @@ def _sentence_spans(text: str) -> list[tuple[int, int]]:
 
     for index, character in enumerate(text):
         if character == "\n":
+            # Markdown and many plain-text sources wrap a single sentence at
+            # line boundaries. Do not turn a lower-case continuation (often
+            # following a colon or comma) into a standalone sentence. Empty
+            # lines and explicit structural markers still split paragraphs.
+            previous = text[start:index].rstrip()
+            following = text[index + 1:].lstrip()
+            line_start = text.rfind("\n", start, index) + 1
+            started_after_sentence = start > line_start
+            if (previous and following
+                    and previous[-1] not in ".!?"
+                    and (following[0].islower() or started_after_sentence)):
+                continue
             append(index)
             start = index + 1
             continue
@@ -235,6 +247,26 @@ def _sentence_span_at(text: str, position: int,
         if boundary < 0:
             break
         if text[boundary] == "\n":
+            line_start = text.rfind("\n", lower_bound, boundary) + 1
+            line_text = text[line_start:boundary].rstrip()
+            following = text[boundary + 1:].lstrip()
+            last_sentence_mark = max(
+                text.rfind(".", line_start, boundary),
+                text.rfind("!", line_start, boundary),
+                text.rfind("?", line_start, boundary))
+            # A line can contain the end of one sentence followed by the
+            # beginning of another that wraps onto the next physical line.
+            # Keep that trailing sentence together (for example, "Create one
+            # portable\\nSQLite model ...") while retaining the punctuation
+            # boundary before it.
+            continued_by_lowercase = (
+                bool(line_text and following)
+                and line_text[-1] not in ".!?"
+                and following[0].islower())
+            if (line_text and (last_sentence_mark >= line_start
+                               or continued_by_lowercase)):
+                cursor = boundary - 1
+                continue
             start = boundary + 1
             break
         if not _is_sentence_boundary(text, boundary):
