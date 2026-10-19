@@ -109,8 +109,13 @@ Findings from the review that change the design:
   [`v1_408_visible_source_referents.py`](../experiments/v1_408_visible_source_referents.py) confirms
   that a follow-up resolves to the one quoted entity and an unshown hit is not retained. Pronoun
   resolution still does not consult entity kind. An ordinal follow-up cannot select a hidden result:
-  when the preceding brief did not show a numbered list, CRMS now says that and asks for more
-  results or an entity name. Selecting among a numbered set of sources remains unsupported.
+  when the preceding brief did not show a numbered list, CRMS says that and asks for more results
+  or an entity name. Explicit plural/list requests can now show up to three ranked, numbered source
+  sentences; an ordinal selects only a citation from that visible list. Dialogue state persists the
+  citation and revalidates it against the current research index on load. Selecting a source returns
+  quoted evidence and does not accept it as a fact. The runtime replay in
+  [v1_409_numbered_source_results.py](../experiments/v1_409_numbered_source_results.py) checks
+  visible-list selection, persistence, citation identity and stale-index rejection.
   The mention heuristic also skips a single capitalized modifier in an indefinite phrase such as
   “a French restaurant” when it is followed by a lowercase noun. This avoids one common false
   referent, but is not named-entity recognition; source-derived referents remain provisional.

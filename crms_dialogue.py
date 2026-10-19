@@ -119,9 +119,14 @@ _FOLLOWUP_ENTITY_RE = re.compile(
 _SOURCE_ORDINAL_FOLLOWUP_RE = re.compile(
     r"^(?:(?:what about|tell me about|tell me more about|"
     r"can you tell me about|can you tell me more about)\s+)"
-    r"(?:the\s+)?(?:first|1st|second|2nd|third|3rd|fourth|4th|last|"
+    r"(?:the\s+)?(?P<ordinal>first|1st|second|2nd|third|3rd|fourth|4th|last|"
     r"other|another)\s+(?:one|option|source|result|item)[?!.]*$",
     flags=re.IGNORECASE)
+_SOURCE_LIST_REQUEST_RE = re.compile(
+    r"\b(?:list|show|find|give\s+me|what\s+are|which\s+are)\b.*\b"
+    r"(?:options|alternatives|results|sources|examples|restaurants)\b|"
+    r"\b(?:options|alternatives|results|sources|examples|restaurants)\b"
+    r".*\b(?:list|show|find)\b", re.IGNORECASE)
 _EXPLANATION_FOLLOWUP_RE = re.compile(
     r"^(?:why(?: is that)?|how do you know(?: that)?|what supports that)"
     r"[?!. ]*$", flags=re.IGNORECASE)
@@ -274,6 +279,8 @@ class CRMSDialogue:
         # Names extracted from the most recently quoted source passage are
         # discourse candidates only; they never become facts or answer evidence.
         self.source_mentions: list[dict[str, str]] = []
+        # Ordinal selection is valid only for citations actually shown as a list.
+        self.presented_sources: list[dict[str, str]] = []
         # Conversation memory that outlives a refused turn. ``clear`` drops
         # referents so a stale pronoun cannot bind; it leaves these alone, and
         # only ``reset_history`` (the explicit /reset) wipes them.
@@ -522,6 +529,7 @@ class CRMSDialogue:
         self.last_timeline_subject = None
         self.last_timeline_order_by = None
         self.source_mentions = []
+        self.presented_sources = []
         self.pending_dialogue_slot = None
         self.open_dialogue_question = None
         self._clear_pending()
@@ -1593,14 +1601,47 @@ class CRMSDialogue:
                 "clarify", question, question,
                 text=("I don't have an open yes/no question in this conversation. "
                       "What would you like to ask or confirm?"))
-        if (_SOURCE_ORDINAL_FOLLOWUP_RE.fullmatch(question)
-                and self.source_mentions):
+        ordinal_match = _SOURCE_ORDINAL_FOLLOWUP_RE.fullmatch(question)
+        if ordinal_match and self.presented_sources and research_index is not None:
+            ordinal = ordinal_match.group("ordinal").casefold()
+            ordinal_map = {"first": 0, "1st": 0, "second": 1, "2nd": 1,
+                           "third": 2, "3rd": 2, "fourth": 3, "4th": 3}
+            position = (len(self.presented_sources) - 1 if ordinal == "last"
+                        else ordinal_map.get(ordinal))
+            if position is None or position >= len(self.presented_sources):
+                return DialogueTurn(
+                    "clarify", question, self.last_question or question,
+                    text=(f"I showed {len(self.presented_sources)} source results. "
+                          "Choose one by its displayed number."))
+            selected = self.presented_sources[position]
+            try:
+                sentence_text = research_index.resolve_citation(selected["citation"])
+                document_id = selected["citation"].partition("#sha256=")[0]
+                document = research_index.document(document_id)
+            except (AttributeError, KeyError, TypeError, ValueError):
+                previous_question = self.last_question or question
+                self.clear()
+                return DialogueTurn(
+                    "clarify", question, previous_question,
+                    text="That source is no longer available in the current index. Please run the search again.")
+            sentence = {"text": sentence_text, "title": document.title,
+                        "citation": selected["citation"],
+                        "location": document.location or document.title}
+            research = ResearchResult("sources_found", source_sentences=[sentence],
+                                      query=self.last_question or question)
+            text = self.knowledge.render_research_brief(research)
+            self.source_mentions = self._source_entity_mentions([sentence])
+            self.presented_sources = [selected]
+            return DialogueTurn("sources_found", question,
+                                self.last_question or question,
+                                research=research, text=text)
+        if ordinal_match and self.source_mentions:
             visible_citations = {item.get("citation", "")
                                  for item in self.source_mentions
                                  if item.get("citation")}
             if len(visible_citations) == 1:
                 text = ("I quoted one source item in my last reply, not a numbered "
-                        "list, so I can't identify another one. Ask me for more "
+                        "list, so I can't identify another one. Ask me to list more "
                         "results or name the source you want to follow up on.")
             else:
                 text = ("I didn't present the source items as a numbered list, "
@@ -1808,6 +1849,24 @@ class CRMSDialogue:
             research = self.knowledge.research(resolved, research_index)
             response = research.response
             text = self.knowledge.render_research_brief(research)
+            if (research.status == "sources_found" and research_index is not None
+                    and _SOURCE_LIST_REQUEST_RE.search(question)):
+                displayable = [item for item in (research.source_sentences or [])
+                               if item.get("text") and item.get("citation")][:3]
+                if displayable:
+                    lines = ["Quoted source results (evidence, not accepted facts):"]
+                    for number, item in enumerate(displayable, 1):
+                        title = item.get("title") or Path(
+                            item.get("location", "source")).name
+                        lines.append(f"{number}. {item['text']}\n   Source: {title}")
+                    choices = ["first", "second", "third"][:len(displayable)]
+                    lines.append("Ask about the " + ", ".join(choices)
+                                 + " result to select it.")
+                    text = "\n".join(lines)
+                    self.presented_sources = [
+                        {"citation": item["citation"],
+                         "title": str(item.get("title") or "source")}
+                        for item in displayable]
             result = DialogueTurn(research.status, question, resolved,
                                  response=response, research=research, text=text)
 
@@ -1839,6 +1898,13 @@ class CRMSDialogue:
                 ]
                 self.source_mentions = self._source_entity_mentions(
                     visible_source_sentences)
+                if (_SOURCE_LIST_REQUEST_RE.search(question)
+                        and visible_source_sentences):
+                    self.presented_sources = [
+                        {"citation": item["citation"],
+                         "title": str(item.get("title") or "source")}
+                        for item in visible_source_sentences[:3]
+                        if item.get("citation")]
                 if self.source_mentions:
                     # Keep only entities from text actually quoted this turn;
                     # they are candidate referents, not accepted knowledge.
@@ -1859,11 +1925,12 @@ class CRMSDialogue:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(
-            json.dumps({"format_version": 19, "last_entity": self.last_entity,
+            json.dumps({"format_version": 20, "last_entity": self.last_entity,
                         "subject_entity": self.subject_entity,
                         "object_entity": self.object_entity,
                         "last_question": self.last_question,
                         "source_mentions": self.source_mentions,
+                        "presented_sources": self.presented_sources,
                         "last_selected_answer": self.last_selected_answer,
                         "last_writing_subject": self.last_writing_subject,
                         "last_writing_request": self.last_writing_request,
@@ -1894,7 +1961,7 @@ class CRMSDialogue:
              ) -> "CRMSDialogue":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
         if payload.get("format_version") not in (
-                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19):
+                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20):
             raise ValueError("unsupported dialogue-state format version")
         dialogue = cls(knowledge, intent_model=intent_model)
         pending_dialogue_slot = payload.get("pending_dialogue_slot")
@@ -2047,6 +2114,25 @@ class CRMSDialogue:
                         "title": indexed_title or title,
                     })
             dialogue.source_mentions = verified_mentions
+            presented_sources = payload.get("presented_sources", [])
+            if not isinstance(presented_sources, list) or len(presented_sources) > 3:
+                raise ValueError("stored presented source list is malformed")
+            verified_sources = []
+            for item in presented_sources:
+                if (not isinstance(item, dict)
+                        or not isinstance(item.get("citation"), str)
+                        or not isinstance(item.get("title", "source"), str)):
+                    raise ValueError("stored presented source is malformed")
+                citation = item["citation"]
+                try:
+                    research_index.resolve_citation(citation)
+                    document_id = citation.partition("#sha256=")[0]
+                    indexed_title = research_index.document(document_id).title
+                except (AttributeError, KeyError, TypeError, ValueError):
+                    continue
+                verified_sources.append({"citation": citation,
+                                         "title": indexed_title or item.get("title", "source")})
+            dialogue.presented_sources = verified_sources
         selected_answer = payload.get("last_selected_answer")
         if selected_answer is not None:
             if not isinstance(selected_answer, str):
