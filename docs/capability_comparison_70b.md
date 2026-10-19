@@ -27,6 +27,11 @@ and thinking modes, 119 languages and dialects, coding, and agentic use; the
 These are developer descriptions and evaluations, not independent guarantees
 of correctness. [Llama 3.3 70B model card](https://github.com/meta-llama/llama-models/blob/main/models/llama3_3/MODEL_CARD.md),
 [Qwen3 model documentation](https://github.com/QwenLM/Qwen3/blob/main/docs/source/getting_started/concepts.md).
+For a concrete scale reference, Meta reports Llama 3.3 70B Instruct scores of
+92.1 on IFEval, 88.4 pass@1 on HumanEval, 50.5 on GPQA Diamond, and 77.0 on
+MATH. These are the model developer's results under the model-card protocols;
+they are not directly comparable with CRMS's smaller, differently constructed
+experiments or a claim of equal performance. [Llama 3.3 model-card results](https://github.com/meta-llama/llama-models/blob/main/models/llama3_3/MODEL_CARD.md).
 
 ## What the user typically experiences
 
