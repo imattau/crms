@@ -284,6 +284,7 @@ def main() -> None:
                        "learned-grandparent [needs_review]",
                        "user marked an answer using it wrong", "Feedback ",
                        "Current rule review signal (held-out learned)",
+                       "User-feedback review signal (held-out learned)",
                        "does not alter proof or answer selection"):
             require(phrase in run.stdout,
                     f"interactive feedback omitted {phrase!r}: {run.stdout}")

@@ -70,7 +70,8 @@ opposite post-restart signals remain a reviewable conflict.
 answer context. Facts remain protected because provenance class cannot be inferred from a feedback
 reference alone; held-out-validated learned rules are adjustable, while teacher-supplied rules remain
 protected. Duplicate feedback cannot update the ledger twice. `/feedback` labels these values as
-review-only and states they do not alter proof or answer selection. The feedback system now
+review-only and states they do not alter proof or answer selection; `/inference-rules` shows the
+current signal next to each rule to support human review. The feedback system now
 covers direct facts, inference, translation, math, code generation, extractive summaries, paper
 authors/results, entity summaries, and timelines. Translation feedback fingerprints the aligned frame and examples;
 math feedback fingerprints the expression, exact result, and licensed operator/number/unit evidence;

@@ -6759,6 +6759,18 @@ def main() -> int:
                 print(f"{rule['rule_id']} [{item['status']}]: "
                       f"{' then '.join(premises)} entails "
                       f"{rule['conclusion_relation']}{typed}.")
+                ledger_state = feedback_store.ledger_item(
+                    "rule", rule["rule_id"])
+                if ledger_state is not None:
+                    source = ("held-out learned" if not ledger_state["protected"]
+                              else "protected")
+                    print(
+                        f"  User-feedback review signal ({source}): "
+                        f"weight {ledger_state['weight']:.3f}, "
+                        f"{ledger_state['hits']} confirming / "
+                        f"{ledger_state['misses']} rejecting; "
+                        f"{ledger_state['status']}. Review-only; it does not "
+                        "change whether the rule proves a conclusion.")
                 validation = item.get("validation") or {}
                 for counterexample in validation.get("counterexamples", []):
                     sources = ", ".join(counterexample.get("negative_sources", []))
