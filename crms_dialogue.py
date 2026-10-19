@@ -420,6 +420,8 @@ class CRMSDialogue:
             slot = self.open_dialogue_question.get("expected_slot", "unknown")
             if slot != "unknown":
                 context.add(f"awaiting_slot_{slot}")
+            if slot == "confirmation":
+                context.add("awaiting_confirmation")
         for slot in self.session_slots:
             context.add(f"has_session_slot_{slot}")
         if self.pending_binding is not None:
@@ -431,7 +433,16 @@ class CRMSDialogue:
         if not open_task and self.last_answered:
             context.add("task_complete")
         predecessor = None
-        if self.history:
+        if (self.open_dialogue_question is not None
+                and self.open_dialogue_question.get("expected_slot")
+                == "confirmation"):
+            predecessor = "confirmation-request"
+        elif self.open_dialogue_question is not None:
+            # The open QUD was created from an assistant clarification. Keep
+            # that move distinct from a completed answer, even though both
+            # are represented by the preceding turn's runtime status.
+            predecessor = "clarification-request"
+        elif self.history:
             predecessor = {
                 "answered": "answer", "ambiguous": "clarification-request",
                 "clarify": "clarification-request", "learned": "action-result",

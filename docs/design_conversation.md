@@ -471,7 +471,7 @@ The numbering is changed from the first draft because phase 0 is largely done.
    `him` and `she` to the right referent.
 1. **Discourse state.** Turn history, `last_answered`, `shown`, active task intent, a bounded
   turn-intent trace, session task-slot values, and the current assistant clarification QUD are
-  saved in dialogue-state format version 19 with older versions still loading. A single typed
+  saved in dialogue-state format version 20 with older versions still loading. A single typed
    `elaboration_topic` slot also
    persists and is validated; see `experiments/v1_375_contextual_elaboration_slot.py`,
    `experiments/v1_386_session_intent_context.py`, and

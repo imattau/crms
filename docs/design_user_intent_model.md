@@ -25,7 +25,12 @@ recent bounded intent trace without adding diagnostics to ordinary answers. Sele
 retained in inspectable session state; ambiguous or unlicensed hypotheses cannot replace the
 active goal. Social turns preserve it, while an explicit end-interaction or `/reset` clears it. This
 is a context predicate for licensed frames, not broad task-slot understanding or authorization to
-act. The trace and last hypothesis are saved in dialogue-state format 19 and validated when reloaded.
+act. The trace and last hypothesis are saved in dialogue-state format 20 and validated when reloaded.
+An open confirmation prompt now exposes both `awaiting_confirmation` and predecessor
+`confirmation-request`; an ordinary yes/no question remains `awaiting_yes_no_answer` with
+predecessor `clarification-request`. Portable intent frames can therefore condition on the prompt's
+function, not just the shared yes/no answer shape. Positive and negative checks are in
+[`v1_410_contextual_confirmation_intent.py`](../experiments/v1_410_contextual_confirmation_intent.py).
 `experiments/v1_386_session_intent_context.py` checks that the active-task predicate actually
 licenses a matching portable frame, survives reload, remains bounded, and clears on explicit end
 or reset; `experiments/v1_365_contextual_clarification_intent.py` checks the existing clarification
@@ -147,7 +152,7 @@ The runtime now also retains one typed open dialogue slot:
 which entity with accepted facts to elaborate on. A bare entity name is then classified as an answer
 to that question and routed to the accepted-fact overview; an unmatched name gets a clarification,
 not a corpus lookup. A new question supersedes the slot, and “never mind” cancels it. This bounded
-slot is persisted in dialogue-state format 19 and rejects unknown slot values on load. The exact
+slot is persisted in dialogue-state format 20 and rejects unknown slot values on load. The exact
 assistant clarification prompt is retained as a bounded QUD with a `detail` or `yes-no` answer kind
 and an expected-slot type such as `location`, `party_size`, `date_time`, `seating`, or `cuisine`.
 Typed slots are exposed to portable intent frames through predicates such as
@@ -498,7 +503,7 @@ confirmation gates.
 The runtime now stores the broad active goal separately from a narrow current subgoal. For example,
 while `make-reservation` is the user's goal, a restaurant-preference answer can be recorded as the
 `provide-constraint` subgoal without replacing the reservation goal. Both are exposed to contextual
-intent frames and `/intent`, and both are bounded, session-only state. Dialogue-state format 19
+intent frames and `/intent`, and both are bounded, session-only state. Dialogue-state format 20
 persists the subgoal; older saves load with no subgoal. The current subgoal vocabulary is limited to
 `provide-constraint`, `seek-information`, and `check-availability`, and a subgoal is set only when a
 broad goal is already active. The turn hypothesis now has an optional `goal_intent` alongside its
