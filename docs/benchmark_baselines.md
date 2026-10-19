@@ -249,6 +249,14 @@ It also transfers the learned connective to the unseen `remove duplicate
 values then sort` pair before applying exact division. Missing list or math
 support abstains. This checks a small cross-product of learned sequence and
 math stages, not arbitrary task planning or broader coding parity.
+The 2026-10-20 extension adds two unseen three-operation list sequences before
+the math stage. On the untrained input `[4, 1, 4, 2]`,
+`remove duplicates → sort → reverse → x*x+3` returns `[19, 7, 4]`; a different
+ordering followed by exact division returns `[1/2, 1, 2]`. The regression
+checks the three-operation order, composed validation probes, exact rational
+results, and the same three-stage request through chat. This demonstrates a
+bounded longer composition over already learned primitives, not open-ended
+program synthesis or broad coding competence.
 The chat response now identifies whether the unsupported component is the
 list procedure or math expression, suggests a matching teaching/rephrasing
 step, and clears stale generated-code context so an explanation follow-up

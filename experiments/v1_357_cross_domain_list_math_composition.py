@@ -167,6 +167,40 @@ def main() -> None:
             and "remove duplicate values"
                 in unseen_pair_artifact.evidence_phrases,
             "unseen list-pair composition returned wrong output or lost evidence")
+    unseen_triple_request = (
+        "remove duplicate values then sort the list then reverse the list then "
+        "apply x times x plus 3 to each value")
+    unseen_triple_artifact = generate_list_then_math_python(
+        rules, math, unseen_triple_request)
+    require(unseen_triple_artifact is not None,
+            "three learned list operations did not compose with exact math")
+    unseen_triple_namespace: dict[str, object] = {}
+    exec(compile(unseen_triple_artifact.source,
+                 "<crms-cross-domain-unseen-triple>", "exec"),
+         unseen_triple_namespace)
+    triple_procedure = unseen_triple_namespace["LIST_PROVENANCE"]["procedure"]
+    require(unseen_triple_namespace["transform"]([4, 1, 4, 2]) == [19, 7, 4]
+            and unseen_triple_namespace["validate_examples"]()
+            and [step["operation"] for step in triple_procedure]
+                == ["stable_unique", "sort_ascending", "reverse"]
+            and unseen_triple_artifact.validation_cases >= 4,
+            "three-stage unseen composition has wrong output, order, or probes")
+    unseen_triple_rational = generate_list_then_math_python(
+        rules, math,
+        "reverse the list then remove duplicate values then sort the list "
+        "then apply x divided by 2 to each value")
+    require(unseen_triple_rational is not None,
+            "a different three-stage sequence did not compose with division")
+    rational_triple_namespace: dict[str, object] = {}
+    exec(compile(unseen_triple_rational.source,
+                 "<crms-cross-domain-rational-triple>", "exec"),
+         rational_triple_namespace)
+    require(rational_triple_namespace["transform"]([4, 1, 4, 2])
+            == [Fraction(1, 2), Fraction(1), Fraction(2)]
+            and rational_triple_namespace["validate_examples"]()
+            and len(rational_triple_namespace["LIST_PROVENANCE"]["procedure"])
+                == 3,
+            "three-stage fractional composition lost exact values or validation")
     evidence = show_generated_code_evidence(artifact)
     require("learned list procedure" in describe_generated_code(artifact)
             and "Generated composed Python" in render(artifact, REQUEST)
@@ -211,6 +245,9 @@ def main() -> None:
             input=("Could you please write me a Python function that "
                    f"{REQUEST_VARIANTS[1]}?\nExplain that code\n"
                    "Show the examples for that code\n"
+                   "Write Python code to remove duplicate values then sort "
+                   "the list then reverse the list then apply x times x plus "
+                   "3 to each value\nExplain that code\n"
                    "Write Python code to sort the list then apply x zarg 3 to "
                    "each value\nExplain that code\n"
                    "Write Python code to rotate the list then apply x times x "
@@ -219,6 +256,8 @@ def main() -> None:
         require(run.returncode == 0
                 and "Generated composed Python" in run.stdout
                 and "Both stages" in run.stdout
+                and "stable_unique" in run.stdout
+                and "reverse" in run.stdout
                 and "Evidence for generated artifact crms-code-v1-" in run.stdout
                 and "sort the list then reverse the values" in run.stdout
                 and "plus" in run.stdout and "times" in run.stdout
@@ -239,6 +278,7 @@ def main() -> None:
           "fractional output and lineage: PASS")
     print("learned connective transferred to a new list-operation pair before "
           "exact division: PASS")
+    print("three unseen list operations compose in order with exact math and lineage: PASS")
     print("natural-language chat generation, explanation, and evidence: PASS")
 
 
