@@ -1,7 +1,7 @@
 # Design: improving natural language handling (answer-type gate, paraphrase tolerance, polar entailment, pronouns)
 
 **Audience:** the developer (human or AI) implementing this.
-**Status:** proposed; the quoted-evidence gate and FTS fallback are implemented. The benchmark
+**Status:** staged; the quoted-evidence gate and FTS fallback are implemented. The benchmark
 ideas below were prototyped as a *wrapper around the unmodified engine* in a scratch folder and
 measured on three question sets (section 2). The live gate applies to quoted source evidence,
 checks named mentions, answer type, lexical relation support and required superlatives, and can
@@ -451,6 +451,16 @@ choosing among sentences the gate has already accepted.
 - Update the README so it states plainly that a small learned ranker exists (it currently says no
   AI model is needed or downloaded; a shipped weights record is not a download, but the wording
   must not imply there are no learned weights).
+
+**Pilot implementation status (2026-10-19).** `crms_sentence_ranker.py` now provides a small,
+versioned logistic model, deterministic training, source IDs and a training-data digest, named
+feature traces, and threshold abstention. Its public ranking path first applies the unchanged
+quoted-evidence gate. `experiments/v1_345_sentence_ranker_pilot.py` checks those mechanics on a
+controlled fixture. This is not the ranker-quality evaluation described above: it does not use
+FTS-retrieved training and test candidates, does not measure fresh-corpus accuracy or latency, and
+is not connected to normal chat. Model scores are not calibrated probabilities yet. Keep the
+ranker disabled in chat until those conditions are measured; its results must not be described as
+an improvement to user-facing accuracy.
 
 *Staged route.* (1) The feature-based ranker tested here. (2) A learned table of wording
 equivalences that is only ever a proposal for human review (section 3.6). (3) Embeddings as a

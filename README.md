@@ -54,6 +54,8 @@ Other things it can currently do:
 - Learn small rules from examples, such as how to reverse or reshape a list of
   numbers.
 - Learn new ways of phrasing questions, with your approval.
+- Experiment with an inspectable sentence-ranker pilot. It is not enabled in
+  normal chat and does not replace source checks.
 - Hold simple conversations that remember what you were just talking about.
 
 ## What it can't do (yet)

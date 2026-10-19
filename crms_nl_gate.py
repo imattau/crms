@@ -303,20 +303,46 @@ def gate_quoted_evidence(question: str, candidates: list[dict[str, Any]], *,
         return {"status": "no_candidates", "evidence": None, "reasons": []}
 
     licensed_predicates = licensed_predicates or []
-    checked = []
-    for row in unique.values():
-        sentence = str(row.get("text", ""))
-        accepted, reasons, score = _check_candidate(
-            question, sentence, licensed_predicates)
-        if accepted:
-            checked.append((score, row))
+    checked = gate_passing_candidates(
+        question, list(unique.values()),
+        licensed_predicates=licensed_predicates)
     if not checked:
         first = next(iter(unique.values()))
         _accepted, reasons, _score = _check_candidate(
             question, str(first.get("text", "")), licensed_predicates)
         return {"status": "rejected", "evidence": first, "reasons": reasons}
-    checked.sort(key=lambda item: item[0], reverse=True)
-    if len(checked) > 1 and checked[0][0] == checked[1][0]:
+    if len(checked) > 1 and checked[0]["gate_score"] == checked[1]["gate_score"]:
         return {"status": "ambiguous", "evidence": None,
                 "reasons": ["multiple equally supported source sentences"]}
-    return {"status": "accepted", "evidence": checked[0][1], "reasons": []}
+    selected = {key: value for key, value in checked[0].items()
+                if key != "gate_score"}
+    return {"status": "accepted", "evidence": selected, "reasons": []}
+
+
+def gate_passing_candidates(
+        question: str, candidates: list[dict[str, Any]], *,
+        licensed_predicates: list[dict[str, Any]] | None = None
+        ) -> list[dict[str, Any]]:
+    """Return every unique sentence that passes the exact evidence gate.
+
+    This exposes the gate's eligible set for diagnostics and opt-in ranker
+    experiments. It does not choose an answer or relax any acceptance check.
+    """
+    if not supports_question_type(question):
+        return []
+    licensed_predicates = licensed_predicates or []
+    unique: dict[str, dict[str, Any]] = {}
+    for row in candidates:
+        sentence = str(row.get("text", "")).strip()
+        if sentence:
+            unique.setdefault(sentence.casefold(), row)
+    checked = []
+    for row in unique.values():
+        accepted, _reasons, score = _check_candidate(
+            question, str(row.get("text", "")), licensed_predicates)
+        if accepted:
+            checked.append((score, row))
+    checked.sort(key=lambda item: (-item[0],
+                                   str(item[1].get("citation", "")),
+                                   str(item[1].get("text", "")).casefold()))
+    return [{**row, "gate_score": score} for score, row in checked]
