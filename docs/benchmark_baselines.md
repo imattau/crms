@@ -852,7 +852,10 @@ explicit negative reverse facts as counterexamples, keeps missing reverse statem
 requires multiple independent source origins before describing support as uncontradicted. A
 contradictory pair retains both its positive and negative evidence. Search bounds are reported, and
 the interactive command is verified to leave the knowledge store unchanged. This is a proposal
-generator, not a held-out validation or an automatic schema learner.
+generator, not an automatic schema learner. `experiments/v1_381_heldout_schema_review.py` checks
+source-separated validation, explicit held-out counterexamples, missing reverse evidence, and the
+interactive report-only path. Passing the configured holdout threshold is evidence for these
+controlled cases, not proof of a universal relation property.
 
 ## Cross-shape reasoning graph baseline
 

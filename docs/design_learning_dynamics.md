@@ -644,11 +644,13 @@ declared rule data only when the proof format can verify their direction and pro
   `crms_schema_learning.py` and exposed as `/suggest-relation-schemas`. It requires explicit
   reciprocal positives for support, records explicit negative reverse edges as counterexamples,
   and reports one-way observations as unknown. It includes citations and independent-origin counts
-  and never installs a declaration. Its `uncontradicted` status describes only the observed,
-  explicitly labeled pairs; there is no held-out schema-validation gate yet. Candidate output must
-  remain a proposal, not evidence that symmetry is generally true. Functional, inverse, and
-  sub-relation proposals remain open, and graph shape alone must not imply any schema. Keep
-  derivation schemas separate from integrity constraints in proposal wording and proof semantics.
+  and never installs a declaration. `/review-relation-schemas HOLDOUT_SOURCE_PREFIX` now discovers
+  on non-holdout sources and reports validation on a source-separated partition. Its `validated`
+  status means only that the configured evidence and thresholds passed for this controlled
+  candidate; it does not establish universal symmetry or auto-install a declaration. Functional,
+  inverse, and sub-relation proposals remain open, and graph shape alone must not imply any schema.
+  Keep derivation schemas separate from integrity constraints in proposal wording and proof
+  semantics.
 - `experiments/v1_307_sqlite_rule_discovery_scale.py` exercises sparse synthetic stores up to
   300,000 facts and checks in-memory/SQLite parity. That does not establish performance on a full
   288,000-document package: report the package's fact count, connectivity, expansions, and bound
@@ -667,3 +669,22 @@ declared rule data only when the proof format can verify their direction and pro
   Profile them on recursive and high-degree graphs before hoisting shared indexes; preserve bounds,
   deterministic results, and independent proof checks. Numeric comparisons and counting belong to
   the deferred Datalog body and exact-math integration design.
+
+### 8.6 Dialogue and contextual user intent
+
+Dialogue is a priority research area. User intent belongs in the CRMS model as a contextual,
+revisable hypothesis: interpretation depends on the utterance plus explicit discourse state (open
+questions, pending choices or offers, current topic and referents, previous move, and the answer or
+claim under discussion). A phrase such as “yes”, “tell me more”, or “that’s wrong” does not have
+one context-free intent. The current `UserIntentHypothesis` and contextual rules are an inspectable
+baseline, not evidence that CRMS has learned dialogue understanding.
+
+The next research step is to evaluate induced move frames and move sequences against that baseline.
+Use dialogue corpora with source-separated holdout and independently reviewed labels; keep each
+prediction's matched frame and context predicates inspectable; and require clarification or
+abstention when context is absent or multiple intents remain plausible. Test paired cases with the
+same wording under different contexts, plus misleading and incomplete contexts. Report correct
+intent resolution, useful clarification, and inappropriate action rates separately. Dialogue model
+artifacts may contain validated frames and transition knowledge, but session-specific discourse
+state remains local and must not be packaged as general knowledge. A learned intent prediction
+must not alter factual evidence or accepted knowledge by itself.

@@ -30,7 +30,8 @@ from crms_rule_proof import (verify_closed_world_denial,
                              verify_constraint_denial,
                              verify_inference_proof)
 from crms_schema_learning import (
-    RelationSchemaDiscovery, discover_relation_schema_candidates,
+    RelationSchemaDiscovery, RelationSchemaReviewResult,
+    discover_relation_schema_candidates, review_relation_schema_candidates,
 )
 from crms_fact_store import SQLiteFactMap
 from crms_schema import (CLOSED_WORLD_SCHEMA, RELATION_SCHEMA_SPECS,
@@ -2626,6 +2627,70 @@ class CRMSKnowledgeBase:
         lines.append(
             "No schema was stored. Review the cited examples; if appropriate, "
             "declare it explicitly with /teach-relation-type.")
+        return "\n".join(lines)
+
+    def review_relation_schemas(self, validation_source_prefix: str, *,
+                                min_support: int = 2,
+                                min_validation_support: int = 2,
+                                min_label_coverage: float = 0.5,
+                                min_precision_lower_bound: float = 0.25,
+                                max_expansions: int = 100_000,
+                                research_index: Any | None = None,
+                                origin_map: Mapping[str, str] | None = None
+                                ) -> RelationSchemaReviewResult:
+        return review_relation_schema_candidates(
+            (asdict(fact) for fact in self.facts()),
+            negative_facts=(asdict(fact) for fact in self.negative_facts()),
+            validation_source_prefix=validation_source_prefix,
+            min_support=min_support,
+            min_validation_support=min_validation_support,
+            min_label_coverage=min_label_coverage,
+            min_precision_lower_bound=min_precision_lower_bound,
+            max_expansions=max_expansions,
+            research_index=research_index, origin_map=origin_map)
+
+    @staticmethod
+    def render_relation_schema_reviews(
+            result: RelationSchemaReviewResult) -> str:
+        completeness = ("complete" if result.complete
+                        else "incomplete: expansion limit reached")
+        lines = [f"Relation-schema review {completeness}; "
+                 f"{result.expansions} reciprocal-pair checks."]
+        if not result.reviews:
+            lines.append("No training candidates met the support threshold.")
+        for number, review in enumerate(result.reviews, 1):
+            candidate, validation = review.candidate, review.validation
+            coverage = (f"{validation.label_coverage:.1%}"
+                        if validation.label_coverage is not None
+                        else "unavailable")
+            precision_lcb = (
+                f"{validation.precision_lower_bound:.1%}"
+                if validation.precision_lower_bound is not None
+                else "unavailable")
+            lines.append(
+                f"Candidate {number} [{validation.status}; "
+                f"training={candidate.status}]: relation {candidate.relation} "
+                f"may be symmetric; training-support="
+                f"{len(candidate.positive_examples)}, "
+                f"holdout-positive={len(validation.positive_examples)}, "
+                f"holdout-negative={len(validation.negative_examples)}, "
+                f"holdout-unknown={validation.unknown_reverse_pairs}, "
+                f"holdout-coverage={coverage}, "
+                f"holdout-precision-lcb95={precision_lcb}, "
+                f"independent-origins={len(validation.independent_sources)}.")
+            for label, examples in (
+                    ("holdout-positive", validation.positive_examples),
+                    ("holdout-negative", validation.negative_examples)):
+                for example in examples:
+                    first, reverse = example["first"], example["conclusion"]
+                    lines.append(
+                        f"  {label}: {first['subject']} — {first['relation']} → "
+                        f"{first['object']} [{', '.join(first['sources'])}]; "
+                        f"{reverse['subject']} — {reverse['relation']} → "
+                        f"{reverse['object']} [{', '.join(reverse['sources'])}]")
+        lines.append(
+            "Review is evidence only; no schema was stored. A validated "
+            "candidate still requires an explicit /teach-relation-type decision.")
         return "\n".join(lines)
 
     def review_inference_rules(self, validation_source_prefix: str, *,

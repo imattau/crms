@@ -47,6 +47,32 @@ Observed in two short driving sessions (about 30 turns, small corpus, committed 
 - **A scope message may replace an abstention message, never an answer.**
 - **Deterministic.** Same input, same output.
 
+## 1.1 User intent is part of the dialogue model
+
+CRMS should represent user intent as a **contextual, revisable hypothesis**, not as a
+standalone label attached to the latest sentence. The same words can do different work in
+different dialogue states: “yes” may accept an offer, select an option, confirm a claim, or
+acknowledge receipt; “tell me more” needs a current topic; “that’s wrong” needs a prior answer or
+claim to repair. Intent resolution should therefore use the current utterance together with an
+explicit, bounded discourse state: open questions and offers, pending choices, current topic and
+referents, the previous move, and the last answer or claim under discussion.
+
+Store the result as a hypothesis with its matched frame, context predicates, selected value or
+alternatives, and decision (`selected`, `ambiguous`, or `uncertain`). Keep the evidence for the
+utterance separate from the contextual evidence. A hypothesis about what the user wants must not
+be treated as a fact about the world or silently overwrite conversation state. If context supports
+multiple intents, ask a targeted clarification or continue the content path conservatively.
+
+This is already partially reflected by `UserIntentHypothesis` and the explicit contextual rules in
+`crms_conversation.py`, but the runtime is still a hand-written baseline, not a learned intent
+model. Dialogue is a priority research area: test whether move frames and transition patterns can
+be induced from dialogue corpora, with source-separated holdout, independent origins, auditable
+labels, and abstention when the current context does not license a move. Keep session context local
+to the conversation; a distributable model may carry validated dialogue knowledge and move frames,
+not a user's private turn history. Compare the learned route against the current rules on paired
+contexts where identical wording should resolve differently, plus misleading-context and missing-
+context cases. Measure correct resolution, clarification quality, and inappropriate action rate.
+
 ## 2. Tested ideas
 
 Method: the same 204 benchmark questions as in the NL design doc (three small corpora), plus

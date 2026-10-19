@@ -192,6 +192,8 @@ HELP = """Commands:
                  discover/review rules; arity=3 enables typed three-premise search
   /suggest-relation-schemas [MIN_SUPPORT]
                  report reciprocal evidence for symmetric relations; never installs a schema
+  /review-relation-schemas HOLDOUT_SOURCE_PREFIX
+                 validate symmetric candidates on disjoint source records; never installs a schema
   /accept-inference-rule N|ID|HOLDOUT_SOURCE_PREFIX[|arity=3]
                  install a candidate only after passing holdout validation
   /inference-rules
@@ -6848,6 +6850,20 @@ def main() -> int:
             except (TypeError, ValueError) as error:
                 print("Could not discover relation-schema candidates: "
                       f"{error}")
+            continue
+        if (line == "/review-relation-schemas"
+                or line.startswith("/review-relation-schemas ")):
+            prefix = line[len("/review-relation-schemas"):].strip()
+            if not prefix:
+                print("Use: /review-relation-schemas HOLDOUT_SOURCE_PREFIX")
+                continue
+            try:
+                review = knowledge.review_relation_schemas(
+                    prefix, research_index=index)
+                print("CRMS> " + knowledge.render_relation_schema_reviews(
+                    review))
+            except (TypeError, ValueError) as error:
+                print(f"Could not review relation-schema candidates: {error}")
             continue
         if line.startswith("/accept-inference-rule "):
             fields = [value.strip() for value in

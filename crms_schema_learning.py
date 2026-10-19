@@ -36,6 +36,32 @@ class RelationSchemaDiscovery:
     expansions: int
 
 
+@dataclass(frozen=True)
+class RelationSchemaValidation:
+    status: str
+    positive_examples: tuple[dict[str, Any], ...]
+    negative_examples: tuple[dict[str, Any], ...]
+    unknown_reverse_pairs: int
+    complete: bool
+    expansions: int
+    independent_sources: tuple[str, ...] = ()
+    label_coverage: float | None = None
+    precision_lower_bound: float | None = None
+
+
+@dataclass(frozen=True)
+class RelationSchemaReview:
+    candidate: RelationSchemaCandidate
+    validation: RelationSchemaValidation
+
+
+@dataclass(frozen=True)
+class RelationSchemaReviewResult:
+    complete: bool
+    reviews: tuple[RelationSchemaReview, ...]
+    expansions: int
+
+
 def _key(value: str) -> tuple[str, ...]:
     return tokens(re.sub(r"[-‐‑‒–—]", " ", value))
 
@@ -217,3 +243,220 @@ def discover_relation_schema_candidates(
         _key(candidate.relation), candidate.qualifiers,
         candidate.status, -len(candidate.positive_examples)))
     return RelationSchemaDiscovery(complete, tuple(candidates), expansions)
+
+
+def _wilson_lower_bound(successes: int, failures: int, *,
+                        z: float = 1.96) -> float | None:
+    total = successes + failures
+    if total == 0:
+        return None
+    rate = successes / total
+    z2 = z * z
+    denominator = 1.0 + z2 / total
+    center = rate + z2 / (2.0 * total)
+    margin = z * ((rate * (1.0 - rate) / total)
+                  + (z2 / (4.0 * total * total))) ** 0.5
+    return max(0.0, (center - margin) / denominator)
+
+
+def validate_relation_schema_candidate(
+        candidate: RelationSchemaCandidate, *,
+        validation_facts: Iterable[Mapping[str, Any]],
+        validation_negative_facts: Iterable[Mapping[str, Any]],
+        min_positive_examples: int = 2,
+        min_label_coverage: float = 0.5,
+        min_precision_lower_bound: float = 0.25,
+        max_expansions: int = 100_000,
+        research_index: Any | None = None,
+        origin_map: Mapping[str, str] | None = None
+        ) -> RelationSchemaValidation:
+    """Validate a symmetric candidate only on a disjoint source partition."""
+    for name, value in (("min_positive_examples", min_positive_examples),
+                        ("max_expansions", max_expansions)):
+        if not isinstance(value, int) or isinstance(value, bool) or value < 1:
+            raise ValueError(f"{name} must be a positive integer")
+    for name, value in (("min_label_coverage", min_label_coverage),
+                        ("min_precision_lower_bound",
+                         min_precision_lower_bound)):
+        if (not isinstance(value, (int, float)) or isinstance(value, bool)
+                or not 0.0 <= value <= 1.0):
+            raise ValueError(f"{name} must be between 0 and 1")
+    if candidate.status == "incomplete":
+        return RelationSchemaValidation("training-incomplete", (), (), 0,
+                                        False, 0)
+    if candidate.negative_examples:
+        return RelationSchemaValidation("training-contradicted", (), (), 0,
+                                        True, 0)
+    if candidate.status != "uncontradicted":
+        return RelationSchemaValidation(
+            "training-insufficient-independent-sources", (), (), 0, True, 0)
+
+    relation = _key(candidate.relation)
+    scope = _qualifiers(candidate.qualifiers)
+    train_keys = set()
+    for example in candidate.positive_examples:
+        for field in ("first", "conclusion"):
+            row = _fact(example[field])
+            train_keys.add((_key(row["subject"]), _key(row["relation"]),
+                            _key(row["object"]), _qualifiers(row["qualifiers"])))
+    positives = []
+    negatives = []
+    for raw in validation_facts:
+        row = _fact(raw)
+        key = (_key(row["subject"]), _key(row["relation"]),
+               _key(row["object"]), _qualifiers(row["qualifiers"]))
+        if key in train_keys:
+            return RelationSchemaValidation("overlap", (), (), 0, True, 0)
+        if key[1] == relation and key[3] == scope:
+            positives.append(row)
+    for raw in validation_negative_facts:
+        row = _fact(raw)
+        key = (_key(row["subject"]), _key(row["relation"]),
+               _key(row["object"]), _qualifiers(row["qualifiers"]))
+        if key in train_keys:
+            return RelationSchemaValidation("overlap", (), (), 0, True, 0)
+        if key[1] == relation and key[3] == scope:
+            negatives.append(row)
+
+    positive_index: dict[tuple[Any, ...], dict[str, Any]] = {}
+    negative_index: dict[tuple[Any, ...], dict[str, Any]] = {}
+    for row, target in ([(row, positive_index) for row in positives]
+                        + [(row, negative_index) for row in negatives]):
+        key = (_key(row["subject"]), _key(row["relation"]),
+               _key(row["object"]), _qualifiers(row["qualifiers"]))
+        target[key] = row
+
+    positive_examples: dict[tuple[Any, ...], dict[str, Any]] = {}
+    negative_examples: dict[tuple[Any, ...], dict[str, Any]] = {}
+    unknown: set[tuple[Any, ...]] = set()
+    seen: set[tuple[Any, ...]] = set()
+    expansions = 0
+    complete = True
+    for subject, row_relation, obj, row_scope in sorted(positive_index):
+        if subject == obj:
+            continue
+        pair = (min(subject, obj), max(subject, obj))
+        if pair in seen:
+            continue
+        if expansions >= max_expansions:
+            complete = False
+            break
+        expansions += 1
+        seen.add(pair)
+        left, right = pair
+        positive_lr = positive_index.get((left, row_relation, right, row_scope))
+        positive_rl = positive_index.get((right, row_relation, left, row_scope))
+        negative_lr = negative_index.get((left, row_relation, right, row_scope))
+        negative_rl = negative_index.get((right, row_relation, left, row_scope))
+        if positive_lr is not None and positive_rl is not None:
+            positive_examples[pair] = {
+                "first": positive_lr, "conclusion": positive_rl}
+        if positive_lr is not None and negative_rl is not None:
+            negative_examples[pair] = {
+                "first": positive_lr, "conclusion": negative_rl}
+        elif positive_rl is not None and negative_lr is not None:
+            negative_examples[pair] = {
+                "first": positive_rl, "conclusion": negative_lr}
+        if ((positive_lr is not None) != (positive_rl is not None)
+                and ((positive_lr is not None and negative_rl is None)
+                     or (positive_rl is not None and negative_lr is None))):
+            unknown.add(pair)
+
+    ordered_positive = tuple(positive_examples[key]
+                             for key in sorted(positive_examples))
+    ordered_negative = tuple(negative_examples[key]
+                             for key in sorted(negative_examples))
+    labeled_pairs = set(positive_examples) | set(negative_examples)
+    label_total = len(labeled_pairs) + len(unknown)
+    label_coverage = (len(labeled_pairs) / label_total if label_total else None)
+    precision_lcb = _wilson_lower_bound(
+        len(positive_examples), len(negative_examples))
+    sources = [source for example in ordered_positive
+               for field in ("first", "conclusion")
+               for source in example[field]["sources"]]
+    independent, available, _copied = independent_origin_support(
+        sources, research_index=research_index, origin_map=origin_map)
+    if not complete:
+        status = "incomplete"
+    elif ordered_negative:
+        status = "contradicted"
+    elif len(ordered_positive) < min_positive_examples:
+        status = "insufficient"
+    elif label_coverage is not None and label_coverage < min_label_coverage:
+        status = "low-coverage"
+    elif precision_lcb is None or precision_lcb < min_precision_lower_bound:
+        status = "low-confidence"
+    elif not available or len(independent) < min_positive_examples:
+        status = "insufficient-independent-sources"
+    else:
+        status = "validated"
+    return RelationSchemaValidation(
+        status, ordered_positive, ordered_negative, len(unknown), complete,
+        expansions, independent, label_coverage, precision_lcb)
+
+
+def review_relation_schema_candidates(
+        facts: Iterable[Mapping[str, Any]], *,
+        negative_facts: Iterable[Mapping[str, Any]] = (),
+        validation_source_prefix: str,
+        min_support: int = 2, min_validation_support: int = 2,
+        min_label_coverage: float = 0.5,
+        min_precision_lower_bound: float = 0.25,
+        max_expansions: int = 100_000,
+        research_index: Any | None = None,
+        origin_map: Mapping[str, str] | None = None
+        ) -> RelationSchemaReviewResult:
+    """Discover on non-holdout facts and report source-separated validation."""
+    if not isinstance(validation_source_prefix, str) or not validation_source_prefix.strip():
+        raise ValueError("validation_source_prefix must be non-empty")
+    for name, value in (("min_support", min_support),
+                        ("min_validation_support", min_validation_support),
+                        ("max_expansions", max_expansions)):
+        if not isinstance(value, int) or isinstance(value, bool) or value < 1:
+            raise ValueError(f"{name} must be a positive integer")
+    for name, value in (("min_label_coverage", min_label_coverage),
+                        ("min_precision_lower_bound",
+                         min_precision_lower_bound)):
+        if (not isinstance(value, (int, float)) or isinstance(value, bool)
+                or not 0.0 <= value <= 1.0):
+            raise ValueError(f"{name} must be between 0 and 1")
+    prefix = validation_source_prefix.strip()
+    all_positive = [_fact(row) for row in facts]
+    all_negative = [_fact(row) for row in negative_facts]
+
+    def partition(rows):
+        training, validation = [], []
+        for row in rows:
+            heldout = any(source.startswith(prefix) for source in row["sources"])
+            (validation if heldout else training).append(row)
+        return training, validation
+
+    training_positive, validation_positive = partition(all_positive)
+    training_negative, validation_negative = partition(all_negative)
+    discovery = discover_relation_schema_candidates(
+        training_positive, negative_facts=training_negative,
+        min_support=min_support, max_expansions=max_expansions,
+        research_index=research_index, origin_map=origin_map)
+    remaining = max_expansions - discovery.expansions
+    reviews = []
+    total_expansions = discovery.expansions
+    complete = discovery.complete
+    for candidate in discovery.candidates:
+        if remaining < 1:
+            validation = RelationSchemaValidation(
+                "incomplete", (), (), 0, False, 0)
+        else:
+            validation = validate_relation_schema_candidate(
+                candidate, validation_facts=validation_positive,
+                validation_negative_facts=validation_negative,
+                min_positive_examples=min_validation_support,
+                min_label_coverage=min_label_coverage,
+                min_precision_lower_bound=min_precision_lower_bound,
+                max_expansions=remaining, research_index=research_index,
+                origin_map=origin_map)
+            remaining -= validation.expansions
+            total_expansions += validation.expansions
+        complete = complete and validation.complete
+        reviews.append(RelationSchemaReview(candidate, validation))
+    return RelationSchemaReviewResult(
+        complete, tuple(reviews), total_expansions)
