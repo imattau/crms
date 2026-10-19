@@ -875,7 +875,7 @@ controlled cases, not proof of a universal relation property.
 
 Command: `python3 experiments/v1_376_reasoning_graph_benchmark.py`
 
-The experiment checks nine cases: 35-hop recursion, a depth-9 path in a 2,047-node binary tree,
+Runtime rerun on 2026-10-19. The experiment checks nine cases: 35-hop recursion, a depth-9 path in a 2,047-node binary tree,
 a ten-layer diamond, direct positive/negative conflict, negative-only evidence, a complete miss,
 an expansion-limited search, a cycle-backed self-relation, and a declared irreflexive denial.
 Positive proofs and constraint denials are checked independently; each semantic result is replayed
@@ -884,9 +884,11 @@ expected status and completeness in the current run. Negative-only evidence rema
 the budget-limited case remained incomplete with `expansion_limit`; the diamond returned 64 proofs
 with `proof_limit`; and the cycle returned an ambiguity rather than an unqualified self-relation.
 
-On the current local run, with `tracemalloc` enabled, the 35-hop chain took 40 ms and peaked at 211 KiB;
-the tree took 653 ms and peaked at 6,617 KiB; and the proof-capped diamond took 274 ms and peaked at
+On this local rerun, with `tracemalloc` enabled, the 35-hop chain took 35 ms and peaked at 211 KiB;
+the tree took 636 ms and peaked at 6,617 KiB; and the proof-capped diamond took 267 ms and peaked at
 556 KiB. These are machine- and instrumentation-specific observations, not performance thresholds.
+The gap between the short chain and the larger tree suggests branching and join work deserves more
+attention than simply raising recursive depth; it does not isolate the cause of the tree's latency.
 The initial graph matrix improves coverage over the focused regressions, but does not yet include
 larger adversarial branching graphs, nonlinear recursive joins, or a broad query distribution.
 
