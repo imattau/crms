@@ -6,13 +6,15 @@ ideas below were prototyped as a *wrapper around the unmodified engine* in a scr
 measured on three question sets (section 2). The live gate applies to quoted source evidence,
 checks named mentions, answer type, lexical relation support and required superlatives, and can
 select from top FTS hits. Exact-title polar evidence can resolve a surname used locally in one
-unique article, and bounded birthplace questions can read an exact-title `birth_place` field.
+unique article, and bounded metadata questions can read exact-title `birth_place`, `type`, `class`,
+or `kind` fields.
 The prototype and the three question sets are in
 `experiments/v1_327_paraphrase_benchmark_nl_layer.py` (run it to reproduce section 2.3); the code
 is a sketch of the logic, not a patch to apply. A later check on real SQuAD passages (section 2.5)
 showed the "zero wrong" result does not generalise: about one question in eight still gets a wrong
-answer, and the main remaining losses are indirect references inside sources and choosing among
-several passing sentences (section 6, items 8 and 9).
+answer. Follow-up tests on tuned and fresh samples (section 2.6) found that only the gate layer's
+gain replicates; cheap wrapper additions (reference binding, proximity ranking, learned word pairs)
+do not generalise, so the next work is structural (section 6, items 8 and 9).
 **Relationship to other docs:** the ground rules in section 0 of
 [design_learning_dynamics.md](design_learning_dynamics.md) apply unchanged (evidence over
 assumption, abstain when unsure, propose then verify, deterministic, CPU-friendly). Section 4
@@ -174,11 +176,12 @@ does not address the real cause below.
 
 **Why the remaining answers are wrong.** For the 25 wrong answers left in the last variant:
 21 came from the engine's own reply passing the gate and only 4 from the fallback selector. In 12
-cases the sentence that contains the gold answer *fails* the gate, mostly because it refers to its
-subject indirectly ("it", "the former", "this process") or paraphrases the question. In the other
-12 the gold sentence passes the gate but a different passing sentence was chosen; the median number
-of corpus sentences passing the gate was 3. So the loss is (a) indirect reference and paraphrase
-inside the source and (b) choosing among several plausible sentences. It is not a lack of strictness.
+cases the sentence that contains the gold answer *fails* the gate. In the other 12 the gold
+sentence passes the gate but a different passing sentence was chosen; the median number of corpus
+sentences passing the gate was 3. So the loss is (a) gold sentences rejected by the mention or
+relation check and (b) choosing among several plausible sentences. It is not a lack of strictness.
+(My first reading of group (a) was that most were indirect references such as "it" or "the
+former". That was a guess; the measurement in section 2.6 does not support it.)
 
 **Ranking among gate-passing sentences (small gain, margin required).** I ranked the sentences
 that pass the gate by the summed inverse document frequency of the question's content stems and
@@ -216,6 +219,51 @@ guessing when candidates are close.
 - The test scripts are in a scratch folder and are not committed. Adding a SQuAD-style set to the
   repository needs the data to be fetched at run time (it cannot be bundled without checking the
   licence), so it would be an optional experiment.
+
+### 2.6 Generalisation tests: what replicates on fresh articles
+
+I tried four additions on top of the gate layer, one at a time, on the 10 articles used so far
+("tuned sample") and then on 10 *different* articles never used for tuning ("fresh sample", same
+sizes: 200 questions and 100 wrong-article questions). Both samples use the frozen engine at
+commit `622fa99`. The ideas were chosen after looking at failures on the tuned sample, so its
+numbers are optimistic; the fresh sample is the honest one.
+
+| Configuration | Tuned: correct / wrong / abstained | Fresh: correct / wrong / abstained | Fresh precision | Fresh wrong-article answered |
+|---|---|---|---|---|
+| Engine alone | 90 / 33 / 77 | 75 / 43 / 82 | 63% | 11 / 100 |
+| NL-gate layer (section 2.3 final) | 99 / 27 / 74 | 84 / 34 / 82 | 71% | 8 / 100 |
+| + possessive and plural mention matching | 106 / 27 / 67 | 88 / 38 / 74 | 69% | 7 / 100 |
+| + proximity-weighted ranking, margin 1.2 | 112 / 26 / 62 | 89 / 42 / 69 | 67% | 8 / 100 |
+| + proximity ranking, margin 1.2, else abstain | 92 / 14 / 94 | 81 / 32 / 87 | 71% | 7 / 100 |
+
+Findings:
+
+1. **The gate layer replicates.** Against the engine alone it gives 9 more correct and 9 fewer wrong
+   answers on the fresh sample (and 9 and 6 on the tuned one). This is the one robust result.
+2. **Possessive and plural mention matching is mixed.** Of the question mentions that failed the
+   check against the gold sentence on the tuned sample, 30 were inflected or possessive forms
+   ("Oedogonium's", "Soviets") and 31 were entities the gold sentence does not name at all. Matching
+   the first group added 7 correct answers on the tuned sample but only 4 correct and 4 more wrong
+   on the fresh one. It is not clearly beneficial without a way to offset the extra wrong answers.
+3. **Reference binding did not help.** Only 21 of 200 gold sentences begin with a pronoun or
+   "this/the former/the latter" reference, and 9 of those were already answered correctly. Binding
+   such a sentence to the article title (or to the previous sentence's subject) raised the number of
+   non-correct questions whose gold sentence passes the gate from 27 to 29 of 101, and left the
+   answer counts essentially unchanged (100 correct, 30 wrong). The earlier diagnosis that indirect
+   reference is the largest remaining loss was wrong. The larger share are entities that the answer
+   sentence does not mention, which only information from neighbouring sentences or the question's
+   context could supply.
+4. **Stronger ranking did not generalise.** Adding proximity of the matched words gained correct
+   answers on the tuned sample but lowered precision on the fresh one (71% to 67%); with an
+   abstain-if-close rule precision only returned to the layer's 71% at the cost of 3 correct
+   answers. The overlap and proximity signals are too weak to choose between plausible sentences.
+5. **Learned wording pairs did not help.** Requiring a word pair from questions and gold sentences
+   to appear in at least 3 separate articles gave 103 correct and 38 wrong (worse than none); at
+   least 5 articles changed nothing. The surviving pairs were generic words ("type" with "other",
+   "also", "such"). Independent-article support alone does not select real paraphrases.
+
+Caveats: 200 questions per sample, so a few questions is noise; the same grader limits as in 2.5;
+scripts are in a scratch folder and are not committed.
 
 ## 3. The ideas, with what was tested
 
@@ -332,6 +380,17 @@ alignments, even when the retained frames were checked for any cross-document sh
 lower the evidence threshold to manufacture yield. The next research step is role-compatible
 distributional evidence (such as independently grounded subject and object classes), with
 review-only hypotheses and held-out tests that measure both paraphrase recall and false alignment.
+An initial title-lead-only probe found poor endpoint coverage. The expanded probe reads explicit
+`type`/`class`/`kind` infobox fields and title-led leads after infobox blocks, including a bounded
+parenthetical after the title. Across all 285,478 documents it found 148,162 pages with one
+unambiguous coarse type head. Three disjoint 10,000-document relation windows contained 58 frame
+proposals and 215 positive non-`is-a` support rows: 49 subjects and 55 objects had a matching
+unique type, and 14 rows had both. Even with a report-only threshold of one distinct, independently
+sourced pair per wording, no two predicates shared an ordered type signature. The initial
+distributional path therefore has no real-corpus yield in these windows. Better entity linking or
+additional source-grounded category fields remain possible, but they need coverage and held-out
+precision evidence before supporting language rules. `experiments/v1_335_role_type_alignment_probe.py`
+reproduces this read-only measurement.
 
 ### 3.7 Pronouns and follow-ups
 
@@ -346,7 +405,7 @@ Australia? / Is it Sydney?" bound "it" to the wrong entity (the capital, not the
 polar module then answered yes (see 3.3 weakness). Also never search the pronoun itself: the
 interactive run had "Where was he born?" looking for the birthplace of "he".
 
-### 3.8 Exact-title context and structured biographical fields
+### 3.8 Exact-title context and structured source fields
 
 A unique exact-title article can license a narrow local subject alias. For example, if the
 `Alan Turing` page says “Turing worked at Bletchley Park,” that page title resolves `Turing` to
@@ -357,16 +416,34 @@ quoted sentence is reviewable evidence, not an accepted fact.
 
 Some source pages express an answer in an infobox instead of prose. For the bounded `Where was X
 born?` form, CRMS can read the exact-title page's explicit `birth_place` field when one unique
-value exists. It cites that exact field and labels the result as quoted source evidence. It does
-not turn the field into an accepted fact or infer a birthplace from nationality, an institution,
-or nearby text. Conflicting values, missing fields, and non-unique title matches must abstain.
+value exists. For bounded `What type/kind of [category] is X?` forms, it can read the exact-title
+page's `type`, `class`, `kind`, or `entity type` field when one unique, short value exists. Both
+routes cite the exact field and label the result as quoted source evidence. A type field also
+creates a review-only `subject — is-a → value` candidate using that exact field as its cited text.
+Only explicit acceptance stores the type claim, after which ordinary reasoning can use it. The
+birthplace route remains evidence-only. Neither route infers a birthplace from nationality, an
+institution, or nearby text.
+Conflicting values, missing fields, and non-unique title matches abstain.
 
 `experiments/v1_333_exact_page_alias_and_birthplace.py` checks the title-local alias, wrong-object
-abstention, explicit negation, and exact field citation through a fresh CLI session. A read-only
+abstention, explicit negation, and birthplace field citation through a fresh CLI session.
+`experiments/v1_336_structured_type_field_chat.py` checks exact type-field citations, abstention
+on conflicting or non-infobox values, review without automatic promotion, explicit acceptance,
+and a later yes/no query over the accepted `is-a` fact. A read-only
 replay on the 285,478-document SimpleWiki index returned the Bletchley Park sentence for the
 yes/no question, abstained for Cambridge, returned the same Bletchley Park sentence for `Where
 does Alan Turing work?`, and read Warsaw from Marie Curie's exact-title infobox. These cases validate the
 targeted route, not broad coreference or polar-question coverage.
+
+The same index answered `What type of place is Albury?` from the exact `type = city` infobox field.
+The field can now enter the cited candidate-review queue and become a reasoning fact only after
+explicit acceptance. It does not automatically add class facts to predicate-alignment discovery.
+
+Exact-title grounding now has a dedicated title-field lookup, avoiding a full ranked body search
+when a route only needs to locate one page. The Who fallback also abstains when a predicate has no
+object, cites the complete sentence, and filters new review proposals against the question's named
+object. Regression checks in `v1_295`, `v1_318`, `v1_333`, and `v1_336` pass. This filtering is
+limited to direct Who questions; it does not solve broad paraphrase or entity-linking coverage.
 
 ## 4. Delivery order
 
@@ -420,7 +497,8 @@ future work; do not treat this as complete natural-language understanding.
     50-question synthetic lexical-confound benchmark is a mechanism check, not a general quality
     result).
 11. **Keep page-title aliases local and structured metadata cited** (section 3.8; exact-title
-    surname grounding and birthplace-field reading are implemented, with the real-index sample
+    surname grounding, birthplace-field reading, and bounded type-field answers are implemented,
+    with the real-index sample
     recorded in `benchmark_baselines.md`).
 
 Each step: add a benchmark family or reuse the sets above, record the numbers in
@@ -429,10 +507,9 @@ Each step: add a benchmark family or reuse the sets above, record the numbers in
 ## 5. Out of scope
 
 - Generating fluent replies (templates for the labelled sentence are enough).
-- General coreference resolution across paragraphs. A bounded form is *not* out of scope: resolving
-  an indirect reference to the topic of the same paragraph or article ("it", "the former", "this
-  process") so that a sentence that states the answer can pass the mention check (section 6,
-  item 8).
+- General coreference resolution across paragraphs. Binding a pronoun to the article title was
+  tested and did not improve answers (section 2.6); only revisit it with evidence from a larger
+  sample.
 - Embeddings or any learned similarity model.
 - Relation extraction beyond the closed type table; open-ended relation discovery stays with the
   existing frame-learning machinery.
@@ -456,21 +533,27 @@ Each step: add a benchmark family or reuse the sets above, record the numbers in
 6. Mention detection should use known entities in the store, not capitalisation, to avoid the
    merged-mention error in 3.3.
 7. Cold-cache behaviour and multi-threading of the gate are not examined.
-8. **The real next problem: indirect reference inside sources.** On SQuAD passages (section 2.5)
-   half of the remaining wrong answers are cases where the sentence that states the answer does not
-   name the entity the question asks about ("It was founded in 1946", "the former type", "this
-   process"), so the mention check rejects it and a different sentence is chosen or CRMS abstains.
-   Candidate approach, to be tested before adoption: for a sentence without a named subject, bind
-   its pronoun or definite reference to the nearest preceding named subject in the same paragraph
-   or to the exact-title article (section 3.8 already does this for a surname), record that binding
-   as reviewable evidence, and let the mention and type checks run against the bound entity. The
-   binding must abstain when more than one preceding entity could fit. Measure it on the SQuAD
-   sample first, because it targets the largest remaining loss.
-9. **Choosing between gate-passing sentences.** The other half of the remaining wrong answers are
-   cases where several sentences pass the gate. Ranking by inverse-document-frequency overlap with a
-   margin helps only slightly (section 2.5); try stronger evidence (proximity of the matched words,
-   agreement between the two best candidates' answer spans, and the role-order checks from 3.3)
-   and keep abstaining when candidates are close.
+8. **Structural fixes are the next work, not more wrapper rules.** The tests in section 2.6 show
+   that adding rules around the retrieved sentence mostly trades correct answers for wrong ones.
+   What is needed, in the order I would try:
+   a. *Facts extracted from sentences at higher yield.* Answers that come from a stored fact
+      generalise across wording because they go through the relation, not the sentence's words.
+      The measured yield on real text is low (section 3.6), so improve extraction first and
+      measure how many SQuAD-style questions become answerable from facts.
+   b. *Evidence from neighbouring sentences.* About half of the gold sentences rejected by the
+      mention check do not name the entity the question asks about; the entity is introduced in
+      the same paragraph. Test paragraph-level evidence units (answer sentence plus its paragraph's
+      named entities) as the thing the mention check runs against, rather than single sentences.
+   c. *Answers built from the structured result* (the answer line from the chat UX doc, and
+      realisation from the relation), so the response does not depend on quoting one sentence.
+   d. *Role-aware wording evidence.* Plain word co-occurrence gave noise (2.6, item 5); the next
+      step is evidence that also requires compatible subject and object classes, with review.
+   Each needs a fresh-sample measurement before adoption; tuned-sample gains do not count.
+9. **Choosing between gate-passing sentences.** Ranking by inverse-document-frequency overlap with a
+   margin, with or without word proximity, did not generalise (section 2.6). Stronger evidence is
+   needed before a ranking step is added: agreement of the answer span between the two best
+   candidates, role-order checks from 3.3, or corroboration by an independent second source. Until
+   then, prefer abstaining when several sentences pass.
 10. **Pin the engine version in benchmarks.** Results moved between runs when the working tree
    changed during testing. A benchmark script should record the commit it ran against, or run
    against an exported copy, and refuse to compare numbers from different commits.
@@ -509,6 +592,27 @@ profile. These timings are directional only: they are not a before/after full-pi
 and they do not validate the 2.1 GB acceptance target or cold-cache behavior. The four-chunk bound
 can miss an answer sentence in a lower-ranked chunk; monitor this on long-document regressions and
 raise or adapt the bound only when measured retrieval quality warrants it.
+
+A later read-only replay drove ten questions through one fresh CLI process on the local
+285,478-document, 2.1 GB SimpleWiki index. It took 12.22 seconds overall (about 1.22 seconds per
+turn including the initial process setup). Replies were broadly similar to the preceding replay,
+but this was not a strict before/after comparison and citation identifiers were not captured. A
+profile of `What is the Pacific Ocean?` showed 0.71 seconds in
+`CRMSSQLiteResearchIndex.search`, including 49 SQLite `execute` calls, while five `_snippet` calls
+took about 21 ms total. This means matched-chunk
+snippet construction is no longer the dominant measured cost; wide FTS searches and their SQL work
+now need attention. Exact-title lookup used to call full ranked retrieval and then discard every
+non-exact title, so it now uses a dedicated FTS title phrase lookup instead. That narrow change
+preserves the exact-title equality check, but did not bring the end-to-end replay near the 200 ms
+target. An experiment removing corpus rarity weights from sentence selection failed the
+entity-less-Who regression and was reverted; keep the grounding behavior while optimizing retrieval.
+
+An interactive replay measured from query submission to first answer for each turn on the same
+ten-question set: median 0.80 seconds, slowest 3.14 seconds. The run was not cold-cache controlled.
+It still misses the supplied median-under-200-ms and slowest-under-1-second targets. Some
+natural-language misses remained in the same run (`Who created Python?` did not select the
+indexed creator sentence; `Where is Mount Everest?` abstained despite indexed location evidence),
+so future latency changes must preserve answer quality and report those cases alongside timings.
 
 **Acceptance target from the report:** on the same 2.1 GB index and ten-question set, median
 question latency below 200 ms and the slowest question below 1 s, with identical answers and
