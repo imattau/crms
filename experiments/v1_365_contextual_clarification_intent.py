@@ -63,6 +63,16 @@ def main() -> None:
             and dialogue.pending_result is None,
             f"contextual ordinal selection failed after yes: {selection}")
 
+    corrected_choice_dialogue = CRMSDialogue(knowledge)
+    corrected_choice_dialogue.turn("What did Ada Lovelace design?")
+    corrected_choice = respond(
+        corrected_choice_dialogue, "No, I meant the Difference Engine.")
+    require(corrected_choice.status == "answered"
+            and corrected_choice.response is not None
+            and corrected_choice.response.answer == "the Difference Engine"
+            and corrected_choice_dialogue.pending_result is None,
+            "explicit correction did not resolve the open candidate choice")
+
     unanchored = respond(CRMSDialogue(knowledge), "Nope.")
     require(unanchored.status == "clarify"
             and "don't have an open yes/no question" in unanchored.text,
@@ -93,6 +103,7 @@ def main() -> None:
 
     print("yes/no with an open choice preserves clarification state: PASS")
     print("ordinal selection after acknowledgement resolves the original candidates: PASS")
+    print("explicit 'I meant' correction resolves the open candidate choice: PASS")
     print("unanchored yes/no asks for context instead of querying the corpus: PASS")
     print("terminal interaction retains context across the clarification sequence: PASS")
 

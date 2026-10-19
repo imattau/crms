@@ -157,7 +157,22 @@ class CRMSDialogue:
         if self.pending_result is None:
             return None, False
         candidates = self.pending_result.candidates or []
-        words = [word.casefold() for word in _WORD_RE.findall(message)]
+        normalized_message = message.strip().rstrip(".!? ")
+        # A correction phrase is a common way to answer a choice clarification:
+        # "I meant the second one" or "No, I meant the Analytical Engine".
+        # Interpret it as a selection only while a candidate choice is open.
+        selection_phrase = re.fullmatch(
+            r"(?:(?:no|actually)\s*[, ]\s*)?"
+            r"(?:i\s+(?:meant|mean|want|choose|prefer)|"
+            r"the answer is|it is|it's)\s+(.+?)[.!? ]*",
+            normalized_message, flags=re.IGNORECASE)
+        if selection_phrase is not None:
+            normalized_message = selection_phrase.group(1).strip()
+        else:
+            normalized_message = re.sub(
+                r"^(?:(?:no|actually)\s*[, ]\s*)", "",
+                normalized_message, flags=re.IGNORECASE)
+        words = [word.casefold() for word in _WORD_RE.findall(normalized_message)]
         selection_words = [word for word in words if word not in {
             "the", "one", "option", "answer", "candidate", "choice",
             "please", "i", "d", "choose", "want", "prefer", "mean",
@@ -175,8 +190,17 @@ class CRMSDialogue:
             return (candidates[index] if 0 <= index < len(candidates) else None), True
         message_key = tuple(words)
         for candidate in candidates:
-            if message_key == tuple(word.casefold()
-                                    for word in _WORD_RE.findall(candidate)):
+            candidate_key = tuple(word.casefold()
+                                  for word in _WORD_RE.findall(candidate))
+            if message_key == candidate_key:
+                return candidate, True
+            # Articles are optional in natural answers but do not change which
+            # stored candidate the user selected.
+            if (message_key[:1] in (("a",), ("an",), ("the",))
+                    and message_key[1:] == candidate_key):
+                return candidate, True
+            if (candidate_key[:1] in (("a",), ("an",), ("the",))
+                    and message_key == candidate_key[1:]):
                 return candidate, True
         return None, False
 
@@ -586,6 +610,11 @@ class CRMSDialogue:
             self, message: str, *, research_index: Any | None = None
             ) -> DialogueTurn | None:
         """Retry the previous grounded question with one explicitly corrected entity."""
+        if (self.pending_result is not None
+                and self._select_candidate(message)[1]):
+            # While a choice is open, "I meant X" answers that clarification;
+            # do not route it through correction of the previous question.
+            return None
         correction = _CORRECTION_RE.fullmatch(message.strip())
         if correction is None:
             return None
