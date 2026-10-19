@@ -41,7 +41,14 @@ def _entity_key(value: str) -> tuple[str, ...]:
     return tokens
 
 
-def _contextual_entity_key(entity: str, page_title: str) -> tuple[str, ...]:
+def _nominal_relation_head(relation: str) -> tuple[str, ...]:
+    """Return the exact nominal head of a bounded ``X of`` relation."""
+    match = re.fullmatch(r"(?P<head>.+?)\s+of", relation.casefold().strip())
+    return tuple(_tokens(match.group("head"))) if match else ()
+
+
+def _contextual_entity_key(entity: str, page_title: str, *,
+                           relation: str = "") -> tuple[str, ...]:
     """Qualify a shortened endpoint with its local exact-page title.
 
     Cross-document role matching by bare strings can merge different people
@@ -55,6 +62,11 @@ def _contextual_entity_key(entity: str, page_title: str) -> tuple[str, ...]:
     title_key = _entity_key(title)
     if (entity_key and len(title_key) > len(entity_key)
             and title_key[-len(entity_key):] == entity_key):
+        return title_key
+    relation_head = _nominal_relation_head(relation)
+    if (entity_key and relation_head
+            and title_key[:len(entity_key)] == entity_key
+            and title_key[len(entity_key):] == relation_head):
         return title_key
     return entity_key
 
@@ -140,6 +152,13 @@ def main() -> None:
         "owen", "jones")
     assert _contextual_entity_key("Felicity Jones", "Felicity Jones") == (
         "felicity", "jones")
+    assert _contextual_entity_key(
+        "Benguela", "Benguela Province", relation="province of") == (
+            "benguela", "province")
+    assert _contextual_entity_key(
+        "Benguela", "Benguela City", relation="province of") == ("benguela",)
+    assert _contextual_entity_key(
+        "Mumbai", "Maharashtra", relation="capital of") == ("mumbai",)
     hyphenated_type = CRMSKnowledgeBase()._discover_surface_relation_candidates(
         "An-26 is a modernized variant.", source="probe:an-26")
     assert any(candidate.subject == "An-26"
@@ -209,7 +228,7 @@ def main() -> None:
                             document_id).title
                     page_title = page_titles[document_id]
                     subject_key = _contextual_entity_key(
-                        row["subject"], page_title)
+                        row["subject"], page_title, relation=relation)
                     object_key = _contextual_entity_key(
                         row["object"], page_title)
                     subject_type = types.get(subject_key)
@@ -271,6 +290,8 @@ def main() -> None:
         print("typed endpoints across positive non-is-a supports "
               f"(subject/object/both): {typed_subject}/{typed_object}/{typed_both} "
               f"of {non_is_a_support}")
+        print("typed supports after page-title entity disambiguation: "
+              f"{typed_both} (each support has both endpoints typed)")
         print("most frequent untyped subjects:",
               sorted(untyped_subjects.items(), key=lambda item: (-item[1], item[0]))[:10])
         print("most frequent untyped objects:",

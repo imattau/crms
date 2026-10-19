@@ -659,14 +659,24 @@ equivalent. This is evidence against using coarse role types as a standalone
 predicate-equivalence signal; the diagnostic remains report-only and does not
 license rules.
 
-The 20-window rerun, covering 200,000 sampled pages, found one candidate above
-the two-pair support threshold: `capital city of` / `province of`, both typed
-`city → country`. Its cited examples establish that the relation phrases are
+The first 20-window pass, covering 200,000 sampled pages, found one candidate
+above the two-pair support threshold: `capital city of` / `province of`, both
+typed `city → country`. Its cited examples established that these phrases are
 not equivalent. The pass also exposed and fixed a corpus-miner crash on the
 hyphenated title “An-26”, which had been tokenized as the article plus a number.
-The full scan now completes, but the false positive confirms that typed role
-compatibility needs a stronger semantic discriminator before it can propose
-reusable language rules.
+
+A follow-up added a narrower entity-key rule for shortened subjects whose
+exact page-title suffix names the nominal head of an `X of` relation (for
+example, `Benguela` on `Benguela Province` under `province of`). It keeps
+`Mumbai` unqualified on the `Maharashtra` page for `capital of`, since the page
+title does not supply the relation head. The 20-window rerun then found 813
+frames, 4,499 positive non-`is-a` supports, 610 supports with both endpoints
+typed, seven one-pair hypotheses, and none at the two-pair threshold. The
+earlier strong false candidate disappeared; this removes that observed title
+collision but does not show that coarse role types can safely license
+alignments. The seven weak hypotheses are not independently adjudicated. Keep
+the diagnostic report-only until a source-disjoint precision test supports a
+stronger semantic signal.
 
 ### 3.7 Pronouns and follow-ups
 

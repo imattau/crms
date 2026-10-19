@@ -437,15 +437,15 @@ standalone corpus scan:
    independent task check and preserve rule examples, holdout boundary, and
    lineage. This is the next capability advance after the dialogue gate, not
    a larger set of demonstrations of an existing composition.
-4. **Treat role/type corpus discovery as exploratory until it earns a gate.**
-   The current uncommitted `v1_335` probe change qualifies selected entities by
-   page title, but its printed “predicate-head/page-type check” count currently
-   equals the full typed-support count; it does not establish that such a
-   filter ran. Do not use those counts to license relation equivalence. First
-   make the diagnostic name and computation agree, then test cited positive
-   and negative examples across ambiguous page titles and held-out documents.
-   Promote a discovery signal only if it rejects the known false alignment
-   without discarding valid cases such as `capital of`.
+4. **Keep role/type corpus discovery exploratory until it earns a gate.**
+   The `v1_335` diagnostic now describes its metric as typed support after
+   page-title disambiguation; it does not claim to apply a separate
+   predicate-head/type filter. The 20-window run yields seven one-pair
+   hypotheses and none at the two-pair threshold after disambiguating
+   `Benguela` city from `Benguela Province`. This removes the observed strong
+   false candidate, but it does not license any relation alignment. The next
+   useful evidence is independent held-out precision on cited positive and
+   negative examples, including valid cases such as `capital of`.
 
 **Near-term completion condition:** the clean-process dialogue suite has no
 wrong-entity answers or stale explanations, and one held-out recombination

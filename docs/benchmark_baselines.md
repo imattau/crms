@@ -1041,16 +1041,26 @@ two-pair threshold.
 ### Wider role-type sample and corpus-miner crash regression (2026-10-20)
 
 The same read-only command was rerun with `--window-count 20`, sampling 20
-disjoint 10,000-document windows across the 285,478-document index. It
-completed 813 relation frames and examined 4,499 positive non-`is-a` supports;
-590 had both endpoints typed. It reported 11 weak candidates and one meeting
-the two-pair threshold. The strongest was `capital city of` / `province of`
-with the shared coarse type `city → country`; the cited example pair was
-“Accra is the capital city of Ghana” and “Benguela is a province of Angola.”
-These do not express the same relation, so role-type compatibility alone is
-not safe for alignment. The weak candidates were not independently adjudicated
-as a set; this run establishes one strong false positive, not a full precision
-estimate.
+disjoint 10,000-document windows across the 285,478-document index. The first
+pass completed 813 relation frames and examined 4,499 positive non-`is-a`
+supports; 590 had both endpoints typed. It reported 11 weak candidates and one
+meeting the two-pair threshold. The strongest was `capital city of` /
+`province of` with the shared coarse type `city → country`; the cited example
+pair was “Accra is the capital city of Ghana” and “Benguela is a province of
+Angola.” These do not express the same relation, so role-type compatibility
+alone is not safe for alignment.
+
+A later page-title check qualified a shortened endpoint only when the exact
+page-title descriptor matched the nominal head of an `X of` relation, avoiding
+the `Benguela` city/province collision while leaving unrelated endpoints such
+as `Mumbai` on the `Maharashtra` page unqualified. The corrected 20-window scan
+reported 610 typed-both supports, seven one-pair candidates, and zero at the
+two-pair threshold. This removes the observed strong false candidate, but the
+weak set has not been independently adjudicated and the result does not
+establish candidate precision. The probe reports the number of supports after
+page-title disambiguation; it does not apply a separate predicate-head/type
+compatibility filter. Keep role-type discovery report-only and require
+source-disjoint precision evidence before licensing an alignment.
 
 The first 20-window run crashed on “An-26 is a modernized variant” because
 tokenization split the hyphenated model name into `an` and `26`, then article
