@@ -99,6 +99,20 @@ _NEGATIVE_CONTRACTION_READINGS = {
 
 
 @dataclass
+class UserIntentHypothesis:
+    """Inspectable, bounded intent decision produced by a dialogue rule."""
+
+    dialogue_act: str
+    task_intent: str | None
+    decision: str
+    matched_frame: str | None = None
+    context_predicates: tuple[str, ...] = ()
+    alternatives: tuple[str, ...] = ()
+    selected_value: str | None = None
+    basis: str = "hand_checked_runtime_rule"
+
+
+@dataclass
 class DialogueTurn:
     status: str
     question: str
@@ -109,6 +123,7 @@ class DialogueTurn:
     writing: WritingResult | None = None
     counterfactual: CounterfactualResult | None = None
     grouped_results: list[dict[str, Any]] | None = None
+    intent_hypothesis: UserIntentHypothesis | None = None
 
 
 class CRMSDialogue:

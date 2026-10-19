@@ -7,13 +7,16 @@ contextual intent understanding.
 
 ## Current contextual baseline
 
-The runtime now distinguishes a bare yes/no response while an answer-choice clarification is open
-from an unanchored yes/no response. With multiple supported candidates, “yes” or “no” leaves the
-choice pending and explains that a specific candidate is needed; without an open yes/no question,
-CRMS asks what the user is responding to rather than sending the token to retrieval. A phrase such
-as “Yeah, the second option please” resolves the existing candidate list. This is one explicit,
-hand-checked contextual rule, not a learned or general user-intent model. Its regression coverage is
-in `experiments/v1_365_contextual_clarification_intent.py`.
+`respond()` now attaches an inspectable `intent_hypothesis` to turns handled by its small set of
+explicit rules. It distinguishes a bare yes/no response while an answer-choice clarification is open
+from an unanchored yes/no response; separates an acknowledgement from a confirmation; and records
+when a candidate phrase or correction resolves the choice. With multiple supported candidates,
+“yes” or “no” leaves the choice pending and explains that a specific candidate is needed; without
+an open yes/no question, CRMS asks what the user is responding to rather than sending the token to
+retrieval. The hypothesis records its act, task intent (when known), decision, matched frame,
+context predicates, alternatives, selected value, and that the basis is a hand-checked runtime rule.
+It is inspectable but not learned or corpus-licensed; unsupported turns have no hypothesis. Regression
+coverage is in `experiments/v1_365_contextual_clarification_intent.py`.
 
 ## Why intent belongs in the model
 

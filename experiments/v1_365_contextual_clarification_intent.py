@@ -47,6 +47,13 @@ def main() -> None:
             and dialogue.pending_result is not None
             and "does not identify" in confirmation.text,
             "bare yes consumed a pending clarification")
+    require(confirmation.intent_hypothesis is not None
+            and confirmation.intent_hypothesis.dialogue_act == "answer-clarification"
+            and confirmation.intent_hypothesis.task_intent == "resolve-ambiguity"
+            and confirmation.intent_hypothesis.decision == "ambiguous"
+            and "pending_candidate_choice" in
+            confirmation.intent_hypothesis.context_predicates,
+            "pending yes did not expose its contextual intent hypothesis")
     polite_confirmation = respond(dialogue, "Yes, please.")
     require(polite_confirmation.status == "ambiguous"
             and dialogue.pending_result is not None,
@@ -56,6 +63,13 @@ def main() -> None:
             and dialogue.pending_result is not None
             and "does not identify" in acknowledgement.text,
             "generic acknowledgement bypassed an open clarification")
+    require(acknowledgement.intent_hypothesis is not None
+            and acknowledgement.intent_hypothesis.dialogue_act
+            == "acknowledgement"
+            and acknowledgement.intent_hypothesis.task_intent
+            == "resolve-ambiguity"
+            and acknowledgement.intent_hypothesis.decision == "ambiguous",
+            "receipt during a choice was not distinguished from confirmation")
     selection = respond(dialogue, "Yeah, the second option please.")
     require(selection.status == "answered"
             and selection.response is not None
@@ -72,11 +86,34 @@ def main() -> None:
             and corrected_choice.response.answer == "the Difference Engine"
             and corrected_choice_dialogue.pending_result is None,
             "explicit correction did not resolve the open candidate choice")
+    require(corrected_choice.intent_hypothesis is not None
+            and corrected_choice.intent_hypothesis.decision == "selected"
+            and corrected_choice.intent_hypothesis.selected_value
+            == "the Difference Engine"
+            and corrected_choice.intent_hypothesis.basis
+            == "hand_checked_runtime_rule",
+            "candidate selection did not expose its inspectable intent decision")
 
     unanchored = respond(CRMSDialogue(knowledge), "Nope.")
     require(unanchored.status == "clarify"
             and "don't have an open yes/no question" in unanchored.text,
             f"bare no entered ordinary retrieval without context: {unanchored}")
+    require(unanchored.intent_hypothesis is not None
+            and unanchored.intent_hypothesis.decision == "ambiguous"
+            and unanchored.intent_hypothesis.dialogue_act == "uncertain"
+            and unanchored.intent_hypothesis.task_intent is None
+            and "no_open_yes_no_question" in
+            unanchored.intent_hypothesis.context_predicates,
+            "unanchored yes/no did not report the missing context")
+
+    mixed = respond(CRMSDialogue(knowledge),
+                    "Hello, what did Ada Lovelace design?")
+    require(mixed.intent_hypothesis is not None
+            and mixed.intent_hypothesis.dialogue_act == "question"
+            and mixed.intent_hypothesis.task_intent == "seek-information"
+            and mixed.intent_hypothesis.matched_frame
+            == "greeting-plus-content-question",
+            "mixed greeting/question did not select the task intent")
 
     with tempfile.TemporaryDirectory(prefix="crms-contextual-intent-") as folder:
         root = Path(folder)

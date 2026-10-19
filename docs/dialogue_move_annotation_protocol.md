@@ -96,12 +96,14 @@ Choose one value from each list:
 
 | Field | Allowed values |
 |---|---|
-| `dialogue_act` | `question`, `request-action`, `provide-information`, `answer-clarification`, `confirm`, `reject`, `correction`, `continuation-request`, `greeting`, `thanks`, `farewell`, `other`, `uncertain` |
+| `dialogue_act` | `question`, `request-action`, `provide-information`, `answer-clarification`, `acknowledgement`, `confirm`, `reject`, `correction`, `continuation-request`, `greeting`, `thanks`, `farewell`, `other`, `uncertain` |
 | `task_intent` | `check-availability`, `make-reservation`, `change-reservation`, `cancel-reservation`, `provide-constraint`, `resolve-ambiguity`, `correct-prior-result`, `seek-information`, `continue-current-task`, `social-contact`, `end-interaction`, `other-task`, `uncertain` |
 
 For mixed utterances, choose the act and intent that determine the next expected system action;
 record secondary actions in `annotator_note`. Use `other` only when the utterance is clear but does
 not fit a value. Use `uncertain` when the utterance or context does not support a stable label.
+Use `acknowledgement` for receipt tokens such as “okay” or “got it” when they do not themselves
+accept a proposed action or answer a clarification; reserve `confirm` for an explicit acceptance.
 
 Infer `task_intent` from the utterance and preceding context together. Do not assume the same surface
 form always has the same intent: “yes” may accept a proposed time, confirm a summary, or answer a
