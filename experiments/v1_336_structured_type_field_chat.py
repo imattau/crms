@@ -47,6 +47,10 @@ def main() -> None:
             "unstructured", "Unstructured Place",
             "Unstructured Place is a town.\ntype = town\n",
             "unstructured.txt")
+        index.add_document(
+            "chicago", "Chicago",
+            "Infobox settlement\nname = Chicago\n"
+            "settlement_type = City\n", "chicago.txt")
 
         evidence = _natural_type_field_evidence(
             index, "What type of place is Albury?")
@@ -54,6 +58,13 @@ def main() -> None:
             raise SystemExit("exact-title infobox type was not found")
         if index.resolve_citation(evidence["citation"]) != "type = city":
             raise SystemExit("citation did not resolve to the exact type field")
+        settlement_evidence = _natural_type_field_evidence(
+            index, "What type of place is Chicago?")
+        if settlement_evidence is None:
+            raise SystemExit("settlement_type infobox field was not recognized")
+        if index.resolve_citation(settlement_evidence["citation"]) != (
+                "settlement_type = City"):
+            raise SystemExit("settlement_type citation was not exact")
         if _natural_type_field_evidence(index, "What type is Tavel Compass?") is not None:
             raise SystemExit("conflicting exact-title type fields were ranked")
         if _natural_type_field_evidence(
@@ -69,6 +80,7 @@ def main() -> None:
                    "/pending-candidates\n"
                    "/accept 1\n"
                    "Is Albury a city?\n"
+                   "What type of place is Chicago?\n"
                    "/quit\n"),
             text=True, capture_output=True, cwd=root, timeout=60)
         output = run.stdout + run.stderr
@@ -80,7 +92,10 @@ def main() -> None:
                 "quoted structured evidence, not an accepted fact",
                 "Albury — is-a → city",
                 "Accepted positive fact: Albury — is-a → city.",
-                "CRMS> Yes."):
+                "CRMS> Yes.",
+                "The source lists Chicago's type as City.",
+                "field “settlement_type = City”",
+                "quoted structured evidence, not an accepted fact"):
             if expected not in output:
                 raise SystemExit(f"chat omitted {expected!r}:\n{output}")
         learned = CRMSKnowledgeBase.load(knowledge_path)
@@ -89,12 +104,15 @@ def main() -> None:
                    and any("#" in source for source in fact.sources)
                    for fact in learned.facts()):
             raise SystemExit("explicitly accepted type field was not stored")
+        if any(fact.subject == "Chicago" for fact in learned.facts()):
+            raise SystemExit("unreviewed settlement type was stored as a fact")
         print("PASS: exact-title type field answers the natural question")
         print("PASS: citation resolves to the exact field")
         print("PASS: conflicting and non-infobox values abstain")
         print("PASS: type claim enters review without automatic promotion")
         print("PASS: explicit acceptance stores the cited is-a fact")
         print("PASS: accepted type fact answers a later yes/no question")
+        print("PASS: real settlement_type-shaped field stays cited and review-only")
 
 
 if __name__ == "__main__":

@@ -417,24 +417,28 @@ no rules and changed no index data. This role-type signal has no yield in these 
 entity linking or separately sourced category fields need coverage and held-out precision evidence
 before they can support language rules.
 
-The current five-window replay uses leading-article normalization for exact-title endpoint matches
-and excludes several newly inspected false subjects. It retained 84 frames and 355 positive
-non-`is-a` supports; 83 subjects and 129 objects matched a unique type, with 28 supports typed at
-both endpoints. The revised replay still found zero role-type alignment hypotheses. The low yield
-does not justify weakening the review or evidence thresholds.
+The current five-window replay uses leading-article normalization for exact-title endpoint matches,
+checks `settlement_type` values, and excludes several newly inspected false subjects. Compound or
+conflicting class values are withheld. It retained 84 frames and 355 positive non-`is-a` supports;
+60 subjects and 108 objects matched one unique type, with 22 supports typed at both endpoints. The
+revised replay still found zero role-type alignment hypotheses. The low yield does not justify
+weakening the review or evidence thresholds.
 
 ## Exact-title structured type answers
 
 Command: `python3 experiments/v1_336_structured_type_field_chat.py`
 
 The CLI now recognizes bounded `What type/kind of [category] is X?` and `What is the type/kind of
-X?` forms, then reads a unique `type`, `class`, `kind`, or `entity type` value from one exact-title
-infobox. It cites the exact field, rejects conflicting title records and non-infobox key/value
-text, and labels the result as quoted structured evidence. The same exact field enters the
+X?` forms, then reads a unique `type`, `class`, `kind`, `entity type`, or `settlement_type` value
+from one exact-title infobox. It cites the exact field, rejects conflicting title records and
+non-infobox key/value text, and labels the result as quoted structured evidence. The fixture also
+checks a `settlement_type = City` field. The same exact field enters the
 review queue as a `subject — is-a → value` candidate, but it is stored only after explicit
 acceptance. The fixture confirms that acceptance enables a later yes/no answer from the fact store.
 A read-only query to the 285,478-document SimpleWiki index answered `What type of place is Albury?`
-from `type = city`.
+from `type = city`; a second read-only chat query answered the same form for Chicago from its exact
+`settlement_type = City` field. Both values were cited as structured evidence, and Chicago remained
+unaccepted in the store.
 
 ## Exact-title subject alias and birthplace retrieval
 

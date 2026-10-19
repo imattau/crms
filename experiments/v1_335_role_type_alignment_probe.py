@@ -25,6 +25,12 @@ _TYPE_ADJUNCTS = frozenset({
     "within", "without", "that", "who", "which", "where", "when",
     "because", "as", "such",
 })
+_TYPE_FIELDS = frozenset({
+    "type", "class", "kind", "entity type",
+    # Wikipedia's settlement infobox usually carries the only explicit
+    # class for city/place pages under this schema-specific key.
+    "settlement type", "settlement_type",
+})
 
 
 def _entity_key(value: str) -> tuple[str, ...]:
@@ -39,6 +45,10 @@ def _coarse_head(noun_phrase: str) -> str | None:
     words = list(_tokens(noun_phrase))
     if words[:3] == ["one", "of", "the"]:
         words = words[3:]
+    # Coordinated classes do not identify one unambiguous head for the typed
+    # predicate join (for example, "city and municipality").
+    if "and" in words or "or" in words:
+        return None
     cut = next((position for position, word in enumerate(words)
                 if word in _TYPE_ADJUNCTS), len(words))
     words = words[:cut]
@@ -93,7 +103,7 @@ def _title_types(index: CRMSSQLiteResearchIndex,
             if field is None:
                 continue
             name = " ".join(field.group(1).casefold().split())
-            if name not in {"type", "class", "kind", "entity type"}:
+            if name not in _TYPE_FIELDS:
                 continue
             head = _coarse_head(field.group(2))
             if head:

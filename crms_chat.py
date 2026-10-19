@@ -665,9 +665,8 @@ def _natural_who_structured_field_evidence(
     entity_tokens = tuple(normalized_tokens(entity))
     if not entity_tokens:
         return None
-    hits = [hit for hit in index.search(entity, limit=100, context_chars=240)
-            if tuple(normalized_tokens(hit.title)) == entity_tokens
-            and not _is_code_source(hit.location)]
+    hits = [hit for hit in _exact_title_hits(index, entity)
+            if not _is_code_source(hit.location)]
     # Multiple exact-title records with potentially different metadata need
     # entity clarification rather than a best-hit guess.
     unique_documents = {hit.document_id: hit for hit in hits}
@@ -719,9 +718,8 @@ def _natural_capital_field_evidence(
     entity_tokens = tuple(normalized_tokens(entity))
     if not entity_tokens:
         return None
-    hits = [hit for hit in index.search(entity, limit=100, context_chars=240)
-            if tuple(normalized_tokens(hit.title)) == entity_tokens
-            and not _is_code_source(hit.location)]
+    hits = [hit for hit in _exact_title_hits(index, entity)
+            if not _is_code_source(hit.location)]
     unique_documents = {hit.document_id: hit for hit in hits}
     if len(unique_documents) != 1:
         return None
@@ -759,9 +757,8 @@ def _natural_birthplace_field_evidence(
     entity_tokens = tuple(normalized_tokens(entity))
     if not entity_tokens:
         return None
-    hits = [hit for hit in index.search(entity, limit=100, context_chars=240)
-            if tuple(normalized_tokens(hit.title)) == entity_tokens
-            and not _is_code_source(hit.location)]
+    hits = [hit for hit in _exact_title_hits(index, entity)
+            if not _is_code_source(hit.location)]
     documents = {hit.document_id: hit for hit in hits}
     if len(documents) != 1:
         return None
@@ -809,15 +806,15 @@ def _natural_type_field_evidence(
     entity_tokens = tuple(normalized_tokens(entity))
     if not entity_tokens:
         return None
-    hits = [hit for hit in index.search(entity, limit=100, context_chars=240)
-            if tuple(normalized_tokens(hit.title)) == entity_tokens
-            and not _is_code_source(hit.location)]
+    hits = [hit for hit in _exact_title_hits(index, entity)
+            if not _is_code_source(hit.location)]
     documents = {hit.document_id: hit for hit in hits}
     if len(documents) != 1:
         return None
     hit = next(iter(documents.values()))
     document = index.document(hit.document_id)
-    fields = ("type", "class", "kind", "entity type")
+    fields = ("type", "class", "kind", "entity type",
+              "settlement_type", "settlement type")
     field_rows = [(field, value, start, end)
                   for field in fields
                   for value, start, end in _infobox_field_rows(document, field)

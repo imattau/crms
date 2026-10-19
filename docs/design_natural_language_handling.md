@@ -394,15 +394,16 @@ support language rules. `experiments/v1_335_role_type_alignment_probe.py` reprod
 measurement.
 
 The probe now normalizes a leading `the`, `a`, or `an` when matching a relation endpoint to an
-exact-title type key. In the same five windows this raised typed subjects from 78 to 83 and rows
-typed at both endpoints from 27 to 28, but still produced zero ordered-type alignment hypotheses.
+exact-title type key, and checks the `settlement_type` field used by SimpleWiki settlement pages.
+Compound and conflicting class values are withheld. The current five-window replay found 121,006
+unambiguous type candidates and 84 relation-frame proposals. The 355 positive non-`is-a` support
+rows had 60 typed subjects and 108 typed objects, with 22 rows typed at both endpoints. It still
+produced zero ordered-type alignment hypotheses.
 The audit also traced recurring false endpoints such as `Then`, `Sometimes`, `In 1969`, `TV`, and
 `EP` to discourse openings, temporal phrases, and capitalized common nouns after determiners.
-Corpus frame discovery now rejects those bounded cases. The five-window sample fell from 96 to 84
-relation frames (409 to 355 positive non-`is-a` support rows); typed endpoint counts are now
-83/129/28 (subject/object/both). The repeated-pair and role-type aligners still propose no real
-corpus transfer. This improves frame precision but does not solve entity linking or paraphrase
-coverage.
+Corpus frame discovery now rejects those bounded cases. Compared with the earlier 96-frame
+five-window run, the repeated-pair and role-type aligners still propose no real-corpus transfer.
+This improves frame precision but does not solve entity linking or paraphrase coverage.
 
 ### 3.7 Pronouns and follow-ups
 
@@ -429,7 +430,8 @@ quoted sentence is reviewable evidence, not an accepted fact.
 Some source pages express an answer in an infobox instead of prose. For the bounded `Where was X
 born?` form, CRMS can read the exact-title page's explicit `birth_place` field when one unique
 value exists. For bounded `What type/kind of [category] is X?` forms, it can read the exact-title
-page's `type`, `class`, `kind`, or `entity type` field when one unique, short value exists. Both
+page's `type`, `class`, `kind`, `entity type`, or `settlement_type` field when one unique, short
+value exists. Both
 routes cite the exact field and label the result as quoted source evidence. A type field also
 creates a review-only `subject — is-a → value` candidate using that exact field as its cited text.
 Only explicit acceptance stores the type claim, after which ordinary reasoning can use it. The
@@ -447,9 +449,12 @@ yes/no question, abstained for Cambridge, returned the same Bletchley Park sente
 does Alan Turing work?`, and read Warsaw from Marie Curie's exact-title infobox. These cases validate the
 targeted route, not broad coreference or polar-question coverage.
 
-The same index answered `What type of place is Albury?` from the exact `type = city` infobox field.
-The field can now enter the cited candidate-review queue and become a reasoning fact only after
-explicit acceptance. It does not automatically add class facts to predicate-alignment discovery.
+The same index answered `What type of place is Albury?` from the exact `type = city` infobox field
+and `What type of place is Chicago?` from `settlement_type = City`. The latter required switching
+the structured lookup from ranked body search to the exact-title index; the previous top-100 body
+search did not find Chicago's title because the large corpus contained many body matches. Both
+fields can enter the cited candidate-review queue and become reasoning facts only after explicit
+acceptance. They do not automatically add class facts to predicate-alignment discovery.
 
 Exact-title grounding now has a dedicated title-field lookup, avoiding a full ranked body search
 when a route only needs to locate one page. The Who fallback also abstains when a predicate has no
