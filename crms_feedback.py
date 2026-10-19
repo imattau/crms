@@ -1,7 +1,7 @@
-"""Persistent user feedback attributed to the evidence behind a CRMS answer.
+"""Persistent, evidence-attributed feedback and its cautious learning ledger.
 
-Feedback is recorded for later review. It does not accept, reject, or reweight
-knowledge by itself.
+Feedback updates a separate per-user ledger for explicit rule review. It never
+changes accepted facts, proof validity, or answer selection by itself.
 """
 
 from __future__ import annotations
@@ -12,11 +12,14 @@ from pathlib import Path
 import sqlite3
 from typing import Any, Iterable, Mapping
 
+from crms_ledger import Ledger
+
 
 _APPLICATION_ID = 0x43524642  # CRFB
-_SCHEMA_VERSION = 2
+_SCHEMA_VERSION = 3
 _V1_TABLES = {"answer_feedback"}
-_TABLES = {"answer_feedback", "feedback_context"}
+_V2_TABLES = {"answer_feedback", "feedback_context"}
+_TABLES = _V2_TABLES | {"item_ledger", "ledger_event"}
 
 
 def _canonical_json(value: Any) -> str:
@@ -371,8 +374,12 @@ class AnswerFeedbackStore:
             app_id = connection.execute("PRAGMA application_id").fetchone()[0]
             version = connection.execute("PRAGMA user_version").fetchone()[0]
             if tables:
-                if (tables == _V1_TABLES and app_id == _APPLICATION_ID
-                        and version == 1):
+                if ((tables == _V1_TABLES and app_id == _APPLICATION_ID
+                     and version == 1)
+                        or (tables == _V2_TABLES and app_id == _APPLICATION_ID
+                            and version == 2)
+                        or (tables == _TABLES and app_id == _APPLICATION_ID
+                            and version == _SCHEMA_VERSION)):
                     # Preserve the append-only event history while adding the
                     # one mutable pointer needed to resume feedback after a
                     # process restart.
@@ -399,15 +406,20 @@ class AnswerFeedbackStore:
                 evidence_json TEXT NOT NULL
             )""")
             connection.execute(f"PRAGMA application_id={_APPLICATION_ID}")
+            # The shared evidence ledger is additive. Existing answer history
+            # remains intact when a v1 or v2 feedback database is upgraded.
+            Ledger(connection)
             connection.execute(f"PRAGMA user_version={_SCHEMA_VERSION}")
 
     def record(self, verdict: str, question: str, answer: str,
-               evidence_refs: Iterable[Mapping[str, Any]]) -> tuple[str, bool]:
+               evidence_refs: Iterable[Mapping[str, Any]], *,
+               auto_learned_rule_ids: Iterable[str] = ()) -> tuple[str, bool]:
         if verdict not in {"right", "wrong"}:
             raise ValueError("verdict must be 'right' or 'wrong'")
         refs = sorted((_normalize_ref(row) for row in evidence_refs),
                       key=lambda row: (row["kind"], row["id"]))
         answer_id = feedback_answer_id(question, answer, refs)
+        learned_rule_ids = {str(value) for value in auto_learned_rule_ids}
         with sqlite3.connect(self.path) as connection:
             cursor = connection.execute(
                 "INSERT OR IGNORE INTO answer_feedback "
@@ -415,7 +427,42 @@ class AnswerFeedbackStore:
                 "VALUES (?,?,?,?,?)",
                 (answer_id, verdict, question.strip(), answer.strip(),
                  _canonical_json(refs)))
+            if cursor.rowcount == 1:
+                ledger = Ledger(connection)
+                ledger_event = "confirmed" if verdict == "right" else "rejected"
+                for item in refs:
+                    kind = item["kind"]
+                    if kind not in {"fact", "rule"}:
+                        continue
+                    item_id = item["id"]
+                    # Facts default to protected because this feedback record
+                    # cannot prove whether a fact was taught, reviewed, or
+                    # derived. Only rules carrying accepted held-out
+                    # validation metadata are eligible for a learned weight.
+                    auto_rule = kind == "rule" and item_id in learned_rule_ids
+                    ledger.register(kind, item_id, protected=not auto_rule)
+                    ledger.record(
+                        kind, item_id, ledger_event,
+                        answer_id=answer_id, verdict=verdict,
+                        question=question.strip())
             return answer_id, cursor.rowcount == 1
+
+    def ledger_weight(self, kind: str, item_id: str) -> float:
+        """Return a review weight for an item, or zero if it has no history."""
+        with sqlite3.connect(self.path) as connection:
+            return Ledger(connection).weight(kind, item_id)
+
+    def ledger_item(self, kind: str, item_id: str) -> dict[str, Any] | None:
+        """Return the explicit review ledger state without affecting retrieval."""
+        with sqlite3.connect(self.path) as connection:
+            row = connection.execute(
+                "SELECT weight,hits,misses,status,protected FROM item_ledger "
+                "WHERE item_kind=? AND item_id=?", (kind, item_id)).fetchone()
+        if row is None:
+            return None
+        return {"weight": float(row[0]), "hits": int(row[1]),
+                "misses": int(row[2]), "status": str(row[3]),
+                "protected": bool(row[4])}
 
     def set_pending(self, question: str, answer: str,
                     evidence_refs: Iterable[Mapping[str, Any]]) -> None:

@@ -58,13 +58,15 @@ def main() -> None:
         store.record("wrong", expected["question"], expected["answer"], refs)
         with sqlite3.connect(path) as connection:
             connection.execute("DROP TABLE feedback_context")
+            connection.execute("DROP TABLE ledger_event")
+            connection.execute("DROP TABLE item_ledger")
             connection.execute("PRAGMA user_version=1")
         migrated = AnswerFeedbackStore(path)
         require(migrated.pending() is None
                 and len(migrated.events()) == 1,
                 "v1 feedback migration discarded events or invented context")
         with sqlite3.connect(path) as connection:
-            require(connection.execute("PRAGMA user_version").fetchone()[0] == 2,
+            require(connection.execute("PRAGMA user_version").fetchone()[0] == 3,
                     "feedback database schema version was not upgraded")
 
     with tempfile.TemporaryDirectory(prefix="crms-feedback-context-restart-") as folder:

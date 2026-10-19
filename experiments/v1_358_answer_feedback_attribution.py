@@ -275,14 +275,16 @@ def main() -> None:
                 "--math-session", str(root / "math-session.json"),
                 "--translations", str(root / "translations.json"),
                 "--translation-session", str(root / "translation-session.json")]
-        commands = ("/infer-relation Nia|grandparent|Pia\n/wrong\n"
+        commands = ("/infer-relation Nia|grandparent|Pia\n/wrong\n/feedback\n"
                     "/inference-rules\n/infer-relation Nia|grandparent|Pia\n/quit\n")
         run = subprocess.run(args, input=commands, text=True, capture_output=True,
                              timeout=30)
         require(run.returncode == 0, run.stderr or run.stdout)
         for phrase in ("Suspended validated learned rule(s) for review",
                        "learned-grandparent [needs_review]",
-                       "user marked an answer using it wrong", "Feedback "):
+                       "user marked an answer using it wrong", "Feedback ",
+                       "Current rule review signal (held-out learned)",
+                       "does not alter proof or answer selection"):
             require(phrase in run.stdout,
                     f"interactive feedback omitted {phrase!r}: {run.stdout}")
         require("contradictory source-backed evidence" not in run.stdout,
@@ -290,6 +292,14 @@ def main() -> None:
         persisted = CRMSKnowledgeBase.load(knowledge_path).list_inference_rules()[0]
         require(persisted["status"] == "needs_review",
                 "interactive feedback did not persist rule review status")
+        ledger_state = AnswerFeedbackStore(
+            root / "feedback.sqlite3").ledger_item(
+                "rule", "learned-grandparent")
+        require(ledger_state is not None and not ledger_state["protected"]
+                and ledger_state["misses"] == 1
+                and abs(ledger_state["weight"] - 0.13) < 1e-12,
+                f"interactive feedback did not update the learned-rule ledger: "
+                f"{ledger_state}")
 
     with tempfile.TemporaryDirectory(prefix="crms-fact-feedback-chat-") as directory:
         root = Path(directory)

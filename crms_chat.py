@@ -5356,9 +5356,15 @@ def main() -> int:
             if last_feedback_record is None:
                 print("CRMS> I don't have a recent evidence-backed answer to attach this to.")
                 continue
+            auto_learned_rule_ids = {
+                row["rule"]["rule_id"] for row in knowledge.list_inference_rules()
+                if isinstance(row.get("validation"), dict)
+                and row.get("status") in {"validated", "needs_review"}
+            }
             feedback_id, inserted = feedback_store.record(
                 line[1:], last_feedback_record["question"],
-                last_feedback_record["answer"], last_feedback_record["evidence"])
+                last_feedback_record["answer"], last_feedback_record["evidence"],
+                auto_learned_rule_ids=auto_learned_rule_ids)
             if not inserted:
                 print("CRMS> I already recorded that feedback for this answer.")
                 continue
@@ -5400,6 +5406,21 @@ def main() -> int:
                     print(f"CRMS> {event['verdict'].upper()} #{event['feedback_seq']}: "
                           f"{event['question']} => {event['answer']}")
                     print("  Used: " + render_feedback_refs(event["evidence"]))
+                    for item in event["evidence"]:
+                        if item.get("kind") != "rule":
+                            continue
+                        state = feedback_store.ledger_item("rule", item["id"])
+                        if state is None:
+                            continue
+                        provenance = ("held-out learned" if not state["protected"]
+                                      else "protected")
+                        print(
+                            f"  Current rule review signal ({provenance}): "
+                            f"{item['id']} — "
+                            f"weight {state['weight']:.3f}, "
+                            f"{state['hits']} confirming / {state['misses']} "
+                            f"rejecting, {state['status']}. This is for review; "
+                            "it does not alter proof or answer selection.")
                     fact_refs = [item for item in event["evidence"]
                                  if item.get("kind") == "fact"
                                  and item.get("subject") and item.get("relation")

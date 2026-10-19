@@ -7,9 +7,13 @@ follow-through is implemented in `crms_chat.py` and covered by
 analysis is implemented in `crms_equivalence_dream.py` and covered by
 `experiments/v1_297_equivalence_dream_diagnostic.py`. The `/right` and `/wrong` feedback signal
 and its evidence-attributed SQLite event log are implemented. The standalone SQLite ledger engine
-is now implemented in `crms_ledger.py` and covered by `experiments/v1_368_evidence_ledger.py`;
-connecting it to accepted model items, answer preference, automated belief revision, and feedback
-effects on answers in sections 1 and 4 remain open work.
+is now implemented in `crms_ledger.py` and covered by `experiments/v1_368_evidence_ledger.py`.
+It is connected to explicit `/right` and `/wrong` feedback in the per-user SQLite feedback
+database: fact feedback is recorded as protected, and only rules with held-out validation metadata
+receive adjustable review weights. `/feedback` exposes the weights and counts as review signals.
+This does not change accepted knowledge, proof validity, or answer selection. Portable model-item
+registration, preference-based retrieval, automated belief revision, and measured answer effects
+remain open work.
 Prototype results below are design evidence;
 their throwaway code (`ledger.py`, `exp_belief*.py`, `gap_followup.py`, `dream2.py`) is not
 imported. Separately, explicit `practice_relation` and `practice_question` can write a complete,
@@ -29,10 +33,10 @@ preference margin, dependency-safe dormancy, stale-item listing, outer-transacti
 noisy revision. Across 200 synthetic 20%-noise seeds, the margin 0.30 policy averaged 1.27
 preference flips and 1.91 stale answers versus 5.46 stale answers with margin 0, with 14.40
 abstentions per 60 observations. This validates only the ledger equations on a synthetic signal;
-it is not a CRMS user-feedback result. The engine is not yet connected to fact/rule/frame registration
-or answer-selection paths: `/right` still does not change answer preferences, and item weights are
-not correctness evidence. Integration needs a source-strength-aware conflict policy and must
-preserve the existing evidence gates.
+it is not a CRMS user-feedback result. The ledger is connected to feedback events, but not portable
+model-item registration or answer-selection paths. Item weights are user-specific review signals,
+not correctness evidence. Any later preference integration needs a source-strength-aware conflict
+policy and must preserve the existing evidence gates.
 **Origin:** ideas reviewed from the HPM Learning Agent repo (belief weights, demand-driven
 learning, "dreaming"), re-expressed without vectors.
 
@@ -61,7 +65,12 @@ reload. Inference `why?` follow-ups also retain proof lineage. The current answe
 now persists in SQLite across chat restarts, including its evidence references; schema version 1
 migrates without discarding its event history. A new natural-language turn clears that target, and
 opposite post-restart signals remain a reviewable conflict.
-`experiments/v1_367_persistent_feedback_context.py` checks those behaviors. The feedback system now
+`experiments/v1_367_persistent_feedback_context.py` checks those behaviors. Feedback schema version
+3 adds ledger tables while migrating version 1 and 2 databases without losing feedback or pending
+answer context. Facts remain protected because provenance class cannot be inferred from a feedback
+reference alone; held-out-validated learned rules are adjustable, while teacher-supplied rules remain
+protected. Duplicate feedback cannot update the ledger twice. `/feedback` labels these values as
+review-only and states they do not alter proof or answer selection. The feedback system now
 covers direct facts, inference, translation, math, code generation, extractive summaries, paper
 authors/results, entity summaries, and timelines. Translation feedback fingerprints the aligned frame and examples;
 math feedback fingerprints the expression, exact result, and licensed operator/number/unit evidence;
@@ -69,9 +78,8 @@ code feedback identifies the generated artifact and its recorded instruction exa
 cases; research feedback retains exact source citations and query-expansion licenses; timeline
 feedback records the underlying fact triples and wording evidence. These identify the model
 evidence without turning feedback into a new training example or proof of correctness. Other
-specialized answer routes still need coverage. Remaining work also includes connecting `/right` to
-evidence-ledger confirmation and measuring
-revision/abstention on a larger noisy-feedback benchmark. Direct-fact feedback stores the structured proposition and its supporting
+specialized answer routes still need coverage. Remaining work includes portable model-item
+registration and measuring revision/abstention on a larger noisy-feedback benchmark. Direct-fact feedback stores the structured proposition and its supporting
 source ids; `/feedback` displays numbered propositions and citations, and
 `/retract-feedback FEEDBACK|FACT|SOURCE` retracts only the selected source support. A wrong signal
 alone does not retract or negate a fact: the user must inspect the evidence and explicitly choose a
@@ -591,8 +599,9 @@ declared rule data only when the proof format can verify their direction and pro
 - Exact missing-premise source follow-through is already implemented and reviewed in section 2;
   it searches indexed text, requires the existing frame to parse the precise missing triple, and
   routes proposals through explicit fact review. No relaxation of that match is needed.
-- Feedback capture is implemented, but the item-weighting evidence ledger remains proposed.
-  `/right` currently records evidence-attributed feedback without strengthening facts or rules.
+- Feedback capture now feeds a per-user evidence ledger. Only held-out-validated learned rules have
+  adjustable review weights; facts and teacher-supplied rules are protected. These weights are not
+  yet used for answer selection or portable model updates.
 - Statistical proposals for symmetric, functional, inverse, or sub-relation behavior may be useful
   if they include positive and negative examples and enter the same cited review workflow. They
   must not install schemas or treat graph shape alone as proof. Separate derivation schemas from
