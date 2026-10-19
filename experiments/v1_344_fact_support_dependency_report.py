@@ -60,6 +60,42 @@ def main() -> None:
     require(before_facts == after_facts and before_cases == after_cases,
             "read-only report mutated accepted facts or derived cases")
 
+    proof_frame_kb = CRMSKnowledgeBase()
+    proof_frame_kb.add_inference_rule(
+        "parent-chain", "parent", "parent", "ancestor")
+    for number in range(2):
+        subject, middle, target = (f"Proof{number}A", f"Proof{number}B",
+                                   f"Proof{number}C")
+        proof_frame_kb.add_fact(subject, "parent", middle,
+                                f"proof:{number}:left")
+        proof_frame_kb.add_fact(middle, "parent", target,
+                                f"proof:{number}:right")
+        proof_frame_kb.teach_question(
+            f"Who is an ancestor of {target}?", relation="ancestor",
+            answer_field="subject", bound_entity=target, answer=subject)
+    proof_frame_row = next(row for row in support_report(proof_frame_kb)
+                           if row.item_kind == "frame"
+                           and row.label.startswith("Question frame"))
+    require(proof_frame_row.support_examples == 2
+            and set(proof_frame_row.source_documents) == {
+                "proof:0:left", "proof:0:right", "proof:1:left", "proof:1:right"},
+            f"inference proof lineage was not captured for question frames: "
+            f"{proof_frame_row}")
+    with tempfile.TemporaryDirectory(prefix="crms-v1-344-proof-frame-") as folder:
+        saved = Path(folder) / "proof-frame.json"
+        proof_frame_kb.save(saved)
+        CRMSKnowledgeBase.load(saved)
+    first_source = "proof:0:left"
+    require(proof_frame_kb.remove_fact(
+        "Proof0A", "parent", "Proof0B", first_source),
+        "inference-frame premise retraction failed")
+    proof_frame_key, proof_frame_examples = next(iter(
+        proof_frame_kb._question_examples.items()))
+    require(len(proof_frame_examples) == 1
+            and not proof_frame_kb._question_frame_is_licensed(
+                proof_frame_key, proof_frame_examples),
+            "removing a proof premise left its question-frame example licensed")
+
     learned = CRMSKnowledgeBase()
     for group, prefix in (("training", "train:"), ("holdout", "holdout:")):
         for number in range(2):
@@ -175,18 +211,67 @@ def main() -> None:
                 f"source-backed frame evidence was not reported: {frame}")
         require(frame.dependents is None and frame.risk == "unassessed",
                 f"frame usage was inferred without a usage link: {frame}")
+
+        question_kb = CRMSKnowledgeBase()
+        for document_id, sentence, subject, obj, _location in frame_examples:
+            hit = next(hit for hit in index.search("likes", limit=30)
+                       if hit.document_id == document_id)
+            citation = index.citation(hit)
+            question_kb.add_fact(subject, "likes", obj, citation)
+            question_kb.teach_question(
+                f"Who likes {obj}?", relation="likes", answer_field="subject",
+                bound_entity=obj, answer=subject)
+        question_rows = support_report(question_kb, research_index=index)
+        question_frame = next(row for row in question_rows
+                              if row.item_kind == "frame"
+                              and row.label.startswith("Question frame"))
+        require(question_frame.support_examples == 2
+                and question_frame.independent_origins == 2,
+                f"question-frame source lineage was not reported: {question_frame}")
+        tea_fact_row = next(row for row in question_rows
+                            if row.item_kind == "fact"
+                            and row.label == "Alice — likes → tea")
+        require(tea_fact_row.dependents == 1,
+                f"question frame was not linked as a fact dependent: {tea_fact_row}")
+        saved = Path(folder) / "question-kb.sqlite"
+        question_kb.save(saved)
+        restored = CRMSKnowledgeBase.load(saved)
+        restored_rows = support_report(restored, research_index=index)
+        restored_frame = next(row for row in restored_rows
+                              if row.item_id == question_frame.item_id)
+        require(restored_frame == question_frame,
+                f"question-frame evidence was not preserved in SQLite: {restored_frame}")
+        tea_hit = next(hit for hit in index.search("likes tea", limit=20)
+                       if hit.document_id == "frame-a")
+        tea_citation = index.citation(tea_hit)
+        require(question_kb.remove_fact("Alice", "likes", "tea", tea_citation),
+                "question-example source retraction failed")
+        remaining_key, remaining_examples = next(iter(
+            question_kb._question_examples.items()))
+        require(len(remaining_examples) == 1
+                and not question_kb._question_frame_is_licensed(
+                    remaining_key, remaining_examples),
+                "retracting one of two examples left the frame licensed")
+        remaining_frame = next(row for row in support_report(
+            question_kb, research_index=index)
+                               if row.item_id == question_frame.item_id)
+        require(remaining_frame.support_examples == 1,
+                f"frame report did not reflect retracted support: {remaining_frame}")
         index.close()
 
     print("PASS: exact fact leaves link to verified derived dependents")
     print("PASS: teacher support and thin-support flag are reported")
     print("PASS: teacher support does not count as an external origin")
     print("PASS: deterministic report leaves facts and derived cases unchanged")
+    print("PASS: inference-backed question frames retain and retract proof provenance")
     print("PASS: accepted rule records training/holdout support and derived dependents")
     print("PASS: citation text detects copies across distinct URL origins")
     print("PASS: unresolved multi-origin citations stay unassessed")
     print("PASS: configured origin mappings group related publishers")
     print("PASS: distinct cited text counts independent origins separately")
     print("PASS: learned sentence frame reports its fact-backed examples")
+    print("PASS: explicit question-frame evidence survives SQLite round-trip")
+    print("PASS: retracting a licensing fact removes that frame example")
 
 
 if __name__ == "__main__":

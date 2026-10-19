@@ -56,6 +56,7 @@ _KNOWLEDGE_DB_TABLES = _KNOWLEDGE_DB_V1_TABLES | {"knowledge_records"}
 _KNOWLEDGE_RECORD_SECTIONS = frozenset({
     "entity_aliases", "entity_alias_explicit_sources",
     "fact_pattern_alias_sources", "question_examples",
+    "question_example_evidence",
     "subject_pattern_question_examples",
     "induced_question_frames", "induced_qualified_question_frames",
     "induced_multi_qualified_question_frames", "qualified_question_examples",
@@ -943,6 +944,10 @@ class CRMSKnowledgeBase:
             tuple[str, str, tuple[str, ...], tuple[str, ...]],
             dict[tuple[str, ...], set[str]],
         ] = {}
+        self._question_example_evidence: dict[
+            tuple[str, str, tuple[str, ...], tuple[str, ...]],
+            dict[tuple[str, ...], list[dict[str, Any]]],
+        ] = {}
         # A reviewed question slot may correspond to a subspan of a fact
         # endpoint, e.g. place in "What research happened at {place}?" maps to
         # the subject pattern "Researchers at {place}". Keep this separate
@@ -1149,6 +1154,22 @@ class CRMSKnowledgeBase:
             and self._qualifiers_equal(stored.qualifiers, candidate_qualifiers)
         )
 
+    def _proof_fact_support_is_present(
+            self, candidate: Mapping[str, Any]) -> bool:
+        """Check that a saved proof's cited sources remain among fact support."""
+        candidate_qualifiers = self._normalize_qualifiers(
+            dict(candidate.get("qualifiers", ())))
+        candidate_sources = {str(source) for source in candidate.get("sources", ())}
+        if not candidate_sources:
+            return False
+        for fact in self._matching_fact_rows(
+                self._facts, *(str(candidate.get(field, ""))
+                               for field in ("subject", "relation", "object"))):
+            if (self._qualifiers_equal(fact.qualifiers, candidate_qualifiers)
+                    and candidate_sources <= set(fact.sources)):
+                return True
+        return False
+
     def _matching_fact_rows(
             self, store, subject: str, relation: str, obj: str
             ) -> list[FactEvidence]:
@@ -1260,6 +1281,8 @@ class CRMSKnowledgeBase:
         old = store.get(key)
         if old is None or source not in old.sources:
             return False
+        if store is self._facts:
+            self._retract_question_example_evidence(key, source)
         if not normalized_qualifiers:
             self._retract_fact_pattern_support(
                 _tokens(subject), _tokens(relation), _tokens(obj), source,
@@ -1283,6 +1306,114 @@ class CRMSKnowledgeBase:
                 self._discard_index_key(
                     self._facts_by_object, _tokens(old.object), key)
         return True
+
+    def _retract_question_example_evidence(
+            self, fact_key: tuple[Any, ...], source: str) -> None:
+        """Remove only frame examples whose exact fact/proof support was retracted."""
+        for frame_key, by_entity in list(self._question_example_evidence.items()):
+            for entity_key, records in list(by_entity.items()):
+                retained = []
+                for original in records:
+                    record = copy.deepcopy(original)
+                    direct_facts = []
+                    for fact in record.get("direct_facts", ()):
+                        fact_record_key = self._fact_key(
+                            fact["subject"], fact["relation"], fact["object"],
+                            self._normalize_qualifiers(
+                                dict(fact.get("qualifiers", ()))))
+                        if (fact_record_key != fact_key
+                                or source not in fact.get("sources", ())):
+                            direct_facts.append(fact)
+                            continue
+                        remaining = [item for item in fact.get("sources", ())
+                                     if item != source]
+                        if remaining:
+                            fact["sources"] = remaining
+                            direct_facts.append(fact)
+                    record["direct_facts"] = direct_facts
+                    proofs = []
+                    for proof in record.get("proofs", ()):
+                        updated = self._without_retracted_proof_fact(
+                            proof, fact_key, source)
+                        if updated is not None:
+                            proofs.append(updated)
+                    record["proofs"] = proofs
+                    if direct_facts or proofs:
+                        retained.append(record)
+                if retained:
+                    by_entity[entity_key] = retained
+                else:
+                    del by_entity[entity_key]
+                    # Old persisted frames have no evidence record; do not
+                    # silently reinterpret their legacy examples as retracted.
+                    if entity_key in self._question_examples.get(frame_key, {}) \
+                            and frame_key in self._question_example_evidence:
+                        self._question_examples[frame_key].pop(entity_key, None)
+            if not by_entity:
+                del self._question_example_evidence[frame_key]
+
+    @classmethod
+    def _without_retracted_proof_fact(
+            cls, proof: Any, fact_key: tuple[Any, ...], source: str
+            ) -> dict[str, Any] | None:
+        """Return a proof with one remaining source removed, or None if broken."""
+        if not isinstance(proof, Mapping):
+            return None
+        updated = copy.deepcopy(dict(proof))
+        if updated.get("kind") == "fact":
+            fact = updated.get("fact")
+            key = (cls._fact_key(
+                fact["subject"], fact["relation"], fact["object"],
+                cls._normalize_qualifiers(dict(fact.get("qualifiers", ()))))
+                   if isinstance(fact, Mapping) else None)
+            if isinstance(fact, Mapping) and key == fact_key:
+                remaining = [item for item in fact.get("sources", ())
+                             if item != source]
+                if not remaining:
+                    return None
+                updated_fact = dict(fact)
+                updated_fact["sources"] = remaining
+                updated["fact"] = updated_fact
+            return updated
+        premises = updated.get("premises")
+        if isinstance(premises, list):
+            revised = [cls._without_retracted_proof_fact(
+                premise, fact_key, source) for premise in premises]
+            if any(item is None for item in revised):
+                return None
+            updated["premises"] = revised
+        for field in ("middle_kind_fact", "relation_type_fact"):
+            fact = updated.get(field)
+            key = (cls._fact_key(
+                fact["subject"], fact["relation"], fact["object"],
+                cls._normalize_qualifiers(dict(fact.get("qualifiers", ()))))
+                   if isinstance(fact, Mapping) else None)
+            if isinstance(fact, Mapping) and key == fact_key:
+                remaining = [item for item in fact.get("sources", ())
+                             if item != source]
+                if not remaining:
+                    return None
+                updated_fact = dict(fact)
+                updated_fact["sources"] = remaining
+                updated[field] = updated_fact
+        kind_facts = updated.get("middle_kind_facts")
+        if isinstance(kind_facts, list):
+            revised_kind_facts = []
+            for fact in kind_facts:
+                key = (cls._fact_key(
+                    fact["subject"], fact["relation"], fact["object"],
+                    cls._normalize_qualifiers(dict(fact.get("qualifiers", ()))))
+                       if isinstance(fact, Mapping) else None)
+                if isinstance(fact, Mapping) and key == fact_key:
+                    remaining = [item for item in fact.get("sources", ())
+                                 if item != source]
+                    if not remaining:
+                        return None
+                    fact = dict(fact)
+                    fact["sources"] = remaining
+                revised_kind_facts.append(fact)
+            updated["middle_kind_facts"] = revised_kind_facts
+        return updated
 
     def _retract_context_fact_pattern_support(
             self, subject: tuple[str, ...], relation: tuple[str, ...],
@@ -9045,6 +9176,27 @@ class CRMSKnowledgeBase:
                answer_field, prefix, suffix)
         entities = self._question_examples.setdefault(key, {})
         entities.setdefault(entity_words, set()).add(" ".join(entity_words))
+        evidence_record = {
+            "answer": answer,
+            "conclusion": {"subject": (answer if answer_field == "subject"
+                                         else bound_entity),
+                           "relation": relation,
+                           "object": (bound_entity if answer_field == "subject"
+                                      else answer)},
+            "qualifiers": list(normalized_qualifiers),
+            "direct_facts": [asdict(fact) for fact in direct],
+            "proofs": ([copy.deepcopy(proof) for proof in inferred.proofs]
+                       if inferred and inferred.status == "answered" else []),
+        }
+        evidence_by_entity = self._question_example_evidence.setdefault(key, {})
+        records = evidence_by_entity.setdefault(entity_words, [])
+        encoded_record = json.dumps(evidence_record, sort_keys=True,
+                                    ensure_ascii=False)
+        if all(json.dumps(item, sort_keys=True, ensure_ascii=False)
+               != encoded_record for item in records):
+            records.append(evidence_record)
+            records.sort(key=lambda item: json.dumps(
+                item, sort_keys=True, ensure_ascii=False))
         return self._question_frame_is_licensed(key, entities)
 
     def _question_frame_is_licensed(
@@ -14091,6 +14243,18 @@ class CRMSKnowledgeBase:
                  "entities": [list(entity) for entity in sorted(values)]}
                 for key, values in sorted(self._question_examples.items())
             ],
+            "question_example_evidence": [
+                {"relation": list(json.loads(key[0])),
+                 "answer_field": key[1], "prefix": list(key[2]),
+                 "suffix": list(key[3]),
+                 "examples": [
+                     {"entity": list(entity),
+                      "evidence": copy.deepcopy(records)}
+                     for entity, records in sorted(by_entity.items())
+                 ]}
+                for key, by_entity in sorted(
+                    self._question_example_evidence.items())
+            ],
             "subject_pattern_question_examples": [
                 {"relation": list(json.loads(key[0])),
                  "answer_field": key[1], "question_prefix": list(key[2]),
@@ -14491,6 +14655,59 @@ class CRMSKnowledgeBase:
                 knowledge._question_examples[key] = {
                     tuple(entity): {" ".join(entity)} for entity in item["entities"]
                 }
+            for item in payload.get("question_example_evidence", []):
+                relation = tuple(item["relation"])
+                answer_field = item.get("answer_field")
+                if not relation or answer_field not in {"subject", "object"}:
+                    raise ValueError("stored question-frame evidence key is malformed")
+                key = (json.dumps(relation, ensure_ascii=False), answer_field,
+                       tuple(item.get("prefix", ())), tuple(item.get("suffix", ())))
+                if key not in knowledge._question_examples:
+                    raise ValueError("question-frame evidence has no stored frame")
+                by_entity = {}
+                for example in item.get("examples", ()):
+                    entity = tuple(example.get("entity", ()))
+                    if not entity or entity not in knowledge._question_examples[key]:
+                        raise ValueError("question-frame evidence names an unknown entity")
+                    records = example.get("evidence", ())
+                    if (not isinstance(records, list)
+                            or any(not isinstance(record, dict)
+                                   or not isinstance(record.get("answer"), str)
+                                   or not isinstance(record.get("conclusion"), dict)
+                                   or not isinstance(record.get("direct_facts", []), list)
+                                   or not isinstance(record.get("proofs", []), list)
+                                   for record in records)):
+                        raise ValueError("stored question-frame evidence is malformed")
+                    for record in records:
+                        conclusion = record["conclusion"]
+                        try:
+                            expected_qualifiers = knowledge._normalize_qualifiers(
+                                dict(record.get("qualifiers", ())))
+                        except (TypeError, ValueError) as error:
+                            raise ValueError(
+                                "stored question-frame qualifiers are malformed") from error
+                        for fact in record.get("direct_facts", ()):
+                            if (not isinstance(fact, Mapping)
+                                    or not knowledge._proof_fact_support_is_present(fact)):
+                                raise ValueError(
+                                    "question-frame direct evidence is absent from the store")
+                        _facts, _negatives, rules = (
+                            knowledge._sqlite_inference_snapshot(
+                                conclusion.get("relation", ""),
+                                expected_qualifiers,
+                                list(knowledge._inference_rules.values())))
+                        for proof in record.get("proofs", ()):
+                            checked = verify_inference_proof(
+                                proof, _facts, rules,
+                                expected_conclusion=conclusion,
+                                expected_qualifiers=expected_qualifiers,
+                                fact_lookup=knowledge._proof_fact_support_is_present)
+                            if not checked.valid:
+                                raise ValueError(
+                                    "question-frame proof evidence failed verification")
+                    by_entity[entity] = copy.deepcopy(records)
+                if by_entity:
+                    knowledge._question_example_evidence[key] = by_entity
             for item in payload.get("subject_pattern_question_examples", []):
                 relation = tuple(item["relation"])
                 answer_field = item.get("answer_field")

@@ -130,6 +130,26 @@ def _proof_rule_ids(proof: Any) -> set[str]:
     return found
 
 
+def _proof_sources(proof: Any) -> set[str]:
+    found: set[str] = set()
+    stack = [proof]
+    while stack:
+        node = stack.pop()
+        if not isinstance(node, Mapping):
+            continue
+        for field in ("fact", "middle_kind_fact", "relation_type_fact"):
+            fact = node.get(field)
+            if isinstance(fact, Mapping):
+                found.update(str(source) for source in fact.get("sources", ()))
+        for fact in node.get("middle_kind_facts", ()):
+            if isinstance(fact, Mapping):
+                found.update(str(source) for source in fact.get("sources", ()))
+        premises = node.get("premises", ())
+        if isinstance(premises, (list, tuple)):
+            stack.extend(premises)
+    return found
+
+
 def _source_statistics(sources: Iterable[str], research_index: Any | None,
                        origin_map: Mapping[str, str] | None
                        ) -> tuple[tuple[str, ...], tuple[str, ...], int | None,
@@ -205,6 +225,8 @@ def support_report(knowledge_base: Any, *, min_dependents: int = 3,
         raise ValueError("min_origins must be a positive integer")
 
     dependencies: dict[tuple[Any, ...], set[str]] = {}
+    question_frame_fact_dependencies: dict[tuple[Any, ...], set[str]] = {}
+    question_frame_rule_dependencies: dict[str, set[str]] = {}
     verified_cases = [case for case in knowledge_base.derived_cases()
                       if case.get("status") == "verified"]
     for case in verified_cases:
@@ -213,6 +235,24 @@ def support_report(knowledge_base: Any, *, min_dependents: int = 3,
         for proof in case.get("proofs", ()):
             for key in _proof_fact_keys(proof):
                 dependencies.setdefault(key, set()).add(case_id)
+    for frame_key, by_entity in getattr(
+            knowledge_base, "_question_example_evidence", {}).items():
+        frame_id = hashlib.sha256(json.dumps(
+            [frame_key[0], frame_key[1], frame_key[2], frame_key[3]],
+            ensure_ascii=False, separators=(",", ":")).encode("utf-8")).hexdigest()
+        for records in by_entity.values():
+            for record in records:
+                for fact in record.get("direct_facts", ()):
+                    if isinstance(fact, Mapping):
+                        question_frame_fact_dependencies.setdefault(
+                            _fact_key(fact), set()).add(frame_id)
+                for proof in record.get("proofs", ()):
+                    for fact_key in _proof_fact_keys(proof):
+                        question_frame_fact_dependencies.setdefault(
+                            fact_key, set()).add(frame_id)
+                    for rule_id in _proof_rule_ids(proof):
+                        question_frame_rule_dependencies.setdefault(
+                            rule_id, set()).add(frame_id)
 
     rows = []
     stores: Iterable[tuple[bool, Iterable[Any]]] = (
@@ -229,8 +269,9 @@ def support_report(knowledge_base: Any, *, min_dependents: int = 3,
             (documents, origins, independent_origins, copied, teacher,
              origin_count_available) = _source_statistics(
                 fact.sources, research_index, origin_map)
-            dependent_cases = dependencies.get(key, set())
-            risk = ("thin" if len(dependent_cases) >= min_dependents
+            dependents = (dependencies.get(key, set())
+                          | question_frame_fact_dependencies.get(key, set()))
+            risk = ("thin" if len(dependents) >= min_dependents
                     and origin_count_available
                     and independent_origins < min_origins else "unassessed")
             polarity_label = "" if polarity else "not "
@@ -239,7 +280,7 @@ def support_report(knowledge_base: Any, *, min_dependents: int = 3,
                      f"{fact.object}{qualifiers}")
             rows.append(SupportRow(
                 "fact", _stable_id(fact_map, polarity), label,
-                len(dependent_cases), documents, origins, independent_origins,
+                len(dependents), documents, origins, independent_origins,
                 copied, teacher, risk, origin_count_available))
 
     rule_dependents: dict[str, set[str]] = {}
@@ -263,7 +304,8 @@ def support_report(knowledge_base: Any, *, min_dependents: int = 3,
         (documents, origins, independent_origins, copied, teacher,
          origin_count_available) = _source_statistics(
             sources, research_index, origin_map)
-        dependents = rule_dependents.get(rule.rule_id, set())
+        dependents = (rule_dependents.get(rule.rule_id, set())
+                      | question_frame_rule_dependencies.get(rule.rule_id, set()))
         risk = ("thin" if len(dependents) >= min_dependents
                 and origin_count_available
                 and independent_origins < min_origins else "unassessed")
@@ -299,5 +341,37 @@ def support_report(knowledge_base: Any, *, min_dependents: int = 3,
             "frame", item_id, label, None, documents, origins,
             independent_origins, copied, teacher, "unassessed",
             origin_count_available, len(examples)))
+    for key, by_entity in getattr(
+            knowledge_base, "_question_example_evidence", {}).items():
+        relation = tuple(json.loads(key[0]))
+        answer_field = key[1]
+        bound_field = "object" if answer_field == "subject" else "subject"
+        template = " ".join((*key[2], "{" + bound_field + "}", *key[3]))
+        sources = set()
+        supported_examples = 0
+        for records in by_entity.values():
+            example_has_support = False
+            for record in records:
+                for fact in record.get("direct_facts", ()):
+                    if isinstance(fact, Mapping):
+                        sources.update(str(source)
+                                       for source in fact.get("sources", ()))
+                        example_has_support = True
+                for proof in record.get("proofs", ()):
+                    sources.update(_proof_sources(proof))
+                    example_has_support = True
+            supported_examples += int(example_has_support)
+        (documents, origins, independent_origins, copied, teacher,
+         origin_count_available) = _source_statistics(
+            sources, research_index, origin_map)
+        label = (f"Question frame {template} ⇒ {' '.join(relation)} "
+                 f"(answers {answer_field})")
+        frame_key = json.dumps([key[0], answer_field, key[2], key[3]],
+                               ensure_ascii=False, separators=(",", ":"))
+        item_id = hashlib.sha256(frame_key.encode("utf-8")).hexdigest()[:20]
+        rows.append(SupportRow(
+            "frame", item_id, label, None, documents, origins,
+            independent_origins, copied, teacher, "unassessed",
+            origin_count_available, supported_examples))
     return sorted(rows, key=lambda row: (
         -(row.dependents or 0), row.label.casefold(), row.item_id))

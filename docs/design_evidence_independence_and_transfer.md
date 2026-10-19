@@ -3,10 +3,10 @@
 **Audience:** the developer (human or AI) implementing this.
 **Status:** staged. Section 3 has a deterministic first implementation in
 `experiments/v1_315_cross_surface_question_transfer.py` with its baseline recorded in
-`benchmark_baselines.md`. A read-only fact/rule dependency and independent-origin report is
+`benchmark_baselines.md`. A read-only fact/rule/question-frame dependency and independent-origin report is
 implemented in `crms_support_report.py` and covered by
-`experiments/v1_344_fact_support_dependency_report.py`. Source-backed sentence-frame examples are
-also reported, but frame dependents, question-frame source lineage, and section 2's
+`experiments/v1_344_fact_support_dependency_report.py`. Explicit question-frame source lineage is
+also retained; frame-use counts, lineage for induced question frames, and section 2's
 source-reliability ledger remain proposed.
 **Origin:** diagnostics and test designs taken from the HPM working paper ("Human Learning as
 Hierarchical Pattern Modelling", included in the HPM Learning Agent repo), re-expressed for
@@ -58,16 +58,19 @@ paths by parent folder, and teacher inputs separately; an optional regex-to-orig
 additional publishers. With a research index, it resolves cited spans and hashes normalized text,
 so verbatim copies across origins count as one independent statement. Without resolvable text,
 multiple origins remain unassessed rather than being assumed independent. It flags a fact as thin
-only when at least the configured number of verified derived cases depend on it and the available
-independent-origin count is below the configured minimum. Other rows say `unassessed`, not `ok`.
+only when at least the configured number of verified derived cases or explicit question-frame
+artifacts depend on it and the available independent-origin count is below the configured
+minimum. Other rows say `unassessed`, not `ok`.
 Accepted inference rules report the stored positive training and holdout evidence and count
-verified derived cases whose proof cites the rule ID. Manually installed rules without saved
-validation provenance remain unassessed. Source-backed declarative frames report their distinct
-fact-pair examples and resolved sources, but current teaching counts do not track which stored
-claims were later produced through a frame. Explicit question-frame teaching also does not retain
-the exact fact proof that licensed each example, so those frame dependents and origins remain
-unassessed. The report uses exact proof leaves and does not change facts, rules, derived cases,
-weights, or answers.
+verified derived cases or explicit question frames whose proof cites the rule ID. Explicit
+question-frame examples now retain their direct facts or verified proof trees; those source facts
+report the frame as a dependent, and retraction removes only the affected example. Manually
+installed rules without saved validation provenance remain unassessed. Source-backed declarative
+frames report their distinct fact-pair examples and resolved sources, but current teaching counts
+do not track which stored claims were later produced through a frame. Question-frame rows report
+their licensing evidence; usage counts for answers produced through a frame remain unavailable.
+The report uses exact proof leaves and does not change facts, rules, derived cases, weights, or
+answers.
 
 These diagnostics supplement recombination, rule discovery, reasoning, and evidence validation;
 they do not replace them.
