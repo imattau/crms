@@ -1407,3 +1407,24 @@ quoted source text, not an accepted fact. The focused regression and nearby
 topic-anchor, source-follow-up, persistence, quoted-evidence, and sentence
 retrieval checks pass. This covers one bounded temporal question shape; it is
 not a general answerability classifier or broad semantic ranker.
+
+## Named-entity grounding for source-only chat answers (2026-10-20)
+
+Command: `python3 experiments/v1_425_named_entity_evidence_guard.py`.
+
+The chat path now refuses to present source-only text for a named entity unless
+the visible cited excerpt names that entity or an explicitly stored alias. A
+fresh replay of “When was the Eiffel Tower completed?” followed by “And
+Italy?” had previously produced the Colosseum date, 80 CE, as if it answered
+the Italy follow-up. It now abstains and clears the old answer as a target for
+`why?`; the named “And the Colosseum?” switch still returns its cited date.
+The experiment also confirms current retrieval selects Marie Curie's own
+Nobel sentence and forces the former Einstein-for-Curie sentence through the
+negative guard.
+
+The focused experiment, topic-anchor, answer-bearing-pronoun, and persistent
+feedback-context regressions pass. This is a chat-layer attribution check, not
+a semantic relation verifier: it may abstain when a source uses an unlicensed
+alias or paraphrase, and it does not establish that a sentence entails the
+requested relation. Retrieval and relation-answerability evaluation remain
+necessary.
