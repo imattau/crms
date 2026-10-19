@@ -462,6 +462,55 @@ def classify_user_intent(
                 alternatives=tuple(dialogue.pending_result.candidates or ()),
             )
 
+    open_question = dialogue.open_dialogue_question
+    if open_question is not None:
+        intent_model = getattr(dialogue, "intent_model", None)
+        context_provider = getattr(dialogue, "intent_context", None)
+        if intent_model is not None and callable(context_provider):
+            context, predecessor = context_provider()
+            portable = intent_model.resolve(
+                text, context=context, predecessor_act=predecessor)
+            if portable is not None:
+                return UserIntentHypothesis(
+                    dialogue_act=portable["dialogue_act"],
+                    task_intent=portable["task_intent"],
+                    decision=portable["decision"],
+                    matched_frame=portable["matched_frame"],
+                    context_predicates=portable["context_predicates"],
+                    alternatives=portable["alternatives"],
+                    selected_value=portable["selected_value"],
+                    basis=portable["basis"],
+                    evidence_refs=portable["evidence_refs"],
+                    runtime_route=portable["runtime_route"],
+                )
+
+    if open_question is not None and len(text) <= 512:
+        is_yes_no = _BARE_YES_NO_RE.fullmatch(text.strip()) is not None
+        is_fresh_question = (_WH_QUESTION_RE.match(text.strip()) is not None
+                             or _YES_NO_QUESTION_RE.fullmatch(text.strip())
+                             is not None)
+        social_act = classify_act(text)
+        expected_yes_no = open_question["answer_kind"] == "yes-no"
+        is_short_detail = (
+            not expected_yes_no and not is_yes_no and not is_fresh_question
+            and "?" not in text
+            and social_act is None
+            and len(re.findall(r"[\w’'-]+", text)) <= 24
+        )
+        if ((is_yes_no and expected_yes_no and not is_fresh_question)
+                or is_short_detail):
+            return UserIntentHypothesis(
+                dialogue_act="answer-clarification",
+                task_intent=(dialogue.active_task_intent
+                             or "continue-current-task"),
+                decision="selected",
+                matched_frame="answer-to-open-dialogue-question",
+                context_predicates=("pending_assistant_question",
+                                    "awaiting_yes_no_answer" if expected_yes_no
+                                    else "awaiting_user_detail"),
+                selected_value=text.strip(),
+            )
+
     act = classify_act(text)
     mappings = {
         "greeting": ("greeting", "social-contact"),
@@ -589,14 +638,37 @@ def respond(dialogue: CRMSDialogue, text: str, *,
     """Handle simple dialogue acts, delegating every content turn unchanged."""
     intent = classify_user_intent(dialogue, text)
     act = classify_act(text)
+    preserves_question = bool(
+        intent is not None and (
+            intent.matched_frame == "elaboration-topic-slot"
+            or (intent.decision == "selected"
+                and intent.dialogue_act == "answer-clarification")))
+    if dialogue.open_dialogue_question is not None and not preserves_question:
+        # A fresh question or unrelated act replaces the prior QUD.
+        dialogue.open_dialogue_question = None
     if (act is None and intent is not None and intent.decision == "selected"
             and intent.basis == "portable_dialogue_model"):
         act = intent.runtime_route
 
     def with_intent(turn: DialogueTurn) -> DialogueTurn:
+        if (intent is not None and intent.decision == "selected"
+                and intent.dialogue_act == "answer-clarification"
+                and dialogue.open_dialogue_question is not None):
+            dialogue.open_dialogue_question = None
+        elif (turn.status == "clarify" and turn.text.rstrip().endswith("?")
+              and not dialogue.offers and dialogue.pending_result is None
+              and dialogue.pending_binding is None):
+            answer_kind = ("yes-no" if _YES_NO_QUESTION_RE.fullmatch(
+                turn.text.strip()) else "detail")
+            dialogue.open_dialogue_question = {
+                "prompt": turn.text.strip()[:500],
+                "answer_kind": answer_kind,
+            }
         turn.intent_hypothesis = intent
         dialogue.last_intent_hypothesis = intent
-        dialogue.record_turn(text, act or "question", turn, intent)
+        history_act = (act or (intent.dialogue_act if intent is not None else None)
+                       or "question")
+        dialogue.record_turn(text, history_act, turn, intent)
         _offer(dialogue, turn)
         return turn
 
@@ -696,6 +768,16 @@ def respond(dialogue: CRMSDialogue, text: str, *,
                       "entity I have accepted facts about.")))
         # A new question or conversational act supersedes the open slot.
         dialogue.pending_dialogue_slot = None
+
+    if (intent is not None and intent.decision == "selected"
+            and intent.dialogue_act == "answer-clarification"
+            and dialogue.open_dialogue_question is not None):
+        prompt = (dialogue.open_dialogue_question or {}).get("prompt", "")
+        value = intent.selected_value or text.strip()
+        return with_intent(DialogueTurn(
+            "social", text, text,
+            text=(f"Got it: {value}. I’ll treat that as your reply to my "
+                  f"question: {prompt}")))
 
     mixed_greeting = _MIXED_GREETING_RE.fullmatch(text.strip())
     if mixed_greeting is not None:

@@ -17,7 +17,9 @@ _ROOT_KEYS = {"format", "version", "builtin_policy", "learned_frames"}
 _CONTEXT_PREDICATES = {
     "conversation_opening", "current_topic_available",
     "previous_grounded_answer", "pending_candidate_choice",
-    "open_dialogue_slot", "awaiting_user_detail", "awaiting_confirmation",
+    "open_dialogue_slot", "pending_assistant_question",
+    "awaiting_user_detail", "awaiting_confirmation",
+    "awaiting_yes_no_answer",
     "task_in_progress", "task_complete", "correction_target_available",
 }
 _DIALOGUE_ACTS = {
@@ -180,6 +182,12 @@ def _validate_frame_values(frame: dict[str, Any], frame_id: str) -> None:
         raise ValueError(f"dialogue frame {frame_id} act conflicts with its runtime route")
     if route is not None and frame["task_intent"] != _ROUTE_INTENTS[route]:
         raise ValueError(f"dialogue frame {frame_id} intent conflicts with its runtime route")
+    if (frame["dialogue_act"] == "answer-clarification"
+            and not set(frame["context_predicates"]) & {
+                "pending_assistant_question", "pending_candidate_choice",
+                "open_dialogue_slot"}):
+        raise ValueError(
+            f"dialogue frame {frame_id} answers a clarification without an open question")
 
 
 class CRMSDialogueIntentModel:
@@ -207,7 +215,8 @@ class CRMSDialogueIntentModel:
         """Return an intent decision for one matching frame, or abstain.
 
         Only built-in policy and held-out-validated learned frames can select
-        an intent or runtime route. Candidate, train-only, and rejected frames
+        an intent or runtime route. An intent may be selected without a route;
+        candidate, train-only, and rejected frames
         remain stored for audit but are inert.
         """
         normalized = self.normalize_surface(utterance)
@@ -215,15 +224,13 @@ class CRMSDialogueIntentModel:
             return None
         candidates: list[dict[str, Any]] = []
         for frame in self.payload["builtin_policy"]:
-            if frame["runtime_route"] is not None and any(
-                    self.normalize_surface(pattern) == normalized
+            if any(self.normalize_surface(pattern) == normalized
                    for pattern in frame["surface_patterns"]):
                 candidates.append({**frame, "frame_id": frame["policy_id"],
                                    "status": "builtin-policy",
                                    "evidence_refs": []})
         for frame in self.payload["learned_frames"]:
             if (frame["status"] != "heldout-validated"
-                    or frame["runtime_route"] is None
                     or not any(self.normalize_surface(pattern) == normalized
                                for pattern in frame["surface_patterns"])):
                 continue

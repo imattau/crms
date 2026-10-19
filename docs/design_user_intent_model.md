@@ -25,7 +25,7 @@ recent bounded intent trace without adding diagnostics to ordinary answers. Sele
 retained in inspectable session state; ambiguous or unlicensed hypotheses cannot replace the
 active goal. Social turns preserve it, while an explicit end-interaction or `/reset` clears it. This
 is a context predicate for licensed frames, not task-slot understanding or authorization to act. The
-trace and last hypothesis are saved in dialogue-state format 13 and validated when reloaded.
+trace and last hypothesis are saved in dialogue-state format 14 and validated when reloaded.
 `experiments/v1_386_session_intent_context.py` checks that the active-task predicate actually
 licenses a matching portable frame, survives reload, remains bounded, and clears on explicit end
 or reset; `experiments/v1_365_contextual_clarification_intent.py` checks the existing clarification
@@ -43,10 +43,15 @@ The runtime now also retains one typed open dialogue slot:
 which entity with accepted facts to elaborate on. A bare entity name is then classified as an answer
 to that question and routed to the accepted-fact overview; an unmatched name gets a clarification,
 not a corpus lookup. A new question supersedes the slot, and “never mind” cancels it. This bounded
-slot is persisted in dialogue-state format 13 and rejects unknown slot values on load. It is session
-context, not learned intent knowledge, and it does not support free-form source summaries. The
-sequence and reload checks are in
-[`v1_375_contextual_elaboration_slot.py`](../experiments/v1_375_contextual_elaboration_slot.py).
+slot is persisted in dialogue-state format 14 and rejects unknown slot values on load. The exact
+assistant clarification prompt is retained as a bounded QUD with a `detail` or `yes-no` answer kind.
+A short reply is interpreted against that question, recorded with its user-provided value in the
+intent trace, and kept out of factual knowledge. This is session context, not learned intent
+knowledge, and it does not support free-form source summaries. Yes/no answers have a separate
+`awaiting_yes_no_answer` predicate and are not treated as action confirmations. The sequence and
+reload checks are in
+[`v1_375_contextual_elaboration_slot.py`](../experiments/v1_375_contextual_elaboration_slot.py)
+and [`v1_388_open_dialogue_question_state.py`](../experiments/v1_388_open_dialogue_question_state.py).
 
 ### Corpus coverage diagnostic
 
@@ -178,13 +183,15 @@ become accepted world facts by default.
 Portable SQLite model v5 accepts an optional versioned `dialogue` memory, validates its
 built-in-policy and learned-frame sections, and preserves it through install and repack. A first
 resolver is now wired into `crms_conversation.py`: it matches exact normalized surface forms,
-requires all declared context predicates and any predecessor condition, and routes only frames
-licensed as built-in policy or held-out validated. Routes are restricted to existing social,
-acknowledgement, reaction, and elaboration handlers. Train-only, candidate, and rejected frames are inert; a context
-mismatch falls through to the prior chat path. Selected portable-frame hypotheses expose the frame
-ID and source citations. `crms_dialogue_intent.py` rejects unknown context predicates, route/intent
-mismatches, malformed evidence metadata, and overlapping train/holdout conversation IDs. Legacy
-model versions remain readable.
+requires all declared context predicates and any predecessor condition, and accepts only frames
+licensed as built-in policy or held-out validated. A frame may select an inspectable intent without
+triggering an action; runtime routes remain restricted to existing social, acknowledgement,
+reaction, and elaboration handlers. Answer-clarification frames must require an explicit open
+question context. Train-only, candidate, and rejected frames are inert; a context mismatch falls
+through to the prior chat path. Selected portable-frame hypotheses expose the frame ID and source
+citations. `crms_dialogue_intent.py` rejects unknown context predicates, route/intent mismatches,
+clarification answers without an open question, malformed evidence metadata, and overlapping
+train/holdout conversation IDs. Legacy model versions remain readable.
 
 This is a narrow runtime seam, not learned dialogue competence: there is no frame induction yet,
 surface patterns are exact phrases rather than slot-generalizing templates, and task-oriented

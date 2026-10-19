@@ -214,6 +214,9 @@ class CRMSDialogue:
         # The slot is explicit so the next user turn can be interpreted in
         # context without treating it as a new factual question.
         self.pending_dialogue_slot: str | None = None
+        # Preserve the exact assistant clarification prompt as a bounded QUD.
+        # It is session context, not a user fact or a learned answer.
+        self.open_dialogue_question: dict[str, str] | None = None
 
     def record_turn(self, utterance: str, act: str,
                     turn: "DialogueTurn",
@@ -259,7 +262,8 @@ class CRMSDialogue:
     def intent_context(self) -> tuple[set[str], str | None]:
         """Expose bounded, observable predicates to the intent-frame matcher."""
         open_task = bool(self.pending_result or self.pending_binding
-                         or self.pending_dialogue_slot or self.offers)
+                         or self.pending_dialogue_slot
+                         or self.open_dialogue_question or self.offers)
         context = set()
         if not self.history:
             context.add("conversation_opening")
@@ -277,6 +281,12 @@ class CRMSDialogue:
         if self.pending_dialogue_slot is not None:
             context.update({"open_dialogue_slot", "awaiting_user_detail",
                             "task_in_progress"})
+        if self.open_dialogue_question is not None:
+            context.update({"pending_assistant_question", "task_in_progress"})
+            if self.open_dialogue_question["answer_kind"] == "yes-no":
+                context.add("awaiting_yes_no_answer")
+            else:
+                context.add("awaiting_user_detail")
         if self.pending_binding is not None:
             context.update({"awaiting_user_detail", "task_in_progress"})
         if any(item.get("kind") == "confirm_statement" for item in self.offers):
@@ -303,6 +313,7 @@ class CRMSDialogue:
         self.shown = []
         self.offers = []
         self.pending_dialogue_slot = None
+        self.open_dialogue_question = None
 
     def focus_entities(self) -> list[str]:
         """Entities the conversation is currently about, most recent answer first."""
@@ -382,6 +393,7 @@ class CRMSDialogue:
         self.last_timeline_order_by = None
         self.source_mentions = []
         self.pending_dialogue_slot = None
+        self.open_dialogue_question = None
         self._clear_pending()
 
     def _clear_pending(self) -> None:
@@ -1686,7 +1698,7 @@ class CRMSDialogue:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(
-            json.dumps({"format_version": 13, "last_entity": self.last_entity,
+            json.dumps({"format_version": 14, "last_entity": self.last_entity,
                         "subject_entity": self.subject_entity,
                         "object_entity": self.object_entity,
                         "last_question": self.last_question,
@@ -1707,7 +1719,8 @@ class CRMSDialogue:
                         "active_task_intent": self.active_task_intent,
                         "last_answered": self.last_answered,
                         "shown": self.shown,
-                        "pending_dialogue_slot": self.pending_dialogue_slot},
+                        "pending_dialogue_slot": self.pending_dialogue_slot,
+                        "open_dialogue_question": self.open_dialogue_question},
                        ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8")
 
@@ -1718,13 +1731,26 @@ class CRMSDialogue:
              ) -> "CRMSDialogue":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
         if payload.get("format_version") not in (
-                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13):
+                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14):
             raise ValueError("unsupported dialogue-state format version")
         dialogue = cls(knowledge, intent_model=intent_model)
         pending_dialogue_slot = payload.get("pending_dialogue_slot")
         if pending_dialogue_slot not in (None, "elaboration_topic"):
             raise ValueError("stored dialogue slot is malformed")
         dialogue.pending_dialogue_slot = pending_dialogue_slot
+        open_dialogue_question = payload.get("open_dialogue_question")
+        if (open_dialogue_question is not None
+                and (not isinstance(open_dialogue_question, dict)
+                     or set(open_dialogue_question) != {"prompt", "answer_kind"}
+                     or not isinstance(open_dialogue_question.get("prompt"), str)
+                     or not open_dialogue_question["prompt"].strip()
+                     or len(open_dialogue_question["prompt"])
+                     > _HISTORY_QUESTION_LIMIT
+                     or not isinstance(open_dialogue_question.get("answer_kind"), str)
+                     or open_dialogue_question["answer_kind"]
+                     not in {"detail", "yes-no"})):
+            raise ValueError("stored open dialogue question is malformed")
+        dialogue.open_dialogue_question = open_dialogue_question
         active_task_intent = payload.get("active_task_intent")
         if (active_task_intent is not None
                 and (not isinstance(active_task_intent, str)

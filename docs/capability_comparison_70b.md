@@ -149,10 +149,14 @@ These results are component evidence, not a single overall capability score:
   unmeasured. See [`design_user_intent_model.md`](design_user_intent_model.md).
 - `v1_386_session_intent_context.py` verifies that selected user intents update
   a bounded active-task label, that social turns preserve it, that an explicit
-  close and `/reset` clear it, and that it survives dialogue-state format 13
+  close and `/reset` clear it, and that it survives dialogue-state format 14
   persistence. It also proves an active-task predicate can license a matching
   portable dialogue frame. This carries task continuity as context; it does not
   add general task-slot extraction or action execution.
+- `v1_388_open_dialogue_question_state.py` verifies that an assistant
+  clarification persists as an explicit QUD, that short replies use that
+  context, that new questions supersede it, and that user-provided replies stay
+  out of factual memory.
 - `v1_375_contextual_elaboration_slot.py` verifies that an open elaboration
   question is represented as typed dialogue state, that a named accepted entity
   is interpreted as its answer and returns a sourced overview, and that the
