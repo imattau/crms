@@ -35,7 +35,7 @@ The runtime now also retains one typed open dialogue slot:
 which entity with accepted facts to elaborate on. A bare entity name is then classified as an answer
 to that question and routed to the accepted-fact overview; an unmatched name gets a clarification,
 not a corpus lookup. A new question supersedes the slot, and “never mind” cancels it. This bounded
-slot is persisted in dialogue-state format 11 and rejects unknown slot values on load. It is session
+slot is persisted in dialogue-state format 12 and rejects unknown slot values on load. It is session
 context, not learned intent knowledge, and it does not support free-form source summaries. The
 sequence and reload checks are in
 [`v1_375_contextual_elaboration_slot.py`](../experiments/v1_375_contextual_elaboration_slot.py).
@@ -142,14 +142,22 @@ become accepted world facts by default.
 
 ### Distributable model boundary
 
-The first storage step is implemented: portable SQLite model v5 accepts an optional versioned
-`dialogue` memory, validates its built-in-policy and learned-frame sections, and preserves it through
-install and repack. `crms_dialogue_intent.py` rejects unknown context predicates, malformed evidence
-metadata, and overlapping train/holdout conversation IDs. Legacy model versions remain readable.
-The memory currently does **not** drive the chat resolver: runtime intent patterns still live in
-`crms_conversation.py`, and current hypotheses identify themselves as
-`hand_checked_runtime_rule`. The package supports distribution of dialogue frames; CRMS does not
-yet learn or use them.
+Portable SQLite model v5 accepts an optional versioned `dialogue` memory, validates its
+built-in-policy and learned-frame sections, and preserves it through install and repack. A first
+resolver is now wired into `crms_conversation.py`: it matches exact normalized surface forms,
+requires all declared context predicates and any predecessor condition, and routes only frames
+licensed as built-in policy or held-out validated. Routes are restricted to existing social,
+acknowledgement, reaction, and elaboration handlers. Train-only, candidate, and rejected frames are inert; a context
+mismatch falls through to the prior chat path. Selected portable-frame hypotheses expose the frame
+ID and source citations. `crms_dialogue_intent.py` rejects unknown context predicates, route/intent
+mismatches, malformed evidence metadata, and overlapping train/holdout conversation IDs. Legacy
+model versions remain readable.
+
+This is a narrow runtime seam, not learned dialogue competence: there is no frame induction yet,
+surface patterns are exact phrases rather than slot-generalizing templates, and task-oriented
+slots beyond existing dialogue state are not supported. Most ordinary intent recognition still
+uses the hand-checked rules in `crms_conversation.py`. The Taskmaster labels remain blank, so no
+accuracy claim is available.
 
 Once a frame has independent human-reviewed training and held-out labels, store it in a versioned
 `dialogue` memory inside the portable SQLite model. Keep the record explicit and auditable:
@@ -166,13 +174,13 @@ intent hypotheses remain in per-user dialogue state; they must never be copied i
 model as user facts. This separates reusable conversational knowledge from the temporary context
 that makes a short answer such as “yes” interpretable.
 
-Next, migrate the bounded hand-checked seed frames into the explicitly separate built-in-policy
-section or keep them as a compatibility fallback; never silently merge built-in product policy with
-corpus-induced frames. Add a package-backed resolver and replace hard-coded patterns only after it
-matches current regression behavior. Do not start induction until independently labeled examples
-exist: the Taskmaster annotation sheets are currently blank, so self-labeled predictions cannot
-serve as validation evidence. Packaging coverage is checked by
-[`v1_383_dialogue_model_memory_packaging.py`](../experiments/v1_383_dialogue_model_memory_packaging.py).
+Next, migrate bounded hand-checked seed frames into the separate built-in-policy section only where
+their behavior is reproduced; never silently merge product policy with corpus-induced frames.
+Expand matching to typed slots only with ambiguity and adversarial tests. Do not start induction
+until independently labeled examples exist: the Taskmaster annotation sheets are currently blank,
+so self-labeled predictions cannot serve as validation evidence. Packaging and runtime coverage
+are checked by [`v1_383_dialogue_model_memory_packaging.py`](../experiments/v1_383_dialogue_model_memory_packaging.py)
+and [`v1_384_contextual_dialogue_frame_resolution.py`](../experiments/v1_384_contextual_dialogue_frame_resolution.py).
 
 ## Runtime decision policy
 

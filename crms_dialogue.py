@@ -13,6 +13,7 @@ from crms_knowledge import (
     CRMSKnowledgeBase, CounterfactualResult, QuestionResult, ResearchResult,
     WritingResult,
 )
+from crms_dialogue_intent import CRMSDialogueIntentModel
 from crms_text import tokens as normalized_tokens, word_matches
 
 
@@ -100,7 +101,7 @@ _NEGATIVE_CONTRACTION_READINGS = {
 
 @dataclass
 class UserIntentHypothesis:
-    """Inspectable, bounded intent decision produced by a dialogue rule."""
+    """Inspectable intent decision with the rule or model basis recorded."""
 
     dialogue_act: str
     task_intent: str | None
@@ -110,6 +111,8 @@ class UserIntentHypothesis:
     alternatives: tuple[str, ...] = ()
     selected_value: str | None = None
     basis: str = "hand_checked_runtime_rule"
+    evidence_refs: tuple[str, ...] = ()
+    runtime_route: str | None = None
 
 
 _HISTORY_LIMIT = 12
@@ -164,8 +167,10 @@ class CRMSDialogue:
     long-range discourse structure; unresolved references trigger abstention.
     """
 
-    def __init__(self, knowledge: CRMSKnowledgeBase) -> None:
+    def __init__(self, knowledge: CRMSKnowledgeBase, *,
+                 intent_model: CRMSDialogueIntentModel | None = None) -> None:
         self.knowledge = knowledge
+        self.intent_model = intent_model or CRMSDialogueIntentModel()
         self.last_entity: str | None = None
         self.subject_entity: str | None = None
         self.object_entity: str | None = None
@@ -219,6 +224,42 @@ class CRMSDialogue:
                 "question": turn.resolved_question[:_HISTORY_QUESTION_LIMIT],
                 "answer": answer[:_HISTORY_QUESTION_LIMIT],
             }
+
+    def intent_context(self) -> tuple[set[str], str | None]:
+        """Expose bounded, observable predicates to the intent-frame matcher."""
+        open_task = bool(self.pending_result or self.pending_binding
+                         or self.pending_dialogue_slot or self.offers)
+        context = set()
+        if not self.history:
+            context.add("conversation_opening")
+        if self.last_entity or self.source_mentions or self.last_answered:
+            context.add("current_topic_available")
+        if self.last_answered:
+            context.add("previous_grounded_answer")
+        if self.last_answered or self.last_question:
+            context.add("correction_target_available")
+        if self.pending_result is not None:
+            context.update({"pending_candidate_choice", "awaiting_user_detail",
+                            "task_in_progress"})
+        if self.pending_dialogue_slot is not None:
+            context.update({"open_dialogue_slot", "awaiting_user_detail",
+                            "task_in_progress"})
+        if self.pending_binding is not None:
+            context.update({"awaiting_user_detail", "task_in_progress"})
+        if any(item.get("kind") == "confirm_statement" for item in self.offers):
+            context.update({"awaiting_confirmation", "task_in_progress"})
+        elif self.offers:
+            context.add("task_in_progress")
+        if not open_task and self.last_answered:
+            context.add("task_complete")
+        predecessor = None
+        if self.history:
+            predecessor = {
+                "answered": "answer", "ambiguous": "clarification-request",
+                "clarify": "clarification-request", "learned": "action-result",
+                "farewell": "close", "help": "other", "social": "other",
+            }.get(self.history[-1].get("status"), "uncertain")
+        return context, predecessor
 
     def reset_history(self) -> None:
         self.history = []
@@ -1609,7 +1650,7 @@ class CRMSDialogue:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(
-            json.dumps({"format_version": 11, "last_entity": self.last_entity,
+            json.dumps({"format_version": 12, "last_entity": self.last_entity,
                         "subject_entity": self.subject_entity,
                         "object_entity": self.object_entity,
                         "last_question": self.last_question,
@@ -1634,11 +1675,14 @@ class CRMSDialogue:
 
     @classmethod
     def load(cls, knowledge: CRMSKnowledgeBase, path: str, *,
-             research_index: Any | None = None) -> "CRMSDialogue":
+             research_index: Any | None = None,
+             intent_model: CRMSDialogueIntentModel | None = None
+             ) -> "CRMSDialogue":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
-        if payload.get("format_version") not in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11):
+        if payload.get("format_version") not in (
+                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12):
             raise ValueError("unsupported dialogue-state format version")
-        dialogue = cls(knowledge)
+        dialogue = cls(knowledge, intent_model=intent_model)
         pending_dialogue_slot = payload.get("pending_dialogue_slot")
         if pending_dialogue_slot not in (None, "elaboration_topic"):
             raise ValueError("stored dialogue slot is malformed")
@@ -1750,7 +1794,13 @@ class CRMSDialogue:
             intent_fields = {
                 "dialogue_act", "task_intent", "decision", "matched_frame",
                 "context_predicates", "alternatives", "selected_value", "basis",
+                "evidence_refs", "runtime_route",
             }
+            # State written before evidence_refs was added remains readable.
+            if isinstance(raw_intent, dict) and "evidence_refs" not in raw_intent:
+                intent_fields.remove("evidence_refs")
+            if isinstance(raw_intent, dict) and "runtime_route" not in raw_intent:
+                intent_fields.remove("runtime_route")
             if (not isinstance(raw_intent, dict)
                     or set(raw_intent) != intent_fields):
                 raise ValueError("stored intent hypothesis is malformed")
@@ -1762,6 +1812,8 @@ class CRMSDialogue:
             alternatives = raw_intent.get("alternatives", [])
             selected_value = raw_intent.get("selected_value")
             basis = raw_intent.get("basis")
+            evidence_refs = raw_intent.get("evidence_refs", [])
+            runtime_route = raw_intent.get("runtime_route")
             if (not isinstance(dialogue_act, str) or not dialogue_act.strip()
                     or len(dialogue_act) > 80
                     or (task_intent is not None
@@ -1782,7 +1834,18 @@ class CRMSDialogue:
                     or (selected_value is not None
                         and (not isinstance(selected_value, str)
                              or len(selected_value) > 512))
-                    or basis != "hand_checked_runtime_rule"):
+                    or not isinstance(evidence_refs, list)
+                    or len(evidence_refs) > 32
+                    or any(not isinstance(value, str) or len(value) > 2048
+                           for value in evidence_refs)
+                    or (runtime_route is not None
+                        and (not isinstance(runtime_route, str)
+                             or runtime_route not in {
+                                 "greeting", "farewell", "thanks",
+                                 "acknowledgement", "reaction", "elaboration"}))
+                    or not isinstance(basis, str)
+                    or basis not in {"hand_checked_runtime_rule",
+                                     "portable_dialogue_model"}):
                 raise ValueError("stored intent hypothesis is malformed")
             dialogue.last_intent_hypothesis = UserIntentHypothesis(
                 dialogue_act=dialogue_act,
@@ -1793,6 +1856,8 @@ class CRMSDialogue:
                 alternatives=tuple(alternatives),
                 selected_value=selected_value,
                 basis=basis,
+                evidence_refs=tuple(evidence_refs),
+                runtime_route=runtime_route,
             )
         history = payload.get("history", [])
         if (not isinstance(history, list) or len(history) > _HISTORY_LIMIT

@@ -4650,6 +4650,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--translations", type=Path,
                         default=Path("crms_translations.json"),
                         help="aligned translation frames (default: %(default)s)")
+    parser.add_argument("--dialogue-model", type=Path,
+                        default=Path("crms_dialogue_intent.json"),
+                        help="optional portable contextual dialogue frames")
     parser.add_argument("--translation-session", type=Path, default=None,
                         help="pending translation clarification (default: next to --translations)")
     parser.add_argument("--index", type=Path, default=None,
@@ -5112,7 +5115,7 @@ def _save_pending_candidates(path: Path, knowledge_path: Path, index_path: Path,
 def main() -> int:
     args = build_parser().parse_args()
     model_research_sidecar: Path | None = None
-    dialogue_memory_path = Path("crms_dialogue_intent.json")
+    dialogue_memory_path = args.dialogue_model
     if args.model_db is not None:
         memories = inspect_model_database(args.model_db)
         for name, value in model_database_rule_settings(
@@ -5230,11 +5233,16 @@ def main() -> int:
     initial_index_state = _index_file_state(args.index)
     if args.index_read_only:
         print(f"Research index opened read-only: {args.index}")
-    dialogue = CRMSDialogue(knowledge)
+    from crms_dialogue_intent import CRMSDialogueIntentModel
+    dialogue_intent_model = (
+        CRMSDialogueIntentModel.load(str(dialogue_memory_path))
+        if dialogue_memory_path.is_file() else CRMSDialogueIntentModel())
+    dialogue = CRMSDialogue(knowledge, intent_model=dialogue_intent_model)
     if args.dialogue_state.exists():
         try:
             dialogue = CRMSDialogue.load(
-                knowledge, str(args.dialogue_state), research_index=index)
+                knowledge, str(args.dialogue_state), research_index=index,
+                intent_model=dialogue_intent_model)
         except (ValueError, OSError) as error:
             stale = args.dialogue_state.with_name(
                 args.dialogue_state.name + ".stale")
@@ -5549,8 +5557,13 @@ def main() -> int:
             if dialogue.last_intent_hypothesis is None:
                 print("CRMS> I don't have an inspectable intent hypothesis for the last turn.")
             else:
-                print("CRMS> Last turn's intent hypothesis "
-                      "(hand-checked runtime rules; not learned):")
+                if (dialogue.last_intent_hypothesis.basis
+                        == "portable_dialogue_model"):
+                    print("CRMS> Last turn's intent hypothesis "
+                          "(portable dialogue model; not a factual claim):")
+                else:
+                    print("CRMS> Last turn's intent hypothesis "
+                          "(hand-checked runtime rules; not learned):")
                 print(json.dumps(asdict(dialogue.last_intent_hypothesis),
                                  ensure_ascii=False, indent=2))
             continue

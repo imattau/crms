@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 import shutil
 import sqlite3
@@ -36,14 +37,16 @@ def sample_memory() -> dict:
         "surface_patterns": ["hello", "hi there"],
         "context_predicates": ["conversation_opening"],
         "predecessor_act": None,
+        "runtime_route": "greeting",
     })
     payload["learned_frames"].append({
         "frame_id": "clarification-choice-v1",
         "dialogue_act": "answer-clarification",
         "task_intent": "resolve-ambiguity",
-        "surface_patterns": ["{choice}"],
+        "surface_patterns": ["the second option"],
         "context_predicates": ["pending_candidate_choice"],
         "predecessor_act": "clarification-request",
+        "runtime_route": None,
         "source_citations": ["taskmaster:dialogue-a#turn=4",
                              "taskmaster:dialogue-b#turn=8"],
         "status": "heldout-validated",
@@ -128,6 +131,16 @@ def main() -> None:
         else:
             raise SystemExit("dialogue memory accepted an unknown context predicate")
 
+        invalid = sample_memory()
+        invalid["builtin_policy"][0]["runtime_route"] = "farewell"
+        try:
+            validate_dialogue_intent_memory(invalid)
+        except ValueError as error:
+            require("conflicts with its runtime route" in str(error),
+                    f"unexpected route validation error: {error}")
+        else:
+            raise SystemExit("dialogue memory accepted an inconsistent route")
+
         legacy = export_model_database(
             root / "without-dialogue.sqlite", knowledge=knowledge_path,
             rules=rules_path)
@@ -143,6 +156,21 @@ def main() -> None:
             db.execute("PRAGMA user_version=4")
         require(set(inspect_model_database(v4)) == {"knowledge", "rules"},
                 "version-4 portable model compatibility regressed")
+        invalid_v4 = root / "invalid-v4-dialogue.sqlite"
+        shutil.copyfile(v4, invalid_v4)
+        serialized = json.dumps(memory, ensure_ascii=False, separators=(",", ":"))
+        with sqlite3.connect(invalid_v4) as db:
+            db.execute("INSERT INTO learned_memories VALUES (?,?,?,?)", (
+                "dialogue", serialized,
+                hashlib.sha256(serialized.encode("utf-8")).hexdigest(),
+                len(serialized.encode("utf-8"))))
+        try:
+            inspect_model_database(invalid_v4)
+        except ValueError as error:
+            require("unknown memory type" in str(error),
+                    f"unexpected legacy memory error: {error}")
+        else:
+            raise SystemExit("version-4 model accepted the version-5 dialogue memory")
 
     print("versioned dialogue intent memory exports and validates in SQLite: PASS")
     print("held-out metadata survives install, chat startup, and repack: PASS")

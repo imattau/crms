@@ -122,8 +122,10 @@ built-in-policy and learned-frame collections. The validator enforces a closed c
 vocabulary, source citations for learned frames, held-out validation metadata, and disjoint train
 and holdout conversation IDs. The experiment checks export, installation into the model sidecar,
 chat startup, repacking, malformed-frame rejection, and legacy packaging without dialogue memory.
-This adds a distribution seam only: `crms_conversation.py` does not yet resolve turns from these
-frames, and the learned collection is not populated from human-labeled dialogue.
+`experiments/v1_384_contextual_dialogue_frame_resolution.py` verifies that a held-out-validated
+literal frame routes only when its context and predecessor match, its citation survives state
+persistence, and train-only frames remain inert. The runtime still recognizes exact phrase matches
+only; no frame induction or human-labeled model is available, so this is not an accuracy result.
 
 ## Balanced phrase recombination from three demonstrations
 

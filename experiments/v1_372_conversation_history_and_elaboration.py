@@ -128,7 +128,7 @@ def main() -> None:
         state = root / "dialogue.json"
         live.save(str(state))
         payload = json.loads(state.read_text(encoding="utf-8"))
-        require(payload["format_version"] == 11 and payload["shown"]
+        require(payload["format_version"] == 12 and payload["shown"]
                 and payload["last_answered"]["answer"] == "Charles Babbage"
                 and payload["history"][-1]["act"] == "elaboration",
                 f"saved state lacked the conversation memory: {payload}")
@@ -144,6 +144,18 @@ def main() -> None:
         legacy = {key: value for key, value in payload.items()
                   if key not in {"history", "last_answered", "shown",
                                  "pending_dialogue_slot"}}
+        legacy["format_version"] = 11
+        legacy_intent = legacy.get("last_intent_hypothesis")
+        if isinstance(legacy_intent, dict):
+            legacy_intent.pop("evidence_refs", None)
+            legacy_intent.pop("runtime_route", None)
+        state.write_text(json.dumps(legacy), encoding="utf-8")
+        old_v11 = CRMSDialogue.load(knowledge, str(state))
+        require(old_v11.last_intent_hypothesis is not None
+                and old_v11.last_intent_hypothesis.evidence_refs == ()
+                and old_v11.last_intent_hypothesis.runtime_route is None,
+                "version 11 intent state did not load with legacy defaults")
+
         legacy["format_version"] = 9
         state.write_text(json.dumps(legacy), encoding="utf-8")
         old = CRMSDialogue.load(knowledge, str(state))
@@ -200,7 +212,7 @@ def main() -> None:
     print("a refusal clears referents but not conversation memory: PASS")
     print("'why?' after a refusal explains the earlier answer and names it: PASS")
     print("history is bounded; clear() keeps it and /reset wipes it: PASS")
-    print("state version 11 round-trips; version 9 loads; tampering is rejected: PASS")
+    print("state version 12 round-trips; versions 11 and 9 load; tampering is rejected: PASS")
 
 
 if __name__ == "__main__":

@@ -476,9 +476,12 @@ def inspect_model_database(path: str | Path) -> dict[str, dict[str, str | int]]:
                     or metadata.get("contains_research_index") != str(has_research).lower()):
                 raise ValueError("unsupported or non-portable CRMS model database")
             memories = {}
+            allowed_memories = set(_MEMORY_NAMES)
+            if schema_version < VERSION:
+                allowed_memories.discard("dialogue")
             for row in db.execute(
                     "SELECT kind, payload_json, sha256, source_bytes FROM learned_memories"):
-                if row["kind"] not in _MEMORY_NAMES:
+                if row["kind"] not in allowed_memories:
                     raise ValueError("model database contains an unknown memory type")
                 raw = row["payload_json"].encode("utf-8")
                 try:

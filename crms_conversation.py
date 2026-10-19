@@ -285,10 +285,11 @@ def is_farewell(text: str) -> bool:
 
 def classify_user_intent(
         dialogue: CRMSDialogue, text: str) -> UserIntentHypothesis | None:
-    """Return only the contextual intent decisions licensed by current rules.
+    """Return only contextual intent decisions licensed by runtime evidence.
 
-    This is an inspectable runtime baseline, not a learned intent model. A
-    missing result means the current rules do not classify this turn.
+    Hand-checked rules handle the existing dialogue routes; the optional
+    portable model can extend exact surface forms when its context conditions
+    pass. A missing result means neither mechanism licenses an intent.
     """
     if _EXPLANATION_FOLLOWUP_RE.fullmatch(text.strip()):
         if dialogue.pending_result is not None:
@@ -430,6 +431,30 @@ def classify_user_intent(
             matched_frame=act,
         )
 
+    # Portable dialogue frames are additive: built-in content-free and
+    # contextual clarification rules above take precedence. Only explicitly
+    # built-in or held-out-validated frames can select a route.
+    intent_model = getattr(dialogue, "intent_model", None)
+    context_provider = getattr(dialogue, "intent_context", None)
+    portable = None
+    if intent_model is not None and callable(context_provider):
+        context, predecessor = context_provider()
+        portable = intent_model.resolve(
+            text, context=context, predecessor_act=predecessor)
+    if portable is not None:
+        return UserIntentHypothesis(
+            dialogue_act=portable["dialogue_act"],
+            task_intent=portable["task_intent"],
+            decision=portable["decision"],
+            matched_frame=portable["matched_frame"],
+            context_predicates=portable["context_predicates"],
+            alternatives=portable["alternatives"],
+            selected_value=portable["selected_value"],
+            basis=portable["basis"],
+            evidence_refs=portable["evidence_refs"],
+            runtime_route=portable["runtime_route"],
+        )
+
     # Content questions and modal requests need an intent hypothesis too. Keep
     # this lexical baseline narrow and explicit: it classifies the immediate
     # speech act without asserting a factual premise or changing the answer path.
@@ -497,6 +522,9 @@ def respond(dialogue: CRMSDialogue, text: str, *,
     """Handle simple dialogue acts, delegating every content turn unchanged."""
     intent = classify_user_intent(dialogue, text)
     act = classify_act(text)
+    if (act is None and intent is not None and intent.decision == "selected"
+            and intent.basis == "portable_dialogue_model"):
+        act = intent.runtime_route
 
     def with_intent(turn: DialogueTurn) -> DialogueTurn:
         turn.intent_hypothesis = intent

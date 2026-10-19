@@ -679,12 +679,13 @@ claim under discussion). A phrase such as “yes”, “tell me more”, or “t
 one context-free intent. The current `UserIntentHypothesis` and contextual rules are an inspectable
 baseline, not evidence that CRMS has learned dialogue understanding.
 
-The next research step is to evaluate induced move frames and move sequences against that baseline.
-Use dialogue corpora with source-separated holdout and independently reviewed labels; keep each
-prediction's matched frame and context predicates inspectable; and require clarification or
-abstention when context is absent or multiple intents remain plausible. Test paired cases with the
-same wording under different contexts, plus misleading and incomplete contexts. Report correct
-intent resolution, useful clarification, and inappropriate action rates separately. Dialogue model
+Portable SQLite model v5 now carries optional dialogue memory, and an exact-match resolver uses
+only built-in or held-out-validated frames with satisfied context and predecessor conditions. This
+is a first routing seam, not induction. The next research step is to use independently reviewed
+dialogue labels to learn paraphrase and slot frames and to measure move sequences against the
+hand-checked baseline. Keep matched frames and context predicates inspectable; test paired turns
+with identical wording under different contexts, plus misleading and incomplete contexts. Report
+correct intent resolution, useful clarification, and inappropriate action rates separately. Model
 artifacts may contain validated frames and transition knowledge, but session-specific discourse
-state remains local and must not be packaged as general knowledge. A learned intent prediction
-must not alter factual evidence or accepted knowledge by itself.
+state stays local. A learned intent prediction must not alter factual evidence or accepted
+knowledge by itself.

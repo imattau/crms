@@ -35,6 +35,18 @@ _PREDECESSOR_ACTS = {
     "greeting", "action-result", "close", "other", "uncertain",
 }
 _FRAME_STATUSES = {"candidate", "train-only", "heldout-validated", "rejected"}
+_RUNTIME_ROUTES = {"greeting", "farewell", "thanks", "acknowledgement",
+                   "reaction", "elaboration"}
+_ROUTE_ACTS = {
+    "greeting": "greeting", "farewell": "farewell", "thanks": "thanks",
+    "acknowledgement": "acknowledgement", "reaction": "social",
+    "elaboration": "continuation-request",
+}
+_ROUTE_INTENTS = {
+    "greeting": "social-contact", "farewell": "end-interaction",
+    "thanks": "social-contact", "acknowledgement": "continue-current-task",
+    "reaction": "social-contact", "elaboration": "continue-current-task",
+}
 
 
 def empty_dialogue_intent_memory() -> dict[str, Any]:
@@ -69,7 +81,8 @@ def validate_dialogue_intent_memory(payload: Any) -> dict[str, Any]:
     normalized_builtin = []
     for frame in builtin:
         required = {"policy_id", "dialogue_act", "task_intent",
-                    "surface_patterns", "context_predicates", "predecessor_act"}
+                    "surface_patterns", "context_predicates", "predecessor_act",
+                    "runtime_route"}
         if not isinstance(frame, dict) or set(frame) != required:
             raise ValueError("built-in dialogue policy frame has an invalid shape")
         frame_id = frame["policy_id"]
@@ -84,7 +97,7 @@ def validate_dialogue_intent_memory(payload: Any) -> dict[str, Any]:
     for frame in learned:
         required = {"frame_id", "dialogue_act", "task_intent", "surface_patterns",
                     "context_predicates", "predecessor_act", "source_citations",
-                    "status", "validation"}
+                    "status", "validation", "runtime_route"}
         if not isinstance(frame, dict) or set(frame) != required:
             raise ValueError("learned dialogue frame has an invalid shape")
         frame_id = frame["frame_id"]
@@ -159,3 +172,91 @@ def _validate_frame_values(frame: dict[str, Any], frame_id: str) -> None:
             and (not isinstance(predecessor, str)
                  or predecessor not in _PREDECESSOR_ACTS)):
         raise ValueError(f"dialogue frame {frame_id} has an unknown predecessor act")
+    route = frame["runtime_route"]
+    if route is not None and (not isinstance(route, str)
+                              or route not in _RUNTIME_ROUTES):
+        raise ValueError(f"dialogue frame {frame_id} has an unknown runtime route")
+    if route is not None and frame["dialogue_act"] != _ROUTE_ACTS[route]:
+        raise ValueError(f"dialogue frame {frame_id} act conflicts with its runtime route")
+    if route is not None and frame["task_intent"] != _ROUTE_INTENTS[route]:
+        raise ValueError(f"dialogue frame {frame_id} intent conflicts with its runtime route")
+
+
+class CRMSDialogueIntentModel:
+    """Match explicitly licensed literal frames against bounded dialogue state."""
+
+    def __init__(self, payload: dict[str, Any] | None = None) -> None:
+        self.payload = validate_dialogue_intent_memory(
+            payload if payload is not None else empty_dialogue_intent_memory())
+
+    @classmethod
+    def load(cls, path: str) -> "CRMSDialogueIntentModel":
+        import json
+        from pathlib import Path
+        return cls(json.loads(Path(path).read_text(encoding="utf-8")))
+
+    @staticmethod
+    def normalize_surface(value: str) -> str:
+        import unicodedata
+        value = unicodedata.normalize("NFKC", value).casefold()
+        return " ".join(re.findall(r"\w+(?:['’]\w+)*", value,
+                                   flags=re.UNICODE))
+
+    def resolve(self, utterance: str, *, context: set[str],
+                predecessor_act: str | None) -> dict[str, Any] | None:
+        """Return an intent decision for one matching frame, or abstain.
+
+        Only built-in policy and held-out-validated learned frames can select
+        an intent or runtime route. Candidate, train-only, and rejected frames
+        remain stored for audit but are inert.
+        """
+        normalized = self.normalize_surface(utterance)
+        if not normalized:
+            return None
+        candidates: list[dict[str, Any]] = []
+        for frame in self.payload["builtin_policy"]:
+            if frame["runtime_route"] is not None and any(
+                    self.normalize_surface(pattern) == normalized
+                   for pattern in frame["surface_patterns"]):
+                candidates.append({**frame, "frame_id": frame["policy_id"],
+                                   "status": "builtin-policy",
+                                   "evidence_refs": []})
+        for frame in self.payload["learned_frames"]:
+            if (frame["status"] != "heldout-validated"
+                    or frame["runtime_route"] is None
+                    or not any(self.normalize_surface(pattern) == normalized
+                               for pattern in frame["surface_patterns"])):
+                continue
+            candidates.append({**frame, "evidence_refs": frame["source_citations"]})
+        if not candidates:
+            return None
+
+        eligible = [frame for frame in candidates
+                    if set(frame["context_predicates"]) <= context
+                    and (frame["predecessor_act"] is None
+                         or frame["predecessor_act"] == predecessor_act)]
+        if eligible:
+            signatures = {(frame["dialogue_act"], frame["task_intent"],
+                           frame["runtime_route"]) for frame in eligible}
+            if len(signatures) != 1:
+                return None
+            # Prefer the most context-specific license; stable ID ordering is
+            # only a tie-break between frames that authorize the same action.
+            frame = sorted(eligible, key=lambda item: (
+                -len(item["context_predicates"]), item["frame_id"]))[0]
+            evidence_refs = sorted({
+                citation for item in eligible
+                for citation in item["evidence_refs"]})[:32]
+            return {
+                "dialogue_act": frame["dialogue_act"],
+                "task_intent": frame["task_intent"],
+                "decision": "selected",
+                "matched_frame": frame["frame_id"],
+                "context_predicates": tuple(frame["context_predicates"]),
+                "alternatives": (),
+                "selected_value": None,
+                "basis": "portable_dialogue_model",
+                "evidence_refs": tuple(evidence_refs),
+                "runtime_route": frame["runtime_route"],
+            }
+        return None

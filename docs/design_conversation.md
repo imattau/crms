@@ -90,7 +90,7 @@ Findings from the review that change the design:
   `subject_entity`, `object_entity`, `last_question`, `last_selected_answer`, a pending
   clarification, writing and timeline fields, `source_mentions` (names quoted from sources, kept as
   candidate referents), `last_intent_hypothesis`, `pending_dialogue_slot`, `history`, `last_answered`
-  and `shown` (format version 11). General question-under-discussion state and task slots remain
+  and `shown` (format version 12, with legacy intent-state loading). General question-under-discussion state and task slots remain
   absent; offers are transient.
 - **Entity recognition is partly widened.** `_source_entity_mentions` retains capitalised names from
   quoted sentences as candidates; `_canonical_entity` and `_known_entity_surfaces` still look only at
@@ -446,7 +446,7 @@ The numbering is changed from the first draft because phase 0 is largely done.
    single-token topics (section 2, rule 1), mixed-turn handling beyond the comma form, and binding
    `him` and `she` to the right referent.
 1. **Discourse state.** Turn history, `last_answered` and `shown` are saved in dialogue-state format
-   version 11 with older versions still loading. A single typed `elaboration_topic` slot also
+   version 12 with older versions still loading. A single typed `elaboration_topic` slot also
    persists and is validated; see `experiments/v1_375_contextual_elaboration_slot.py`. Elaboration
    moved here because `shown` needs it. Not done: general `qud`/task slots, `session_facts`, and
    entity kinds for source-derived names.
