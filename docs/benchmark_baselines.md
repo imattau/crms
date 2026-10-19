@@ -1718,7 +1718,8 @@ the three non-empty held-out lists changes when any one stage is removed; the
 empty list remains an unchanged control.
 Chat-generated Python passes those lists, preserves the citations and labeler
 attribution, reproduces after a fresh chat restart, and refuses an unsupported
-`encrypt` middle step.
+`encrypt` middle step. Held-out inputs and expected outputs remain in the
+experiment evaluator and are not written to the source index loaded by chat.
 
 Runtime result: all checks passed. This remains a source-cited,
 teacher-guided composition result, not source-only induction or broad coding

@@ -279,12 +279,12 @@ def main() -> None:
                 if values),
                 f"a non-empty held-out input does not show the contribution "
                 f"of {omitted}")
-        held_out_rows = [
-            f"{values} -> {output}"
-            for values, output in zip(HELD_OUT_VALUES, held_out_outputs)]
-        index.add_document(
-            "held-out-composition", "Held-out procedure composition",
-            "\n".join(held_out_rows), "evaluation/held-out-composition.txt")
+        # Evaluation values and expected outputs stay in this runner only.
+        # Never add them to the source index consumed by the chat process.
+        require(all(document_id != "held-out-composition"
+                    for document_id, _title, _location
+                    in index.source_list(limit=1000)),
+                "held-out examples leaked into the chat's source index")
         index.save(root / "index.json")
 
         answer = f"Write Python code to {HELD_OUT_TEXT}"
@@ -387,6 +387,7 @@ def main() -> None:
     print("unique rule sorts distinct values on a non-monotonic input: PASS")
     print("each non-empty held-out output changes when any one stage is removed: PASS")
     print("chat composed stable-unique→sort→reverse on four held-out lists: PASS")
+    print("held-out input/output pairs were not in the chat source index: PASS")
     print("generated artifact kept component citations and passed checks: PASS")
     print("declared labeler attribution survived save and artifact rendering: PASS")
     print("generated artifact retains declared labeler attribution: PASS")
