@@ -2083,6 +2083,8 @@ class CRMSResearchIndex:
                   per_document: int = 2,
                   retrieval_terms: Iterable[str] = (),
                   expansion_licenses: Iterable[Mapping[str, Any]] = (),
+                  allowed_person_anaphora: Iterable[
+                      tuple[str, int, int]] = (),
                   precomputed_hits: Iterable[SearchHit] | None = None
                   ) -> ExtractiveSummary:
         """Select exact cited sentences using query terms and licensed expansions.
@@ -2095,6 +2097,14 @@ class CRMSResearchIndex:
             raise ValueError("limit must be a positive integer")
         if type(per_document) is not int or per_document < 1:
             raise ValueError("per_document must be a positive integer")
+        allowed_anaphora: set[tuple[str, int, int]] = set()
+        for index, span in enumerate(allowed_person_anaphora):
+            if (index >= 256 or not isinstance(span, tuple) or len(span) != 3
+                    or not isinstance(span[0], str) or not span[0]
+                    or type(span[1]) is not int or type(span[2]) is not int
+                    or span[1] < 0 or span[2] <= span[1]):
+                raise ValueError("allowed person anaphora spans are malformed")
+            allowed_anaphora.add(span)
         extra_terms = []
         for term in retrieval_terms:
             if (len(extra_terms) >= 128 or not isinstance(term, str)
@@ -2333,7 +2343,10 @@ class CRMSResearchIndex:
                         and not requests_figure_source
                         and effective_coverage < (1 if limit > 1 else 2)):
                     continue
-                if (person_question
+                has_anchored_anaphora = (
+                    document.document_id, local_start, local_end
+                ) in allowed_anaphora
+                if (person_question and not has_anchored_anaphora
                         and len(covered_terms)
                         < minimum_person_term_coverage):
                     continue

@@ -1667,6 +1667,39 @@ alias or paraphrase, and it does not establish that a sentence entails the
 requested relation. Retrieval and relation-answerability evaluation remain
 necessary.
 
+## Relation-aligned source answers for named actions (2026-10-20)
+
+Command: `python3 run_experiments.py --match v1_423_pronoun_sentence_answer_selection --match v1_425_named_entity_evidence_guard --match v1_426_dialogue_paragraph_grounding --match v1_438_dialogue_topic_pronoun_context --match v1_439_explicit_topic_clause --match v1_440_who_action_sentence_alignment --timeout 300`.
+
+The baseline failure was reproduced: `Who designed the Sydney Opera House?`
+selected “The Sydney Opera House opened in 1973.” although “Jorn Utzon designed
+it.” was present. For a named `Who [action] [entity]` question, retrieval now
+searches for the asked predicate and admits an object-pronoun sentence only
+when the nearest preceding explicit subject in the same paragraph matches the
+named entity. The resulting cited excerpt includes that local entity sentence.
+The selected sentence must also state the requested predicate or an active,
+licensed predicate wording. A named-entity sentence without the asked action,
+a pronoun sentence across a paragraph break, and a sentence whose nearest
+explicit subject is another entity all abstain. Direct entity-bearing wording
+and “designed and built” for a `Who built ...?` request remain supported.
+
+For `When` questions, the final selected citation must contain an explicit
+temporal expression. The exact selected citation is used for the source
+passage, even when the initial lexical hit was a truncated or neighboring
+sentence. This keeps answers such as 1889 and 80 CE while preventing a sentence
+such as “Rome is the capital of Italy” from filling an unrelated date slot.
+An unsupported question about the current source-backed topic now retains that
+topic for a later follow-up while clearing the old answer as a `why?` target.
+
+The six focused retrieval and dialogue experiments pass (6/6); `v1_440` covers
+the original failure plus direct, missing-action, wrong-paragraph, and wrong-
+antecedent cases. This is a narrow alignment gate, not a general entailment or
+temporal-expression model. It requires the requested action to be exact or
+licensed, uses a bounded temporal vocabulary, and may abstain on valid but
+unrecognized wording. The separate sentence-ranker evaluation was not
+completed in this run; no broad retrieval-quality claim follows from these
+fixtures.
+
 ## Transformation-rule example provenance (2026-10-20)
 
 Command: `python3 experiments/v1_428_procedure_example_provenance.py`.

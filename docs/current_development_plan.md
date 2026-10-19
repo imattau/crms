@@ -170,6 +170,14 @@ unsupported cases alongside capability results.
    negatives, conflicts, cycles/integrity violations, and budget exhaustion;
    keep derived write-back review-only until correction and invalidation pass.
 
+**Checkpoint (2026-10-20):** the answer-selection slice now passes six focused
+chat experiments, including the Sydney Opera House designer sentence, wrong
+paragraph/entity negatives, an action-missing abstention, date answer selection,
+and source-only topic retention after an unsupported follow-up. This closes
+only that narrow regression set. General relation entailment, author-held-out
+dialogue, source-only learning of action wording, and broad temporal phrasing
+remain open.
+
 Do not grow the corpus as a substitute for these packets: more documents cannot
 repair relation selection, context updates, or a missing composition learner.
 Use a larger corpus only when a defined held-out evaluation needs it and record

@@ -2412,6 +2412,25 @@ class CRMSDialogue:
             if response is not None and response.status == "ambiguous" and response.candidates:
                 self.pending_question = resolved
                 self.pending_result = response
+            elif (research is not None and research.status == "unknown"
+                  and prior_topic_entity):
+                # A source-backed topic remains useful after an unsupported
+                # question about that same topic. Keep only the already shown
+                # entity references; clear the explanation target so `why?`
+                # cannot accidentally explain an older answer.
+                entity_tokens = tuple(
+                    token.casefold() for token in
+                    _WORD_RE.findall(prior_topic_entity))
+                resolved_tokens = tuple(
+                    token.casefold() for token in _WORD_RE.findall(resolved))
+                entity_is_in_resolved_question = bool(entity_tokens) and any(
+                    resolved_tokens[index:index + len(entity_tokens)]
+                    == entity_tokens
+                    for index in range(
+                        len(resolved_tokens) - len(entity_tokens) + 1))
+                if entity_is_in_resolved_question:
+                    self.topic_entity = prior_topic_entity
+                    self.source_mentions = prior_source_mentions
             elif research is not None and research.status in {
                     "sources_found", "needs_review"}:
                 # Keep referents only from text actually shown to the user.

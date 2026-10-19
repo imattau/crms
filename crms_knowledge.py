@@ -7635,8 +7635,93 @@ class CRMSKnowledgeBase:
             # a wider candidate set, then rank using sentence-level context.
             document_count = research_index.document_count()
             acronym_search_limit = max(limit, min(document_count, 50))
+        capitalized = list(re.finditer(
+            r"\b[A-Z][\w’'-]*\b", question, flags=re.UNICODE))
+        named_anchor_tokens: set[str] = set()
+        first_word = next(re.finditer(r"\w+", question), None)
+        for match in capitalized:
+            if first_word is not None and match.start() == first_word.start():
+                continue
+            term = match.group(0)
+            if term.casefold() != "i":
+                named_anchor_tokens.update(_tokens(term))
+        who_action = re.fullmatch(
+            r"\s*(?:who|whom)\s+(?:(?:did|does|do)\s+)?"
+            r"(?P<predicate>[a-z][\w’'-]*)\s+(?P<object>.+?)\s*[?!.]?\s*",
+            question, flags=re.IGNORECASE)
         hits = research_index.search(
             retrieval_query, limit=acronym_search_limit, context_chars=240)
+        allowed_person_anaphora: set[tuple[str, int, int]] = set()
+
+        def local_entity_antecedent_matches(document_id: str,
+                                            sentence_start: int) -> bool:
+            """Require the nearest explicit subject in this paragraph to be
+            the named entity before accepting an object-pronoun sentence."""
+            try:
+                document = research_index.document(document_id)
+            except (AttributeError, KeyError, TypeError, ValueError):
+                return False
+            if not 0 <= sentence_start <= len(document.text):
+                return False
+            previous_break = document.text.rfind("\n\n", 0, sentence_start)
+            paragraph_start = previous_break + 2 if previous_break >= 0 else 0
+            prefix = document.text[paragraph_start:sentence_start]
+            subject_pattern = re.compile(
+                r"^\s*(?:(?:the|a|an)\s+)?"
+                r"(?P<subject>[A-Z][\w’'-]*(?:\s+[A-Z][\w’'-]*){0,5})"
+                r"\s+(?P<verb>is|was|are|were|has|have|had|can|could|"
+                r"will|would|did|does|do|became|built|created|designed|"
+                r"invented|won|founded|worked|lived|stood|stands|flows|"
+                r"lies|located|opened|contains|includes|held|holds|"
+                r"reached|produced|served)\b", flags=re.IGNORECASE)
+            for prior_sentence in reversed(re.split(
+                    r"(?<=[.!?])\s+", prefix)):
+                match = subject_pattern.match(prior_sentence)
+                if match is None:
+                    continue
+                subject = match.group("subject")
+                if subject.casefold() in {
+                        "it", "he", "she", "they", "this", "that"}:
+                    continue
+                return named_anchor_tokens.issubset(set(_tokens(subject)))
+            return False
+
+        def object_pronoun_search_hit_is_anchored(hit: Any) -> bool:
+            if (who_action is None or not named_anchor_tokens
+                    or not isinstance(hit, SearchHit)):
+                return False
+            predicate = who_action.group("predicate").casefold()
+            source_words = set(_tokens(hit.snippet))
+            if (predicate not in source_words or "it" not in source_words
+                    or not re.search(
+                        rf"\b{re.escape(predicate)}\b[^.!?]*\bit\b",
+                        hit.snippet, flags=re.IGNORECASE)):
+                return False
+            return local_entity_antecedent_matches(
+                hit.document_id, hit.start)
+
+        if who_action is not None and named_anchor_tokens:
+            anchor_document_ids = {
+                hit.document_id for hit in hits
+                if named_anchor_tokens.issubset(set(_tokens(hit.snippet)))
+            }
+            predicate = who_action.group("predicate").casefold()
+            if anchor_document_ids and predicate:
+                relation_hits = research_index.search(
+                    predicate, limit=min(max(10, acronym_search_limit * 2), 50),
+                    context_chars=240)
+                existing_spans = {
+                    (hit.document_id, hit.start, hit.end) for hit in hits}
+                for hit in relation_hits:
+                    key = (hit.document_id, hit.start, hit.end)
+                    if (hit.document_id in anchor_document_ids
+                            and predicate in set(hit.matched_terms)
+                            and key not in existing_spans
+                            and object_pronoun_search_hit_is_anchored(hit)):
+                        hits.append(hit)
+                        existing_spans.add(key)
+                        allowed_person_anaphora.add(key)
+                acronym_search_limit = max(acronym_search_limit, len(hits))
         extractive = research_index.summarize(
             question, limit=acronym_search_limit,
             # A named-entity lead sentence often outranks the sentence that
@@ -7647,6 +7732,7 @@ class CRMSKnowledgeBase:
                 "how"} else 1),
             retrieval_terms=sorted(set(expansions)),
             expansion_licenses=expansion_licenses,
+            allowed_person_anaphora=allowed_person_anaphora,
             precomputed_hits=hits)
         source_sentences = [asdict(sentence)
                             for sentence in extractive.sentences]
@@ -7654,18 +7740,6 @@ class CRMSKnowledgeBase:
         # another retrieval keyword. Without this gate, a sentence about a
         # different person can win on shared topical words (for example,
         # Einstein's Nobel Prize sentence for a Marie Curie question).
-        capitalized = list(re.finditer(
-            r"\b[A-Z][\w’'-]*\b", question, flags=re.UNICODE))
-        named_anchor_tokens: set[str] = set()
-        first_word = next(re.finditer(r"\w+", question), None)
-        for match in capitalized:
-            if first_word is not None and match.start() == first_word.start():
-                continue
-            term = match.group(0)
-            if term.casefold() in {"i"}:
-                continue
-            named_anchor_tokens.update(_tokens(term))
-
         def pronoun_sentence_is_anchored(sentence: Mapping[str, Any]) -> bool:
             """Keep a short ``it`` sentence only under the nearest named subject."""
             text = str(sentence.get("text", ""))
@@ -7715,13 +7789,63 @@ class CRMSKnowledgeBase:
                 return named_anchor_tokens.issubset(set(_tokens(subject)))
             return False
 
+        def object_pronoun_sentence_is_anchored(
+                sentence: Mapping[str, Any]) -> bool:
+            if who_action is None or not named_anchor_tokens:
+                return False
+            text = str(sentence.get("text", ""))
+            predicate = who_action.group("predicate").casefold()
+            if (predicate not in set(_tokens(text))
+                    or "it" not in set(_tokens(text))
+                    or not re.search(
+                        rf"\b{re.escape(predicate)}\b[^.!?]*\bit\b",
+                        text, flags=re.IGNORECASE)):
+                return False
+            citation = str(sentence.get("citation", ""))
+            span = re.search(r"&chars=(\d+):(\d+)", citation)
+            document_id = sentence.get("document_id")
+            if span is None or not isinstance(document_id, str):
+                return False
+            return local_entity_antecedent_matches(
+                document_id, int(span.group(1)))
+
         if named_anchor_tokens:
             source_sentences = [
                 sentence for sentence in source_sentences
                 if (named_anchor_tokens.issubset(set(_tokens(
                         sentence.get("text", ""))))
-                    or pronoun_sentence_is_anchored(sentence))
+                    or pronoun_sentence_is_anchored(sentence)
+                    or object_pronoun_sentence_is_anchored(sentence))
             ]
+        if who_action is not None:
+            requested_predicate = who_action.group("predicate").casefold()
+            licensed_predicate_phrases = tuple(
+                tuple(_tokens(record.get("text", "")))
+                for record in expansion_licenses
+                if record.get("kind") == "licensed_predicate"
+                and _tokens(record.get("text", "")))
+
+            def requested_action_is_stated(text: str) -> bool:
+                words = _tokens(text)
+                if any(word == requested_predicate
+                       or _analyze_predicate_spelling(
+                           requested_predicate, word)
+                       for word in words):
+                    return True
+                return any(
+                    words[index:index + len(phrase)] == phrase
+                    for phrase in licensed_predicate_phrases
+                    for index in range(len(words) - len(phrase) + 1))
+
+            # Entity overlap alone cannot answer an action question: the
+            # selected sentence must state the requested predicate (or a
+            # predicate licensed by the active wording evidence).
+            source_sentences = [
+                sentence for sentence in source_sentences
+                if requested_action_is_stated(str(sentence.get("text", "")))
+            ]
+            hits = [hit for hit in hits
+                    if requested_action_is_stated(hit.snippet)]
         question_seeks_example = bool(
             set(query_words) & {"example", "examples", "sample", "samples",
                                 "illustration", "illustrative", "template",
@@ -7863,9 +7987,11 @@ class CRMSKnowledgeBase:
 
             source_sentences.sort(key=source_sentence_rank, reverse=True)
             if (named_anchor_tokens and source_sentences
-                    and re.match(r"\s*(?:it|its)\b",
-                                 str(source_sentences[0].get("text", "")),
-                                 flags=re.IGNORECASE)):
+                    and (re.match(r"\s*(?:it|its)\b",
+                                  str(source_sentences[0].get("text", "")),
+                                  flags=re.IGNORECASE)
+                         or object_pronoun_sentence_is_anchored(
+                             source_sentences[0]))):
                 # The answer sentence may use an anaphor. Cite the local
                 # antecedent with it so the user can see why the pronoun is
                 # bound to the named entity, and so dialogue can safely retain
@@ -8304,6 +8430,91 @@ class CRMSKnowledgeBase:
             hits = [hit for hit in hits if has_requested_number(hit.snippet)]
             source_sentences = [sentence for sentence in source_sentences
                                 if has_requested_number(sentence.get("text", ""))]
+        # Reapply answer-type constraints after specialized fallback routes.
+        # Some later routes can recover a paragraph or structured passage, so
+        # enforcing these only during initial sentence selection is not enough.
+        if who_action is not None:
+            final_predicate = who_action.group("predicate").casefold()
+
+            def final_action_match(text: str) -> bool:
+                words = _tokens(text)
+                if any(word == final_predicate
+                       or _analyze_predicate_spelling(final_predicate, word)
+                       for word in words):
+                    return True
+                return any(
+                    words[index:index + len(phrase)] == phrase
+                    for phrase in licensed_predicate_phrases
+                    for index in range(len(words) - len(phrase) + 1))
+
+            source_sentences = [
+                sentence for sentence in source_sentences
+                if final_action_match(str(sentence.get("text", "")))
+            ]
+            hits = [hit for hit in hits if final_action_match(hit.snippet)]
+        if query_words and query_words[0] == "when":
+            final_time_pattern = re.compile(
+                r"\b(?:1[0-9]{3}|20[0-9]{2}|\d{1,4}\s*"
+                r"(?:BCE|CE|AD|BC)|\d{1,2}(?:st|nd|rd|th)?\s+"
+                r"(?:century|millennium)|\d{3,4}s|"
+                r"January|February|March|April|May|June|July|August|"
+                r"September|October|November|December|"
+                r"spring|summer|autumn|fall|winter|"
+                r"yesterday|today|tomorrow|recently|formerly|currently|"
+                r"during the (?:Middle Ages|Renaissance|"
+                r"(?:First|Second) World War|World War [IVX]+|\d{3,4}s)|"
+                r"\b(?:WWI|WWII|World War [IVX]+)\b|"
+                r"early\s+(?:\d{3,4}s|\d{1,2}(?:st|nd|rd|th)?\s+century)|"
+                r"mid\s+(?:\d{3,4}s|\d{1,2}(?:st|nd|rd|th)?\s+century)|"
+                r"late\s+(?:\d{3,4}s|\d{1,2}(?:st|nd|rd|th)?\s+century))\b",
+                re.IGNORECASE)
+            source_sentences = [
+                sentence for sentence in source_sentences
+                if final_time_pattern.search(str(sentence.get("text", "")))
+            ]
+            temporal_spans = []
+            for sentence in source_sentences:
+                citation_span = re.search(
+                    r"&chars=(\d+):(\d+)",
+                    str(sentence.get("citation", "")))
+                document_id = sentence.get("document_id")
+                if citation_span is not None and isinstance(document_id, str):
+                    temporal_spans.append((
+                        document_id, *map(int, citation_span.groups())))
+            hits = [hit for hit in hits if any(
+                hit.document_id == document_id
+                and hit.start < end and hit.end > start
+                for document_id, start, end in temporal_spans)]
+        if who_action is not None or (
+                query_words and query_words[0] == "when"):
+            # The final sentence selector has already enforced entity,
+            # relation/answer-type, and pronoun-anchor constraints. Ensure the
+            # passage list uses those exact cited spans too; the top lexical
+            # hit may be a different sentence in the same document.
+            aligned_hits = []
+            for sentence in source_sentences:
+                citation = str(sentence.get("citation", ""))
+                span = re.search(r"&chars=(\d+):(\d+)", citation)
+                document_id = sentence.get("document_id")
+                if span is None or not isinstance(document_id, str):
+                    continue
+                start, end = map(int, span.groups())
+                try:
+                    document = research_index.document(document_id)
+                except (AttributeError, KeyError, TypeError, ValueError):
+                    continue
+                if not 0 <= start < end <= len(document.text):
+                    continue
+                exact_text = document.text[start:end]
+                if exact_text != sentence.get("text"):
+                    continue
+                matched_terms = tuple(sorted(set(
+                    sentence.get("matched_terms", ()))))
+                aligned_hits.append(SearchHit(
+                    document.document_id, document.title, document.location,
+                    float(sentence.get("score", 0.0)), exact_text, start, end,
+                    matched_terms))
+            hits = aligned_hits
         passages: list[dict[str, Any]] = []
         question_terms = set(query_words)
         candidates: dict[tuple[str, str, str, str, bool], FactCandidate] = {}
