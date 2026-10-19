@@ -25,14 +25,19 @@ but remain uneven and mostly demonstrated on controlled examples.
 The main gap is integration and generalization. Source-disjoint rule learning,
 unseen procedure composition, governed write-back, broad conversational
 reliability, and the complete portable-model contract are not yet established.
-Recent dialogue tests demonstrate that a named topic can anchor an `it`
-follow-up in a fixture; they do not yet settle the reported wrong-entity answer
-across varied documents, turn sequences, and persistence. Keep the overall goal
-in progress.
+Recent dialogue tests improve single-topic pronoun grounding and explicit topic
+switches, but a driven chat still exposed two answer-selection/context gaps:
+`Who designed the Sydney Opera House?` can prefer a less relevant sentence
+about when it opened over the nearby “Jorn Utzon designed it” sentence, and
+source-only answers do not always leave usable context for “and Italy?” or
+“and the Colosseum?”. A separate Eiffel/Colosseum test showed why an `It ...`
+sentence must be bound to the nearest suitable antecedent, not whichever entity
+makes the sentence answerable. These failures are now the first user-facing
+gate. Keep the overall goal in progress.
 
 ## Execution order
 
-### 1. Lock a trustworthy end-to-end scorecard
+### 1. Freeze a trustworthy chat scorecard and failure corpus
 
 Keep a small versioned set of complete chat transcripts and task cases covering
 direct questions, paraphrases, unsupported or conflicting claims, multi-part
@@ -45,22 +50,31 @@ wrong, omitted, abstained, coverage, latency, and provenance separately.
 **Gate:** a clean process can replay the frozen set; every known failure remains
 visible; component tests cannot substitute for chat outcomes.
 
-### 2. Close dialogue grounding and context failures
+### 2. Fix answer selection and dialogue grounding together
 
-First reproduce the Colosseum/Eiffel Tower failure in the current runtime. Keep
-the current-topic pronoun binding as a regression, then vary paragraph layout,
-entity names, intervening turns, source-only answers, unanswered turns,
-`why?`, clarification, and save/reload. Preserve valid context after a source-only
-answer, but do not let stale or weak context silently select an entity. Ambiguity
-must lead to a clarification or abstention. Track user intent as a provisional
-hypothesis from the utterance and explicit dialogue state; it may route or ask,
-but cannot create facts or authorize unsupported actions.
+Use complete document fixtures and fresh chat processes to distinguish three
+questions: did retrieval find the document, did sentence selection choose a
+sentence that answers the requested relation, and did dialogue bind pronouns
+to the intended topic? Include competing entities, answer sentences with
+object pronouns, paragraph boundaries, “built”/“designed and built”, source-only
+answers, unanswered turns, “why?”, “and X?”, and save/reload. A source sentence
+that does not state the requested relation must not win merely because it
+shares entity words. A pronoun-led sentence needs a local, explicit antecedent
+check. Keep valid visible context after source-only answers and recoverable
+abstentions; expire it on reset, explicit incompatible topic change, or a clear
+context failure. Preserve ambiguity as a clarification or abstention, never a
+silent entity guess.
 
-**Gate:** no confident wrong-entity answers or stale explanations on the held-out
-dialogue set; valid source-only context survives; ambiguous references are
-resolved explicitly or left unanswered. Keep dialogue-move induction
-experimental until it improves held-out task completion over the current
-explicit baseline.
+Track wrong-answer sentences, wrong referents, omissions, abstentions,
+clarifications, citation support, and task completion separately. Dialogue
+intent remains a contextual hypothesis used for routing and repair; it cannot
+create facts or authorize unsupported actions.
+
+**Gate:** on held-out layouts and transcripts, no confident wrong relation or
+wrong referent; citations support the answer; source-only context survives;
+ambiguity is clarified or declined. Test whole turns and transcripts, not only
+resolver helpers. Keep learned dialogue-move induction experimental until it
+beats this explicit baseline.
 
 ### 3. Prove source-disjoint procedure learning and recombination
 
@@ -129,6 +143,37 @@ without original ingestion files. Run the same scorecard on that copy.
 **Gate:** answers, evidence lookup, learning, corrections, and reload behave as
 expected on a clean copy without source files. Publish resource use and
 unsupported cases alongside capability results.
+
+## Immediate work packets
+
+1. **Answer-bearing retrieval:** add a fixed chat regression for the Sydney
+   Opera House example alongside direct-entity, wrong-paragraph, and missing-
+   relation negatives. Correct selection must preserve the source sentence and
+   citation, and must abstain if the only named-entity sentence does not answer
+   the question. Keep lexical retrieval, relation fit, entity identity, and
+   answer-type checks separately observable.
+2. **Context after source-only answers:** replay “What is the capital of
+   France?” followed by “and Italy?”, plus an explicit topic switch and `why?`.
+   Retain only entities and answers actually shown to the user. An unsupported
+   follow-up must not borrow a prior answer or explain an unrelated turn.
+3. **Independent dialogue set:** add author-held-out transcripts and varied
+   paragraph/entity layouts for pronouns, multiple entities, repairs, history,
+   and ordinal references. Keep current curated transcripts as regression
+   controls, not the generalization score.
+4. **Source-derived procedure transfer:** expand proposal quality and source
+   independence before adding more hand labels. Keep quoted, negated,
+   contrastive, metalinguistic, and unrelated prose as negative controls. Make
+   labeler effort and the distinction between source evidence and supervision
+   visible.
+5. **Unseen composition plus proof checks:** join a learned procedure with a
+   verified reasoning step in ordinary chat. Check missing premises, explicit
+   negatives, conflicts, cycles/integrity violations, and budget exhaustion;
+   keep derived write-back review-only until correction and invalidation pass.
+
+Do not grow the corpus as a substitute for these packets: more documents cannot
+repair relation selection, context updates, or a missing composition learner.
+Use a larger corpus only when a defined held-out evaluation needs it and record
+its source mix, licensing/provenance, size, and exact build.
 
 ## Working cadence and decision rule
 
