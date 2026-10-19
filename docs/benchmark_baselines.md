@@ -1,5 +1,18 @@
 # Language and recombination benchmark baselines
 
+## Capability-comparison status (2026-10-19)
+
+CRMS has focused, reproducible checks for natural-language transfer,
+recombination, retrieval, math, coding, translation, and proof-backed
+reasoning, but these results are not a shared cross-domain score and do not
+establish equivalence to a large language model. The current container exposes
+an `ollama` executable but no reachable Ollama service (`ollama list` failed to
+connect to `127.0.0.1:11434` under the available runtime permissions), and no
+70B-class comparator outputs are recorded here. A comparison remains pending a
+pinned model/runtime that can be run on the same held-out tasks and context.
+Until then, report component results and unsupported cases separately; make no
+parity claim.
+
 ## Cross-surface question transfer v1
 
 Command: `python3 experiments/v1_315_cross_surface_question_transfer.py`
