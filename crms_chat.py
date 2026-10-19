@@ -68,7 +68,7 @@ from crms_translation import (
 
 HELP = """Commands:
   /help          show this guide
-  /intent        inspect the last turn's contextual intent hypothesis
+  /intent        inspect the last turn's intent and session-only task values
   /effort quick|standard|thorough
                  set session-only reasoning and evidence-check depth
   /right | /wrong record feedback on the last evidence-backed answer
@@ -5600,6 +5600,10 @@ def main() -> int:
                 print(json.dumps(asdict(dialogue.last_intent_hypothesis),
                                  ensure_ascii=False, indent=2))
             print(f"Active task context: {dialogue.active_task_intent or 'none'}")
+            if dialogue.session_slots:
+                print("User-provided task parameters (session only; not facts):")
+                print(json.dumps(dialogue.session_slots,
+                                 ensure_ascii=False, indent=2))
             if dialogue.intent_trace:
                 print("Recent intent trace:")
                 print(json.dumps(dialogue.intent_trace[-5:],

@@ -25,6 +25,9 @@ _CONTEXT_PREDICATES = {
     "awaiting_slot_date_time", "awaiting_slot_seating", "awaiting_slot_cuisine",
     "awaiting_slot_restaurant_choice", "awaiting_slot_confirmation",
     "awaiting_slot_yes_no",
+    "has_session_slot_location", "has_session_slot_party_size",
+    "has_session_slot_date_time", "has_session_slot_seating",
+    "has_session_slot_cuisine", "has_session_slot_restaurant_choice",
     "task_in_progress", "task_complete", "correction_target_available",
 }
 _DIALOGUE_ACTS = {

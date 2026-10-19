@@ -24,8 +24,8 @@ unsupported turns have no hypothesis. `/intent` exposes the last hypothesis, act
 recent bounded intent trace without adding diagnostics to ordinary answers. Selected task goals are
 retained in inspectable session state; ambiguous or unlicensed hypotheses cannot replace the
 active goal. Social turns preserve it, while an explicit end-interaction or `/reset` clears it. This
-is a context predicate for licensed frames, not task-slot understanding or authorization to act. The
-trace and last hypothesis are saved in dialogue-state format 15 and validated when reloaded.
+is a context predicate for licensed frames, not broad task-slot understanding or authorization to
+act. The trace and last hypothesis are saved in dialogue-state format 16 and validated when reloaded.
 `experiments/v1_386_session_intent_context.py` checks that the active-task predicate actually
 licenses a matching portable frame, survives reload, remains bounded, and clears on explicit end
 or reset; `experiments/v1_365_contextual_clarification_intent.py` checks the existing clarification
@@ -43,14 +43,16 @@ The runtime now also retains one typed open dialogue slot:
 which entity with accepted facts to elaborate on. A bare entity name is then classified as an answer
 to that question and routed to the accepted-fact overview; an unmatched name gets a clarification,
 not a corpus lookup. A new question supersedes the slot, and “never mind” cancels it. This bounded
-slot is persisted in dialogue-state format 15 and rejects unknown slot values on load. The exact
+slot is persisted in dialogue-state format 16 and rejects unknown slot values on load. The exact
 assistant clarification prompt is retained as a bounded QUD with a `detail` or `yes-no` answer kind
 and an expected-slot type such as `location`, `party_size`, `date_time`, `seating`, or `cuisine`.
 Typed slots are exposed to portable intent frames through predicates such as
 `awaiting_slot_location`; format 14 QUD state migrates by deriving its slot from the saved prompt.
-A short reply is interpreted against that question, recorded with its user-provided value in the
-intent trace, and kept out of factual knowledge. This is session context, not learned intent
-knowledge or general slot-value extraction, and it does not support free-form source summaries.
+A short reply is interpreted against that question and recorded in the intent trace. For the
+bounded task slots (location, party size, date/time, seating, cuisine, and restaurant choice), its
+user-provided value and the prompting question are retained in session state, displayed by `/intent`,
+and kept out of factual knowledge. This is session context, not learned intent knowledge or robust
+slot extraction from arbitrary turns, and it does not support free-form source summaries.
 Yes/no answers have a separate `awaiting_yes_no_answer` predicate and are not treated as action
 confirmations. The sequence and reload checks are in
 [`v1_375_contextual_elaboration_slot.py`](../experiments/v1_375_contextual_elaboration_slot.py)

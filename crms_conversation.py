@@ -655,17 +655,23 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         if (intent is not None and intent.decision == "selected"
                 and intent.dialogue_act == "answer-clarification"
                 and dialogue.open_dialogue_question is not None):
+            dialogue.remember_session_slot(intent.selected_value or "")
             dialogue.open_dialogue_question = None
         elif (turn.status == "clarify" and turn.text.rstrip().endswith("?")
               and not dialogue.offers and dialogue.pending_result is None
               and dialogue.pending_binding is None):
             answer_kind = ("yes-no" if _YES_NO_QUESTION_RE.fullmatch(
                 turn.text.strip()) else "detail")
+            expected_slot = infer_open_question_slot(
+                turn.text.strip(), answer_kind)
+            if expected_slot in dialogue.session_slots:
+                # The assistant is asking for this value again; do not expose
+                # the previous answer as if it were still current.
+                del dialogue.session_slots[expected_slot]
             dialogue.open_dialogue_question = {
                 "prompt": turn.text.strip()[:500],
                 "answer_kind": answer_kind,
-                "expected_slot": infer_open_question_slot(
-                    turn.text.strip(), answer_kind),
+                "expected_slot": expected_slot,
             }
         turn.intent_hypothesis = intent
         dialogue.last_intent_hypothesis = intent

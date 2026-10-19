@@ -47,6 +47,10 @@ _OPEN_QUESTION_SLOT_TYPES = {
     "date_time", "seating", "cuisine", "restaurant_choice", "confirmation",
     "yes_no",
 }
+_SESSION_SLOT_TYPES = {
+    "location", "party_size", "date_time", "seating", "cuisine",
+    "restaurant_choice",
+}
 
 
 def infer_open_question_slot(prompt: str, answer_kind: str) -> str:
@@ -263,6 +267,23 @@ class CRMSDialogue:
         # Preserve the exact assistant clarification prompt as a bounded QUD.
         # It is session context, not a user fact or a learned answer.
         self.open_dialogue_question: dict[str, str] | None = None
+        # User-provided task parameters stay in session state with their prompt;
+        # they are never inserted into factual knowledge.
+        self.session_slots: dict[str, dict[str, Any]] = {}
+
+    def remember_session_slot(self, value: str) -> None:
+        """Retain a bounded answer to the current typed clarification."""
+        question = self.open_dialogue_question
+        if question is None or not isinstance(value, str):
+            return
+        slot = question.get("expected_slot", "unknown")
+        value = value.strip()
+        if slot not in _SESSION_SLOT_TYPES or not value or len(value) > 256:
+            return
+        self.session_slots[slot] = {
+            "value": value,
+            "question": question["prompt"],
+        }
 
     def record_turn(self, utterance: str, act: str,
                     turn: "DialogueTurn",
@@ -291,6 +312,7 @@ class CRMSDialogue:
             if intent_hypothesis.decision == "selected":
                 if task_intent == "end-interaction":
                     self.active_task_intent = None
+                    self.session_slots = {}
                 elif task_intent in {
                         "seek-information", "provide-information", "other-task"}:
                     self.active_task_intent = task_intent
@@ -309,7 +331,8 @@ class CRMSDialogue:
         """Expose bounded, observable predicates to the intent-frame matcher."""
         open_task = bool(self.pending_result or self.pending_binding
                          or self.pending_dialogue_slot
-                         or self.open_dialogue_question or self.offers)
+                         or self.open_dialogue_question or self.offers
+                         or self.session_slots)
         context = set()
         if not self.history:
             context.add("conversation_opening")
@@ -317,7 +340,7 @@ class CRMSDialogue:
             context.add("current_topic_available")
         if self.last_answered:
             context.add("previous_grounded_answer")
-        if self.active_task_intent is not None:
+        if self.active_task_intent is not None or self.session_slots:
             context.add("task_in_progress")
         if self.last_answered or self.last_question:
             context.add("correction_target_available")
@@ -336,6 +359,8 @@ class CRMSDialogue:
             slot = self.open_dialogue_question.get("expected_slot", "unknown")
             if slot != "unknown":
                 context.add(f"awaiting_slot_{slot}")
+        for slot in self.session_slots:
+            context.add(f"has_session_slot_{slot}")
         if self.pending_binding is not None:
             context.update({"awaiting_user_detail", "task_in_progress"})
         if any(item.get("kind") == "confirm_statement" for item in self.offers):
@@ -357,6 +382,7 @@ class CRMSDialogue:
         self.history = []
         self.intent_trace = []
         self.active_task_intent = None
+        self.session_slots = {}
         self.last_intent_hypothesis = None
         self.last_answered = None
         self.shown = []
@@ -1747,7 +1773,7 @@ class CRMSDialogue:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(
-            json.dumps({"format_version": 15, "last_entity": self.last_entity,
+            json.dumps({"format_version": 16, "last_entity": self.last_entity,
                         "subject_entity": self.subject_entity,
                         "object_entity": self.object_entity,
                         "last_question": self.last_question,
@@ -1769,7 +1795,8 @@ class CRMSDialogue:
                         "last_answered": self.last_answered,
                         "shown": self.shown,
                         "pending_dialogue_slot": self.pending_dialogue_slot,
-                        "open_dialogue_question": self.open_dialogue_question},
+                        "open_dialogue_question": self.open_dialogue_question,
+                        "session_slots": self.session_slots},
                        ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8")
 
@@ -1780,7 +1807,7 @@ class CRMSDialogue:
              ) -> "CRMSDialogue":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
         if payload.get("format_version") not in (
-                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15):
+                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16):
             raise ValueError("unsupported dialogue-state format version")
         dialogue = cls(knowledge, intent_model=intent_model)
         pending_dialogue_slot = payload.get("pending_dialogue_slot")
@@ -1816,6 +1843,24 @@ class CRMSDialogue:
                      not in _OPEN_QUESTION_SLOT_TYPES)):
             raise ValueError("stored open dialogue question is malformed")
         dialogue.open_dialogue_question = open_dialogue_question
+        session_slots = payload.get("session_slots", {})
+        if (not isinstance(session_slots, dict)
+                or len(session_slots) > len(_SESSION_SLOT_TYPES)
+                or set(session_slots) - _SESSION_SLOT_TYPES):
+            raise ValueError("stored session task slots are malformed")
+        validated_session_slots: dict[str, dict[str, Any]] = {}
+        for slot, record in session_slots.items():
+            if (not isinstance(record, dict)
+                    or set(record) != {"value", "question"}
+                    or not isinstance(record["value"], str)
+                    or not record["value"].strip()
+                    or len(record["value"]) > 256
+                    or not isinstance(record["question"], str)
+                    or not record["question"].strip()
+                    or len(record["question"]) > _HISTORY_QUESTION_LIMIT):
+                raise ValueError("stored session task slot is malformed")
+            validated_session_slots[slot] = dict(record)
+        dialogue.session_slots = validated_session_slots
         active_task_intent = payload.get("active_task_intent")
         if (active_task_intent is not None
                 and (not isinstance(active_task_intent, str)

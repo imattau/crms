@@ -154,8 +154,9 @@ label correctness, held-out generalization, or improved runtime intent recogniti
 The follow-up implementation stores a typed expected slot on each open assistant question and
 exposes predicates such as `awaiting_slot_location` to the portable dialogue-frame matcher.
 `experiments/v1_388_open_dialogue_question_state.py` checks slot inference, persistence, migration
-from state format 14, and context-conditioned frame selection. User replies are still not extracted
-into persistent task-slot values.
+from state format 14, context-conditioned frame selection, and retention of six supported
+user-provided task-slot values in session state. It verifies those values stay separate from facts,
+survive reload, and clear on full reset; arbitrary turns are not yet parsed into slots.
 
 ## Balanced phrase recombination from three demonstrations
 

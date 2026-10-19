@@ -51,9 +51,9 @@ def main() -> None:
         state_path = Path(folder) / "dialogue.json"
         dialogue.save(str(state_path))
         saved = json.loads(state_path.read_text(encoding="utf-8"))
-        require(saved["format_version"] == 15
+        require(saved["format_version"] == 16
                 and saved["open_dialogue_question"]["prompt"] == original_prompt,
-                "typed open question was not persisted in state format 15")
+                "typed open question was not persisted in state format 16")
         restored = CRMSDialogue.load(kb, str(state_path))
         require(restored.open_dialogue_question == dialogue.open_dialogue_question,
                 "open question did not survive state reload")
@@ -80,8 +80,55 @@ def main() -> None:
             == "answer-to-open-dialogue-question"
             and detail_answer.intent_hypothesis.selected_value == "7 pm"
             and detail.history[-1]["act"] == "answer-clarification"
+            and detail.session_slots["date_time"]["value"] == "7 pm"
+            and detail.session_slots["date_time"]["question"] == "What time should I use?"
+            and "has_session_slot_date_time" in detail.intent_context()[0]
             and detail.open_dialogue_question is None,
-            "a short detail did not fill the open contextual question")
+            "a short detail was not retained as session-only task context")
+    require(len(kb._facts) == 1,
+            "a session task parameter was incorrectly stored as a fact")
+    slot_context_memory = empty_dialogue_intent_memory()
+    slot_context_memory["builtin_policy"].append({
+        "policy_id": "continue-with-known-time",
+        "dialogue_act": "continuation-request",
+        "task_intent": "continue-current-task",
+        "surface_patterns": ["Continue with that time"],
+        "context_predicates": ["has_session_slot_date_time"],
+        "predecessor_act": None,
+        "runtime_route": None,
+    })
+    slot_context_dialogue = CRMSDialogue(
+        kb, intent_model=CRMSDialogueIntentModel(slot_context_memory))
+    slot_context_dialogue.session_slots = dict(detail.session_slots)
+    slot_context_intent = classify_user_intent(
+        slot_context_dialogue, "Continue with that time")
+    require(slot_context_intent is not None
+            and slot_context_intent.basis == "portable_dialogue_model"
+            and slot_context_intent.matched_frame == "continue-with-known-time",
+            "a saved user task value did not license a contextual intent frame")
+    with tempfile.TemporaryDirectory(prefix="crms-session-task-slots-") as folder:
+        slot_state = Path(folder) / "dialogue.json"
+        detail.save(str(slot_state))
+        payload = json.loads(slot_state.read_text(encoding="utf-8"))
+        require(payload["session_slots"]["date_time"] == {
+                    "value": "7 pm", "question": "What time should I use?"},
+                "session task-slot value or prompt was not persisted")
+        restored_slots = CRMSDialogue.load(kb, str(slot_state))
+        require(restored_slots.session_slots == detail.session_slots
+                and "has_session_slot_date_time"
+                in restored_slots.intent_context()[0],
+                "session task slot did not survive reload as contextual intent")
+        restored_slots.clear()
+        require(restored_slots.session_slots == detail.session_slots,
+                "clearing entity focus erased the active task parameter")
+        restored_slots.reset_history()
+        require(not restored_slots.session_slots,
+                "full dialogue reset left session task parameters behind")
+    farewell = CRMSDialogue(kb)
+    farewell.session_slots = dict(detail.session_slots)
+    respond(farewell, "Goodbye")
+    require(not farewell.session_slots,
+            "ending the interaction left task parameters active")
 
     wrong_kind = CRMSDialogue(kb)
     wrong_kind.open_dialogue_question = {
@@ -92,6 +139,8 @@ def main() -> None:
             or wrong_kind.last_intent_hypothesis.matched_frame
             != "answer-to-open-dialogue-question",
             "bare yes was accepted for a detail question")
+    require(not wrong_kind.session_slots,
+            "a rejected clarification answer was stored as a task parameter")
 
     # A generic yes/no prompt accepts a bare yes and records the exact value.
     yes_no = CRMSDialogue(kb)
@@ -111,6 +160,7 @@ def main() -> None:
             and "awaiting_yes_no_answer" in
             answer.intent_hypothesis.context_predicates
             and yes_no.open_dialogue_question is None
+            and not yes_no.session_slots
             and yes_no.intent_trace[-1]["selected_value"] == "Yes"
             and len(kb._facts) == before,
             "bare yes was not treated as a contextual task response")
@@ -243,6 +293,16 @@ def main() -> None:
 
         payload["format_version"] = 15
         payload["open_dialogue_question"] = {
+            "prompt": "What time should I use?", "answer_kind": "detail",
+            "expected_slot": "date_time"}
+        payload.pop("session_slots", None)
+        state_path.write_text(json.dumps(payload), encoding="utf-8")
+        migrated_slots = CRMSDialogue.load(kb, str(state_path))
+        require(migrated_slots.session_slots == {},
+                "format 15 state did not migrate without session slot values")
+
+        payload["format_version"] = 16
+        payload["open_dialogue_question"] = {
             "prompt": "What time?", "answer_kind": "detail",
             "expected_slot": "not-a-slot"}
         state_path.write_text(json.dumps(payload), encoding="utf-8")
@@ -252,6 +312,20 @@ def main() -> None:
             pass
         else:
             raise SystemExit("unknown expected slot was accepted")
+
+        payload["format_version"] = 16
+        payload["open_dialogue_question"] = {
+            "prompt": "Where?", "answer_kind": "detail",
+            "expected_slot": "location"}
+        payload["session_slots"] = {
+            "location": {"value": "Paris", "question": "Where?", "extra": True}}
+        state_path.write_text(json.dumps(payload), encoding="utf-8")
+        try:
+            CRMSDialogue.load(kb, str(state_path))
+        except ValueError:
+            pass
+        else:
+            raise SystemExit("malformed session task slot was accepted")
 
     print("open assistant-question context, persistence, supersession, and fact isolation: PASS")
 
