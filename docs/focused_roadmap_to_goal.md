@@ -311,16 +311,50 @@ the goal but cannot substitute for transfer, task completion, or safe context.
 
 ### Ordered work from here
 
-1. **Finish the end-to-end dialogue baseline.**
-   Focused fixes now ground pronoun-led answers in their source paragraph,
-   preserve the latest explanation target, reject mismatched entity switches,
-   and retain source-only context when its citation remains valid. The focused
-   regressions pass, but the full multi-turn conversation has not yet been
-   captured as one compact, reproducible clean-process transcript. Run it at a
-   recorded revision with named topic switches, follow-ups, source-only
-   answers, an unanswered turn, `why?`, “and Italy?”, “what did I just ask?”,
-   and “the first one”. Treat any result from a truncated diagnostic run as
-   inconclusive.
+### Execution queue from the current checkpoint
+
+Use this as the near-term work order; the stages below remain the longer-term
+gates. Keep each slice small enough to compare against the pinned behavior and
+to attribute regressions. Dialogue reliability and recombination are both
+active priorities: dialogue is not deferred until the learning work is done.
+
+| Order | Slice | Concrete deliverable | Exit check |
+|---|---|---|---|
+| 1 | Lock the dialogue regression baseline | Preserve the reported topic-switch failure and related multi-turn flow as deterministic regressions. The current 30-turn transcript plus source-topic and paragraph-grounding checks pass; see below for scope. | Keep current positives, abstentions, citations, clarification recovery, and stale-answer negatives passing. Reopen implementation only for a reproduced gap. |
+| 2 | Replace fixture-only recombination evidence with source-disjoint evidence | A small, licensed natural-source task set with exact source spans, independently held-out documents, unseen compositions and wording, plus an explicit unsupported middle-step case. Report publisher independence separately from document independence. | Through chat, learned components compose correctly on held-out tasks; an independent validator confirms outputs; unsupported combinations abstain; lineage excludes held-out sources. |
+| 3 | Make self-learning a governed proposal path | Add the smallest useful derived-case proposal flow: retrieve → compose → verify independently → propose with lineage. Do not automatically promote. Include correction/invalidation and duplicate-growth probes before considering promotion. | A derived output cannot validate itself; dependency correction marks affected proposals stale; taught evidence outranks derived output; repeated runs are deterministic. |
+| 4 | Close a reasoning slice end to end | Select one natural-language reasoning family and route it from chat through proof search, verification, and explanation. Include a positive proof, missing premise, contradiction/cycle, and search-limit case. | Chat and engine agree; every positive proof verifies; uncertainty categories remain distinct; no cycle or budget limit becomes an unqualified answer. |
+| 5 | Progress intent and dialogue-move research in parallel | Evaluate contextual intent/discourse state on held-out conversations. Separately run a bounded, source-disjoint move-learning pilot against the current explicit baseline. | Intent gains are measured by task progress and incorrect updates, not label agreement alone. Learned moves remain non-authoritative unless they improve held-out outcomes without raising inappropriate actions. |
+| 6 | Expand one user-facing domain at a time | Choose a bounded math, coding, translation, or creative task slice; expose it through ordinary CRMS language; supply held-out requests, validators, refusal cases, and multi-turn repair. | Task-specific correctness, coverage, abstention, completeness, cost, and provenance are reported; only then add another slice or cross-domain composition. |
+| 7 | Finish the portable release contract | Build, copy, query, learn, export, reload, and query a SQLite model without its original source files. Run the fixed cross-domain suite against that copy. | Semantics, citations, rules, and lineage survive; package size and resource use are reported; source files are unnecessary at inference. |
+
+**Critical path:** slices 1–4 establish trustworthy interaction, transferable
+learning, and proof-backed recombination. Slice 5 should proceed alongside
+slices 1–2 as a research track. Slice 6 should reuse the same evaluation and
+validation contracts, rather than starting separate unmeasured demos. Slice 7
+is a release gate, not a substitute for capability breadth.
+
+**Do not advance a claim on a demo alone.** Each slice needs a pinned baseline,
+whole-document or whole-conversation holdout as appropriate, negative cases,
+and a recorded result. Keep source text, taught examples, induced rules,
+derived proposals, and user-provided context distinguishable. If a slice fails,
+use the failure to narrow the next hypothesis instead of increasing corpus
+volume or relaxing abstention.
+
+1. **Keep the end-to-end dialogue baseline locked.**
+   Focused fixes ground pronoun-led answers in their source paragraph, preserve
+   the latest explanation target, reject mismatched entity switches, and retain
+   source-only context when its citation remains valid. Runtime checks
+   `v1_412_dialogue_topic_anchor_grounding.py`,
+   `v1_413_source_topic_followups.py`,
+   `v1_426_dialogue_paragraph_grounding.py`, and
+   `v1_427_dialogue_multiturn_transcript.py` passed in the current working
+   tree. The 30-turn transcript includes topic changes, short follow-ups,
+   history, clarification, ordinal selection, and dialogue-state save/load;
+   the focused CLI check covers a separate process. This is regression
+   evidence on a small authored travel corpus, not broad conversational
+   coverage or independent user evaluation. Keep these as locked regressions
+   and reopen implementation only when a new failure is reproduced.
 
    **Gate:** no wrong-entity sentence is returned; a citation supports the
    exact answer shown; current topic and explanation target update separately;
