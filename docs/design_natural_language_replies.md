@@ -1,11 +1,14 @@
 # Design: natural-language replies built from stored content, not quoted sentences
 
 **Audience:** the developer (human or AI) implementing this.
-**Status:** proposed. A first-step prototype (question plus answer span to a short declarative
-sentence, with a round-trip check) was tested in a scratch folder and **works only on simple
-sentences**; it fails on real questions, and its cheap round-trip check cannot tell right from wrong
-(section 2). The design in section 3 is therefore built around structured content and a *parsed*
-round trip, not around rearranging question words. Nothing here is implemented.
+**Status:** proposed, with partial runtime foundations. A first-step prototype (question plus answer
+span to a short declarative sentence, with a round-trip check) was tested in a scratch folder and
+**works only on simple sentences**; it fails on real questions, and its cheap round-trip check
+cannot tell right from wrong (section 2). Since that prototype, CRMS has added fact-backed sentence
+realisation and several narrow source-backed realisation paths (see section 1). The unified
+`ReplyPlan`, role-preserving parsed round trip, and multi-claim composition described here remain
+unimplemented. The design in section 3 is built around structured content and a *parsed* round trip,
+not around rearranging question words.
 **Relationship to other docs:** the output rule below governs everything.
 [design_natural_language_handling.md](design_natural_language_handling.md) decides *whether* a
 sentence answers a question; [design_chat_ux.md](design_chat_ux.md) decides how a reply is shown;
@@ -25,11 +28,22 @@ Consequences: no free paraphrase, no fluent filler, no wording chosen to sound g
 
 | Need | Exists today | Missing |
 |---|---|---|
-| Something to say that is smaller than a sentence (a fact, a typed span) | Stored facts with provenance; proofs; question frames | Facts extracted from real text at useful yield (measured low, see the NL doc section 3.6); a reliable answer-span extractor |
-| Licensed wording for a fact | `write_fact` realises a stored fact from a fact-backed structural frame with varied subjects and objects; each emitted surface must have at least one recorded alignment | Coverage across relations; tense, agreement, plurals, determiners, negation, quantities; question-shaped answer templates |
-| Combining several facts | none | Aggregation, referring expressions, ordering, connectives |
-| Checking its own output | none | A round trip: parse the reply back with CRMS's own rules and compare |
-| Controlled variation | none | A deterministic choice rule or a user setting |
+| Something to say that is smaller than a sentence (a fact, a typed span) | Stored facts with provenance; proofs; question frames; the chat's quoted-evidence gate checks candidate source sentences before presenting them as answers | Useful-yield fact extraction from real text (measured low, see the NL doc section 3.6); a reliable answer-span extractor |
+| Licensed wording for a fact | `write_fact` realises accepted facts from fact-backed structural frames. `render_brief` uses it for some direct fact answers; it avoids realizing truth-valued and composite-proof answers as simple declaratives. `crms_knowledge.py` also has narrow passive-source and structured-field realization paths. | Coverage across relations and reply intents; a unified policy for tense, agreement, plurals, determiners, negation, quantities, and question-shaped answer templates; a consistent check that each output claim is supported |
+| Combining several facts | Proof objects and multi-part question routing exist, but they do not form a general reply content plan | Aggregation, safe referring expressions, ordering, and proof-linked connectives |
+| Checking its own output | Source-answer gating and stored-fact evidence/proof checks exist on their respective paths | A role-preserving round trip for a realized reply, kept independent from source/evidence support validation |
+| Controlled variation | Realization is deterministic; `write_fact` uses a stable order for eligible surfaces | A user setting or a broader policy for choosing among verified wordings |
+
+### Current runtime boundary
+
+These existing paths are building blocks, not an implementation of the full design. In particular,
+the quoted-evidence gate decides whether a retrieved sentence is a plausible answer to the question;
+it does not parse arbitrary generated wording back into a claim and prove role equivalence. Likewise,
+`write_fact` confirms that a fact is stored and has an eligible wording frame, but its use in
+`render_brief` does not yet create a `ReplyPlan` or independently round-trip-check the emitted
+sentence. Source-specific passive and structured-field realizations are bounded patterns, not a
+general source-sentence parser. New realization work must preserve the evidence status, citation,
+and abstention behavior already enforced by those paths.
 
 ## 2. A first-step prototype, and what it showed
 
@@ -162,19 +176,24 @@ the plan: each claim, the wording rule used, and the round-trip result.
 
 ## 4. Delivery order
 
-1. **Span extractor with checks.** Replace the heuristic with a parse-backed span (section 3.4,
-   requirement 4) and measure it on real questions; this also fixes the UX doc's bold answer line.
-2. **Question-to-statement templates for stored facts first.** Answers backed by an accepted fact
-   already have roles; add the ten-pattern set from section 2 on top of the verified wording, and
-   measure the round trip on facts (not on question rearrangement).
-3. **Separate source support from the round trip** (3.4): check source support or stored proof
-   independently, then parse the realisation and compare its claim roles. Benchmark both checks on
-   correct and deliberately wrong (question, sentence) pairs; do not let one check stand in for the
-   other.
-4. **Aggregation and ordering** for multi-claim replies (3.3), starting with same-subject claims.
-5. **Proof explanations** with connectives (3.3).
-6. **Wording coverage** for more relations and forms, driven by what the round-trip benchmark shows
-   is missing.
+1. **Benchmark existing fact realizations.** Use accepted facts with varied relations and question
+   forms, plus deliberately wrong claim/source pairs. Record which answers `render_brief` realizes,
+   which it leaves structured or quoted, and whether every emitted sentence preserves the fact's
+   roles. This establishes a baseline for the runtime path that already exists.
+2. **Add a role-preserving check for stored facts.** Parse the output of one narrow `write_fact` path
+   back into claims and compare subject, relation, object, polarity, and qualifiers with the stored
+   fact. Keep evidence/proof validation independent. On failure, use the current structured or
+   quoted fallback.
+3. **Expand question-to-statement coverage for stored facts.** Add the ten-pattern set from section
+   2 only where it can use an accepted fact's roles and verified wording; measure coverage and
+   correctness on held-out fact/query pairs.
+4. **Improve source answer spans as a separate extraction task.** Replace the closed-class heuristic
+   with parse-backed spans only when a source parse can establish the answer role. This benefits
+   quoted-evidence display and source-to-fact extraction, but should not block improvements for
+   already structured facts.
+5. **Add aggregation and ordering** for multi-claim replies (3.3), starting with same-subject claims.
+6. **Add proof explanations** with connectives (3.3), then expand wording coverage based on measured
+   round-trip failures.
 
 ## 5. Acceptance and tests
 
