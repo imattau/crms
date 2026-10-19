@@ -167,6 +167,27 @@ phrase candidates still cover only 5.6% of this set. Longer-term work should ind
 and task-intent frames conditioned on typed question/slot and active task, while preserving
 ambiguity and abstention.
 
+### Frozen contextual-intent test pilot
+
+After commit `5afd9f5`, six complete conversations were labeled from the source corpus `test` split
+and replayed without further code changes. The pilot selection was the first six test conversations
+by source order with 8–18 user turns (not a random sample); it contains 66 classifiable turns and
+two uncertain turns. With annotated context supplied, the frozen router produced 31 hypotheses
+(47.0% coverage): 29 selected, 2 ambiguous, and 35 abstentions. Joint agreement with the same
+Codex labeler was 21/31 (67.7%) among hypotheses and 21/29 (72.4%) among selected turns. A
+context-free comparison produced 16 hypotheses (24.2%) and 10/16 exact label matches. Frozen
+train-only exact-phrase candidates matched 1/66 classifiable turns (1.5%). These are provisional
+single-labeler agreement results on a small, domain-specific, non-random pilot—not accuracy, a
+large-scale dialogue benchmark, or evidence of parity with a 70B-class assistant.
+
+The mismatches identify useful next research questions: preference answers such as “Low-price drinks
+if anything” still fall through to generic clarification; “Sure” without an open assistant question
+is marked uncertain rather than acknowledged; a reservation goal can start inside a search task;
+and “Can you tell me how late ...?” is classified as a request-action rather than a question. Keep
+this test set frozen. Any changes motivated by these cases must be developed on train/dev data and
+checked on a later untouched test sample. The test labels were supplied by Codex under user
+authorization and have no independent human review.
+
 ## Contextual intent: active task and expected slot
 
 Command: `python3 experiments/v1_390_contextual_intent_task_slot_diagnostic.py USER_TURNS.csv`

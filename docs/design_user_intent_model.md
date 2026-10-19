@@ -51,6 +51,18 @@ development agreement**, not held-out generalization or accuracy. The next evalu
 the implementation and use previously untouched conversations; the primary labels remain from one
 Codex annotator without independent review.
 
+The implementation was frozen in commit `5afd9f5` before a first test-split pilot. Six complete,
+non-randomly selected test conversations (66 classifiable turns; two uncertain) yielded 31 runtime
+hypotheses with oracle context (47.0% coverage), 29 selected and 2 ambiguous. Joint agreement with
+the Codex labels was 67.7% among hypotheses and 72.4% among selected turns; a context-free run
+covered 16/66 turns and matched 10/16 labels. The exact-phrase learner covered only 1/66. This is a
+small held-out diagnostic against the same provisional labeler, not independent accuracy evidence.
+It showed that the dev-set prompt cues did not collapse entirely on these conversations, while
+coverage remained below half. Failures include generic preference prompts, short acknowledgements
+without an open question, task changes from search into booking, and request-versus-question
+classification. Keep this pilot untouched; use development labels to address these cases and then
+evaluate against another unseen sample.
+
 The elaboration baseline recognizes a small set of equivalent content-free forms, including
 “Could you tell me more?”, “Can you say more?”, and “Could you elaborate?”. These use the same
 context policy as “Tell me more”: continue the current grounded topic, or ask which accepted entity
