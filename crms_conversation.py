@@ -1000,6 +1000,100 @@ def _explain_earlier_answer(
     return turn
 
 
+def _present_direct_search_matches(
+        dialogue: CRMSDialogue, turn: DialogueTurn,
+        research_index: Any | None) -> DialogueTurn:
+    """Show exact retrieved excerpts for a direct, open-ended search request.
+
+    Search hits are source matches, not accepted facts or verified
+    recommendations. Only citations actually shown become selectable
+    conversation context.
+    """
+    research = turn.research
+    if research_index is None or research is None:
+        return turn
+    if research.status != "sources_found":
+        if research.status == "unknown":
+            turn.text = ("I couldn't find a matching source for what you're "
+                         "looking for, so I can't recommend an option from "
+                         "the indexed material.")
+        return turn
+    request = turn.question.casefold()
+    target_match = re.search(
+        r"(?:looking for|need to find|want to find|search for|"
+        r"need|want)\s+(?P<target>.+?)(?:[.!?]|$)", request)
+    target_terms: set[str] = set()
+    location_terms: set[str] = set()
+    if target_match is not None:
+        target_parts = re.split(
+            r"\b(?:in|near|around|at|within)\b",
+            target_match.group("target"), maxsplit=1)
+        target_text = target_parts[0]
+        target_terms = set(re.findall(r"[a-z0-9]+", target_text)) - {
+            "i", "we", "am", "are", "was", "were", "a", "an", "the",
+            "to", "for", "me", "us", "some", "any", "please", "just",
+            "looking", "need", "want", "find", "search", "place", "option",
+        }
+        if len(target_parts) == 2:
+            location_terms = set(re.findall(r"[a-z0-9]+", target_parts[1])) - {
+                "i", "we", "a", "an", "the", "please", "just",
+            }
+    passages = research.passages or []
+    visible: list[dict[str, str]] = []
+    for passage in passages:
+        if not isinstance(passage, dict):
+            continue
+        matched_terms = {str(term).casefold() for term in
+                         passage.get("matched_question_terms", [])}
+        if target_terms and not target_terms.intersection(matched_terms):
+            continue
+        if location_terms and not location_terms.intersection(matched_terms):
+            continue
+        citation = passage.get("citation")
+        if not isinstance(citation, str) or not citation:
+            continue
+        try:
+            excerpt = research_index.resolve_citation(citation)
+        except (AttributeError, KeyError, TypeError, ValueError):
+            continue
+        if not excerpt.strip():
+            continue
+        visible.append({
+            "text": excerpt,
+            "document_id": citation.partition("#sha256=")[0],
+            "title": str(passage.get("title") or "source"),
+            "location": str(passage.get("location") or ""),
+            "citation": citation,
+        })
+        if len(visible) == 3:
+            break
+    if not visible:
+        turn.text = ("I couldn't find a source excerpt that matched what "
+                     "you're looking for, so I can't recommend an option "
+                     "from the indexed material.")
+        return turn
+
+    lines = ["Matching source excerpts (quoted evidence, not verified recommendations):"]
+    for number, item in enumerate(visible, 1):
+        lines.append(f"{number}. {item['text']}\n   Source: {item['title']}")
+    choices = ["first", "second", "third"][:len(visible)]
+    lines.append("Ask about the " + ", ".join(choices)
+                 + " result to select it.")
+    turn.text = "\n".join(lines)
+    research.source_sentences = visible
+    dialogue.presented_sources = [
+        {"citation": item["citation"], "title": item["title"]}
+        for item in visible
+    ]
+    # The dialogue layer may have cleared state for a non-answer. Restore only
+    # evidence the user can now see, so follow-ups cannot bind to hidden hits.
+    dialogue.source_mentions = dialogue._source_entity_mentions(visible)
+    dialogue.topic_entity = (dialogue.source_mentions[0]["entity"]
+                             if len(dialogue.source_mentions) == 1 else None)
+    dialogue.last_question = turn.resolved_question
+    return turn
+
+
 def respond(dialogue: CRMSDialogue, text: str, *,
             research_index: Any | None = None,
             pending_claims: int = 0) -> DialogueTurn:
@@ -1019,7 +1113,8 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         # A fresh question or unrelated act replaces the prior QUD.
         dialogue.open_dialogue_question = None
     if (act is None and intent is not None and intent.decision == "selected"
-            and intent.basis == "portable_dialogue_model"):
+            and intent.basis == "portable_dialogue_model"
+            and intent.matched_frame != "explicit-search-request"):
         act = intent.runtime_route
 
     def with_intent(turn: DialogueTurn) -> DialogueTurn:
@@ -1367,6 +1462,18 @@ def respond(dialogue: CRMSDialogue, text: str, *,
                 )
                 return with_intent(card)
     if act is None and _EXPLANATION_FOLLOWUP_RE.fullmatch(text.strip()):
+        if (dialogue.presented_sources and dialogue.last_question
+                and dialogue.last_intent_hypothesis is not None
+                and dialogue.last_intent_hypothesis.matched_frame
+                    == "explicit-search-request"):
+            sources = ", ".join(
+                item.get("title", "source")
+                for item in dialogue.presented_sources[:3])
+            return with_intent(DialogueTurn(
+                "sources_found", text, dialogue.last_question,
+                text=(f"I showed those excerpts because they matched terms in "
+                      f"your search. Sources: {sources}. They are quoted source "
+                      "matches, not verified recommendations.")))
         explained = _explain_earlier_answer(dialogue, text, research_index)
         if explained is not None:
             return with_intent(explained)
@@ -1385,6 +1492,10 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             return with_intent(proposal)
     if act is None:
         turn = dialogue.turn(text, research_index=research_index)
+        if (intent is not None
+                and intent.matched_frame == "explicit-search-request"):
+            turn = _present_direct_search_matches(
+                dialogue, turn, research_index)
         if dialogue.pending_binding is not None:
             intent = UserIntentHypothesis(
                 dialogue_act="question",
