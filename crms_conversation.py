@@ -54,6 +54,10 @@ _BARE_YES_NO_RE = re.compile(
     r"^(?:yes|yeah|yep|yup|sure|certainly|absolutely|no|nope|nah|not really)"
     r"(?:[, ]+(?:please|thanks|thank you))?[.!? ]*$",
     re.IGNORECASE)
+_AFFIRMATIVE_DETAIL_RE = re.compile(
+    r"^(?:yes|yeah|yep|yup|sure)[, ]+(?:i(?:'d| would| want| prefer| need)\b|"
+    r"we(?:'d| would| want| prefer| need)\b|one\s+that\b|something\s+that\b|"
+    r"with\b|and\b)", re.IGNORECASE)
 _CORRECTION_RE = re.compile(
     r"^(?:(?:no|nope|sorry)[,.!]?\s+)?(?:i\s+meant|i\s+mean)\s+"
     r"(?P<entity>\S.*?)[?!. ]*$", re.IGNORECASE)
@@ -462,7 +466,9 @@ def _open_question_task_intent(dialogue: CRMSDialogue,
         "what kind of restaurant", "which kind of restaurant",
         "what type of food", "what kind of food", "what style of food",
         "what cuisine", "which cuisine", "restaurant preference",
-        "dining preference", "dining requirement", "dining need",
+        "restaurant preferences", "dining preference", "dining preferences",
+        "your preferences", "preferences", "characteristic",
+        "dining requirement", "dining need", "it would help my search",
         "additional characteristic", "restaurant to have",
         "dietary restriction", "what area", "which area", "where are you",
         "where in ",
@@ -484,6 +490,7 @@ def _open_question_task_intent(dialogue: CRMSDialogue,
     slot = open_question.get("expected_slot", "unknown")
     search_constraint_slots = {
         "location", "party_size", "date_time", "seating", "cuisine",
+        "detail",
     }
     if active_task == "seek-information" and slot in search_constraint_slots:
         return "provide-constraint"
@@ -649,6 +656,21 @@ def classify_user_intent(
                              is not None)
         social_act = classify_act(text)
         expected_yes_no = open_question["answer_kind"] == "yes-no"
+        if (expected_yes_no
+                and _AFFIRMATIVE_DETAIL_RE.match(text.strip())
+                and not is_fresh_question):
+            task_intent = _open_question_task_intent(dialogue, open_question)
+            if task_intent == "provide-constraint":
+                return UserIntentHypothesis(
+                    dialogue_act="provide-information",
+                    task_intent=task_intent,
+                    decision="selected",
+                    matched_frame="affirmative-with-preference-details",
+                    context_predicates=("pending_assistant_question",
+                                        "awaiting_yes_no_answer",
+                                        "restaurant_preference_prompt"),
+                    selected_value=text.strip(),
+                )
         if is_yes_no and not expected_yes_no:
             slot = open_question.get("expected_slot", "detail")
             label = _SESSION_SLOT_LABELS.get(slot, "requested detail")
@@ -817,7 +839,8 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             or intent.matched_frame == "yes-no-response-to-detail-question"
             or (intent.decision == "selected"
                 and intent.dialogue_act in {
-                    "answer-clarification", "confirm", "reject"})))
+                    "answer-clarification", "provide-information",
+                    "confirm", "reject"})))
     if dialogue.open_dialogue_question is not None and not preserves_question:
         # A fresh question or unrelated act replaces the prior QUD.
         dialogue.open_dialogue_question = None
@@ -831,6 +854,10 @@ def respond(dialogue: CRMSDialogue, text: str, *,
                 and dialogue.open_dialogue_question is not None):
             dialogue.remember_session_slot(
                 intent.selected_value or "", user_turn=text)
+            dialogue.open_dialogue_question = None
+        elif (intent is not None and intent.decision == "selected"
+              and intent.dialogue_act == "provide-information"
+              and dialogue.open_dialogue_question is not None):
             dialogue.open_dialogue_question = None
         elif (intent is not None and intent.decision == "selected"
               and intent.dialogue_act in {"confirm", "reject"}
@@ -959,11 +986,16 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         dialogue.pending_dialogue_slot = None
 
     if (intent is not None and intent.decision == "selected"
-            and intent.dialogue_act == "answer-clarification"
+            and intent.dialogue_act in {"answer-clarification",
+                                        "provide-information"}
             and dialogue.open_dialogue_question is not None
             and _session_slot_correction(text) is None):
         prompt = (dialogue.open_dialogue_question or {}).get("prompt", "")
-        value = intent.selected_value or text.strip()
+        value = (intent.selected_value or text.strip()).rstrip(" .!?")
+        if intent.dialogue_act == "provide-information":
+            return with_intent(DialogueTurn(
+                "social", text, text,
+                text="Got it. I’ve noted those restaurant preferences."))
         return with_intent(DialogueTurn(
             "social", text, text,
             text=(f"Got it: {value}. I’ll treat that as your reply to my "

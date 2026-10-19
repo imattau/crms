@@ -56,9 +56,24 @@ Development labels also showed misses on bounded acknowledgements such as “Tha
 checks these positive-assessment forms, task-state retention, and that question wording is not
 swallowed. On the same in-sample dev labels, the rules raised hypothesis coverage from 63/124
 (50.8%) to 67/124 (54.0%); joint label agreement was 52/67 (77.6%) among hypotheses and 52/65
-(80.0%) among selected turns. This is a development fit, not an independent quality result. The
-first test pilot still measures commit `5afd9f5`; a second, disjoint test sample has since
-been evaluated against the current frozen implementation, as described below.
+(80.0%) among selected turns. This is a development fit, not an independent quality result.
+
+A further dev-v4 replay found that preference answers could lose their intent when the assistant
+asked a yes/no-shaped question such as “Are there any other restaurant characteristics you would
+like?” and the user answered “Yes” plus specific constraints. The router now recognizes this bounded
+affirmative-with-details form when the prompt is explicitly about restaurant preferences, labels the
+turn as `provide-information` / `provide-constraint`, and acknowledges it instead of sending the
+full sentence through fact retrieval. Generic “preferences” and “it would help my search” prompt
+forms also select the constraint intent; a short detail answer during search inherits the constraint
+intent, while reservation-detail prompts retain the reservation task. The same 124-turn dev-v4 replay
+now produces 67 hypotheses, 56/67 (83.6%) joint agreement, and 56/65 (86.2%) selected-turn
+agreement, compared with 52/67 and 52/65 immediately before this change. Four previously mismatched
+dev turns are now matched, with no newly mismatched dev predictions in that replay. These numbers
+are in-sample fit because the examples guided the rules; no held-out score is claimed. The focused
+checks live in `experiments/v1_396_open_question_task_intent.py`.
+
+The first test pilot still measures commit `5afd9f5`; a second, disjoint test sample has since
+been evaluated on the implementation frozen at `8bd3b69`, as described below.
 
 The implementation was frozen in commit `5afd9f5` before a first test-split pilot. Six complete,
 non-randomly selected test conversations (66 classifiable turns; two uncertain) yielded 31 runtime
@@ -80,8 +95,9 @@ all 31, and matched both labels on 23/31 (74.2%). The context-free comparison hy
 all four agreeing with the provisional labels. This remains a small non-random pilot scored against
 one Codex labeler; oracle context means it is not end-to-end performance or independent accuracy.
 Source record hashes and exact utterance spans were verified, and conversation IDs do not overlap
-the train, development, or first test pilot. The 8bd3b69 implementation remains frozen; do not tune
-against this sample. The labeling file and runtime reports are in `/tmp/crms_dialogue_test_v2`.
+the train, development, or first test pilot. The evaluation used `8bd3b69` before the subsequent
+dev-only preference-intent change; this sample remains frozen and was not used to tune that change.
+The labeling file and runtime reports are in `/tmp/crms_dialogue_test_v2`.
 
 The elaboration baseline recognizes a small set of equivalent content-free forms, including
 “Could you tell me more?”, “Can you say more?”, and “Could you elaborate?”. These use the same

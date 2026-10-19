@@ -64,6 +64,43 @@ def main() -> None:
             and preference_detail.task_intent == "provide-constraint",
             "an open-ended restaurant preference question was left untyped")
 
+    preference_confirmation = classify(
+        "Are there any other restaurant characteristics you would like?",
+        "yes_no", "seek-information",
+        "Yes, I would like one that has booth, affordable dining and a waiting staff.",
+        answer_kind="yes-no")
+    require(preference_confirmation is not None
+            and preference_confirmation.decision == "selected"
+            and preference_confirmation.dialogue_act == "provide-information"
+            and preference_confirmation.task_intent == "provide-constraint",
+            "an affirmative preference answer with details was not kept as a constraint")
+
+    live_preferences = CRMSDialogue(CRMSKnowledgeBase())
+    live_preferences.active_task_intent = "seek-information"
+    live_preferences.open_dialogue_question = {
+        "prompt": "Are there any other restaurant characteristics you would like?",
+        "answer_kind": "yes-no", "expected_slot": "yes_no",
+    }
+    preference_turn = respond(
+        live_preferences,
+        "Yes, I would like one that has booth, affordable dining and a waiting staff.")
+    require(preference_turn.status == "social"
+            and preference_turn.text
+            == "Got it. I’ve noted those restaurant preferences."
+            and preference_turn.intent_hypothesis is not None
+            and preference_turn.intent_hypothesis.dialogue_act == "provide-information"
+            and live_preferences.open_dialogue_question is None
+            and live_preferences.active_task_intent == "seek-information",
+            "live dialogue failed to accept preference details as a search constraint")
+
+    search_preference = classify(
+        "It would help my search if I knew your preferences.", "detail",
+        "make-reservation", "Fast.")
+    require(search_preference is not None
+            and search_preference.dialogue_act == "provide-information"
+            and search_preference.task_intent == "provide-constraint",
+            "an explicit search-preference prompt inherited the booking task")
+
     category_prompt = "What type of restaurant are you looking for?"
     require(infer_open_question_slot(category_prompt, "detail") == "restaurant_type",
             "restaurant-category question did not receive its own typed slot")
@@ -132,6 +169,8 @@ def main() -> None:
     print("search detail resolves as a constraint: PASS")
     print("reservation task resolves from active state or explicit prompt: PASS")
     print("restaurant filters remain constraints during reservation flows: PASS")
+    print("affirmative preference answers preserve added constraints: PASS")
+    print("live preference answer acknowledges the constraint and clears the open question: PASS")
     print("restaurant type is exposed as a typed open-question slot: PASS")
     print("change-reservation task resolves from explicit prompt: PASS")
     print("missing task evidence retains the conservative continuation label: PASS")

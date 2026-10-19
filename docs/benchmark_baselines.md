@@ -157,8 +157,12 @@ turns; seven uncertain), the prompt/slot rules produced 63 hypotheses (50.8% cov
 48/63 (76.2%) joint act-and-intent agreement. Adding explicit assessment acknowledgements found
 in the development labels raised this to 67 hypotheses (54.0% coverage) and 52/67 (77.6%) joint
 agreement; 65 were selected, 2 ambiguous, and 57 abstained. Selected-turn joint agreement was
-52/65 (80.0%). The context-free ablation on the current code hypothesized 37/124 (29.8%) and
-matched 26/37 labels (70.3%). These are **development-set fit**: the prompts and labels from these
+52/65 (80.0%). A later dev-v4 pass added handling for affirmative answers that include preference
+details, preference-oriented prompts, and short detail answers during an information-seeking task.
+Coverage stayed at 67/124; joint agreement rose to 56/67 (83.6%), and selected-turn agreement to
+56/65 (86.2%). Four previous mismatches became matches, with no new mismatches on this same dev
+sample. The context-free ablation hypothesized 37/124 (29.8%) and matched 26/37 labels (70.3%).
+These are **development-set fit**: the prompts and labels from these
 conversations guided the rules, so this is not held-out generalization. The labels and context come
 from one Codex annotator, with no independent review. The changes remain hand-checked phrase rules,
 not learned generalization; frozen exact-phrase candidates still cover only 5.6%. Longer-term work
@@ -193,8 +197,8 @@ post-change result is claimed by this first pilot.
 A second disjoint set of six complete conversations was selected in source order from the remaining
 Taskmaster-1 test split after the first pilot, using the same 8–18 user-turn window. The 69 turns
 include one uncertain label; all 69 cited record hashes and exact utterance spans verified, and IDs
-were checked against train, dev, and the first test pilot. With the implementation frozen at
-`8bd3b69`, the contextual runtime replay hypothesized 31/68 classifiable turns (45.6%), selected
+were checked against train, dev, and the first test pilot. Before the later dev-only preference-
+intent change, the replay at `8bd3b69` hypothesized 31/68 classifiable turns (45.6%), selected
 all 31, and matched both labels on 23/31 (74.2%). The context-free comparison hypothesized 13/68
 (19.1%) and matched 12/13. The inert train-only candidate memory matched four turns (5.9% coverage),
 all four agreeing with the provisional labels; it remains inactive at runtime.
@@ -202,8 +206,9 @@ all four agreeing with the provisional labels; it remains inactive at runtime.
 These results are provisional agreement with one Codex annotator, not accuracy or independent
 validation. The sample is small and non-random, and the runtime replay was given annotated context
 state and predecessor acts, so it is not end-to-end performance. The higher context-free agreement
-rate is based on only 13 predictions. Keep this sample frozen and use train/dev labels for subsequent
-changes. Label and output files are in `/tmp/crms_dialogue_test_v2`.
+rate is based on only 13 predictions. Keep this sample frozen; the later preference-intent change
+was developed and measured on dev data only. Label and output files are in
+`/tmp/crms_dialogue_test_v2`.
 
 ## Contextual intent: active task and expected slot
 
