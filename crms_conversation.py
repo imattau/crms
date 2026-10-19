@@ -218,6 +218,23 @@ _ACTION_REQUEST_VERBS = {
     "put", "remind", "reserve", "seat", "send", "set", "take", "translate",
     "try", "write",
 }
+_EXPLICIT_RESERVATION_REQUEST_RE = re.compile(
+    r"^(?:(?:i|we)\s+(?:(?:need|want)\s+(?:to\s+)?|"
+    r"(?:would|could)\s+like\s+to\s+)"
+    r"(?:make|place|book|reserve|set\s+up)\s+(?:(?:a|the)\s+)?"
+    r"(?:reservation|booking|table)\b|"
+    r"(?:i|we)['’]d\s+like\s+to\s+(?:make|place|book|reserve|set\s+up)\s+"
+    r"(?:(?:a|the)\s+)?(?:reservation|booking|table)\b|"
+    r"(?:i|we)\s+(?:need|want)\s+(?:a|the)\s+reservation\b|"
+    r"(?:i|we)\s+(?:am|was)\s+(?:trying|looking|hoping)\s+to\s+"
+    r"(?:make|place|book|reserve|set\s+up)\s+(?:(?:a|the)\s+)?"
+    r"(?:reservation|booking|table)\b|"
+    r"(?:can|could|would)\s+we\s+(?:please\s+)?"
+    r"(?:make|place|book|reserve|set\s+up)\s+(?:(?:a|the)\s+)?"
+    r"(?:reservation|booking|table)\b|"
+    r"(?:let['’]s|please)\s+(?:make|place|book|reserve|set\s+up)\s+"
+    r"(?:(?:a|the)\s+)?(?:reservation|booking|table)\b)"
+    r".*[.! ]*$", re.IGNORECASE)
 
 
 def natural_feedback_verdict(text: str) -> str | None:
@@ -797,6 +814,23 @@ def classify_user_intent(
             task_intent=task_intent,
             decision="selected",
             matched_frame=act,
+        )
+
+    # Recognize a bounded, explicit booking request in ordinary declarative
+    # wording. Questions about how reservations work stay information requests.
+    reservation_request = text.strip()
+    is_reservation_request = bool(
+        _EXPLICIT_RESERVATION_REQUEST_RE.fullmatch(reservation_request))
+    is_request_question = bool(re.match(
+        r"^(?:can|could|would)\s+we\b", reservation_request, re.IGNORECASE))
+    if (is_reservation_request
+            and ("?" not in reservation_request or is_request_question)):
+        return UserIntentHypothesis(
+            dialogue_act="request-action",
+            task_intent="make-reservation",
+            decision="selected",
+            matched_frame="explicit-reservation-request",
+            context_predicates=("direct-user-request",),
         )
 
     # Portable dialogue frames are additive: built-in content-free and

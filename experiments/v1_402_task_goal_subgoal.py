@@ -3,15 +3,17 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from crms_conversation import respond
+from crms_conversation import classify_user_intent, respond
 from crms_dialogue import CRMSDialogue
 from crms_knowledge import CRMSKnowledgeBase
+from crms_research import CRMSResearchIndex
 
 
 def require(condition: bool, message: str) -> None:
@@ -20,6 +22,21 @@ def require(condition: bool, message: str) -> None:
 
 
 def main() -> None:
+    for request in (
+            "I need to make a reservation for an Italian restaurant in San Francisco.",
+            "I'd like to book a table for tonight.",
+            "Could we please set up a reservation?",
+            "Let's reserve a table."):
+        hypothesis = classify_user_intent(CRMSDialogue(CRMSKnowledgeBase()), request)
+        require(hypothesis is not None
+                and hypothesis.task_intent == "make-reservation"
+                and hypothesis.dialogue_act == "request-action",
+                f"explicit reservation request was not recognized: {request!r}: {hypothesis}")
+    how_to = classify_user_intent(
+        CRMSDialogue(CRMSKnowledgeBase()), "How do I make a reservation?")
+    require(how_to is not None and how_to.task_intent == "seek-information",
+            "a question about the reservation process was mistaken for a booking request")
+
     dialogue = CRMSDialogue(CRMSKnowledgeBase())
     dialogue.active_task_intent = "make-reservation"
     dialogue.open_dialogue_question = {
@@ -40,7 +57,13 @@ def main() -> None:
             f"goal and subgoal were not both exposed: {context}")
 
     followup = CRMSDialogue(CRMSKnowledgeBase())
-    followup.active_task_intent = "make-reservation"
+    start = respond(
+        followup,
+        "I need to make a reservation for an Italian restaurant in San Francisco.")
+    require(start.intent_hypothesis is not None
+            and start.intent_hypothesis.task_intent == "make-reservation"
+            and followup.active_task_intent == "make-reservation",
+            "ordinary reservation wording did not establish the broad task goal")
     # Taskmaster-1 dev, conversation dlg-048c8c7c-f409-4c6b-9737-09582bb04c31,
     # user turn 16; the turn was labeled seek-information during a reservation.
     question = respond(followup, "Could you just give me the phone number?")
@@ -86,9 +109,38 @@ def main() -> None:
     require(dialogue.active_task_intent is None
             and dialogue.active_task_subgoal is None,
             "full dialogue reset left goal/subgoal state behind")
+
+    with tempfile.TemporaryDirectory(prefix="crms-goal-subgoal-cli-") as folder:
+        root = Path(folder)
+        knowledge_path = root / "knowledge.json"
+        index_path = root / "index.json"
+        CRMSKnowledgeBase().save(knowledge_path)
+        CRMSResearchIndex().save(index_path)
+        command = [
+            sys.executable,
+            str(Path(__file__).resolve().parents[1] / "crms_chat.py"),
+            "--knowledge", str(knowledge_path),
+            "--index", str(index_path),
+            "--dialogue-state", str(root / "dialogue.json"),
+            "--rules", str(root / "rules.json"),
+            "--math", str(root / "math.json"),
+            "--translations", str(root / "translations.json"),
+            "--feedback-db", str(root / "feedback.sqlite3"),
+        ]
+        completed = subprocess.run(
+            command,
+            input=("I need to make a reservation for an Italian restaurant in "
+                   "San Francisco.\nCould you just give me the phone number?\n"
+                   "/intent\n/quit\n"),
+            text=True, capture_output=True, check=True, timeout=30)
+        require("Active goal: make-reservation" in completed.stdout
+                and "Current subgoal: seek-information" in completed.stdout,
+                "interactive chat did not expose the retained goal/subgoal")
+
     print("reservation goal survives search and information subgoals: PASS")
     print("goal and subgoal context persist and validate: PASS")
     print("explicit reset clears both levels: PASS")
+    print("interactive chat displays contextual goal and subgoal: PASS")
 
 
 if __name__ == "__main__":

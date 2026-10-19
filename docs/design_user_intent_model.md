@@ -31,6 +31,16 @@ licenses a matching portable frame, survives reload, remains bounded, and clears
 or reset; `experiments/v1_365_contextual_clarification_intent.py` checks the existing clarification
 behavior.
 
+The runtime recognizes a bounded set of explicit reservation requests (for example “I need to make
+a reservation” and “Could we set up a reservation?”) as `make-reservation`; a question such as “How
+do I make a reservation?” remains `seek-information`. During an active goal, `provide-constraint`,
+`seek-information`, and `check-availability` can be represented as current subgoals without
+replacing that goal. The same information request with no active goal becomes the goal. This fixes a
+real CLI sequence where an initial reservation request was misrouted to information-seeking and a
+later phone-number question became the active goal. The end-to-end assertion is in
+[`v1_402_task_goal_subgoal.py`](../experiments/v1_402_task_goal_subgoal.py); these hand-checked
+patterns do not constitute general task understanding.
+
 Short answers to a typed open assistant question now resolve task intent using both the saved active
 task and explicit task wording in that question. For example, a party-size answer during restaurant
 search is `provide-constraint`; an open prompt that asks when to make a reservation establishes
@@ -294,9 +304,11 @@ that candidate frames remain inert.
 
 When a selected turn establishes a high-level task, session state now exposes both the broad
 `task_in_progress` predicate and a typed predicate such as `active_task_make_reservation` or
-`active_task_seek_information`. Clarifications and constraints retain the active goal; a newly
-selected task can replace it, and `end-interaction` clears it. This lets the same short answer be
-interpreted differently in a restaurant search and a reservation exchange.
+`active_task_seek_information`. Clarifications and constraints retain the active goal; information
+seeking and availability checks become modeled subgoals when another goal is active. Without a
+parent goal, they establish their own goal. A newly selected goal can replace the current one, and
+`end-interaction` clears it. This lets CRMS distinguish a venue-detail question inside a reservation
+from a standalone information request.
 
 The minimum context state should remain bounded and typed: recent acts, the current question under
 discussion, the active task/topic, open required slots, pending clarification or offer, and the

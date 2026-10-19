@@ -231,6 +231,20 @@ and two more label matches than the earlier replay, but a lower match rate among
 shows that higher coverage alone does not resolve contextual intent. No code was tuned from this
 replay; keep the sample frozen for future development.
 
+### Contextual task goal and subgoal state
+
+`python3 experiments/v1_402_task_goal_subgoal.py` checks the current task hierarchy in both direct
+dialogue and the actual CLI. It covers explicit reservation requests, distinguishes an information
+question about making reservations, and replays a Taskmaster-1 development turn asking for a
+restaurant's phone number while a reservation is active. The phone-number request remains the
+immediate `seek-information` intent; the broad `make-reservation` goal remains active and the
+information request becomes a subgoal. Without an active parent, the same utterance establishes
+`seek-information` as the goal. The experiment also checks search constraints, save/reload, invalid
+state rejection, `/intent` display, and reset behavior. All checks pass. These are controlled
+mechanism checks using Codex-authored labels, not held-out dialogue accuracy or a general task
+hierarchy result. The current vocabulary covers only constraint, information-seeking, and
+availability subgoals; the system has no arbitrary goal stack or learned task decomposition.
+
 These results are provisional agreement with one Codex annotator, not accuracy or independent
 validation. The sample is small and non-random, and the runtime replay was given annotated context
 state and predecessor acts, so it is not end-to-end performance. The higher context-free agreement
