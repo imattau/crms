@@ -46,11 +46,15 @@ Conflicting `/right` and `/wrong` feedback is logged without applying a new rule
 duplicate suppression, and retention of contradictory signals. Temporary-store interactive chat
 runs verified `/wrong` on both a cited direct answer and `/infer-relation`, including its premise
 sources, and confirmed that a validated learned rule is withheld and its status persists after
-reload. Inference `why?` follow-ups also retain proof lineage. Remaining work includes persisting
-the immediate answer context across chat restarts, covering feedback on every specialized answer
-route, connecting `/right` to evidence-ledger confirmation, and measuring revision/abstention on a
-larger noisy-feedback benchmark. Direct-fact feedback stores the structured proposition and its
-supporting source ids; `/feedback` displays numbered propositions and citations, and
+reload. Inference `why?` follow-ups also retain proof lineage. The current answer-feedback target
+now persists in SQLite across chat restarts, including its evidence references; schema version 1
+migrates without discarding its event history. A new natural-language turn clears that target, and
+opposite post-restart signals remain a reviewable conflict.
+`experiments/v1_367_persistent_feedback_context.py` checks those behaviors. Remaining work includes
+covering feedback on every specialized answer route,
+connecting `/right` to evidence-ledger confirmation, and measuring revision/abstention on a larger
+noisy-feedback benchmark. Direct-fact feedback stores the structured proposition and its supporting
+source ids; `/feedback` displays numbered propositions and citations, and
 `/retract-feedback FEEDBACK|FACT|SOURCE` retracts only the selected source support. A wrong signal
 alone does not retract or negate a fact: the user must inspect the evidence and explicitly choose a
 specific support to remove. After retraction, CRMS rechecks the original question against the

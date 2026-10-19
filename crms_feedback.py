@@ -14,7 +14,9 @@ from typing import Any, Iterable, Mapping
 
 
 _APPLICATION_ID = 0x43524642  # CRFB
-_SCHEMA_VERSION = 1
+_SCHEMA_VERSION = 2
+_V1_TABLES = {"answer_feedback"}
+_TABLES = {"answer_feedback", "feedback_context"}
 
 
 def _canonical_json(value: Any) -> str:
@@ -174,10 +176,16 @@ class AnswerFeedbackStore:
                 "AND name NOT LIKE 'sqlite_%'")}
             app_id = connection.execute("PRAGMA application_id").fetchone()[0]
             version = connection.execute("PRAGMA user_version").fetchone()[0]
-            if tables and (tables != {"answer_feedback"}
-                           or app_id != _APPLICATION_ID
-                           or version != _SCHEMA_VERSION):
-                raise ValueError("existing file is not a CRMS feedback database")
+            if tables:
+                if (tables == _V1_TABLES and app_id == _APPLICATION_ID
+                        and version == 1):
+                    # Preserve the append-only event history while adding the
+                    # one mutable pointer needed to resume feedback after a
+                    # process restart.
+                    pass
+                elif (tables != _TABLES or app_id != _APPLICATION_ID
+                      or version != _SCHEMA_VERSION):
+                    raise ValueError("existing file is not a CRMS feedback database")
             connection.execute("""CREATE TABLE IF NOT EXISTS answer_feedback (
                 feedback_seq INTEGER PRIMARY KEY AUTOINCREMENT,
                 answer_id TEXT NOT NULL,
@@ -189,6 +197,13 @@ class AnswerFeedbackStore:
             )""")
             connection.execute("CREATE INDEX IF NOT EXISTS feedback_answer_id "
                                "ON answer_feedback(answer_id)")
+            connection.execute("""CREATE TABLE IF NOT EXISTS feedback_context (
+                id INTEGER PRIMARY KEY CHECK(id=1),
+                answer_id TEXT NOT NULL,
+                question TEXT NOT NULL,
+                answer TEXT NOT NULL,
+                evidence_json TEXT NOT NULL
+            )""")
             connection.execute(f"PRAGMA application_id={_APPLICATION_ID}")
             connection.execute(f"PRAGMA user_version={_SCHEMA_VERSION}")
 
@@ -207,6 +222,54 @@ class AnswerFeedbackStore:
                 (answer_id, verdict, question.strip(), answer.strip(),
                  _canonical_json(refs)))
             return answer_id, cursor.rowcount == 1
+
+    def set_pending(self, question: str, answer: str,
+                    evidence_refs: Iterable[Mapping[str, Any]]) -> None:
+        """Remember the current answer target for feedback across restarts."""
+        question = question.strip()
+        answer = answer.strip()
+        refs = sorted((_normalize_ref(row) for row in evidence_refs),
+                      key=lambda row: (row["kind"], row["id"]))
+        if not question or not answer or not refs:
+            self.clear_pending()
+            return
+        answer_id = feedback_answer_id(question, answer, refs)
+        with sqlite3.connect(self.path) as connection:
+            connection.execute(
+                "INSERT INTO feedback_context "
+                "(id,answer_id,question,answer,evidence_json) VALUES (1,?,?,?,?) "
+                "ON CONFLICT(id) DO UPDATE SET answer_id=excluded.answer_id, "
+                "question=excluded.question, answer=excluded.answer, "
+                "evidence_json=excluded.evidence_json",
+                (answer_id, question, answer, _canonical_json(refs)))
+
+    def pending(self) -> dict[str, Any] | None:
+        """Return the validated answer target for a subsequent feedback turn."""
+        with sqlite3.connect(self.path) as connection:
+            row = connection.execute(
+                "SELECT answer_id,question,answer,evidence_json "
+                "FROM feedback_context WHERE id=1").fetchone()
+        if row is None:
+            return None
+        try:
+            if not all(isinstance(value, str) for value in row):
+                raise ValueError
+            refs = json.loads(row[3])
+            if not isinstance(refs, list) or not refs:
+                raise ValueError
+            normalized = sorted((_normalize_ref(item) for item in refs),
+                                key=lambda item: (item["kind"], item["id"]))
+            if normalized != refs or feedback_answer_id(row[1], row[2], refs) != row[0]:
+                raise ValueError
+        except (KeyError, TypeError, ValueError, json.JSONDecodeError) as error:
+            raise ValueError("stored feedback context is malformed") from error
+        return {"answer_id": row[0], "question": row[1], "answer": row[2],
+                "evidence": refs}
+
+    def clear_pending(self) -> None:
+        """Forget the current answer target without changing feedback history."""
+        with sqlite3.connect(self.path) as connection:
+            connection.execute("DELETE FROM feedback_context WHERE id=1")
 
     def events(self) -> list[dict[str, Any]]:
         with sqlite3.connect(self.path) as connection:

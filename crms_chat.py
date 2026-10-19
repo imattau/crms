@@ -5180,6 +5180,13 @@ def main() -> int:
     knowledge = (CRMSKnowledgeBase.load(args.knowledge, fact_db=args.fact_db)
                  if args.knowledge.exists() else CRMSKnowledgeBase())
     feedback_store = AnswerFeedbackStore(args.feedback_db)
+    try:
+        restored_feedback_context = feedback_store.pending()
+    except ValueError as error:
+        print(f"Ignoring saved answer-feedback target ({error}); "
+              "the feedback history is retained.")
+        feedback_store.clear_pending()
+        restored_feedback_context = None
     math_model = (CRMSMath.load(args.math)
                   if args.math.exists() else CRMSMath())
     pending_math = _load_pending_math(args.math_session, args.math, math_model)
@@ -5255,6 +5262,10 @@ def main() -> int:
         _kind, _source, _target, choices, _text = restored_translation_clarification
         print("Restored a pending translation clarification. Choose one of: "
               + ", ".join(choices) + ".")
+    if restored_feedback_context is not None:
+        print("Restored the last evidence-backed answer as the /right or /wrong "
+              f"target: {restored_feedback_context['question']} => "
+              f"{restored_feedback_context['answer']}")
     auto_practice_questions = False
     last_generated_code = None
     pending_story_tone: str | None = None
@@ -5267,7 +5278,16 @@ def main() -> int:
     last_summary_scoped_hit = None
     last_research_evidence: dict | None = None
     last_answer_had_inference_proof = False
-    last_feedback_record: dict[str, Any] | None = None
+    last_feedback_record: dict[str, Any] | None = restored_feedback_context
+
+    def remember_feedback(record: dict[str, Any] | None) -> None:
+        nonlocal last_feedback_record
+        last_feedback_record = record
+        if record is None:
+            feedback_store.clear_pending()
+        else:
+            feedback_store.set_pending(
+                record["question"], record["answer"], record["evidence"])
     latest_research_documents: list[dict] = []
     current_effort = "standard"
     queued_natural_parts: list[str] = []
@@ -5464,7 +5484,7 @@ def main() -> int:
                 print(f"Could not retract feedback support: {error}")
             continue
         if not line.startswith("/"):
-            last_feedback_record = None
+            remember_feedback(None)
         if line == "/effort" or line.startswith("/effort "):
             level = line[len("/effort"):].strip()
             if level not in {"quick", "standard", "thorough"}:
@@ -6843,7 +6863,7 @@ def main() -> int:
                         f"{name}={value}" for name, value in sorted(qualifiers.items())) + "]"
                 print(f"CRMS> {rendered}")
                 proof_refs = collect_feedback_refs(result)
-                last_feedback_record = (
+                remember_feedback(
                     {"question": " | ".join(fields[:3]),
                      "answer": rendered, "evidence": proof_refs}
                     if result.status == "answered" and proof_refs else None)
@@ -8647,7 +8667,7 @@ def main() -> int:
                     print("CRMS> " + rendered)
                     explanation_refs = collect_feedback_refs(
                         explanation.response)
-                    last_feedback_record = (
+                    remember_feedback(
                         {"question": dialogue.last_question or line,
                          "answer": rendered, "evidence": explanation_refs}
                         if explanation_refs else None)
@@ -10180,14 +10200,14 @@ def main() -> int:
             or (turn.research is not None
                 and (turn.research.source_sentences or turn.research.passages)))
         if evidence_backed_answer and answer_refs:
-            last_feedback_record = {
+            remember_feedback({
                 "question": turn.resolved_question or line,
                 "answer": (turn.text or
                            (turn.response.answer if turn.response else "")),
                 "evidence": answer_refs,
-            }
+            })
         else:
-            last_feedback_record = None
+            remember_feedback(None)
         if (turn.response is not None
                 and turn.response.status == "answered"
                 and turn.response.inference_proofs):
