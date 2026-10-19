@@ -130,7 +130,7 @@ from the generated artifact. With no example of the unique→sort pair, the same
 learned connective also composes “remove duplicate values then sort the list”
 and generates executable code returning `[1, 2, 4]` for `[4, 1, 4, 2]`; the
 artifact cites both component procedures and both connective examples.
-With composition depth set to three, the same grounded procedures also answer
+At the default composition depth, the same grounded procedures also answer
 “remove duplicate values then sort the list then reverse the values” with
 `[4, 2, 1]`. This phrase was not taught directly; its generated code passes
 the artifact's examples and retains all three component phrases plus both

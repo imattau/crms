@@ -101,8 +101,8 @@ These results are component evidence, not a single overall capability score:
   domain competence.
 - `v1_355_learned_sequence_connective_codegen.py` demonstrates two held-out
   sequence crossings using one contrastively learned `then` connective, then
-  composes three grounded clauses into a verified artifact after increasing
-  the bounded composition depth. The code runs in the terminal and retains
+  composes three grounded clauses into a verified artifact at the default
+  bounded rule depth. The code runs in the terminal and retains
   component and connective evidence. This is controlled composition, not
   general coding ability or a 70B comparison.
 - `v1_356_grounded_math_list_composition.py` checks a request that crosses

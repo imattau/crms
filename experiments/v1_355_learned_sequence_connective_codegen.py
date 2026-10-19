@@ -176,7 +176,8 @@ def main() -> None:
 
     # The same connective composes three grounded clauses, even where one
     # two-clause segmentation has an equivalent compact sort operation.
-    model.max_composition_depth = 3
+    require(model.max_composition_depth == 2,
+            "three-clause composition test should use the default rule depth")
     three_stage = model.predict(THREE_STAGE, TEST_INPUT)
     three_stage_evidence = {
         "remove duplicate values", "sort the list", "reverse the values",
@@ -238,7 +239,6 @@ def main() -> None:
             "--index", str(root / "index.json"),
             "--dialogue-state", str(root / "dialogue.json"),
             "--rule-session", str(root / "rule-session.json"),
-            "--rule-depth", "3",
             "--math", str(root / "math.json"),
             "--translations", str(root / "translations.json"),
         ]

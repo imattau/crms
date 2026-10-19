@@ -143,7 +143,8 @@ surface accepts a small set of equivalent orderings (“then”, “and then”,
 the same learned procedure and math evidence.
 
 Within the list-procedure domain, `experiments/v1_355_learned_sequence_connective_codegen.py`
-now checks a three-clause unseen composition (remove duplicates → sort → reverse).
+now checks a three-clause unseen composition (remove duplicates → sort → reverse)
+at the default bounded rule depth.
 An exact sort/reverse normal form removes a false ambiguity between the compact
 two-clause sort operation and the explicit three-clause sequence. The executable
 artifact preserves the three operation phrases and the two independent examples
