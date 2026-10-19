@@ -220,11 +220,11 @@ outside the claim.
 
 Command: `python3 experiments/v1_427_dialogue_multiturn_transcript.py`.
 
-Runtime replay on 2026-10-20 for `cf44f12`, using a fresh temporary source
-index and dialogue state. All 30 turns completed without a crash. The
-Eiffel Tower → Colosseum switch kept the Colosseum's `80 CE` and `50,000
-spectators` evidence local; `why?` followed the capacity answer; history recall
-updated after an unanswered turn; and the final `why?` did not reuse stale
+Runtime replay on 2026-10-20 for `a00f863`,
+using a fresh temporary source index and dialogue state. All 30 turns completed
+without a crash. The Eiffel Tower → Colosseum switch kept the Colosseum's
+`80 CE` and `50,000 spectators` evidence local; `why?` followed the capacity
+answer; history recall updated after an unanswered turn; and the final `why?` did not reuse stale
 evidence. Nearby regressions `v1_426` and `v1_419` also passed.
 
 The transcript is a two-paragraph diagnostic, not a representative dialogue
@@ -237,12 +237,18 @@ Tower, so “Who designed it?” resolves to “Who designed Eiffel Tower?” in
 of drifting to Gustave Eiffel. A source-only “And Italy?” follow-up also sets
 Italy as the current topic; “What is its capital?” now reuses that topic and
 returns the exact “Rome is the capital of Italy” source sentence as review-
-pending evidence, not an accepted fact. The same transcript now has three
-unknown turns:
-`When was it built?` immediately after an unsupported Analytical Engine query,
-`What about the Eiffel Tower?` and its follow-up after that failure. These
-abstain rather than producing a wrong answer in this run, but they limit
-recovery and contextual language coverage. Keep safety and coverage separate.
+pending evidence, not an accepted fact. When “When was it built?” follows an
+unsupported Analytical Engine query, CRMS asks which entity “it” refers to.
+That open entity slot now survives save/reload; “What about the Eiffel Tower?”
+supplies the referent and resumes the pending question through ordinary
+retrieval, including when the user's entity name is lowercase. The source only
+says that the tower was designed and built by
+Gustave Eiffel, so CRMS shows that exact related sentence and does not turn the
+completion date into a construction date. “When was it completed?” then returns
+the cited 1889 sentence. An unrelated turn closes the open entity slot, and a
+bare “and yes” is not treated as an entity. This remains a two-paragraph
+diagnostic, not a representative dialogue benchmark;
+it measures safe recovery, not broad conversational competence.
 
 ## Grounded math-to-list-code composition
 

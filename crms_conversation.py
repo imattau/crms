@@ -1109,6 +1109,12 @@ def respond(dialogue: CRMSDialogue, text: str, *,
                 and intent.dialogue_act in {
                     "answer-clarification", "provide-information",
                     "confirm", "reject"})))
+    if dialogue._pending_entity_followup_question(
+            text, research_index=research_index) is not None:
+        # A named entity is a valid answer to the explicit referent
+        # clarification even when the learned intent classifier calls the
+        # surface a new question ("What about Eiffel Tower?").
+        preserves_question = True
     if dialogue.open_dialogue_question is not None and not preserves_question:
         # A fresh question or unrelated act replaces the prior QUD.
         dialogue.open_dialogue_question = None

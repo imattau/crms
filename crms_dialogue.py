@@ -1520,6 +1520,14 @@ class CRMSDialogue:
         if match is None:
             return None
         target_phrase = next((group for group in match.groups() if group), "")
+        pending_question = self._pending_entity_followup_question(
+            message, research_index=research_index)
+        if pending_question is not None:
+            self.open_dialogue_question = None
+            carried = self.turn(pending_question,
+                                research_index=research_index)
+            carried.question = message
+            return carried
         target_is_pronoun = target_phrase.strip().casefold() in _REFERENTIAL_PRONOUNS
         if target_is_pronoun:
             if (self.last_question is None and self.last_writing_subject is not None):
@@ -1896,6 +1904,63 @@ class CRMSDialogue:
                 text="I have no earlier question in this conversation.")
         return None
 
+    def _pending_entity_followup_question(
+            self, message: str, *,
+            research_index: Any | None = None) -> str | None:
+        """Fill one open pronoun clarification from a named-entity follow-up."""
+        open_question = self.open_dialogue_question
+        if (open_question is None
+                or open_question.get("expected_slot") != "entity"):
+            return None
+        match = _FOLLOWUP_ENTITY_RE.fullmatch(message.strip())
+        if match is None:
+            return None
+        target = next((group for group in match.groups() if group), "").strip()
+        if not target or len(target) > 256:
+            return None
+        # The entity can be typed in any case, but it must resolve to a name
+        # already present in the knowledge or source store. This rejects
+        # "and yes" while keeping lowercase user input usable.
+        canonical = self._canonical_entity(target)
+        if canonical is None and research_index is not None:
+            target_words = tuple(word.casefold()
+                                 for word in _WORD_RE.findall(target))
+            try:
+                hits = research_index.search(target, limit=5)
+            except (AttributeError, TypeError, ValueError):
+                hits = []
+            for hit in hits:
+                try:
+                    document = research_index.document(hit.document_id)
+                except (AttributeError, KeyError, TypeError, ValueError):
+                    continue
+                for candidate_text in (document.title, document.text):
+                    for candidate in re.finditer(
+                            r"(?<!\w)" + re.escape(target) + r"(?!\w)",
+                            candidate_text, flags=re.IGNORECASE):
+                        surface = candidate.group(0)
+                        words = tuple(word.casefold() for word
+                                      in _WORD_RE.findall(surface))
+                        if target_words and words == target_words:
+                            canonical = surface
+                            break
+                    if canonical:
+                        break
+                if canonical:
+                    break
+        if canonical is None:
+            return None
+        canonical = re.sub(
+            r"^(The|A|An)\b",
+            lambda match: match.group(1).lower(), canonical)
+        pending = open_question.get("prompt", "")
+        pronouns = [item for item in _WORD_RE.finditer(pending)
+                    if item.group().casefold() in _REFERENTIAL_PRONOUNS]
+        if len(pronouns) != 1:
+            return None
+        pronoun = pronouns[0]
+        return pending[:pronoun.start()] + canonical + pending[pronoun.end():]
+
     def _source_ordinal_turn(self, question: str, research_index: Any | None
                              ) -> "DialogueTurn | None":
         """Select a numbered source result, or explain why none can be."""
@@ -2130,6 +2195,17 @@ class CRMSDialogue:
                                      f"a name: {numbered}.")
             else:
                 self.clear()
+                if any(item.group().casefold() in _REFERENTIAL_PRONOUNS
+                       for item in _WORD_RE.finditer(question)):
+                    # Keep the unresolved question as a typed open slot.
+                    # A following "What about Eiffel Tower?" can supply the
+                    # missing entity and re-enter the ordinary evidence path;
+                    # this does not assert that the entity or answer is true.
+                    self.open_dialogue_question = {
+                        "prompt": question[:_HISTORY_QUESTION_LIMIT],
+                        "answer_kind": "detail",
+                        "expected_slot": "entity",
+                    }
                 response = QuestionResult("unknown", request=clarification)
             return DialogueTurn("unknown", question, question, response, text=clarification or "")
         counterfactual = self.knowledge.ask_counterfactual_source_question(resolved)

@@ -69,8 +69,17 @@ def main() -> None:
         index = CRMSResearchIndex()
         index.add_directory(folder)
         dialogue = CRMSDialogue(CRMSKnowledgeBase())
-        turns = [respond(dialogue, text, research_index=index)
-                 for text in TRANSCRIPT]
+        dialogue_path = Path(folder, "dialogue.json")
+        turns = []
+        for number, text in enumerate(TRANSCRIPT, 1):
+            turns.append(respond(dialogue, text, research_index=index))
+            if number == 18:
+                # The entity clarification is a bounded discourse state and
+                # must survive a normal restart before the user's response.
+                dialogue.save(str(dialogue_path))
+                dialogue = CRMSDialogue.load(
+                    CRMSKnowledgeBase(), str(dialogue_path),
+                    research_index=index)
 
     require(len(turns) == 30, f"transcript stopped early: {len(turns)} turns")
     require(all(turn.status for turn in turns), "a transcript turn has no status")
@@ -89,6 +98,54 @@ def main() -> None:
             f"history recall did not report the preceding question: {turns[12]!r}")
     require("And Italy?" in turns[14].text,
             f"history recall was not updated after an unanswered turn: {turns[14]!r}")
+    clarification = turns[17]
+    require(clarification.status == "unknown"
+            and "Please name the entity" in clarification.text,
+            f"unresolved pronoun did not request its missing entity: {clarification!r}")
+    recovered = turns[18]
+    require(recovered.status == "sources_found"
+            and recovered.resolved_question
+                == "When was the Eiffel Tower built?"
+            and "The tower was designed and built by Gustave Eiffel" in recovered.text
+            and "1889" not in recovered.text
+            and recovered.research is not None
+            and recovered.research.source_sentences,
+            f"named entity did not fill the open pronoun clarification: {recovered!r}")
+    recovered_citation = recovered.research.source_sentences[0]
+    require(index.resolve_citation(recovered_citation["citation"])
+            == recovered_citation["text"],
+            "clarification recovery returned an inexact evidence citation")
+    completed = turns[19]
+    require(completed.status == "sources_found"
+            and completed.resolved_question == "When was Eiffel Tower completed?"
+            and "1889" in completed.text,
+            f"the recovered entity did not remain available for the next turn: {completed!r}")
+
+    # The pending entity slot is a one-step clarification, not a sticky mode.
+    interrupted = CRMSDialogue(CRMSKnowledgeBase())
+    respond(interrupted, "When was it built?", research_index=index)
+    respond(interrupted, "Tell me a joke", research_index=index)
+    after_interruption = respond(
+        interrupted, "What about the Eiffel Tower?", research_index=index)
+    require(after_interruption.status == "unknown"
+            and after_interruption.resolved_question
+                != "When was the Eiffel Tower built?",
+            f"an unrelated turn left a stale entity clarification open: {after_interruption!r}")
+    lowercase_reply = CRMSDialogue(CRMSKnowledgeBase())
+    respond(lowercase_reply, "When was it built?", research_index=index)
+    lowercase_recovered = respond(
+        lowercase_reply, "what about the eiffel tower?", research_index=index)
+    require(lowercase_recovered.resolved_question
+                == "When was the Eiffel Tower built?"
+            and lowercase_recovered.status == "sources_found",
+            f"lowercase entity reply did not resolve against the index: {lowercase_recovered!r}")
+    bare_confirmation = CRMSDialogue(CRMSKnowledgeBase())
+    respond(bare_confirmation, "When was it built?", research_index=index)
+    confirmation_reply = respond(
+        bare_confirmation, "and yes", research_index=index)
+    require(confirmation_reply.resolved_question
+                != "When was yes built?",
+            f"a bare confirmation was inserted as an entity name: {confirmation_reply!r}")
     built = turns[25]
     require(built.status == "sources_found"
             and "designed and built by Gustave Eiffel" in built.text
@@ -115,17 +172,17 @@ def main() -> None:
 
     # Coverage is deliberately reported separately: the experiment must not
     # turn honest abstentions into apparent passes.
-    weak_coverage = [number for number in (18, 19, 20)
+    weak_coverage = [number for number in (18,)
                      if turns[number - 1].status in {"unknown", "clarify"}]
     print("multi-turn transcript: 30 turns, no crash")
     print("topic switch and Colosseum follow-ups: grounded, no cross-topic leak")
-    print("history recall and stale-explanation guard: PASS")
-    print("unanswered/clarification turns:", ", ".join(
+    print("history, stale-explanation, and clarification save/reload: PASS")
+    print("unresolved pronoun turns:", ", ".join(
         f"{n}:{turns[n - 1].status}" for n in weak_coverage) or "none")
-    print("coverage gaps to track:")
-    for number in (18, 19, 20):
-        turn = turns[number - 1]
-        print(f"  {number}. {TRANSCRIPT[number - 1]} [{turn.status}]")
+    print("entity clarification resumes the held question; completion follow-up: PASS")
+    print("unrelated turn expires the entity clarification: PASS")
+    print("built date remains unstated; related source wording is shown without converting")
+    print("the completion date into a construction date")
 
 
 if __name__ == "__main__":
