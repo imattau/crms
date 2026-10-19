@@ -1984,6 +1984,12 @@ definite-article entity forms to match learned question frames, collapsing
 surface variants only when they return the same supported reading.
 `experiments/v1_161_dialogue_demonstratives.py` checks this/that resolution,
 article transfer, the determiner guard, and clarification without a referent.
+It also checks the natural entity-switch follow-up “And Italy?” after a
+capital question about France: CRMS resolves it to the same stored question
+frame, answers from Italy's fact, and asks for an entity when the follow-up
+names an unsupported place. The terminal-path regression confirms the actual
+chat output; this remains bounded to entities and frames represented in the
+knowledge store.
 Explicit distributive forms “they each” and “each of them” can run a follow-up
 once for each of the two entities grounded in the preceding answer. CRMS
 combines results only when every individual query has one supported answer,

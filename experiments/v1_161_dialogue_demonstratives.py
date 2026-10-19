@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -117,10 +119,70 @@ def main() -> None:
             or not corrected.research.passages or not corrected.response.evidence):
         raise SystemExit(f"research-backed correction lost its source result: {corrected}")
 
+    # A common elliptical entity switch should reuse only the prior question
+    # frame, then prove the replacement entity's answer from its own fact.
+    capital_kb = CRMSKnowledgeBase()
+    for country, city in (("France", "Paris"), ("Italy", "Rome")):
+        capital_kb.add_fact(country, "capital of", city,
+                            f"source:capital:{country.casefold()}")
+        capital_kb.teach_question(
+            f"What is the capital of {country}?", relation="capital of",
+            answer_field="object", bound_entity=country, answer=city)
+    capital_dialogue = CRMSDialogue(capital_kb)
+    first_capital = capital_dialogue.turn("What is the capital of France?")
+    second_capital = capital_dialogue.turn("And Italy?")
+    if (first_capital.response is None
+            or first_capital.response.answer != "Paris"
+            or second_capital.status != "answered"
+            or second_capital.resolved_question != "What is the capital of Italy?"
+            or second_capital.response is None
+            or second_capital.response.answer != "Rome"
+            or not second_capital.response.evidence):
+        raise SystemExit(
+            f"elliptical country switch failed to use the new entity's fact: "
+            f"{first_capital}, {second_capital}")
+
+    unsupported = CRMSDialogue(capital_kb)
+    unsupported.turn("What is the capital of France?")
+    unsupported_turn = unsupported.turn("And Atlantis?")
+    if (unsupported_turn.status != "unknown"
+            or "entity already present" not in unsupported_turn.text):
+        raise SystemExit(
+            f"unsupported entity follow-up did not request clarification: "
+            f"{unsupported_turn}")
+
+    with tempfile.TemporaryDirectory(prefix="crms-ellipsis-chat-") as folder:
+        root = Path(folder)
+        knowledge_path = root / "knowledge.json"
+        capital_kb.save(knowledge_path)
+        CRMSResearchIndex().save(root / "index.json")
+        command = [
+            sys.executable, str(Path(__file__).resolve().parents[1]
+                                / "crms_chat.py"),
+            "--knowledge", str(knowledge_path),
+            "--index", str(root / "index.json"),
+            "--dialogue-state", str(root / "dialogue.json"),
+            "--rules", str(root / "rules.json"),
+            "--rule-session", str(root / "rule-session.json"),
+            "--candidate-session", str(root / "candidates.json"),
+            "--math", str(root / "math.json"),
+            "--translations", str(root / "translations.json"),
+        ]
+        terminal = subprocess.run(
+            command,
+            input="What is the capital of France?\nAnd Italy?\n/quit\n",
+            text=True, capture_output=True, cwd=root, check=False, timeout=30)
+        if (terminal.returncode != 0
+                or "CRMS> Paris." not in terminal.stdout
+                or "CRMS> Rome." not in terminal.stdout):
+            raise SystemExit(
+                f"terminal elliptical entity switch failed:\n"
+                f"{terminal.stdout}\n{terminal.stderr}")
+
     print("dialogue demonstrative diagnostic: PASS")
     print("grounded this/that, elliptical follow-up, unique/ambiguous binding, "
           "determiner guard, no-context clarification, source-backed "
-          "follow-up/correction: PASS")
+          "follow-up/correction, And Italy? entity switch and chat route: PASS")
 
 
 if __name__ == "__main__":

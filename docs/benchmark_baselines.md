@@ -16,6 +16,17 @@ head-to-head score still requires a pinned model/runtime on the same held-out
 tasks and context. Report component results and unsupported cases separately;
 make no parity claim.
 
+## Elliptical entity-switch follow-up
+
+Command: `python3 experiments/v1_161_dialogue_demonstratives.py`
+
+After “What is the capital of France?”, the terminal accepts “And Italy?” and
+answers “Rome” using Italy's stored fact and the previously licensed question
+frame. The diagnostic also checks the resolved question and evidence in the
+dialogue API and confirms that an unsupported entity prompts for a known
+entity. Other parts of this diagnostic cover ambiguous demonstratives. This is
+bounded entity substitution, not general conversational context handling.
+
 ## Natural follow-ups to quoted evidence
 
 Command: `python3 experiments/v1_352_quoted_evidence_followup.py`

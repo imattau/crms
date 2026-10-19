@@ -216,9 +216,13 @@ once at load time on a bounded number of candidates and store the result.
   the regression asks each after a fresh quoted-source answer and checks that
   source and review status remain explicit. These aliases do not add support
   or confidence beyond the cited sentence.
-- **Follow-ups still open:** elliptical questions ("and France?") and
-  context-aware "tell me more" (next sentence). Pronoun follow-ups are covered
-  in section 3.7 of the NL design doc.
+- **Follow-ups:** a bounded entity switch such as “And Italy?” reuses the last
+  grounded question frame only when the replacement produces one supported
+  answer. `experiments/v1_161_dialogue_demonstratives.py` checks API behavior,
+  unsupported-entity clarification, and the terminal chat path. Pronoun and
+  demonstrative bindings have separate controlled cases in section 3.7 of the
+  NL design doc. Context-aware “tell me more” (next source sentence) remains
+  open; this does not establish general discourse understanding.
 - **Clarifying questions with candidates:** replace "Please name the entity this pronoun refers to"
   with "Did you mean Python or Linux?" when the previous turn offers candidates.
 - **Plain-language labels and one inline accept prompt:** replace "supporting claim awaiting review;
