@@ -1365,3 +1365,21 @@ quality evaluation. It shows no accuracy gain over the gate on this sample and
 lower overall coverage, so it does not justify enabling the ranker in chat.
 Expand and diversify the source-disjoint evaluation before reconsidering
 deployment; report wrong-answer rate and abstention as well as precision.
+
+## Answer-bearing pronoun sentence in source retrieval (2026-10-20)
+
+Command: `python3 experiments/v1_423_pronoun_sentence_answer_selection.py`.
+
+The runtime now retains three candidate sentences per document for factual
+questions, permits a leading “It” sentence only when the named entity occurs
+in the same paragraph, and ranks date-bearing sentences above entity-only
+lead sentences for `When` questions when the requested predicate also matches.
+When the chosen sentence uses a pronoun, its answer text is shown with the
+nearest named antecedent in one exact, source-cited excerpt. The Eiffel Tower /
+Colosseum sequence now selects 1889 and 80 CE respectively, preserves the
+Colosseum topic for a subsequent follow-up and `why?`, and refuses the same
+orphan date sentence when it occurs in a separate paragraph. Evidence remains
+quoted source text, not an accepted fact. The focused regression and nearby
+topic-anchor, source-follow-up, persistence, quoted-evidence, and sentence
+retrieval checks pass. This covers one bounded temporal question shape; it is
+not a general answerability classifier or broad semantic ranker.

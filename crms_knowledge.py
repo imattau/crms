@@ -7582,7 +7582,13 @@ class CRMSKnowledgeBase:
         hits = research_index.search(
             retrieval_query, limit=acronym_search_limit, context_chars=240)
         extractive = research_index.summarize(
-            question, limit=acronym_search_limit, per_document=1,
+            question, limit=acronym_search_limit,
+            # A named-entity lead sentence often outranks the sentence that
+            # answers the requested property. Keep a small per-document set
+            # so the identity gate and answer-type ranker can inspect both.
+            per_document=(3 if query_words and query_words[0] in {
+                "who", "whom", "what", "which", "where", "when", "why",
+                "how"} else 1),
             retrieval_terms=sorted(set(expansions)),
             expansion_licenses=expansion_licenses,
             precomputed_hits=hits)
@@ -7603,11 +7609,38 @@ class CRMSKnowledgeBase:
             if term.casefold() in {"i"}:
                 continue
             named_anchor_tokens.update(_tokens(term))
+
+        def pronoun_sentence_is_anchored(sentence: Mapping[str, Any]) -> bool:
+            """Keep a short ``it`` sentence when its named antecedent is local."""
+            text = str(sentence.get("text", ""))
+            if not named_anchor_tokens or not re.match(
+                    r"\s*(?:it|its)\b", text, flags=re.IGNORECASE):
+                return False
+            citation = str(sentence.get("citation", ""))
+            span = re.search(r"&chars=(\d+):(\d+)", citation)
+            document_id = sentence.get("document_id")
+            if span is None or not isinstance(document_id, str):
+                return False
+            try:
+                document = research_index.document(document_id)
+            except (AttributeError, KeyError, TypeError, ValueError):
+                return False
+            start = int(span.group(1))
+            if not 0 <= start <= len(document.text):
+                return False
+            paragraph_start = document.text.rfind("\n\n", 0, start) + 2
+            paragraph_end = document.text.find("\n\n", start)
+            if paragraph_end < 0:
+                paragraph_end = len(document.text)
+            paragraph = document.text[paragraph_start:paragraph_end]
+            return named_anchor_tokens.issubset(set(_tokens(paragraph)))
+
         if named_anchor_tokens:
             source_sentences = [
                 sentence for sentence in source_sentences
-                if named_anchor_tokens.issubset(set(_tokens(
-                    sentence.get("text", ""))))
+                if (named_anchor_tokens.issubset(set(_tokens(
+                        sentence.get("text", ""))))
+                    or pronoun_sentence_is_anchored(sentence))
             ]
         question_seeks_example = bool(
             set(query_words) & {"example", "examples", "sample", "samples",
@@ -7727,9 +7760,99 @@ class CRMSKnowledgeBase:
             "about", "please", "me", "tell", "explain", "describe",
         }
         if evidence_terms:
-            source_sentences.sort(
-                key=lambda sentence: len(evidence_terms.intersection(
-                    set(_tokens(sentence.get("text", ""))))), reverse=True)
+            def source_sentence_rank(sentence: Mapping[str, Any]) -> tuple[
+                    int, int, int, float]:
+                sentence_tokens = set(_tokens(sentence.get("text", "")))
+                answer_kind_match = 0
+                if query_words and query_words[0] == "when":
+                    answer_kind_match = int(bool(re.search(
+                        r"\b(?:1[0-9]{3}|20[0-9]{2}|\d{1,4}\s*(?:BCE|CE|AD|BC)|"
+                        r"January|February|March|April|May|June|July|August|"
+                        r"September|October|November|December)\b",
+                        str(sentence.get("text", "")), flags=re.IGNORECASE)))
+                requested_predicate_overlap = len(
+                    (evidence_terms - named_anchor_tokens)
+                    & sentence_tokens)
+                return (
+                    answer_kind_match,
+                    requested_predicate_overlap,
+                    len(evidence_terms & sentence_tokens),
+                    float(sentence.get("score", 0.0)),
+                )
+
+            source_sentences.sort(key=source_sentence_rank, reverse=True)
+            if (named_anchor_tokens and source_sentences
+                    and re.match(r"\s*(?:it|its)\b",
+                                 str(source_sentences[0].get("text", "")),
+                                 flags=re.IGNORECASE)):
+                # The answer sentence may use an anaphor. Cite the local
+                # antecedent with it so the user can see why the pronoun is
+                # bound to the named entity, and so dialogue can safely retain
+                # that topic after a source-only answer.
+                answer_sentence = source_sentences[0]
+                answer_span = re.search(
+                    r"&chars=(\d+):(\d+)",
+                    str(answer_sentence.get("citation", "")))
+                context_candidates = []
+                if answer_span is not None:
+                    answer_start, answer_end = map(int, answer_span.groups())
+                    for candidate in source_sentences[1:]:
+                        if (candidate.get("document_id")
+                                != answer_sentence.get("document_id")
+                                or not named_anchor_tokens.issubset(
+                                    set(_tokens(candidate.get("text", ""))))):
+                            continue
+                        candidate_span = re.search(
+                            r"&chars=(\d+):(\d+)",
+                            str(candidate.get("citation", "")))
+                        if candidate_span is None:
+                            continue
+                        context_start, context_end = map(
+                            int, candidate_span.groups())
+                        if context_end > answer_start:
+                            continue
+                        try:
+                            document = research_index.document(
+                                str(answer_sentence["document_id"]))
+                        except (AttributeError, KeyError, TypeError, ValueError):
+                            continue
+                        left_break = document.text.rfind("\n\n", 0, answer_start)
+                        right_break = document.text.find("\n\n", answer_start)
+                        paragraph_start = left_break + 2 if left_break >= 0 else 0
+                        if right_break < 0:
+                            right_break = len(document.text)
+                        if (context_start < paragraph_start
+                                or context_end > right_break
+                                or answer_start - context_end > 500):
+                            continue
+                        context_candidates.append((
+                            answer_start - context_end, context_start,
+                            context_end, document))
+                    if context_candidates:
+                        _distance, context_start, _context_end, document = min(
+                            context_candidates, key=lambda row: (row[0], row[1]))
+                        excerpt = document.text[context_start:answer_end]
+                        contextual_hit = SearchHit(
+                            str(answer_sentence["document_id"]),
+                            str(answer_sentence.get("title", "source")),
+                            answer_sentence.get("location"),
+                            float(answer_sentence.get("score", 0.0)),
+                            excerpt, context_start, answer_end,
+                            tuple(sorted(evidence_terms
+                                         & set(_tokens(excerpt)))))
+                        answer_sentence["text"] = excerpt
+                        answer_sentence["citation"] = research_index.citation(
+                            contextual_hit)
+                        answer_sentence["matched_terms"] = (
+                            contextual_hit.matched_terms)
+                        source_sentences = [
+                            answer_sentence,
+                            *(candidate for candidate in source_sentences[1:]
+                              if not (candidate.get("document_id")
+                                      == answer_sentence.get("document_id")
+                                      and candidate.get("text")
+                                      and named_anchor_tokens.issubset(set(
+                                          _tokens(candidate.get("text", ""))))))]
             hits.sort(
                 key=lambda hit: len(evidence_terms.intersection(
                     set(_tokens(hit.snippet)))), reverse=True)
