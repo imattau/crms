@@ -514,9 +514,12 @@ The remaining issues are:
   honest abstention after the fact-scan budget is reached. It also finds all nine ancestors of a
   deepest leaf in a 2,047-node binary tree despite the 256-entity cutoff. The same diagnostic now
   checks a bounded mutually recursive pair of linear rules in both subject and object answer
-  directions on in-memory and SQLite stores, including independent proof verification. Nonlinear
-  recursion and other recursive shapes still use the bounded entity-scan fallback. Broader
-  recursive join ordering and visible expansion-truncation handling remain open.
+  directions on in-memory and SQLite stores, including independent proof verification. A targeted
+  indexed closure now handles nonlinear self-composition rules of the form `R,R -> R` when their
+  seed rules are two-premise joins over non-derivable relations; nested proofs retain the explicit
+  rule and pass independent verification (`v1_377`). Other nonlinear and mutually dependent seed
+  shapes still use the bounded entity-scan fallback. Broader recursive join ordering and visible
+  expansion-truncation handling remain open.
 - Learned path-question frames can also do bounded forward expansion from a known entity. A
   two-example frame handles possessive wording such as “Who are Ann's grandchildren?”, including
   ASCII and curly apostrophes, and returns the two-edge proof. The system still needs those
@@ -548,10 +551,11 @@ The remaining issues are:
    depth, expansions, proof count, elapsed time, peak traced memory, and termination reason. Larger and more adversarial
    branching graphs still need measurement before raising search limits further.
 2. **Extend variable queries and inverse relations.** Indexed joins now cover extensional rules,
-   a common self-recursive form in either supported endpoint orientation, and mutually recursive
-   linear rules for both answer directions. Next, evaluate nonlinear recursion and selective join
-   ordering, and improve explicit partial-answer presentation. Keep candidate and fact-scan bounds,
-   with incomplete status whenever they prevent an exhaustive answer set.
+   a common self-recursive form in either supported endpoint orientation, mutually recursive
+   linear rules for both answer directions, and bounded nonlinear self-composition for grounded
+   two-premise seeds. Next, evaluate other nonlinear recursion and selective join ordering, and
+   improve explicit partial-answer presentation. Keep candidate and fact-scan bounds, with
+   incomplete status whenever they prevent an exhaustive answer set.
 3. **Measure recursive and premise-join performance** on broader graph shapes, including multiple
    converging subgoals and adversarial branching. Keep support-cap and shortest-proof reporting
    explicit; never interpret 64 listed proofs as the total.
@@ -573,6 +577,14 @@ proof length, proofs materialized, expansion count, elapsed time, peak memory, a
 Score correctness and abstention separately: an unknown caused by a documented budget is not a
 false answer, but remains a completeness failure for cases whose proof fits the declared target
 limits.
+
+`experiments/v1_377_nonlinear_recursive_closure.py` reproduces an explicit nonlinear rule pair:
+`ancestor := parent,parent` and `ancestor := ancestor,ancestor`. The previous candidate scan exhausted
+10,000 expansions even on a four-edge chain. The indexed self-composition path now answers 4-, 8-,
+and 12-edge chains, checks depth and expansion exhaustion, verifies nested recursive and typed
+middle-kind proofs independently, preserves cyclic-support ambiguity, and survives SQLite backing.
+This optimization is restricted to `R,R -> R` with direct two-premise seed joins; it does not
+establish tractability for arbitrary nonlinear recursion.
 
 The initial follow-up measurements are an external validation report for `60c93ea`. The targeted
 depth-40 change has passed the local runtime regression and reasoning contract. Reproduce the

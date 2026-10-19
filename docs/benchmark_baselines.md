@@ -856,8 +856,21 @@ expected status and completeness in the current run. Negative-only evidence rema
 the budget-limited case remained incomplete with `expansion_limit`; the diamond returned 64 proofs
 with `proof_limit`; and the cycle returned an ambiguity rather than an unqualified self-relation.
 
-On this local run, with `tracemalloc` enabled, the 35-hop chain took 78 ms and peaked at 212 KiB;
-the tree took 997 ms and peaked at 6,616 KiB; and the proof-capped diamond took 348 ms and peaked at
+On the current local run, with `tracemalloc` enabled, the 35-hop chain took 40 ms and peaked at 211 KiB;
+the tree took 653 ms and peaked at 6,617 KiB; and the proof-capped diamond took 274 ms and peaked at
 556 KiB. These are machine- and instrumentation-specific observations, not performance thresholds.
 The initial graph matrix improves coverage over the focused regressions, but does not yet include
 larger adversarial branching graphs, nonlinear recursive joins, or a broad query distribution.
+
+## Nonlinear recursive self-composition
+
+Command: `python3 experiments/v1_377_nonlinear_recursive_closure.py`
+
+For `ancestor := parent,parent` plus `ancestor := ancestor,ancestor`, the indexed seed closure
+answered 4-, 8-, and 12-edge chains in 6, 26, and 207 expansions. Before this implementation, the
+bounded candidate scan exhausted 10,000 expansions even on a four-edge chain. All returned nested
+proofs passed the independent verifier, including a typed variant with middle-kind witnesses. A
+disconnected query remained a complete unknown, explicit depth and expansion limits remained
+incomplete, a cycle-backed self-relation remained ambiguous, and the behavior survived a SQLite
+round trip. This covers the exact self-composition shape with directly joinable two-premise seed
+rules; other nonlinear recursion still uses the bounded fallback.

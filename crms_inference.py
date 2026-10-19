@@ -839,6 +839,204 @@ def _infer_relation_bounded(
             proof_cache[cache_key] = [dict(proof) for proof in proofs]
         return proofs
 
+    def prove_self_composition(
+            atom: tuple[tuple[str, ...], ...], depth: int
+            ) -> list[dict[str, Any]] | None:
+        """Solve an R,R -> R closure by indexed base edges and bounded paths.
+
+        This exact case is nonlinear recursion: both premises are the
+        conclusion relation. Materializing its nonrecursive two-edge seeds
+        avoids recursively scanning every entity for every candidate middle.
+        Unsupported seed-rule shapes return None so the general engine keeps
+        its existing bounded fallback.
+        """
+        nonlocal exhausted, limit_kind, proofs_truncated
+        relation_key = atom[1]
+        output_rules = rules_by_conclusion.get(relation_key, ())
+        recursive_rules = [
+            rule for rule in output_rules
+            if rule.third_relation is None
+            and _key(rule.first_relation) == relation_key
+            and _key(rule.second_relation) == relation_key
+        ]
+        if not recursive_rules or transitive_type_facts.get(relation_key) \
+                or symmetric_type_facts.get(relation_key):
+            return None
+        base_rules = [rule for rule in output_rules if rule not in recursive_rules]
+        for rule in base_rules:
+            if (rule.third_relation is not None
+                    or relation_is_derivable(_key(rule.first_relation))
+                    or relation_is_derivable(_key(rule.second_relation))):
+                return None
+
+        # Each edge maps to one or more proof trees that do not use the
+        # nonlinear recursive rule. All eligible base rules are direct-index
+        # joins, so an empty path result is a complete miss for this rule set.
+        edges: dict[
+            tuple[tuple[str, ...], tuple[str, ...]], list[dict[str, Any]]
+        ] = {}
+
+        def add_edge(source: tuple[str, ...], target: tuple[str, ...],
+                     proof: dict[str, Any]) -> None:
+            rows = edges.setdefault((source, target), [])
+            key = repr(proof)
+            if all(repr(existing) != key for existing in rows):
+                rows.append(proof)
+
+        for triple, rows in fact_index.items():
+            if triple[1] != relation_key:
+                continue
+            for fact in rows:
+                add_edge(triple[0], triple[2], {
+                    "kind": "fact", "conclusion": display_atom(triple),
+                    "fact": fact,
+                })
+        for triple, rows in derived_proofs.items():
+            if (triple[1] != relation_key or fact_index.get(triple)):
+                continue
+            for proof in rows:
+                add_edge(triple[0], triple[2], dict(proof))
+
+        facts_outgoing: dict[
+            tuple[tuple[str, ...], tuple[str, ...]],
+            list[tuple[tuple[tuple[str, ...], ...], dict[str, Any]]],
+        ] = {}
+        for triple, rows in fact_index.items():
+            facts_outgoing.setdefault((triple[0], triple[1]), []).extend(
+                (triple, fact) for fact in rows)
+        for rows in facts_outgoing.values():
+            rows.sort(key=lambda item: (item[0], repr(item[1])))
+
+        for rule in base_rules:
+            first_relation = _key(rule.first_relation)
+            second_relation = _key(rule.second_relation)
+            first_facts = [
+                (triple, fact) for (source, rel), rows in facts_outgoing.items()
+                if rel == first_relation
+                for triple, fact in rows
+            ]
+            for first_triple, first_fact in first_facts:
+                for second_triple, second_fact in facts_outgoing.get(
+                        (first_triple[2], second_relation), ()):
+                    if rule.middle_kind is not None:
+                        required_kind = _key(rule.middle_kind)
+                        kind_facts = [fact for fact in
+                                      kind_index.get(first_triple[2], ())
+                                      if _triple_key(fact)[2] == required_kind]
+                        if not kind_facts:
+                            continue
+                    else:
+                        kind_facts = [None]
+                    if not spend():
+                        return []
+                    conclusion = (first_triple[0], relation_key,
+                                  second_triple[2])
+                    for kind_fact in kind_facts:
+                        proof = {
+                            "kind": "rule", "rule": asdict(rule),
+                            "conclusion": display_atom(conclusion),
+                            "premises": [
+                                {"kind": "fact",
+                                 "conclusion": display_atom(first_triple),
+                                 "fact": first_fact},
+                                {"kind": "fact",
+                                 "conclusion": display_atom(second_triple),
+                                 "fact": second_fact},
+                            ],
+                        }
+                        if kind_fact is not None:
+                            proof["middle_kind_fact"] = kind_fact
+                        add_edge(conclusion[0], conclusion[2], proof)
+
+        for rows in edges.values():
+            rows.sort(key=repr)
+        outgoing: dict[tuple[str, ...], list[tuple[tuple[str, ...], list[dict[str, Any]]]]] = {}
+        for (source, target), proofs in sorted(edges.items()):
+            outgoing.setdefault(source, []).append((target, proofs))
+
+        paths: list[tuple[list[tuple[str, ...]],
+                           list[list[dict[str, Any]]]]] = []
+        queue = deque([(atom[0], [atom[0]], [])])
+        while queue:
+            current, nodes, path_edges = queue.popleft()
+            for target, edge_proofs in outgoing.get(current, ()):
+                closes_requested_cycle = (
+                    target == atom[2] == atom[0] and target in nodes
+                )
+                if target in nodes and not closes_requested_cycle:
+                    continue
+                if not spend():
+                    break
+                next_nodes = [*nodes, target]
+                next_edges = [*path_edges, edge_proofs]
+                if target == atom[2]:
+                    paths.append((next_nodes, next_edges))
+                elif target not in nodes:
+                    queue.append((target, next_nodes, next_edges))
+            if exhausted:
+                break
+
+        result: list[dict[str, Any]] = []
+        depth_blocked = False
+
+        def compose(nodes: list[tuple[str, ...]],
+                    path_edges: list[list[dict[str, Any]]],
+                    start: int, end: int) -> list[dict[str, Any]]:
+            nonlocal depth_blocked, proofs_truncated
+            if end == start + 1:
+                return [dict(proof) for proof in path_edges[start]]
+            composed: list[dict[str, Any]] = []
+            for split in range(start + 1, end):
+                left = compose(nodes, path_edges, start, split)
+                right = compose(nodes, path_edges, split, end)
+                if not left or not right:
+                    continue
+                for rule in recursive_rules:
+                    if rule.middle_kind is not None:
+                        required_kind = _key(rule.middle_kind)
+                        kind_facts = [fact for fact in kind_index.get(
+                            nodes[split], ())
+                            if _triple_key(fact)[2] == required_kind]
+                        if not kind_facts:
+                            continue
+                    else:
+                        kind_facts = [None]
+                    for first_proof in left:
+                        for second_proof in right:
+                            for kind_fact in kind_facts:
+                                if not spend():
+                                    return composed
+                                conclusion = (nodes[start], relation_key,
+                                              nodes[end])
+                                proof: dict[str, Any] = {
+                                    "kind": "rule", "rule": asdict(rule),
+                                    "conclusion": display_atom(conclusion),
+                                    "premises": [first_proof, second_proof],
+                                }
+                                if kind_fact is not None:
+                                    proof["middle_kind_fact"] = kind_fact
+                                if depth + proof_height(proof) > max_depth:
+                                    depth_blocked = True
+                                    continue
+                                composed.append(proof)
+                                if len(composed) >= max_proofs_per_goal:
+                                    proofs_truncated = True
+                                    return composed
+            return composed
+
+        for nodes, path_edges in paths:
+            result.extend(compose(nodes, path_edges, 0, len(nodes) - 1))
+            if len(result) >= max_proofs_per_goal:
+                result = result[:max_proofs_per_goal]
+                proofs_truncated = True
+                break
+            if exhausted:
+                break
+        if depth_blocked and not exhausted:
+            exhausted = True
+            limit_kind = "depth_limit"
+        return result
+
     def prove_uncached(atom: tuple[tuple[str, ...], ...], active: frozenset,
                        depth: int) -> list[dict[str, Any]]:
         nonlocal exhausted, proofs_truncated, limit_kind
@@ -861,6 +1059,9 @@ def _infer_relation_bounded(
             return []
         if exhausted:
             return proofs
+        self_composition = prove_self_composition(atom, depth)
+        if self_composition is not None:
+            return self_composition
         new_active = active | {atom}
         applications: list[tuple[InferenceRule, Mapping[str, Any] | None]] = []
         # Built-in transitivity performs its own fact-only first pass. Run it
