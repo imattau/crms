@@ -129,6 +129,98 @@ what to do next and what evidence unlocks the following step. Keep dialogue and
 intent research active alongside the learning work; do not postpone them until
 reasoning is “finished.”
 
+### Immediate work queue (reviewed 2026-10-20)
+
+Work these packets in order. Keep each packet small enough to produce a
+reproducible chat-level result before moving to the next one. The dialogue
+research track stays active, but it should not displace the main capability
+test: learning and recombining procedures that generalize beyond their
+examples.
+
+1. **Freeze a dialogue/intent evaluation slice before changing its rules.**
+   Preserve the passing Eiffel Tower/Colosseum topic-switch cases and the
+   source-only follow-up cases as regression controls. Add a small, fixed set
+   of complete multi-turn examples covering topic switches, pronoun anchors,
+   context after unanswered/source-only turns, `why?`, clarification, and
+   save/reload. For contextual intent, use the prepared second-domain
+   movie-ticket Taskmaster sample rather than extending restaurant-specific
+   patterns first. Codex may label a bounded sample, with exact transcript
+   spans and primary-labeler provenance; reserve conversations for test and
+   report agreement, coverage, and errors separately. Do not call agreement
+   accuracy or generalize from this pilot to open-domain dialogue.
+
+   The context-free baseline and the first transcript-context replay are now
+   recorded in [`design_user_intent_model.md`](design_user_intent_model.md).
+   The current runtime has a bounded explicit-task goal rule and typed replies
+   for parameters, choices, and confirmations. On four development dialogues,
+   context replay jointly matched Codex act/task labels on 17/37 turns. On six
+   test dialogues held back until the code freeze, it matched 22/68; the
+   context-free comparison matched 15/68. Hypothesis coverage increased from
+   39.7% to 66.2%, while agreement among hypotheses fell from 55.6% to 48.9%.
+   These are one-labeler diagnostics from a transcript classifier replay, not
+   chat completion or accuracy. The other 12 dialogues were exploratory during
+   development and are not held-out evidence. Keep the six final dialogues
+   frozen; do not tune from their disagreements.
+
+   This completes the baseline setup and gives a bounded task-goal slice, but
+   it does not close the broader dialogue reliability milestone. Keep intent
+   labels inspectable and provisional, preserve the existing topic-switch and
+   source-only follow-up regressions, and run the replay only when making a
+   measured dialogue change. Continue dialogue research in parallel with the
+   main recombination and reasoning work.
+
+   **Exit:** a frozen clean-process replay establishes the current baseline;
+   no confidently wrong referent, stale explanation, or context loss is
+   accepted. The movie-ticket sample reports what the intent model covers and
+   where it abstains before any rule is tuned from it.
+
+2. **Run the source-disjoint recombination experiment.** Choose one compact,
+   useful procedure family. Keep source text, extracted examples, connective or
+   instruction labels, induced rule, and validator outcomes as separate
+   artifacts. Use complete-document holdout, unseen compositions, independent
+   wording, near misses, and an independent output checker. The current
+   phrase-grid and `unique → sort → reverse` results are controls, not the
+   target evidence: the former is synthetic; the latter still depends on
+   teacher-authored connective evidence and sparse operation examples.
+
+   **Exit:** at least one held-out composition succeeds through ordinary chat,
+   a fresh process, and reload; an independently implemented checker accepts
+   it; unsupported or incomplete compositions abstain; provenance identifies
+   every source and teacher/labeler contribution. If prose does not license the
+   connective, record that boundary instead of implying autonomous
+   self-learning.
+
+3. **Join that learned composition to verified reasoning and governed
+   derivation.** Route the same request through chat and the engine. Verify the
+   output independently; exercise missing, conflicting, cyclic, and
+   budget-limited premises. If the result is proposed for reuse, store it as a
+   derived record with lineage and review status. Test correction and
+   dependency invalidation before retrieval can rely on it.
+
+   **Exit:** chat and engine agree; each positive has an accepted proof or
+   independent task check; no incomplete search becomes a positive result;
+   corrections make every dependent derivation discoverable and unusable until
+   revalidated.
+
+4. **Use results, not aspiration, to choose the next breadth slice.** Once
+   packets 1–3 have stable gates, improve the largest measured loss in
+   answer-bearing retrieval, paraphrase coverage, dialogue completion, or a
+   bounded math/code/translation/creative task. Add one slice at a time with a
+   held-out chat set and domain-appropriate validator. Defer SQLite contract
+   completion until the records and write-back lifecycle exercised by those
+   paths are stable; then prove build/copy/learn/reload without source files.
+
+   **Exit:** new breadth improves held-out useful coverage without increasing
+   wrong answers or hiding abstentions, and works in the portable model copy.
+
+**Decision rule:** prefer the next task that removes a measured user-visible
+failure or unlocks a held-out recombination result. Do not spend a cycle on a
+new feature, larger corpus, or storage migration without a named benchmark
+failure or an exit gate it enables. Recheck the overall goal after each packet:
+CRMS is on track only when the same ordinary-language scorecard shows growing
+held-out task coverage, controlled errors, useful multi-turn continuity, and
+portable verified learning. A larger experiment count alone is not progress.
+
 ### Milestone A — Close the known chat correctness gaps
 
 Use the recent multi-topic transcript and source-only follow-ups as the fixed

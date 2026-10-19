@@ -64,6 +64,10 @@ Other things it can currently do:
   session-closing farewells without treating them as source searches. Greetings
   report the facts and source documents actually loaded.
 - Hold simple conversations that remember what you were just talking about.
+- Track a small, explicit task goal separately from the current step, and
+  interpret answers to a few typed follow-up questions as task constraints,
+  choices, or confirmations. This intent handling is hand-checked and narrow;
+  it is not a general task planner.
 - Recall a small set of user-provided task details, such as a requested location,
   time, party size, seating, cuisine, or restaurant choice, during the same session.
 
@@ -80,7 +84,9 @@ Being honest about limits is part of the project:
   person would find obviously similar to one it handled.
 - Conversation is still **limited**. It retains a bounded clarification
   question and a small set of session-only task details, but it cannot track
-  arbitrary task slots, fill forms, or sustain open-ended dialogue.
+  arbitrary task slots, fill forms, or sustain open-ended dialogue. Its
+  contextual intent rules can over-interpret a reply when the active goal or
+  assistant question is unclear.
 - It sometimes picks the **wrong sentence** from a document. It labels these
   as quoted evidence, but it is a known weakness.
 - Long creative writing, long reasoning, and broad general knowledge remain

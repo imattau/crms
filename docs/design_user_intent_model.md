@@ -207,6 +207,107 @@ The diagnostic is reproducible with
 [`v1_373_taskmaster_intent_baseline_coverage.py`](../experiments/v1_373_taskmaster_intent_baseline_coverage.py).
 It reports coverage by split and the preceding-question cue, without exposing utterance text or
 claiming correctness.
+
+### Second-domain movie-ticket coverage baseline
+
+The prepared Taskmaster-1 movie-ticket pilot was evaluated with
+`experiments/v1_373_taskmaster_intent_baseline_coverage.py` against the current
+working tree, before tuning from its test turns. It contains 165 train, 16 dev,
+and 19 test conversations; the evaluation uses each user turn in a fresh,
+empty dialogue, so this is a context-free coverage diagnostic. The test split
+has 181 turns: the runtime produced an intent hypothesis for 57 (31.5%) and a
+selected task intent for 41 (22.7%). It abstained on 124 turns. Of those, 75
+(60.5%) followed an assistant utterance containing a question mark; 22 of 39
+short no-hypothesis turns had the same preceding-question cue. The cue does not
+prove that those turns answer the assistant, but it identifies a high-value
+context test set. Dev coverage was 53/199 hypotheses (26.6%) and 41/199
+selected task intents (20.6%); train coverage was 416/1,747 hypotheses
+(23.8%) and 276/1,747 selected task intents (15.8%).
+
+This establishes only how often the current lexical and hand-checked rules
+fire on this second domain. There are no labels in these results, so they say
+nothing about correctness, goal/subgoal accuracy, or task completion. The
+pilot's conversations are from one corpus and its task is transactional movie
+tickets; they are not independent publishers or a sample of open-domain chat.
+The next evaluation step was to label a bounded, conversation-level sample
+with exact utterance citations and Codex as the primary annotator, freeze those
+labels, then measure context-aware coverage and agreement without tuning on
+held-out conversations. That pilot and its limits are summarized below. Keep
+the context-free numbers as a comparison baseline.
+
+### Transcript-context replay and task-goal slice (2026-10-20)
+
+The development probe exposed a model limitation, not just a phrase gap: a
+direct task request often did not establish a broad goal, so answers to the
+assistant's next questions were classified as generic continuation. CRMS now
+recognizes a bounded set of explicit first-person action requests as the broad
+`other-task` goal, distinguishes direct availability requests, and records
+typed task parameters as `provide-constraint` subgoals while retaining the
+larger goal. It types common proposal questions and option-choice questions so
+their answers can be treated as confirmations or ambiguity resolution. This is
+hand-checked runtime logic; it is not an induced intent model or general task
+planner. The focused contract is in
+[`v1_437_contextual_task_goal_and_slots.py`](../experiments/v1_437_contextual_task_goal_and_slots.py).
+
+`experiments/v1_436_transcript_context_intent_replay.py` compares the current
+classifier in two modes: each utterance with empty state, and conversation
+replay using the last visible assistant question plus only the active goal
+CRMS itself predicted on earlier turns. The replay does not use labeled goals,
+slot values, or expected answers as runtime state, and it does not simulate
+complete assistant responses. A conversational opening such as “How can I
+help?” is excluded as a pending detail question. The prepared context window
+remains limited to a small number of turns.
+
+On four development conversations (37 labeled turns), context-free
+classification hypothesized on 10/37 turns (27.0%), with 6/37 joint act/task
+matches. The transcript replay hypothesized on 23/37 (62.2%), with 17/37 joint
+matches (73.9% agreement among hypotheses). These labels were used to shape the
+implementation; this is development fit, not held-out accuracy.
+
+After freezing the code, six previously unused test conversations were labeled
+by Codex before running the replay (68 turns; two labeled uncertain). On these
+turns, context-free classification hypothesized on 27/68 (39.7%), with 15/68
+joint act/task matches (55.6% among hypotheses). Transcript replay hypothesized
+on 45/68 (66.2%), with 22/68 joint matches (32.4% of all labeled turns; 48.9%
+among hypotheses). The replay therefore increased coverage and the number of
+matching labels, while its conditional agreement was lower. Four of 45 replay
+hypotheses were marked ambiguous or unlicensed; selected coverage was 41/68.
+These are agreements with one Codex primary labeler, not accuracy or
+independent validation. The labels, hashes, exact utterance spans, and reports
+are currently in `/tmp/crms_taskmaster_movie_pilot_v2/` (`movie_dev_first4`,
+`movie_test_final6`, and the corresponding `context_replay` JSON reports).
+
+The earlier eight movie-ticket test dialogues were used to find and repair the
+transcript adapter's opening-invitation error; they are exploratory and must
+not be reused as held-out evidence. The final six-conversation group was kept
+unused until this code freeze, but it remains a small primary-label pilot from
+one domain. These results show that explicit context improves coverage; they
+also show the current contextual classifier still over-selects or mislabels
+many turns. They do not establish natural task completion or broad conversation
+ability. Keep the rules bounded, retain abstention, and seek an independent
+label review before making quality claims.
+
+For an initial label-conditioned diagnostic, Codex labeled the first four
+conversation-held-out movie-ticket test dialogues before inspecting runtime
+predictions (28 user turns; one source turn is marked deleted and labeled
+`uncertain`). Labels preserve the source utterance citation and are explicitly
+primary Codex labels, not independent ground truth. The current classifier,
+run with a fresh empty dialogue for every turn, emitted hypotheses for 7/28
+turns (25.0%); six of those seven matched both the primary dialogue-act and
+task-intent labels (85.7% agreement among hypotheses, 21.4% of all labeled
+turns). It left common movie-ticket requests, title/location/time/quantity
+answers, and showtime selections unclassified. The one classified mismatch
+mapped a request for a later show to generic `seek-information` instead of
+`check-availability`.
+
+This four-dialogue sample is a frozen, small diagnostic, not a quality claim:
+it has one annotator, uses the context-free policy, and is from one transactional
+domain. The six-of-seven conditional agreement is especially easy to
+overinterpret because coverage is only one quarter. Keep these conversations
+out of development and candidate induction. The working labels are stored at
+`/tmp/crms_taskmaster_movie_pilot_v2/movie_test_first4_codex_primary.csv`; the
+untouched baseline output is at `/tmp/crms_taskmaster_movie_intent_baseline.json`.
+
 The single-AI-label pass enables a limited development comparison, but it does not satisfy the
 independent review gate. Running
 [`v1_385_provisional_dialogue_label_comparison.py`](../experiments/v1_385_provisional_dialogue_label_comparison.py)

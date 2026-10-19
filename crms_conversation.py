@@ -286,6 +286,22 @@ _DIRECT_SEARCH_REQUEST_RE = re.compile(
     r"(?:i|we)\s+(?:need|want)\s+(?:a|the)\s+"
     r"(?:place|restaurant|recommendation|option)\b)\s+\S",
     re.IGNORECASE)
+_EXPLICIT_GENERIC_TASK_REQUEST_RE = re.compile(
+    r"^(?:(?:good\s+(?:morning|afternoon|evening)|hey|hi|hello)[,!. ]+)?"
+    r"(?:(?:i|we)(?:['’]d|\s+(?:would|could))\s+like\s+|"
+    r"(?:i|we)\s+(?:want|need|wanted|needed)\s+|"
+    r"(?:i|we)(?:['’]m|\s+(?:am|was|were))\s+"
+    r"(?:hoping|trying|looking)\s+to\s+)"
+    r"(?:to\s+)?(?P<request>.+?)[.! ]*$",
+    re.IGNORECASE)
+_INFORMATION_COMPLEMENT_RE = re.compile(
+    r"^(?:know\b|learn\b|find\s+out\b|see\s+if\b|check\s+if\b|"
+    r"ask\b|understand\b|be\s+told\b)", re.IGNORECASE)
+_AVAILABILITY_SEARCH_RE = re.compile(
+    r"\b(?:looking|trying|hoping|want)\s+to\s+see\s+if\b.+\b"
+    r"(?:playing|showing|available)\b|"
+    r"\b(?:looking|trying|hoping)\s+to\s+find\s+showtimes?\b",
+    re.IGNORECASE)
 
 
 def natural_feedback_verdict(text: str) -> str | None:
@@ -545,6 +561,7 @@ def _open_question_task_intent(dialogue: CRMSDialogue,
     reported as constraints rather than inheriting the broad task label.
     """
     prompt = " ".join(open_question.get("prompt", "").casefold().split())
+    active_task = dialogue.active_task_intent
     search_prompt_cues = (
         "what type of restaurant", "which type of restaurant",
         "what kind of restaurant", "which kind of restaurant",
@@ -559,6 +576,10 @@ def _open_question_task_intent(dialogue: CRMSDialogue,
     )
     if any(cue in prompt for cue in search_prompt_cues):
         return "provide-constraint"
+    if open_question.get("expected_slot") == "confirmation":
+        return active_task or "resolve-ambiguity"
+    if open_question.get("expected_slot") == "choice":
+        return "resolve-ambiguity"
     if (re.search(r"\b(?:cancel|cancell?ing)\b", prompt)
             and re.search(r"\breserv(?:e|ation|ations)\b", prompt)):
         return "cancel-reservation"
@@ -566,19 +587,27 @@ def _open_question_task_intent(dialogue: CRMSDialogue,
             and re.search(r"\breserv(?:e|ation|ations)\b", prompt)):
         return "change-reservation"
     if (re.search(r"\b(?:book|booking)\b", prompt)
+            and re.search(r"\b(?:reservation|restaurant|table)\b", prompt)
             or (re.search(r"\bmake\b", prompt)
                 and re.search(r"\breserv(?:ation|ations)\b", prompt))
             or (re.search(r"\b(?:need|want)\b", prompt)
                 and re.search(r"\breserv(?:ation|ations)\b", prompt))):
         return "make-reservation"
 
-    active_task = dialogue.active_task_intent
     slot = open_question.get("expected_slot", "unknown")
-    search_constraint_slots = {
-        "location", "party_size", "date_time", "seating", "cuisine",
-        "detail",
+    task_parameter_slots = {
+        "location", "party_size", "quantity", "date_time", "seating",
+        "cuisine", "restaurant_choice", "detail", "entity",
     }
-    if active_task == "seek-information" and slot in search_constraint_slots:
+    if (active_task == "other-task" and slot in task_parameter_slots):
+        return "provide-constraint"
+    if (active_task == "check-availability"
+            and slot in {"location", "party_size", "quantity", "date_time",
+                         "detail", "entity"}):
+        return "provide-constraint"
+    if (active_task == "seek-information"
+            and slot in {"location", "party_size", "date_time", "seating",
+                         "cuisine", "detail"}):
         return "provide-constraint"
     return active_task or "continue-current-task"
 
@@ -810,14 +839,19 @@ def classify_user_intent(
                 alternatives=(f"provide the requested {label}",
                              "ask a yes/no question"),
             )
-        is_short_detail = (
+        is_typed_parameter_reply = (
             not expected_yes_no and not is_yes_no and not is_fresh_question
             and "?" not in text
             and social_act is None
-            and len(re.findall(r"[\w’'-]+", text)) <= 24
+            and _EXPLICIT_RESERVATION_REQUEST_RE.fullmatch(text) is None
+            and (len(re.findall(r"[\w’'-]+", text)) <= 24
+                 or (open_question.get("expected_slot") in {
+                     "location", "party_size", "quantity", "date_time",
+                     "seating", "cuisine", "restaurant_type"}
+                     ))
         )
         if ((is_yes_no and expected_yes_no and not is_fresh_question)
-                or is_short_detail):
+                or is_typed_parameter_reply):
             task_intent = _open_question_task_intent(dialogue, open_question)
             return UserIntentHypothesis(
                 dialogue_act=_open_question_dialogue_act(
@@ -901,6 +935,43 @@ def classify_user_intent(
             goal_intent="make-reservation",
         )
 
+    if _AVAILABILITY_SEARCH_RE.search(reservation_request):
+        return UserIntentHypothesis(
+            dialogue_act="request-action",
+            task_intent="check-availability",
+            goal_intent="check-availability",
+            decision="selected",
+            matched_frame="explicit-availability-search",
+            context_predicates=("direct-user-request",))
+
+    # Treat explicit first-person wants/needs for an action or service as a
+    # broad task goal. Information-seeking complements are left to the search
+    # and question routes below; the rule does not infer a task from a bare
+    # topic mention.
+    generic_request = _EXPLICIT_GENERIC_TASK_REQUEST_RE.fullmatch(
+        reservation_request)
+    if generic_request is not None:
+        complement = (generic_request.group("request")
+                      or generic_request.group("looking") or "").strip()
+        if _INFORMATION_COMPLEMENT_RE.match(complement):
+            return UserIntentHypothesis(
+                dialogue_act="request-action",
+                task_intent="seek-information",
+                goal_intent="seek-information",
+                decision="selected",
+                matched_frame="explicit-information-request",
+                context_predicates=("direct-user-request",
+                                    "information-seeking-complement"))
+        else:
+            return UserIntentHypothesis(
+                dialogue_act="request-action",
+                task_intent="other-task",
+                goal_intent="other-task",
+                decision="selected",
+                matched_frame="explicit-generic-task-request",
+                context_predicates=("direct-user-request",
+                                    "explicit-action-complement"))
+
     # A direct search statement establishes an information-seeking goal.
     # This runs after open-question handling and explicit booking detection so
     # a cuisine/slot answer or reservation commitment keeps its active intent.
@@ -952,15 +1023,23 @@ def classify_user_intent(
                 task_intent=("seek-information"
                              if verb in _INFORMATION_REQUEST_VERBS
                              else "other-task"),
+                goal_intent=("seek-information"
+                             if verb in _INFORMATION_REQUEST_VERBS
+                             else "other-task"),
                 decision="selected",
                 matched_frame="modal-request",
                 context_predicates=("direct-user-request",),
             )
     if (_WH_QUESTION_RE.match(stripped)
             or _YES_NO_QUESTION_RE.fullmatch(stripped)):
+        availability_followup = bool(
+            dialogue.active_task_intent is not None
+            and re.search(r"\b(?:showtimes?|screenings?|playing|available)\b",
+                          stripped, re.IGNORECASE))
         return UserIntentHypothesis(
             dialogue_act="question",
-            task_intent="seek-information",
+            task_intent=("check-availability" if availability_followup
+                         else "seek-information"),
             decision="selected",
             matched_frame=("wh-question" if _WH_QUESTION_RE.match(stripped)
                            else "yes-no-question"),

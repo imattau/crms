@@ -44,7 +44,7 @@ class _WordScanner:
 _WORD_RE = _WordScanner()
 _OPEN_QUESTION_SLOT_TYPES = {
     "unknown", "detail", "topic", "entity", "location", "restaurant_type",
-    "party_size",
+    "party_size", "quantity", "choice",
     "date_time", "seating", "cuisine", "restaurant_choice", "confirmation",
     "yes_no",
 }
@@ -58,6 +58,9 @@ def infer_open_question_slot(prompt: str, answer_kind: str) -> str:
     """Map a bounded clarification question to an inspectable slot category."""
     text = " ".join(prompt.casefold().split())
     if answer_kind == "yes-no":
+        if (" or " in text and any(cue in text for cue in (
+                "would you like", "do you want", "should i", "would you prefer"))):
+            return "choice"
         if any(cue in text for cue in (
                 "to confirm", "did you say", "you said", "are you sure",
                 "is that right", "is that correct", "that's right",
@@ -66,16 +69,25 @@ def infer_open_question_slot(prompt: str, answer_kind: str) -> str:
                 "so i have", "correct?", "right?", "should i book",
                 "shall i book", "should i make the reservation",
                 "should i place the reservation",
-                "do you want me to book", "would you like me to book")):
+                "do you want me to book", "would you like me to book",
+                "will that work", "does that work", "is that okay",
+                "is that ok", "would that be okay", "would that be ok",
+                "would you like this", "would you like that",
+                "would you like to purchase", "would you like to buy",
+                "can i charge", "can i continue with the purchase")):
             return "confirmation"
         return "yes_no"
     if any(cue in text for cue in (
             "how many people", "how big is your party", "party size")):
         return "party_size"
     if any(cue in text for cue in (
-            "what time", "which time", "when would", "what day", "which day",
-            "what date", "which date")):
+            "what time", "which time", "what showtime", "which showtime",
+            "when would", "what day", "which day", "what date", "which date")):
         return "date_time"
+    if any(cue in text for cue in (
+            "how many tickets", "how many items", "how many would",
+            "how many do you need", "how many did you need")):
+        return "quantity"
     if any(cue in text for cue in (
             "what city", "which city", "what location", "where should",
             "where would", "which area", "what area", "where are you",
@@ -89,6 +101,11 @@ def infer_open_question_slot(prompt: str, answer_kind: str) -> str:
             "what cuisine", "which cuisine", "what kind of food",
             "what type of food", "what style of food", "food preference")):
         return "cuisine"
+    if any(cue in text for cue in (
+            "which option", "which one", "which do you prefer",
+            "which would you prefer", "which theater", "which theatre",
+            "first one or", "would you prefer to take")):
+        return "choice"
     if any(cue in text for cue in (
             "which restaurant", "which place", "which option", "which one")):
         return "restaurant_choice"
@@ -215,6 +232,7 @@ _ACTIVE_TASK_INTENTS = {
 }
 _TASK_SUBGOAL_INTENTS = {
     "check-availability", "provide-constraint", "seek-information",
+    "resolve-ambiguity",
 }
 _SHOWN_LIMIT = 500
 _ELABORATION_BATCH = 3
