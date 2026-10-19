@@ -17,16 +17,36 @@ head-to-head benchmark. No external model was run for this document.
 
 Parameter count alone does not determine behavior. Training data, post-training,
 instruction tuning, tool access, context limits, quantization, and runtime
-configuration all matter. For concrete reference points, Meta describes its
-Llama 3.1 family as supporting broad knowledge, reasoning, coding, multilingual
-use, and long context; its current docs point users to the later Llama 3.3 70B
-Instruct model for that size class. Qwen2.5's technical report similarly
-describes its 72B instruction model across language understanding, reasoning,
-math, coding, long-text generation, and instruction following. These are
-developer-reported evaluations, not independent guarantees of correctness.
-[Meta Llama 3.1 overview](https://ai.meta.com/blog/meta-llama-3-1/),
-[Meta model documentation](https://dev.meta.ai/llama/docs/model-cards-and-prompt-formats/llama3_1),
-[Qwen2.5 technical report](https://arxiv.org/abs/2412.15115).
+configuration all matter. Two current, concrete reference points are Meta's
+Llama 3.3 70B Instruct and Qwen3-235B-A22B. Meta describes Llama 3.3 as an
+instruction-tuned assistant-chat model with multilingual text and code output;
+its published card reports instruction-following, reasoning, coding, math, and
+multilingual benchmark results. Qwen describes Qwen3 as supporting instruction
+and thinking modes, 119 languages and dialects, coding, and agentic use; the
+235B-A22B name denotes 235B total parameters with 22B activated per token.
+These are developer descriptions and evaluations, not independent guarantees
+of correctness. [Llama 3.3 70B model card](https://github.com/meta-llama/llama-models/blob/main/models/llama3_3/MODEL_CARD.md),
+[Qwen3 model documentation](https://github.com/QwenLM/Qwen3/blob/main/docs/source/getting_started/concepts.md).
+
+## What the user typically experiences
+
+A strong instruction model can often take an ordinary request, produce a
+complete-looking answer or artifact in the requested format, and continue when
+the user asks for a revision, explanation, or another related task. Depending
+on the model and prompt, it can respond with prose, lists, tables, translations,
+or code; some model families also expose selectable or hybrid thinking modes.
+This is an expectation about broad instruction-tuned systems, not a claim that
+every 70B+ model handles every request well. The claim is inferred from the
+documented assistant-chat use cases and broad instruction, coding, and
+multilingual evaluations above; CRMS has not been compared head-to-head here.
+
+The user-facing answer is not itself a proof. A fluent model may omit a request
+part, invent a detail, or produce code that fails. Citations and tool-backed
+checks depend on the surrounding system, and a thinking mode does not by itself
+guarantee that a displayed explanation faithfully represents the computation.
+CRMS can expose proof steps and source lineage when the relevant facts and
+rules are represented, but its user-visible coverage and wording flexibility
+remain much narrower.
 
 ## Comparison by user task
 
