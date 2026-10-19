@@ -2094,6 +2094,14 @@ taught phrases to 16/16 at eight, with no wrong unique answers; all five
 controlled negatives abstained. This is evidence for that bounded synthetic
 grammar, not a general language benchmark. Its ten authored paraphrase probes
 currently abstain, showing the remaining open-vocabulary gap.
+The complementary `experiments/v1_354_balanced_phrase_recombination.py` checks
+two crossed verb/object grids: after three balanced demonstrations, CRMS
+recombines the held-out familiar-word combination across all six teaching
+orders (36/36 held-out input cases, with all three source phrases preserved).
+It abstains on 48/48 controls with an unseen word, reordered words, or an
+unsupported modifier. This result shows that the example arrangement affects
+sample efficiency; it is not synonym transfer or open-ended language
+understanding.
 `experiments/v1_241_chat_usability_diagnostics.py` checks that an optional
 question word or contiguous phrase (up to three tokens) is inferred only from
 two aligned, fact-backed examples, carries its source trace through chat and

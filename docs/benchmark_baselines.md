@@ -16,6 +16,31 @@ head-to-head score still requires a pinned model/runtime on the same held-out
 tasks and context. Report component results and unsupported cases separately;
 make no parity claim.
 
+## Balanced phrase recombination from three demonstrations
+
+Command: `python3 experiments/v1_354_balanced_phrase_recombination.py`
+
+Two balanced 2×2 phrase grids tested whether a single held-out combination can
+be recombined from three same-operation examples:
+
+| Trained phrases | Held-out phrase | Teaching orders | Held-out inputs correct | Wrong | Abstained |
+|---|---|---:|---:|---:|---:|
+| reverse list, reverse values, invert values | invert list | 6 | 18/18 | 0 | 0 |
+| reverse list, invert list, invert values | reverse values | 6 | 18/18 | 0 | 0 |
+
+The held-out inputs include an empty list, negative values, and repeated values.
+Every prediction cites all three teaching phrases. Across all orders, the model
+abstained on 48/48 controls containing an unseen operator, an unseen object,
+reordered words, or an unsupported inserted modifier. This is evidence of
+position-based verb/object recombination with familiar terms after only three
+demonstrations, and it is invariant to order for these two specific crossings.
+It does not establish transfer to synonyms, unseen vocabulary, or open-ended
+requests. In particular, the broader 4×4 grid in `v1_242` intentionally has
+unbalanced early examples: its first four phrases contain four distinct verbs
+and four distinct nouns, so those examples do not independently repeat the
+word roles. Read the two learning curves together; the example arrangement is
+part of the measured condition.
+
 ## Cross-surface question transfer v1
 
 Command: `python3 experiments/v1_315_cross_surface_question_transfer.py`
