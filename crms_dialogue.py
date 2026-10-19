@@ -1795,10 +1795,18 @@ class CRMSDialogue:
                 self.pending_result = response
             elif research is not None and research.status in {
                     "sources_found", "needs_review"}:
-                # A quoted answer awaiting review is still text the user just
-                # read, so its names stay available as candidate referents.
+                # Keep referents only from text actually shown to the user.
+                # Retrieval can return several supporting sentences while the
+                # brief renders just the first; unsurfaced names must not
+                # become dialogue context or be offered as choices.
+                visible_source_sentences = [
+                    item for item in (research.source_sentences or [])
+                    if (isinstance(item.get("text"), str)
+                        and item["text"].strip()
+                        and item["text"].strip() in text)
+                ]
                 self.source_mentions = self._source_entity_mentions(
-                    research.source_sentences)
+                    visible_source_sentences)
                 if self.source_mentions:
                     # Keep only entities from text actually quoted this turn;
                     # they are candidate referents, not accepted knowledge.
@@ -1807,12 +1815,9 @@ class CRMSDialogue:
                     # Retain a source-backed acronym as a discourse focus.
                     focus = self._explicit_research_acronym(resolved)
                     evidence_text = " ".join(
-                        [str(item.get("text", "")) + " "
-                         + str(item.get("title", ""))
-                         for item in (research.source_sentences or [])]
-                        + [str(item.get("excerpt", "")) + " "
-                           + str(item.get("title", ""))
-                           for item in (research.passages or [])])
+                        str(item.get("text", "")) + " "
+                        + str(item.get("title", ""))
+                        for item in visible_source_sentences)
                     if focus and focus.casefold() in evidence_text.casefold():
                         self.last_question = resolved
         return result

@@ -103,7 +103,13 @@ Findings from the review that change the design:
   persists with the inspectable task label.
 - **Entity recognition is partly widened.** `_source_entity_mentions` retains capitalised names from
   quoted sentences as candidates; `_canonical_entity` and `_known_entity_surfaces` still look only at
-  accepted facts and aliases. Pronoun resolution does not consult entity kind.
+  accepted facts and aliases. These source referents are now limited to exact source sentences
+  present in the rendered reply. Retrieval can return more sentences than the brief displays, so
+  names from hidden hits must not become conversational context. The runtime replay in
+  [`v1_408_visible_source_referents.py`](../experiments/v1_408_visible_source_referents.py) confirms
+  that a follow-up resolves to the one quoted entity and an unshown hit is not retained. Pronoun
+  resolution still does not consult entity kind, and ordinal selection across a general list of
+  source results remains unsupported.
 - **The chat loop still post-processes every turn** (count routes, source routes) in a file of about
   10,000 lines.
 - **Chat learning is explicit.** Every `/teach-*` command teaches content. No command teaches a
