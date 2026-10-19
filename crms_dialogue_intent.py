@@ -20,6 +20,11 @@ _CONTEXT_PREDICATES = {
     "open_dialogue_slot", "pending_assistant_question",
     "awaiting_user_detail", "awaiting_confirmation",
     "awaiting_yes_no_answer",
+    "awaiting_slot_detail", "awaiting_slot_topic", "awaiting_slot_entity",
+    "awaiting_slot_location", "awaiting_slot_party_size",
+    "awaiting_slot_date_time", "awaiting_slot_seating", "awaiting_slot_cuisine",
+    "awaiting_slot_restaurant_choice", "awaiting_slot_confirmation",
+    "awaiting_slot_yes_no",
     "task_in_progress", "task_complete", "correction_target_available",
 }
 _DIALOGUE_ACTS = {

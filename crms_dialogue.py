@@ -42,6 +42,52 @@ class _WordScanner:
 
 
 _WORD_RE = _WordScanner()
+_OPEN_QUESTION_SLOT_TYPES = {
+    "unknown", "detail", "topic", "entity", "location", "party_size",
+    "date_time", "seating", "cuisine", "restaurant_choice", "confirmation",
+    "yes_no",
+}
+
+
+def infer_open_question_slot(prompt: str, answer_kind: str) -> str:
+    """Map a bounded clarification question to an inspectable slot category."""
+    text = " ".join(prompt.casefold().split())
+    if answer_kind == "yes-no":
+        if any(cue in text for cue in (
+                "to confirm", "did you say", "is that", "correct?", "right?")):
+            return "confirmation"
+        return "yes_no"
+    if any(cue in text for cue in (
+            "how many people", "how big is your party", "party size")):
+        return "party_size"
+    if any(cue in text for cue in (
+            "what time", "which time", "when would", "what day", "which day",
+            "what date", "which date")):
+        return "date_time"
+    if any(cue in text for cue in (
+            "what city", "which city", "what location", "where should",
+            "where would", "which area", "what area")):
+        return "location"
+    if any(cue in text for cue in (
+            "indoor or outdoor", "outdoor or indoor", "seating preference",
+            "what kind of seating")):
+        return "seating"
+    if any(cue in text for cue in (
+            "what cuisine", "which cuisine", "what kind of food",
+            "what type of food", "food preference")):
+        return "cuisine"
+    if any(cue in text for cue in (
+            "which restaurant", "which place", "which option", "which one")):
+        return "restaurant_choice"
+    if any(cue in text for cue in ("which entity", "known entity")):
+        return "entity"
+    if any(cue in text for cue in ("which topic", "what topic", "which subject")):
+        return "topic"
+    if answer_kind == "detail":
+        return "detail"
+    return "unknown"
+
+
 _CORRECTION_RE = re.compile(
     r"^(?:(?:no|actually)[, ]+)*(?:i meant)\s+(.+?)[.!?]*$",
     flags=re.IGNORECASE)
@@ -287,6 +333,9 @@ class CRMSDialogue:
                 context.add("awaiting_yes_no_answer")
             else:
                 context.add("awaiting_user_detail")
+            slot = self.open_dialogue_question.get("expected_slot", "unknown")
+            if slot != "unknown":
+                context.add(f"awaiting_slot_{slot}")
         if self.pending_binding is not None:
             context.update({"awaiting_user_detail", "task_in_progress"})
         if any(item.get("kind") == "confirm_statement" for item in self.offers):
@@ -1698,7 +1747,7 @@ class CRMSDialogue:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(
-            json.dumps({"format_version": 14, "last_entity": self.last_entity,
+            json.dumps({"format_version": 15, "last_entity": self.last_entity,
                         "subject_entity": self.subject_entity,
                         "object_entity": self.object_entity,
                         "last_question": self.last_question,
@@ -1731,7 +1780,7 @@ class CRMSDialogue:
              ) -> "CRMSDialogue":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
         if payload.get("format_version") not in (
-                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14):
+                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15):
             raise ValueError("unsupported dialogue-state format version")
         dialogue = cls(knowledge, intent_model=intent_model)
         pending_dialogue_slot = payload.get("pending_dialogue_slot")
@@ -1739,16 +1788,32 @@ class CRMSDialogue:
             raise ValueError("stored dialogue slot is malformed")
         dialogue.pending_dialogue_slot = pending_dialogue_slot
         open_dialogue_question = payload.get("open_dialogue_question")
+        if open_dialogue_question is not None and isinstance(open_dialogue_question, dict):
+            expected_keys = ({"prompt", "answer_kind", "expected_slot"}
+                             if payload.get("format_version") >= 15
+                             else {"prompt", "answer_kind"})
+            if set(open_dialogue_question) != expected_keys:
+                raise ValueError("stored open dialogue question is malformed")
+            if payload.get("format_version") < 15:
+                open_dialogue_question = dict(open_dialogue_question)
+                prompt = open_dialogue_question.get("prompt")
+                answer_kind = open_dialogue_question.get("answer_kind")
+                open_dialogue_question["expected_slot"] = (
+                    infer_open_question_slot(prompt, answer_kind)
+                    if isinstance(prompt, str) and isinstance(answer_kind, str)
+                    else "unknown")
         if (open_dialogue_question is not None
                 and (not isinstance(open_dialogue_question, dict)
-                     or set(open_dialogue_question) != {"prompt", "answer_kind"}
                      or not isinstance(open_dialogue_question.get("prompt"), str)
                      or not open_dialogue_question["prompt"].strip()
                      or len(open_dialogue_question["prompt"])
                      > _HISTORY_QUESTION_LIMIT
                      or not isinstance(open_dialogue_question.get("answer_kind"), str)
                      or open_dialogue_question["answer_kind"]
-                     not in {"detail", "yes-no"})):
+                     not in {"detail", "yes-no"}
+                     or not isinstance(open_dialogue_question.get("expected_slot"), str)
+                     or open_dialogue_question["expected_slot"]
+                     not in _OPEN_QUESTION_SLOT_TYPES)):
             raise ValueError("stored open dialogue question is malformed")
         dialogue.open_dialogue_question = open_dialogue_question
         active_task_intent = payload.get("active_task_intent")

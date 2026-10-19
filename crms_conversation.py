@@ -6,7 +6,8 @@ import hashlib
 import re
 from typing import Any
 
-from crms_dialogue import CRMSDialogue, DialogueTurn, UserIntentHypothesis
+from crms_dialogue import (CRMSDialogue, DialogueTurn, UserIntentHypothesis,
+                           infer_open_question_slot)
 
 
 _ACTS: tuple[tuple[str, re.Pattern[str]], ...] = (
@@ -663,6 +664,8 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             dialogue.open_dialogue_question = {
                 "prompt": turn.text.strip()[:500],
                 "answer_kind": answer_kind,
+                "expected_slot": infer_open_question_slot(
+                    turn.text.strip(), answer_kind),
             }
         turn.intent_hypothesis = intent
         dialogue.last_intent_hypothesis = intent

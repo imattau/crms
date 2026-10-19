@@ -151,6 +151,12 @@ Francisco, California.” The features are small lexical cues from the latest as
 recent user statements. This is descriptive label-consistency evidence only; it does not establish
 label correctness, held-out generalization, or improved runtime intent recognition.
 
+The follow-up implementation stores a typed expected slot on each open assistant question and
+exposes predicates such as `awaiting_slot_location` to the portable dialogue-frame matcher.
+`experiments/v1_388_open_dialogue_question_state.py` checks slot inference, persistence, migration
+from state format 14, and context-conditioned frame selection. User replies are still not extracted
+into persistent task-slot values.
+
 ## Balanced phrase recombination from three demonstrations
 
 Command: `python3 experiments/v1_354_balanced_phrase_recombination.py`
