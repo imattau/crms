@@ -453,9 +453,13 @@ choosing among sentences the gate has already accepted.
 
 **Pilot implementation status (2026-10-19).** `crms_sentence_ranker.py` provides a small,
 versioned logistic model, deterministic training, source IDs and a training-data digest, named
-feature traces, and threshold abstention. Schema v2 has 15 non-duplicated features; the earlier
+feature traces, and threshold abstention. Schema v3 has 15 non-duplicated features; the earlier
 16-feature schema contained two identical IDF-coverage features. The output is explicitly a
-monotonic logistic score, not a calibrated probability. Its public ranking path first applies the
+monotonic logistic score, not a calibrated probability. A separate manifest digest binds the
+training-data digest, source IDs, feature schema, training date and procedure, threshold, and
+resulting model parameters; record loading rejects changes that do not match the manifest. The
+candidate-relative IDF features are computed over the gate-passing candidate set. Its public
+ranking path first applies the
 unchanged quoted-evidence gate. `experiments/v1_345_sentence_ranker_pilot.py` checks those
 mechanics on a controlled fixture. The initial FTS-backed, disjoint-window SimpleWiki evaluation
 is now recorded in `benchmark_baselines.md`: the gate and ranker tied on 40 generated questions,

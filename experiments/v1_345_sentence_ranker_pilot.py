@@ -62,6 +62,23 @@ def main() -> None:
     require(record["training_source_ids"] == sorted(sources),
             "model record omitted training source provenance")
 
+    for field, value in (
+            ("training_source_ids", ["tampered-source"]),
+            ("training_method", "unrecorded-training-method"),
+            ("training_parameters", {"iterations": 1,
+                                      "learning_rate": 0.15, "l2": 0.001}),
+            ("threshold", 0.8),
+            ("weights", [0.0] * len(FEATURE_NAMES))):
+        tampered = dict(record)
+        tampered[field] = value
+        try:
+            SentenceRanker.from_dict(tampered)
+        except ValueError:
+            pass
+        else:
+            raise SystemExit(
+                f"ranker manifest accepted tampered {field}")
+
     question = "Who designed Meridian Engine 99?"
     candidates = [
         {"text": "Ada 99 designed Meridian Engine 99 after testing.",
@@ -90,12 +107,9 @@ def main() -> None:
     uncited = [{"text": candidates[0]["text"]}]
     require(not rank_candidates(question, uncited, restored),
             "ranker selected a sentence without a citation")
-    low_threshold_model = SentenceRanker(
-        restored.weights, restored.bias, 0.999999, restored.training_examples,
-        restored.positive_examples, restored.training_data_sha256,
-        restored.training_source_ids, restored.trained_on,
-        restored.training_parameters, restored.training_method,
-        restored.version)
+    low_threshold_model = fit_ranker(
+        training, training_source_ids=sources, trained_on="2026-10-19",
+        threshold=0.999999)
     _ranked, abstained = rank_gated_candidates(
         question, candidates, low_threshold_model)
     require(abstained is None,
@@ -106,7 +120,7 @@ def main() -> None:
     require(repeated == model, "training was not deterministic")
     print("sentence-ranker pilot mechanism: PASS")
     print("gate-preserving candidate set, deterministic training, source-aware "
-          "model record, feature trace, threshold abstention: PASS")
+          "manifest integrity, feature trace, threshold abstention: PASS")
     print("quality, FTS retrieval, fresh-corpus, hand-written-set, domain, and "
           "latency checks remain open; production chat remains unchanged")
 

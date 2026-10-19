@@ -17,7 +17,7 @@ from typing import Any, Iterable, Mapping, Sequence
 from crms_nl_gate import _answer_type, _question_mentions, _stem, _tokens
 
 
-VERSION = 2
+VERSION = 3
 WH_TYPES = ("WHO", "WHEN", "WHERE", "MEASURE", "COUNT", "DEF", "NAME")
 FEATURE_NAMES = (
     "idf_weighted_question_coverage",
@@ -65,6 +65,31 @@ def _typed_span(question: str, sentence: str) -> bool:
     if kind == "DEF":
         return bool(_tokens(sentence))
     return False
+
+
+def _training_manifest_digest(*, version: int, feature_names: Sequence[str],
+                              training_data_sha256: str,
+                              training_source_ids: Sequence[str],
+                              trained_on: str,
+                              training_parameters: Sequence[tuple[str, float]],
+                              training_method: str, threshold: float,
+                              weights: Sequence[float], bias: float) -> str:
+    """Bind model parameters, training provenance, and procedure in one digest."""
+    payload = {
+        "version": version,
+        "feature_names": list(feature_names),
+        "training_data_sha256": training_data_sha256,
+        "training_source_ids": list(training_source_ids),
+        "trained_on": trained_on,
+        "training_parameters": dict(training_parameters),
+        "training_method": training_method,
+        "threshold": threshold,
+        "weights": list(weights),
+        "bias": bias,
+    }
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"),
+                         allow_nan=False).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def feature_vector(question: str, candidate: Mapping[str, Any], *,
@@ -142,6 +167,7 @@ class SentenceRanker:
     training_examples: int
     positive_examples: int
     training_data_sha256: str
+    training_manifest_sha256: str
     training_source_ids: tuple[str, ...]
     trained_on: str
     training_parameters: tuple[tuple[str, float], ...]
@@ -170,6 +196,8 @@ class SentenceRanker:
             raise ValueError("trained_on must be an ISO calendar date")
         if not self.training_source_ids:
             raise ValueError("ranker training needs source provenance")
+        if tuple(sorted(set(self.training_source_ids))) != self.training_source_ids:
+            raise ValueError("training source IDs must be unique and sorted")
         if tuple(name for name, _value in self.training_parameters) != (
                 "iterations", "learning_rate", "l2"):
             raise ValueError("ranker training parameters are incomplete or unordered")
@@ -179,6 +207,16 @@ class SentenceRanker:
                 or parameter_values["learning_rate"] <= 0
                 or parameter_values["l2"] < 0):
             raise ValueError("invalid stored training parameters")
+        expected_manifest = _training_manifest_digest(
+            version=self.version, feature_names=FEATURE_NAMES,
+            training_data_sha256=self.training_data_sha256,
+            training_source_ids=self.training_source_ids,
+            trained_on=self.trained_on,
+            training_parameters=self.training_parameters,
+            training_method=self.training_method, threshold=self.threshold,
+            weights=self.weights, bias=self.bias)
+        if self.training_manifest_sha256 != expected_manifest:
+            raise ValueError("ranker training manifest digest does not match its record")
 
     def score(self, features: Sequence[float]) -> float:
         """Return the logistic score; it is not a calibrated probability."""
@@ -198,6 +236,7 @@ class SentenceRanker:
                 "training_examples": self.training_examples,
                 "positive_examples": self.positive_examples,
                 "training_data_sha256": self.training_data_sha256,
+                "training_manifest_sha256": self.training_manifest_sha256,
                 "training_source_ids": list(self.training_source_ids),
                 "trained_on": self.trained_on,
                 "training_parameters": dict(self.training_parameters),
@@ -212,6 +251,7 @@ class SentenceRanker:
                    int(value["training_examples"]),
                    int(value["positive_examples"]),
                    str(value["training_data_sha256"]),
+                   str(value["training_manifest_sha256"]),
                    tuple(str(source) for source in value["training_source_ids"]),
                    str(value["trained_on"]),
                    tuple((str(name), float(item)) for name, item in
@@ -271,12 +311,21 @@ def fit_ranker(rows: Iterable[tuple[Sequence[float], int]], *,
     digest_payload = json.dumps(
         [[list(features), label] for features, label in data],
         separators=(",", ":"), allow_nan=False).encode("utf-8")
-    return SentenceRanker(tuple(weights), bias, threshold, len(data), positives,
-                          hashlib.sha256(digest_payload).hexdigest(),
-                          tuple(sorted(set(training_source_ids))), trained_on,
-                          (("iterations", float(iterations)),
-                           ("learning_rate", float(learning_rate)),
-                           ("l2", float(l2))))
+    data_digest = hashlib.sha256(digest_payload).hexdigest()
+    sources = tuple(sorted(set(training_source_ids)))
+    parameters = (("iterations", float(iterations)),
+                  ("learning_rate", float(learning_rate)),
+                  ("l2", float(l2)))
+    weight_tuple = tuple(weights)
+    manifest_digest = _training_manifest_digest(
+        version=VERSION, feature_names=FEATURE_NAMES,
+        training_data_sha256=data_digest, training_source_ids=sources,
+        trained_on=trained_on, training_parameters=parameters,
+        training_method="deterministic-batch-logistic-gradient-v1",
+        threshold=threshold, weights=weight_tuple, bias=bias)
+    return SentenceRanker(weight_tuple, bias, threshold, len(data), positives,
+                          data_digest, manifest_digest, sources, trained_on,
+                          parameters)
 
 
 def _score_candidates(question: str,
