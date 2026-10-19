@@ -260,7 +260,13 @@ program synthesis or broad coding competence.
 The chat response now identifies whether the unsupported component is the
 list procedure or math expression, suggests a matching teaching/rephrasing
 step, and clears stale generated-code context so an explanation follow-up
-cannot describe the previous artifact.
+cannot describe the previous artifact. The diagnostic now checks each
+conjunctive list operation independently when a composed request fails: an
+unsupported middle operation is named as step 2 instead of being mislabeled as
+an unsupported first step. If each individual operation is learned but the
+exact sequence is not, it reports that the combination itself needs examples.
+This improves failure localization; it does not change which procedures are
+licensed or generated.
 
 ## Elliptical entity-switch follow-up
 

@@ -217,9 +217,19 @@ def main() -> None:
     list_gap = diagnose_list_then_math_support(
         rules, math,
         "rotate the list then apply x times x plus 3 to each value")
+    middle_gap = diagnose_list_then_math_support(
+        rules, math,
+        "sort the list then rotate the list then reverse the list then "
+        "apply x times x plus 3 to each value")
     require(math_gap is not None and "list step is supported" in math_gap
             and "math expression" in math_gap
-            and list_gap is not None and "first list step" in list_gap,
+            and list_gap is not None and "first list step" in list_gap
+            and generate_list_then_math_python(
+                rules, math,
+                "sort the list then rotate the list then reverse the list "
+                "then apply x times x plus 3 to each value") is None
+            and middle_gap is not None and "list step 2" in middle_gap
+            and "rotate the list" in middle_gap,
             "composition abstention did not identify its unsupported stage")
 
     with tempfile.TemporaryDirectory(prefix="crms-cross-domain-chat-") as folder:

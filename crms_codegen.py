@@ -857,6 +857,22 @@ def diagnose_list_then_math_support(
     list_instruction, expression = parts
     list_artifact = generate_python(model, list_instruction)
     if list_artifact is None:
+        procedure_steps = [step.strip() for step in re.split(
+            r"\s+(?:and\s+)?then\s+", list_instruction,
+            flags=re.IGNORECASE) if step.strip()]
+        if len(procedure_steps) > 1:
+            unsupported_step = next((
+                index for index, step in enumerate(procedure_steps, start=1)
+                if generate_python(model, step) is None), None)
+            if unsupported_step is not None:
+                step_text = procedure_steps[unsupported_step - 1]
+                return (f"I couldn't resolve list step {unsupported_step} "
+                        f"('{step_text}') to a supported learned procedure. "
+                        "Teach that operation with input/output examples or "
+                        "rephrase it using a procedure CRMS already knows.")
+            return ("Each list operation is supported on its own, but I "
+                    "couldn't verify this exact sequence. Teach the combined "
+                    "procedure with input/output examples or rephrase it.")
         return ("I couldn't resolve the first list step to a supported learned "
                 "procedure. Teach that operation with input/output examples "
                 "or rephrase it using a procedure CRMS already knows.")
