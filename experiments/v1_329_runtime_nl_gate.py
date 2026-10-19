@@ -15,6 +15,8 @@ PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
 from crms_nl_gate import gate_quoted_evidence  # noqa: E402
+from crms_nl_gate import gate_passing_candidates  # noqa: E402
+from crms_research import CRMSSQLiteResearchIndex, _sentence_spans  # noqa: E402
 
 
 def main() -> None:
@@ -60,6 +62,43 @@ def main() -> None:
     assert gate_quoted_evidence(
         "Who crafted Python?", created_sentence,
         licensed_predicates=licenses)["status"] == "rejected"
+    monty_python_decoy = [{
+        "text": ("Monty Python and the Holy Grail is the second movie "
+                 "made by Monty Python."),
+        "title": "Monty Python and the Holy Grail",
+    }]
+    assert gate_quoted_evidence(
+        "Who made Python?", monty_python_decoy)["status"] == "rejected"
+    assert gate_quoted_evidence(
+        "Who made Python?", [{"text": "Python was made by Guido van Rossum."}]
+    )["status"] == "accepted"
+
+    # The human-authored natural-language drive found this high-lexical-overlap
+    # decoy in the full SimpleWiki index. Keep the large-index check read-only.
+    large_index_path = PROJECT / "data" / "crms_simplewiki_research.sqlite"
+    if large_index_path.is_file():
+        large_index = CRMSSQLiteResearchIndex(large_index_path, read_only=True)
+        try:
+            question = "Who made Python?"
+            candidates = []
+            for hit in large_index.search(question, limit=12, context_chars=520):
+                for start, end in _sentence_spans(hit.snippet):
+                    sentence = hit.snippet[start:end].strip()
+                    if sentence:
+                        candidates.append({"text": sentence,
+                                           "citation": large_index.citation(hit),
+                                           "title": hit.title})
+            decoys = [row for row in candidates
+                      if "monty python and the holy grail" in
+                      row["text"].casefold()]
+            assert decoys, "full-index Monty Python decoy was not retrieved"
+            assert all(gate_quoted_evidence(question, [row])["status"]
+                       != "accepted" for row in decoys), decoys
+            assert all("monty python and the holy grail" not in
+                       row["text"].casefold()
+                       for row in gate_passing_candidates(question, candidates))
+        finally:
+            large_index.close()
 
     institute_question = (
         "At which institute did researchers study quartz field 0266?")
@@ -94,6 +133,9 @@ def main() -> None:
             "The Amazon River flows through Brazil.\n"
             "Researchers at the Meridian Institute 0266 studied quartz field 0266.\n"
             "Researcher 0303 studied quartz field 0266 in 2046.\n",
+            encoding="utf-8")
+        (docs / "monty-python.txt").write_text(
+            "Monty Python and the Holy Grail is the second movie made by Monty Python.\n",
             encoding="utf-8")
         options = []
         for name in ("knowledge", "math", "rules", "dialogue-state",
@@ -135,6 +177,7 @@ def main() -> None:
         assert "can't answer yes or no" in replies[7].casefold(), replies[7]
         assert "can't answer with 'made' yet" in replies[8].casefold(), replies[8]
         assert "created → Python" in replies[8], replies[8]
+        assert "Monty Python and the Holy Grail" not in replies[8], replies[8]
         assert "Meridian Institute 0266" in replies[9], replies[9]
         assert "multiple equally supported" not in replies[9], replies[9]
         # A rejected near match is useful context, but must remain visibly

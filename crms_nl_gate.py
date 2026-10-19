@@ -159,16 +159,38 @@ def _role_order_mismatch(question: str, sentence: str,
     relation_position = min(relation_positions)
     anchor_position = min(anchor_positions)
     if anchor_position <= relation_position:
-        lower = [word.casefold() for word in sentence_words]
-        by_positions = [i for i, word in enumerate(lower)
-                       if word == "by" and i > relation_position]
-        if active and by_positions:
+        # For an active ``Who VERB ENTITY?`` question, the entity may precede
+        # the predicate in a passive clause (``Python was created by Ada``).
+        # Do not accept any later ``by`` phrase as sufficient: in
+        # ``Monty Python ... is a movie made by Monty Python``, the queried
+        # name is part of the agent/title, not the patient of ``made``.
+        passive_pairs = []
+        if active:
+            auxiliaries = {"is", "are", "was", "were", "has", "have", "had",
+                           "be", "been", "being"}
+            lower = [word.casefold() for word in sentence_words]
+            for anchor_start in anchor_positions:
+                anchor_end = anchor_start + len(anchor_stems)
+                for predicate_start in relation_positions:
+                    if (predicate_start <= anchor_end
+                            or predicate_start - anchor_end > 5):
+                        continue
+                    between = lower[anchor_end:predicate_start]
+                    if not auxiliaries.intersection(between):
+                        continue
+                    if any(word == "by" for word in lower[predicate_start + 1:]):
+                        passive_pairs.append((anchor_start, predicate_start))
+        if active and passive_pairs:
+            _passive_anchor, passive_predicate = min(passive_pairs)
+            lower = [word.casefold() for word in sentence_words]
+            by_positions = [i for i, word in enumerate(lower)
+                            if word == "by" and i > passive_predicate]
             mention_terms = {word.casefold() for group in mentions for word in group}
             answer_after_by = [i for i, word in enumerate(sentence_words)
                                if word[:1].isupper()
                                and word.casefold() not in mention_terms
                                and word.casefold() not in {"the", "a", "an"}
-                               and i > by_positions[0]]
+                               and i > by_positions[0]] if by_positions else []
             if answer_after_by:
                 return False
         return True

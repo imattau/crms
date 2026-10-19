@@ -705,7 +705,12 @@ source sentences, then adds exact asserted sentences from the top 12 FTS hits; i
 corpus. It also runs on supported question types when the ordinary answer path abstains. A unique
 best match is quoted with its source. If candidates fail the checks or tie, CRMS abstains. Accepted
 fact answers and proof-backed inferences do not pass through this quoted-source gate. For WHO
-questions it checks basic active and `relation of X` word order, including passive `by` evidence.
+questions it checks basic active and `relation of X` word order. In passive evidence for `Who VERB
+ENTITY?`, the queried entity must occur as the patient before the predicate with a nearby
+auxiliary; an unrelated later `by` phrase no longer licenses the sentence. This rejects the
+human-reported `Who made Python?` decoy “Monty Python and the Holy Grail is the second movie made
+by Monty Python” while preserving “Python was made by Guido van Rossum.” The relation synonym is
+still unlicensed, so CRMS abstains instead of inventing equivalence.
 When the current research result carries a `licensed_predicate` expansion, the gate uses the
 source-backed relation family for overlap and FTS retrieval. An unlicensed synonym cannot activate
 that family.
@@ -716,7 +721,9 @@ when a measurement is absent, plus licensed-versus-unlicensed relation forms. It
 previously observed reversed-parent role, exact polar support, polar abstention on a wrong object,
 short-name location retrieval, and a question-anchored review proposal for `Who made Python?` when
 the source says `created`. This proposal does not treat the two verbs as equivalent: it presents
-the source relation and asks for review before teaching a rule. The `v1_327` three-set benchmark passed its wrapped-layer
+the source relation and asks for review before teaching a rule. A Monty Python sentence that
+previously passed the passive-role heuristic is now rejected, while direct and passive supported
+sentences still pass. The `v1_327` three-set benchmark passed its wrapped-layer
 invariants (zero wrong, all must-refuse items declined). Two identical runs with the live gate and
 fallback scored 41/78, 25/45 and 27/44 correct on dev, held and unseen, with zero wrong and
 corresponding abstentions. The full experimental wrapper scored 73/78, 44/45 and 42/44 with zero
