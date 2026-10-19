@@ -39,6 +39,7 @@ class ContentDialogue:
         self.source_mentions: list = []
         self.last_intent_hypothesis = None
         self.last_answered = None
+        self.pending_binding = None
         self.history: list = []
         self.calls_recorded: list = []
         self.calls: list[str] = []

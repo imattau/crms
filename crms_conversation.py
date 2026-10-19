@@ -42,6 +42,10 @@ _BARE_YES_NO_RE = re.compile(
     r"^(?:yes|yeah|yep|yup|sure|certainly|absolutely|no|nope|nah|not really)"
     r"(?:[, ]+(?:please|thanks|thank you))?[.!? ]*$",
     re.IGNORECASE)
+_OVERVIEW_RE = re.compile(
+    r"^(?:what\s+do\s+you\s+know\s+about|what\s+can\s+you\s+tell\s+me\s+about|"
+    r"tell\s+me\s+what\s+you\s+know\s+about|what\s+is\s+known\s+about)\s+"
+    r"(?P<entity>\S.*?)[?!. ]*$", re.IGNORECASE)
 _EXPLANATION_FOLLOWUP_RE = re.compile(
     r"^(?:why(?: is that)?|how do you know(?: that)?|what supports that)"
     r"[?!. ]*$", re.IGNORECASE)
@@ -236,12 +240,74 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         if turn.text:
             turn.text = "Hello. " + turn.text
         return with_intent(turn)
+    binding = dialogue.pending_binding
+    if binding is not None:
+        names = tuple(option["entity"] for option in binding["options"])
+        chosen = dialogue.select_binding(text)
+        if chosen is not None:
+            intent = UserIntentHypothesis(
+                dialogue_act="answer-clarification",
+                task_intent="resolve-ambiguity",
+                decision="selected",
+                matched_frame="pronoun-binding-selection",
+                context_predicates=("pending_pronoun_binding",),
+                alternatives=tuple(name for name in names
+                                   if name != chosen["entity"]),
+                selected_value=chosen["entity"],
+            )
+            dialogue.pending_binding = None
+            return with_intent(dialogue.turn(
+                chosen["resolved"], research_index=research_index))
+        if act in {"acknowledgement", "reaction"} or _BARE_YES_NO_RE.fullmatch(
+                text.strip()):
+            intent = UserIntentHypothesis(
+                dialogue_act="answer-clarification",
+                task_intent="resolve-ambiguity",
+                decision="ambiguous",
+                matched_frame="receipt-during-pending-binding",
+                context_predicates=("pending_pronoun_binding",),
+                alternatives=names,
+            )
+            numbered = "; ".join(f"{number}. {name}"
+                                 for number, name in enumerate(names, 1))
+            return with_intent(DialogueTurn(
+                "ambiguous", text, binding["question"],
+                text=("That does not say which one. Please choose: "
+                      f"{numbered}.")))
+        dialogue.pending_binding = None
+    if act is None:
+        overview = _OVERVIEW_RE.fullmatch(text.strip())
+        if overview is not None:
+            subject, conflict = dialogue.knowledge.resolve_about_request(text)
+            card = (None if conflict or subject is not None else
+                    dialogue.overview(overview.group("entity")))
+            if card is not None:
+                intent = UserIntentHypothesis(
+                    dialogue_act="question",
+                    task_intent="seek-information",
+                    decision="selected",
+                    matched_frame="entity-overview",
+                    context_predicates=("accepted_facts_available",),
+                    selected_value=dialogue.subject_entity,
+                )
+                return with_intent(card)
     if act is None and _EXPLANATION_FOLLOWUP_RE.fullmatch(text.strip()):
         explained = _explain_earlier_answer(dialogue, text, research_index)
         if explained is not None:
             return with_intent(explained)
     if act is None:
-        return with_intent(dialogue.turn(text, research_index=research_index))
+        turn = dialogue.turn(text, research_index=research_index)
+        if dialogue.pending_binding is not None:
+            intent = UserIntentHypothesis(
+                dialogue_act="question",
+                task_intent="seek-information",
+                decision="ambiguous",
+                matched_frame="pronoun-binding-request",
+                context_predicates=("ambiguous_pronoun_referent",),
+                alternatives=tuple(option["entity"] for option
+                                   in dialogue.pending_binding["options"]),
+            )
+        return with_intent(turn)
     if act == "acknowledgement" and dialogue.pending_result is not None:
         # A receipt such as "okay" acknowledges the request to choose, but it
         # does not itself select or close the open answer clarification.

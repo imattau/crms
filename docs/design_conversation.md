@@ -117,8 +117,16 @@ loaded model, the session history, entity names from the knowledge base or index
 words. **An act reply never asserts a fact about the world.** The current greeting, farewell and
 acknowledgement already satisfy this.
 
-Non-goals: open-ended chit-chat, personality, opinions, humour, creative generation (the bounded
-story generator is separate), and any reply whose wording is chosen to sound good.
+**Goal and its constraint.** CRMS is meant to be an LLM-class system built on a different
+architecture, not a research assistant or a lookup tool. Conversation therefore has to grow toward
+general use: open-ended chat, writing, explanation and reasoning, not only questions about loaded
+sources. The README's "not a general-purpose chatbot" describes today's coverage, not the target. What
+the architecture adds is a rule about *how* it grows: every claim stays traceable, and nothing is
+produced by a learned distribution. So the items below are things this document does not yet design,
+not things CRMS should never do: open-ended chit-chat, a consistent personality, opinions and humour,
+and broader creative generation (the bounded story generator is separate). Each would need a
+verified, auditable mechanism before it ships, and a reply whose wording is chosen only to sound good
+has none.
 
 ## 2. Architecture
 
@@ -212,13 +220,13 @@ Vocabulary follows `UserIntentHypothesis` (`dialogue_act`, `task_intent`) from t
 | acknowledgement | "ok" | asks what next, or defers to open choice | open offer | implemented |
 | affirm / deny | "yes", "no" | resolves an open offer; else asks what it answers | `offers` | partly: only during an open choice; otherwise an ambiguous hypothesis |
 | content question | "Who created Python?" | existing question path | n/a | implemented |
-| elliptical follow-up | "And Ada Lovelace?" | rebind `qud` (5.1) | `qud` | missing |
+| elliptical follow-up | "And Ada Lovelace?" | carry the last question frame to the new entity (5.1) | last question | exists (`_resolve_entity_followup`) for fact-backed answers; quoted-source answers cannot verify it |
 | elaboration | "Tell me more" | next unshown facts about the focus (5.3) | `shown`, focus entities | implemented in phase 1 for accepted facts; source-only topics still ask a question |
 | justification | "Why?" | existing explanation | `last_answered` | implemented; after a refusal it explains the earlier answer and says which |
 | challenge | "Are you sure?" | re-run with evidence | `history` | missing |
 | correction / repair | "No, I meant …" | rebind the last reference (5.4) | `history`, `salience` | only while a choice is open |
 | clarification choice | "the second one" | `_select_candidate` | pending result | implemented |
-| entity overview | "What do you know about X?" | entity card (5.8) | facts about X | missing; refuses |
+| entity overview | "What do you know about X?" | entity card (5.8) | facts about X | implemented in phase 2 for entities with accepted facts |
 | capability / meta | "What can you do?" | help text | none | implemented; status slots missing |
 | user statement | "Ada wrote the first algorithm." | confirm-and-learn (5.9) | `session_facts` | missing |
 | out of scope | "Write me a poem" | scope message | none | partly (stories, scope text) |
@@ -232,8 +240,9 @@ Vocabulary follows `UserIntentHypothesis` (`dialogue_act`, `task_intent`) from t
    labelled corpus, with usage evidence, context licence and policy approval kept separate and
    conversation-level holdouts. This document does not duplicate it. One addition worth deciding:
    whether a user may also teach a frame directly (`/teach-reply`-style examples, held-out checked,
-   shown in a review queue). The pilot corpus is task-service dialogue (restaurant booking), so a
-   user-taught route may fit a research tool better than corpus-induced greetings.
+   shown in a review queue). The pilot corpus is task-service dialogue (restaurant booking), which
+   covers greetings, repair and closing but not open-domain conversation, so it is a starting corpus
+   and not the target; a second, open-domain corpus will be needed for the stated goal.
 4. **Unclassified.** No act, no content: a closed question about what CRMS can do with the loaded
    model, never retrieval.
 
@@ -243,18 +252,22 @@ matched, so a wrong classification can be diagnosed from the hypothesis shown by
 ## 5. Moves
 
 ### 5.1 Elliptical follow-up
-Keep the question under discussion as `(relation, answer slot, bound entity)`. "And Ada Lovelace?"
-and "What about Babbage?" re-ask the same relation with the new entity bound and run the ordinary
-question path on the rewritten question. With no `qud`, or an unresolvable entity, say what is
-missing ("I don't have a previous question to apply that to"), not "name an entity already in the
-knowledge base".
+This already exists, which the first draft of this document missed. `_resolve_entity_followup`
+carries the last question frame to a named entity ("And Ada Lovelace?", "What about Babbage?") by
+substituting the entity into the previous question and accepting the result only if the knowledge base
+answers it. That is why it fails on quoted-source answers: a quoted answer cannot verify the
+substitution (the research status does not separate a real answer from a loosely related sentence,
+section 0), so the user sees "name an entity already present in the knowledge base", which is
+misleading when the entity is in the sources. A separate `qud` record is therefore not needed. What
+remains is the wording of that failure and, for quoted-source answers, offering the rewritten question
+as a numbered choice in the way section 5.5 now does for pronouns.
 
 ### 5.2 Pronouns
-As in section 3. Trace what `him` is bound to in "Who worked with him?" (the explicit-name form
-answers, so the binding is the fault), and measure the effect of kind-based filtering on the current
-candidate set. Add the section 0 pronoun cases as a regression table. Question wording that fails
-with explicit names ("Who did Ada Lovelace work with?") belongs to the inverse-relation work in the
-reasoning notes, not to this layer.
+Phase 2 did not change which entity a pronoun binds to; it changed what the user can do when it
+cannot decide (5.5). Kind-based filtering is still the way to stop `she` offering "Harvard" or "the
+first compiler" as candidates, and it needs entity kinds for source-derived names, which do not exist.
+Question wording that fails with explicit names ("Who did Ada Lovelace work with?") belongs to the
+inverse-relation work in the reasoning notes, not to this layer.
 
 ### 5.3 Elaboration
 Implemented for accepted facts (`CRMSDialogue.elaborate`). The focus is the last answer's entity and
@@ -278,8 +291,15 @@ exist; this extends them to the last answered turn.
 Extend the numbered-choice mechanism from "multiple candidate answers" to the other ambiguities
 already detected: two equally salient persons, two entities with the same surface name, and
 "multiple equally supported source sentences" (currently a plain refusal). Options are always real
-candidates from the evidence, shown with their sources, answerable by number, ordinal or name. The
-current pronoun message ("please name one and restate the question") is the form to improve.
+candidates from the evidence, shown with their sources, answerable by number, ordinal or name.
+
+Implemented in phase 2 for pronouns (`pending_binding`). When a single pronoun could mean several
+entities, the reply keeps its existing explanation and adds "Or reply with a number or a name: 1. …".
+Picking one runs the corresponding rewritten question through the ordinary path, so its answer carries
+its normal evidence label. A receipt ("ok", "yes", a reaction) repeats the choice; any other turn
+discards it. The binding is transient and not saved, and only questions with exactly one pronoun get
+options. Still to do: the same for two entities with one surface name and for "multiple equally
+supported source sentences".
 
 ### 5.6 Offers and suggestions
 After a reply CRMS may offer a next step stored in `offers` with a short expiry: "1 source claim is
@@ -294,11 +314,13 @@ suggestion. Replies name CRMS in the third person ("CRMS has …"); keep that co
 claim about feelings.
 
 ### 5.8 Entity overview
-"What do you know about X?" renders an entity card: accepted facts about X grouped by relation, each
-with its citation, then the number of source passages that mention X and an offer to elaborate. It is
-a deterministic template over stored facts, the kind of rendering `write_fact` already does for single
-facts. With no accepted facts, list candidate claims labelled as unreviewed, or say there is nothing,
-with the usual next step.
+Implemented in phase 2 (`CRMSDialogue.overview`). "What do you know about X?", "What can you tell me
+about X?" and two similar phrasings list up to five accepted facts about X, including facts where X is
+the object, each as a cited line, then how many remain; "tell me more" continues with the rest. It
+applies only when X names a single entity with accepted facts and no taught about-frame already
+matches, so unknown and source-only entities keep their existing handling. Not done: grouping by
+relation, a count of mentioning source passages, and an unreviewed-claims section for source-only
+entities.
 
 ### 5.9 Conversational teaching
 The user states something in a plain sentence; CRMS replies with what it understood and asks before
@@ -381,9 +403,11 @@ The numbering is changed from the first draft because phase 0 is largely done.
    `experiments/v1_372_conversation_history_and_elaboration.py`). Elaboration moved here from phase 2
    because `shown` needs it. Not done: `qud`, `offers`, `session_facts`, and entity kinds for
    source-derived names.
-2. **Follow-ups.** Kind-based pronoun binding, elliptical turns (needs `qud`), the entity card, and
-   elaboration for source-only topics. "Why?" surviving a refusal and elaboration over accepted facts
-   are already done.
+2. **Follow-ups.** Done on branch `conversation-phase2`: a numbered choice for an ambiguous pronoun
+   and the entity overview (checked by
+   `experiments/v1_373_conversation_binding_and_overview.py`). Elliptical turns already existed. Not
+   done: kind-based pronoun filtering, elaboration for source-only topics, and the wording of the
+   quoted-source follow-up failure.
 3. **Mixed initiative.** Clarification questions beyond numbered candidates, offers, affirm and deny,
    correction of the last answer wired to `/wrong` and `/right`.
 4. **Conversational teaching.** First a spike on the two risks in 5.9; only then the confirm-and-learn
@@ -395,13 +419,15 @@ Each phase ships with its own tests and may not lower any metric in section 7.
 
 ## 9. Out of scope
 
-Free-form generation, an open-ended persona, emotion or opinion statements, long-range discourse
-structure beyond the bounded history here, speech, and multi-user conversations.
+Not designed here yet, and needed for the stated goal of LLM-class conversation: open-ended
+generation, a persona, emotion and opinion statements, and long-range discourse structure beyond the
+bounded history. Out of scope for a different reason: speech and multi-user conversations.
 
 ## 10. Open questions for the owner
 
 1. Is a user-taught conversational frame wanted in addition to corpus-induced frames, given that the
-   pilot corpus is restaurant-booking dialogue and CRMS is a research assistant?
+   pilot corpus is restaurant-booking dialogue and the goal is open-domain, LLM-class conversation?
+   (A first draft of this document called CRMS a research assistant; that was wrong.)
 2. Should user statements default to session scope or always ask? The design asks every time at
    first, then allows a setting.
 3. Which corpus should the junk-retrieval baseline use as the standard? The academic model contains

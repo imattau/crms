@@ -117,6 +117,8 @@ _HISTORY_FIELD_LIMIT = 200
 _HISTORY_QUESTION_LIMIT = 500
 _SHOWN_LIMIT = 500
 _ELABORATION_BATCH = 3
+_OVERVIEW_BATCH = 5
+_BINDING_OPTION_LIMIT = 6
 _HISTORY_KEYS = {"act", "utterance", "status"}
 
 
@@ -180,6 +182,11 @@ class CRMSDialogue:
         self.history: list[dict[str, str]] = []
         self.last_answered: dict[str, str] | None = None
         self.shown: list[str] = []
+        # A pronoun that could mean several entities leaves its candidates
+        # here so the next turn can pick one by number or name. Transient:
+        # it is not saved, and any other turn discards it.
+        self.pending_binding: dict[str, Any] | None = None
+        self._pronoun_options: list[tuple[str, str]] = []
 
     def record_turn(self, utterance: str, act: str,
                     turn: "DialogueTurn") -> None:
@@ -288,6 +295,65 @@ class CRMSDialogue:
     def _clear_pending(self) -> None:
         self.pending_question = None
         self.pending_result = None
+        self.pending_binding = None
+
+    def select_binding(self, message: str) -> dict[str, str] | None:
+        """Return the open pronoun-binding option the message picks, if any."""
+        if self.pending_binding is None:
+            return None
+        options = self.pending_binding["options"]
+        words = [word.casefold() for word in _WORD_RE.findall(message)]
+        words = [word for word in words
+                 if word not in {"the", "a", "an", "one", "option", "answer",
+                                 "it", "is", "that", "i", "mean", "meant"}]
+        ordinals = {"first": 0, "1st": 0, "second": 1, "2nd": 1, "third": 2,
+                    "3rd": 2, "fourth": 3, "4th": 3, "last": len(options) - 1}
+        if len(words) == 1 and words[0].isdigit():
+            index = int(words[0]) - 1
+            return options[index] if 0 <= index < len(options) else None
+        if len(words) == 1 and words[0] in ordinals:
+            return options[ordinals[words[0]]]
+        for option in options:
+            name = [word.casefold() for word in _WORD_RE.findall(option["entity"])]
+            name = name[1:] if name[:1] in (["the"], ["a"], ["an"]) else name
+            if words and words == name:
+                return option
+        return None
+
+    def overview(self, phrase: str) -> "DialogueTurn | None":
+        """Summarise the accepted facts about one named entity, five at a time.
+
+        Returns ``None`` unless the phrase names a single entity that has
+        accepted facts, so every other case keeps its existing handling.
+        """
+        entity = self._canonical_entity(phrase.strip())
+        if entity is None:
+            return None
+        rows = self._facts_about([entity])
+        if not rows:
+            return None
+        keyed = [(_shown_key(fact), fact) for fact in rows]
+        self.shown = [key for key in self.shown
+                      if key not in {item for item, _ in keyed}]
+        batch = keyed[:_OVERVIEW_BATCH]
+        lines = [f"What I have accepted about {entity}:"]
+        for key, fact in batch:
+            lines.append(f"- {fact.subject} — {fact.relation} → {fact.object} "
+                         f"[{_source_label(fact.sources)}]")
+            self.shown.append(key)
+        del self.shown[:-_SHOWN_LIMIT]
+        remaining = len(keyed) - len(batch)
+        lines.append(f"{remaining} more available; say ‘tell me more’."
+                     if remaining else
+                     f"That is everything I have accepted about {entity}.")
+        self.subject_entity = entity
+        self.last_entity = entity
+        self.object_entity = None
+        self.last_question = None
+        self.last_selected_answer = None
+        question = f"What do you know about {entity}?"
+        return DialogueTurn("elaborated", question, question,
+                            text="\n".join(lines))
 
     def _select_candidate(self, message: str) -> tuple[str | None, bool]:
         if self.pending_result is None:
@@ -345,6 +411,7 @@ class CRMSDialogue:
                          ) -> tuple[str | None, str | None]:
         matches = list(_WORD_RE.finditer(question))
         known_surfaces = tuple(self._known_entity_surfaces())
+        self._pronoun_options = []
         pronouns = []
         for index, match in enumerate(matches):
             word = match.group(0).casefold()
@@ -430,6 +497,11 @@ class CRMSDialogue:
                     resolved = (resolved[:match.start()] + surface
                                 + resolved[match.end():])
                 alternatives.append((resolved, binding))
+        if len(pronouns) == 1:
+            options: dict[str, str] = {}
+            for resolved, binding in alternatives:
+                options.setdefault(binding[0], resolved)
+            self._pronoun_options = list(options.items())
 
         supported: dict[tuple[str, ...], list[tuple[str, tuple[Any, ...]]]] = {}
         seen: set[tuple[str, tuple[str, ...]]] = set()
@@ -1418,6 +1490,17 @@ class CRMSDialogue:
                     request=clarification,
                     language_evidence=[{"kind": "source_entity_candidates",
                                         "mentions": source_evidence}])
+                if len(self._pronoun_options) >= 2:
+                    options = self._pronoun_options[:_BINDING_OPTION_LIMIT]
+                    self.pending_binding = {
+                        "question": question,
+                        "options": [{"entity": entity, "resolved": resolved}
+                                    for entity, resolved in options]}
+                    numbered = "; ".join(
+                        f"{number}. {entity}"
+                        for number, (entity, _) in enumerate(options, 1))
+                    clarification = (f"{clarification} Or reply with a number or "
+                                     f"a name: {numbered}.")
             else:
                 self.clear()
                 response = QuestionResult("unknown", request=clarification)
