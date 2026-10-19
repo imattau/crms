@@ -108,6 +108,21 @@ These are invariants. A change that breaks one is wrong even if it passes tests.
 6. **Provenance preserved.** Every ledger change records its cause (event type, source ids).
 7. **Stdlib only.** No new dependencies.
 
+### Derivability is not evidence redundancy
+
+A read-only diagnostic can remove one explicit proposition temporarily, run a complete rule search,
+and report whether the proposition remains derivable. A positive result proves only that the current
+rules and remaining premises can reproduce the conclusion. It does not make the removed assertion
+or its sources redundant: the direct source may be independent corroboration, may conflict with a
+different rule path, or may be needed to revise the rule later.
+
+Therefore, never demote or discard a taught/source-backed fact merely because it has a proof without
+itself. A future compact derived view may cache the alternate proof, but it must preserve the direct
+fact, its citations, and the separate proof lineage. Any storage optimization must show that source
+support counts, conflict outcomes, citations, and correction invalidation remain equivalent before
+and after compaction. Derivability diagnostics are proposals for inspection, not permission to
+rewrite evidence.
+
 ## 1. Evidence ledger
 
 ### 1.1 Purpose
