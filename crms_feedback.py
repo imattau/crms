@@ -36,6 +36,9 @@ def _normalize_ref(row: Mapping[str, Any]) -> dict[str, Any]:
     if row.get("sources") is not None:
         normalized["sources"] = sorted({str(value)
                                          for value in row["sources"] if value})
+    for field in ("domain", "evidence_examples", "validation_cases"):
+        if row.get(field) is not None:
+            normalized[field] = row[field]
     return normalized
 
 
@@ -225,6 +228,28 @@ def collect_math_feedback_refs(result: Any) -> list[dict[str, Any]]:
     return refs
 
 
+def collect_codegen_feedback_refs(result: Any) -> list[dict[str, Any]]:
+    """Identify generated code by its provenance and recorded evidence counts."""
+    provenance_id = getattr(result, "provenance_id", None)
+    source = getattr(result, "source", None)
+    evidence_examples = getattr(result, "evidence_examples", 0)
+    validation_cases = getattr(result, "validation_cases", 0)
+    domain = getattr(result, "domain", None)
+    if (not isinstance(provenance_id, str) or not provenance_id.strip()
+            or not isinstance(source, str) or not source.strip()
+            or type(evidence_examples) is not int or evidence_examples < 1
+            or type(validation_cases) is not int or validation_cases < 1):
+        return []
+    phrases = sorted({str(value).strip()
+                      for value in (getattr(result, "evidence_phrases", ()) or ())
+                      if str(value).strip()})
+    return [{"kind": "code_artifact", "id": provenance_id,
+             "domain": str(domain or "unknown"),
+             "evidence_examples": evidence_examples,
+             "validation_cases": validation_cases,
+             "sources": phrases}]
+
+
 def render_feedback_refs(evidence_refs: Iterable[Mapping[str, Any]]) -> str:
     """Render feedback references so a user can identify the proposition used."""
     rendered = []
@@ -243,6 +268,14 @@ def render_feedback_refs(evidence_refs: Iterable[Mapping[str, Any]]) -> str:
             label = f"translation frame {item['id']}"
             if examples:
                 label += f" (aligned example ids: {examples})"
+            rendered.append(label)
+        elif item.get("kind") == "code_artifact":
+            label = (f"generated code {item['id']} ({item.get('domain', 'unknown')}; "
+                     f"{item.get('evidence_examples', 0)} evidence examples; "
+                     f"{item.get('validation_cases', 0)} validation cases)")
+            phrases = ", ".join(item.get("sources", ()))
+            if phrases:
+                label += f" (instruction evidence: {phrases})"
             rendered.append(label)
         else:
             rendered.append(f"{item['kind']}={item['id']}")

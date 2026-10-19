@@ -51,11 +51,12 @@ now persists in SQLite across chat restarts, including its evidence references; 
 migrates without discarding its event history. A new natural-language turn clears that target, and
 opposite post-restart signals remain a reviewable conflict.
 `experiments/v1_367_persistent_feedback_context.py` checks those behaviors. Remaining work includes
-attaching feedback to completed translation and math routes. Translation feedback fingerprints the
-aligned frame and examples; math feedback fingerprints the expression, exact result, and licensed
-operator/number/unit evidence. These identify the model evidence without turning feedback into a
-new training example. Other specialized answer routes still need coverage. Remaining work also
-includes connecting `/right` to evidence-ledger confirmation and measuring
+attaching feedback to completed translation, math, and code-generation routes. Translation feedback
+fingerprints the aligned frame and examples; math feedback fingerprints the expression, exact
+result, and licensed operator/number/unit evidence; code feedback identifies the generated artifact
+and its recorded instruction examples and parity cases. These identify the model evidence without
+turning feedback into a new training example or proof of correctness. Other specialized answer
+routes still need coverage. Remaining work also includes connecting `/right` to evidence-ledger confirmation and measuring
 revision/abstention on a larger noisy-feedback benchmark. Direct-fact feedback stores the structured proposition and its supporting
 source ids; `/feedback` displays numbered propositions and citations, and
 `/retract-feedback FEEDBACK|FACT|SOURCE` retracts only the selected source support. A wrong signal

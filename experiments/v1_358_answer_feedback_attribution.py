@@ -17,12 +17,15 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from crms_feedback import (
-    AnswerFeedbackStore, collect_feedback_refs,
+    AnswerFeedbackStore, collect_codegen_feedback_refs,
+    collect_feedback_refs,
     collect_math_feedback_refs, collect_translation_feedback_refs,
     feedback_answer_id, render_feedback_refs,
 )
 from crms_knowledge import CRMSKnowledgeBase
 from crms_math import CRMSMath
+from crms_model import CRMSModel
+from crms_codegen import generate_python
 from crms_translation import CRMSTranslation
 
 
@@ -89,6 +92,24 @@ def main() -> None:
     require(collect_math_feedback_refs(SimpleNamespace(
                 status="unknown", value=None, expression=None)) == [],
             "unknown math output was offered as answer feedback")
+
+    code_model = CRMSModel(max_composition_depth=1, max_workers=1)
+    require(code_model.teach(
+                "reverse the list",
+                [([1, 2, 3], [3, 2, 1]), ([4, -1, 7], [7, -1, 4])]
+            ).status == "learned", "code feedback fixture did not learn")
+    code_artifact = generate_python(code_model, "reverse the list")
+    code_refs = collect_codegen_feedback_refs(code_artifact)
+    require(len(code_refs) == 1
+            and code_refs[0]["kind"] == "code_artifact"
+            and code_refs[0]["id"] == code_artifact.provenance_id
+            and code_refs[0]["evidence_examples"] >= 2
+            and code_refs[0]["validation_cases"] >= 2,
+            f"code feedback did not retain artifact provenance: {code_refs}")
+    require("instruction evidence:" in render_feedback_refs(code_refs),
+            "code feedback hid its instruction evidence")
+    require(collect_codegen_feedback_refs(None) == [],
+            "missing code artifact was offered as feedback evidence")
     fact_ref = next((item for item in refs if item["kind"] == "fact"), None)
     require(fact_ref is not None
             and fact_ref["subject"] == "Ada"
@@ -314,11 +335,38 @@ def main() -> None:
                         for item in events[0]["evidence"]),
                 f"math feedback lost its derivation attribution: {events}")
 
+    with tempfile.TemporaryDirectory(prefix="crms-code-feedback-chat-") as directory:
+        root = Path(directory)
+        code_model.save(root / "rules.json")
+        args = [sys.executable, str(ROOT / "crms_chat.py"),
+                "--knowledge", str(root / "knowledge.json"),
+                "--feedback-db", str(root / "feedback.sqlite3"),
+                "--dialogue-state", str(root / "dialogue.json"),
+                "--rules", str(root / "rules.json"),
+                "--rule-session", str(root / "rule-session.json"),
+                "--math", str(root / "math.json"),
+                "--math-session", str(root / "math-session.json"),
+                "--translations", str(root / "translations.json"),
+                "--translation-session", str(root / "translation-session.json")]
+        run = subprocess.run(
+            args,
+            input=("Can you write Python code to reverse the list?\n"
+                   "/wrong\n/feedback\n/quit\n"),
+            text=True, capture_output=True, timeout=30)
+        require(run.returncode == 0, run.stderr or run.stdout)
+        events = AnswerFeedbackStore(root / "feedback.sqlite3").recent(1)
+        require(len(events) == 1
+                and any(item["kind"] == "code_artifact"
+                        for item in events[0]["evidence"]),
+                f"code correction lost its generated-artifact attribution: {events}")
+
     print("answer feedback attribution: direct facts, rule, and source refs PASS")
     print("translation feedback ties to deterministic aligned-frame evidence: PASS")
     print("interactive translation feedback persists its frame attribution: PASS")
     print("math feedback ties to deterministic expression and licensed evidence: PASS")
     print("interactive math feedback persists its derivation attribution: PASS")
+    print("code feedback ties to artifact provenance and parity evidence: PASS")
+    print("interactive code feedback persists artifact attribution: PASS")
     print("SQLite persistence, deterministic IDs, duplicate suppression: PASS")
     print("conflicting feedback retained for review without changing knowledge: PASS")
     print("wrong proof feedback suspends only validated learned rules: PASS")

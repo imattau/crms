@@ -15,6 +15,7 @@ from crms_dialogue import CRMSDialogue
 from crms_conversation import is_farewell, respond as respond_conversation
 from crms_feedback import (
     AnswerFeedbackStore, collect_feedback_refs,
+    collect_codegen_feedback_refs,
     collect_math_feedback_refs,
     collect_translation_feedback_refs, render_feedback_refs,
 )
@@ -8760,7 +8761,13 @@ def main() -> int:
                 last_generated_code = generated_code
             else:
                 last_generated_code = None
-            print(f"CRMS> {render_codegen(generated_code, code_instruction)}")
+            code_text = render_codegen(generated_code, code_instruction)
+            print(f"CRMS> {code_text}")
+            code_refs = collect_codegen_feedback_refs(generated_code)
+            remember_feedback(
+                {"question": line, "answer": code_text,
+                 "evidence": code_refs}
+                if code_refs else None)
             continue
         latest_topic = _natural_latest_research_request(line)
         if latest_topic is not None:
