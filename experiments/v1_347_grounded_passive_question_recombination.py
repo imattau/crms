@@ -44,28 +44,28 @@ def main() -> None:
         ("created", "created", "Engine"),
         ("designed", "designed", "Compiler"),
     ]
-    expected_transforms = []
     for relation, verb, entity_prefix in relations:
         examples = add_examples(kb, relation, verb, entity_prefix)
         subject, obj, heldout_source = examples[-1]
         active = kb.ask(f"Who {verb} {obj}?")
-        passive = kb.ask(f"{obj} was {verb} by whom?")
-        transform = next((item for item in passive.language_evidence or []
-                          if item.get("kind")
-                          == "active_to_passive_subject_question_frame"), None)
         require(active.status == "answered" and active.answer == subject,
                 f"active frame stopped answering for {relation}: {active}")
-        require(passive.status == "answered" and passive.answer == subject,
-                f"passive question did not recombine for {relation}: {passive}")
-        require(any(heldout_source in fact.get("sources", ())
-                    for fact in passive.evidence or ()),
-                f"passive answer lost held-out fact evidence: {passive}")
-        require(transform is not None and transform["predicate"] == verb
-                and all(heldout_source not in row["sources"]
-                        for row in transform["supporting_examples"]),
-                f"passive transformation trace was missing or leaked held-out data: {passive}")
-        expected_transforms.append(transform)
-
+        passive_questions = (f"{obj} was {verb} by whom?",
+                             f"Who was {obj} {verb} by?")
+        for passive_question in passive_questions:
+            passive = kb.ask(passive_question)
+            transform = next((item for item in passive.language_evidence or []
+                              if item.get("kind")
+                              == "active_to_passive_subject_question_frame"), None)
+            require(passive.status == "answered" and passive.answer == subject,
+                    f"passive question did not recombine for {relation}: {passive}")
+            require(any(heldout_source in fact.get("sources", ())
+                        for fact in passive.evidence or ()),
+                    f"passive answer lost held-out fact evidence: {passive}")
+            require(transform is not None and transform["predicate"] == verb
+                    and all(heldout_source not in row["sources"]
+                            for row in transform["supporting_examples"]),
+                    f"passive transformation trace was missing or leaked held-out data: {passive}")
         require(kb.ask(f"{obj} {verb} by whom?").status != "answered",
                 f"passive transform accepted a missing auxiliary for {relation}")
         require(kb.ask(f"{obj} was crafted by whom?").status != "answered",
@@ -88,7 +88,8 @@ def main() -> None:
     examples = add_examples(conflict, "created", "created", "Device")
     subject, obj, _source = examples[-1]
     conflict.add_negative_fact(subject, "created", obj, "review:negative")
-    for wording in (f"Who created {obj}?", f"{obj} was created by whom?"):
+    for wording in (f"Who created {obj}?", f"{obj} was created by whom?",
+                    f"Who was {obj} created by?"):
         result = conflict.ask(wording)
         require(result.status == "ambiguous"
                 and {row.get("polarity") for row in result.evidence or []}
@@ -100,12 +101,14 @@ def main() -> None:
             path = Path(folder) / f"knowledge{suffix}"
             kb.save(path)
             restored = CRMSKnowledgeBase.load(path)
-            result = restored.ask("Engine Three was created by whom?")
-            require(result.status == "answered" and result.answer == "Mira Sen"
-                    and any(item.get("kind")
-                            == "active_to_passive_subject_question_frame"
-                            for item in result.language_evidence or []),
-                    f"voice recombination was lost after {suffix} save/load")
+            for question in ("Engine Three was created by whom?",
+                             "Who was Engine Three created by?"):
+                result = restored.ask(question)
+                require(result.status == "answered" and result.answer == "Mira Sen"
+                        and any(item.get("kind")
+                                == "active_to_passive_subject_question_frame"
+                                for item in result.language_evidence or []),
+                        f"voice recombination was lost after {suffix} save/load")
             restored.close()
 
             conflict_path = Path(folder) / f"conflict{suffix}"
@@ -120,7 +123,8 @@ def main() -> None:
             restored_conflict.close()
 
     print("grounded active/passive question recombination: PASS")
-    print("regular -ed predicates: created, designed; held-out fact cited; "
+    print("regular -ed predicates: created, designed; both passive question orders; "
+          "held-out fact cited; "
           "training lineage retained")
     print("one-example, missing-auxiliary, unsupported-predicate, role-swap, "
           "explicit-negative, JSON, and SQLite controls: PASS")

@@ -3821,6 +3821,7 @@ class CRMSKnowledgeBase:
             for verb in passive_verbs:
                 if len(verb) > 3 and verb.endswith("ed"):
                     variants.add(((), ("was", verb, "by", "whom")))
+                    variants.add((("who", "was"), (verb, "by")))
         return variants
 
     def _is_grounded_progressive_question(
@@ -12653,11 +12654,17 @@ class CRMSKnowledgeBase:
                         transform, sort_keys=True, ensure_ascii=False)] = transform
                 if (answer_field == "subject" and len(prefix) == 2
                         and prefix[0] == "who" and not suffix
-                        and not frame_prefix and len(frame_suffix) == 4
-                        and frame_suffix[0] == "was"
-                        and frame_suffix[2:] == ("by", "whom")
-                        and frame_suffix[1].endswith("ed")):
-                    passive_verb = frame_suffix[1]
+                        and (
+                            (not frame_prefix and len(frame_suffix) == 4
+                             and frame_suffix[0] == "was"
+                             and frame_suffix[2:] == ("by", "whom"))
+                            or (frame_prefix == ("who", "was")
+                                and len(frame_suffix) == 2
+                                and frame_suffix[1] == "by"))):
+                    passive_verb = (frame_suffix[1] if not frame_prefix
+                                    else frame_suffix[0])
+                    if not passive_verb.endswith("ed"):
+                        continue
                     supporting_examples = []
                     for example_words in entities:
                         example_entity = _tokens(" ".join(example_words))
@@ -12677,8 +12684,10 @@ class CRMSKnowledgeBase:
                         "predicate": passive_verb,
                         "licensed_frame": " ".join(
                             prefix + ("{object}",) + suffix),
-                        "derived_frame": "{object} was " + passive_verb
-                                         + " by whom",
+                        "derived_frame": (
+                            "{object} was " + passive_verb + " by whom"
+                            if not frame_prefix else
+                            "Who was {object} " + passive_verb + " by"),
                         "supporting_examples": supporting_examples,
                     }
                     matched_frame_transformations[json.dumps(

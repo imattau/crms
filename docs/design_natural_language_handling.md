@@ -562,7 +562,8 @@ with the unique vocabulary word at edit distance 1 (including transposition) and
 correction** to the user. Typo alone added 4 correct on dev and 4 on held.
 
 Question-frame learning also supports a narrower, evidence-backed active-to-passive recombination:
-two varied examples of `Who created X?` can license `X was created by whom?` for a held-out object.
+two varied examples of `Who created X?` can license both `X was created by whom?` and
+`Who was X created by?` for a held-out object.
 Only the same single-token regular `-ed` predicate is transformed; the answer still comes from a
 separately stored fact, and the trace retains the frame-training sources. Unsupported verbs,
 missing auxiliaries, role swaps, and one-example frames abstain. If matching positive and negative
