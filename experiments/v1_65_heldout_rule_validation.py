@@ -94,6 +94,40 @@ def main() -> None:
             != ("holdout:one",)):
         raise SystemExit("two sections of one source counted as independent validation")
 
+    revised_kb = seed()
+    revised = revised_kb.accept_inference_rule_candidate(
+        1, "parent-transitivity", "holdout:")
+    if not revised.accepted:
+        raise SystemExit(f"valid rule was not accepted for revision test: {revised}")
+    practiced = revised_kb.practice_relation("Nia", "ancestor", "Pia")
+    if (practiced.status != "answered"
+            or revised_kb.retrieve_derived_case(
+                "Nia", "ancestor", "Pia", record_use=False) is None):
+        raise SystemExit("validated rule result was not practiced as a derived case")
+    revised_kb.add_negative_fact(
+        "Nia", "ancestor", "Pia", "revision:explicit-negative")
+    contradicted = revised_kb.infer_relation("Nia", "ancestor", "Pia")
+    if contradicted.status != "ambiguous":
+        raise SystemExit(
+            f"new counterevidence did not conflict with accepted rule: {contradicted}")
+    if revised_kb.retrieve_derived_case(
+            "Nia", "ancestor", "Pia", record_use=False) is not None:
+        raise SystemExit("contradicted derived case remained retrievable")
+    if revised_kb.practice_relation(
+            "Nia", "ancestor", "Pia").status != "ambiguous":
+        raise SystemExit("practice wrote back a rule result after contradiction")
+
+    with tempfile.TemporaryDirectory() as folder:
+        path = Path(folder) / "revised.sqlite"
+        revised_kb.save(path)
+        restored = CRMSKnowledgeBase.load(path)
+        restored_result = restored.infer_relation("Nia", "ancestor", "Pia")
+        if (restored_result.status != "ambiguous"
+                or restored.retrieve_derived_case(
+                    "Nia", "ancestor", "Pia", record_use=False) is not None):
+            raise SystemExit("rule conflict or derived-case invalidation changed after reload")
+        restored.close()
+
     with tempfile.TemporaryDirectory() as folder:
         root = Path(folder)
         knowledge_path = root / "knowledge.json"
@@ -133,7 +167,9 @@ def main() -> None:
         if loaded.infer_relation("Nia", "ancestor", "Pia").status != "answered":
             raise SystemExit("accepted rule did not remain usable after reload")
     print("held-out rule validation diagnostic: PASS")
-    print("disjoint source split, positive validation, counterexample rejection, support threshold, CLI acceptance and persistence: PASS")
+    print("disjoint source split, counterexample rejection, explicit acceptance, "
+          "post-acceptance contradiction, derived-case invalidation, "
+          "SQLite persistence, and CLI use: PASS")
 
 
 if __name__ == "__main__":

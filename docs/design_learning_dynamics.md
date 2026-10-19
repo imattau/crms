@@ -11,7 +11,10 @@ their throwaway code (`ledger.py`, `exp_belief*.py`, `gap_followup.py`, `dream2.
 imported. Separately, explicit `practice_relation` and `practice_question` can write a complete,
 independently reverified proof to bounded derived-case storage; ordinary `ask()` stays read-only.
 The `practice_question` retained flag is true only when the case can be retrieved and revalidated,
-so a zero storage cap cannot be reported as learning.
+so a zero storage cap cannot be reported as learning. `experiments/v1_65_heldout_rule_validation.py`
+also checks the learning loop after acceptance: adding an explicit negative fact makes the rule
+query ambiguous, invalidates the practiced case for retrieval, and preserves that behavior after
+SQLite reload.
 **Origin:** ideas reviewed from the HPM Learning Agent repo (belief weights, demand-driven
 learning, "dreaming"), re-expressed without vectors.
 
