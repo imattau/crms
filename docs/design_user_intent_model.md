@@ -48,7 +48,10 @@ assistant clarification prompt is retained as a bounded QUD with a `detail` or `
 and an expected-slot type such as `location`, `party_size`, `date_time`, `seating`, or `cuisine`.
 Typed slots are exposed to portable intent frames through predicates such as
 `awaiting_slot_location`; format 14 QUD state migrates by deriving its slot from the saved prompt.
-A short reply is interpreted against that question and recorded in the intent trace. For the
+A short reply is interpreted against that question and recorded in the intent trace. If the question
+asks for a detail but the user answers only “yes” or “no”, CRMS preserves the open question and asks
+for the requested detail again instead of treating the token as a social acknowledgement or clearing
+the context. For the
 bounded task slots (location, party size, date/time, seating, cuisine, and restaurant choice), its
 user-provided value and the prompting question are retained in session state, displayed by `/intent`,
 and kept out of factual knowledge. Direct questions such as “What time did I give you?” can recall

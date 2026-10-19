@@ -75,6 +75,16 @@ def main() -> None:
         "expected_slot": "date_time"}
     require("awaiting_slot_date_time" in detail.intent_context()[0],
             "expected date/time slot was not exposed as contextual intent")
+    yes_to_detail = respond(detail, "yes")
+    require(yes_to_detail.status == "clarify"
+            and yes_to_detail.intent_hypothesis is not None
+            and yes_to_detail.intent_hypothesis.decision == "ambiguous"
+            and yes_to_detail.intent_hypothesis.matched_frame
+            == "yes-no-response-to-detail-question"
+            and "date or time" in yes_to_detail.text
+            and detail.open_dialogue_question is not None
+            and not detail.session_slots,
+            "a bare yes erased the context of an open detail question")
     detail_answer = respond(detail, "7 pm")
     require(detail_answer.intent_hypothesis is not None
             and detail_answer.intent_hypothesis.matched_frame

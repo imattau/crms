@@ -585,6 +585,20 @@ def classify_user_intent(
                              is not None)
         social_act = classify_act(text)
         expected_yes_no = open_question["answer_kind"] == "yes-no"
+        if is_yes_no and not expected_yes_no:
+            slot = open_question.get("expected_slot", "detail")
+            label = _SESSION_SLOT_LABELS.get(slot, "requested detail")
+            return UserIntentHypothesis(
+                dialogue_act="answer-clarification",
+                task_intent="resolve-ambiguity",
+                decision="ambiguous",
+                matched_frame="yes-no-response-to-detail-question",
+                context_predicates=("pending_assistant_question",
+                                    "awaiting_user_detail",
+                                    f"awaiting_slot_{slot}"),
+                alternatives=(f"provide the requested {label}",
+                             "ask a yes/no question"),
+            )
         is_short_detail = (
             not expected_yes_no and not is_yes_no and not is_fresh_question
             and "?" not in text
@@ -735,6 +749,7 @@ def respond(dialogue: CRMSDialogue, text: str, *,
     preserves_question = bool(
         intent is not None and (
             intent.matched_frame == "elaboration-topic-slot"
+            or intent.matched_frame == "yes-no-response-to-detail-question"
             or (intent.decision == "selected"
                 and intent.dialogue_act == "answer-clarification")))
     if dialogue.open_dialogue_question is not None and not preserves_question:
@@ -752,6 +767,7 @@ def respond(dialogue: CRMSDialogue, text: str, *,
                 intent.selected_value or "", user_turn=text)
             dialogue.open_dialogue_question = None
         elif (turn.status == "clarify" and turn.text.rstrip().endswith("?")
+              and dialogue.open_dialogue_question is None
               and not dialogue.offers and dialogue.pending_result is None
               and dialogue.pending_binding is None):
             answer_kind = ("yes-no" if _YES_NO_QUESTION_RE.fullmatch(
@@ -882,6 +898,17 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             "social", text, text,
             text=(f"Got it: {value}. I’ll treat that as your reply to my "
                   f"question: {prompt}")))
+
+    if (intent is not None
+            and intent.matched_frame == "yes-no-response-to-detail-question"
+            and dialogue.open_dialogue_question is not None):
+        question = dialogue.open_dialogue_question
+        slot = question.get("expected_slot", "detail")
+        label = _SESSION_SLOT_LABELS.get(slot, "requested detail")
+        return with_intent(DialogueTurn(
+            "clarify", text, question.get("prompt", ""),
+            text=(f"I was asking for the {label}. "
+                  f"{question.get('prompt', 'What detail should I use?')}")))
 
     mixed_greeting = _MIXED_GREETING_RE.fullmatch(text.strip())
     if mixed_greeting is not None:
