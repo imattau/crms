@@ -63,6 +63,26 @@ NEGATED_REVERSE_SOURCE = (
     "https://example.invalid/negative-reverse-fixture",
     "Do not reverse the order of elements; preserve their original order.",
 )
+MENTIONED_SORT_SOURCE = (
+    "mentioned-sort-phrase", "Controlled metalinguistic sort near miss",
+    "https://example.invalid/mentioned-sort-fixture",
+    "The note mentions the phrase 'sort values ascending', but gives no sorting instruction.",
+)
+MENTIONED_REVERSE_SOURCE = (
+    "mentioned-reverse-phrase", "Controlled metalinguistic reverse near miss",
+    "https://example.invalid/mentioned-reverse-fixture",
+    "The phrase 'reverse the order of elements' is a label here, not a requested operation.",
+)
+UNRELATED_SORT_SOURCE = (
+    "unrelated-sort-text", "Controlled unrelated sort passage",
+    "https://example.invalid/unrelated-sort-fixture",
+    "A table contains values from several experiments and reports their means.",
+)
+UNRELATED_REVERSE_SOURCE = (
+    "unrelated-reverse-text", "Controlled unrelated reverse passage",
+    "https://example.invalid/unrelated-reverse-fixture",
+    "A sequence of measurements is shown with its original order preserved.",
+)
 TRAINING_PAIR = ([5, 2, 3, 1, 4], [1, 2, 3, 4, 5])
 REVERSE_PAIR = ([1, 3, 5, 7, 9], [9, 7, 5, 3, 1])
 REVIEW_CONTRASTS = (
@@ -129,6 +149,12 @@ def phrase_is_directly_negated(text: str, phrase: str) -> bool:
     return re.search(pattern, text, flags=re.IGNORECASE) is not None
 
 
+def phrase_starts_instruction(text: str, phrase: str) -> bool:
+    """Require the cited sentence to state the operation, not mention it."""
+    pattern = r"^\s*(?:please\s+)?" + re.escape(phrase) + r"\b"
+    return re.match(pattern, text, flags=re.IGNORECASE) is not None
+
+
 def propose_sort_phrase(index: CRMSResearchIndex,
                         prose_source_id: str = PANDAS_SOURCE[0]
                         ) -> RulePhraseCandidate | None:
@@ -141,6 +167,8 @@ def propose_sort_phrase(index: CRMSResearchIndex,
     code = index.resolve_citation(index.citation(code_hit))
     normalized = " ".join(prose.casefold().split())
     if "sort values ascending" not in normalized:
+        return None
+    if not phrase_starts_instruction(prose, "sort values ascending"):
         return None
     if phrase_is_directly_negated(prose, "sort values ascending"):
         return None
@@ -181,6 +209,8 @@ def propose_reverse_phrase(index: CRMSResearchIndex,
     code = index.resolve_citation(index.citation(code_hit))
     phrase = "reverse the order of elements"
     if phrase not in " ".join(prose.casefold().split()):
+        return None
+    if not phrase_starts_instruction(prose, phrase):
         return None
     if phrase_is_directly_negated(prose, phrase):
         return None
@@ -426,6 +456,30 @@ def main() -> None:
             negative_reverse_index, NEGATED_REVERSE_SOURCE[0]) is None,
                 "negated reverse wording produced a positive source proposal")
 
+        # A source that merely quotes the phrase is not an instruction mapping;
+        # unrelated prose should also abstain. Keep the examples explicit and
+        # report the size of this deliberately small controlled negative set.
+        negative_controls = (
+            (PYTHON_SOURCE, MENTIONED_SORT_SOURCE,
+             lambda idx: propose_sort_phrase(idx, MENTIONED_SORT_SOURCE[0]),
+             "mentioned sort phrase"),
+            (PYTHON_SOURCE, UNRELATED_SORT_SOURCE,
+             lambda idx: propose_sort_phrase(idx, UNRELATED_SORT_SOURCE[0]),
+             "unrelated sort text"),
+            (PYTHON_REVERSE_SOURCE, MENTIONED_REVERSE_SOURCE,
+             lambda idx: propose_reverse_phrase(idx, MENTIONED_REVERSE_SOURCE[0]),
+             "mentioned reverse phrase"),
+            (PYTHON_REVERSE_SOURCE, UNRELATED_REVERSE_SOURCE,
+             lambda idx: propose_reverse_phrase(idx, UNRELATED_REVERSE_SOURCE[0]),
+             "unrelated reverse text"),
+        )
+        for code_source, prose_source, proposer, label in negative_controls:
+            control_index = CRMSResearchIndex()
+            for document_id, title, location, text in (code_source, prose_source):
+                control_index.add_document(document_id, title, text, location)
+            require(proposer(control_index) is None,
+                    f"{label} produced a positive source proposal")
+
         # Bad code output cannot enter the candidate, even when its prose cue is
         # identical. A single source cannot pass the independent-origin gate.
         bad_index = CRMSResearchIndex()
@@ -455,7 +509,9 @@ def main() -> None:
     print("two-origin prose/code evidence proposed a phrase mapping: PASS")
     print("proposal remained review-only and preserved exact citations: PASS")
     print("reviewed rule learned, persisted, and passed three held-out lists: PASS")
-    print("descending, negated, tampered, and single-origin controls rejected: PASS")
+    print("descending, negated, mentioned-phrase, unrelated, tampered, and "
+          "single-origin controls rejected: PASS")
+    print("controlled source-text controls: 0 false candidates in 7 cases")
     print("limitation: phrase and source association used a bounded cue rule; Codex reviewed before teaching")
 
 

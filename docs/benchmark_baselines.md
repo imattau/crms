@@ -1770,14 +1770,16 @@ and seven Codex-labeled examples before the procedure learner finds a unique
 fit. Accepted rules persist the code citation, phrase citation, and reviewer
 label. Each passes three held-out numeric lists. Direction controls keep
 descending wording unsupported by the ascending rule and reject descending
-prose as support for that candidate. Directly negated sort and reverse phrases
-are rejected in controlled near-miss fixtures. A tampered code/output pair and
-two documents assigned to the same source origin do not produce a valid sort
-proposal.
+prose as support for that candidate. A sentence-initial operation cue rejects
+metalinguistic phrase mentions, while descending, directly negated, and
+unrelated source-text controls produce 0 false proposals in 7 cases. A
+tampered code/output pair and two documents assigned to the same source origin
+do not produce a valid sort proposal.
 
 Runtime result: `v1_436` passed; the adjacent `v1_431`, `v1_433`, and `v1_434`
-also passed in the same run (4/4). Negation handling is a small prefix-window
-check tested against two controlled examples; it does not cover broader scope,
+also passed in the same run (4/4). These seven controls are synthetic and
+hand-selected, so 0/7 is a regression result, not an estimate of field
+precision. The lead-cue and negation checks do not cover broader scope,
 contrastive wording, or paraphrased negation. This is still a cue-based
 experiment with explicit human review and substantial labeler effort for
 reverse. It does not establish autonomous phrase induction, general language
