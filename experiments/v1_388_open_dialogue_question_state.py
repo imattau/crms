@@ -52,7 +52,7 @@ def main() -> None:
         state_path = Path(folder) / "dialogue.json"
         dialogue.save(str(state_path))
         saved = json.loads(state_path.read_text(encoding="utf-8"))
-        require(saved["format_version"] == 20
+        require(saved["format_version"] == 21
                 and saved["open_dialogue_question"]["prompt"] == original_prompt,
                 "typed open question was not persisted in state format 20")
         restored = CRMSDialogue.load(kb, str(state_path))
