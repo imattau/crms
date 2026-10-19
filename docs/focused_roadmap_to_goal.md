@@ -428,11 +428,12 @@ standalone corpus scan:
    do not leak Colosseum/Eiffel evidence, `why?` follows the latest answer,
    and history updates across abstention. Citation-local paragraph grounding
    now connects explicit “Eiffel Tower” questions to “the tower” and keeps the
-   requested entity as the follow-up topic. The remaining transcript gaps are
-   recovery to an indexed entity after an unrelated abstention and possessive
-   resolution such as “What is its capital?” after a reviewed source answer.
-   Extend the multi-turn test with save/reload and a negative case that tries
-   to transfer an antecedent across paragraphs.
+   requested entity as the follow-up topic. The remaining transcript gap is
+   recovery to an indexed entity after an unrelated abstention. Source-only
+   possessives now reuse the explicit topic and return review-pending evidence
+   through normal retrieval; they do not turn it into an accepted fact. Extend
+   the multi-turn test with save/reload and a negative case that tries to
+   transfer an antecedent across paragraphs.
 2. **Advance recombination and self-learning rule transfer.** Use ordinary chat to
    test a genuinely unseen composition from learned components, plus a
    contrastive near-miss and missing-step case. Verify the result with an

@@ -99,12 +99,23 @@ def main() -> None:
             and designed.resolved_question == "Who designed Eiffel Tower?"
             and "designed and built by Gustave Eiffel" in designed.text,
             f"follow-up pronoun drifted from the explicitly named tower: {designed!r}")
+    possessive = turns[22]
+    require(possessive.status == "needs_review"
+            and possessive.resolved_question == "What is the capital of Italy?"
+            and "Rome is the capital of Italy" in possessive.text
+            and "Paris" not in possessive.text
+            and possessive.research is not None
+            and possessive.research.source_sentences,
+            f"source-only possessive follow-up lost or misbound Italy: {possessive!r}")
+    cited = possessive.research.source_sentences[0]
+    require(index.resolve_citation(cited["citation"]) == cited["text"],
+            "source-only possessive answer has an inexact citation")
     require("80 CE" not in turns[29].text and "1889" not in turns[29].text,
             "final why? reused stale evidence after an out-of-scope turn")
 
     # Coverage is deliberately reported separately: the experiment must not
     # turn honest abstentions into apparent passes.
-    weak_coverage = [number for number in (18, 19, 20, 23)
+    weak_coverage = [number for number in (18, 19, 20)
                      if turns[number - 1].status in {"unknown", "clarify"}]
     print("multi-turn transcript: 30 turns, no crash")
     print("topic switch and Colosseum follow-ups: grounded, no cross-topic leak")
@@ -112,7 +123,7 @@ def main() -> None:
     print("unanswered/clarification turns:", ", ".join(
         f"{n}:{turns[n - 1].status}" for n in weak_coverage) or "none")
     print("coverage gaps to track:")
-    for number in (18, 19, 20, 23):
+    for number in (18, 19, 20):
         turn = turns[number - 1]
         print(f"  {number}. {TRANSCRIPT[number - 1]} [{turn.status}]")
 

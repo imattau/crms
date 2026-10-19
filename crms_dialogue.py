@@ -1733,8 +1733,9 @@ class CRMSDialogue:
         if auxiliary in {"'s", "’s"}:
             auxiliary = "is"
         property_phrase = match.group("property").strip()
-        entities = sorted({entity for entity in
-                           (self.subject_entity, self.object_entity) if entity})
+        entities = ([self.topic_entity] if self.topic_entity else
+                    sorted({entity for entity in
+                            (self.subject_entity, self.object_entity) if entity}))
         supported: dict[str, tuple[str, QuestionResult, ResearchResult | None, str]] = {}
         for entity in entities:
             resolved_question = (
@@ -1757,6 +1758,15 @@ class CRMSDialogue:
             self.last_writing_request = None
             return DialogueTurn("answered", message, resolved_question,
                                 response=response, research=research, text=text)
+        if research_index is not None and self.topic_entity is not None:
+            # Source-only turns have a citation-backed topic but do not fill
+            # subject_entity/object_entity (those are accepted-fact slots).
+            # Expand the possessive against that explicit topic and let the
+            # ordinary research/review route decide what the source supports.
+            resolved_question = (
+                f"{wh.capitalize()} {auxiliary} the {property_phrase} of "
+                f"{self.topic_entity}?")
+            return self.turn(resolved_question, research_index=research_index)
         self.clear()
         if supported:
             candidates = sorted(supported)

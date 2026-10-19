@@ -220,7 +220,7 @@ outside the claim.
 
 Command: `python3 experiments/v1_427_dialogue_multiturn_transcript.py`.
 
-Runtime replay on 2026-10-20 for `d9a8a4c`, using a fresh temporary source
+Runtime replay on 2026-10-20 for `cf44f12`, using a fresh temporary source
 index and dialogue state. All 30 turns completed without a crash. The
 Eiffel Tower → Colosseum switch kept the Colosseum's `80 CE` and `50,000
 spectators` evidence local; `why?` followed the capacity answer; history recall
@@ -234,10 +234,13 @@ the exact same paragraph named that entity. Paragraph-local anchoring now
 allows the explicit “Who built the Eiffel Tower?” query to use “The tower was
 designed and built by Gustave Eiffel.” The resulting topic remains Eiffel
 Tower, so “Who designed it?” resolves to “Who designed Eiffel Tower?” instead
-of drifting to Gustave Eiffel. The same transcript now has four unknown turns:
+of drifting to Gustave Eiffel. A source-only “And Italy?” follow-up also sets
+Italy as the current topic; “What is its capital?” now reuses that topic and
+returns the exact “Rome is the capital of Italy” source sentence as review-
+pending evidence, not an accepted fact. The same transcript now has three
+unknown turns:
 `When was it built?` immediately after an unsupported Analytical Engine query,
-`What about the Eiffel Tower?` and its follow-up after that failure, and
-`What is its capital?` after a source-backed Italy capital answer. These
+`What about the Eiffel Tower?` and its follow-up after that failure. These
 abstain rather than producing a wrong answer in this run, but they limit
 recovery and contextual language coverage. Keep safety and coverage separate.
 
