@@ -197,6 +197,16 @@ the plan: each claim, the wording rule used, and the round-trip result.
 
 ## 5. Acceptance and tests
 
+**Initial runtime baseline:** `experiments/v1_348_fact_reply_roundtrip_baseline.py` checks 100
+fact-backed active-clause realizations against the stored `(subject, relation, object, polarity,
+qualifiers)` tuple, plus 100 same-question sentences with an adjacent but unsupported object. All
+100 correct realizations round-tripped to the expected roles; each decoy fit the learned wording
+frame but was rejected by the separate stored-fact support check and was not emitted by
+`write_fact`. Reversed-role and unlicensed-predicate controls also behaved as expected. This is
+useful evidence for one direct-fact path, not a broad natural-language benchmark: entities and the
+single active relation are synthetic, and it does not test passives, negation, quantities, derived
+proofs, or free source sentences.
+
 - On a benchmark of at least 100 (question, sentence) pairs that includes wrong sentences:
   zero realised sentences that state something the cited sentence does not support; report how
   many correct pairs are realised versus quoted.
