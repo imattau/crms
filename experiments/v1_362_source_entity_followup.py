@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import sys
+import subprocess
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -50,6 +52,29 @@ def main() -> None:
     require(not kb.facts(),
             "dialogue referent candidates were promoted into the fact store")
 
+    # Exercise the actual terminal route as well: the user must see the source
+    # label first, then a concrete clarification rather than a retrieved
+    # answer that silently chooses one person.
+    with tempfile.TemporaryDirectory(prefix="crms-source-followup-") as folder:
+        root = Path(folder)
+        kb.save(root / "knowledge.json")
+        index.save(root / "index.json")
+        project = Path(__file__).resolve().parents[1]
+        process = subprocess.run(
+            [sys.executable, str(project / "crms_chat.py"),
+             "--knowledge", str(root / "knowledge.json"),
+             "--index", str(root / "index.json"),
+             "--dialogue-state", str(root / "dialogue.json"),
+             "--rules", str(root / "rules.json"),
+             "--rule-session", str(root / "session.json")],
+            input="Who worked with Charles Babbage?\nWhere did she work?\n/quit\n",
+            text=True, capture_output=True, check=True, timeout=20)
+        require("Ada Lovelace worked with Charles Babbage." in process.stdout
+                and "quoted evidence, not an accepted fact" in process.stdout
+                and "Which entity do you mean?" in process.stdout
+                and "Lovelace biography" in process.stdout,
+                f"terminal hid source evidence or clarification: {process.stdout}")
+
     # Once the required question frames are licensed, existing evidence can
     # resolve subject/object pronouns by supported substitution.
     framed = CRMSKnowledgeBase()
@@ -92,6 +117,7 @@ def main() -> None:
 
     print("source-only names stay cited referent candidates, never accepted facts: PASS")
     print("ambiguous follow-up asks for a named choice instead of guessing: PASS")
+    print("terminal shows quoted evidence then source-named clarification: PASS")
     print("licensed fact frames still resolve supported she/him substitutions: PASS")
 
 

@@ -785,3 +785,21 @@ four correct multi-candidate selections alongside two wrong ones. The question t
 answer labels are generated from a few exact sentence patterns, and the test set is small; these
 results do not measure human-written query coverage or the efficacy of the additional `WHEN`,
 `MEASURE`, `COUNT`, and `DEF` types. The ranker remains disabled in chat.
+
+## Source-only entity candidates in dialogue follow-ups
+
+Command: `python3 experiments/v1_362_source_entity_followup.py`
+
+On a one-sentence indexed source, asking “Who worked with Charles Babbage?” retains Ada Lovelace
+and Charles Babbage as candidate referents, with the source title and citation attached to dialogue
+evidence. “Where did she work?” asks which named entity the user means rather than guessing. The
+check confirms that no facts are added from those quoted names. On a separate accepted-fact fixture,
+licensed frames still resolve supported “she” and “him” follow-ups to the corresponding subject
+and object and return the expected fact-backed answers. Existing entity-repair, pronoun, and
+seed-conversation experiments also pass on the same checkout.
+
+This is a bounded discourse-memory improvement. Capitalized names are only referent candidates;
+they are not a general named-entity recognizer, accepted knowledge, or evidence that a substituted
+question has an answer. Multi-turn salience, coreference across paragraphs, and learned dialogue
+moves remain unmeasured. The corpus-induced move research direction and its policy/labeling limits
+are described in [`design_dialogue_moves.md`](design_dialogue_moves.md).
