@@ -1318,3 +1318,14 @@ lineage; retracting the final required premise makes the case unavailable and ma
 existing conflict, persistence, and no-fact-promotion checks still pass. This verifies one bounded
 revalidation path; it does not establish general derivation governance, automatic practice, or
 storage-compression safety.
+
+## Held-out typed three-premise rule transfer through chat
+
+Command: `python3 experiments/v1_192_typed_three_premise_discovery.py`
+
+The learner discovers a typed `employs + owns + located in → reaches` rule, validates it on
+source-held-out positive examples, rejects a balanced negative holdout, and requires both middle
+kind witnesses. The added natural-language probe asks “Does Nia reach Sydney?” and independently
+verifies the proof; removing the runtime person-kind witness makes the chat path abstain. This
+demonstrates one held-out ternary schema through ordinary language, not general three-premise
+understanding or broad learned-rule coverage.

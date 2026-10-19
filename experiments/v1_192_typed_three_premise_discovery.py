@@ -12,6 +12,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from crms_knowledge import CRMSKnowledgeBase
+from crms_conversation import respond
+from crms_dialogue import CRMSDialogue
 from crms_research import CRMSResearchIndex
 from crms_rule_proof import verify_inference_proof
 
@@ -113,6 +115,39 @@ def main() -> None:
             expected_conclusion=inferred.conclusion)
         require(checked.valid, f"independent checker rejected typed discovery proof: {checked}")
 
+    # The learned three-premise schema must also be reachable through an
+    # ordinary-language yes/no turn, with its typed middle witnesses in proof.
+    natural_language = respond(
+        CRMSDialogue(kb), "Does Nia reach Sydney?")
+    require(natural_language.status == "answered"
+            and natural_language.response is not None
+            and natural_language.response.truth is True
+            and natural_language.response.inference_proofs
+            and "employment-route" in json.dumps(
+                natural_language.response.inference_proofs),
+            f"natural-language chat did not use the learned typed rule: "
+            f"{natural_language}")
+    natural_proof = natural_language.response.inference_proofs[0]
+    natural_check = verify_inference_proof(
+        natural_proof, fact_rows, rule_rows,
+        expected_conclusion={
+            "subject": "Nia", "relation": "reaches", "object": "Sydney"})
+    require(natural_check.valid,
+            f"natural-language typed proof did not independently verify: "
+            f"{natural_check}")
+    missing_kind = seeded()
+    missing_kind.accept_inference_rule_candidate(
+        1, "employment-route", "holdout:", max_arity=3)
+    require(missing_kind.remove_fact(
+        "Oren", "is-a", "person", "runtime:one"),
+        "runtime kind witness could not be removed for the negative control")
+    untyped_chat = respond(
+        CRMSDialogue(missing_kind), "Does Nia reach Sydney?")
+    require(untyped_chat.status != "answered"
+            or untyped_chat.response is None
+            or untyped_chat.response.truth is not True,
+            "natural-language chat ignored a required typed middle witness")
+
     contradicted = seeded(negative_holdout=True).review_inference_rules(
         "holdout:", max_arity=3)
     rejected = [review for review in contradicted.reviews
@@ -172,6 +207,8 @@ def main() -> None:
                 "typed discovered rule lost its schema on reload")
 
     print("typed three-premise rule discovery diagnostic: PASS")
+    print("learned three-premise rule reaches natural-language chat with an independently verified proof: PASS")
+    print("natural-language reasoning abstains when a required kind witness is absent: PASS")
     print("bounded discovery, explicit kinds, source-heldout validation, negative rejection, proof verification, CLI and persistence: PASS")
 
 
