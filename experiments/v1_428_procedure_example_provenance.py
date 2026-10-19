@@ -156,11 +156,24 @@ def main() -> None:
     else:
         raise SystemExit("misaligned source IDs were silently accepted")
 
+    grouped = CRMSModel(max_workers=1)
+    citation_a = "doc-a#sha256=" + "a" * 64 + "&chars=0:10"
+    citation_a2 = "doc-a#sha256=" + "b" * 64 + "&chars=10:20"
+    citation_b = "doc-b#sha256=" + "c" * 64 + "&chars=0:10"
+    grouped.teach("an unresolved evidence label",
+                  [([1], [1]), ([2], [2]), ([3], [3])],
+                  source_ids=[citation_a, citation_a2, citation_b])
+    require(grouped.example_documents("an unresolved evidence label")
+            == ["doc-a", "doc-b"]
+            and len(grouped.example_sources("an unresolved evidence label")) == 3,
+            "document grouping collapsed exact citation evidence or split one document")
+
     print("held-out composition: correct output, no held-out source leakage: PASS")
     print("generated code retains each example's source ID: PASS")
     print("JSON and SQLite preserve source lineage and behavior: PASS")
     print("legacy memories remain readable with provenance marked unknown: PASS")
     print("misaligned lineage is rejected: PASS")
+    print("multiple citations in one document group at document level: PASS")
 
 
 if __name__ == "__main__":

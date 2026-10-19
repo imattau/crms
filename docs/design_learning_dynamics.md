@@ -716,6 +716,9 @@ evaluation and correction audits weaker than the fact/rule paths.
 per demonstration. The IDs are stored alongside the examples, survive JSON and
 SQLite round trips, and appear in generated code's evidence records. The
 `example_sources()` and `example_records()` methods expose the recorded lineage.
+`example_documents()` groups citations by document ID so multiple passages from
+one file are not mistaken for multiple documents; it makes no claim about
+independent publishers or origins.
 Old memories without this field load with `source_id=None`; CRMS must never
 infer or fabricate provenance. Source IDs identify origin only: they do not
 establish source independence, truth, or rule validity, and they do not affect

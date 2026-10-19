@@ -1557,8 +1557,10 @@ CSV|SOURCE CITATION`; the exact citation must resolve against the active index.
 The cited span must also contain the exact numeric input/output pair. The reply
 states that this does not verify that the source wording licenses the
 instruction. The IDs remain parallel to demonstrations through
-JSON and SQLite persistence, are available through `example_records()`, and are
-embedded in generated-code evidence. Old rule memories load with missing
+JSON and SQLite persistence, are available through `example_records()` and
+the document-level `example_documents()` view, and are embedded in
+generated-code evidence. Multiple citations in one document count as one
+document; the method does not assert independent publishing origins. Old rule memories load with missing
 provenance left unknown. `v1_428` checks held-out composition, artifact parity,
 JSON/SQLite round trips, legacy loading, and source-list validation.
 `v1_429_chat_rule_source_attribution.py` drives the actual command, verifies

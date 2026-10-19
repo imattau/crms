@@ -3458,6 +3458,19 @@ class CRMSModel:
             for index, (inputs, outputs) in enumerate(examples)
         ]
 
+    def example_documents(self, instruction: str) -> list[str]:
+        """Return distinct document IDs represented by recorded citations.
+
+        Exact citation strings remain available from ``example_records``.
+        This groups multiple spans in one indexed document, but does not claim
+        that different documents are independent origins.
+        """
+        documents = set()
+        for source in self.example_sources(instruction):
+            document_id, marker, _ = source.partition("#sha256=")
+            documents.add(document_id if marker else source)
+        return sorted(documents)
+
     @staticmethod
     def _instruction_sequence(instruction: str) -> list[str]:
         # NFC makes canonically equivalent spellings (for example, a
