@@ -93,9 +93,14 @@ These results are component evidence, not a single overall capability score:
   70B comparison or a claim about production chat coverage.
 - `v1_242_grounded_recombination_benchmark.py`: learned components recombine
   successfully in a structured grid at larger example counts (16/16 at k=8
-  and 8/16 at k=12); all controlled negatives abstained and no wrong answers
-  were recorded. All 10 hand-authored unseen wordings abstained. This shows
-  bounded compositional transfer, not general creative writing.
+  and 8/8 at k=12 in the 2026-10-19 rerun); all controlled negatives abstained
+  and no wrong answers were recorded. All 10 hand-authored unseen wordings
+  abstained. This shows
+  bounded compositional transfer, not general creative writing. `k=12` has
+  four held-out phrases, each checked on two inputs. The exact-frame baseline
+  answered 2/3 article/casing variants; normalization answered 3/3 with the
+  same trace. See the detailed run record in
+  [`benchmark_baselines.md`](benchmark_baselines.md).
 - `v1_206`, `v1_207`, and `v1_217` exercise bounded math, aligned translation,
   and learned-operator code generation respectively. They do not sample broad
   domain competence.

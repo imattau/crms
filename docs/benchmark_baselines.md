@@ -1,5 +1,28 @@
 # Language and recombination benchmark baselines
 
+## Grounded language recombination grid
+
+Command: `python3 experiments/v1_242_grounded_recombination_benchmark.py`
+
+Runtime rerun on 2026-10-19. Each k is the number of demonstrations used to
+learn the phrase grid. The held-out count is the number of phrase combinations;
+each is checked on two input lists.
+
+| k | Held-out phrases | Correct predictions | Wrong | Abstained | Coverage | Controlled-negative abstention |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 15 | 0/30 | 0 | 30 | 0% | 100% |
+| 2 | 14 | 0/28 | 0 | 28 | 0% | 100% |
+| 4 | 12 | 0/24 | 0 | 24 | 0% | 100% |
+| 8 | 8 | 16/16 | 0 | 0 | 100% | 100% |
+| 12 | 4 | 8/8 | 0 | 0 | 100% | 100% |
+
+The ten hand-authored unseen wordings all returned `need_examples`. Article and
+casing variants scored 2/3 with the exact-frame baseline and 3/3 after
+normalization, with the same trace. These are bounded fixture results: at k=12
+the held-out set has only four phrases, and the hand-authored wording set is
+not representative of open-domain paraphrase. This does not establish broad
+language coverage or creative-writing ability.
+
 ## Bounded fictional story composition
 
 Command: `python3 run_experiments.py --match v1_353_creative_request_scope`
