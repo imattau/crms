@@ -6930,6 +6930,53 @@ class CRMSKnowledgeBase:
         memo[memo_key] = tuple(result)
         return result
 
+    _PAGE_TITLE_PRONOUNS = frozenset({"he", "she", "it"})
+
+    def _resolve_page_title_subjects(
+            self, candidates: list[FactCandidate], *, research_index: Any,
+            hit: Any) -> list[FactCandidate]:
+        """Credit a sentence-initial pronoun subject to the page's named subject.
+
+        Encyclopedic pages are about their title, so "He was born in Leeds."
+        on the page "Jimmy Winston" proposes a fact about Jimmy Winston. The
+        title must be one bounded name (no list/descriptive/namespace titles)
+        and must appear in the page opening. The resolved candidate stays
+        review-only and carries ``page_title_coreference`` evidence, which
+        frame licensing already refuses to generalize from. Unresolved
+        pronoun candidates are kept unchanged.
+        """
+        if not any(candidate.subject.strip().casefold()
+                   in self._PAGE_TITLE_PRONOUNS for candidate in candidates):
+            return candidates
+        try:
+            document = research_index.document(hit.document_id)
+        except (KeyError, OSError, ValueError):
+            return candidates
+        title = re.sub(r"\s*\([^)]*\)\s*$", "", document.title).strip()
+        if (not title or ":" in title
+                or title.casefold().startswith(("list of ", "the "))
+                or not title[0].isupper()
+                or title.casefold() not in document.text[:400].casefold()):
+            return candidates
+        resolved: list[FactCandidate] = []
+        for candidate in candidates:
+            pronoun = candidate.subject.strip()
+            if pronoun.casefold() not in self._PAGE_TITLE_PRONOUNS:
+                resolved.append(candidate)
+                continue
+            evidence = candidate.language_evidence + ({
+                "kind": "page_title_coreference",
+                "review_required": True,
+                "pronoun": pronoun,
+                "antecedent": title,
+                "document_id": hit.document_id,
+                "method": "sentence-initial pronoun resolved to page title",
+            },)
+            resolved.append(replace(
+                candidate, subject=self._canonicalize_entity(title),
+                language_evidence=evidence))
+        return resolved
+
     def propose_facts_from_hit(self, sentence: str, *,
                                research_index: Any, hit: Any) -> list[FactCandidate]:
         """Propose cited facts, including explicit relation-schema claims.
@@ -6943,7 +6990,9 @@ class CRMSKnowledgeBase:
         excerpt = research_index.resolve_citation(citation)
         if sentence not in excerpt:
             raise ValueError("candidate sentence is not contained in the cited passage")
-        proposals = self.propose_facts(sentence, source=citation)
+        proposals = self._resolve_page_title_subjects(
+            self.propose_facts(sentence, source=citation),
+            research_index=research_index, hit=hit)
         schema = self._propose_explicit_relation_type(sentence, citation)
         if schema is not None:
             key = (schema.subject.casefold(), schema.relation.casefold(),
