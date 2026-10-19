@@ -14,6 +14,8 @@ import argparse
 import csv
 import hashlib
 import json
+import math
+from collections import defaultdict
 from pathlib import Path
 import re
 import sys
@@ -51,23 +53,60 @@ def _split_for(conversation_id: str) -> str:
     return "test"
 
 
-def _read_dialogues(payload: Any) -> list[dict[str, Any]]:
+def _annotation_sample(dialogues: list[dict[str, Any]], limit: int,
+                       domain_filter: str) -> set[tuple[str, str]]:
+    """Choose conversation IDs deterministically within one dialogue domain."""
+    if type(limit) is not int or limit < 1:
+        raise ValueError("annotation_dialogues must be a positive integer")
+    groups: dict[str, dict[str, dict[str, Any]]] = defaultdict(dict)
+    for dialogue in dialogues:
+        domain = dialogue["instruction_id"].rsplit("-", 1)[0] or "unknown"
+        if domain != domain_filter:
+            continue
+        groups[domain].setdefault(dialogue["conversation_id"], dialogue)
+    available = sum(len(rows) for rows in groups.values())
+    if not available:
+        raise ValueError(f"no conversations found for annotation domain {domain_filter!r}")
+    target = min(limit, available)
+    exact = {domain: target * len(rows) / available
+             for domain, rows in groups.items()}
+    quotas = {domain: math.floor(value) for domain, value in exact.items()}
+    remainder = target - sum(quotas.values())
+    for domain in sorted(groups, key=lambda value: (
+            -(exact[value] - quotas[value]), value))[:remainder]:
+        quotas[domain] += 1
+    chosen: set[tuple[str, str]] = set()
+    for domain, rows in groups.items():
+        ranked = sorted(rows, key=lambda conversation_id: (
+            hashlib.sha256(f"{domain}\0{conversation_id}".encode("utf-8"))
+            .hexdigest(), conversation_id))
+        chosen.update((domain, conversation_id)
+                      for conversation_id in ranked[:quotas[domain]])
+    return chosen
+
+
+def _read_dialogues(payload: Any
+                    ) -> tuple[list[dict[str, Any]], list[str], int, int, int]:
     if isinstance(payload, dict):
         payload = payload.get("dialogs", payload.get("dialogues", [payload]))
     if not isinstance(payload, list):
         raise ValueError("Taskmaster input must be a dialogue list")
     rows = []
-    seen = set()
-    for dialogue in payload:
+    skipped_empty = []
+    input_count = len(payload)
+    unknown_speaker_turns = 0
+    id_counts: dict[str, int] = {}
+    for record_ordinal, dialogue in enumerate(payload):
         if not isinstance(dialogue, dict):
             raise ValueError("dialogue entries must be objects")
         conversation_id = _safe_id(dialogue.get("conversation_id"))
-        if conversation_id in seen:
-            raise ValueError(f"duplicate conversation_id: {conversation_id}")
-        seen.add(conversation_id)
+        id_counts[conversation_id] = id_counts.get(conversation_id, 0) + 1
         utterances = dialogue.get("utterances")
-        if not isinstance(utterances, list) or not utterances:
-            raise ValueError(f"dialogue {conversation_id} has no utterances")
+        if not isinstance(utterances, list):
+            raise ValueError(f"dialogue {conversation_id} has malformed utterances")
+        if not utterances:
+            skipped_empty.append(conversation_id)
+            continue
         normalized = []
         indices = set()
         for turn in utterances:
@@ -77,22 +116,30 @@ def _read_dialogues(payload: Any) -> list[dict[str, Any]]:
             speaker = turn.get("speaker")
             text = turn.get("text")
             if (type(index) is not int or index < 0 or index in indices
-                    or speaker not in {"USER", "ASSISTANT"}
+                    or speaker not in {"USER", "ASSISTANT", ""}
                     or not isinstance(text, str) or not text.strip()):
                 raise ValueError(f"dialogue {conversation_id} has an invalid utterance")
+            if speaker == "":
+                speaker = "UNKNOWN"
+                unknown_speaker_turns += 1
             indices.add(index)
             normalized.append({"index": index, "speaker": speaker, "text": text})
         normalized.sort(key=lambda row: row["index"])
         if [row["index"] for row in normalized] != list(range(len(normalized))):
             raise ValueError(f"dialogue {conversation_id} has non-contiguous turn indices")
         rows.append({"conversation_id": conversation_id,
+                     "source_record_ordinal": record_ordinal,
                      "instruction_id": str(dialogue.get("instruction_id", "")),
                      "utterances": normalized})
-    return sorted(rows, key=lambda row: row["conversation_id"])
+    return (sorted(rows, key=lambda row: row["conversation_id"]),
+            sorted(skipped_empty), input_count, unknown_speaker_turns,
+            sum(count - 1 for count in id_counts.values() if count > 1))
 
 
 def prepare(source_path: Path, output_path: Path, *,
-            maximum_dialogues: int | None = None) -> dict[str, Any]:
+            maximum_dialogues: int | None = None,
+            annotation_dialogues: int = 500,
+            annotation_domain: str = "restaurant-table") -> dict[str, Any]:
     source_path = source_path.expanduser().resolve()
     output_path = output_path.expanduser().resolve()
     if not source_path.is_file():
@@ -101,13 +148,16 @@ def prepare(source_path: Path, output_path: Path, *,
         raise FileExistsError(f"output directory already exists: {output_path}")
     raw = source_path.read_bytes()
     source_sha256 = hashlib.sha256(raw).hexdigest()
-    dialogues = _read_dialogues(json.loads(raw.decode("utf-8")))
+    (dialogues, skipped_empty, input_count, unknown_speaker_turns,
+     duplicate_id_records) = _read_dialogues(json.loads(raw.decode("utf-8")))
     if maximum_dialogues is not None:
         if type(maximum_dialogues) is not int or maximum_dialogues < 1:
             raise ValueError("maximum_dialogues must be a positive integer")
         dialogues = dialogues[:maximum_dialogues]
     if not dialogues:
         raise ValueError("no dialogues selected")
+    annotation_ids = _annotation_sample(
+        dialogues, annotation_dialogues, annotation_domain)
 
     corpus_root = output_path / "corpus"
     annotations_path = output_path / "assistant_turns_to_label.csv"
@@ -115,12 +165,19 @@ def prepare(source_path: Path, output_path: Path, *,
     corpus_root.mkdir()
     annotation_rows: list[dict[str, str]] = []
     split_dialogues = {"train": 0, "dev": 0, "test": 0}
+    annotation_splits = {"train": 0, "dev": 0, "test": 0}
     assistant_turns = 0
+    annotation_assistant_turns = 0
+    annotation_ids_written: set[tuple[str, str]] = set()
     for dialogue in dialogues:
         conversation_id = dialogue["conversation_id"]
+        domain = dialogue["instruction_id"].rsplit("-", 1)[0] or "unknown"
+        annotation_key = (domain, conversation_id)
+        record_ordinal = dialogue["source_record_ordinal"]
         split = _split_for(conversation_id)
         split_dialogues[split] += 1
-        relative = Path("dialogues") / f"{conversation_id}.txt"
+        record_id = f"{conversation_id}__record_{record_ordinal:05d}"
+        relative = Path("dialogues") / f"{record_id}.txt"
         destination = corpus_root / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         pieces = []
@@ -141,10 +198,17 @@ def prepare(source_path: Path, output_path: Path, *,
         # normal CRMS citation format so this sheet can be used after indexing
         # the generated corpus directory.
         document_id = str(destination.resolve())
+        if (annotation_key in annotation_ids
+                and annotation_key not in annotation_ids_written):
+            annotation_ids_written.add(annotation_key)
+            annotation_splits[split] += 1
         for position, turn in enumerate(dialogue["utterances"]):
             if turn["speaker"] != "ASSISTANT":
                 continue
             assistant_turns += 1
+            if annotation_key not in annotation_ids:
+                continue
+            annotation_assistant_turns += 1
             prior = dialogue["utterances"][:position]
             context = "\n".join(
                 f"{item['speaker']}: {item['text']}" for item in prior[-2:])
@@ -152,6 +216,7 @@ def prepare(source_path: Path, output_path: Path, *,
             annotation_rows.append({
                 "split": split,
                 "conversation_id": conversation_id,
+                "source_record_ordinal": str(record_ordinal),
                 "instruction_id": dialogue["instruction_id"],
                 "utterance_index": str(turn["index"]),
                 "preceding_context": context,
@@ -167,6 +232,8 @@ def prepare(source_path: Path, output_path: Path, *,
                 "source_utterance_index": str(turn["index"]),
             })
 
+    if not annotation_rows:
+        raise ValueError("selected annotation sample contains no assistant turns")
     fieldnames = list(annotation_rows[0])
     with annotations_path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
@@ -185,9 +252,20 @@ def prepare(source_path: Path, output_path: Path, *,
         "source_file": str(source_path),
         "source_file_sha256": source_sha256,
         "conversation_split": "sha256(conversation_id) mod 100: train 80%, dev 10%, test 10%",
+        "input_conversation_count": input_count,
         "conversation_count": len(dialogues),
+        "duplicate_conversation_id_extra_records": duplicate_id_records,
+        "skipped_empty_dialogue_count": len(skipped_empty),
+        "skipped_empty_dialogue_ids": skipped_empty,
+        "unknown_speaker_turn_count": unknown_speaker_turns,
         "assistant_turn_count": assistant_turns,
         "dialogues_by_split": split_dialogues,
+        "annotation_dialogue_target": annotation_dialogues,
+        "annotation_domain": annotation_domain,
+        "annotation_dialogue_count": len(annotation_ids),
+        "annotation_dialogues_with_assistant_turns": len(annotation_ids_written),
+        "annotation_assistant_turn_count": annotation_assistant_turns,
+        "annotation_dialogues_by_split": annotation_splits,
         "annotation_file": annotations_path.name,
         "corpus_directory": corpus_root.name,
         "move_classes_for_human_review": list(ASSISTANT_MOVE_CLASSES),
@@ -231,17 +309,28 @@ def main() -> int:
     parser.add_argument("output", type=Path, help="new output directory")
     parser.add_argument("--max-dialogues", type=int,
                         help="small deterministic prefix for a format dry-run")
+    parser.add_argument("--annotation-dialogues", type=int, default=500,
+                        help="unique conversations sampled for human labels (default: 500)")
+    parser.add_argument("--annotation-domain", default="restaurant-table",
+                        help="single Taskmaster domain to label (default: restaurant-table)")
     args = parser.parse_args()
     try:
         result = prepare(args.source, args.output,
-                         maximum_dialogues=args.max_dialogues)
+                         maximum_dialogues=args.max_dialogues,
+                         annotation_dialogues=args.annotation_dialogues,
+                         annotation_domain=args.annotation_domain)
     except (FileExistsError, FileNotFoundError, OSError, UnicodeError,
             json.JSONDecodeError, RuntimeError, ValueError) as error:
         print(f"Could not prepare Taskmaster dialogue pilot: {error}", file=sys.stderr)
         return 2
     print(json.dumps({key: result[key] for key in (
-        "dataset", "conversation_count", "assistant_turn_count",
-        "dialogues_by_split", "labels_assigned_automatically")}, indent=2))
+        "dataset", "input_conversation_count", "conversation_count",
+        "skipped_empty_dialogue_count", "duplicate_conversation_id_extra_records",
+        "unknown_speaker_turn_count", "assistant_turn_count",
+        "dialogues_by_split", "annotation_domain", "annotation_dialogue_count",
+        "annotation_dialogues_with_assistant_turns",
+        "annotation_assistant_turn_count", "annotation_dialogues_by_split",
+        "labels_assigned_automatically")}, indent=2))
     return 0
 
 

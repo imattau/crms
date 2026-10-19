@@ -106,11 +106,23 @@ python3 experiments/v1_363_prepare_taskmaster_dialogue_pilot.py \
 The tool writes one indexed text source per complete conversation and
 `assistant_turns_to_label.csv`, with the preceding turns, an empty move label, reviewer fields,
 SHA-256/character-offset citations, and the original file digest, conversation ID, and utterance
-index. It creates deterministic 80/10/10 splits by conversation ID and refuses to overwrite an
-existing output directory. A synthetic two-conversation dry-run verified the CSV, split, and
-citation round trips; **the Taskmaster corpus itself has not yet been processed or labeled**. CRMS
-currently uses absolute paths as file-ingestion document IDs, so moving a prepared directory means
-reindexing it and regenerating citations.
+index. By default, it indexes the complete corpus but samples 500 distinct conversations from the
+`restaurant-table` domain for human annotation (`--annotation-domain` and
+`--annotation-dialogues` can change this). It creates deterministic 80/10/10 splits by conversation
+ID and refuses to overwrite an existing output directory. CRMS currently uses absolute paths as
+file-ingestion document IDs, so moving a prepared directory means reindexing it and regenerating
+citations.
+
+The released Taskmaster-1 file has now been processed in a scratch directory outside the repository.
+Of 5,507 records, 5,503 contained turns; four empty records were skipped, five extra records with
+reused conversation IDs were retained under distinct transcript filenames, and 55 blank speaker
+labels were preserved as `UNKNOWN`. The indexed set has 73,195 assistant utterances. The
+restaurant-table annotation sample contains 500 distinct conversation IDs and 7,312 assistant
+utterances, split across 397 train, 49 dev, and 54 test conversations. Every annotation citation
+resolved through CRMS's normal research-index API to the exact assistant utterance. Labels remain
+blank: this is prepared evidence, not an induced or evaluated dialogue model. The corpus has six
+domains; the other five are indexed for future transfer work, not mixed into this first annotation
+study.
 
 The proposed 500-transcript scale and 80% held-out target are hypotheses, not acceptance criteria
 until corpus size, class balance, label agreement, and a scripted baseline are measured. In
