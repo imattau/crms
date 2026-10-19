@@ -55,6 +55,12 @@ MENTION_SOURCE = (
     "The phrase 'sort the array in ascending order' appears in this note, "
     "but is not an instruction.",
 )
+QUOTED_SOURCE = (
+    "mdn-quoted-sort", "Controlled quoted positive-looking wording",
+    "https://example.invalid/quoted-mdn-sort",
+    "The note says, 'The following function will sort the array in ascending "
+    "order,' but this is only a quoted example, not an instruction.",
+)
 PAIR = ([5, 2, 3, 1, 4], [1, 2, 3, 4, 5])
 CONTRASTS = (
     ([1, -1, 1], [-1, 1, 1]),
@@ -77,6 +83,30 @@ def exact_hit(index: CRMSResearchIndex, source_id: str, query: str):
                  if hit.document_id == source_id), None)
 
 
+def _phrase_is_quoted(text: str, position: int) -> bool:
+    """Return whether a character offset is inside a balanced quotation."""
+    closing_for = {'"': '"', "'": "'", "“": "”", "‘": "’",
+                   "«": "»", "`": "`"}
+    closing: str | None = None
+    index = 0
+    while index < min(position, len(text)):
+        char = text[index]
+        if char == "\\":
+            index += 2
+            continue
+        if char == "'" and index > 0 and index + 1 < len(text):
+            # Apostrophes in contractions and possessives are not quote marks.
+            if text[index - 1].isalnum() and text[index + 1].isalnum():
+                index += 1
+                continue
+        if closing is None:
+            closing = closing_for.get(char)
+        elif char == closing:
+            closing = None
+        index += 1
+    return closing is not None
+
+
 def extract_review_candidate(index: CRMSResearchIndex,
                              prose_source_id: str = MDN_SOURCE[0]):
     prose_hit = exact_hit(index, prose_source_id,
@@ -94,8 +124,10 @@ def extract_review_candidate(index: CRMSResearchIndex,
     match = re.search(
         r"\bwill\s+(?P<phrase>sort\s+the\s+array\s+in\s+ascending\s+order)\b",
         prose, flags=re.IGNORECASE)
-    if match is None or re.search(
-            r"\bwill\s+not\s+sort\b", prose, flags=re.IGNORECASE):
+    if (match is None or _phrase_is_quoted(prose, match.start("phrase"))
+            or re.search(
+                    r"\bwill\s+not\s+sort\b", prose,
+                    flags=re.IGNORECASE)):
         return None
     if not _citation_contains_integer_pair(code, *PAIR):
         return None
@@ -302,7 +334,7 @@ def main() -> None:
 
         # Negated and metalinguistic text must not create another candidate.
         false_proposals = 0
-        for source in (NEGATED_SOURCE, MENTION_SOURCE):
+        for source in (NEGATED_SOURCE, MENTION_SOURCE, QUOTED_SOURCE):
             negative_index = CRMSResearchIndex()
             for item in (source, PYTHON_SOURCE):
                 document_id, title, location, text = item
@@ -327,7 +359,7 @@ def main() -> None:
     print("publisher-held-out predictive and passive phrases: PASS")
     print("proposal remained inert until review and chat teaching: PASS")
     print("reviewed rule persisted and passed three held-out lists: PASS")
-    print("negation/mention/direction controls: 0 false candidates in 3 cases")
+    print("negation/mention/quoted/direction controls: 0 false candidates in 4 cases")
     print("limitation: two hand-coded sentence constructions; not general induction")
 
 

@@ -1869,9 +1869,12 @@ form, but not a held-out publisher: NumPy was already used for reverse in
 Both candidates stay review-only until taught through chat. Their exact prose
 and Python code citations and the Codex reviewer attribution survive reload;
 each generated rule passes three independent held-out lists. Opposite-direction
-wording remains unlicensed. Negation, metalinguistic, and direction-only
-controls produce no false proposals in the five cases exercised across the
-two extraction forms. The five-script source-learning/recombination run passed
+wording remains unlicensed. Negation, metalinguistic, quoted-positive, and
+direction-only controls produce no false proposals in four cases in `v1_437`.
+The quoted-positive case exposed that the original cue also matched an
+instruction embedded as a quotation; the extractor now rejects a phrase inside
+balanced quotation marks. This small control set is still not a proposal
+precision estimate. The five-script source-learning/recombination run passed
 5/5, including `v1_437`.
 
 This is publisher holdout for one MDN excerpt and source-document/sentence-form
