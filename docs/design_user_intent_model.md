@@ -5,6 +5,16 @@
 tracks recent entities and question/clarification state. These mechanisms do not constitute general
 contextual intent understanding.
 
+## Current contextual baseline
+
+The runtime now distinguishes a bare yes/no response while an answer-choice clarification is open
+from an unanchored yes/no response. With multiple supported candidates, “yes” or “no” leaves the
+choice pending and explains that a specific candidate is needed; without an open yes/no question,
+CRMS asks what the user is responding to rather than sending the token to retrieval. A phrase such
+as “Yeah, the second option please” resolves the existing candidate list. This is one explicit,
+hand-checked contextual rule, not a learned or general user-intent model. Its regression coverage is
+in `experiments/v1_365_contextual_clarification_intent.py`.
+
 ## Why intent belongs in the model
 
 The same words can request different things depending on the exchange. “Yes” may confirm a time,

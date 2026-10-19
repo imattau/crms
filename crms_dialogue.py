@@ -44,6 +44,11 @@ _WORD_RE = _WordScanner()
 _CORRECTION_RE = re.compile(
     r"^(?:(?:no|actually)[, ]+)*(?:i meant)\s+(.+?)[.!?]*$",
     flags=re.IGNORECASE)
+_BARE_YES_NO_RE = re.compile(
+    r"^(?:yes|yeah|yep|yup|sure|certainly|absolutely|ok|okay|got it|"
+    r"understood|no|nope|nah|not really)"
+    r"(?:[, ]+(?:please|thanks|thank you))?[.!? ]*$",
+    flags=re.IGNORECASE)
 _FOLLOWUP_ENTITY_RE = re.compile(
     r"^(?:and\s+)?what about\s+(.+?)[?!.]*$|^and\s+(.+?)[?!.]*$",
     flags=re.IGNORECASE)
@@ -153,8 +158,12 @@ class CRMSDialogue:
             return None, False
         candidates = self.pending_result.candidates or []
         words = [word.casefold() for word in _WORD_RE.findall(message)]
-        selection_words = [word for word in words
-                           if word not in {"the", "one", "option", "answer"}]
+        selection_words = [word for word in words if word not in {
+            "the", "one", "option", "answer", "candidate", "choice",
+            "please", "i", "d", "choose", "want", "prefer", "mean",
+            "meant", "would", "like",
+            "yes", "yeah", "yep", "sure", "ok", "okay", "no", "nope", "nah",
+        }]
         ordinals = {"first": 0, "1st": 0, "second": 1, "2nd": 1,
                     "third": 2, "3rd": 2, "fourth": 3, "4th": 3,
                     "last": len(candidates) - 1}
@@ -1094,6 +1103,12 @@ class CRMSDialogue:
                 "out_of_scope", question, question,
                 text=("CRMS answers questions from supplied sources and learned "
                       "facts; try asking about a stored fact or adding a source."))
+        if (_BARE_YES_NO_RE.fullmatch(question)
+                and self.pending_result is None):
+            return DialogueTurn(
+                "clarify", question, question,
+                text=("I don't have an open yes/no question in this conversation. "
+                      "What would you like to ask or confirm?"))
         repaired = self._repair_entity_reference(
             question, research_index=research_index)
         if repaired is not None:
@@ -1205,6 +1220,16 @@ class CRMSDialogue:
             return DialogueTurn("answered", question, resolved_question,
                                 response=response,
                                 text=self.knowledge.render_brief(response))
+        if (self.pending_result is not None
+                and _BARE_YES_NO_RE.fullmatch(question)):
+            candidates = self.pending_result.candidates or []
+            choices = "; ".join(f"{i}. {value}"
+                                 for i, value in enumerate(candidates, 1))
+            return DialogueTurn(
+                "ambiguous", question, self.pending_question or question,
+                response=self.pending_result,
+                text=("Yes or no does not identify one of the supported answers. "
+                      f"Please choose: {choices}."))
         self._clear_pending()
         grouped = self._resolve_distributive_plural(
             question, research_index=research_index)

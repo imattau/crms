@@ -60,6 +60,10 @@ def respond(dialogue: CRMSDialogue, text: str, *,
     act = classify_act(text)
     if act is None:
         return dialogue.turn(text, research_index=research_index)
+    if act == "acknowledgement" and dialogue.pending_result is not None:
+        # A receipt such as "okay" acknowledges the request to choose, but it
+        # does not itself select or close the open answer clarification.
+        return dialogue.turn(text, research_index=research_index)
 
     if act == "greeting":
         fact_count = len(dialogue.knowledge._facts)
