@@ -30,6 +30,8 @@ from crms_rule_proof import (verify_closed_world_denial,
                              verify_constraint_denial,
                              verify_inference_proof)
 from crms_fact_store import SQLiteFactMap
+from crms_schema import (CLOSED_WORLD_SCHEMA, RELATION_SCHEMA_SPECS,
+                         relation_schema_pattern, relation_schema_spec)
 from crms_research import (
     SearchHit, SummarySentence, _RESEARCH_STOPWORDS, _is_code_source, _sentence_context_kind,
     _sentence_spans,
@@ -1690,13 +1692,9 @@ class CRMSKnowledgeBase:
         """Explicitly annotate a relation with a supported symbolic schema type."""
         relation = _display(relation, "relation")
         relation_type = _display(relation_type, "relation type")
-        if _tokens(relation_type) not in {
-                ("transitive",), ("symmetric",),
-                ("irreflexive",), ("asymmetric",), ("functional",),
-                ("closed", "world")}:
-            raise ValueError(
-                "supported relation types are transitive, symmetric, "
-                "irreflexive, asymmetric, functional, and closed-world")
+        if relation_schema_spec(relation_type) is None:
+            supported = ", ".join(spec.name for spec in RELATION_SCHEMA_SPECS)
+            raise ValueError(f"supported relation types are {supported}")
         return self.add_fact(relation, "has relation type", relation_type, source,
                              qualifiers=qualifiers)
 
@@ -6847,9 +6845,7 @@ class CRMSKnowledgeBase:
     def _propose_explicit_relation_type(
             sentence: str, source: str) -> FactCandidate | None:
         """Extract only a literal, affirmative relation-type declaration."""
-        schema_pattern = (
-            r"transitive|symmetric|irreflexive|asymmetric|functional|"
-            r"closed[- ]world")
+        schema_pattern = relation_schema_pattern()
         pattern = re.compile(
             r"\s*the\s+relation\s+(?:"
             r"\"(?P<double>[^\"\r\n]+)\"|"
@@ -9583,9 +9579,7 @@ class CRMSKnowledgeBase:
         return any(
             _tokens(fact.subject) == relation_key
             and _tokens(fact.relation) == _tokens("has relation type")
-            and _tokens(fact.object) in {
-                _tokens("transitive"), _tokens("irreflexive"),
-                _tokens("asymmetric"), _tokens("closed-world")}
+            and relation_schema_spec(fact.object) is not None
             and self._scope_is_within(fact.qualifiers, qualifiers)
             for fact in self._facts.values())
 
@@ -9612,9 +9606,7 @@ class CRMSKnowledgeBase:
         relations.update(
             fact.subject for fact in self._facts.values()
             if (_tokens(fact.relation) == _tokens("has relation type")
-                and _tokens(fact.object) in {
-                    _tokens("transitive"), _tokens("irreflexive"),
-                    _tokens("asymmetric"), _tokens("closed-world")}
+                and relation_schema_spec(fact.object) is not None
                 and self._scope_is_within(fact.qualifiers, qualifiers)))
         return sorted(relations, key=_tokens)
 
@@ -11633,13 +11625,14 @@ class CRMSKnowledgeBase:
         }
         closed_world_facts = (
             self._facts.lookup(
-                _tokens("has relation type"), _tokens("closed-world"), "object")
+                _tokens("has relation type"),
+                _tokens(CLOSED_WORLD_SCHEMA.name), "object")
             if isinstance(self._facts, SQLiteFactMap)
             else self._facts.values())
         stored_relations.update(
             _tokens(fact.subject) for fact in closed_world_facts
             if (_tokens(fact.relation) == _tokens("has relation type")
-                and _tokens(fact.object) == _tokens("closed-world")
+                and _tokens(fact.object) == _tokens(CLOSED_WORLD_SCHEMA.name)
                 and self._qualifiers_equal(fact.qualifiers, qualifiers)))
         licensed_relations = {
             key[1] for key, examples in self._fact_pattern_examples.items()

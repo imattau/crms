@@ -828,3 +828,17 @@ referent candidates; they are not a general named-entity recognizer, accepted kn
 question has an answer. Multi-turn salience, coreference across paragraphs, and learned dialogue
 moves remain unmeasured. The corpus-induced move research direction and its policy/labeling limits
 are described in [`design_dialogue_moves.md`](design_dialogue_moves.md).
+
+## Relation-schema registry and proof contract
+
+Command: `python3 experiments/v1_374_relation_schema_registry.py`
+
+The shared registry covers six schema types, distinguishes derivation from
+integrity constraints, and records built-in proof IDs, premise counts,
+validation metadata, and the allowed transitive flat-chain proof form. Teaching,
+explicit source parsing, and relation-name discovery recognize the same six
+types. Transitive and symmetric conclusions still pass the independent proof
+checker; tampering with the proof form is rejected. Unregistered schema names
+and proof forms are refused. The existing `v1_349`, `v1_350`, and `v1_351`
+schema-proposal, inference, explanation, and scope tests also pass. This is a
+consistency and proof-contract regression, not automatic schema learning.

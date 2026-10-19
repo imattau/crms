@@ -5,6 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Callable, Iterable, Mapping
 from crms_text import tokens as normalized_tokens
+from crms_schema import (
+    CLOSED_WORLD_SCHEMA, PROOF_SCHEMA_SPECS, WITNESS_CONSTRAINT_DENIAL_TYPES,
+)
 
 
 def _key(value: str) -> tuple[str, ...]:
@@ -77,7 +80,7 @@ def verify_closed_world_denial(
             return RuleProofCheck(False, "closed-world declaration is not in the fact snapshot")
         subject, relation, obj = _triple(expected_conclusion)
         if (_triple(declaration) != (relation, _key("has relation type"),
-                                     _key("closed-world"))):
+                                     _key(CLOSED_WORLD_SCHEMA.name))):
             return RuleProofCheck(False, "declaration does not close the queried relation")
         scope = _qualifiers(expected_qualifiers)
         if not _scope_is_within(declaration.get("qualifiers", ()), scope):
@@ -108,7 +111,7 @@ def verify_constraint_denial(
         if not isinstance(evidence, Mapping):
             return RuleProofCheck(False, "constraint evidence is missing")
         constraint = evidence.get("constraint")
-        if constraint not in {"irreflexive", "asymmetric", "functional"}:
+        if constraint not in WITNESS_CONSTRAINT_DENIAL_TYPES:
             return RuleProofCheck(False, "constraint type is unsupported")
         declaration = evidence.get("declaration")
         if not isinstance(declaration, Mapping):
@@ -215,23 +218,25 @@ def verify_inference_proof(
                 if not isinstance(schema, Mapping) or not isinstance(premises, list) \
                         or not isinstance(type_fact, Mapping):
                     raise ValueError("schema proof is missing its declaration or premises")
-                schema_specs = {
-                    "transitivity-v1": ("transitive", 2),
-                    "symmetry-v1": ("symmetric", 1),
-                }
                 schema_id = schema.get("schema_id")
-                schema_spec = schema_specs.get(schema_id)
+                schema_spec = PROOF_SCHEMA_SPECS.get(schema_id)
+                proof_form = node.get("proof_form")
                 if (schema_spec is None
-                        or schema.get("schema_type") != schema_spec[0]
+                        or schema_spec.category != "derivation"
+                        or schema.get("schema_type") != schema_spec.name
                         or schema.get("validation") != {
-                            "status": "validated",
-                            "validator": "builtin-schema-check-v1"}):
-                    raise ValueError("schema declaration is unknown or not validated")
+                            "status": schema_spec.validation_status,
+                            "validator": schema_spec.validator}
+                        or (proof_form is not None
+                            and proof_form not in schema_spec.proof_forms)):
+                    raise ValueError("schema declaration or proof form is unknown")
+                if schema_spec.proof_premises is None:
+                    raise ValueError("registered proof schema has no premise contract")
                 flat_transitivity = (
-                    schema_id == "transitivity-v1"
-                    and node.get("proof_form") == "flat-chain-v1")
+                    schema_spec.name == "transitive"
+                    and proof_form == "flat-chain-v1")
                 if (len(premises) < 2 if flat_transitivity else
-                        len(premises) != schema_spec[1]):
+                        len(premises) != schema_spec.proof_premises):
                     raise ValueError("schema proof has the wrong number of premises")
                 relation = schema.get("relation")
                 if not isinstance(relation, str) or not relation.strip() or not _key(relation):
@@ -239,13 +244,13 @@ def verify_inference_proof(
                 if not fact_is_present(type_fact):
                     raise ValueError("relation-type assertion is not in the fact snapshot")
                 if (_triple(type_fact) != (_key(relation), _key("has relation type"),
-                                           _key(schema_spec[0]))
+                                           _key(schema_spec.name))
                         or not _scope_is_within(
                             type_fact.get("qualifiers", ()), expected_scope)):
                     raise ValueError("relation-type assertion does not license this schema")
                 cs, cr, co = conclusion_key
-                if schema_id == "transitivity-v1":
-                    if node.get("proof_form") == "flat-chain-v1":
+                if schema_spec.name == "transitive":
+                    if proof_form == "flat-chain-v1":
                         if len(premises) < 2 or cr != _key(relation):
                             raise ValueError("flat transitivity proof needs at least two matching edges")
                         visited = [visit(item, depth + 1) for item in premises]

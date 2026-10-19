@@ -591,15 +591,17 @@ Scoped edges remain unavailable to an unscoped query, and unrelated scope values
 verification, SQLite persistence, and these negative controls. This is exact qualifier coverage,
 not interval reasoning; temporal ranges and precedence need a separate design.
 
-Schema vocabulary and behavior are still spread across teaching/parsing, inference dispatch,
-proof verification, and relation-name discovery. Consolidate the supported schema names,
-classification (derivation or integrity constraint), validation status, and proof-form metadata in
-one static registry before adding schema types. Keep proof verification independently strict: a
-registry entry must not turn arbitrary user data into an executable or trusted proof rule.
-Constraint checking should then consume the classification without conflating derivation schemas
-such as transitivity with checks such as functionality. Review the current type lists for drift;
-in particular, symmetric behavior and functional constraints need explicit, tested coverage in
-the right paths.
+The supported vocabulary is now centralized in `crms_schema.py`: six canonical schema names,
+derivation versus integrity classification, built-in proof IDs and premise counts, validation
+metadata, and the permitted flat-chain proof form. Relation-type teaching and text proposals,
+inference dispatch, and relation-name discovery consume that registry. The proof checker uses the
+registered schema contract but still independently checks the declaration against the fact
+snapshot, qualifier scope, premise structure, and endpoints; the registry alone does not authorize a
+proof. `experiments/v1_374_relation_schema_registry.py` checks all six names through teaching,
+parsing, and discovery, checks transitive and symmetric proofs with the independent verifier, and
+rejects unknown names and proof forms. This also makes symmetric and functional declarations
+visible to relation-name discovery. Keep future schema additions in the registry and add a proof
+contract only when its evidence semantics can be checked independently.
 
 After that mechanical cleanup, extract candidate-fact constraint checking so it can run at both
 acceptance and inference time. Use keyed type and outgoing-relation indexes instead of launching a

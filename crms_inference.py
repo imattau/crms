@@ -16,7 +16,13 @@ from dataclasses import asdict, dataclass, replace
 from itertools import product
 from typing import Any, Iterable, Mapping
 from crms_text import tokens as normalized_tokens
+from crms_schema import (INTEGRITY_SCHEMA_TYPES, RELATION_SCHEMA_BY_NAME,
+                         relation_schema_spec)
 from crms_support_report import independent_origin_support
+
+
+_TRANSITIVITY = RELATION_SCHEMA_BY_NAME["transitive"]
+_SYMMETRY = RELATION_SCHEMA_BY_NAME["symmetric"]
 
 
 def _independent_sources_from_examples(
@@ -459,14 +465,16 @@ def _infer_relation_bounded(
         triple = _triple_key(fact)
         if triple[1] != _key("has relation type"):
             continue
-        if triple[2] == _key("transitive"):
+        schema = relation_schema_spec(triple[2])
+        if schema is None:
+            continue
+        if schema.category == "derivation" and schema.name == _TRANSITIVITY.name:
             transitive_type_facts.setdefault(triple[0], []).append(fact)
-        elif triple[2] == _key("symmetric"):
+        elif schema.category == "derivation" and schema.name == _SYMMETRY.name:
             symmetric_type_facts.setdefault(triple[0], []).append(fact)
-        elif triple[2] in {_key("irreflexive"), _key("asymmetric"),
-                           _key("functional"), _key("closed-world")}:
+        elif schema.name in INTEGRITY_SCHEMA_TYPES:
             integrity_type_facts.setdefault(triple[0], {}).setdefault(
-                " ".join(triple[2]), []).append(fact)
+                schema.name, []).append(fact)
     for triple in fact_index:
         if triple[1] in symmetric_type_facts:
             known_outgoing.setdefault((triple[2], triple[1]), set()).add(triple[0])
@@ -718,13 +726,13 @@ def _infer_relation_bounded(
                         found.append({
                             "kind": "schema",
                             "schema": {
-                                "schema_id": "transitivity-v1",
-                                "schema_type": "transitive",
+                                "schema_id": _TRANSITIVITY.proof_schema_id,
+                                "schema_type": _TRANSITIVITY.name,
                                 "relation": relation_displays.get(
                                     relation_key, " ".join(relation_key)),
                                 "validation": {
-                                    "status": "validated",
-                                    "validator": "builtin-schema-check-v1",
+                                    "status": _TRANSITIVITY.validation_status,
+                                    "validator": _TRANSITIVITY.validator,
                                 },
                             },
                             "proof_form": "flat-chain-v1",
@@ -783,12 +791,12 @@ def _infer_relation_bounded(
             proof = {
                 "kind": "schema",
                 "schema": {
-                    "schema_id": "symmetry-v1",
-                    "schema_type": "symmetric",
+                    "schema_id": _SYMMETRY.proof_schema_id,
+                    "schema_type": _SYMMETRY.name,
                     "relation": relation_displays.get(atom[1], " ".join(atom[1])),
                     "validation": {
-                        "status": "validated",
-                        "validator": "builtin-schema-check-v1",
+                        "status": _SYMMETRY.validation_status,
+                        "validator": _SYMMETRY.validator,
                     },
                 },
                 "relation_type_fact": relation_type_fact,
@@ -859,7 +867,7 @@ def _infer_relation_bounded(
         # before rules that feed the same relation so that a direct chain is
         # retained without eagerly enumerating rule-derived alternatives.
         applications.extend((InferenceRule(
-            "transitivity-v1", " ".join(relation_key), " ".join(relation_key),
+            _TRANSITIVITY.proof_schema_id, " ".join(relation_key), " ".join(relation_key),
             " ".join(relation_key)), type_fact)
             for relation_key, facts_for_type in transitive_type_facts.items()
             if relation_key == atom[1]
@@ -870,20 +878,20 @@ def _infer_relation_bounded(
         # unproductive recursive branch must not exhaust the shared bound
         # before a shorter proof is assembled.
         applications.sort(key=lambda item: (
-            0 if item[0].rule_id == "transitivity-v1" else 1,
+            0 if item[0].rule_id == _TRANSITIVITY.proof_schema_id else 1,
             sum(_key(relation) in derivable_relations for relation in (
                 item[0].first_relation, item[0].second_relation,
                 *((item[0].third_relation,) if item[0].third_relation else ()))),
             item[0].rule_id))
         applications.extend((InferenceRule(
-            "symmetry-v1", " ".join(relation_key), " ".join(relation_key),
+            _SYMMETRY.proof_schema_id, " ".join(relation_key), " ".join(relation_key),
             " ".join(relation_key)), type_fact)
             for relation_key, facts_for_type in symmetric_type_facts.items()
             if relation_key == atom[1]
             for type_fact in facts_for_type)
         for rule, relation_type_fact in applications:
             if relation_type_fact is not None:
-                if rule.rule_id == "transitivity-v1":
+                if rule.rule_id == _TRANSITIVITY.proof_schema_id:
                     proofs.extend(prove_transitive(
                         atom, relation_type_fact, depth, new_active))
                 else:
@@ -989,12 +997,12 @@ def _infer_relation_bounded(
                                 proof = {
                                     "kind": "schema",
                                     "schema": {
-                                        "schema_id": "transitivity-v1",
-                                        "schema_type": "transitive",
+                                        "schema_id": _TRANSITIVITY.proof_schema_id,
+                                        "schema_type": _TRANSITIVITY.name,
                                         "relation": rule.conclusion_relation,
                                         "validation": {
-                                            "status": "validated",
-                                            "validator": "builtin-schema-check-v1",
+                                            "status": _TRANSITIVITY.validation_status,
+                                            "validator": _TRANSITIVITY.validator,
                                         },
                                     },
                                     "relation_type_fact": relation_type_fact,
