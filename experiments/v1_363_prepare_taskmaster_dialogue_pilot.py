@@ -85,6 +85,32 @@ def _annotation_sample(dialogues: list[dict[str, Any]], limit: int,
     return chosen
 
 
+def _double_label_sample(
+        dialogues: list[dict[str, Any]],
+        annotation_ids: set[tuple[str, str]],
+        fraction: float = 0.20) -> tuple[set[tuple[str, str]], dict[str, int]]:
+    """Choose whole conversations for independent review within each split."""
+    grouped: dict[str, set[tuple[str, str]]] = defaultdict(set)
+    for dialogue in dialogues:
+        domain = dialogue["instruction_id"].rsplit("-", 1)[0] or "unknown"
+        key = (domain, dialogue["conversation_id"])
+        if key in annotation_ids:
+            grouped[_split_for(dialogue["conversation_id"])].add(key)
+    selected: set[tuple[str, str]] = set()
+    counts = {}
+    for split, keys in grouped.items():
+        ranked = sorted(keys, key=lambda key: (
+            hashlib.sha256(
+                f"dialogue-move-audit-v1\0{split}\0{key[0]}\0{key[1]}"
+                .encode("utf-8")).hexdigest(), key))
+        count = math.ceil(len(keys) * fraction)
+        selected.update(ranked[:count])
+        counts[split] = count
+    for split in ("train", "dev", "test"):
+        counts.setdefault(split, 0)
+    return selected, counts
+
+
 def _read_dialogues(payload: Any
                     ) -> tuple[list[dict[str, Any]], list[str], int, int, int]:
     if isinstance(payload, dict):
@@ -158,6 +184,8 @@ def prepare(source_path: Path, output_path: Path, *,
         raise ValueError("no dialogues selected")
     annotation_ids = _annotation_sample(
         dialogues, annotation_dialogues, annotation_domain)
+    double_label_ids, double_label_dialogues_by_split = _double_label_sample(
+        dialogues, annotation_ids)
 
     corpus_root = output_path / "corpus"
     annotations_path = output_path / "assistant_turns_to_label.csv"
@@ -221,10 +249,18 @@ def prepare(source_path: Path, output_path: Path, *,
                 "utterance_index": str(turn["index"]),
                 "preceding_context": context,
                 "assistant_utterance": turn["text"],
+                "double_label_required": str(annotation_key in double_label_ids).lower(),
                 "move_label": "",
                 "context_license": "",
                 "predecessor_label": "",
                 "reviewer": "",
+                "move_label_2": "",
+                "context_license_2": "",
+                "predecessor_label_2": "",
+                "reviewer_2": "",
+                "adjudicated_label": "",
+                "adjudicator": "",
+                "annotator_note": "",
                 "citation": (f"{document_id}#sha256={digest}"
                              f"&chars={start}:{end}"),
                 "source_file_sha256": source_sha256,
@@ -266,6 +302,11 @@ def prepare(source_path: Path, output_path: Path, *,
         "annotation_dialogues_with_assistant_turns": len(annotation_ids_written),
         "annotation_assistant_turn_count": annotation_assistant_turns,
         "annotation_dialogues_by_split": annotation_splits,
+        "double_label_fraction": 0.20,
+        "double_label_dialogues_by_split": double_label_dialogues_by_split,
+        "double_label_dialogue_count": len(double_label_ids),
+        "double_label_turn_count": sum(
+            1 for row in annotation_rows if row["double_label_required"] == "true"),
         "annotation_file": annotations_path.name,
         "corpus_directory": corpus_root.name,
         "move_classes_for_human_review": list(ASSISTANT_MOVE_CLASSES),
@@ -330,6 +371,8 @@ def main() -> int:
         "dialogues_by_split", "annotation_domain", "annotation_dialogue_count",
         "annotation_dialogues_with_assistant_turns",
         "annotation_assistant_turn_count", "annotation_dialogues_by_split",
+        "double_label_fraction", "double_label_dialogues_by_split",
+        "double_label_dialogue_count", "double_label_turn_count",
         "labels_assigned_automatically")}, indent=2))
     return 0
 

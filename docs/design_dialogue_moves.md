@@ -129,6 +129,11 @@ until corpus size, class balance, label agreement, and a scripted baseline are m
 particular, a high greeting match rate is not useful if the system greets during a factual answer or
 uses the wrong domain convention.
 
+Use [dialogue_move_annotation_protocol.md](dialogue_move_annotation_protocol.md) for the label
+definitions, context coding, independent review, agreement reporting, and comparator evaluation.
+The worksheet flags a deterministic 20% conversation-level reliability sample within each split
+and leaves the second-rater and adjudication fields empty until humans complete them.
+
 **Stop or narrow the work** if induced frames do not outperform or materially simplify the scripted
 baseline, if acceptable coverage requires prohibitive annotation, if labels have poor agreement, or
 if the context rules cannot reliably prevent inappropriate moves. A scoped dialogue assistant could
