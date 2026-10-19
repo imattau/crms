@@ -125,10 +125,25 @@ same conversation-level audit sample as the assistant sheet.
 
 The prepared sheets have 7,312 assistant-turn rows and 6,227 user-turn rows, so labeling every row
 is a substantial effort.
-Begin with a feasibility batch drawn from the existing train partition and its double-label audit.
-Check class coverage, disagreement, and annotation time before expanding. Keep dev and test sealed
-from frame induction and policy tuning. If a target class has too few independently supported
-examples, report it as underpowered rather than borrowing turns across the split.
+Use `experiments/v1_382_dialogue_feasibility_batch.py` to create a deterministic smaller batch
+from whole conversations in the existing train partition. It copies the cited transcripts, leaves
+all label and reviewer fields blank, and marks a deterministic 20% of selected conversations for
+double labeling. For the current prepared Taskmaster sample, 40 conversations yielded 563 user turns
+and 650 assistant turns, with 8 conversations assigned to the audit. The counts describe workload,
+not quality or class balance. Example:
+
+```sh
+python3 experiments/v1_382_dialogue_feasibility_batch.py \
+  /tmp/crms_taskmaster_pilot/user_turns_to_label.csv \
+  /tmp/crms_taskmaster_pilot/assistant_turns_to_label.csv \
+  /tmp/crms_taskmaster_pilot/corpus \
+  /tmp/crms_dialogue_feasibility_v1 --conversations 40
+```
+
+Begin with this batch and check class coverage, disagreement, and annotation time before expanding.
+Keep dev and test sealed from frame induction and policy tuning. If a target class has too few
+independently supported examples, report it as underpowered rather than borrowing turns across the
+split. The sampler refuses annotated inputs and never uses CRMS predictions as labels.
 
 The assistant worksheet stores the first label in `move_label`, `context_license`,
 `predecessor_label`, and `reviewer`. Record `reviewed_at` and `protocol_version` for that label. For

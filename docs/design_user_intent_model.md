@@ -236,3 +236,10 @@ reports `awaiting_annotations`, 6,227 user turns, 7,312 assistant turns, and no 
 empty sheet is not evidence of agreement. It supports `--strict` to prevent incomplete annotations
 from being reported as a completed evaluation, and `--self-test` for the agreement formula,
 split-leakage checks, and required label provenance.
+
+To make a first human pass manageable, `experiments/v1_382_dialogue_feasibility_batch.py` selects
+whole conversations from train only, copies their cited transcripts, and deterministically assigns
+20% of the selected conversations for independent double labeling. The current 40-conversation
+batch contains 563 user turns and 650 assistant turns; its label cells remain blank. This creates a
+feasible annotation artifact, not an accuracy result. Run the evaluator after labels are entered,
+and do not train or tune on the double-label audit or held-out dev/test conversations.
