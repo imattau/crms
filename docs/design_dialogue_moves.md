@@ -147,6 +147,23 @@ The 40-conversation feasibility batch has Codex-authored primary labels, with se
 adjudication fields empty. Candidate induction may proceed, but these labels do not establish
 independent reliability or validate product behavior. See the annotation protocol for provenance
 and limits.
+
+**Runtime evaluation checkpoint (2026-10-20):** the prepared 500-conversation sheet still has
+blank assistant-move labels in train, dev, and test. The 40-conversation feasibility batch supplies
+650 Codex-labeled assistant turns from train conversations. To make a first held-out check possible,
+I labeled the first five dev conversations (76 assistant turns) under this protocol; the labels and
+report are in `/tmp/crms_dialogue_feasibility_v1/dev_first5_codex_primary.csv` and
+`/tmp/crms_dialogue_feasibility_v1/v1_411_dev_first5_report.json`. With the working-tree diagnostic
+`experiments/v1_411_dialogue_move_candidate_transfer.py`, exact-surface candidates matched 3/76
+held-out turns (3.9% coverage) and agreed with my primary labels on 2/3 matches. Context-conditioned
+candidates matched 5/76 (6.6%) and agreed on all five. The one exact-surface disagreement was
+“Did you need anything else?”: I labeled it `close` after the user ended the task, while the train
+examples label the same wording `other-task`. This exposes a context-sensitive boundary and possible
+annotator inconsistency; these small agreement figures are not accuracy or reliability estimates.
+The candidate frames remain inert. Keep test conversations sealed, expand only the preselected dev
+annotation if the diagnostic is still useful, and arrange a genuinely independent audit before
+making a label-quality or dialogue-appropriateness claim.
+
 The separate [contextual user-intent design](design_user_intent_model.md) makes intent a first-class
 research target distinct from assistant move realization. The pilot now includes user-turn
 annotations because assistant-only labels cannot teach CRMS what users are trying to accomplish.
