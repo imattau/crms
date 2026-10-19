@@ -14,7 +14,10 @@ is a sketch of the logic, not a patch to apply. A later check on real SQuAD pass
 showed the "zero wrong" result does not generalise: about one question in eight still gets a wrong
 answer. Follow-up tests on tuned and fresh samples (section 2.6) found that only the gate layer's
 gain replicates; cheap wrapper additions (reference binding, proximity ranking, learned word pairs)
-do not generalise, so the next work is structural (section 6, items 8 and 9).
+do not generalise, so the next work is structural (section 6, items 8 and 9). The one exception is
+a small learned ranker over gate-passing sentences, which did generalise (section 2.7). The
+project owner has decided that a bounded learned component of this kind is allowed (decision
+recorded in section 2.7); embeddings and neural similarity are not yet allowed.
 **Relationship to other docs:** the ground rules in section 0 of
 [design_learning_dynamics.md](design_learning_dynamics.md) apply unchanged (evidence over
 assumption, abstain when unsure, propose then verify, deterministic, CPU-friendly). Section 4
@@ -261,9 +264,131 @@ Findings:
    to appear in at least 3 separate articles gave 103 correct and 38 wrong (worse than none); at
    least 5 articles changed nothing. The surviving pairs were generic words ("type" with "other",
    "also", "such"). Independent-article support alone does not select real paraphrases.
+6. **Wider entity context raises coverage, not precision.** I let the mention check also accept
+   entity tokens from the answer sentence's paragraph and the article title, together with the
+   possessive and plural handling from item 2. With that, on the tuned sample the gold sentence
+   passes the gate for 136 of 200 questions (68%), and on the fresh sample for 132 of 200 (66%);
+   54 and 42 questions have no candidate sentence at all. Correct answers rise (tuned 99 to 111,
+   fresh 84 to 97), but wrong answers rise with them (tuned 27 to 30, fresh 34 to 42) and
+   precision stays flat to lower (tuned 78%, fresh 69%). The mention check remains the largest
+   single blocker: of the 64 (tuned) and 68 (fresh) gold sentences still rejected, relaxing it
+   alone would admit 42 in each, against 4 and 9 for the answer-type check and 10 and 16 for
+   relation-word overlap. Remaining mention failures are possessive forms, name variants
+   ("Bill Aiken" against "Aken"), a partial name for a multi-word title ("Doctor" for "Doctor
+   Who") and pronoun-initial sentences.
+7. **The selection gap is large.** When the gold sentence does pass the gate, plain overlap ranking
+   puts it first in 100 of 200 questions (tuned) and 94 of 200 (fresh), and in the top three in 119
+   and 113; the median number of sentences passing the gate was 5 and 6.
+8. **Answer-span agreement did not replicate.** Preferring the top-ranked sentence when its typed
+   answer span also appears in another top-five sentence, and abstaining when neither that nor a
+   score margin holds, looked good on the tuned sample (99 correct, 16 wrong, 86% precision) but gave
+   90 correct and 39 wrong (69%) on the fresh sample. A span-vote variant was worse on both.
 
 Caveats: 200 questions per sample, so a few questions is noise; the same grader limits as in 2.5;
 scripts are in a scratch folder and are not committed.
+
+### 2.7 A small learned ranker generalises (decision recorded)
+
+Everything above chooses between candidate sentences with hand-set scores, and none of it
+generalised. The one thing that did is a small logistic-regression ranker over the sentences that
+pass the gate.
+
+**Setup.** Training data: 1,520 questions (40 from each of the 38 articles never used for
+testing), 11,323 candidate rows (the top 15 gate-passing sentences per question), 1,749 positive
+(the sentence contains a gold answer). Inputs are computed from the question and sentence only, not
+from gold: idf-weighted share of the question's terms matched, fraction of terms matched, word
+proximity, whether a typed answer span exists, mention coverage, sentence length, whether it is the
+paragraph's first sentence, summed matched idf, the log of the number of candidates, and the wh-type
+of the question (16 inputs in all). The ranker picks the highest-probability candidate and answers
+only if its probability reaches a threshold; otherwise CRMS abstains. The mention fixes and
+paragraph/title context from item 6 are used.
+
+**Learned weights (largest).** idf-weighted term coverage +1.48, fraction of terms matched +1.27,
+log candidate count -0.55 (fewer plausible candidates means more confidence), word proximity
++0.32, summed matched idf +0.23. The answer-span, first-sentence and wh-type inputs are all
+within about 0.2 of zero.
+
+**Results.** All rows use the frozen engine at commit `622fa99`.
+
+| Configuration | Sample | Correct | Abstained | Wrong | Wrong-article answered | Precision |
+|---|---|---|---|---|---|---|
+| Engine alone | fresh | 75 | 82 | 43 | 11 / 100 | 63% |
+| NL-gate layer | fresh | 84 | 82 | 34 | 8 / 100 | 71% |
+| Mention fixes and context, no ranking | fresh | 97 | 61 | 42 | 8 / 100 | 69% |
+| Learned ranker, answer if p ≥ 0.3 | fresh | 99 | 76 | 25 | 2 / 100 | 79% |
+| Learned ranker, answer if p ≥ 0.4 | fresh | 94 | 85 | 21 | 0 / 100 | 81% |
+| Learned ranker, answer if p ≥ 0.5 | fresh | 83 | 100 | 17 | 0 / 100 | 83% |
+| Learned ranker, answer if p ≥ 0.6 | fresh | 76 | 109 | 15 | 0 / 100 | 83% |
+| NL-gate layer | tuned | 99 | 74 | 27 | 5 / 100 | 78% |
+| Learned ranker, answer if p ≥ 0.3 | tuned | 107 | 66 | 27 | 2 / 100 | 79% |
+| Learned ranker, answer if p ≥ 0.4 | tuned | 101 | 81 | 18 | 2 / 100 | 84% |
+| Learned ranker, answer if p ≥ 0.5 | tuned | 91 | 98 | 11 | 2 / 100 | 89% |
+
+At p ≥ 0.3 on the fresh sample it gives 15 more correct answers than the gate layer, 9 fewer wrong
+ones and 6 fewer wrong-article answers. Raising the threshold trades coverage for precision in a
+predictable way, which none of the hand-set rankers did. This is the only addition in this
+document that improved precision on articles it was not tuned on; the training articles and the
+fresh articles are disjoint, and the thresholds were chosen from a fixed grid before looking at
+the fresh sample.
+
+**Caveats.**
+- Same kind of text for training and testing (Wikipedia-style paragraphs with SQuAD questions).
+  I did not test other domains, other languages, less training data, or the small hand-written
+  sets.
+- It scanned every sentence of an article for candidates. At scale, candidates must come from the
+  FTS retrieval and the 15-per-question cap, which I did not test, along with latency.
+- Where candidates exist it answers with the chosen sentence directly and does not use the
+  engine's own reply; the engine reply is the fallback only when no candidate passes the gate.
+- 200 questions per sample, so a few questions is noise. The scripts are in a scratch folder and
+  are not committed.
+
+**Decision (project owner, recorded 2026-10-19).** The earlier rule "no learned similarity model"
+is relaxed for a *bounded* learned component. This was option (B) in the analysis below, adopted
+on the strength of one fresh-sample result; it is a licence to pilot, not a finding that the
+ranker is proven. The ranker is 16 numbers, deterministic to retrain, CPU-cheap, and restricted to
+choosing among sentences the gate has already accepted.
+
+*Allowed*
+- A learned component that **proposes or ranks** candidates. It may never be the source of a fact
+  and never the final judge of acceptance: the evidence gate, the proof checks and the abstention
+  threshold still decide what is returned, so every answer still traces to a cited source.
+- Small, readable models whose inputs are named features (the 16-weight form tested here), stored
+  as a **reviewable, versioned record** that records its training data, training procedure and
+  date, and that can be listed, replaced or removed like other learned items. The `why?` view
+  should be able to show the feature values behind a choice.
+- Deterministic training (fixed procedure, fixed order, fixed seed) and CPU-only inference.
+
+*Not allowed yet*
+- Embeddings or neural similarity, any learned component that decides what to accept as a fact,
+  and any component that requires a model download. Reconsider only if the staged route below
+  plateaus, and only as a proposer with exact verification.
+
+*Conditions before it ships*
+- Keep the "fresh articles only" bar: a gain counts only if it holds on text it was not trained or
+  tuned on, with wrong answers and wrong-article answers reported alongside correct ones.
+- Test the cases not yet covered: less training data (a learning curve), the hand-written sets,
+  other kinds of text, and candidates supplied by FTS retrieval instead of a whole-article scan,
+  with latency.
+- Check that shipping weights trained on SQuAD (CC BY-SA 4.0) is acceptable, or train instead on
+  data CRMS already holds under its own rules: reviewed answers, accepted facts, and feedback
+  recorded in the evidence ledger. That alternative is untested and is the preferred direction
+  because it keeps the training loop inside the project's provenance rules.
+- Update the README so it states plainly that a small learned ranker exists (it currently says no
+  AI model is needed or downloaded; a shipped weights record is not a download, but the wording
+  must not imply there are no learned weights).
+
+*Staged route.* (1) The feature-based ranker tested here. (2) A learned table of wording
+equivalences that is only ever a proposal for human review (section 3.6). (3) Embeddings as a
+proposer with exact verification, only if steps 1 and 2 plateau. Each step needs its own
+fresh-sample evidence before the next is considered.
+
+*Analysis behind the decision.* Arguments for: it fits "propose, then verify"; the weights are
+reviewable; the choice can be explained. Arguments against: the training labels come from an
+external dataset; it adds a model that must be retrained and versioned; it moves the project
+across the "no learned weights" line that distinguishes it from an LLM. Options considered: (A) do
+not adopt and accept about 70% precision on this kind of text; (B) adopt as a reviewable, versioned
+record (chosen, within the limits above); (C) use the learned weights only as a guide for hand-set
+scores (untested).
 
 ## 3. The ideas, with what was tested
 
@@ -527,7 +652,9 @@ Each step: add a benchmark family or reuse the sets above, record the numbers in
 - General coreference resolution across paragraphs. Binding a pronoun to the article title was
   tested and did not improve answers (section 2.6); only revisit it with evidence from a larger
   sample.
-- Embeddings or any learned similarity model.
+- Embeddings or neural similarity models, and any learned component that decides whether
+  something is accepted as a fact. A small, readable, versioned ranker that only orders
+  gate-passing candidates is allowed under the decision in section 2.7.
 - Relation extraction beyond the closed type table; open-ended relation discovery stays with the
   existing frame-learning machinery.
 
@@ -558,19 +685,24 @@ Each step: add a benchmark family or reuse the sets above, record the numbers in
       The measured yield on real text is low (section 3.6), so improve extraction first and
       measure how many SQuAD-style questions become answerable from facts.
    b. *Evidence from neighbouring sentences.* About half of the gold sentences rejected by the
-      mention check do not name the entity the question asks about; the entity is introduced in
-      the same paragraph. Test paragraph-level evidence units (answer sentence plus its paragraph's
-      named entities) as the thing the mention check runs against, rather than single sentences.
+      mention check do not name the entity the question asks about. Letting the check use the
+      paragraph's and title's entities (2.6, item 6) raised coverage by about 13 correct answers
+      per 200 questions but also added wrong answers, so it needs a better selector (2.7) to be
+      worth shipping. Name variants and partial names of multi-word titles remain open.
    c. *Answers built from the structured result* (the answer line from the chat UX doc, and
       realisation from the relation), so the response does not depend on quoting one sentence.
    d. *Role-aware wording evidence.* Plain word co-occurrence gave noise (2.6, item 5); the next
       step is evidence that also requires compatible subject and object classes, with review.
    Each needs a fresh-sample measurement before adoption; tuned-sample gains do not count.
-9. **Choosing between gate-passing sentences.** Ranking by inverse-document-frequency overlap with a
-   margin, with or without word proximity, did not generalise (section 2.6). Stronger evidence is
-   needed before a ranking step is added: agreement of the answer span between the two best
-   candidates, role-order checks from 3.3, or corroboration by an independent second source. Until
-   then, prefer abstaining when several sentences pass.
+9. **Choosing between gate-passing sentences.** Hand-set ranking (idf overlap with a margin, word
+   proximity, answer-span agreement) did not generalise (section 2.6). A 16-weight learned ranker
+   did (section 2.7: 79 to 83% precision on fresh articles against 71% for the gate layer). The
+   project owner has allowed a bounded learned ranker (section 2.7). Next: test it with less
+   training data (a learning curve), on the hand-written sets, on other text, and on FTS-supplied
+   candidates with latency; try training it on CRMS's own reviewed answers and ledger feedback
+   instead of an external dataset; and update the README wording. Until it ships, prefer abstaining
+   when several sentences pass, with role-order checks from 3.3 or corroboration by an independent
+   second source as non-learned alternatives.
 10. **Pin the engine version in benchmarks.** Results moved between runs when the working tree
    changed during testing. A benchmark script should record the commit it ran against, or run
    against an exported copy, and refuse to compare numbers from different commits.
