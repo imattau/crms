@@ -60,6 +60,30 @@ def main() -> None:
                 and "1889" not in explanation.text,
                 f"why? explained an older topic instead of the latest one: {explanation!r}")
 
+        failure_dialogue = CRMSDialogue(CRMSKnowledgeBase())
+        respond(failure_dialogue, "When was the Eiffel Tower completed?",
+                research_index=index)
+        respond(failure_dialogue, "And the Colosseum?", research_index=index)
+        unsupported = respond(failure_dialogue, "Who designed it?",
+                              research_index=index)
+        require(unsupported.status == "unknown"
+                and failure_dialogue.topic_entity == "Colosseum"
+                and failure_dialogue.last_question is None,
+                f"an unsupported pronoun answer erased the grounded topic or "
+                f"left a stale explanation target: {unsupported!r}; "
+                f"{failure_dialogue!r}")
+        unsupported_explanation = respond(failure_dialogue, "Why?",
+                                          research_index=index)
+        require("50,000 spectators" not in unsupported_explanation.text
+                and "1889" not in unsupported_explanation.text,
+                f"why? reused an answer from before the failed turn: "
+                f"{unsupported_explanation!r}")
+        recovered = respond(failure_dialogue, "When was it completed?",
+                            research_index=index)
+        require("80 CE" in recovered.text and "1889" not in recovered.text,
+                f"valid topic context did not survive an unsupported follow-up: "
+                f"{recovered!r}")
+
         state = Path(folder) / "dialogue.json"
         dialogue.save(str(state))
         restored = CRMSDialogue.load(CRMSKnowledgeBase(), str(state),
@@ -103,6 +127,7 @@ def main() -> None:
     print("source-only topic switch and local paragraph grounding: PASS")
     print("remote-paragraph answer leakage: REJECTED")
     print("latest-answer explanation and save/reload follow-up: PASS")
+    print("unsupported follow-up preserves topic but clears stale why-target: PASS")
 
 
 if __name__ == "__main__":

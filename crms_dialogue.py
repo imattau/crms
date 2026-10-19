@@ -1157,7 +1157,7 @@ class CRMSDialogue:
                     quantity_words & {word.casefold()
                                       for word in _WORD_RE.findall(quoted_text)})
             if not has_quantity:
-                self.clear()
+                self._clear_rejected_source_turn(question, resolved)
                 return DialogueTurn(
                     "unknown", question, resolved,
                     text=("The quoted source does not state a quantity, so I "
@@ -1166,13 +1166,39 @@ class CRMSDialogue:
             resolved, quoted_text, visible_research, research_index)
         if not missing:
             return None
-        self.clear()
+        self._clear_rejected_source_turn(question, resolved)
         names = ", ".join(missing)
         return DialogueTurn(
             "unknown", question, resolved,
             text=(f"The quoted sentence I found does not name {names}, so I can't "
                   "safely attribute it to that entity. Please provide a "
                   "source that names it or rephrase the question."))
+
+    def _clear_rejected_source_turn(self, question: str, resolved: str) -> None:
+        """Drop a rejected answer while retaining a still-grounded pronoun topic.
+
+        An unsupported follow-up must not become the target of ``why?``. But if
+        the user asked about the already active topic and retrieval returned an
+        unanchored sentence, that failed retrieval does not make the previously
+        displayed topic disappear. Keep only its displayed citation mention so
+        the next short follow-up can still be resolved safely.
+        """
+        topic = self.topic_entity
+        pronoun_led = any(
+            match.group(0).casefold() in _REFERENTIAL_PRONOUNS
+            for match in _WORD_RE.finditer(question))
+        topic_in_resolved = bool(topic and re.search(
+            r"(?<!\w)" + re.escape(topic) + r"(?!\w)", resolved,
+            flags=re.IGNORECASE))
+        preserved_mentions = [
+            item for item in self.source_mentions
+            if topic and str(item.get("entity", "")).casefold() == topic.casefold()
+        ]
+        self.clear()
+        self.last_answered = None
+        if topic and pronoun_led and topic_in_resolved and preserved_mentions:
+            self.topic_entity = topic
+            self.source_mentions = preserved_mentions
 
     def _merge_mentions(self, *groups: list[dict[str, str]]
                         ) -> list[dict[str, str]]:
