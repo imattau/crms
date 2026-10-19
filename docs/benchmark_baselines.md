@@ -2035,3 +2035,30 @@ abstention and “may not answer” wording; it permits a closest sentence only
 when clearly identified as non-answer evidence. These changes correct the
 fixtures, not CRMS's answer behavior. The retest confirms these narrow cases on
 the current checkout; held-out dialogue generalization remains unmeasured.
+
+## New-entity dialogue transfer probe (2026-10-20)
+
+Command: `python3 experiments/v1_442_heldout_dialogue_transfer.py`.
+
+Four Codex-authored fixtures vary entity names and source layout: adjacent
+entities in one paragraph, separate paragraphs with a third intervening
+entity and a plural antecedent, line-wrapped source, and reversed entity order.
+Each conversation checks a named answer, named topic switch, pronoun follow-up,
+`why?`, exact source citation, state reload, and an unsupported closing-action
+question. The run selected target evidence on 20/20 supported steps, returned
+0 wrong answers, and abstained on all 4/4 negative controls. The conversational
+labels and sources were constructed together by Codex; this is a frozen
+regression/transfer probe, not an independent or representative dialogue
+benchmark.
+
+The probe exposed that `When did X open?` worked when the answer sentence
+named X but failed when the source used a locally anchored pronoun and regular
+past tense (`It opened ...`). The do-support retrieval morphology now runs for
+WH questions beyond `where`, and exact licensed morphology can contribute to
+sentence coverage. Pronoun-led sentences are considered when the nearest
+explicit subject in the cited paragraph matches the query, including plural
+and gendered forms. The existing 12 focused retrieval/dialogue regressions
+(`v1_413`, `v1_414`, `v1_419`, `v1_420`, `v1_423`, `v1_425`, `v1_426`,
+`v1_427`, `v1_435`, `v1_438`, `v1_439`, `v1_440`) also passed after the change.
+This does not demonstrate open-domain language transfer or human-label
+accuracy.

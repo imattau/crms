@@ -2325,9 +2325,14 @@ class CRMSResearchIndex:
                     continue
                 matched_terms = tuple(sorted({token.group() for token in matching}))
                 covered_terms = (set(matched_terms) & original_terms)
-                if person_question:
-                    covered_terms.update(
-                        frame_expansion_coverage(set(sentence_words)))
+                # Morphology licensed from the question is useful for every
+                # WH role, not only WHO questions. For example, do-support in
+                # "When did it open?" licenses the surface form "opened" in
+                # source text. Entity identity remains a separate coverage
+                # requirement, with dialogue paragraph grounding required for
+                # pronoun-led source sentences.
+                covered_terms.update(
+                    frame_expansion_coverage(set(sentence_words)))
                 # Require multiple matching terms for ordinary retrieval so a
                 # generic one-word match cannot masquerade as an answer. For
                 # summaries, a one-term sentence can be useful when it covers

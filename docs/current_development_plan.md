@@ -148,14 +148,15 @@ unsupported cases alongside capability results.
 
 1. **Measure dialogue generalization.** Keep the reported Eiffel Tower /
    Colosseum, source-only context, `why?`, and France → Italy sequences as
-   regressions (`v1_413`, `v1_419`, `v1_426`, `v1_427`). Build a frozen set of
-   new conversations with varied paragraph layouts, competing entities,
-   interruptions, corrections, history questions, ordinal references, and
-   unresolved choices. Include pronoun-led sentences in both shared and
-   separate paragraphs. Report wrong referents, wrong answer sentences,
-   omissions, clarification, abstention, citation support, and task completion
-   separately. Attribute labels and authoring; do not present this small set as
-   independent human evaluation.
+   regressions (`v1_413`, `v1_419`, `v1_426`, `v1_427`). The first new transfer
+   probe is now `v1_442`: four new entity/layout cases cover adjacent topics,
+   an intervening third entity, line-wrapped text, plural antecedents, topic
+   switches, `why?`, reload, and unsupported actions. Add independently
+   authored conversations with interruptions, corrections, history questions,
+   ordinal references, and unresolved choices. Report wrong referents, wrong
+   answer sentences, omissions, clarification, abstention, citation support,
+   and task completion separately. Attribute labels and authoring; do not
+   present the Codex-authored probe as independent human evaluation.
 2. **Advance source-derived self-learning rules.** Extend beyond current
    teacher-labeled phrase and connective examples using complete-document and
    source-disjoint holdouts. Keep source evidence, extracted candidates,
@@ -188,6 +189,21 @@ paragraph/entity negatives, an action-missing abstention, date answer selection,
 and source-only topic retention after an unsupported follow-up. This closes
 only that narrow regression set. General relation entailment, author-held-out
 dialogue, source-only learning of action wording, and broad temporal phrasing
+remain open.
+
+The first new dialogue transfer probe, `v1_442_heldout_dialogue_transfer.py`,
+passes four Codex-authored source/layout cases: 20/20 supported answer or
+evidence steps selected the target entity, and 4/4 unsupported closing-date
+questions abstained. It covers single-paragraph adjacent entities, separate
+paragraphs with an intervening third entity, line-wrapped paragraphs, and a
+plural `they` antecedent, including `why?`, exact citations, and state reload.
+To support it, regular do-support verb spelling retrieval now applies across
+WH roles, and a pronoun-led source sentence can be shown when its nearest
+explicit paragraph subject matches the query entity. The 13 focused runtime
+regressions (`v1_413`, `v1_414`, `v1_419`, `v1_420`, `v1_423`, `v1_425`,
+`v1_426`, `v1_427`, `v1_435`, `v1_438`, `v1_439`, `v1_440`, `v1_442`) pass.
+This is controlled transfer evidence, not an independently authored dialogue
+benchmark; broader verbs, varied natural dialogue, and independent labels
 remain open.
 
 The procedure track now has an additional end-to-end recombination slice:

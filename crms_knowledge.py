@@ -7420,11 +7420,16 @@ class CRMSKnowledgeBase:
                     evidence=token,
                     rules=[rule, "retrieval-only spelling correspondence"])
 
-        # A common locative question uses an uninflected verb after do/does,
-        # while its evidence may use a regular finite form ("work" / "worked").
-        # Generate only transparent regular spellings; this changes retrieval
-        # terms, never the fact store or the wording of quoted evidence.
-        if (len(query_words) >= 3 and query_words[0] == "where"
+        # Wh-questions with do-support use an uninflected verb ("When did X
+        # open?"), while source prose may use a regular finite form ("It
+        # opened in 1964."). Generate only transparent regular spellings;
+        # this changes retrieval terms, never the fact store or the wording of
+        # quoted evidence. The sentence-level ranker and entity/paragraph
+        # grounding still decide whether a retrieved sentence answers.
+        if (len(query_words) >= 3
+                and query_words[0] in {
+                    "who", "whom", "what", "which", "where", "when",
+                    "why", "how"}
                 and query_words[1] in {"do", "does", "did"}):
             base = query_words[-1]
             irregular = {
@@ -7437,7 +7442,19 @@ class CRMSKnowledgeBase:
                 "speak", "stand", "take", "teach", "tell", "think", "throw",
                 "understand", "wear", "win", "write",
             }
-            if base.isalpha() and len(base) >= 2 and base not in irregular:
+            trailing_function_words = {
+                "about", "above", "across", "after", "against", "along",
+                "among", "around", "as", "at", "before", "behind",
+                "below", "beneath", "beside", "between", "beyond", "by",
+                "down", "during", "for", "from", "in", "inside", "into",
+                "near", "of", "off", "on", "onto", "out", "outside",
+                "over", "past", "since", "through", "throughout", "to",
+                "toward", "under", "underneath", "until", "up", "upon",
+                "with", "within", "without",
+            }
+            if (base.isalpha() and len(base) >= 2
+                    and base not in irregular
+                    and base not in trailing_function_words):
                 context, removed = _predicate_spelling_class(base)
                 stem = base[:-1] if context == "final-e" else base
                 plural = (base + "es" if context in {"sibilant", "final-o"}
@@ -7458,7 +7475,7 @@ class CRMSKnowledgeBase:
                 for form in sorted({plural, past, progressive} - {base}):
                     add_expansion(
                         form, kind="regular_question_verb_inflection",
-                        evidence=f"where-question verb: {base}",
+                        evidence=f"do-support wh-question verb: {base}",
                         rules=[f"{context}; removed={removed or 'none'}"])
 
         # A bounded agent-noun question can retrieve evidence written with its
@@ -7741,10 +7758,11 @@ class CRMSKnowledgeBase:
         # different person can win on shared topical words (for example,
         # Einstein's Nobel Prize sentence for a Marie Curie question).
         def pronoun_sentence_is_anchored(sentence: Mapping[str, Any]) -> bool:
-            """Keep a short ``it`` sentence only under the nearest named subject."""
+            """Keep a pronoun-led sentence only under the nearest named subject."""
             text = str(sentence.get("text", ""))
             if not named_anchor_tokens or not re.match(
-                    r"\s*(?:it|its)\b", text, flags=re.IGNORECASE):
+                    r"\s*(?:it|its|he|him|his|she|her|they|them|their)\b",
+                    text, flags=re.IGNORECASE):
                 return False
             citation = str(sentence.get("citation", ""))
             span = re.search(r"&chars=(\d+):(\d+)", citation)
@@ -7987,7 +8005,9 @@ class CRMSKnowledgeBase:
 
             source_sentences.sort(key=source_sentence_rank, reverse=True)
             if (named_anchor_tokens and source_sentences
-                    and (re.match(r"\s*(?:it|its)\b",
+                    and (re.match(
+                                  r"\s*(?:it|its|he|him|his|she|her|"
+                                  r"they|them|their)\b",
                                   str(source_sentences[0].get("text", "")),
                                   flags=re.IGNORECASE)
                          or object_pronoun_sentence_is_anchored(
