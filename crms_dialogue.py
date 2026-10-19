@@ -1107,8 +1107,25 @@ class CRMSDialogue:
             research: ResearchResult | None = None,
             research_index: Any | None = None
             ) -> DialogueTurn | None:
+        # Only evidence actually shown to the user may license a source-only
+        # answer. Research can return several candidates, and a different
+        # candidate may contain the queried entity's antecedent. Letting that
+        # unseen candidate anchor the displayed sentence can attribute a
+        # pronoun sentence to the wrong entity (for example, two "It was
+        # completed" sentences in one paragraph).
+        visible_research = research
+        if research is not None and research.source_sentences:
+            visible_sentences = [
+                item for item in research.source_sentences
+                if (isinstance(item.get("text"), str)
+                    and item["text"].strip()
+                    and item["text"].strip() in quoted_text)
+            ]
+            visible_research = ResearchResult(
+                status=research.status, source_sentences=visible_sentences,
+                query=research.query)
         missing = self._unanchored_question_entities(
-            resolved, quoted_text, research, research_index)
+            resolved, quoted_text, visible_research, research_index)
         if not missing:
             return None
         self.clear()

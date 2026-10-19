@@ -178,6 +178,23 @@ mismatched city identifier. The end-to-end experiment passes. This is a fix for
 direct predicate containment and route order, not a synonym or open-domain
 semantic parser.
 
+## Citation-local topic grounding with competing antecedents
+
+Command: `python3 experiments/v1_435_dialogue_visible_evidence_anchor.py`.
+
+A varied corpus probe put the Eiffel Tower and Colosseum, and both
+"It was completed" sentences, in the same paragraph. After an explicit
+Colosseum switch, retrieval displayed the Eiffel Tower's 1889 sentence. The
+guard accepted it because a different, undisplayed candidate citation had a
+Colosseum antecedent. The guard now checks only citations included in the
+rendered reply. In the same-paragraph case CRMS abstains rather than attributing
+1889 to the Colosseum; the separate-paragraph control remains free of Eiffel
+leakage. The focused dialogue regressions `v1_412`, `v1_413`, `v1_414`,
+`v1_426`, `v1_427`, and `v1_418` also pass on this working tree. This closes
+the false citation-license path, but not retrieval ranking: a same-paragraph
+topic switch can still abstain where a stronger sentence selector should find
+the correct 80 CE sentence.
+
 ## Failed entity follow-up must not leave a stale explanation target
 
 Command: `python3 experiments/v1_419_failed_entity_followup_state.py`.
