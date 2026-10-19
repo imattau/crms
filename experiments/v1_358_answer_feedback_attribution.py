@@ -20,7 +20,8 @@ from crms_feedback import (
     AnswerFeedbackStore, collect_codegen_feedback_refs,
     collect_feedback_refs,
     collect_math_feedback_refs, collect_translation_feedback_refs,
-    collect_summary_feedback_refs, feedback_answer_id, render_feedback_refs,
+    collect_summary_feedback_refs, collect_timeline_feedback_refs,
+    feedback_answer_id, render_feedback_refs,
 )
 from crms_knowledge import CRMSKnowledgeBase
 from crms_math import CRMSMath
@@ -133,6 +134,26 @@ def main() -> None:
     require({("source", "src-1"), ("rule", "rule-1")} <= {
                 (item["kind"], item["id"]) for item in expansion_refs},
             f"summary feedback omitted query-expansion lineage: {expansion_refs}")
+
+    timeline_kb = CRMSKnowledgeBase()
+    for subject, obj, source in (("Ada", "Acme", "event:2012"),
+                                 ("Grace", "Lab", "event:2013")):
+        timeline_kb.add_fact(subject, "founded", obj, source)
+        timeline_kb.teach_fact_pattern(
+            f"{subject} founded {obj}.", subject=subject, relation="founded",
+            obj=obj, source=source, predicate_phrase="founded")
+    timeline_kb.add_fact("Ada", "founded", "Acme", "event:2012",
+                         qualifiers={"year": "2012"})
+    timeline_result = timeline_kb.write_timeline("Ada")
+    timeline_refs = collect_timeline_feedback_refs(timeline_result)
+    require(any(item["kind"] == "fact"
+                and item.get("subject") == "Ada"
+                and item.get("object") == "Acme"
+                and "event:2012" in item.get("sources", ())
+                for item in timeline_refs)
+            and ("source", "event:2012") in {
+                (item["kind"], item["id"]) for item in timeline_refs},
+            f"timeline feedback omitted fact or wording-source lineage: {timeline_refs}")
     fact_ref = next((item for item in refs if item["kind"] == "fact"), None)
     require(fact_ref is not None
             and fact_ref["subject"] == "Ada"
@@ -446,6 +467,36 @@ def main() -> None:
                 f"paper metadata/result feedback lost exact citations: {events}\n"
                 f"chat output: {run.stdout}")
 
+    with tempfile.TemporaryDirectory(prefix="crms-timeline-feedback-chat-") as directory:
+        root = Path(directory)
+        timeline_kb.save(root / "knowledge.json")
+        args = [sys.executable, str(ROOT / "crms_chat.py"),
+                "--knowledge", str(root / "knowledge.json"),
+                "--feedback-db", str(root / "feedback.sqlite3"),
+                "--dialogue-state", str(root / "dialogue.json"),
+                "--rules", str(root / "rules.json"),
+                "--rule-session", str(root / "rule-session.json"),
+                "--math", str(root / "math.json"),
+                "--math-session", str(root / "math-session.json"),
+                "--translations", str(root / "translations.json"),
+                "--translation-session", str(root / "translation-session.json")]
+        run = subprocess.run(
+            args,
+            input="Write a timeline for Ada ordered by year.\n"
+                  "/wrong\n/feedback\n/quit\n",
+            text=True, capture_output=True, timeout=30)
+        require(run.returncode == 0, run.stderr or run.stdout)
+        events = AnswerFeedbackStore(root / "feedback.sqlite3").recent(1)
+        require(len(events) == 1
+                and any(item["kind"] == "fact"
+                        and item.get("subject") == "Ada"
+                        and item.get("object") == "Acme"
+                        for item in events[0]["evidence"])
+                and any(item["kind"] == "source"
+                        and item["id"] == "event:2012"
+                        for item in events[0]["evidence"]),
+                f"timeline feedback lost its exact claim/frame attribution: {events}")
+
     print("answer feedback attribution: direct facts, rule, and source refs PASS")
     print("translation feedback ties to deterministic aligned-frame evidence: PASS")
     print("interactive translation feedback persists its frame attribution: PASS")
@@ -456,6 +507,8 @@ def main() -> None:
     print("summary feedback retains exact citations and expansion lineage: PASS")
     print("interactive summary feedback persists cited sources: PASS")
     print("paper author and main-result feedback retain exact citations: PASS")
+    print("timeline feedback retains fact and wording-source lineage: PASS")
+    print("interactive timeline feedback persists cited fact attribution: PASS")
     print("SQLite persistence, deterministic IDs, duplicate suppression: PASS")
     print("conflicting feedback retained for review without changing knowledge: PASS")
     print("wrong proof feedback suspends only validated learned rules: PASS")

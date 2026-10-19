@@ -180,6 +180,23 @@ def collect_summary_feedback_refs(summary: Any) -> list[dict[str, Any]]:
     })
 
 
+def collect_timeline_feedback_refs(result: Any) -> list[dict[str, Any]]:
+    """Collect fact and wording-source lineage from written timeline events."""
+    evidence_rows = []
+    for statement in getattr(result, "statements", ()) or ():
+        if not isinstance(statement, Mapping):
+            continue
+        fact = statement.get("fact")
+        if isinstance(fact, Mapping):
+            evidence_rows.append(fact)
+        frame = statement.get("frame_evidence")
+        if isinstance(frame, Mapping):
+            evidence_rows.append(frame)
+    if not evidence_rows:
+        return []
+    return collect_feedback_refs(response={"evidence": evidence_rows})
+
+
 def collect_translation_feedback_refs(result: Any) -> list[dict[str, Any]]:
     """Identify the aligned model examples behind a completed translation.
 

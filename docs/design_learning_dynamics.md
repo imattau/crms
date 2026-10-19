@@ -50,13 +50,14 @@ reload. Inference `why?` follow-ups also retain proof lineage. The current answe
 now persists in SQLite across chat restarts, including its evidence references; schema version 1
 migrates without discarding its event history. A new natural-language turn clears that target, and
 opposite post-restart signals remain a reviewable conflict.
-`experiments/v1_367_persistent_feedback_context.py` checks those behaviors. Remaining work includes
-attaching feedback to completed translation, math, code-generation, extractive-summary, paper-author,
-and paper-result routes. Translation feedback fingerprints the aligned frame and examples; math
-feedback fingerprints the expression, exact result, and licensed operator/number/unit evidence; code
-feedback identifies the generated artifact and its recorded instruction examples and parity cases;
-research feedback retains exact source citations and query-expansion licenses. These identify the
-model evidence without turning feedback into a new training example or proof of correctness. Other
+`experiments/v1_367_persistent_feedback_context.py` checks those behaviors. The feedback system now
+covers direct facts, inference, translation, math, code generation, extractive summaries, paper
+authors/results, and timelines. Translation feedback fingerprints the aligned frame and examples;
+math feedback fingerprints the expression, exact result, and licensed operator/number/unit evidence;
+code feedback identifies the generated artifact and its recorded instruction examples and parity
+cases; research feedback retains exact source citations and query-expansion licenses; timeline
+feedback records the underlying fact triples and wording evidence. These identify the model
+evidence without turning feedback into a new training example or proof of correctness. Other
 specialized answer routes still need coverage. Remaining work also includes connecting `/right` to
 evidence-ledger confirmation and measuring
 revision/abstention on a larger noisy-feedback benchmark. Direct-fact feedback stores the structured proposition and its supporting

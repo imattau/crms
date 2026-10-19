@@ -18,6 +18,7 @@ from crms_feedback import (
     collect_codegen_feedback_refs,
     collect_math_feedback_refs,
     collect_summary_feedback_refs,
+    collect_timeline_feedback_refs,
     collect_translation_feedback_refs, render_feedback_refs,
 )
 from crms_explain import render_verified_explanation
@@ -8995,6 +8996,11 @@ def main() -> int:
                                  for value in timeline_request.groups())
             result = knowledge.write_timeline(subject, order_by=order_by)
             print(f"CRMS> {result.text}")
+            timeline_refs = collect_timeline_feedback_refs(result)
+            remember_feedback(
+                {"question": line, "answer": result.text,
+                 "evidence": timeline_refs}
+                if timeline_refs else None)
             if result.statements:
                 dialogue.last_question = None
                 dialogue.last_selected_answer = None
