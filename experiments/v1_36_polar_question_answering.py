@@ -15,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from crms_knowledge import CRMSKnowledgeBase
 from crms_dialogue import CRMSDialogue
 from crms_research import CRMSResearchIndex
+from crms_rule_proof import verify_closed_world_denial
 
 
 def main() -> None:
@@ -122,6 +123,32 @@ def main() -> None:
         raise SystemExit(
             f"explicit closed-world declaration did not ground a negative answer: "
             f"{closed_world_no}")
+    closed_world_inference = zero_kb.infer_relation(
+        "Ada Lovelace", "create", "Linux")
+    if (closed_world_inference.status != "denied"
+            or not closed_world_inference.complete
+            or not closed_world_inference.denial_evidence):
+        raise SystemExit(
+            "closed-world absence did not produce a complete, evidenced denial: "
+            f"{closed_world_inference}")
+    if "Denied by the declared closed-world boundary" not in \
+            CRMSKnowledgeBase.render_inference(closed_world_inference):
+        raise SystemExit("inference renderer did not preserve the denied status")
+    expected = closed_world_inference.conclusion
+    declaration = closed_world_inference.denial_evidence
+    if verify_closed_world_denial(
+            expected, declaration, expected_conclusion=expected,
+            complete=False, facts=zero_kb.facts()).valid:
+        raise SystemExit("denial verifier accepted an incomplete search")
+    if verify_closed_world_denial(
+            expected, None, expected_conclusion=expected,
+            complete=True, facts=zero_kb.facts()).valid:
+        raise SystemExit("denial verifier accepted a missing declaration")
+    if verify_closed_world_denial(
+            {"subject": "Grace Hopper", "relation": "create", "object": "Linux"},
+            declaration, expected_conclusion=expected,
+            complete=True, facts=zero_kb.facts()).valid:
+        raise SystemExit("denial verifier accepted a different conclusion")
     still_yes = zero_kb.ask("Did Ada Lovelace create the Engine?")
     if still_yes.status != "answered" or still_yes.truth is not True:
         raise SystemExit("closed-world absence changed a directly supported positive")
@@ -131,9 +158,12 @@ def main() -> None:
         "parent-base", "parent", "parent", "ancestor")
     zero_kb.add_fact("Ada Lovelace", "parent", "Bea", "family:one")
     zero_kb.add_fact("Bea", "parent", "Cara", "family:two")
+    zero_kb.add_relation_type(
+        "ancestor", "closed-world", "teacher:ancestor-closed-world")
     bounded_no = zero_kb.infer_relation(
         "Ada Lovelace", "ancestor", "Missing", max_expansions=1)
-    if (bounded_no.complete or bounded_no.failure_kind != "search_limit"
+    if (bounded_no.status != "unknown" or bounded_no.complete
+            or bounded_no.failure_kind != "search_limit"
             or bounded_no.reason_code == "closed_world_absence"):
         raise SystemExit(
             f"incomplete inference was incorrectly turned into closed-world no: {bounded_no}")

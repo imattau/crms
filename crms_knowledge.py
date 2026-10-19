@@ -26,7 +26,8 @@ from crms_inference import (InferenceRule, InferenceResult,
                             discover_rule_candidates, infer_relation,
                             reasoning_budget,
                             validate_rule_candidate)
-from crms_rule_proof import verify_inference_proof
+from crms_rule_proof import (verify_closed_world_denial,
+                             verify_inference_proof)
 from crms_fact_store import SQLiteFactMap
 from crms_research import (
     SearchHit, SummarySentence, _RESEARCH_STOPWORDS, _is_code_source, _sentence_context_kind,
@@ -1877,6 +1878,22 @@ class CRMSKnowledgeBase:
             max_expansions=max_expansions, max_depth=max_depth,
             max_candidates=budget.max_candidates,
             max_proofs=budget.max_proofs, effort_level=budget.level)
+        if result.status == "denied":
+            denial_check = verify_closed_world_denial(
+                result.conclusion, result.denial_evidence,
+                expected_conclusion={"subject": subject, "relation": relation,
+                                     "object": obj},
+                expected_qualifiers=normalized_qualifiers,
+                complete=result.complete, proofs=result.proofs,
+                fact_lookup=self._proof_fact_is_present, facts=fact_rows)
+            if not denial_check.valid:
+                return InferenceResult(
+                    "unknown", request=("The closed-world denial failed "
+                                         f"independent verification: {denial_check.reason}"),
+                    complete=False, reason_code="denial_rejected",
+                    failure_kind="denial_rejected",
+                    effort_level=budget.level,
+                    language_evidence=language_evidence)
         verified_proof_count = 0
         if result.proofs:
             facts = fact_rows
@@ -2788,6 +2805,15 @@ class CRMSKnowledgeBase:
                 text = "\n".join(lines)
             else:
                 text = result.request or "No explicit rule proof supports this conclusion."
+        elif result.status == "denied":
+            assert result.conclusion is not None
+            text = ("Denied by the declared closed-world boundary: no proof was "
+                    "found for {subject} — {relation} → {object}.".format(
+                        **result.conclusion))
+            if result.denial_evidence:
+                sources = result.denial_evidence.get("sources", [])
+                if sources:
+                    text += " Declaration source: " + ", ".join(sources) + "."
         elif result.status == "ambiguous":
             text = result.request or "The inference is ambiguous."
         else:
@@ -11092,7 +11118,7 @@ class CRMSKnowledgeBase:
             return QuestionResult(
                 "answered", answer="No", candidates=["No"], evidence=evidence,
                 matched_templates=[template], truth=False)
-        if inferred.failure_kind == "closed_world_absence":
+        if inferred.status == "denied":
             schema = self._relation_type_fact(
                 " ".join(relation), "closed-world", requested)
             return QuestionResult(
@@ -11694,7 +11720,7 @@ class CRMSKnowledgeBase:
                 language_evidence=language_evidence,
                 request=inferred.request, complete=inferred.complete,
                 expansions=inferred.expansions)
-        if inferred.failure_kind == "closed_world_absence":
+        if inferred.status == "denied":
             schema = self._relation_type_fact(
                 " ".join(frame["relation"]), "closed-world", qualifiers)
             return QuestionResult(
@@ -11775,7 +11801,7 @@ class CRMSKnowledgeBase:
             elif negative is not None:
                 results.append((False, asdict(negative), template_text,
                                 relation_tokens, [], False))
-            elif inferred and inferred.failure_kind == "closed_world_absence":
+            elif inferred and inferred.status == "denied":
                 schema = self._relation_type_fact(
                     " ".join(relation_tokens), "closed-world",
                     requested_qualifiers)

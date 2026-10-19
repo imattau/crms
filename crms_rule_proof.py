@@ -44,6 +44,49 @@ class RuleProofCheck:
     reason: str
 
 
+def verify_closed_world_denial(
+        conclusion: Mapping[str, Any] | None,
+        declaration: Mapping[str, Any] | None, *,
+        expected_conclusion: Mapping[str, Any],
+        expected_qualifiers: Any = (), complete: bool,
+        proofs: Iterable[Mapping[str, Any]] = (),
+        fact_lookup: Callable[[Mapping[str, Any]], bool] | None = None,
+        facts: Iterable[Mapping[str, Any]] = ()) -> RuleProofCheck:
+    """Check the evidence and completeness contract for a closed-world denial.
+
+    Absence is not a proof tree. A denial is admissible only when inference
+    reports a completed search with no positive proofs and cites a stored,
+    scope-applicable closed-world declaration for the queried relation.
+    """
+    try:
+        if complete is not True:
+            return RuleProofCheck(False, "closed-world search was incomplete")
+        if tuple(proofs):
+            return RuleProofCheck(False, "a denial cannot contain positive proofs")
+        if not isinstance(conclusion, Mapping) or (
+                _triple(conclusion) != _triple(expected_conclusion)):
+            return RuleProofCheck(False, "denial does not match the requested conclusion")
+        if not isinstance(declaration, Mapping):
+            return RuleProofCheck(False, "closed-world declaration is missing")
+        if fact_lookup is not None:
+            present = bool(fact_lookup(declaration))
+        else:
+            signatures = {_fact_signature(item) for item in facts}
+            present = _fact_signature(declaration) in signatures
+        if not present:
+            return RuleProofCheck(False, "closed-world declaration is not in the fact snapshot")
+        subject, relation, obj = _triple(expected_conclusion)
+        if (_triple(declaration) != (relation, _key("has relation type"),
+                                     _key("closed-world"))):
+            return RuleProofCheck(False, "declaration does not close the queried relation")
+        scope = _qualifiers(expected_qualifiers)
+        if not _scope_is_within(declaration.get("qualifiers", ()), scope):
+            return RuleProofCheck(False, "closed-world declaration is outside query scope")
+        return RuleProofCheck(True, "valid complete closed-world denial")
+    except (TypeError, ValueError, AttributeError) as error:
+        return RuleProofCheck(False, str(error) or "malformed closed-world denial")
+
+
 def verify_inference_proof(
         proof: Mapping[str, Any], facts: Iterable[Mapping[str, Any]],
         rules: Iterable[Mapping[str, Any]], *,

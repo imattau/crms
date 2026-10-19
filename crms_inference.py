@@ -121,6 +121,7 @@ class InferenceResult:
     memo_hits: int = 0
     effort_level: str = "standard"
     effort_checks: tuple[str, ...] = ()
+    denial_evidence: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -1099,13 +1100,15 @@ def _infer_relation_bounded(
         missing = tuple(missing_premises[key]
                         for key in sorted(missing_premises)[:8])
         if integrity_type_facts.get(root_relation, {}).get("closed world"):
+            declaration = integrity_type_facts[root_relation]["closed world"][0]
             return InferenceResult(
-                "unknown", conclusion={
+                "denied", conclusion={
                     "subject": subject, "relation": relation, "object": obj},
-                request=("No: this relation is declared closed-world and a "
-                         "complete search found no supporting proof."),
+                request=("The relation is declared closed-world and a complete "
+                         "search found no supporting proof."),
                 expansions=expansions, reason_code="closed_world_absence",
-                failure_kind="closed_world_absence")
+                failure_kind="closed_world_absence",
+                denial_evidence=dict(declaration))
         failure_kind = ("missing_premise" if root_has_rule else
                         "no_applicable_rule")
         return InferenceResult("unknown", request="No explicit rule proof supports this conclusion.",
