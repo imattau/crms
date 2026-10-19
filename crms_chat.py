@@ -49,6 +49,7 @@ from crms_research import (
     _research_query_terms,
     _sentence_context_kind, _sentence_spans,
 )
+from crms_story import generate_short_story
 from crms_text import tokens as normalized_tokens
 from crms_translation import (
     CRMSTranslation, infer_shared_slot_templates,
@@ -3466,6 +3467,31 @@ def _natural_creative_request(message: str) -> str | None:
     return match.group("kind").casefold() if match else None
 
 
+def _natural_story_request(message: str) -> tuple[str | None, str] | None:
+    """Parse a direct request for a short fictional story and optional topic."""
+    match = re.fullmatch(
+        r"\s*(?:please\s+)?(?:write|compose|create|make|tell)\s+"
+        r"(?:(?:me|us)\s+)?(?:(?:a|an|some)\s+)?"
+        r"(?P<modifiers>(?:(?:short|brief|funny|original|little)\s+){0,3})"
+        r"story(?:\s+(?:about|of)\s+(?P<topic>.+?))?\s*[.!?]*\s*",
+        message, flags=re.IGNORECASE)
+    if match is None:
+        return None
+    topic = match.group("topic")
+    if topic is not None:
+        topic = topic.strip().strip(" \t\r\n.,!?;:") or None
+    modifiers = set(re.findall(r"[a-z]+", match.group("modifiers").casefold()))
+    tone = "funny" if "funny" in modifiers else "adventure"
+    return topic, tone
+
+
+_STORY_UNSUPPORTED_CONSTRAINT_RE = re.compile(
+    r"\b(?:based\s+on|according\s+to|in\s+the\s+style\s+of|"
+    r"using\s+(?:the\s+)?(?:facts?|sources?|documents?)|"
+    r"(?:under|exactly)\s+\d+\s+(?:words?|sentences?))\b",
+    flags=re.IGNORECASE)
+
+
 def _method_mechanism_followup(message: str) -> bool:
     return re.fullmatch(
         r"(?:why|how)\s+(?:does|did|do|is|was|are|were)\s+"
@@ -5201,6 +5227,7 @@ def main() -> int:
               + ", ".join(choices) + ".")
     auto_practice_questions = False
     last_generated_code = None
+    pending_story_tone: str | None = None
     pending_translation_clarification: tuple[
         str, str, str, tuple[str, ...], str] | None = (
             restored_translation_clarification)
@@ -5235,6 +5262,36 @@ def main() -> int:
                 line = parts[0]
                 print(f"Handling {natural_part_total} explicit questions separately.")
         if not line:
+            continue
+        if (pending_story_tone is not None and not line.startswith("/")
+                and _natural_story_request(line) is None):
+            is_new_request = (
+                line.rstrip().endswith("?")
+                or _natural_creative_request(line) is not None
+                or re.match(
+                    r"\s*(?:who|what|which|where|when|why|how|is|are|was|were|"
+                    r"do|does|did|can|could|please\s+(?:write|create|make|"
+                    r"translate|summari[sz]e|explain|calculate|solve|find))\b",
+                    line, flags=re.IGNORECASE) is not None)
+            if not is_new_request:
+                story_tone = pending_story_tone
+                pending_story_tone = None
+                try:
+                    story = generate_short_story(line, tone=story_tone)
+                except ValueError as error:
+                    print(f"CRMS> I couldn't use that story topic: {error}")
+                    continue
+                print("CRMS> " + story.render())
+                continue
+            pending_story_tone = None
+        if _natural_story_request(line) is not None:
+            pending_story_tone = None
+        if line == "/cancel-story":
+            if pending_story_tone is None:
+                print("CRMS> There is no story topic waiting for a reply.")
+            else:
+                pending_story_tone = None
+                print("CRMS> Cancelled the story request.")
             continue
         if line in {"/right", "/wrong"}:
             if last_feedback_record is None:
@@ -8466,13 +8523,33 @@ def main() -> int:
             except (OSError, ValueError) as error:
                 print(f"Could not infer a safe translation frame: {error}")
             continue
+        story_request = _natural_story_request(line)
+        if story_request is not None:
+            story_topic, story_tone = story_request
+            if _STORY_UNSUPPORTED_CONSTRAINT_RE.search(line):
+                print("CRMS> I can write a short fictional story from a topic, "
+                      "but this story grammar can't use source facts, imitate "
+                      "a named style, or meet exact length constraints yet.")
+                continue
+            if story_topic is None:
+                pending_story_tone = story_tone
+                print("CRMS> What should the story be about? I can write a "
+                      "short fictional story with clearly invented details. "
+                      "Reply with a topic or type /cancel-story.")
+                continue
+            try:
+                story = generate_short_story(story_topic, tone=story_tone)
+            except ValueError as error:
+                print(f"CRMS> I couldn't use that story topic: {error}")
+                continue
+            print("CRMS> " + story.render())
+            continue
         creative_kind = _natural_creative_request(line)
         if creative_kind is not None:
             print(
-                "CRMS> I can't generate original creative writing from a "
-                "prompt yet. I can answer from indexed sources, explain "
-                "supported reasoning, or use learned math, code, and "
-                "translation procedures.")
+                "CRMS> I can compose a short fictional story from a small "
+                "story structure. Poems, songs, jokes, and other original "
+                "writing requests aren't supported yet.")
             continue
         translation_result = translation_model.translate(line)
         if translation_result is not None:

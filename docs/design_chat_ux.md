@@ -198,14 +198,15 @@ once at load time on a bounded number of candidates and store the result.
 
 ## 3. Runtime updates and remaining untested gaps
 
-- **Explicit creative-writing requests:** the terminal now recognizes a narrow
-  imperative form for story, poem, haiku, song, joke, and lyrics requests and
-  gives a direct scope statement instead of presenting a lexical source match
-  as an answer. Factual questions, descriptive questions, and code-writing
-  requests are negative controls in
-  `experiments/v1_353_creative_request_scope.py`. This is scope handling, not
-  creative generation; less direct wording and other open-ended task types
-  remain unsupported.
+- **Short fictional stories:** the terminal now composes a five-beat story
+  from a small, deterministic story grammar when given a topic. It labels the
+  result as fiction with invented details, and asks for a topic when one is
+  missing. The optional funny wording selects a comic grammar. Poems, songs,
+  jokes, and other open-ended writing still receive a scope reply. The
+  `experiments/v1_353_creative_request_scope.py` regression checks topic
+  clarification, output structure, factual-route controls, and unsupported
+  creative requests. This is bounded template composition, not general
+  creative generation or large-model-level revision.
 - **Evidence follow-up wording:** after a quoted-source answer, `Why?` now
   states that the cited sentence was used as evidence and remains unaccepted,
   instead of describing the interaction as a missing paraphrase rule.
@@ -257,7 +258,8 @@ questions), and report the numbers in `benchmark_baselines.md`.
 
 - Generating fluent prose beyond quoting and templated wording.
 - Streaming tokens or a graphical front end.
-- Inventing an answer for creative or opinion requests.
+- Presenting invented story details as facts, or treating opinion requests as
+  evidence-seeking questions.
 
 ## 6. Open questions and caveats
 

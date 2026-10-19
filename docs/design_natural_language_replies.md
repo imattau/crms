@@ -226,8 +226,11 @@ proofs, or free source sentences.
 ## 6. Out of scope
 
 - Free paraphrase, summarisation by rewriting, or any learned text generation.
-- Creative writing as such. If it is ever added, it must follow the same rule (templates and
-  quoted material only) and will be much more limited than LLM output.
+- Open-ended creative writing remains out of scope. A bounded short-story
+  path now uses an inspectable five-beat grammar and labels its details as
+  invented fiction; it does not present those details as facts. This is much
+  more limited than LLM output and does not yet support broad revision or
+  genre control.
 - Replies in languages other than the ones for which wording rules are verified.
 
 ## 7. Open questions and caveats

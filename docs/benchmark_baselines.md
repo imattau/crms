@@ -1,5 +1,21 @@
 # Language and recombination benchmark baselines
 
+## Bounded fictional story composition
+
+Command: `python3 run_experiments.py --match v1_353_creative_request_scope`
+
+The chat composes a deterministic five-beat short story around a supplied
+topic, with an optional funny tone selecting a comic template. A missing topic
+prompts for clarification; an unsupported story constraint (source grounding)
+is declined, and a question asked during clarification returns to the factual
+route. The regression also checks that generated details are labelled as
+invented fiction, invalid topics are rejected, poems and jokes remain
+unsupported, and factual questions keep their previous routes. Runtime result:
+3 generated stories, including a topic clarification and funny variant; all
+scope and factual-routing controls passed. This checks request routing and
+story-grammar invariants, not human-rated coherence, originality, or parity
+with a large instruction model.
+
 ## Capability-comparison status (2026-10-19)
 
 CRMS has focused, reproducible checks for natural-language transfer,

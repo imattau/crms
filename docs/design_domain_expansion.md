@@ -105,6 +105,28 @@ Qualitatively compare language coverage, fluency, register adaptation, and
 clarification behavior with a strong 70B-class assistant. Use human review for
 meaning and fluency; exact-match alone is not a sufficient translation metric.
 
+### 2.4 Creative writing
+
+**Current boundary:** a direct short-story request with a topic can produce a
+deterministic five-beat fictional story from an inspectable story grammar. A
+funny request selects a comic grammar; a missing topic triggers a clarification
+prompt. The reply marks the details as invented fiction. This generator does
+not use source facts, learn narrative rules from examples, or support poems,
+songs, jokes, and general open-ended writing.
+
+**Next work:** collect human-written request/ideal-story pairs and score topic
+fit, narrative coherence, requested tone, variety, and follow-up revision.
+Expand story grammar only when held-out requests show that a new beat or
+constraint improves those scores. If factual material is requested, add it as
+separately cited story ingredients and keep invented connective details
+labelled as fiction.
+
+**Measure:** prompt fulfillment, coherence, diversity across topics, clarity
+that the output is fictional, deterministic reproducibility, and handling of
+missing or conflicting constraints. Compare output usefulness and revision
+behavior qualitatively with a strong 70B-class assistant; do not treat a
+five-beat template pass as broad creative-writing parity.
+
 ## 3. Cross-domain composition
 
 After each domain has stable individual checks, evaluate bounded compositions:
