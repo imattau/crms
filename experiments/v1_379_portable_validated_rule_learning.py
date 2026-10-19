@@ -170,6 +170,38 @@ def main() -> None:
                 or unsupported_chat.response.truth is not True,
                 "chat answered an unsupported one-edge ancestor query")
 
+        budget_limited = restored.infer_relation(
+            "Pax", "ancestor", "Rae", max_expansions=1)
+        require(budget_limited.status == "unknown"
+                and not budget_limited.complete
+                and budget_limited.reason_code == "search_limit"
+                and restored.retrieve_derived_case(
+                    "Pax", "ancestor", "Rae", record_use=False) is None,
+                "incomplete search became a positive answer or derived case")
+
+        restored.add_negative_fact(
+            "Pax", "ancestor", "Rae", "probe:explicit-negative")
+        conflict_chat = respond(
+            CRMSDialogue(restored), "Is Pax an ancestor of Rae?")
+        require(conflict_chat.status == "ambiguous"
+                and conflict_chat.response is not None
+                and conflict_chat.response.reason_code == "contradiction"
+                and conflict_chat.response.truth is None,
+                "natural-language chat hid negative evidence opposing its proof")
+
+        cycle_kb = CRMSKnowledgeBase()
+        cycle_kb.add_fact("Ann", "parent", "Bob", "cycle:left")
+        cycle_kb.add_fact("Bob", "parent", "Ann", "cycle:right")
+        cycle_kb.add_inference_rule(
+            "cycle-parent-chain", "parent", "parent", "ancestor")
+        cycle_chat = respond(
+            CRMSDialogue(cycle_kb), "Is Ann an ancestor of Ann?")
+        require(cycle_chat.status == "ambiguous"
+                and cycle_chat.response is not None
+                and cycle_chat.response.reason_code == "cyclic_support"
+                and cycle_chat.response.truth is None,
+                "natural-language chat returned an unqualified cycle-backed self-link")
+
         packaged_index = CRMSSQLiteResearchIndex.load(installed["research_index"])
         source_hit = next((hit for hit in packaged_index.search(
             "Ada parent Bea", limit=5) if hit.document_id == "train:one"), None)
@@ -194,10 +226,24 @@ def main() -> None:
                 and "rule learned-parent-chain" in runtime.stdout,
                 f"portable chat failed to use the learned rule:\n{runtime.stdout}")
 
+        # Retraction invalidates the practiced case through its recorded proof
+        # lineage; it cannot remain available merely because the result once
+        # passed verification and survived packaging.
+        require(restored.remove_fact(
+            "Nia", "parent", "Oren", "probe:source-left"),
+            "could not retract the practiced case's required premise")
+        require(restored.retrieve_derived_case(
+            "Nia", "ancestor", "Pia", record_use=False) is None
+                and any(case["status"] == "stale_or_conflicted"
+                        for case in restored.derived_cases()),
+                "source correction did not invalidate the packaged derivation")
+
     print("held-out-validated inference rule survives portable SQLite packaging: PASS")
     print("new conclusion remains proof-backed and the practiced case retains lineage: PASS")
     print("unpracticed composition transfers through natural-language chat with a verified proof: PASS")
     print("one-edge near-miss abstains in natural-language chat: PASS")
+    print("incomplete search, explicit conflict, and cycle remain non-positive in chat: PASS")
+    print("source correction invalidates the packaged derived case: PASS")
     print("embedded source text remains searchable with resolvable citations: PASS")
     print("interactive portable chat uses the installed learned rule: PASS")
 

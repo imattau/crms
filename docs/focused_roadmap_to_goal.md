@@ -59,6 +59,8 @@ Then test derivation as a governed proposal: retrieve → compose → independen
 
 **Exit:** chat and engine agree; every positive is independently verified; incomplete search cannot become a positive answer; corrections identify and disable affected derived proposals until revalidated.
 
+**Current evidence (2026-10-20):** `v1_379` now exercises one complete `parent + parent → ancestor` path through source-held-out rule validation, explicit acceptance, SQLite packaging, ordinary-language chat, and independent proof verification. It also checks an unsupported one-edge query, an expansion-limited result with no derived write-back, positive/negative conflict, cycle-backed self-relation, and invalidation after retracting a required premise. The focused reasoning-governance suite passed 6/6 (`v1_191`, `v1_193`, `v1_376`, `v1_379`, `v1_415`, `v1_82`). This closes the integration gate for one controlled rule family and its derived-case lifecycle. It does not demonstrate broad natural-language reasoning, arbitrary learned-rule coverage, or cross-domain procedure planning; those remain open.
+
 ### 4. Advance contextual intent and dialogue
 
 Treat user intent as a revisable hypothesis from the current utterance and explicit discourse context. Use it to track task/subgoal, resolve follow-ups, choose a route, or ask for clarification; it must not create facts or authorize unsupported actions. Evaluate identical utterances in different contexts, topic changes, repairs, confirmations, open choices, and history questions. Keep three measures separate: intent classification, safe context resolution, and successful task completion. A classifier improvement is not useful if the answer uses the wrong entity.

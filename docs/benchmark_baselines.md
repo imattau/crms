@@ -1470,6 +1470,23 @@ proof passes the independent verifier, while a one-edge near-miss abstains. This
 rule-to-chat integration gap; it remains one controlled rule shape and does not establish
 open-domain rule induction quality or natural-language intent learning.
 
+The current runtime extension also checks failure governance through the same
+installed rule: a one-expansion search stays `unknown/incomplete` and writes no
+derived case; an explicit negative against a positively derived chat answer
+returns `ambiguous/contradiction`; and a cycle-backed `Ann ancestor Ann` chat
+query returns `ambiguous/cyclic_support`. Retracting a required premise after
+installation makes the previously practiced `Nia ancestor Pia` case unavailable
+and marks it stale or conflicted. These checks connect proof status, chat
+routing, and derived-case lineage for this rule shape, but do not test general
+dialogue or arbitrary rule compositions.
+
+On 2026-10-20 the focused reasoning-governance suite
+(`v1_191`, `v1_193`, `v1_376`, `v1_379`, `v1_415`, `v1_82`) passed 6/6 on the
+working tree. Together these cover bounded abduction without write-back,
+schema conflicts and scope, graph-search limits and cycles, portable validated
+rule use, redundant-fact detection, and derived-lineage invalidation. This is a
+selected diagnostic suite, not a broad reasoning accuracy estimate.
+
 ## Derived-case correction after source retraction
 
 Command: `python3 experiments/v1_72_proof_backed_derived_cases.py`
