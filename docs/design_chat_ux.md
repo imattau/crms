@@ -198,6 +198,12 @@ once at load time on a bounded number of candidates and store the result.
 
 ## 3. Observed but not tested
 
+- **Evidence follow-up wording:** after a quoted-source answer, `Why?` now
+  states that the cited sentence was used as evidence and remains unaccepted,
+  instead of describing the interaction as a missing paraphrase rule.
+  `experiments/v1_352_quoted_evidence_followup.py` checks the actual terminal
+  chat. This explains the answer's source basis; it does not claim that the
+  quoted sentence is an accepted fact or provide a causal explanation.
 - **Follow-ups:** elliptical questions ("and France?"), "tell me more" (next sentence), and mapping
   "are you sure?" and "how do you know?" onto the existing `why?` behaviour. Pronoun follow-ups
   are covered in section 3.7 of the NL design doc.
