@@ -4583,6 +4583,14 @@ lists longer than 10,000 are refused. This is elementwise math→code compositio
 not general program generation. `experiments/v1_356_grounded_math_list_composition.py`
 checks the artifact and ordinary-language chat, including explanation and
 evidence follow-ups.
+CRMS can also run one learned list procedure before the elementwise math map:
+`generate_list_then_math_python` composes both standalone stages, their source
+examples, and provenance into a single generated artifact. A learned
+sort→reverse sequence followed by `x times x plus 3` maps `[4, 1, 4, 2]` to
+`[19, 19, 7, 4]`. Each component and the composed function are checked;
+missing or unsupported stages abstain. This remains a fixed two-stage pattern,
+not general task planning. See
+`experiments/v1_357_cross_domain_list_math_composition.py`.
 After generating code in the current chat session, a user can ask “Explain that
 code” or “What does it do?” to inspect its learned operation, aligned examples,
 and recorded parity checks. The explanation is rendered from the typed artifact

@@ -31,6 +31,20 @@ produce no usable map artifact or are rejected by its input contract. The
 terminal path supports code generation, explanation, and evidence follow-up.
 This is a bounded elementwise math→code composition, not general coding.
 
+## Cross-domain list→math composition
+
+Command: `python3 experiments/v1_357_cross_domain_list_math_composition.py`
+
+This diagnostic learns two oppositely ordered sequence patterns using a
+contrastive duplicate-only input, then applies the transferred sort→reverse
+sequence before an exact learned `x*x+3` map. The generated artifact returns
+`[19, 19, 7, 4]` for `[4, 1, 4, 2]`, records list-stage, math-stage, and outer
+composition provenance, checks both component artifacts and four composed
+probes, and answers ordinary chat requests for generation, explanation, and
+examples. Missing list or math support abstains. This is one held-out crossing
+of learned list recombination with exact math; it does not test arbitrary task
+planning or broader coding parity.
+
 ## Elliptical entity-switch follow-up
 
 Command: `python3 experiments/v1_161_dialogue_demonstratives.py`

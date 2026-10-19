@@ -14,7 +14,8 @@ from typing import Any
 from crms_dialogue import CRMSDialogue
 from crms_explain import render_verified_explanation
 from crms_codegen import (
-    describe_generated_code, generate_mapped_math_python,
+    describe_generated_code, generate_list_then_math_python,
+    generate_mapped_math_python,
     generate_math_python, generate_python,
     generate_unit_conversion_python, natural_language_request,
     render as render_codegen, show_generated_code_evidence,
@@ -8403,7 +8404,11 @@ def main() -> int:
             continue
         code_instruction = natural_language_request(line)
         if code_instruction is not None:
-            generated_code = generate_python(rules, code_instruction)
+            generated_code = generate_list_then_math_python(
+                rules, math_model, code_instruction,
+                grounded_cardinals=rules.grounded_cardinal_phrases())
+            if generated_code is None:
+                generated_code = generate_python(rules, code_instruction)
             if generated_code is None:
                 generated_code = generate_mapped_math_python(
                     math_model, code_instruction,

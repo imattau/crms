@@ -126,6 +126,16 @@ to each value in the list”, then supports the existing code explanation and
 evidence follow-ups. This establishes only an elementwise map composition;
 translation→math/code and other cross-domain task structures remain untested.
 
+A second, two-stage crossing is checked by
+`generate_list_then_math_python` and
+`experiments/v1_357_cross_domain_list_math_composition.py`: the system applies
+a learned list procedure (including a sequence rule transferred to a held-out
+operation wording) and then maps an exact learned math expression across the
+result. Both stage artifacts and the outer composition retain lineage, and the
+standalone output is checked against exact composed probes. This still handles
+one typed list operation followed by one elementwise formula; it does not
+establish general task planning or arbitrary code composition.
+
 Each composition must retain the lineage of every contributing frame, rule,
 fact, and intermediate result. If one stage is unsupported, the whole result
 must disclose the incomplete stage rather than presenting a complete-looking

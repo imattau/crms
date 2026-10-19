@@ -224,6 +224,12 @@ def describe_generated_code(result: GeneratedCode) -> str:
                 f"{result.evidence_examples} aligned examples; the combined "
                 f"artifact passed {result.validation_cases} list probes. "
                 f"Artifact id: {result.provenance_id}.")
+    if result.domain == "list_math_map":
+        return ("The generated function first applies its learned list "
+                "procedure, then maps the exact learned math expression over "
+                f"the resulting values. Both stages and "
+                f"{result.validation_cases} composed probes are recorded. "
+                f"Artifact id: {result.provenance_id}.")
     if result.domain == "unit":
         descriptor = result.procedure[0]
         return (f"The function converts {descriptor['source_unit']} to "
@@ -246,6 +252,19 @@ def show_generated_code_evidence(result: GeneratedCode) -> str:
         for row in result.evidence_details:
             lines.append(
                 f"'{row['phrase']}': {row['input']} -> {row['output']}")
+    elif result.domain == "list_math_map":
+        for row in result.evidence_details:
+            if "input" in row:
+                lines.append(
+                    f"'{row['phrase']}': {row['input']} -> {row['output']}")
+            elif row.get("kind") == "grounded_number":
+                lines.append(
+                    f"Grounded number '{row['phrase']}' = {row['value']} "
+                    f"[sources: {', '.join(row['sources'])}]")
+            else:
+                lines.append(
+                    f"'{row['left']} {row['phrase']} {row['right']}' -> "
+                    f"{row['answer']}")
     elif result.domain in {"math", "math_map"}:
         for row in result.evidence_details:
             if row.get("kind") == "grounded_number":
@@ -806,6 +825,130 @@ def generate_mapped_math_python(
         evidence_details=scalar.evidence_details)
 
 
+def generate_list_then_math_python(
+        model: CRMSModel, math_model: CRMSMath, instruction: str, *,
+        grounded_cardinals: dict[
+            tuple[str, ...], tuple[int, tuple[str, ...]]] | None = None
+        ) -> GeneratedCode | None:
+    """Compose a learned list procedure with an exact learned math mapping."""
+    match = re.fullmatch(
+        r"\s*(.+?)\s+then\s+(?:apply|map)\s+(.+?)\s+to\s+each\s+"
+        r"(?:integer|number|value|item)(?:\s+in\s+(?:the\s+)?"
+        r"(?:list|input))?\s*[.!?]*\s*",
+        instruction, flags=re.IGNORECASE)
+    if match is None:
+        return None
+    list_instruction, expression = match.group(1).strip(), match.group(2).strip()
+    list_artifact = generate_python(model, list_instruction)
+    math_instruction = f"apply {expression} to each value in the list"
+    math_artifact = generate_mapped_math_python(
+        math_model, math_instruction, grounded_cardinals=grounded_cardinals)
+    if list_artifact is None or math_artifact is None:
+        return None
+
+    def rename_names(source: str, names: dict[str, str]) -> str:
+        for old, new in names.items():
+            source = re.sub(rf"\b{re.escape(old)}\b", new, source)
+        return source
+
+    list_source = rename_names(list_artifact.source, {
+        "transform": "transform_list",
+        "validate_examples": "validate_list_examples",
+        "PROCEDURE": "LIST_PROCEDURE",
+        "CRMS_PROVENANCE": "LIST_PROVENANCE",
+        "EVIDENCE_EXAMPLES": "LIST_EVIDENCE_EXAMPLES",
+        "VALIDATION_EXAMPLES": "LIST_VALIDATION_EXAMPLES",
+    })
+    math_source = rename_names(math_artifact.source, {
+        "transform": "map_math",
+        "validate_examples": "validate_math_map_examples",
+        "CRMS_PROVENANCE": "MATH_MAP_PROVENANCE",
+        "MAP_VALIDATION_CASES": "MATH_MAP_VALIDATION_CASES",
+    })
+    validation_inputs = ([], [0], [1, -1, 2], [4, 4, -1])
+    namespace: dict[str, Any] = {"__name__": "crms_generated"}
+    try:
+        component_source = list_source + "\n\n" + math_source
+        exec(compile(component_source, "<crms-composed-components>", "exec"),
+             namespace)
+        list_steps = tuple(Step(
+            row["operation"], dict(row.get("parameters", {})))
+            for row in list_artifact.procedure)
+        math_question = expression
+        if not re.match(
+                r"^(?:what\s+is|how\s+much\s+is|calculate|compute)\b",
+                math_question, flags=re.IGNORECASE):
+            math_question = f"What is {math_question}?"
+        math_tokens = math_model._expression_tokens(math_question)
+        if math_tokens is None:
+            return None
+        math_node = _ExpressionParser(
+            math_model, math_tokens, grounded_cardinals or {}).parse()
+        expected_cases = []
+        for values in validation_inputs:
+            intermediate = _apply_procedure(list_steps, values)
+            output = [_evaluate_math_node(math_node, {"x": value})
+                      for value in intermediate]
+            expected_cases.append({
+                "input": list(values),
+                "output": [[Fraction(value).numerator,
+                            Fraction(value).denominator]
+                           for value in output],
+            })
+        provenance = {
+            "schema": "crms-list-then-math-code-provenance-v1",
+            "requested_instruction": instruction.strip(),
+            "list_artifact_id": list_artifact.provenance_id,
+            "list_provenance": namespace.get("LIST_PROVENANCE"),
+            "math_map_artifact_id": math_artifact.provenance_id,
+            "math_map_provenance": namespace.get("MATH_MAP_PROVENANCE"),
+            "stage_order": ["learned_list_procedure", "exact_math_map"],
+            "validation_cases": expected_cases,
+        }
+        provenance_id = "crms-code-v1-" + hashlib.sha256(
+            json.dumps(provenance, sort_keys=True, separators=(",", ":"),
+                       ensure_ascii=False).encode("utf-8")).hexdigest()
+        provenance["artifact_id"] = provenance_id
+        combined = (
+            component_source
+            + "\n\nCOMPOSITION_PROVENANCE = " + repr(provenance) + "\n"
+            + "COMPOSITION_VALIDATION_CASES = " + repr(expected_cases) + "\n\n"
+            + "def transform(values: list[int]) -> list[int | Fraction]:\n"
+            + '    """Run the learned list stage, then exact math per value."""\n'
+            + "    return map_math(transform_list(values))\n\n"
+            + "def validate_examples() -> bool:\n"
+            + '    """Check both component artifacts and the composed behavior."""\n'
+            + "    if not validate_list_examples() or not validate_math_map_examples():\n"
+            + "        return False\n"
+            + "    for row in COMPOSITION_VALIDATION_CASES:\n"
+            + "        expected = [Fraction(n, d) for n, d in row['output']]\n"
+            + "        actual = [Fraction(value) for value in transform(row['input'])]\n"
+            + "        if actual != expected:\n"
+            + "            return False\n"
+            + "    return True\n"
+        )
+        ast.parse(combined)
+        exec(compile(combined, "<crms-list-then-math>", "exec"), namespace)
+        if not namespace["validate_examples"]():
+            return None
+    except (SyntaxError, TypeError, ValueError, OverflowError,
+            ZeroDivisionError, KeyError):
+        return None
+    details = tuple(list_artifact.evidence_details) + tuple(
+        math_artifact.evidence_details)
+    return GeneratedCode(
+        instruction=instruction.strip(), source=combined,
+        evidence_examples=(list_artifact.evidence_examples
+                           + math_artifact.evidence_examples),
+        validation_cases=len(expected_cases),
+        procedure=tuple(list_artifact.procedure) + tuple(math_artifact.procedure),
+        evidence_phrases=tuple(dict.fromkeys(
+            (*list_artifact.evidence_phrases,
+             *math_artifact.evidence_phrases))),
+        provenance_id=provenance_id, domain="list_math_map",
+        evidence_details=details)
+
+
 def generate_unit_conversion_python(
         model: CRMSMath, instruction: str) -> GeneratedCode | None:
     """Render a source-backed unit ratio as an exact standalone function."""
@@ -1006,6 +1149,13 @@ def render(result: GeneratedCode | None, instruction: str) -> str:
                 f"artifact retains the scalar expression provenance and its "
                 f"composition record, id {result.provenance_id}:\n\n"
                 f"```python\n{result.source}```")
+    if result.domain == "list_math_map":
+        return (f"Generated composed Python for '{result.instruction}' from "
+                f"the learned list procedure and exact math evidence "
+                f"({result.evidence_examples} aligned examples; exact output "
+                f"checked on {result.validation_cases} composed probes). The "
+                f"artifact records both stage provenances, id "
+                f"{result.provenance_id}:\n\n```python\n{result.source}```")
     if result.domain == "unit":
         return (f"Generated exact Python conversion for '{result.instruction}' "
                 f"from {result.evidence_examples} aligned quantity examples; "
