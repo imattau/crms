@@ -142,6 +142,14 @@ surface accepts a small set of equivalent orderings (“then”, “and then”,
 “after [list stage], map …”), while operation selection remains grounded in
 the same learned procedure and math evidence.
 
+Within the list-procedure domain, `experiments/v1_355_learned_sequence_connective_codegen.py`
+now checks a three-clause unseen composition (remove duplicates → sort → reverse).
+An exact sort/reverse normal form removes a false ambiguity between the compact
+two-clause sort operation and the explicit three-clause sequence. The executable
+artifact preserves the three operation phrases and the two independent examples
+that license `then`. This advances bounded recombination depth; it does not
+provide general task planning or arbitrary-length composition.
+
 Each composition must retain the lineage of every contributing frame, rule,
 fact, and intermediate result. If one stage is unsupported, the whole result
 must disclose the incomplete stage rather than presenting a complete-looking

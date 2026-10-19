@@ -130,10 +130,17 @@ from the generated artifact. With no example of the unique→sort pair, the same
 learned connective also composes “remove duplicate values then sort the list”
 and generates executable code returning `[1, 2, 4]` for `[4, 1, 4, 2]`; the
 artifact cites both component procedures and both connective examples.
+With composition depth set to three, the same grounded procedures also answer
+“remove duplicate values then sort the list then reverse the values” with
+`[4, 2, 1]`. This phrase was not taught directly; its generated code passes
+the artifact's examples and retains all three component phrases plus both
+connective examples. Exact sort/reverse normal forms merge equivalent
+segmentations, while magnitude sorting remains distinct. This advances
+bounded three-clause recombination, not arbitrary task planning.
 Unsupported connective, operation, and modifier variants abstain and produce
 no code. This is reusable composition over known list procedures, not zero-shot
 programming or broad natural-language understanding. The control flow and
-source count are local CRMS results; no external 70B model was run on this
+evidence counts are local CRMS results; no external 70B model was run on this
 fixture.
 
 ## Cross-surface question transfer v1

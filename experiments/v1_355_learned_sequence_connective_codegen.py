@@ -10,7 +10,7 @@ PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
 from crms_codegen import generate_python
-from crms_model import CRMSModel
+from crms_model import CRMSModel, Step, _apply_procedure, _semantic_key
 
 
 INPUTS = ([3, 1, 2], [4, -1, 7], [0, 5, -2, 8], [-5, 9], [12], [])
@@ -27,6 +27,8 @@ COMPOUND_PHRASES = (
     "reverse the list then sort the values",
 )
 HELD_OUT = "sort the list then reverse the list"
+THREE_STAGE = ("remove duplicate values then sort the list then "
+               "reverse the values")
 TEST_INPUT = [4, 1, 4, 2]
 
 
@@ -59,6 +61,28 @@ def apply_named(values: list[int], operation: str) -> list[int]:
 
 
 def main() -> None:
+    normal_forms = (
+        ((Step("sort_ascending", {}), Step("reverse", {})),
+         (Step("sort_descending", {}),)),
+        ((Step("sort_descending", {}), Step("reverse", {})),
+         (Step("sort_ascending", {}),)),
+        ((Step("reverse", {}), Step("sort_ascending", {})),
+         (Step("sort_ascending", {}),)),
+        ((Step("reverse", {}), Step("sort_descending", {})),
+         (Step("sort_descending", {}),)),
+        ((Step("reverse", {}), Step("reverse", {})), ()),
+    )
+    for procedure, equivalent in normal_forms:
+        require(_semantic_key(procedure) == _semantic_key(equivalent),
+                f"exact ordering equivalence did not canonicalize: {procedure}")
+        for values in ([], [1], [2, 2, -1], [4, 1, 4, 2], [-9, 0, 5]):
+            require(_apply_procedure(procedure, values)
+                    == _apply_procedure(equivalent, values),
+                    f"ordering normal form changed behavior: {procedure}")
+    require(_semantic_key((Step("sort_by_magnitude", {}),))
+            != _semantic_key((Step("sort_ascending", {}),)),
+            "magnitude sort was incorrectly merged with numeric sorting")
+
     model = CRMSModel(max_composition_depth=2, max_workers=1)
     for phrase, operation in BASE_PHRASES:
         examples = [(list(values), apply_named(list(values), operation))
@@ -150,6 +174,20 @@ def main() -> None:
             f"learned connective did not transfer to a new operation pair: "
             f"{unique_then_sort}")
 
+    # The same connective composes three grounded clauses, even where one
+    # two-clause segmentation has an equivalent compact sort operation.
+    model.max_composition_depth = 3
+    three_stage = model.predict(THREE_STAGE, TEST_INPUT)
+    three_stage_evidence = {
+        "remove duplicate values", "sort the list", "reverse the values",
+        COMPOUND_PHRASES[0], COMPOUND_PHRASES[1],
+    }
+    require(three_stage.status == "ok"
+            and three_stage.output == [4, 2, 1]
+            and three_stage.matched_templates == ["learned_sequence:then"]
+            and three_stage_evidence <= set(three_stage.evidence_phrases),
+            f"three-stage sequence failed or lost evidence: {three_stage}")
+
     artifact = generate_python(model, HELD_OUT)
     require(artifact is not None
             and set(artifact.evidence_phrases) == expected_evidence,
@@ -173,6 +211,17 @@ def main() -> None:
     require(new_namespace["transform"](TEST_INPUT) == expected_new_output
             and new_namespace["validate_examples"](),
             "generated unique-then-sort code failed behavioral validation")
+    three_stage_artifact = generate_python(model, THREE_STAGE)
+    require(three_stage_artifact is not None
+            and three_stage_evidence <= set(three_stage_artifact.evidence_phrases),
+            f"three-stage composition did not generate a traceable artifact: "
+            f"{three_stage_artifact}")
+    three_stage_namespace: dict[str, object] = {}
+    exec(compile(three_stage_artifact.source, "<crms-three-stage>", "exec"),
+         three_stage_namespace)
+    require(three_stage_namespace["transform"](TEST_INPUT) == [4, 2, 1]
+            and three_stage_namespace["validate_examples"](),
+            "generated three-stage code failed behavioral validation")
     repeated = generate_python(model, HELD_OUT)
     require(repeated is not None
             and repeated.provenance_id == artifact.provenance_id,
@@ -189,6 +238,7 @@ def main() -> None:
             "--index", str(root / "index.json"),
             "--dialogue-state", str(root / "dialogue.json"),
             "--rule-session", str(root / "rule-session.json"),
+            "--rule-depth", "3",
             "--math", str(root / "math.json"),
             "--translations", str(root / "translations.json"),
         ]
@@ -218,6 +268,17 @@ def main() -> None:
                 f"terminal new-operation composition failed: "
                 f"{second_chat.stdout}\n{second_chat.stderr}")
 
+        third_chat = subprocess.run(
+            command,
+            input=(f"Write Python code to {THREE_STAGE}\n/quit\n"),
+            text=True, capture_output=True, check=False, timeout=30)
+        require(third_chat.returncode == 0
+                and f"Generated Python for '{THREE_STAGE}'" in third_chat.stdout
+                and all(phrase in third_chat.stdout
+                        for phrase in three_stage_evidence),
+                f"terminal three-stage composition failed: "
+                f"{third_chat.stdout}\n{third_chat.stderr}")
+
     for unsupported in (
             "sort the list or reverse the list",
             "rotate the list then reverse the list",
@@ -232,6 +293,8 @@ def main() -> None:
     print("held-out sort→reverse: correct output, four evidence phrases, verified code: PASS")
     print("same connective transferred to unseen unique→sort pair: correct output, "
           "four evidence phrases, verified code: PASS")
+    print("three-stage unique→sort→reverse recombination: correct output, five "
+          "evidence phrases, verified code and natural-language chat: PASS")
     print("terminal code request, explanation, and evidence follow-up: PASS")
     print("unsupported connective, operation, and modifier: abstained; no code: PASS")
 

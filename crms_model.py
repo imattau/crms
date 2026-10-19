@@ -1725,6 +1725,34 @@ def _semantic_key_uncached(procedure: Iterable[Step]) -> tuple:
         for step in raw_steps)
     if canonical_modular_steps != raw_steps:
         return _semantic_key(canonical_modular_steps)
+    # Numeric sorting is a total-order operation. Canonicalize adjacent sort
+    # and reverse combinations so a composed instruction has one exact
+    # behavior key even when one phrase learned the equivalent compound as a
+    # single ascending/descending sort operation.
+    sort_rewrites = {
+        ("sort_ascending", "reverse"): "sort_descending",
+        ("sort_descending", "reverse"): "sort_ascending",
+        ("reverse", "sort_ascending"): "sort_ascending",
+        ("reverse", "sort_descending"): "sort_descending",
+        ("sort_ascending", "sort_descending"): "sort_descending",
+        ("sort_descending", "sort_ascending"): "sort_ascending",
+    }
+    sort_normalized = list(raw_steps)
+    index = 0
+    while index < len(sort_normalized) - 1:
+        left, right = sort_normalized[index:index + 2]
+        if left.operation == "reverse" and right.operation == "reverse":
+            del sort_normalized[index:index + 2]
+            index = max(0, index - 1)
+            continue
+        replacement = sort_rewrites.get((left.operation, right.operation))
+        if replacement is not None:
+            sort_normalized[index:index + 2] = [Step(replacement, {})]
+            index = max(0, index - 1)
+            continue
+        index += 1
+    if tuple(sort_normalized) != raw_steps:
+        return _semantic_key(sort_normalized)
     # Adjacent rotations compose by adding their offsets, including when a
     # later positional filter would otherwise force a conservative syntax key.
     rotation_compacted: list[Step] = []
