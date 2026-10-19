@@ -63,6 +63,69 @@ answers, and how it handles follow-ups against CRMS's measured behavior. No
 live large-model run is required. Report CRMS component results and
 unsupported cases separately; make no parity claim.
 
+## Cross-domain working-tree scorecard (2026-10-20)
+
+The selected runtime checks below were run through `run_experiments.py` from
+the working tree based on `d597615` (not a clean checkout). The tree contained
+uncommitted dialogue/chat changes and an updated large-corpus audit report, so
+these results describe that local snapshot. They are component diagnostics,
+not a single capability score and not a large-model comparison.
+
+Command:
+
+```sh
+python3 run_experiments.py --match 327 --match 242 --match 376 \
+  --match 357 --match 207 --match 389 --match 413 --match 414 --timeout 300
+```
+
+All 9 selected scripts passed: `v1_207_grounded_translation`, both
+`v1_242` recombination/retrieval diagnostics, `v1_327` natural-language
+transfer, `v1_357` list-to-math/code composition, `v1_376` reasoning graph
+benchmark, `v1_389` story revision, and `v1_413`/`v1_414` source-topic
+dialogue and persistence. Passing means each script's own assertions passed;
+it does not mean the system performs those tasks broadly.
+
+The direct `v1_327` run reported:
+
+| Set | Baseline correct | Layer correct | Layer wrong | Layer abstained | Must-refuse accepted |
+|---|---:|---:|---:|---:|---:|
+| Dev | 50/78 | 73/78 | 0 | 5 | 11/11 |
+| Held | 31/45 | 44/45 | 0 | 1 | 12/12 |
+| Unseen | 29/44 | 42/44 | 0 | 2 | 14/14 |
+
+These figures are for the benchmark wrapper and its small, partly tuned
+question sets. They do not contradict the weaker real-text audit below: the
+wrapper and the large-corpus probe test different distributions and scoring
+rules.
+
+The same run of `v1_376` independently verified every positive proof and
+replayed semantic results deterministically. The 35-hop chain and depth-9
+binary tree completed; the diamond query answered with 64 listed proofs and
+`complete=False` due to the explicit proof cap; the positive/negative conflict
+was ambiguous; the negative-only and complete-miss cases remained unknown; an
+expansion-limited query remained incomplete; the cycle-backed self-relation
+was ambiguous; and the declared irreflexive constraint denied its self-link.
+Observed runtime was 0.8–311 ms across those cases on this machine; these
+values are not portable performance guarantees.
+
+The current 1,200-document, 7,200-sentence audit in
+[`large_corpus_chat_audit.json`](../experiments/reports/large_corpus_chat_audit.json)
+reports that all 30 expected sentences for its canonical queries were seen by
+retrieval and that all three negative relation controls abstained. This is
+retrieval coverage on a generated corpus, not answer accuracy. For 11 positive
+paraphrase probes, the report records 7 expected-sentence hits; a hit can still
+be labelled as related evidence rather than an answer to the requested
+relation. Several paraphrases remain unsupported, including `Which stream
+passes through Nacre City 0133?` and `Where does the Serein River 0133 run?`.
+This gap is language/relation coverage, not missing source text.
+
+The scorecard points to the next work: retain the strong bounded recombination
+and verified-proof behavior while improving answer-bearing sentence selection
+and relation paraphrase transfer on source-disjoint language tests. Continue
+to evaluate multi-turn dialogue across topic switches and restarts, and measure
+creative quality separately from scripted route and template correctness.
+No overall capability or parity claim follows from this run.
+
 ## Grounded math-to-list-code composition
 
 Command: `python3 experiments/v1_356_grounded_math_list_composition.py`
