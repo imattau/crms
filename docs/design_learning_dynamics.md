@@ -53,7 +53,9 @@ larger noisy-feedback benchmark. Direct-fact feedback stores the structured prop
 supporting source ids; `/feedback` displays numbered propositions and citations, and
 `/retract-feedback FEEDBACK|FACT|SOURCE` retracts only the selected source support. A wrong signal
 alone does not retract or negate a fact: the user must inspect the evidence and explicitly choose a
-specific support to remove.
+specific support to remove. After retraction, CRMS rechecks the original question against the
+remaining accepted facts and reports whether it still has an answer, now has conflicting support,
+or must abstain.
 
 ## 0. Ground rules (read first)
 

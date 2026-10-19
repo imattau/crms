@@ -5360,6 +5360,16 @@ def main() -> int:
                 print(f"CRMS> Retracted {polarity} support from {source}: "
                       f"{subject} — {relation} → {obj}. The feedback record remains "
                       "as the audit trail; teach a corrected fact if you have one.")
+                rechecked, _reply = knowledge.respond(event["question"])
+                if rechecked.status == "answered":
+                    print("CRMS> Recheck: the original question still has a supported "
+                          f"answer: {rechecked.answer}.")
+                elif rechecked.status == "ambiguous":
+                    print("CRMS> Recheck: the remaining facts are ambiguous; "
+                          "review their support before using an answer.")
+                else:
+                    print("CRMS> Recheck: no accepted fact now answers the original "
+                          "question.")
             except (TypeError, ValueError) as error:
                 print(f"Could not retract feedback support: {error}")
             continue

@@ -125,7 +125,8 @@ recent signals, fact propositions, and source references. Feedback is saved in
 suspends validated learned rules used in that proof until they pass held-out
 revalidation; facts and teacher-supplied rules are not changed automatically.
 For a direct fact, `/feedback` gives numbered source support; retract only the
-selected citation with `/retract-feedback FEEDBACK|FACT|SOURCE`.
+selected citation with `/retract-feedback FEEDBACK|FACT|SOURCE`. CRMS then
+rechecks the original question against the remaining accepted facts.
 
 ## Learn more
 

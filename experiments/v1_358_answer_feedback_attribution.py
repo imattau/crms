@@ -219,7 +219,8 @@ def main() -> None:
             text=True, capture_output=True, timeout=30)
         require(retract_run.returncode == 0,
                 retract_run.stderr or retract_run.stdout)
-        require("Retracted POS support from book:12" in retract_run.stdout,
+        require("Retracted POS support from book:12" in retract_run.stdout
+                and "Recheck: no accepted fact now answers" in retract_run.stdout,
                 f"explicit correction did not retract selected support: "
                 f"{retract_run.stdout}")
         corrected_store = CRMSKnowledgeBase.load(knowledge_path)
