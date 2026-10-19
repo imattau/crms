@@ -270,6 +270,73 @@ def _count(value: int, noun: str) -> str:
     return f"{value:,} {noun}{'' if value == 1 else 's'}"
 
 
+_RUNTIME_ROUTE_WORDING = {
+    "greeting": ("a greeting", "greet you"),
+    "farewell": ("a goodbye", "say goodbye"),
+    "thanks": ("thanks", "thank you"),
+    "acknowledgement": ("an acknowledgement", "acknowledge it"),
+    "reaction": ("a social reaction", "treat it as a reaction"),
+    "elaboration": ("a request to continue the current topic",
+                    "continue the current topic"),
+}
+
+
+def _ambiguous_runtime_routes(
+        intent: UserIntentHypothesis) -> tuple[str, ...]:
+    """Extract only the validated routes encoded in ambiguous frame readings."""
+    if (intent.basis != "portable_dialogue_model"
+            or intent.decision != "ambiguous"
+            or intent.matched_frame != "ambiguous-portable-frames"):
+        return ()
+    routes = []
+    for alternative in intent.alternatives:
+        match = re.search(r"; route ([a-z-]+)\)$", alternative)
+        if match is None or match.group(1) not in _RUNTIME_ROUTE_WORDING:
+            return ()
+        routes.append(match.group(1))
+    if len(routes) != 2 or routes[0] == routes[1]:
+        return ()
+    return tuple(routes)
+
+
+def _runtime_route_reply(dialogue: CRMSDialogue, route: str, text: str, *,
+                         research_index: Any | None,
+                         pending_claims: int) -> DialogueTurn:
+    """Run a previously licensed route after the user resolves ambiguity."""
+    if route == "greeting":
+        fact_count = len(dialogue.knowledge._facts)
+        source_count = (research_index.document_count()
+                        if research_index is not None else 0)
+        reply = ("Hello. CRMS has "
+                 f"{_count(fact_count, 'accepted fact')} and "
+                 f"{_count(source_count, 'source document')} loaded")
+        if pending_claims:
+            reply += f", with {_count(pending_claims, 'claim')} awaiting review"
+        reply += (". Ask about an entity or source; ask ‘why?’ to see the "
+                  "supporting evidence.")
+        if pending_claims:
+            reply += " Use /pending-candidates to inspect them."
+        return DialogueTurn("social", text, text, text=reply)
+    if route == "farewell":
+        return DialogueTurn("farewell", text, text, text="Goodbye.")
+    if route == "thanks":
+        return DialogueTurn("social", text, text, text="You're welcome.")
+    if route in {"acknowledgement", "reaction"}:
+        return DialogueTurn(
+            "social", text, text,
+            text="Okay. What would you like to ask or do next?")
+    if route == "elaboration":
+        elaborated = dialogue.elaborate()
+        if elaborated is not None:
+            return elaborated
+        dialogue.pending_dialogue_slot = "elaboration_topic"
+        return DialogueTurn(
+            "clarify", text, text,
+            text="Which entity with accepted facts should I look at in more detail?")
+    return DialogueTurn("unclassified", text, text,
+                        text="I could not use that intent route.")
+
+
 def classify_act(text: str) -> str | None:
     """Classify only anchored, content-free seed acts; mixed turns pass through."""
     normalized = text.strip()
@@ -548,6 +615,26 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             "yes", "yeah", "yep", "yup", "sure", "certainly", "absolutely"}
         offer = dialogue.offers[-1]
         dialogue.offers = []
+        if offer.get("kind") == "intent_choice":
+            routes = offer.get("routes", ())
+            selected_route = routes[0] if said_yes else routes[1]
+            intent = UserIntentHypothesis(
+                dialogue_act="answer-clarification",
+                task_intent="resolve-ambiguity",
+                decision="selected",
+                matched_frame=offer["matched_frame"],
+                context_predicates=("pending_intent_choice",),
+                alternatives=(offer["alternatives"][1 if said_yes else 0],),
+                selected_value=selected_route,
+                basis="portable_dialogue_model",
+                evidence_refs=tuple(offer["evidence_refs"]),
+                runtime_route=selected_route,
+            )
+            act = "answer-clarification"
+            return with_intent(_runtime_route_reply(
+                dialogue, selected_route, text,
+                research_index=research_index,
+                pending_claims=pending_claims))
         intent = UserIntentHypothesis(
             dialogue_act="accept-offer" if said_yes else "decline-offer",
             task_intent="continue-current-task",
@@ -568,6 +655,26 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             reply = DialogueTurn("social", text, text,
                                  text="Okay, I will leave them for now.")
         return with_intent(reply)
+
+    intent_routes = _ambiguous_runtime_routes(intent) if intent is not None else ()
+    if (intent_routes and not dialogue.offers
+            and dialogue.pending_result is None
+            and dialogue.pending_binding is None):
+        first_label, first_action = _RUNTIME_ROUTE_WORDING[intent_routes[0]]
+        second_label, _second_action = _RUNTIME_ROUTE_WORDING[intent_routes[1]]
+        dialogue.offers.append({
+            "kind": "intent_choice",
+            "routes": intent_routes,
+            "turns_left": _OFFER_LIFETIME,
+            "matched_frame": intent.matched_frame,
+            "alternatives": intent.alternatives,
+            "evidence_refs": intent.evidence_refs,
+        })
+        return with_intent(DialogueTurn(
+            "clarify", text, text,
+            text=(f"I can read that as {first_label} or {second_label}. "
+                  f"Should I {first_action}? Say yes for {first_label} or "
+                  f"no for {second_label}.")))
 
     if dialogue.pending_dialogue_slot == "elaboration_topic":
         if _CANCEL_FOLLOWUP_RE.fullmatch(text.strip()):

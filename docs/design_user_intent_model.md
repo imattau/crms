@@ -160,7 +160,11 @@ This is a narrow runtime seam, not learned dialogue competence: there is no fram
 surface patterns are exact phrases rather than slot-generalizing templates, and task-oriented
 slots beyond existing dialogue state are not supported. Most ordinary intent recognition still
 uses the hand-checked rules in `crms_conversation.py`. The Taskmaster labels remain blank, so no
-accuracy claim is available.
+accuracy claim is available. If two licensed portable frames match the same utterance and context
+but select different routes, CRMS now records an ambiguous hypothesis, asks the user to choose
+between the two routes, and executes only the selected route. The short yes/no choice retains the
+matched-frame evidence and never changes factual knowledge. This handles an explicit model conflict;
+it does not resolve general paraphrase or task-slot ambiguity.
 
 Once a frame has independent human-reviewed training and held-out labels, store it in a versioned
 `dialogue` memory inside the portable SQLite model. Keep the record explicit and auditable:

@@ -149,6 +149,33 @@ def main() -> None:
             and ambiguous.runtime_route is None
             and len(ambiguous.alternatives) == 2,
             f"conflicting licensed readings were not preserved safely: {ambiguous}")
+    route_options = tuple(
+        item.rsplit("route ", 1)[1].rstrip(")")
+        for item in ambiguous.alternatives)
+    prompt_dialogue = CRMSDialogue(
+        knowledge, intent_model=CRMSDialogueIntentModel(conflicting_memory))
+    prompt = respond(prompt_dialogue, "Keep this thread moving")
+    require(prompt.status == "clarify"
+            and "Say yes" in prompt.text and "or no" in prompt.text
+            and len(prompt_dialogue.offers) == 1
+            and prompt_dialogue.offers[0]["kind"] == "intent_choice",
+            f"ambiguous routes did not ask a bounded clarification: {prompt}")
+    yes_dialogue = CRMSDialogue(
+        knowledge, intent_model=CRMSDialogueIntentModel(conflicting_memory))
+    respond(yes_dialogue, "Keep this thread moving")
+    yes_route = respond(yes_dialogue, "yes")
+    require(yes_route.intent_hypothesis is not None
+            and yes_route.intent_hypothesis.runtime_route == route_options[0]
+            and yes_route.intent_hypothesis.decision == "selected",
+            f"yes did not select the first licensed route: {yes_route}")
+    no_dialogue = CRMSDialogue(
+        knowledge, intent_model=CRMSDialogueIntentModel(conflicting_memory))
+    respond(no_dialogue, "Keep this thread moving")
+    no_route = respond(no_dialogue, "no")
+    require(no_route.intent_hypothesis is not None
+            and no_route.intent_hypothesis.runtime_route == route_options[1]
+            and no_route.intent_hypothesis.decision == "selected",
+            f"no did not select the alternate licensed route: {no_route}")
 
     with tempfile.TemporaryDirectory(prefix="crms-intent-resolution-") as temporary:
         root = Path(temporary)
@@ -195,11 +222,32 @@ def main() -> None:
                 f"interactive chat did not use its dialogue model: "
                 f"{chat.stdout}\n{chat.stderr}")
 
+        conflict_model_path = root / "conflicting-dialogue-intent.json"
+        conflict_model_path.write_text(
+            json.dumps(conflicting_memory), encoding="utf-8")
+        conflict_chat = subprocess.run(
+            [sys.executable, str(PROJECT / "crms_chat.py"),
+             "--dialogue-model", str(conflict_model_path),
+             "--knowledge", str(root / "knowledge.json"),
+             "--rules", str(root / "conflict-rules.json"),
+             "--dialogue-state", str(root / "conflict-state.json"),
+             "--feedback-db", str(root / "conflict-feedback.sqlite3")],
+            input="Keep this thread moving\nyes\n/intent\n/quit\n",
+            text=True, capture_output=True, cwd=root, timeout=30)
+        require(conflict_chat.returncode == 0
+                and "Say yes for" in conflict_chat.stdout
+                and "Which entity with accepted facts" in conflict_chat.stdout
+                and '"matched_frame": "ambiguous-portable-frames"'
+                in conflict_chat.stdout
+                and '"runtime_route": "elaboration"' in conflict_chat.stdout,
+                f"interactive chat did not clarify and route the selected intent: "
+                f"{conflict_chat.stdout}\n{conflict_chat.stderr}")
+
     print("same elaboration wording abstains without its required context: PASS")
     print("validated frame requires context/predecessor and normalizes case: PASS")
     print("candidate/train-only frame has no runtime effect: PASS")
-    print("conflicting licensed frames remain ambiguous and do not route: PASS")
-    print("chat and state preserve the model basis; legacy intent state loads: PASS")
+    print("conflicting frames ask for clarification; yes/no selects only licensed routes: PASS")
+    print("chat routes the selected frame; model basis and legacy state load: PASS")
 
 
 if __name__ == "__main__":
