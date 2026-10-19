@@ -57,6 +57,25 @@ direction and avoids assigning meaning to a probability threshold before its cal
 Keep context predicates separate from learned surface frames. A frame can be well supported in a
 corpus and still be wrong to use in the current state.
 
+## Initial corpus choice
+
+Use **Taskmaster-1's two-person Wizard-of-Oz conversations** for the first pilot, limited to the
+released task-service domains. The dataset release says it contains 13,215 conversations, including
+5,507 two-person spoken dialogues, and is available under CC BY 4.0. Its documentation says the
+provided annotations describe API arguments and transaction status, rather than conventional
+dialogue-act labels. See the [Taskmaster-1 release documentation](https://github.com/google-research-datasets/Taskmaster/blob/master/TM-1-2019/README.md)
+and [Taskmaster-1 paper](https://aclanthology.org/D19-1459/).
+
+This is a practical corpus for testing greetings, acknowledgements, clarification, repair, and
+closing in task-oriented exchanges, but it is not a direct sample of research-assistant or open-domain
+conversation. The two-person assistant turns were produced by trained human operators, so this
+measures task-service conventions rather than an existing automated assistant. Label only assistant
+turns for the initial move inventory; keep user turns as context. Split by complete conversation ID
+so no adjacent turn leaks across train and holdout. Treat distinct dialogue IDs as independent
+conversations **within this one collection**, not as independent publisher origins. Any claim that a
+move generalizes beyond this corpus needs replication in a second, separately collected dialogue
+corpus. Preserve the dataset citation and CC BY attribution with every derived evaluation artifact.
+
 ## Bounded experiment
 
 The current baseline is sufficient to begin a dialogue pilot: content-free turns avoid retrieval,
@@ -76,6 +95,22 @@ moves add value over the current explicit handlers.
 - Compare with a scripted baseline on the same held-out conversations. Measure appropriate-move
   accuracy, unsupported/inappropriate move rate, abstention, frame coverage, source diversity, and
   teacher/reviewer time. Do not score surface similarity as conversational correctness.
+
+Preparation command:
+
+```text
+python3 experiments/v1_363_prepare_taskmaster_dialogue_pilot.py \
+  /path/to/woz-dialogs.json /path/to/new-output-directory
+```
+
+The tool writes one indexed text source per complete conversation and
+`assistant_turns_to_label.csv`, with the preceding turns, an empty move label, reviewer fields,
+SHA-256/character-offset citations, and the original file digest, conversation ID, and utterance
+index. It creates deterministic 80/10/10 splits by conversation ID and refuses to overwrite an
+existing output directory. A synthetic two-conversation dry-run verified the CSV, split, and
+citation round trips; **the Taskmaster corpus itself has not yet been processed or labeled**. CRMS
+currently uses absolute paths as file-ingestion document IDs, so moving a prepared directory means
+reindexing it and regenerating citations.
 
 The proposed 500-transcript scale and 80% held-out target are hypotheses, not acceptance criteria
 until corpus size, class balance, label agreement, and a scripted baseline are measured. In
