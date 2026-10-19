@@ -140,6 +140,13 @@ def main() -> None:
         "owen", "jones")
     assert _contextual_entity_key("Felicity Jones", "Felicity Jones") == (
         "felicity", "jones")
+    hyphenated_type = CRMSKnowledgeBase()._discover_surface_relation_candidates(
+        "An-26 is a modernized variant.", source="probe:an-26")
+    assert any(candidate.subject == "An-26"
+               and candidate.relation == "is-a"
+               and candidate.object == "modernized variant"
+               for candidate in hyphenated_type), (
+                   "hyphenated An-26 was mistaken for the article 'an'")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "index", nargs="?", type=Path,

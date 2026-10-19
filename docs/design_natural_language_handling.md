@@ -659,6 +659,15 @@ equivalent. This is evidence against using coarse role types as a standalone
 predicate-equivalence signal; the diagnostic remains report-only and does not
 license rules.
 
+The 20-window rerun, covering 200,000 sampled pages, found one candidate above
+the two-pair support threshold: `capital city of` / `province of`, both typed
+`city → country`. Its cited examples establish that the relation phrases are
+not equivalent. The pass also exposed and fixed a corpus-miner crash on the
+hyphenated title “An-26”, which had been tokenized as the article plus a number.
+The full scan now completes, but the false positive confirms that typed role
+compatibility needs a stronger semantic discriminator before it can propose
+reusable language rules.
+
 ### 3.7 Pronouns and follow-ups
 
 Baseline: every pronoun follow-up in nine scripted two-turn dialogues returned "Please name the

@@ -4865,12 +4865,19 @@ class CRMSKnowledgeBase:
             proper_article_subject = (
                 len(subject.split()) > 1
                 and subject.split()[1][:1].isupper())
+            surface_words = subject.split()
             if (subject_words[:1] in {("the",), ("a",), ("an",)}
+                    and surface_words
+                    and surface_words[0].casefold() in {"the", "a", "an"}
                     and not proper_article_subject):
-                subject_words = subject_words[1:]
-                subject = " ".join(subject.split()[1:])
+                subject = " ".join(surface_words[1:])
+                subject_words = _tokens(subject)
+            surface_starts_with_article = bool(
+                surface_words
+                and surface_words[0].casefold() in {"the", "a", "an"})
             if (sentence[:1].isupper() and subject_words and object_words
-                    and subject_words[0] not in weak_np_heads
+                    and (subject_words[0] not in weak_np_heads
+                         or not surface_starts_with_article)
                     and not (set(subject_words + object_words)
                              & forbidden_np_words)
                     and tuple(subject_words) != tuple(object_words)):
