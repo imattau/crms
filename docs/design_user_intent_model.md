@@ -377,8 +377,43 @@ dialogue state, predecessor, and active goal. On the ten-conversation dev set, a
 configuration selected 15/124 turns at 12.1% coverage, with 13/15 joint act/task-intent agreement
 and 14/15 broad-goal agreement. Exact candidates selected 8/124 at 6.5%, with 7/8 joint agreement.
 These are Codex-label agreement results with prior state supplied as oracle context. They show that
-the assistant's preceding wording adds useful signal on this small sample, but do not establish
-held-out transfer or justify runtime routing. A fresh conversation sample is still required.
+the assistant's preceding wording adds useful signal on this small development sample, but do not
+establish held-out transfer or justify runtime routing. The following fresh conversation evaluation
+did not reproduce this result.
+
+A fresh evaluation was then run against six previously unused test conversations (86 turns, of
+which 83 were classifiable). The matcher and settings were frozen before inspecting these
+transcripts: similarity threshold 0.4 and assistant-context weight 0.25. Codex supplied primary
+labels for dialogue act, immediate task intent, broad goal, context state, and predecessor using the
+project protocol; all six complete transcripts were read, citations and split assignments were
+preserved, and second-rater fields were left empty. With these labels and prior context supplied as
+oracle input, the nearest-example matcher selected 1/83 turns (1.2% coverage), and that prediction
+matched neither act nor task intent nor goal. The exact-surface candidate baseline matched 0/83.
+This is agreement with the authorized single Codex annotator, not independent accuracy. It is a
+negative transfer result for this small sample: dev-set lexical similarity and assistant-prompt
+weighting did not generalize at the selected threshold. The failure argues against runtime routing
+from either baseline and makes context modeling a research priority rather than a product-ready
+feature. The frozen labels and reports are in `/tmp/crms_dialogue_feasibility_v1/`.
+
+### Context is part of intent, not an optional feature
+
+The model should represent a turn's immediate task intent separately from the broader user goal
+that persists across turns. Both are contextual hypotheses. The same surface “yes” can accept an
+offer, confirm a proposed value, or answer a factual yes/no question; “What about Friday?” can
+modify an active reservation or open a new request. The relevant evidence includes the current
+utterance, the assistant's open question and expected slot, recent user-provided details, the
+previous dialogue act, active goal, and whether the task is open, complete, or being repaired.
+Discourse context should be an explicit bounded state record, while reusable intent and dialogue
+frames belong in the distributable model. A predicted intent may guide a clarification or route, but
+must not be treated as a world fact or as authorization to perform an external action.
+
+Dialogue and contextual intent remain a priority research area. The next experiments should test
+whether explicit state features improve conversation-held-out coverage without raising wrong
+commitments, and should include contrastive turns with identical wording but different prior
+assistant questions or active goals. Codex is authorized to provide primary labels in place of a
+human for this phase; those labels must remain attributed to Codex, with uncertain cases explicit
+and no claim of independent review. A second corpus outside restaurant service is needed before
+generalizing beyond task dialogue.
 
 The owner authorized Codex to provide provisional labels in place of a human for this research
 phase. `experiments/v1_395_runtime_intent_oracle_context.py` uses those labels to replay the four

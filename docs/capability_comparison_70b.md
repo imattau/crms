@@ -153,9 +153,14 @@ These results are component evidence, not a single overall capability score:
   dev-selected configuration matched both act and task intent on 13/15 selected
   turns (86.7%) at 12.1% coverage; the exact-surface baseline covered 6.5% at
   87.5% agreement. This is a small, single-Codex-label result with oracle prior
-  intent/context, not a direct large-model comparison or runtime result. A
+  intent/context, not a direct large-model comparison or runtime result. On a
+  fresh six-conversation test sample, the frozen matcher selected only 1/83
+  classifiable turns (1.2%), with no act/task/goal agreement; the exact-surface
+  baseline selected none. The negative transfer result shows that lexical
+  nearest-example retrieval is not an adequate contextual dialogue model. A
   strong 70B-class model is expected to handle a much broader range of
-  paraphrases and dialogue context, though its answers also need verification.
+  paraphrases, implicit intent, and dialogue context, though its answers also
+  need verification. No 70B model was run for this comparison.
 - `v1_386_session_intent_context.py` verifies that selected user intents update
   a bounded active-task label, that social turns preserve it, that an explicit
   close and `/reset` clear it, and that it survives dialogue-state format 17

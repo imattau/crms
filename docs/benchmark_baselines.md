@@ -177,8 +177,21 @@ with 13/15 (86.7%) joint act/task-intent agreement and 14/15 (93.3%) broad-goal 
 exact-surface baseline selected 8/124 (6.5%) with 7/8 (87.5%) joint agreement. These remain
 development results against the same single Codex annotator, with prior turn labels supplied as
 oracle context. They suggest the preceding assistant wording adds useful context, but do not
-establish held-out transfer or runtime quality. A fresh conversation-held-out evaluation is still
-required before considering runtime use.
+establish held-out transfer or runtime quality.
+
+A fresh conversation-held-out evaluation selected six previously unused test conversations before
+transcript inspection (86 turns; 83 classifiable). The method and settings were frozen at threshold
+0.4 and assistant-context weight 0.25. Codex labeled dialogue act, task intent, broad goal, context
+state, and predecessor from the complete transcripts under the project protocol; the results are
+therefore agreement with one named annotator, with prior context supplied as oracle input. The
+nearest-example matcher selected 1/83 turns (1.2% coverage), and that prediction matched neither
+act, task intent, nor broad goal. The exact-surface candidate baseline selected 0/83. This small
+negative result means the development-selected lexical matcher did not transfer to this fresh
+sample; it should not be routed at runtime. It does not establish that contextual intent modeling
+is unhelpful: it indicates that content-word similarity plus simple hard gates is insufficient and
+that context-sensitive dialogue needs broader, more discriminating representations and evaluation.
+The labeled sheet, selection manifest, and machine-readable reports are in
+`/tmp/crms_dialogue_feasibility_v1/`.
 
 ### Runtime intent routing with supplied context
 
