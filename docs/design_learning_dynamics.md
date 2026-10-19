@@ -756,11 +756,11 @@ semantics; a non-monotonic standalone probe catches this distinction, which
 the later sort stage had previously hidden. The composed `unique → sort →
 reverse` artifact passes four held-out lists, keeps its three component
 citations, survives a fresh chat process, and refuses an unsupported middle
-operation. This demonstrates teacher-guided recombination using source-cited
-component examples; the source text alone did not license the instructions or
-the connective. The cited NumPy pair itself is monotonic, so the new probe is
-an implementation check, not evidence that the citation's particular numeric
-pair distinguishes sorted unique from stable unique.
+operation. The NumPy citation uses a non-monotonic input and returns sorted
+unique values, so this example distinguishes sorted-unique from stable-unique.
+This demonstrates teacher-guided recombination using source-cited component
+examples; the source text alone did not license the instruction mapping or the
+connective.
 
 `v1_432_cited_doctest_rule_learning.py` exercises this path using exact code
 excerpts from the official Python Sorting HOWTO and NumPy documentation. The

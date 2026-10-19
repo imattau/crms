@@ -1663,6 +1663,5 @@ licenses the natural-language instruction. This is a source-cited,
 teacher-guided composition result, not source-only induction or broad coding
 competence. It also exposed that the wording variant used by a composition
 must retain its own citation or the generated artifact loses that component's
-lineage. The one cited NumPy input is already sorted, so its code/output pair
-alone cannot distinguish sorted-unique from stable-unique; the standalone
-probe checks implementation semantics but is not extra source evidence.
+lineage. The cited NumPy example now uses a non-monotonic input, so the
+source-backed pair itself distinguishes sorted-unique from stable-unique.

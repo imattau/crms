@@ -25,7 +25,8 @@ from crms_translation import CRMSTranslation
 
 SORT_DOC = (">>> sorted([5, 2, 3, 1, 4])\n[1, 2, 3, 4, 5]")
 UNIQUE_DOC = (
-    ">>> np.unique([1, 1, 2, 2, 3, 3])\narray([1, 2, 3])")
+    ">>> a = np.array([1, 2, 6, 4, 2, 3, 2])\n"
+    ">>> np.unique(a)\narray([1, 2, 3, 4, 6])")
 REVERSE_DOC = (
     ">>> for i in reversed(range(1, 10, 2)):\n"
     "...     print(i)\n...\n9\n7\n5\n3\n1")
@@ -35,8 +36,8 @@ SOURCES = (
      "sort the list", SORT_DOC, [5, 2, 3, 1, 4], [1, 2, 3, 4, 5]),
     ("numpy-unique", "NumPy: numpy.unique",
      "https://numpy.org/doc/stable/reference/generated/numpy.unique.html",
-     "remove duplicate values", UNIQUE_DOC, [1, 1, 2, 2, 3, 3],
-     [1, 2, 3]),
+     "remove duplicate values", UNIQUE_DOC, [1, 2, 6, 4, 2, 3, 2],
+     [1, 2, 3, 4, 6]),
     ("python-reverse", "Python Tutorial: Data Structures",
      "https://docs.python.org/3/tutorial/datastructures.html",
      "reverse the list", REVERSE_DOC, [1, 3, 5, 7, 9], [9, 7, 5, 3, 1]),
