@@ -16,6 +16,17 @@ head-to-head score still requires a pinned model/runtime on the same held-out
 tasks and context. Report component results and unsupported cases separately;
 make no parity claim.
 
+## Natural follow-ups to quoted evidence
+
+Command: `python3 experiments/v1_352_quoted_evidence_followup.py`
+
+In a fresh terminal session, the same source-backed question is asked before
+each of three follow-ups: “Why?”, “How do you know?”, and “Are you sure?”. All
+three follow-ups return the previously cited sentence, identify it as quoted
+evidence, and say it has not been accepted as a fact. This validates three
+surface forms for one narrow source-explanation route; it does not establish
+general conversational memory or confidence calibration.
+
 ## Balanced phrase recombination from three demonstrations
 
 Command: `python3 experiments/v1_354_balanced_phrase_recombination.py`

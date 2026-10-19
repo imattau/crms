@@ -3428,7 +3428,8 @@ def _natural_research_explanation_request(message: str) -> bool:
     """Recognize short follow-ups that ask about the prior research result."""
     value = message.strip().rstrip(".!?").strip()
     return re.fullmatch(
-        r"(?:why(?:\s+is\s+that)?|show\s+(?:the\s+)?"
+        r"(?:why(?:\s+is\s+that)?|are\s+you\s+sure|"
+        r"how\s+do\s+you\s+know|show\s+(?:the\s+)?"
         r"(?:source|citation))",
         value, flags=re.IGNORECASE) is not None or re.fullmatch(
         r"(?:(?:can|could|would)\s+you\s+)?(?:please\s+)?"

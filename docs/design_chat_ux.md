@@ -211,10 +211,14 @@ once at load time on a bounded number of candidates and store the result.
   instead of describing the interaction as a missing paraphrase rule.
   `experiments/v1_352_quoted_evidence_followup.py` checks the actual terminal
   chat. This explains the answer's source basis; it does not claim that the
-  quoted sentence is an accepted fact or provide a causal explanation.
-- **Follow-ups:** elliptical questions ("and France?"), "tell me more" (next sentence), and mapping
-  "are you sure?" and "how do you know?" onto the existing `why?` behaviour. Pronoun follow-ups
-  are covered in section 3.7 of the NL design doc.
+  quoted sentence is an accepted fact or provide a causal explanation. The
+  same evidence response now handles "How do you know?" and "Are you sure?";
+  the regression asks each after a fresh quoted-source answer and checks that
+  source and review status remain explicit. These aliases do not add support
+  or confidence beyond the cited sentence.
+- **Follow-ups still open:** elliptical questions ("and France?") and
+  context-aware "tell me more" (next sentence). Pronoun follow-ups are covered
+  in section 3.7 of the NL design doc.
 - **Clarifying questions with candidates:** replace "Please name the entity this pronoun refers to"
   with "Did you mean Python or Linux?" when the previous turn offers candidates.
 - **Plain-language labels and one inline accept prompt:** replace "supporting claim awaiting review;
