@@ -5112,6 +5112,7 @@ def _save_pending_candidates(path: Path, knowledge_path: Path, index_path: Path,
 def main() -> int:
     args = build_parser().parse_args()
     model_research_sidecar: Path | None = None
+    dialogue_memory_path = Path("crms_dialogue_intent.json")
     if args.model_db is not None:
         memories = inspect_model_database(args.model_db)
         for name, value in model_database_rule_settings(
@@ -5156,11 +5157,12 @@ def main() -> int:
         args.rules = memory_dir / rule_memory_name
         args.math = memory_dir / "math.json"
         args.translations = memory_dir / "translations.json"
+        dialogue_memory_path = memory_dir / "dialogue.json"
         if (args.fact_db is None and knowledge_memory_name == "knowledge.json"):
             args.fact_db = memory_dir / "facts.sqlite"
         print(f"Loaded portable learned model: {args.model_db}")
         model_memory_paths = (args.knowledge, args.rules, args.math,
-                              args.translations)
+                              args.translations, dialogue_memory_path)
         initial_model_memory_state = {
             path: _memory_file_state(path) for path in model_memory_paths
         }
@@ -5629,6 +5631,8 @@ def main() -> int:
                         math=args.math if args.math.is_file() else None,
                         translations=(args.translations
                                       if args.translations.is_file() else None),
+                        dialogue=(dialogue_memory_path
+                                  if dialogue_memory_path.is_file() else None),
                         research_index=(args.index if args.index.is_file()
                                         else model_research_sidecar
                                         if model_research_sidecar is not None

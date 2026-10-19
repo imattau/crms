@@ -1,0 +1,161 @@
+"""Validation helpers for portable, contextual dialogue-intent memory.
+
+Dialogue memory separates built-in interaction policy from corpus-induced
+frames. It is data only; a frame cannot update factual knowledge or authorize
+an external action.
+"""
+
+from __future__ import annotations
+
+import re
+from typing import Any
+
+
+FORMAT = "crms-dialogue-intent-memory"
+VERSION = 1
+_ROOT_KEYS = {"format", "version", "builtin_policy", "learned_frames"}
+_CONTEXT_PREDICATES = {
+    "conversation_opening", "current_topic_available",
+    "previous_grounded_answer", "pending_candidate_choice",
+    "open_dialogue_slot", "awaiting_user_detail", "awaiting_confirmation",
+    "task_in_progress", "task_complete", "correction_target_available",
+}
+_DIALOGUE_ACTS = {
+    "question", "request-action", "provide-information", "answer-clarification",
+    "confirmation", "acknowledgement", "correction", "greeting", "thanks",
+    "farewell", "continuation-request", "social", "uncertain",
+}
+_TASK_INTENTS = {
+    "seek-information", "provide-information", "continue-current-task",
+    "resolve-ambiguity", "correct-result", "social-contact", "end-interaction",
+    "other-task",
+}
+_PREDECESSOR_ACTS = {
+    "question", "clarification-request", "answer", "confirmation-request",
+    "greeting", "action-result", "close", "other", "uncertain",
+}
+_FRAME_STATUSES = {"candidate", "train-only", "heldout-validated", "rejected"}
+
+
+def empty_dialogue_intent_memory() -> dict[str, Any]:
+    return {"format": FORMAT, "version": VERSION,
+            "builtin_policy": [], "learned_frames": []}
+
+
+def _strings(value: Any, name: str, *, maximum: int,
+             nonempty: bool = False) -> list[str]:
+    if not isinstance(value, list) or len(value) > maximum:
+        raise ValueError(f"dialogue memory {name} must be a bounded list")
+    if nonempty and not value:
+        raise ValueError(f"dialogue memory {name} must not be empty")
+    if any(not isinstance(item, str) or not item.strip() or len(item) > 512
+           for item in value):
+        raise ValueError(f"dialogue memory {name} contains an invalid value")
+    return value
+
+
+def validate_dialogue_intent_memory(payload: Any) -> dict[str, Any]:
+    """Validate and return a canonical portable dialogue-memory payload."""
+    if not isinstance(payload, dict) or set(payload) != _ROOT_KEYS:
+        raise ValueError("dialogue intent memory has an invalid root shape")
+    if payload.get("format") != FORMAT or payload.get("version") != VERSION:
+        raise ValueError("unsupported dialogue intent memory format")
+    builtin = payload.get("builtin_policy")
+    learned = payload.get("learned_frames")
+    if (not isinstance(builtin, list) or len(builtin) > 10_000
+            or not isinstance(learned, list) or len(learned) > 100_000):
+        raise ValueError("dialogue intent frames must be bounded lists")
+    seen_ids: set[str] = set()
+    normalized_builtin = []
+    for frame in builtin:
+        required = {"policy_id", "dialogue_act", "task_intent",
+                    "surface_patterns", "context_predicates", "predecessor_act"}
+        if not isinstance(frame, dict) or set(frame) != required:
+            raise ValueError("built-in dialogue policy frame has an invalid shape")
+        frame_id = frame["policy_id"]
+        if (not isinstance(frame_id, str) or not frame_id.strip()
+                or len(frame_id) > 120 or frame_id in seen_ids):
+            raise ValueError("dialogue policy IDs must be unique non-empty strings")
+        seen_ids.add(frame_id)
+        _validate_frame_values(frame, frame_id)
+        normalized_builtin.append(dict(frame))
+
+    normalized_learned = []
+    for frame in learned:
+        required = {"frame_id", "dialogue_act", "task_intent", "surface_patterns",
+                    "context_predicates", "predecessor_act", "source_citations",
+                    "status", "validation"}
+        if not isinstance(frame, dict) or set(frame) != required:
+            raise ValueError("learned dialogue frame has an invalid shape")
+        frame_id = frame["frame_id"]
+        if (not isinstance(frame_id, str) or not frame_id.strip()
+                or len(frame_id) > 120 or frame_id in seen_ids):
+            raise ValueError("dialogue frame IDs must be unique non-empty strings")
+        seen_ids.add(frame_id)
+        _validate_frame_values(frame, frame_id)
+        citations = _strings(frame["source_citations"],
+                             f"{frame_id}.source_citations", maximum=100_000,
+                             nonempty=True)
+        status = frame["status"]
+        if not isinstance(status, str) or status not in _FRAME_STATUSES:
+            raise ValueError(f"dialogue frame {frame_id} has an unknown status")
+        validation = frame["validation"]
+        if status == "heldout-validated":
+            keys = {"status", "train_conversation_ids",
+                    "holdout_conversation_ids", "reviewer_count", "metrics"}
+            if not isinstance(validation, dict) or set(validation) != keys:
+                raise ValueError(
+                    f"validated dialogue frame {frame_id} lacks validation metadata")
+            if validation["status"] != "heldout-validated":
+                raise ValueError("dialogue frame status disagrees with its validation")
+            train_ids = set(_strings(
+                validation["train_conversation_ids"],
+                f"{frame_id}.train_conversation_ids", maximum=100_000,
+                nonempty=True))
+            holdout_ids = set(_strings(
+                validation["holdout_conversation_ids"],
+                f"{frame_id}.holdout_conversation_ids", maximum=100_000,
+                nonempty=True))
+            if train_ids & holdout_ids:
+                raise ValueError(
+                    f"dialogue frame {frame_id} has conversation split leakage")
+            reviewer_count = validation["reviewer_count"]
+            if (not isinstance(reviewer_count, int) or isinstance(reviewer_count, bool)
+                    or reviewer_count < 2):
+                raise ValueError(
+                    f"dialogue frame {frame_id} needs two independent reviewers")
+            if not isinstance(validation["metrics"], dict):
+                raise ValueError(f"dialogue frame {frame_id} metrics must be an object")
+        elif validation is not None:
+            raise ValueError(
+                f"unvalidated dialogue frame {frame_id} cannot carry validation metadata")
+        normalized_learned.append(dict(frame))
+    return {"format": FORMAT, "version": VERSION,
+            "builtin_policy": normalized_builtin,
+            "learned_frames": normalized_learned}
+
+
+def _validate_frame_values(frame: dict[str, Any], frame_id: str) -> None:
+    if (not isinstance(frame["dialogue_act"], str)
+            or frame["dialogue_act"] not in _DIALOGUE_ACTS):
+        raise ValueError(f"dialogue frame {frame_id} has an unknown act")
+    intent = frame["task_intent"]
+    if (intent is not None and (not isinstance(intent, str)
+                                or intent not in _TASK_INTENTS)):
+        raise ValueError(f"dialogue frame {frame_id} has an unknown task intent")
+    patterns = _strings(frame["surface_patterns"],
+                        f"{frame_id}.surface_patterns", maximum=100,
+                        nonempty=True)
+    if any("(?" in pattern or re.search(r"\\[1-9]", pattern)
+           for pattern in patterns):
+        raise ValueError(
+            f"dialogue frame {frame_id} patterns must be literal templates, not regex")
+    predicates = _strings(frame["context_predicates"],
+                          f"{frame_id}.context_predicates", maximum=32)
+    if set(predicates) - _CONTEXT_PREDICATES:
+        raise ValueError(f"dialogue frame {frame_id} has an unknown context predicate")
+    predecessor = frame["predecessor_act"]
+    if (predecessor is not None
+            and (not isinstance(predecessor, str)
+                 or predecessor not in _PREDECESSOR_ACTS)):
+        raise ValueError(f"dialogue frame {frame_id} has an unknown predecessor act")

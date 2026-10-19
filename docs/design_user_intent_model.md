@@ -142,11 +142,14 @@ become accepted world facts by default.
 
 ### Distributable model boundary
 
-This boundary is designed but not implemented. The portable package currently includes `knowledge`,
-`rules`, `math`, and `translations`; it has no dialogue-intent memory. Runtime intent patterns still
-live in `crms_conversation.py`, and the present hypotheses identify themselves as
-`hand_checked_runtime_rule`. Do not describe these patterns as learned or as part of a portable
-model until they are moved behind a package-backed interface.
+The first storage step is implemented: portable SQLite model v5 accepts an optional versioned
+`dialogue` memory, validates its built-in-policy and learned-frame sections, and preserves it through
+install and repack. `crms_dialogue_intent.py` rejects unknown context predicates, malformed evidence
+metadata, and overlapping train/holdout conversation IDs. Legacy model versions remain readable.
+The memory currently does **not** drive the chat resolver: runtime intent patterns still live in
+`crms_conversation.py`, and current hypotheses identify themselves as
+`hand_checked_runtime_rule`. The package supports distribution of dialogue frames; CRMS does not
+yet learn or use them.
 
 Once a frame has independent human-reviewed training and held-out labels, store it in a versioned
 `dialogue` memory inside the portable SQLite model. Keep the record explicit and auditable:
@@ -163,13 +166,13 @@ intent hypotheses remain in per-user dialogue state; they must never be copied i
 model as user facts. This separates reusable conversational knowledge from the temporary context
 that makes a short answer such as “yes” interpretable.
 
-The implementation should add the `dialogue` package memory and a loader/validator first, with
-round-trip and legacy-model tests. Then migrate the bounded hand-checked seed frames into an
-explicitly labeled built-in policy section or keep them as a compatibility fallback; never silently
-merge built-in product policy with corpus-induced frames. Replace the corresponding hard-coded
-patterns only after the package-backed resolver matches the current regression behavior. Do not
-start induction until independently labeled examples exist: the Taskmaster annotation sheets are
-currently blank, so self-labeled predictions cannot serve as validation evidence.
+Next, migrate the bounded hand-checked seed frames into the explicitly separate built-in-policy
+section or keep them as a compatibility fallback; never silently merge built-in product policy with
+corpus-induced frames. Add a package-backed resolver and replace hard-coded patterns only after it
+matches current regression behavior. Do not start induction until independently labeled examples
+exist: the Taskmaster annotation sheets are currently blank, so self-labeled predictions cannot
+serve as validation evidence. Packaging coverage is checked by
+[`v1_383_dialogue_model_memory_packaging.py`](../experiments/v1_383_dialogue_model_memory_packaging.py).
 
 ## Runtime decision policy
 

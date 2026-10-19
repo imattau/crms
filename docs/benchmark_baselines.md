@@ -113,6 +113,18 @@ evidence, and say it has not been accepted as a fact. This validates three
 surface forms for one narrow source-explanation route; it does not establish
 general conversational memory or confidence calibration.
 
+## Portable dialogue-intent memory
+
+Command: `python3 experiments/v1_383_dialogue_model_memory_packaging.py`
+
+Portable model v5 can carry an optional, versioned dialogue-intent payload with separate
+built-in-policy and learned-frame collections. The validator enforces a closed context-predicate
+vocabulary, source citations for learned frames, held-out validation metadata, and disjoint train
+and holdout conversation IDs. The experiment checks export, installation into the model sidecar,
+chat startup, repacking, malformed-frame rejection, and legacy packaging without dialogue memory.
+This adds a distribution seam only: `crms_conversation.py` does not yet resolve turns from these
+frames, and the learned collection is not populated from human-labeled dialogue.
+
 ## Balanced phrase recombination from three demonstrations
 
 Command: `python3 experiments/v1_354_balanced_phrase_recombination.py`

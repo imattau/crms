@@ -13,10 +13,12 @@ import tempfile
 FORMAT = "crms-learned-model"
 _VERSION_RULE_SQL = 2
 _VERSION_KNOWLEDGE_SQL = 3
-VERSION = 4
-_LEGACY_VERSIONS = {1, _VERSION_RULE_SQL, _VERSION_KNOWLEDGE_SQL}
+_VERSION_KNOWLEDGE_RECORDS = 4
+VERSION = 5
+_LEGACY_VERSIONS = {1, _VERSION_RULE_SQL, _VERSION_KNOWLEDGE_SQL,
+                    _VERSION_KNOWLEDGE_RECORDS}
 APPLICATION_ID = int.from_bytes(b"CRMS", "big")
-_MEMORY_NAMES = ("knowledge", "rules", "math", "translations")
+_MEMORY_NAMES = ("knowledge", "rules", "math", "translations", "dialogue")
 _MAX_MEMBER_BYTES = 512 * 1024 * 1024
 _REQUIRED_TABLES = {"model_metadata", "learned_memories"}
 _RESEARCH_TABLES = {"research_documents"}
@@ -279,6 +281,7 @@ def _sha256(data: bytes) -> str:
 def export_model_database(output: str | Path, *, knowledge: str | Path,
                           rules: str | Path, math: str | Path | None = None,
                           translations: str | Path | None = None,
+                          dialogue: str | Path | None = None,
                           research_index: str | Path | None = None) -> Path:
     """Create one SQLite model database from learned memories and sources."""
     sources = {"knowledge": Path(knowledge), "rules": Path(rules)}
@@ -286,6 +289,8 @@ def export_model_database(output: str | Path, *, knowledge: str | Path,
         sources["math"] = Path(math)
     if translations is not None:
         sources["translations"] = Path(translations)
+    if dialogue is not None:
+        sources["dialogue"] = Path(dialogue)
     memories: dict[str, tuple[str, str, int]] = {}
     for name, source in sources.items():
         if not source.is_file():
@@ -307,6 +312,9 @@ def export_model_database(output: str | Path, *, knowledge: str | Path,
                     f"{name} memory exceeds the model database size limit")
             payload = json.loads(data.decode("utf-8"))
             source_bytes = len(data)
+        if name == "dialogue":
+            from crms_dialogue_intent import validate_dialogue_intent_memory
+            payload = validate_dialogue_intent_memory(payload)
         canonical = json.dumps(payload, ensure_ascii=False,
                                separators=(",", ":"))
         if len(canonical.encode("utf-8")) > _MAX_MEMBER_BYTES:
@@ -455,7 +463,7 @@ def inspect_model_database(path: str | Path) -> dict[str, dict[str, str | int]]:
                 base_tables = base_tables | _RULE_TABLES
             if schema_version >= _VERSION_KNOWLEDGE_SQL:
                 base_tables = base_tables | _KNOWLEDGE_SQL_TABLES
-            if schema_version >= VERSION:
+            if schema_version >= _VERSION_KNOWLEDGE_RECORDS:
                 base_tables = base_tables | _KNOWLEDGE_RECORD_TABLES
             expected_table_sets = [base_tables, base_tables | _RESEARCH_TABLES]
             if tables not in expected_table_sets:
@@ -485,6 +493,9 @@ def inspect_model_database(path: str | Path) -> dict[str, dict[str, str | int]]:
                     "bytes": len(raw), "source_bytes": row["source_bytes"],
                     "top_level_type": type(parsed).__name__,
                 }
+                if row["kind"] == "dialogue":
+                    from crms_dialogue_intent import validate_dialogue_intent_memory
+                    validate_dialogue_intent_memory(parsed)
             if not {"knowledge", "rules"} <= memories.keys():
                 raise ValueError("model database must include knowledge and rule memories")
             if schema_version >= _VERSION_RULE_SQL:
@@ -573,6 +584,20 @@ def model_database_has_research(path: str | Path, *,
         return db.execute(
             "SELECT 1 FROM sqlite_master WHERE type='table' "
             "AND name='research_documents'").fetchone() is not None
+
+
+def model_database_dialogue_intent_memory(
+        path: str | Path, *, validate: bool = True) -> dict | None:
+    """Read the optional contextual dialogue memory embedded in a model."""
+    if validate:
+        inspect_model_database(path)
+    with sqlite3.connect(f"file:{Path(path).resolve()}?mode=ro", uri=True) as db:
+        row = db.execute(
+            "SELECT payload_json FROM learned_memories WHERE kind='dialogue'").fetchone()
+    if row is None:
+        return None
+    from crms_dialogue_intent import validate_dialogue_intent_memory
+    return validate_dialogue_intent_memory(json.loads(row[0]))
 
 
 def model_database_research_stats(path: str | Path, *,
@@ -736,6 +761,7 @@ def repack_model_database(path: str | Path, memory_dir: str | Path,
             rules=chosen_memories["rules"],
             math=chosen_memories.get("math"),
             translations=chosen_memories.get("translations"),
+            dialogue=chosen_memories.get("dialogue"),
             research_index=research_index)
 
 
@@ -748,6 +774,8 @@ def main() -> None:
     export.add_argument("--rules", type=Path, required=True)
     export.add_argument("--math", type=Path)
     export.add_argument("--translations", type=Path)
+    export.add_argument("--dialogue", type=Path,
+                        help="optional contextual dialogue-intent memory JSON")
     export.add_argument("--research-index", type=Path,
                         help="optionally embed extracted searchable source text")
     inspect = commands.add_parser("inspect", help="verify a SQLite model database")
@@ -768,6 +796,7 @@ def main() -> None:
         result = export_model_database(
             args.output, knowledge=args.knowledge, rules=args.rules,
             math=args.math, translations=args.translations,
+            dialogue=args.dialogue,
             research_index=args.research_index)
         print(f"Created portable CRMS model database: {result}")
     elif args.command == "inspect":
