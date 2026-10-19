@@ -24,9 +24,16 @@ _ACTS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("help", re.compile(
         r"^(?:help|what\s+can\s+you\s+do|how\s+do\s+i\s+use\s+this)"
         r"[?!. ]*$", re.IGNORECASE)),
+    ("reaction", re.compile(
+        r"^(?:lol|lmao|rofl|(?:ha){2,}h?|(?:he){2,}h?|wow|whoa|oops|ugh|"
+        r"huh|yay|meh|cool|nice|great|awesome)[.!? ]*$", re.IGNORECASE)),
     ("unclassified", re.compile(
         r"^(?:h+m+|u+h+|u+m+|e+r+m+|\.\.\.|\?+)[.!? ]*$",
         re.IGNORECASE)),
+    # Emoji or punctuation with no letters, digits or arithmetic operators.
+    # Digits and operators are excluded so a bare calculation still reaches
+    # the exact-math route.
+    ("unclassified", re.compile(r"^[^\w+\-*/=^%()<>\[\]{}$#@&|~]+$")),
 )
 _MIXED_GREETING_RE = re.compile(
     r"^(?:hi|hello|hey)(?:\s+there)?[,]\s*(?P<question>\S.+)$",
@@ -38,6 +45,10 @@ _BARE_YES_NO_RE = re.compile(
 _EXPLANATION_FOLLOWUP_RE = re.compile(
     r"^(?:why(?: is that)?|how do you know(?: that)?|what supports that)"
     r"[?!. ]*$", re.IGNORECASE)
+
+
+def _count(value: int, noun: str) -> str:
+    return f"{value:,} {noun}{'' if value == 1 else 's'}"
 
 
 def classify_act(text: str) -> str | None:
@@ -102,7 +113,7 @@ def classify_user_intent(
                                    if value != selected),
                 selected_value=selected,
             )
-        if classify_act(text) == "acknowledgement":
+        if classify_act(text) in {"acknowledgement", "reaction"}:
             return UserIntentHypothesis(
                 dialogue_act="acknowledgement",
                 task_intent="resolve-ambiguity",
@@ -127,6 +138,7 @@ def classify_user_intent(
         "farewell": ("farewell", "end-interaction"),
         "thanks": ("thanks", "social-contact"),
         "acknowledgement": ("acknowledgement", "continue-current-task"),
+        "reaction": ("reaction", "social-contact"),
         "elaboration": ("continuation-request", "continue-current-task"),
         "help": ("question", "seek-information"),
     }
@@ -199,22 +211,35 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         # A receipt such as "okay" acknowledges the request to choose, but it
         # does not itself select or close the open answer clarification.
         return with_intent(dialogue.turn(text, research_index=research_index))
+    if act == "reaction" and dialogue.pending_result is not None:
+        # An exclamation is neither a choice nor a new topic: repeat the open
+        # choice without retrieval and without discarding it.
+        candidates = dialogue.pending_result.candidates or []
+        choices = "; ".join(f"{i}. {value}"
+                            for i, value in enumerate(candidates, 1))
+        return with_intent(DialogueTurn(
+            "ambiguous", text, dialogue.pending_question or text,
+            response=dialogue.pending_result,
+            text=("That does not identify one of the supported answers. "
+                  f"Please choose: {choices}.")))
 
     if act == "greeting":
         fact_count = len(dialogue.knowledge._facts)
         source_count = (research_index.document_count()
                         if research_index is not None else 0)
-        counts = f"{fact_count:,} accepted facts and {source_count:,} source documents"
+        reply = ("Hello. CRMS has "
+                 f"{_count(fact_count, 'accepted fact')} and "
+                 f"{_count(source_count, 'source document')} loaded")
         if pending_claims:
-            counts += f"; {pending_claims:,} claims awaiting review"
-        reply = (f"Hello. CRMS has {counts} loaded. Ask about an entity or source; "
-                 "ask ‘why?’ to see the supporting evidence.")
+            reply += f", with {_count(pending_claims, 'claim')} awaiting review"
+        reply += (". Ask about an entity or source; ask ‘why?’ to see the "
+                  "supporting evidence.")
         return with_intent(DialogueTurn("social", text, text, text=reply))
     if act == "farewell":
         return with_intent(DialogueTurn("farewell", text, text, text="Goodbye."))
     if act == "thanks":
         return with_intent(DialogueTurn("social", text, text, text="You're welcome."))
-    if act == "acknowledgement":
+    if act in {"acknowledgement", "reaction"}:
         return with_intent(DialogueTurn(
             "social", text, text,
             text="Okay. What would you like to ask or do next?"))

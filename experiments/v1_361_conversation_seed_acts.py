@@ -33,6 +33,11 @@ class ContentDialogue:
     def __init__(self) -> None:
         self.knowledge = SimpleNamespace(_facts={})
         self.last_entity = None
+        self.pending_result = None
+        self.last_question = None
+        self.last_selected_answer = None
+        self.source_mentions: list = []
+        self.last_intent_hypothesis = None
         self.calls: list[str] = []
 
     def turn(self, text: str, *, research_index=None):
@@ -98,7 +103,7 @@ def main() -> None:
             check=True, timeout=20)
         require("CRMS state saved. Goodbye." in completed.stdout
                 and (root / "dialogue.json").is_file()
-                and "1 source documents" in completed.stdout
+                and "1 source document loaded" in completed.stdout
                 and "Which entity or source" in completed.stdout
                 and "[Source: Conversation bait" not in completed.stdout,
                 f"acts caused junk retrieval or failed to exit: {completed.stdout}")

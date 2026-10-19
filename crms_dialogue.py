@@ -1361,7 +1361,10 @@ class CRMSDialogue:
             if response is not None and response.status == "ambiguous" and response.candidates:
                 self.pending_question = resolved
                 self.pending_result = response
-            elif research is not None and research.status == "sources_found":
+            elif research is not None and research.status in {
+                    "sources_found", "needs_review"}:
+                # A quoted answer awaiting review is still text the user just
+                # read, so its names stay available as candidate referents.
                 self.source_mentions = self._source_entity_mentions(
                     research.source_sentences)
                 if self.source_mentions:

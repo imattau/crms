@@ -29,10 +29,10 @@ facts). They were run twice: before and after `crms_conversation.py` landed.
 | "hi there" | Quoted a Python code snippet | Greeting |
 | "Goodbye" | Quoted a code snippet | Ends the session and saves |
 | "Tell me more" | Quoted an unrelated paper | Asks which entity or source to look at; does not elaborate |
-| "lol" | not run | **Quoted a sentence about a video game** |
+| "lol" | not run (quoted a video-game sentence when first tried) | Handled as a reaction; no retrieval (phase 0) |
 | "what's your name?" | not run | Refusal ("multiple equally supported sentences") |
 | "Who designed **it**?" after "Who created Python?" | Refusal | Refusal |
-| "Who worked with **him**?" | Refusal | Refusal; cause not yet diagnosed |
+| "Who worked with **him**?" | Refusal | Named choice ("Which entity do you mean?") after phase 0; still not bound |
 | "Where did **she** work?" | "No workplace statement for *she*" | "Could refer to the first compiler, Grace Hopper; name one" |
 | "And Ada Lovelace?" | "Name an entity already in the knowledge base" | Same |
 | "No, I meant …" | Same | Same |
@@ -47,20 +47,28 @@ contextual yes/no and corrections while a choice is open, a comma-separated gree
 
 Findings from the review that change the design:
 
-- **The remaining junk-retrieval path is any content-free turn outside the seed phrases.** "lol"
-  still reaches the retriever. The seed handlers are anchored regexes (`_ACTS` in
-  [crms_conversation.py](../crms_conversation.py)), not a general check, so the rule in section 2
-  stays necessary.
-- **The `she` failure is partly explained.** Pronoun resolution treats the object of the last answer
-  ("the first compiler") as a candidate referent alongside the subject, so `she` is ambiguous between
-  a thing and a person. Resolving by entity kind (section 3) addresses this. `Who worked with him?`
-  is a pronoun failure, not a relation failure: the direct "Who worked with Charles Babbage?" answers
-  from the source. What the pronoun was bound to was not traced. Two related questions still fail
-  even with explicit names: "Who did Ada Lovelace work with?" (active/passive rewording) and "Who
-  worked with Ada Lovelace?" (the source states it from Ada's side; no inverse reading).
-- **A small defect in the new greeting.** With one document and pending claims it prints
-  "0 accepted facts and 1 source documents; 2 claims awaiting review loaded." The plural and the
-  trailing "loaded" are wrong when the pending-claims clause is present.
+- **The junk-retrieval path was any content-free turn outside the seed phrases.** "lol" reached the
+  retriever and quoted a sentence about a video game. Phase 0 closed it with seed reactions and a
+  non-lexical class (`_ACTS` in [crms_conversation.py](../crms_conversation.py)). That is still an
+  enumeration, and the general rule drafted here does not work as first written: "lol" **is** a word
+  in the corpus, so a test of "no known word" cannot catch it (section 2, rule 1).
+- **The pronoun failures had two causes, now traced.** (1) `CRMSDialogue.turn` calls `clear()` on any
+  turn that is not an accepted-fact answer, and recorded source-quoted names only when the research
+  status was `sources_found`. A quoted answer awaiting review (`needs_review`, which is what
+  "Who designed the Analytical Engine?" returns) left no referent at all, so "Who worked with him?"
+  got "Please name the entity this pronoun refers to." Phase 0 retains the quoted names for
+  `needs_review` as well; the follow-up now gets a named choice. (2) Even then `him` is not bound:
+  `_resolve_pronoun` accepts a substitution only when the knowledge answers it, and a quoted-source
+  match does not count, because the research status cannot separate a real answer from a loosely
+  related sentence ("Who worked with the Analytical Engine?" also returns a quote). Binding needs a
+  role-checked match or entity kind (section 3), not a status check. When the object of the last
+  answer is a candidate too, `she` is ambiguous between a thing and a person. The direct questions
+  with explicit names answer. Two related questions still fail even with explicit names: "Who did
+  Ada Lovelace work with?" (active/passive rewording) and "Who worked with Ada Lovelace?" (the source
+  states it from Ada's side; no inverse reading).
+- **A small defect in the new greeting, fixed in phase 0.** With one document and pending claims it
+  printed "0 accepted facts and 1 source documents; 2 claims awaiting review loaded." It now reads
+  "…1 source document loaded, with 2 claims awaiting review."
 
 ### 0.1 What exists, and where it falls short
 
@@ -129,11 +137,16 @@ user text
 
 Rules that bind the whole pipeline:
 
-1. **A content-free turn never reaches retrieval.** Replace "matches an anchored seed phrase" with a
-   general test: after removing any act phrase, the turn contains no word that is an entity, alias,
-   source-mentioned name or relation word known to the knowledge base or the loaded index. "lol"
-   fails the test today. The test must be conservative: a short real question ("Python?") has a known
-   entity and passes.
+1. **A content-free turn never reaches retrieval.** What is built is a closed set: seed phrases,
+   a short list of reactions (laughter, exclamations) and turns with no letters, digits or
+   arithmetic operators. A general test was drafted as "no word that is an entity, alias,
+   source-mentioned name or relation word known to the knowledge base or index", and it fails on the
+   evidence: "lol" appears in the corpus, so it counts as a known word. Open design problem: a
+   single-token turn with no question shape ("lol", "Python") matches any sentence containing the
+   token, and the answer gate has nothing to check because there is no asked relation or answer type.
+   A candidate, untested, is to answer such bare topics with an entity card or "What would you like to
+   know about X?" (5.8) instead of a quotation. That would change replies to bare topic words, so it
+   needs the answer-regression test in section 7 first.
 2. **An act handler may replace an abstention or answer a content-free turn. It may never replace an
    answer.** This mirrors the "scope message may replace an abstention, never an answer" rule in the
    chat UX doc, whose measurement showed rule lists are fragile on fresh wording (45% on 20 unseen
@@ -172,9 +185,12 @@ Design decisions:
 - **Entity inventory.** Accepted-fact entities, learned aliases, subjects and objects of pending
   candidates, and source-quoted names. The last of these exists; replies about a source-only entity
   keep the label "quoted evidence, not an accepted fact".
-- **A refusal should not erase the last grounded answer.** "Why?" after two refused turns returned
-  "No previous grounded answer to explain yet." The mechanism was not traced; the requirement is that
-  `history` keeps the last *answered* turn separately from the last turn.
+- **A refusal clears the dialogue context.** The cause is the `clear()` call described in section 0
+  for every non-answered turn, deliberately so that an unrelated pronoun cannot reach a stale
+  referent. "Why?" after two refused turns therefore returned "No previous grounded answer to explain
+  yet." Whether "Why?" after a refusal should explain the *older answer* or the *refusal itself* is a
+  policy question; the second is the more natural reading. The requirement is that `history` keeps the
+  last answered turn separately from the last turn and that "Why?" says which one it is explaining.
 - **User-supplied text is stored locally in the state file.** Say so in the help text, and clear it
   with the existing reset command.
 
@@ -186,7 +202,8 @@ Vocabulary follows `UserIntentHypothesis` (`dialogue_act`, `task_intent`) from t
 
 | Act | Example | Handler | Slots | Status |
 |---|---|---|---|---|
-| greeting | "Hello?" | status greeting (5.7) | model counts, a tested suggestion | implemented; fix wording defect in section 0 |
+| greeting | "Hello?" | status greeting (5.7) | model counts, a tested suggestion | implemented |
+| reaction | "lol", "wow", "🙂" | acknowledge, no retrieval | none | implemented in phase 0 |
 | farewell | "Goodbye" | close and save | none | implemented |
 | thanks | "thanks" | acknowledgement | none | implemented |
 | acknowledgement | "ok" | asks what next, or defers to open choice | open offer | implemented |
@@ -194,7 +211,7 @@ Vocabulary follows `UserIntentHypothesis` (`dialogue_act`, `task_intent`) from t
 | content question | "Who created Python?" | existing question path | n/a | implemented |
 | elliptical follow-up | "And Ada Lovelace?" | rebind `qud` (5.1) | `qud` | missing |
 | elaboration | "Tell me more" | next unshown facts about the focus (5.3) | `shown`, `salience` | stub that asks a question |
-| justification | "Why?" | existing explanation | `history` | hypothesis exists; refusal erases context |
+| justification | "Why?" | existing explanation | `history` | hypothesis exists; a refused turn clears the context |
 | challenge | "Are you sure?" | re-run with evidence | `history` | missing |
 | correction / repair | "No, I meant …" | rebind the last reference (5.4) | `history`, `salience` | only while a choice is open |
 | clarification choice | "the second one" | `_select_candidate` | pending result | implemented |
@@ -328,7 +345,7 @@ turns, expected act, expected reply kind and content assertions.
 
 | Metric | Definition | Baseline |
 |---|---|---|
-| Junk-retrieval rate | Content-free turns that produced a quoted passage | before: 3 of 7 on the academic model; now: 1 of 3 non-seed content-free turns ("lol"; "blah blah" and "what's your name?" refused) |
+| Junk-retrieval rate | Content-free turns that produced a quoted passage | before: 3 of 7 on the academic model; now: 0 of 3 non-seed content-free turns after phase 0 ("lol" is a reaction; "blah blah" and "what's your name?" are refused) |
 | Act accuracy | Correct act on held-out phrasings | not measured; seed regexes only |
 | Resolution accuracy | Correct binding for it, she, he, him, her, they and elliptical turns | 1 of 4 person and elliptical cases, before and now |
 | Dead-end rate | Turns ending with no answer and no next step | not measured |
@@ -344,8 +361,12 @@ reply has an empty claim list.
 
 The numbering is changed from the first draft because phase 0 is largely done.
 
-0. **Finish the baseline.** The general content-free rule (replaces seed-only matching), the greeting
-   wording defect, mixed-turn handling beyond the comma form, and the trace of what `him` binds to.
+0. **Finish the baseline.** Done on branch `conversation-phase0`: the greeting wording, seed
+   reactions and non-lexical turns kept out of retrieval and out of an open choice, and quoted
+   answers under review kept as candidate referents (checked by
+   `experiments/v1_370_conversation_content_free_and_referents.py`). Not done: a general rule for bare
+   single-token topics (section 2, rule 1), mixed-turn handling beyond the comma form, and binding
+   `him` and `she` to the right referent.
 1. **Discourse state.** Turn history, `shown`, `qud`, last answered turn kept separate from the last
    turn, saved in the next format version with tolerant loading kept. Entity kind for source-derived
    names.
