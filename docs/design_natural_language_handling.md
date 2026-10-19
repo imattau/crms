@@ -881,6 +881,20 @@ natural-language misses remained in the same run (`Who created Python?` did not 
 indexed creator sentence; `Where is Mount Everest?` abstained despite indexed location evidence),
 so future latency changes must preserve answer quality and report those cases alongside timings.
 
+**Term-frequency cache measurement (19 October 2026):** each SQLite search computed document
+frequency separately for every query term. The index now caches those counts per connection and
+invalidates them when `PRAGMA data_version` detects a committed write from another connection;
+same-connection document ingestion clears the cache directly. A parity experiment verified
+identical hits, scores, snippets, and exact citations on repeated searches, and verified that a
+read-only connection sees a newly committed document after invalidation. On the 285,478-document,
+2.1 GB index, a ten-question search-only replay took 1,504 ms with the cache cleared before each
+query and 1,431 ms with normal reuse (about 5% lower total). Results and citations were identical.
+A preceding replay measured 1,438 ms and 1,380 ms respectively, showing some run-to-run variation.
+This is a modest benefit on a distinct-query mix and does not establish a full-chat latency gain.
+The slowest search was still about 502 ms, before answer construction and other chat work, so the
+interactive acceptance target remains unmet. These warm local measurements do not cover cold-cache
+performance.
+
 **Acceptance target from the report:** on the same 2.1 GB index and ten-question set, median
 question latency below 200 ms and the slowest question below 1 s, with identical answers and
 citations. Record warm and cold-cache results separately when available. Retrieval should remain

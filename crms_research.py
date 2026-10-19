@@ -2466,6 +2466,8 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
             raise TypeError("read_only must be a boolean")
         self.path = Path(path).expanduser().resolve()
         self.read_only = read_only
+        self._term_document_frequency_cache: dict[str, int] = {}
+        self._term_document_frequency_data_version: int | None = None
         if read_only:
             if not self.path.is_file():
                 raise FileNotFoundError(self.path)
@@ -2585,6 +2587,32 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
             raise
         else:
             self._db.execute("RELEASE crms_add_document")
+            self._term_document_frequency_cache.clear()
+
+    def _refresh_term_document_frequency_cache(self) -> None:
+        """Discard cached corpus frequencies after another connection writes."""
+        version = int(self._db.execute("PRAGMA data_version").fetchone()[0])
+        if version != self._term_document_frequency_data_version:
+            self._term_document_frequency_cache.clear()
+            self._term_document_frequency_data_version = version
+
+    def _term_document_frequency(self, term: str) -> int:
+        """Count containing documents once per stable index version and term."""
+        cached = self._term_document_frequency_cache.get(term)
+        if cached is not None:
+            return cached
+        quoted_term = f'"{term.replace(chr(34), chr(34) * 2)}"'
+        expression = f"title : {quoted_term} OR body : {quoted_term}"
+        frequency = int(self._db.execute(
+            "SELECT count(DISTINCT c.document_id) "
+            "FROM source_fts JOIN source_chunks c "
+            "ON c.chunk_id=CAST(source_fts.chunk_id AS INTEGER) "
+            "WHERE source_fts MATCH ?", (expression,)).fetchone()[0])
+        # Bound per-index memory when a long-lived session sees many topics.
+        if len(self._term_document_frequency_cache) >= 4096:
+            self._term_document_frequency_cache.clear()
+        self._term_document_frequency_cache[term] = frequency
+        return frequency
 
     @classmethod
     def _chunk_ranges(cls, text: str) -> list[tuple[int, int]]:
@@ -2825,19 +2853,14 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
         count = self.document_count()
         if not terms or count == 0:
             return []
+        self._refresh_term_document_frequency_cache()
         query_words = tuple(match.group().casefold()
                             for match in word_matches(query))
         prose_preferred = _prefers_prose_sources(query)
         programming_query = _is_programming_query(query)
         term_weights = {}
         for term in terms:
-            quoted_term = f'"{term.replace(chr(34), chr(34) * 2)}"'
-            expression = f"title : {quoted_term} OR body : {quoted_term}"
-            frequency = int(self._db.execute(
-                "SELECT count(DISTINCT c.document_id) "
-                "FROM source_fts JOIN source_chunks c "
-                "ON c.chunk_id=CAST(source_fts.chunk_id AS INTEGER) "
-                "WHERE source_fts MATCH ?", (expression,)).fetchone()[0])
+            frequency = self._term_document_frequency(term)
             term_weights[term] = math.log(
                 1 + (count - frequency + 0.5) / (frequency + 0.5)) \
                 * (8.0 if term in focus_terms else 1.0)
