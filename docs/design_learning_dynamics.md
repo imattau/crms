@@ -583,9 +583,12 @@ declared rule data only when the proof format can verify their direction and pro
 - Closed-world absence returns `status="denied"` only after a complete search finds no proof.
   The independent denial verifier checks the requested triple, absence of positive proof trees,
   and a stored, scope-applicable `closed-world` declaration. Bounded or incomplete searches remain
-  `unknown`. Constraint-derived negatives (for example, a second value under a functional relation)
-  still need explicit proof nodes that cite the relevant schema and conflicting value. Never infer
-  a negative from absence without a declared closed-world scope.
+  `unknown`. Explicit `irreflexive`, `asymmetric`, and `functional` declarations can also refute a
+  query when the denial is supported by a self-edge shape or a verified counterexample proof. The
+  verifier checks the declaration, scope, requested claim, and counterexample proof independently;
+  chat answers cite both schema and witness. If the target itself is positively supported despite
+  the constraint, CRMS reports a conflict. Never infer a negative from absence without a declared
+  closed-world scope.
 - Recursive-rule entity scans and repeated per-goal kind filtering remain optimization targets.
   Profile them on recursive and high-degree graphs before hoisting shared indexes; preserve bounds,
   deterministic results, and independent proof checks. Numeric comparisons and counting belong to

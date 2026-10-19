@@ -87,6 +87,75 @@ def verify_closed_world_denial(
         return RuleProofCheck(False, str(error) or "malformed closed-world denial")
 
 
+def verify_constraint_denial(
+        conclusion: Mapping[str, Any] | None,
+        evidence: Mapping[str, Any] | None, *,
+        expected_conclusion: Mapping[str, Any],
+        expected_qualifiers: Any = (), complete: bool,
+        proofs: Iterable[Mapping[str, Any]] = (),
+        fact_lookup: Callable[[Mapping[str, Any]], bool] | None = None,
+        facts: Iterable[Mapping[str, Any]] = (),
+        rules: Iterable[Mapping[str, Any]] = ()) -> RuleProofCheck:
+    """Verify a negative conclusion from an explicit integrity constraint."""
+    try:
+        if complete is not True:
+            return RuleProofCheck(False, "constraint search was incomplete")
+        if tuple(proofs):
+            return RuleProofCheck(False, "a denial cannot contain a positive proof")
+        if not isinstance(conclusion, Mapping) or (
+                _triple(conclusion) != _triple(expected_conclusion)):
+            return RuleProofCheck(False, "denial does not match the requested conclusion")
+        if not isinstance(evidence, Mapping):
+            return RuleProofCheck(False, "constraint evidence is missing")
+        constraint = evidence.get("constraint")
+        if constraint not in {"irreflexive", "asymmetric", "functional"}:
+            return RuleProofCheck(False, "constraint type is unsupported")
+        declaration = evidence.get("declaration")
+        if not isinstance(declaration, Mapping):
+            return RuleProofCheck(False, "constraint declaration is missing")
+        if fact_lookup is not None:
+            present = bool(fact_lookup(declaration))
+        else:
+            signatures = {_fact_signature(item) for item in facts}
+            present = _fact_signature(declaration) in signatures
+        if not present:
+            return RuleProofCheck(False, "constraint declaration is not in the fact snapshot")
+        subject, relation, obj = _triple(expected_conclusion)
+        if (_triple(declaration) != (relation, _key("has relation type"),
+                                     _key(constraint))):
+            return RuleProofCheck(False, "declaration does not license this constraint")
+        scope = _qualifiers(expected_qualifiers)
+        if not _scope_is_within(declaration.get("qualifiers", ()), scope):
+            return RuleProofCheck(False, "constraint declaration is outside query scope")
+        witness = evidence.get("witness")
+        if constraint == "irreflexive":
+            if subject != obj or witness is not None:
+                return RuleProofCheck(False, "irreflexive denial needs a self-relation query")
+            return RuleProofCheck(True, "valid irreflexive denial")
+        if not isinstance(witness, Mapping):
+            return RuleProofCheck(False, "constraint denial is missing its witness proof")
+        witness_conclusion = witness.get("conclusion")
+        if not isinstance(witness_conclusion, Mapping):
+            return RuleProofCheck(False, "constraint witness conclusion is malformed")
+        ws, wr, wo = _triple(witness_conclusion)
+        if wr != relation:
+            return RuleProofCheck(False, "constraint witness uses a different relation")
+        if constraint == "asymmetric":
+            if (subject == obj or ws != obj or wo != subject):
+                return RuleProofCheck(False, "asymmetric witness does not reverse the query")
+        elif ws != subject or wo == obj:
+            return RuleProofCheck(False, "functional witness does not establish another value")
+        witness_check = verify_inference_proof(
+            witness, facts, rules, expected_conclusion=witness_conclusion,
+            expected_qualifiers=expected_qualifiers, fact_lookup=fact_lookup)
+        if not witness_check.valid:
+            return RuleProofCheck(False, "constraint witness failed verification: "
+                                  + witness_check.reason)
+        return RuleProofCheck(True, f"valid {constraint} denial with verified witness")
+    except (TypeError, ValueError, AttributeError) as error:
+        return RuleProofCheck(False, str(error) or "malformed constraint denial")
+
+
 def verify_inference_proof(
         proof: Mapping[str, Any], facts: Iterable[Mapping[str, Any]],
         rules: Iterable[Mapping[str, Any]], *,

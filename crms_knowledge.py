@@ -27,6 +27,7 @@ from crms_inference import (InferenceRule, InferenceResult,
                             reasoning_budget,
                             validate_rule_candidate)
 from crms_rule_proof import (verify_closed_world_denial,
+                             verify_constraint_denial,
                              verify_inference_proof)
 from crms_fact_store import SQLiteFactMap
 from crms_research import (
@@ -520,6 +521,44 @@ def _proof_leaf_sources(proof: Mapping[str, Any]) -> set[str]:
     if isinstance(relation_type_fact, Mapping):
         sources.update(relation_type_fact.get("sources", []))
     return sources
+
+
+def _proof_fact_rows(proof: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Collect cited fact leaves and schema facts from an inference proof."""
+    rows: list[dict[str, Any]] = []
+    fact = proof.get("fact")
+    if proof.get("kind") == "fact" and isinstance(fact, Mapping):
+        rows.append(dict(fact))
+    for premise in proof.get("premises", []):
+        if isinstance(premise, Mapping):
+            rows.extend(_proof_fact_rows(premise))
+    for name in ("middle_kind_fact", "relation_type_fact"):
+        item = proof.get(name)
+        if isinstance(item, Mapping):
+            rows.append(dict(item))
+    for item in proof.get("middle_kind_facts", []):
+        if isinstance(item, Mapping):
+            rows.append(dict(item))
+    return rows
+
+
+def _denial_fact_rows(result: InferenceResult) -> list[dict[str, Any]]:
+    """Return all stored facts that justify an inference denial."""
+    if isinstance(result.denial_evidence, Mapping):
+        return [dict(result.denial_evidence)]
+    denial = result.constraint_denial
+    if not isinstance(denial, Mapping):
+        return []
+    rows = []
+    declaration = denial.get("declaration")
+    if isinstance(declaration, Mapping):
+        rows.append(dict(declaration))
+    witness = denial.get("witness")
+    if isinstance(witness, Mapping):
+        rows.extend(_proof_fact_rows(witness))
+    unique = {json.dumps(row, sort_keys=True, ensure_ascii=False): row
+              for row in rows}
+    return [unique[key] for key in sorted(unique)]
 
 
 def _proof_rule_ids(proof: Mapping[str, Any]) -> set[str]:
@@ -1879,16 +1918,26 @@ class CRMSKnowledgeBase:
             max_candidates=budget.max_candidates,
             max_proofs=budget.max_proofs, effort_level=budget.level)
         if result.status == "denied":
-            denial_check = verify_closed_world_denial(
-                result.conclusion, result.denial_evidence,
-                expected_conclusion={"subject": subject, "relation": relation,
-                                     "object": obj},
-                expected_qualifiers=normalized_qualifiers,
-                complete=result.complete, proofs=result.proofs,
-                fact_lookup=self._proof_fact_is_present, facts=fact_rows)
+            expected = {"subject": subject, "relation": relation,
+                        "object": obj}
+            if result.reason_code == "constraint_denial":
+                denial_check = verify_constraint_denial(
+                    result.conclusion, result.constraint_denial,
+                    expected_conclusion=expected,
+                    expected_qualifiers=normalized_qualifiers,
+                    complete=result.complete, proofs=result.proofs,
+                    fact_lookup=self._proof_fact_is_present,
+                    facts=fact_rows, rules=rule_rows)
+            else:
+                denial_check = verify_closed_world_denial(
+                    result.conclusion, result.denial_evidence,
+                    expected_conclusion=expected,
+                    expected_qualifiers=normalized_qualifiers,
+                    complete=result.complete, proofs=result.proofs,
+                    fact_lookup=self._proof_fact_is_present, facts=fact_rows)
             if not denial_check.valid:
                 return InferenceResult(
-                    "unknown", request=("The closed-world denial failed "
+                    "unknown", request=("The inference denial failed "
                                          f"independent verification: {denial_check.reason}"),
                     complete=False, reason_code="denial_rejected",
                     failure_kind="denial_rejected",
@@ -2807,13 +2856,30 @@ class CRMSKnowledgeBase:
                 text = result.request or "No explicit rule proof supports this conclusion."
         elif result.status == "denied":
             assert result.conclusion is not None
-            text = ("Denied by the declared closed-world boundary: no proof was "
-                    "found for {subject} — {relation} → {object}.".format(
-                        **result.conclusion))
-            if result.denial_evidence:
-                sources = result.denial_evidence.get("sources", [])
+            if result.constraint_denial:
+                constraint = result.constraint_denial.get("constraint", "integrity")
+                text = (f"Denied by the declared {constraint} constraint: "
+                        "{subject} — {relation} → {object}.".format(
+                            **result.conclusion))
+                witness = result.constraint_denial.get("witness")
+                if isinstance(witness, Mapping):
+                    claim = witness.get("conclusion", {})
+                    if isinstance(claim, Mapping):
+                        text += (f" The verified conflicting claim is "
+                                 f"{claim.get('subject')} — {claim.get('relation')} → "
+                                 f"{claim.get('object')}.")
+                sources = sorted({source for row in _denial_fact_rows(result)
+                                  for source in row.get("sources", [])})
                 if sources:
-                    text += " Declaration source: " + ", ".join(sources) + "."
+                    text += " Supporting sources: " + ", ".join(sources) + "."
+            else:
+                text = ("Denied by the declared closed-world boundary: no proof was "
+                        "found for {subject} — {relation} → {object}.".format(
+                            **result.conclusion))
+                if result.denial_evidence:
+                    sources = result.denial_evidence.get("sources", [])
+                    if sources:
+                        text += " Declaration source: " + ", ".join(sources) + "."
         elif result.status == "ambiguous":
             text = result.request or "The inference is ambiguous."
         else:
@@ -11119,13 +11185,13 @@ class CRMSKnowledgeBase:
                 "answered", answer="No", candidates=["No"], evidence=evidence,
                 matched_templates=[template], truth=False)
         if inferred.status == "denied":
-            schema = self._relation_type_fact(
-                " ".join(relation), "closed-world", requested)
+            denial_kind = ("closed_world_absence" if inferred.reason_code ==
+                           "closed_world_absence" else "constraint_denial")
             return QuestionResult(
                 "answered", answer="No", candidates=["No"],
-                evidence=[asdict(schema)] if schema is not None else evidence,
+                evidence=_denial_fact_rows(inferred) or evidence,
                 matched_templates=[template], truth=False,
-                language_evidence=[{"kind": "closed_world_absence",
+                language_evidence=[{"kind": denial_kind,
                                     "relation": " ".join(relation)}])
         return QuestionResult(
             "unknown", matched_templates=[template],
@@ -11721,14 +11787,14 @@ class CRMSKnowledgeBase:
                 request=inferred.request, complete=inferred.complete,
                 expansions=inferred.expansions)
         if inferred.status == "denied":
-            schema = self._relation_type_fact(
-                " ".join(frame["relation"]), "closed-world", qualifiers)
+            denial_kind = ("closed_world_absence" if inferred.reason_code ==
+                           "closed_world_absence" else "constraint_denial")
             return QuestionResult(
                 "answered", answer="No", candidates=["No"], truth=False,
-                evidence=[asdict(schema)] if schema is not None else evidence,
+                evidence=_denial_fact_rows(inferred) or evidence,
                 matched_templates=[matched_template],
                 language_evidence=language_evidence + [{
-                    "kind": "closed_world_absence",
+                    "kind": denial_kind,
                     "relation": " ".join(frame["relation"])}])
         return QuestionResult(
             "unknown", matched_templates=[matched_template],
@@ -11802,11 +11868,9 @@ class CRMSKnowledgeBase:
                 results.append((False, asdict(negative), template_text,
                                 relation_tokens, [], False))
             elif inferred and inferred.status == "denied":
-                schema = self._relation_type_fact(
-                    " ".join(relation_tokens), "closed-world",
-                    requested_qualifiers)
-                results.append((False, asdict(schema) if schema else None,
-                                template_text, relation_tokens, [], False))
+                for denial_fact in _denial_fact_rows(inferred):
+                    results.append((False, denial_fact,
+                                    template_text, relation_tokens, [], False))
             else:
                 results.append((None, None, template_text, relation_tokens, [], False))
         if not results:

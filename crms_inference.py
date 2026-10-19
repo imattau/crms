@@ -122,6 +122,7 @@ class InferenceResult:
     effort_level: str = "standard"
     effort_checks: tuple[str, ...] = ()
     denial_evidence: dict[str, Any] | None = None
+    constraint_denial: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -1099,6 +1100,59 @@ def _infer_relation_bounded(
             or symmetric_type_facts.get(root_relation))
         missing = tuple(missing_premises[key]
                         for key in sorted(missing_premises)[:8])
+        relation_constraints = integrity_type_facts.get(root_relation, {})
+        constraint_denial = None
+        constraint_check_incomplete = False
+        if goal[0] == goal[2] and relation_constraints.get("irreflexive"):
+            constraint_denial = {
+                "constraint": "irreflexive",
+                "declaration": relation_constraints["irreflexive"][0],
+            }
+        if (constraint_denial is None and goal[0] != goal[2]
+                and relation_constraints.get("asymmetric")):
+            reverse_goal = (goal[2], goal[1], goal[0])
+            reverse_proofs = prove(reverse_goal, frozenset(), 0)
+            if reverse_proofs:
+                constraint_denial = {
+                    "constraint": "asymmetric",
+                    "declaration": relation_constraints["asymmetric"][0],
+                    "witness": reverse_proofs[0],
+                }
+            elif exhausted or proofs_truncated:
+                constraint_check_incomplete = True
+        if (constraint_denial is None
+                and relation_constraints.get("functional")):
+            for candidate_object in bounded_candidates(candidates):
+                if candidate_object == goal[2]:
+                    continue
+                alternative_goal = (goal[0], goal[1], candidate_object)
+                alternative_proofs = prove(
+                    alternative_goal, frozenset(), 0)
+                if alternative_proofs:
+                    constraint_denial = {
+                        "constraint": "functional",
+                        "declaration": relation_constraints["functional"][0],
+                        "witness": alternative_proofs[0],
+                    }
+                    break
+                if exhausted or proofs_truncated:
+                    constraint_check_incomplete = True
+                    break
+        if constraint_denial is not None:
+            constraint_name = constraint_denial["constraint"]
+            witness = constraint_denial.get("witness", {})
+            witness_claim = witness.get("conclusion", {}) if witness else {}
+            witness_text = (f"; conflicting support: {witness_claim.get('subject')} — "
+                            f"{witness_claim.get('relation')} → "
+                            f"{witness_claim.get('object')}" if witness_claim else "")
+            return InferenceResult(
+                "denied", conclusion={
+                    "subject": subject, "relation": relation, "object": obj},
+                request=(f"The declared {constraint_name} constraint refutes this "
+                         f"claim{witness_text}."),
+                expansions=expansions, reason_code="constraint_denial",
+                failure_kind="constraint_denial",
+                constraint_denial=constraint_denial)
         if integrity_type_facts.get(root_relation, {}).get("closed world"):
             declaration = integrity_type_facts[root_relation]["closed world"][0]
             return InferenceResult(
@@ -1109,6 +1163,15 @@ def _infer_relation_bounded(
                 expansions=expansions, reason_code="closed_world_absence",
                 failure_kind="closed_world_absence",
                 denial_evidence=dict(declaration))
+        if constraint_check_incomplete:
+            constraint_name = ("asymmetric" if relation_constraints.get("asymmetric")
+                               else "functional")
+            return InferenceResult(
+                "unknown", request=(f"Integrity check for {constraint_name} relation "
+                                    "reached the inference search limit."),
+                expansions=expansions, complete=False,
+                reason_code="search_limit", failure_kind="search_limit",
+                limit_kind=limit_kind)
         failure_kind = ("missing_premise" if root_has_rule else
                         "no_applicable_rule")
         return InferenceResult("unknown", request="No explicit rule proof supports this conclusion.",
