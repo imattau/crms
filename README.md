@@ -118,6 +118,11 @@ Then type `/help` for a short guide. A good first session:
 2. Ask questions about them in plain English.
 3. Type `why?` after an answer to see where it came from.
 
+After an evidence-backed answer, use `/right` or `/wrong` to record feedback
+against its cited fact, source, or inference rule. Use `/feedback` to inspect
+recent signals and their references. Feedback is saved in `crms_feedback.sqlite3`
+for review; it does not change stored knowledge by itself.
+
 ## Learn more
 
 - [CRMS_README.md](CRMS_README.md) - the detailed technical documentation.

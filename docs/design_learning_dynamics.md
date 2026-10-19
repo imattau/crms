@@ -5,8 +5,10 @@
 follow-through is implemented in `crms_chat.py` and covered by
 `experiments/v1_296_missing_premise_source_followup.py`. Section 3's report-only equivalence
 analysis is implemented in `crms_equivalence_dream.py` and covered by
-`experiments/v1_297_equivalence_dream_diagnostic.py`. The evidence ledger and belief-revision
-mechanisms in sections 1 and 4 remain proposed. Prototype results below are design evidence;
+`experiments/v1_297_equivalence_dream_diagnostic.py`. The `/right` and `/wrong` feedback signal
+and its evidence-attributed SQLite event log are implemented; ledger weighting, preference,
+automated belief revision, and feedback effects on answers in sections 1 and 4 remain proposed.
+Prototype results below are design evidence;
 their throwaway code (`ledger.py`, `exp_belief*.py`, `gap_followup.py`, `dream2.py`) is not
 imported. Separately, explicit `practice_relation` and `practice_question` can write a complete,
 independently reverified proof to bounded derived-case storage; ordinary `ask()` stays read-only.
@@ -22,6 +24,25 @@ rule status and the cited counterexample so a user can inspect and correct it. L
 accepted-rule store also rechecks saved negative evidence and suspends rules that it contradicts.
 **Origin:** ideas reviewed from the HPM Learning Agent repo (belief weights, demand-driven
 learning, "dreaming"), re-expressed without vectors.
+
+### Current implementation checkpoint: answer feedback
+
+The chat now accepts `/right` and `/wrong` immediately after an evidence-backed answer, and `/feedback`
+lists the ten newest signals with their attached references. It writes
+an append-only event to a separate SQLite feedback database (`crms_feedback.sqlite3` by default)
+and captures the exact fact/source identifiers and inference rule identifiers available on that
+answer. Repeating the same verdict for the same answer is deduplicated; opposite verdicts are both
+retained and surfaced as a conflict for review. The command reports the references it attached.
+This is an input signal for future review and ledger work: it does **not** change fact acceptance,
+rule status, or answer ranking. Feedback whose answer has no attributable evidence is refused.
+
+`experiments/v1_358_answer_feedback_attribution.py` checks stable attribution, persistence,
+duplicate suppression, and retention of contradictory signals. A temporary-store interactive chat
+run also verified `/wrong` followed by `/right` against a cited answer. Remaining work includes
+persisting the immediate answer context across chat restarts, covering feedback on every specialized
+answer route, and connecting reviewed feedback to the evidence-ledger policy below. Until those
+steps are implemented, the feedback log is inspectable storage for learning signals, not a
+self-modifying rule or fact learner.
 
 ## 0. Ground rules (read first)
 

@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from crms_dialogue import CRMSDialogue
+from crms_feedback import AnswerFeedbackStore, collect_feedback_refs
 from crms_explain import render_verified_explanation
 from crms_codegen import (
     describe_generated_code, diagnose_list_then_math_support,
@@ -57,6 +58,8 @@ HELP = """Commands:
   /help          show this guide
   /effort quick|standard|thorough
                  set session-only reasoning and evidence-check depth
+  /right | /wrong record feedback on the last evidence-backed answer
+  /feedback      inspect recent feedback and its evidence references
   /source PATH|URL add a supported local file or capture one HTTP(S) page
   /source-dir PATH [--replace|--verify]
                  recursively index text/markup, tables, slides, chats, HTML, DOCX, ODT, EPUB, and PDFs
@@ -4589,6 +4592,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dialogue-state", type=Path,
                         default=Path("crms_dialogue.json"),
                         help="short-term context state (default: %(default)s)")
+    parser.add_argument("--feedback-db", type=Path,
+                        default=Path("crms_feedback.sqlite3"),
+                        help="SQLite log for evidence-attributed /right and /wrong feedback")
     parser.add_argument("--rules", type=Path, default=Path("crms_rules.json"),
                         help="learned transformation-rule memory; .sqlite paths use indexed SQLite storage (default: %(default)s)")
     parser.add_argument("--rule-depth", type=int, choices=(1, 2, 3, 4), default=2,
@@ -5123,6 +5129,7 @@ def main() -> int:
         raise ValueError("--fact-db must be a separate file from --knowledge")
     knowledge = (CRMSKnowledgeBase.load(args.knowledge, fact_db=args.fact_db)
                  if args.knowledge.exists() else CRMSKnowledgeBase())
+    feedback_store = AnswerFeedbackStore(args.feedback_db)
     math_model = (CRMSMath.load(args.math)
                   if args.math.exists() else CRMSMath())
     pending_math = _load_pending_math(args.math_session, args.math, math_model)
@@ -5197,6 +5204,7 @@ def main() -> int:
     last_summary_scoped_hit = None
     last_research_evidence: dict | None = None
     last_answer_had_inference_proof = False
+    last_feedback_record: dict[str, Any] | None = None
     latest_research_documents: list[dict] = []
     current_effort = "standard"
     queued_natural_parts: list[str] = []
@@ -5222,6 +5230,46 @@ def main() -> int:
                 print(f"Handling {natural_part_total} explicit questions separately.")
         if not line:
             continue
+        if line in {"/right", "/wrong"}:
+            if last_feedback_record is None:
+                print("CRMS> I don't have a recent evidence-backed answer to attach this to.")
+                continue
+            feedback_id, inserted = feedback_store.record(
+                line[1:], last_feedback_record["question"],
+                last_feedback_record["answer"], last_feedback_record["evidence"])
+            if not inserted:
+                print("CRMS> I already recorded that feedback for this answer.")
+                continue
+            opposite = "wrong" if line == "/right" else "right"
+            has_opposite = any(
+                event["answer_id"] == feedback_id
+                and event["verdict"] == opposite
+                for event in feedback_store.events())
+            if has_opposite:
+                print("CRMS> I recorded the conflicting feedback for review; "
+                      "neither signal changes stored knowledge automatically.")
+            else:
+                evidence_summary = ", ".join(
+                    f"{item['kind']}={item['id']}"
+                    for item in last_feedback_record["evidence"])
+                print("CRMS> I recorded your feedback against "
+                      f"{evidence_summary}. "
+                      "It will inform review; it does not change facts or rules by itself.")
+            continue
+        if line == "/feedback":
+            events = feedback_store.events()[-10:]
+            if not events:
+                print("CRMS> No answer feedback has been recorded.")
+            else:
+                for event in events:
+                    refs = ", ".join(
+                        f"{item['kind']}={item['id']}"
+                        for item in event["evidence"]) or "no evidence references"
+                    print(f"CRMS> {event['verdict'].upper()}: "
+                          f"{event['question']} => {event['answer']} [{refs}]")
+            continue
+        if not line.startswith("/"):
+            last_feedback_record = None
         if line == "/effort" or line.startswith("/effort "):
             level = line[len("/effort"):].strip()
             if level not in {"quick", "standard", "thorough"}:
@@ -9884,6 +9932,21 @@ def main() -> int:
             print(f"CRMS> Part {part_number} of {part_total}: {turn.text}")
             if part_number == part_total:
                 print(f"Processed all {part_total} question parts separately.")
+        answer_refs = collect_feedback_refs(turn.response, turn.research)
+        evidence_backed_answer = bool(
+            (turn.response is not None
+             and turn.response.status == "answered")
+            or (turn.research is not None
+                and (turn.research.source_sentences or turn.research.passages)))
+        if evidence_backed_answer and answer_refs:
+            last_feedback_record = {
+                "question": turn.resolved_question or line,
+                "answer": (turn.text or
+                           (turn.response.answer if turn.response else "")),
+                "evidence": answer_refs,
+            }
+        else:
+            last_feedback_record = None
         if (turn.response is not None
                 and turn.response.status == "answered"
                 and turn.response.inference_proofs):
