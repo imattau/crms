@@ -886,13 +886,18 @@ with `proof_limit`; and the cycle returned an ambiguity rather than an unqualifi
 
 Before the inference normalization cache, a local run with `tracemalloc` enabled measured 35 ms for
 the 35-hop chain (211 KiB peak), 636 ms for the tree (6,617 KiB), and 267 ms for the proof-capped
-diamond (556 KiB). After adding a bounded 65,536-entry cache for pure token normalization in
-`crms_inference.py`, the same cases measured 28 ms (198 KiB), 321 ms (6,257 KiB), and 246 ms
-(548 KiB). A `cProfile` replay of the tree fell from 0.390 s / 1.82 million calls to 0.144 s / 0.63
-million calls. These are machine- and instrumentation-specific observations, not performance
-thresholds. The improvement confirms repeated normalization was a significant cost; the remaining
-profile is led by proof expansion and repeated fact-triple verification, which should be profiled
-before further search changes.
+diamond (556 KiB). The bounded 65,536-entry token-normalization cache reduced the tree to 321 ms
+(6,257 KiB). A second, narrowly recognized target-pruning path for the exact rule pair
+`edge + edge -> closure` and `edge + closure -> closure` reduced it further to 105 ms (2,850 KiB)
+and reduced proof-search expansions from 2,055 to 27. This optimization uses backward reachability
+over the same scope-filtered direct-edge index, preserves direct and verified closure-edge anchors,
+and leaves other rule sets on the general search path. The 35-hop chain took 29 ms and 105
+expansions after pruning (versus 28 ms and 70 expansions after normalization caching alone): the
+reachability scan adds work when there are few irrelevant branches. A `cProfile` replay of the tree
+measured 0.077 s / 0.41 million calls after both changes, compared with 0.390 s / 1.82 million calls
+before them. These are machine- and instrumentation-specific observations, not performance
+thresholds. The current profile is dominated by repeated fact-triple verification; any further
+optimization should be separately measured and must preserve the fallback for broader rule sets.
 The initial graph matrix improves coverage over the focused regressions, but does not yet include
 larger adversarial branching graphs, nonlinear recursive joins, or a broad query distribution.
 

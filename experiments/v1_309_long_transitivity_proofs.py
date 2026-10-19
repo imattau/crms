@@ -9,7 +9,9 @@ PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
 from crms_knowledge import CRMSKnowledgeBase
+from crms_inference import infer_relation as infer_proof_relation
 from crms_rule_proof import verify_inference_proof
+from crms_text import tokens
 
 
 def require(condition: bool, message: str) -> None:
@@ -38,14 +40,10 @@ def main() -> None:
         require(checked.valid,
                 f"independent verifier rejected {hops}-edge proof: {checked}")
 
-    # A recursive proof can be found even when exhaustive alternative-proof
-    # enumeration explores an unrelated branch to the search limit. Preserve
-    # the verified positive conclusion, label its search incomplete, and keep
-    # it out of persistent practice memory.
+    # A broader rule set retains the old honest partial-support behavior: the
+    # optimization below must decline to prune when the closure pair is not
+    # the complete set of rules for the conclusion relation.
     recursive = CRMSKnowledgeBase()
-    # The current default recursion depth is 40. Keep the irrelevant branch
-    # long enough that exhaustive alternatives still hit that bound while
-    # the six-edge target proof is already available.
     for index in range(99):
         recursive.add_fact(f"Person {index}", "parent", f"Person {index + 1}",
                            f"family:{index}")
@@ -53,12 +51,14 @@ def main() -> None:
         "parent-recursion", "parent", "ancestor", "ancestor")
     recursive.add_inference_rule(
         "parent-base", "parent", "parent", "ancestor")
+    recursive.add_inference_rule(
+        "alternate-ancestor", "other-first", "other-second", "ancestor")
     result = recursive.infer_relation("Person 0", "ancestor", "Person 5")
     require(result.status == "answered" and result.proofs,
             f"a found recursive proof was discarded after a depth-limited branch: {result}")
     require(not result.complete and result.support_class == "partial"
             and result.limit_kind == "depth_limit",
-            "incomplete alternative enumeration was reported as complete support")
+            "unsupported pruning hid incomplete alternative enumeration")
     checked = verify_inference_proof(
         result.proofs[0], [asdict(fact) for fact in recursive.facts()],
         [asdict(rule) for rule in recursive._inference_rules.values()],
@@ -75,6 +75,68 @@ def main() -> None:
             and recursive.retrieve_derived_case(
                 "Person 0", "ancestor", "Person 5") is None,
             "partial proof was incorrectly persisted as a complete practiced result")
+
+    pruned = CRMSKnowledgeBase()
+    for index in range(99):
+        pruned.add_fact(f"Person {index}", "parent", f"Person {index + 1}",
+                        f"pruned:{index}")
+    pruned.add_inference_rule(
+        "parent-recursion", "parent", "ancestor", "ancestor")
+    pruned.add_inference_rule(
+        "parent-base", "parent", "parent", "ancestor")
+    pruned_result = pruned.infer_relation("Person 0", "ancestor", "Person 5")
+    require(pruned_result.status == "answered" and pruned_result.complete
+            and pruned_result.limit_kind is None and pruned_result.expansions < 100,
+            f"target-unreachable branches were not safely pruned: {pruned_result}")
+    pruned_check = verify_inference_proof(
+        pruned_result.proofs[0], [asdict(fact) for fact in pruned.facts()],
+        [asdict(rule) for rule in pruned._inference_rules.values()],
+        expected_conclusion=pruned_result.conclusion)
+    require(pruned_check.valid,
+            f"independent verifier rejected target-pruned proof: {pruned_check}")
+    bounded_pruning = pruned.infer_relation(
+        "Person 0", "ancestor", "Person 5", max_expansions=1)
+    require(bounded_pruning.status == "unknown"
+            and not bounded_pruning.complete
+            and bounded_pruning.limit_kind == "expansion_limit",
+            f"target reachability scan escaped the expansion bound: {bounded_pruning}")
+    retained = pruned.practice_relation(
+        "Person 0", "ancestor", "Person 5")
+    require(retained.status == "answered" and retained.complete
+            and pruned.retrieve_derived_case(
+                "Person 0", "ancestor", "Person 5") is not None,
+            "complete target-pruned proof was not retained as a derived case")
+
+    # A verified cached closure edge is a reachability anchor; its upstream
+    # parent path must remain eligible even when it is not itself parent-derived.
+    anchored = CRMSKnowledgeBase()
+    for index in range(4):
+        anchored.add_fact(f"A{index}", "parent", f"A{index + 1}",
+                          f"anchor:parent:{index}")
+    anchored.add_inference_rule(
+        "anchor-parent-recursion", "parent", "ancestor", "ancestor")
+    anchored.add_inference_rule(
+        "anchor-parent-base", "parent", "parent", "ancestor")
+    cached_anchor = anchored.infer_relation("A2", "ancestor", "A4")
+    require(cached_anchor.status == "answered" and cached_anchor.complete
+            and cached_anchor.proofs,
+            f"could not create verified closure-edge anchor: {cached_anchor}")
+    anchor_key = (tokens("A2"), tokens("ancestor"), tokens("A4"))
+    anchored_result = infer_proof_relation(
+        [asdict(fact) for fact in anchored.facts()],
+        list(anchored._inference_rules.values()),
+        subject="A0", relation="ancestor", obj="A4",
+        verified_derived_proofs={anchor_key: cached_anchor.proofs})
+    require(anchored_result.status == "answered" and anchored_result.complete
+            and anchored_result.proofs,
+            f"a verified closure-edge anchor was pruned: {anchored_result}")
+    anchored_check = verify_inference_proof(
+        anchored_result.proofs[0],
+        [asdict(fact) for fact in anchored.facts()],
+        [asdict(rule) for rule in anchored._inference_rules.values()],
+        expected_conclusion=anchored_result.conclusion)
+    require(anchored_check.valid,
+            f"independent verifier rejected anchored recursive proof: {anchored_check}")
 
     # Two recursive branches converge on the same subgoal. Query-local
     # memoization should reuse that complete positive proof set.
@@ -151,7 +213,8 @@ def main() -> None:
 
     print("long transitive proof diagnostic: PASS")
     print("2, 8, 9, 12, 20, and 30-edge paths proved and independently verified")
-    print("recursive proof retained with an explicit partial-support label: PASS")
+    print("partial-support disclosure remains for broader, unoptimized rule sets: PASS")
+    print("target-directed pruning proves short recursive goals completely: PASS")
     print(f"overlapping recursive subgoals reused ({memoized.memo_hits} memo hits): PASS")
     print("fact retraction is visible to the next inference call: PASS")
     print(f"ten-layer diamond: {len(branching.proofs)} shortest proof records; PASS")

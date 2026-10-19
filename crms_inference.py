@@ -503,6 +503,45 @@ def _infer_relation_bounded(
                            | set(transitive_type_facts)
                            | set(symmetric_type_facts))
 
+    def recursive_edge_relation(
+            relation_key: tuple[str, ...]) -> tuple[str, ...] | None:
+        """Recognize the exact edge+edge / edge+closure rule pair.
+
+        For this narrow closure form, every derived path must follow direct
+        edges of one non-derived relation. That lets a query's target prune
+        recursive middles that cannot reach it, without changing the supported
+        proof set. More general rule systems keep the unpruned search.
+        """
+        outputs = rules_by_conclusion.get(relation_key, ())
+        if (len(outputs) != 2 or relation_key in transitive_type_facts
+                or relation_key in symmetric_type_facts):
+            return None
+        recursive_edges = []
+        base_edges = []
+        for rule in outputs:
+            if (rule.third_relation is not None or rule.middle_kind is not None
+                    or rule.second_middle_kind is not None):
+                return None
+            first = _key(rule.first_relation)
+            second = _key(rule.second_relation)
+            if second == relation_key and first != relation_key:
+                recursive_edges.append(first)
+            elif first == second and first != relation_key:
+                base_edges.append(first)
+            else:
+                return None
+        if (len(recursive_edges) != 1 or len(base_edges) != 1
+                or recursive_edges[0] != base_edges[0]
+                or relation_is_derivable(recursive_edges[0])):
+            return None
+        return recursive_edges[0]
+
+    recursive_edge_relations = {
+        relation: edge_relation
+        for relation in rules_by_conclusion
+        if (edge_relation := recursive_edge_relation(relation)) is not None
+    }
+
     def display_atom(atom: tuple[tuple[str, ...], ...]) -> dict[str, str]:
         return {
             "subject": entities.get(atom[0], " ".join(atom[0])),
@@ -612,6 +651,38 @@ def _infer_relation_bounded(
             for item in removable[:len(selected) - max_candidates]:
                 selected.remove(item)
         return sorted(selected)
+
+    target_reachability_cache: dict[
+        tuple[tuple[str, ...], tuple[str, ...]], frozenset[tuple[str, ...]]
+    ] = {}
+
+    def recursive_target_candidates(
+            relation: tuple[str, ...], edge_relation: tuple[str, ...],
+            target: tuple[str, ...]) -> frozenset[tuple[str, ...]]:
+        """Return direct-edge ancestors of target, plus direct/cached closure edges."""
+        key = (relation, target)
+        cached = target_reachability_cache.get(key)
+        if cached is not None:
+            return cached
+        # A direct or previously verified closure edge is valid support even
+        # when its provenance is not a path of the recognized base edge. Its
+        # subject is also a terminal anchor for an upstream edge path.
+        reached = {target} | set(known_incoming.get((relation, target), ()))
+        queue = deque(sorted(reached))
+        while queue:
+            current = queue.popleft()
+            predecessors = known_incoming.get((edge_relation, current), ())
+            for predecessor in sorted(predecessors):
+                if not spend():
+                    break
+                if predecessor not in reached:
+                    reached.add(predecessor)
+                    queue.append(predecessor)
+            if exhausted:
+                break
+        bounded = frozenset(bounded_candidates(reached))
+        target_reachability_cache[key] = bounded
+        return bounded
 
     def prove_transitive(atom: tuple[tuple[str, ...], ...],
                          relation_type_fact: Mapping[str, Any],
@@ -1153,6 +1224,16 @@ def _infer_relation_bounded(
                                     rule.rule_id, 1,
                                     premise_support((middle, second_relation,
                                                      atom[2])))
+                # For the recognized edge+edge / edge+closure pair, only
+                # recurse through middles that can reach this goal's target.
+                # Direct or verified closure edges are retained independently.
+                if (eligible is not None
+                        and second_relation == atom[1]
+                        and recursive_edge_relations.get(atom[1]) == first_relation):
+                    eligible = set(eligible) & set(recursive_target_candidates(
+                        atom[1], first_relation, atom[2]))
+                    if exhausted:
+                        return proofs
                 if rule.middle_kind is not None:
                     required_kind = _key(rule.middle_kind)
                     eligible_source = candidates if eligible is None else eligible
