@@ -79,8 +79,9 @@ Findings from the review that change the design:
   task intent, decision, matched frame, context predicates, alternatives), shown by `/intent`.
   The baseline includes contextual pending-choice and explanation-follow-up handling, plus bounded
   lexical frames for direct wh/yes-no questions and modal requests. It remains a hand-checked
-  rule set; nothing is learned, and the frames do not recover task intent for short slot answers
-  without context.
+  rule set; nothing is learned. A typed elaboration-topic slot now recovers a bare entity reply
+  when CRMS has asked which accepted entity to expand on; the general task-slot inventory remains
+  unimplemented.
 - **Elaboration and conversation memory were added in phase 1** (the baseline described here
   predates it). "Tell me more" lists unshown accepted facts about the focus; it used to return "I can
   look for more grounded information about X…" and show nothing. For a topic that exists only in a
@@ -88,8 +89,9 @@ Findings from the review that change the design:
 - **State was a bag of fields, with additions.** `CRMSDialogue` holds `last_entity`,
   `subject_entity`, `object_entity`, `last_question`, `last_selected_answer`, a pending
   clarification, writing and timeline fields, `source_mentions` (names quoted from sources, kept as
-  candidate referents), `last_intent_hypothesis`, and since phase 1 `history`, `last_answered` and
-  `shown` (format version 10). Still absent: a question under discussion and open offers.
+  candidate referents), `last_intent_hypothesis`, `pending_dialogue_slot`, `history`, `last_answered`
+  and `shown` (format version 11). General question-under-discussion state and task slots remain
+  absent; offers are transient.
 - **Entity recognition is partly widened.** `_source_entity_mentions` retains capitalised names from
   quoted sentences as candidates; `_canonical_entity` and `_known_entity_surfaces` still look only at
   accepted facts and aliases. Pronoun resolution does not consult entity kind.
@@ -416,12 +418,11 @@ The numbering is changed from the first draft because phase 0 is largely done.
    `experiments/v1_370_conversation_content_free_and_referents.py`). Not done: a general rule for bare
    single-token topics (section 2, rule 1), mixed-turn handling beyond the comma form, and binding
    `him` and `she` to the right referent.
-1. **Discourse state.** Done on branch `conversation-phase1`: turn history, `last_answered` and
-   `shown`, saved in dialogue-state format version 10 with strict validation of the new fields and
-   version 9 files still loading (checked by
-   `experiments/v1_372_conversation_history_and_elaboration.py`). Elaboration moved here from phase 2
-   because `shown` needs it. Not done: `qud`, `offers`, `session_facts`, and entity kinds for
-   source-derived names.
+1. **Discourse state.** Turn history, `last_answered` and `shown` are saved in dialogue-state format
+   version 11 with older versions still loading. A single typed `elaboration_topic` slot also
+   persists and is validated; see `experiments/v1_375_contextual_elaboration_slot.py`. Elaboration
+   moved here because `shown` needs it. Not done: general `qud`/task slots, `session_facts`, and
+   entity kinds for source-derived names.
 2. **Follow-ups.** Done on branch `conversation-phase2`: a numbered choice for an ambiguous pronoun
    and the entity overview (checked by
    `experiments/v1_373_conversation_binding_and_overview.py`). Elliptical turns already existed. Not

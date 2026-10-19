@@ -23,6 +23,16 @@ the versioned dialogue state and validated when reloaded, so the diagnostic surv
 Regression coverage is in
 `experiments/v1_365_contextual_clarification_intent.py`.
 
+The runtime now also retains one typed open dialogue slot:
+`pending_dialogue_slot = "elaboration_topic"`. If “tell me more” has no current topic, CRMS asks
+which entity with accepted facts to elaborate on. A bare entity name is then classified as an answer
+to that question and routed to the accepted-fact overview; an unmatched name gets a clarification,
+not a corpus lookup. A new question supersedes the slot, and “never mind” cancels it. This bounded
+slot is persisted in dialogue-state format 11 and rejects unknown slot values on load. It is session
+context, not learned intent knowledge, and it does not support free-form source summaries. The
+sequence and reload checks are in
+[`v1_375_contextual_elaboration_slot.py`](../experiments/v1_375_contextual_elaboration_slot.py).
+
 ### Corpus coverage diagnostic
 
 The current rules were measured against the prepared Taskmaster-1 `restaurant-table` user-turn
@@ -117,8 +127,9 @@ intent when the context is insufficient.
 
 The minimum context state should remain bounded and typed: recent acts, the current question under
 discussion, the active task/topic, open required slots, pending clarification or offer, and the
-provenance/status of the last answer. Store the reusable intent frames and their evidence in the
-SQLite model database. Keep a user's current slot values and unresolved intent hypotheses in
+provenance/status of the last answer. A first typed open slot now supports an elaboration topic; the
+general task-slot inventory remains future work. Store reusable intent frames and their evidence in
+the SQLite model database. Keep a user's current slot values and unresolved intent hypotheses in
 session dialogue state. User-provided values remain user claims or task parameters; they do not
 become accepted world facts by default.
 

@@ -193,6 +193,10 @@ class CRMSDialogue:
         # Next steps CRMS has offered, each answerable by a bare yes or no for a
         # short time. Transient: not saved, and ``clear`` leaves them alone.
         self.offers: list[dict[str, Any]] = []
+        # A short, typed follow-up question asked by the conversation layer.
+        # The slot is explicit so the next user turn can be interpreted in
+        # context without treating it as a new factual question.
+        self.pending_dialogue_slot: str | None = None
 
     def record_turn(self, utterance: str, act: str,
                     turn: "DialogueTurn") -> None:
@@ -219,6 +223,7 @@ class CRMSDialogue:
         self.last_answered = None
         self.shown = []
         self.offers = []
+        self.pending_dialogue_slot = None
 
     def focus_entities(self) -> list[str]:
         """Entities the conversation is currently about, most recent answer first."""
@@ -297,6 +302,7 @@ class CRMSDialogue:
         self.last_timeline_subject = None
         self.last_timeline_order_by = None
         self.source_mentions = []
+        self.pending_dialogue_slot = None
         self._clear_pending()
 
     def _clear_pending(self) -> None:
@@ -1601,7 +1607,7 @@ class CRMSDialogue:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(
-            json.dumps({"format_version": 10, "last_entity": self.last_entity,
+            json.dumps({"format_version": 11, "last_entity": self.last_entity,
                         "subject_entity": self.subject_entity,
                         "object_entity": self.object_entity,
                         "last_question": self.last_question,
@@ -1619,7 +1625,8 @@ class CRMSDialogue:
                             if self.last_intent_hypothesis else None),
                         "history": self.history,
                         "last_answered": self.last_answered,
-                        "shown": self.shown},
+                        "shown": self.shown,
+                        "pending_dialogue_slot": self.pending_dialogue_slot},
                        ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8")
 
@@ -1627,9 +1634,13 @@ class CRMSDialogue:
     def load(cls, knowledge: CRMSKnowledgeBase, path: str, *,
              research_index: Any | None = None) -> "CRMSDialogue":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
-        if payload.get("format_version") not in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10):
+        if payload.get("format_version") not in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11):
             raise ValueError("unsupported dialogue-state format version")
         dialogue = cls(knowledge)
+        pending_dialogue_slot = payload.get("pending_dialogue_slot")
+        if pending_dialogue_slot not in (None, "elaboration_topic"):
+            raise ValueError("stored dialogue slot is malformed")
+        dialogue.pending_dialogue_slot = pending_dialogue_slot
         last_question = payload.get("last_question")
         if last_question is not None:
             if not isinstance(last_question, str):

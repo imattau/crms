@@ -92,7 +92,8 @@ def main() -> None:
             and dialogue.history[-1]["status"] == "unknown",
             "refusal erased the conversation memory")
     nothing = respond(dialogue, "Tell me more", research_index=index)
-    require(nothing.status == "clarify" and "Which entity or source" in nothing.text,
+    require(nothing.status == "clarify"
+            and "Which entity with accepted facts" in nothing.text,
             f"elaboration invented a topic after a refusal: {nothing.text!r}")
 
     # 'Why?' after the refusal explains the earlier answer and says which one.
@@ -127,7 +128,7 @@ def main() -> None:
         state = root / "dialogue.json"
         live.save(str(state))
         payload = json.loads(state.read_text(encoding="utf-8"))
-        require(payload["format_version"] == 10 and payload["shown"]
+        require(payload["format_version"] == 11 and payload["shown"]
                 and payload["last_answered"]["answer"] == "Charles Babbage"
                 and payload["history"][-1]["act"] == "elaboration",
                 f"saved state lacked the conversation memory: {payload}")
@@ -141,7 +142,8 @@ def main() -> None:
                 f"restored dialogue repeated or lost shown facts: {more.text!r}")
 
         legacy = {key: value for key, value in payload.items()
-                  if key not in {"history", "last_answered", "shown"}}
+                  if key not in {"history", "last_answered", "shown",
+                                 "pending_dialogue_slot"}}
         legacy["format_version"] = 9
         state.write_text(json.dumps(legacy), encoding="utf-8")
         old = CRMSDialogue.load(knowledge, str(state))
@@ -198,7 +200,7 @@ def main() -> None:
     print("a refusal clears referents but not conversation memory: PASS")
     print("'why?' after a refusal explains the earlier answer and names it: PASS")
     print("history is bounded; clear() keeps it and /reset wipes it: PASS")
-    print("state version 10 round-trips; version 9 loads; tampering is rejected: PASS")
+    print("state version 11 round-trips; version 9 loads; tampering is rejected: PASS")
 
 
 if __name__ == "__main__":

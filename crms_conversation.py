@@ -60,11 +60,25 @@ _OVERVIEW_RE = re.compile(
 _EXPLANATION_FOLLOWUP_RE = re.compile(
     r"^(?:why(?: is that)?|how do you know(?: that)?|what supports that)"
     r"[?!. ]*$", re.IGNORECASE)
+_ELABORATION_TOPIC_REPLY_RE = re.compile(
+    r"^(?:about\s+)?(?P<topic>[\w][\w '&’.-]{0,118})[.! ]*$",
+    re.IGNORECASE)
+_CANCEL_FOLLOWUP_RE = re.compile(
+    r"^(?:never mind|forget it|cancel that|cancel)[.! ]*$", re.IGNORECASE)
 _WH_QUESTION_RE = re.compile(
     r"^(?:who|whom|whose|what|which|when|where|why|how)\b", re.IGNORECASE)
 _YES_NO_QUESTION_RE = re.compile(
     r"^(?:am|is|are|was|were|do|does|did|has|have|had|can|could|will|would|"
     r"shall|should|may|might)\b.+\?\s*$", re.IGNORECASE)
+
+
+def _elaboration_topic_reply(text: str) -> re.Match[str] | None:
+    """Match a short entity-like answer, never a newly asked question."""
+    stripped = text.strip()
+    if (_WH_QUESTION_RE.match(stripped)
+            or _YES_NO_QUESTION_RE.fullmatch(stripped)):
+        return None
+    return _ELABORATION_TOPIC_REPLY_RE.fullmatch(stripped)
 _MODAL_REQUEST_RE = re.compile(
     r"^(?:can|could|would|will)\s+(?:you|i|we)\s+"
     r"(?P<verb>[a-z]+)\b(?:\s+.+)?[?.! ]*$", re.IGNORECASE)
@@ -176,6 +190,40 @@ def classify_user_intent(
             context_predicates=("no_previous_grounded_answer",),
             alternatives=("request-explanation", "ask-new-question"),
         )
+
+    if dialogue.pending_dialogue_slot == "elaboration_topic":
+        if _CANCEL_FOLLOWUP_RE.fullmatch(text.strip()):
+            return UserIntentHypothesis(
+                dialogue_act="cancel-follow-up",
+                task_intent="continue-current-task",
+                decision="selected",
+                matched_frame="cancel-open-elaboration-question",
+                context_predicates=("open_question:elaboration_topic",),
+            )
+        topic_reply = _elaboration_topic_reply(text)
+        if topic_reply and classify_act(text) is None:
+            topic = topic_reply.group("topic").strip()
+            canonical = dialogue._canonical_entity(topic)
+            if canonical:
+                return UserIntentHypothesis(
+                    dialogue_act="answer-clarification",
+                    task_intent="continue-current-task",
+                    decision="selected",
+                    matched_frame="elaboration-topic-slot",
+                    context_predicates=("open_question:elaboration_topic",
+                                        "accepted_entity_match"),
+                    selected_value=canonical,
+                )
+            return UserIntentHypothesis(
+                dialogue_act="answer-clarification",
+                task_intent="continue-current-task",
+                decision="ambiguous",
+                matched_frame="elaboration-topic-slot",
+                context_predicates=("open_question:elaboration_topic",
+                                    "no_accepted_entity_match"),
+                alternatives=("name an entity with accepted facts",
+                             "ask a specific question about the source"),
+            )
 
     if dialogue.pending_result is not None:
         selected, is_selection = dialogue._select_candidate(text)
@@ -353,6 +401,27 @@ def respond(dialogue: CRMSDialogue, text: str, *,
                                  text="Okay, I will leave them for now.")
         return with_intent(reply)
 
+    if dialogue.pending_dialogue_slot == "elaboration_topic":
+        if _CANCEL_FOLLOWUP_RE.fullmatch(text.strip()):
+            dialogue.pending_dialogue_slot = None
+            return with_intent(DialogueTurn(
+                "social", text, text,
+                text="Okay, I cancelled that follow-up."))
+        topic_reply = _elaboration_topic_reply(text)
+        if topic_reply and act is None:
+            dialogue.pending_dialogue_slot = None
+            topic = topic_reply.group("topic").strip()
+            card = dialogue.overview(topic)
+            if card is not None:
+                return with_intent(card)
+            return with_intent(DialogueTurn(
+                "clarify", text, text,
+                text=(f"I couldn't match ‘{topic}’ to an entity with accepted "
+                      "facts. Ask a specific question about it, or name an "
+                      "entity I have accepted facts about.")))
+        # A new question or conversational act supersedes the open slot.
+        dialogue.pending_dialogue_slot = None
+
     mixed_greeting = _MIXED_GREETING_RE.fullmatch(text.strip())
     if mixed_greeting is not None:
         content = mixed_greeting.group("question").strip()
@@ -495,7 +564,8 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         elaborated = dialogue.elaborate()
         if elaborated is not None:
             return with_intent(elaborated)
-        reply = "Which entity or source should I look at in more detail?"
+        reply = "Which entity with accepted facts should I look at in more detail?"
+        dialogue.pending_dialogue_slot = "elaboration_topic"
         return with_intent(DialogueTurn("clarify", text, text, text=reply))
     if act == "help":
         return with_intent(DialogueTurn(
