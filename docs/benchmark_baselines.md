@@ -1578,3 +1578,23 @@ not verified, and the existing recombination scores remain bounded synthetic
 results. The next gate must
 exercise lineage from independently sourced examples through ordinary chat on
 genuinely held-out documents and independently written requests.
+
+## Source-document-held-out procedure transfer through chat (2026-10-20)
+
+Command: `python3 experiments/v1_430_source_disjoint_chat_rule_transfer.py`.
+
+The actual chat teaches `sort the numbers` from exact input/output pairs cited
+to two training documents, then generates standalone Python. A third indexed
+document contains a held-out list/output pair; its citation is excluded from
+the rule memory and artifact. The generated procedure returns the exact held-
+out output and passes its embedded parity checks. The experiment also probes
+an unseen paraphrase and an unsupported operation; both abstain in this run.
+
+Runtime result: all safety and parity checks passed. These are three
+programmatically authored fixture documents using the same wording pattern,
+not independent publishers or a natural corpus. The result demonstrates
+document separation and provenance through one exact procedure, not unseen
+multi-step composition, broad language transfer, or independent source
+reliability. The next recombination benchmark should teach connective patterns
+from cited examples in separate source documents and test a held-out combination
+through the same chat and artifact path.
