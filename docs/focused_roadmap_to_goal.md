@@ -5,6 +5,58 @@
 overall goal. CRMS has inspectable foundations and narrow end-to-end wins, but
 does not yet behave like a broadly capable assistant.
 
+## Overall review and immediate direction
+
+CRMS is still pursuing the right goal. Its distinctive strengths—explicit
+knowledge, traceable evidence, bounded procedures, independently checked
+reasoning, and correction—are visible in the code and in focused runtime
+experiments. The work has not drifted into a different product.
+
+The gap is breadth and integration. Current results establish selected
+capabilities on controlled examples; they do not establish reliable performance
+across ordinary requests or long conversations. The 70B-class comparison is a
+useful product reference, but CRMS should be judged against a versioned task
+scorecard, not against a few impressive demonstrations. Retrieval coverage,
+labeler agreement, and passing component scripts must remain distinct from
+end-to-end answer quality.
+
+The next work should follow this critical path:
+
+1. **Make the evaluation trustworthy and current.** Pin a clean code snapshot,
+   corpus and transcript splits, expected answers, abstentions, and independent
+   checks. Re-run the compact chat scorecard against that snapshot. Keep results
+   from uncommitted trees clearly marked as working-tree diagnostics.
+2. **Close dialogue grounding failures before adding dialogue features.** Extend
+   the Eiffel Tower/Colosseum regression across paragraph layouts, intervening
+   turns, entity changes, source-only answers, and save/reload. Fail any
+   confidently wrong referent or stale explanation; ask or abstain when the
+   context does not license a referent. The current authored transcript passes
+   are useful starting controls, not broad dialogue evidence.
+3. **Prove one source-disjoint learned recombination end to end.** This is the
+   highest-leverage capability experiment: source text and examples should
+   license components, a held-out source and unseen composition should transfer
+   through chat, and an independent checker should validate the output. Keep
+   teacher-assisted connective labels explicit where prose alone does not
+   license them.
+4. **Join that slice to verified reasoning and governed derivation.** Route the
+   same user request through the chat interface, preserve proof/output checks,
+   expose missing premises and incomplete search, and keep derived knowledge
+   review-only with lineage until correction and invalidation work.
+5. **Advance contextual intent alongside the above.** Improve task/subgoal
+   tracking on held-out conversations; treat intent as a revisable hypothesis
+   from the utterance and explicit state. Keep dialogue-move induction inert
+   until it beats the scripted baseline on held-out outcomes.
+6. **Expand domains and finish portable SQLite distribution only behind shared
+   gates.** Validate one bounded slice each for math, coding, translation and
+   creative work. Then prove a copied model works without its ingestion files,
+   including learning, reload, evidence lookup and the same scorecard.
+
+This means the project is **on track in architectural direction, but not yet on
+track to claim the capability goal**. Continue focused runtime validation and
+commit only intended files. Do not expand corpus size, domain count, or
+dialogue machinery unless it improves a measured scorecard result or closes a
+named capability gate.
+
 ## Goal
 
 Build a lightweight, distributable language system that can handle a broad
