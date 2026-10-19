@@ -52,6 +52,11 @@ _SESSION_SLOT_TYPES = {
     "location", "party_size", "date_time", "seating", "cuisine",
     "restaurant_choice",
 }
+_EXPLICIT_TOPIC_DIRECTIVE_RE = re.compile(
+    r"^switch\s+to\s+(?:the\s+)?(?P<entity>[^.!?;:]+)"
+    r"[.!?;:]\s*(?P<question>(?:who|what|when|where|why|how|is|are|"
+    r"was|were|did|does|do|can|could|would|will|should)\b.+)$",
+    flags=re.IGNORECASE | re.DOTALL)
 
 
 def infer_open_question_slot(prompt: str, answer_kind: str) -> str:
@@ -2111,6 +2116,25 @@ class CRMSDialogue:
                       "or entity do you mean?"))
         return None
 
+    def _explicit_topic_directive(
+            self, question: str, *, research_index: Any | None = None
+            ) -> "DialogueTurn | None":
+        """Route a named topic switch followed by one factual question."""
+        match = _EXPLICIT_TOPIC_DIRECTIVE_RE.fullmatch(question.strip())
+        if match is None:
+            return None
+        named_topic = match.group("entity").strip()
+        followup_question = match.group("question").strip()
+        canonical = self._canonical_entity(named_topic) or named_topic
+
+        # A user's explicit name licenses dialogue reference resolution only.
+        # The suffix still runs through the ordinary fact/source answer path.
+        self.topic_entity = canonical
+        result = self.turn(followup_question, research_index=research_index)
+        self.topic_entity = canonical
+        result.question = question
+        return result
+
     def turn(self, question: str, *, research_index: Any | None = None) -> DialogueTurn:
         question = question.strip()
         if not question:
@@ -2120,6 +2144,10 @@ class CRMSDialogue:
         quick = self._quick_reply(question)
         if quick is not None:
             return quick
+        topic_directive = self._explicit_topic_directive(
+            question, research_index=research_index)
+        if topic_directive is not None:
+            return topic_directive
         ordinal_turn = self._source_ordinal_turn(question, research_index)
         if ordinal_turn is not None:
             return ordinal_turn

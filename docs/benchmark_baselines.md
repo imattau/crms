@@ -256,6 +256,24 @@ clarification, and the source sentence must independently support the answer.
 `v1_438` plus the established topic, persistence, citation, and transcript
 regressions passed 10/10 in the focused runtime suite.
 
+## Explicit topic-switch clause followed by a question
+
+Command: `python3 experiments/v1_439_explicit_topic_clause.py`.
+
+The natural multi-clause turn “Switch to the Sydney Opera House. Who designed
+it?” previously reached retrieval as one malformed question. A bounded
+directive parser now separates an explicit `Switch to <name>. <question>`
+prefix, sets the named topic in dialogue state, and sends the question suffix
+through the usual evidence path. The test confirms a cited designer sentence,
+a later pronoun follow-up to the same topic, and refusal to reuse Eiffel Tower
+evidence when the new name (Atlantis) is unsupported. The explicit topic is
+context only; the parser neither accepts a fact nor generates a source.
+
+The test uses explicit entity-bearing source sentences. It does not show that
+retrieval can resolve arbitrary aliases or pronoun-only source sentences, and
+the directive grammar covers only one bounded prefix form. The current
+dialogue suite, including this experiment, passed 11/11.
+
 ## Failed entity follow-up must not leave a stale explanation target
 
 Command: `python3 experiments/v1_419_failed_entity_followup_state.py`.
@@ -1918,9 +1936,10 @@ python3 experiments/v1_426_dialogue_paragraph_grounding.py
 python3 experiments/v1_427_dialogue_multiturn_transcript.py
 python3 experiments/v1_435_dialogue_visible_evidence_anchor.py
 python3 experiments/v1_438_dialogue_topic_pronoun_context.py
+python3 experiments/v1_439_explicit_topic_clause.py
 ```
 
-All ten scripts passed. Together they exercise visible-only source referents,
+All eleven scripts passed. Together they exercise visible-only source referents,
 numbered source selection and citation revalidation, named topic switches,
 pronoun follow-ups, paragraph-local antecedent grounding, save/reload, failed
 follow-up cleanup, and `why?` behavior. The CLI subprocess in `v1_419` checks a
