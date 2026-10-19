@@ -311,14 +311,16 @@ the goal but cannot substitute for transfer, task completion, or safe context.
 
 ### Ordered work from here
 
-1. **Re-pin the real chat baseline and reconcile the current dialogue work.**
-   Run the full Rome/Paris and Eiffel Tower/Colosseum conversations through a
-   fresh process at a recorded commit. Include named topic switches, follow-ups,
-   source-only answers, an unanswered turn, `why?`, “and Italy?”, “what did I
-   just ask?”, and “the first one”. The current branch already has focused
-   work for answer-bearing pronoun sentences, topic-first pronoun binding,
-   and page-title coreference; the latter two are still uncommitted in the
-   working tree and must be reviewed as such, not reported as shipped.
+1. **Finish the end-to-end dialogue baseline.**
+   Focused fixes now ground pronoun-led answers in their source paragraph,
+   preserve the latest explanation target, reject mismatched entity switches,
+   and retain source-only context when its citation remains valid. The focused
+   regressions pass, but the full multi-turn conversation has not yet been
+   captured as one compact, reproducible clean-process transcript. Run it at a
+   recorded revision with named topic switches, follow-ups, source-only
+   answers, an unanswered turn, `why?`, “and Italy?”, “what did I just ask?”,
+   and “the first one”. Treat any result from a truncated diagnostic run as
+   inconclusive.
 
    **Gate:** no wrong-entity sentence is returned; a citation supports the
    exact answer shown; current topic and explanation target update separately;
@@ -339,11 +341,12 @@ the goal but cannot substitute for transfer, task completion, or safe context.
    `why?` never targets a stale answer; no context update makes a factual claim
    accepted or changes its evidence status.
 
-3. **Expand held-out recombination through chat.** Build on the passing
-   contrastive procedure-learning slice. Vary learned components, connective
-   rules, argument roles, order, values, and paraphrased requests; hold out
-   combinations and source examples. Include a matched unsupported composition
-   and a missing-middle-step case. Keep learner and validator independent.
+3. **Advance recombination and self-learning rules through chat.** Build on
+   the passing contrastive procedure-learning slice. Vary learned components,
+   connective rules, argument roles, order, values, and paraphrased requests;
+   hold out combinations and source examples. Include a matched unsupported
+   composition and a missing-middle-step case. Keep learner and validator
+   independent.
    Retain each rule's examples, source lineage, holdout result, status, and
    tested scope.
 
