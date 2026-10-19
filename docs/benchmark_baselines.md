@@ -1551,18 +1551,28 @@ necessary.
 
 Command: `python3 experiments/v1_428_procedure_example_provenance.py`.
 
-`CRMSModel.teach` now accepts optional per-example `source_ids`. They remain
-parallel to the demonstrations through JSON and SQLite persistence, are
-available through `example_records()`, and are embedded in generated-code
-evidence. Old rule memories load with missing provenance left unknown. The
-experiment checks a held-out list composition, exact parity of the emitted
-artifact, JSON/SQLite round trips, legacy loading, and rejection of source lists
-that do not align with the examples.
+`CRMSModel.teach` now accepts optional per-example `source_ids`. The chat
+command also accepts a fourth field, `/teach-rule INSTRUCTION|INPUT CSV|OUTPUT
+CSV|SOURCE CITATION`; the exact citation must resolve against the active index.
+The cited span must also contain the exact numeric input/output pair. The reply
+states that this does not verify that the source wording licenses the
+instruction. The IDs remain parallel to demonstrations through
+JSON and SQLite persistence, are available through `example_records()`, and are
+embedded in generated-code evidence. Old rule memories load with missing
+provenance left unknown. `v1_428` checks held-out composition, artifact parity,
+JSON/SQLite round trips, legacy loading, and source-list validation.
+`v1_429_chat_rule_source_attribution.py` drives the actual command, verifies
+persistence of a valid citation, confirms an unlabelled example stays
+unlabelled, and rejects stale citations and citations that state a different
+output.
 
 Runtime result: all checks passed. The source identifiers in this experiment
 are fixture labels authored for the test; the task is still a plumbing and
-lineage check, not a source-disjoint transfer result. The `/teach-rule` chat
-path does not yet capture source identifiers, and the existing recombination
-scores remain bounded synthetic results. The next gate must exercise this
-lineage from source-backed examples through ordinary chat on genuinely held-out
-documents and independently written requests.
+lineage check, not a source-disjoint transfer result. Chat captures citations
+only when explicitly supplied; conversational and contrastive teaching
+examples remain unlabelled unless taught separately with a citation. The
+cited numeric pair is checked, but the instruction-to-operation alignment is
+not verified, and the existing recombination scores remain bounded synthetic
+results. The next gate must
+exercise lineage from independently sourced examples through ordinary chat on
+genuinely held-out documents and independently written requests.

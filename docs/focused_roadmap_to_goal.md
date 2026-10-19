@@ -352,10 +352,14 @@ the goal but cannot substitute for transfer, task completion, or safe context.
 
    **Lineage prerequisite now partly implemented:** `CRMSModel.teach` accepts
    optional per-example source IDs, preserves them through JSON/SQLite memory,
-   and includes them in generated-code evidence. The fixture check
-   `v1_428_procedure_example_provenance.py` validates this plumbing. It does not
-   yet provide chat-level source attribution or a source-disjoint transfer
-   result; keep those as explicit blockers to the gate below.
+   and includes them in generated-code evidence. `/teach-rule` accepts an
+   optional exact citation that must resolve in the active index and contain
+   the exact input/output pair; its user-attributed link between wording and
+   instruction is not itself verified. `v1_428_procedure_example_provenance.py`
+   and `v1_429_chat_rule_source_attribution.py` validate memory, artifact, and
+   chat plumbing. Natural-language and contrastive teaching still lack source
+   capture, and no source-disjoint transfer result exists; keep these as
+   explicit blockers to the gate below.
 
    **Gate:** at least one genuinely unseen composition works through ordinary
    chat, passes an independent task validator, and survives save/reload with
@@ -446,13 +450,16 @@ standalone corpus scan:
    contrastive teaching, chat generation, independent exact-output checks,
    and an unsupported-middle-step refusal. Their small synthetic list and
    math distributions do not meet the source-disjoint transfer gate. Procedure
-   example provenance is now preserved by the model API and generated artifact
-   (`v1_428`), but its source IDs are test fixtures and `/teach-rule` does not
-   yet collect them. Build the next evaluation around actual source-backed
-   teaching examples and held-out documents, with independently written
-   natural-language requests, unseen component combinations, role/order
-   changes, near-misses, and missing stages. Keep the learner and task validator
-   independent; retain examples, validation split, and lineage.
+   example provenance is now preserved by the model API, generated artifact,
+   and optional cited `/teach-rule` path (`v1_428`, `v1_429`). The cited numeric
+   pair is checked, but the source-to-instruction link remains teacher-attributed
+   rather than semantically verified, and the
+   test sources are fixtures. Build the next evaluation around verified,
+   independently sourced teaching examples and held-out documents, with
+   independently written natural-language requests, unseen component
+   combinations, role/order changes, near-misses, and missing stages. Keep the
+   learner and task validator independent; retain examples, validation split,
+   and lineage.
    Do not count more synthetic demonstrations of the same connective as
    evidence of broad transfer.
 3. **Strengthen reasoning on the composition path.** Reuse the unseen

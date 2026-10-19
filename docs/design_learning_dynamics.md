@@ -723,8 +723,12 @@ candidate search or licensing.
 
 The initial runtime check uses fixture IDs and demonstrates only persistence,
 artifact traceability, and a held-out composition. It is not yet a transfer
-result from independent natural-language documents. The chat teaching flow does
-not yet collect a source ID. Before a source-disjoint recombination claim, wire
-the teaching path to a cited source or clearly attributed teacher example,
-record source-disjoint training/validation/test partitions, and verify the
-composed result with a validator that did not produce the examples.
+result from independent natural-language documents. `/teach-rule` now accepts
+an optional exact source citation and verifies that it resolves in the active
+index and contains the exact input/output list pair before storing it. This is
+still a user-provided attribution: the current flow does not verify that the
+cited wording licenses the instruction, and natural-language and contrastive
+teaching still lack per-example source capture. Before a source-disjoint
+recombination claim, validate each cited demonstration, record source-disjoint
+training/validation/test partitions, and verify the composed result with a
+validator that did not produce the examples.

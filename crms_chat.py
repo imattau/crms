@@ -223,7 +223,7 @@ HELP = """Commands:
                  teach a sourced counterfactual question frame
   /teach-counterfactual-path-question Q|REL1>REL2|START|TARGET|SOURCE[|KEY=VALUE...]
                  teach a frame that varies both endpoints and source
-  /teach-rule I|INPUT CSV|OUTPUT CSV
+  /teach-rule I|INPUT CSV|OUTPUT CSV[|SOURCE CITATION]
                  teach one grounded list-transformation example
   /retry-rule I   rerun stored demonstrations under current rule bounds
   Try to learn the rule for INSTRUCTION
@@ -335,6 +335,11 @@ _RULE_SHARED_PHRASES_RE = re.compile(
 _RULE_EXAMPLE_PAIR_RE = re.compile(
     r"\[(?P<input>[^\[\]]*)\]\s*(?:->|=>|becomes|maps\s+to|yields)\s*"
     r"\[(?P<output>[^\[\]]*)\]",
+    flags=re.IGNORECASE)
+_CITED_INTEGER_PAIR_RE = re.compile(
+    r"\[(?P<input>\s*(?:-?\d+\s*(?:,\s*-?\d+\s*)*)?)\]\s*"
+    r"(?:->|=>|produces|yields|maps\s+to|becomes|returns)\s*"
+    r"\[(?P<output>\s*(?:-?\d+\s*(?:,\s*-?\d+\s*)*)?)\]",
     flags=re.IGNORECASE)
 _RULE_BATCH_SEPARATOR_RE = re.compile(r"\s*(?:;|\band\b)\s*", re.IGNORECASE)
 _NATURAL_TRANSLATION_PREFIX_RE = re.compile(
@@ -576,6 +581,20 @@ def _parse_integer_list(value: str, *, allow_empty: bool = False) -> list[int]:
     if not value.strip() or any(not part.strip() for part in parts):
         raise ValueError("provide a comma-separated list of integers")
     return [int(part.strip()) for part in parts]
+
+
+def _citation_contains_integer_pair(source_text: str, inputs: list[int],
+                                    outputs: list[int]) -> bool:
+    """Check that a cited span states the exact supplied list transformation."""
+    for match in _CITED_INTEGER_PAIR_RE.finditer(source_text):
+        try:
+            cited_input = _parse_integer_list(match.group("input"), allow_empty=True)
+            cited_output = _parse_integer_list(match.group("output"), allow_empty=True)
+        except ValueError:
+            continue
+        if cited_input == inputs and cited_output == outputs:
+            return True
+    return False
 
 
 def _normalize_natural_rule_instruction(instruction: str) -> str | None:
@@ -7443,13 +7462,24 @@ def main() -> int:
             continue
         if line.startswith("/teach-rule "):
             fields = [value.strip() for value in line[len("/teach-rule "):].split("|")]
-            if len(fields) != 3 or not fields[0]:
-                print("Use: /teach-rule INSTRUCTION|INPUT INTEGER CSV|OUTPUT INTEGER CSV")
+            if len(fields) not in {3, 4} or not fields[0]:
+                print("Use: /teach-rule INSTRUCTION|INPUT INTEGER CSV|OUTPUT INTEGER CSV[|SOURCE CITATION]")
                 continue
             try:
                 inputs = _parse_integer_list(fields[1], allow_empty=True)
                 outputs = _parse_integer_list(fields[2], allow_empty=True)
-                learned = rules.teach(fields[0], [(inputs, outputs)])
+                source_ids = None
+                if len(fields) == 4:
+                    if not fields[3]:
+                        raise ValueError("provide a source citation after the final separator")
+                    cited_text = index.resolve_citation(fields[3])
+                    if not _citation_contains_integer_pair(
+                            cited_text, inputs, outputs):
+                        raise ValueError(
+                            "source citation does not contain this exact input/output pair")
+                    source_ids = [fields[3]]
+                learned = rules.teach(fields[0], [(inputs, outputs)],
+                                      source_ids=source_ids)
                 rules.save(args.rules)
                 pending_rule = (
                     (fields[0], learned.contrastive_input)
@@ -7457,6 +7487,12 @@ def main() -> int:
                     and learned.contrastive_input is not None else None)
                 _save_pending_rule(args.rule_session, args.rules, pending_rule)
                 _print_rule_learning_result(learned)
+                if source_ids:
+                    print("Recorded source attribution for this example: "
+                          + source_ids[0])
+                    print("The cited text contains this exact numeric pair; "
+                          "CRMS has not independently checked that its wording "
+                          "licenses the instruction.")
             except ValueError as error:
                 print(f"Could not teach rule: {error}")
             continue

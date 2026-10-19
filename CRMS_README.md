@@ -2255,7 +2255,12 @@ same scoped schema declaration with user-teaching provenance;
 terminal, persistence, provenance, and independent proof verification.
 `/infer-relation SUBJECT|RELATION|OBJECT` renders the independently checked
 proof and its relation-type provenance. The shell also
-exposes the integer-list rule learner with `/teach-rule INSTRUCTION|INPUT CSV|OUTPUT CSV`,
+exposes the integer-list rule learner with `/teach-rule INSTRUCTION|INPUT CSV|OUTPUT CSV`
+and its optional exact-citation form `/teach-rule INSTRUCTION|INPUT CSV|OUTPUT
+CSV|SOURCE CITATION`. The cited span must resolve in the active source index;
+it must also contain the exact numeric input/output pair. This does not check
+that the source wording licenses the instruction. Unattributed teaching remains
+marked as unknown provenance.
 `/apply-rule INSTRUCTION|INPUT CSV`, `/explain-rule INSTRUCTION|INPUT CSV`,
 and `/rules`. `/explain-rule` shows the selected procedure, grounding phrases,
 and up to three stored demonstrations for each reported phrase, alongside any
