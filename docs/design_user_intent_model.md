@@ -23,6 +23,30 @@ the versioned dialogue state and validated when reloaded, so the diagnostic surv
 Regression coverage is in
 `experiments/v1_365_contextual_clarification_intent.py`.
 
+### Corpus coverage diagnostic
+
+The current phrase-level rules were measured against the prepared Taskmaster-1
+`restaurant-table` user-turn sample (6,227 utterances) with a fresh, empty dialogue state for each
+turn. They emitted a hypothesis for 816 turns (13.1%); 489 turns (7.9%) received a selected task
+intent, while 327 remained ambiguous or unlicensed. Hypothesis coverage was 12.9% on train, 15.7%
+on dev, and 12.4% on test; selected-intent coverage was 7.6%, 8.8%, and 8.6% respectively.
+The emitted hypotheses were almost entirely greetings, acknowledgements, thanks, farewells,
+reactions, and ambiguous bare yes/no turns.
+
+This is a **coverage diagnostic, not an accuracy result**. The pilot labels are still blank, and
+fresh state deliberately removes the context that the proposed model must use. Turns with no
+hypothesis include ordinary task content; short slot answers such as a cuisine, party size, or time
+can only be interpreted as a task-intent continuation in context. Therefore the 86.9% with no
+hypothesis is not an error rate, but it shows how little of this task-dialogue sample the current
+social-phrase baseline classifies. The test-split numbers are not a held-out quality score because
+there are no adjudicated labels.
+
+The diagnostic is reproducible with
+[`v1_373_taskmaster_intent_baseline_coverage.py`](../experiments/v1_373_taskmaster_intent_baseline_coverage.py).
+It reports coverage by split and explicitly avoids exposing utterance text or claiming correctness.
+Next evaluation requires human annotations and should compare context-free and context-aware
+decisions on the same held-out conversations.
+
 ## Why intent belongs in the model
 
 The same words can request different things depending on the exchange. “Yes” may confirm a time,
