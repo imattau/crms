@@ -3,7 +3,8 @@
 Training and evaluation questions are generated from disjoint document windows.
 The ranker sees only the top FTS result sentences and candidates that pass the
 existing quoted-evidence gate. This remains an opt-in benchmark; it never
-changes chat or writes to the source index.
+changes chat or writes to the source index. `--question-type` selects a narrow
+WHO, WHEN, WHERE, MEASURE, COUNT, or DEF cloze template; WHO remains the default.
 
 Run with:
     python3 experiments/v1_346_fts_sentence_ranker_evaluation.py
@@ -47,7 +48,103 @@ _DROP_WORDS = {"a", "an", "the", "and", "or", "but", "of", "in", "on",
                "which", "who", "whom", "whose", "this", "these", "those"}
 
 
-def _question_and_answer(sentence: str) -> tuple[str, str] | None:
+def _question_and_answer(sentence: str, *, question_type: str = "WHO"
+                         ) -> tuple[str, str] | None:
+    """Build a narrow, transparent self-cloze for one requested answer type."""
+    def usable_subject(value: str) -> str | None:
+        subject = re.sub(r"^The\s+", "", value.strip(), flags=re.IGNORECASE)
+        subject_tokens = normalized_tokens(subject)
+        if (not subject_tokens or subject.casefold() in _SKIP_SUBJECTS
+                or subject_tokens[0] in _SKIP_SUBJECTS):
+            return None
+        return subject
+
+    if question_type == "WHEN":
+        time_match = re.fullmatch(
+            r"\s*(?P<subject>(?:The\s+)?[A-Z][\w’'-]*(?:\s+[A-Z][\w’'-]*){0,4})\s+"
+            r"(?P<event>was born|died|was founded|was released|was published)\s+"
+            r"(?:in|on)\s+(?P<answer>(?:(?:January|February|March|April|May|June|"
+            r"July|August|September|October|November|December)\s+)?"
+            r"(?:\d{1,2},?\s+)?(?:1[0-9]{3}|20[0-9]{2}))\s*[.!?]?",
+            sentence.strip(), flags=re.IGNORECASE)
+        if time_match is None:
+            return None
+        subject = usable_subject(time_match.group("subject"))
+        if subject is None:
+            return None
+        event = time_match.group("event").casefold()
+        prompt = {"was born": f"When was {subject} born?",
+                  "died": f"When did {subject} die?",
+                  "was founded": f"When was {subject} founded?",
+                  "was released": f"When was {subject} released?",
+                  "was published": f"When was {subject} published?"}[event]
+        return prompt, time_match.group("answer").strip()
+
+    if question_type == "WHERE":
+        place_match = re.fullmatch(
+            r"\s*(?P<subject>(?:The\s+)?[A-Z][\w’'-]*(?:\s+[A-Z][\w’'-]*){0,4})\s+"
+            r"(?P<event>was born|is located|was located|is based|was based)\s+"
+            r"in\s+(?P<answer>[A-Z][\w’'-]*(?:[ ,]+(?:[A-Z][\w’'-]*|of|the)){0,5})"
+            r"\s*[.!?]?", sentence.strip())
+        if place_match is None:
+            return None
+        subject = usable_subject(place_match.group("subject"))
+        if subject is None:
+            return None
+        event = place_match.group("event").casefold()
+        if event == "was born":
+            prompt = f"Where was {subject} born?"
+        elif event.endswith("located"):
+            prompt = f"Where was {subject} located?" if event.startswith("was") else f"Where is {subject} located?"
+        else:
+            prompt = f"Where was {subject} based?" if event.startswith("was") else f"Where is {subject} based?"
+        return prompt, place_match.group("answer").strip()
+
+    if question_type == "MEASURE":
+        measure_match = re.fullmatch(
+            r"\s*(?P<subject>(?:The\s+)?[A-Z][\w’'-]*(?:\s+[A-Z][\w’'-]*){0,4})\s+"
+            r"(?:is|was)\s+(?P<answer>\d[\d,.]*(?:\s+(?:metres?|meters?|km|"
+            r"miles?|feet|ft|inches?|cm|mm|kg|degrees?))?)\s+"
+            r"(?P<dimension>tall|high|long|wide|deep)\s*[.!?]?",
+            sentence.strip(), flags=re.IGNORECASE)
+        if measure_match is None:
+            return None
+        subject = usable_subject(measure_match.group("subject"))
+        if subject is None:
+            return None
+        dimension = measure_match.group("dimension").casefold()
+        copula = "was" if re.search(r"\bwas\b", sentence, re.I) else "is"
+        return (f"How {dimension} {copula} {subject}?",
+                measure_match.group("answer").strip())
+
+    if question_type == "COUNT":
+        count_match = re.fullmatch(
+            r"\s*(?P<subject>(?:The\s+)?[A-Z][\w’'-]*(?:\s+[A-Z][\w’'-]*){0,4})\s+"
+            r"won\s+(?P<answer>\d+|one|two|three|four|five|six|seven|eight|nine|"
+            r"ten|eleven|twelve)\s+(?P<item>[A-Za-z][\w’'-]*(?:\s+[A-Za-z][\w’'-]*){0,3})"
+            r"\s*[.!?]?", sentence.strip(), flags=re.IGNORECASE)
+        if count_match is None:
+            return None
+        subject = usable_subject(count_match.group("subject"))
+        if subject is None:
+            return None
+        return (f"How many {count_match.group('item').strip()} did {subject} win?",
+                count_match.group("answer").strip())
+
+    if question_type == "DEF":
+        definition_match = re.fullmatch(
+            r"\s*(?P<subject>(?:The\s+)?[A-Z][\w’'-]*(?:\s+[A-Z][\w’'-]*){0,4})\s+"
+            r"is\s+(?P<answer>(?:a|an|the)\s+[^.!?]{3,140})[.!?]?",
+            sentence.strip())
+        if definition_match is None:
+            return None
+        subject = usable_subject(definition_match.group("subject"))
+        if subject is None:
+            return None
+        return f"What is {subject}?", definition_match.group("answer").strip()
+
+    if question_type != "WHO":
+        raise ValueError(f"unsupported generated question type: {question_type}")
     match = _LEADING_SUBJECT.fullmatch(sentence.strip())
     if match is None:
         return None
@@ -126,6 +223,7 @@ def _fts_candidates(index: CRMSSQLiteResearchIndex, question: str,
 
 def _examples_from_window(index: CRMSSQLiteResearchIndex, *, offset: int,
                           max_docs: int, max_examples: int,
+                          question_type: str = "WHO",
                           excluded_candidate_source_ids: set[str] | None = None
                           ) -> list[dict[str, object]]:
     examples = []
@@ -140,7 +238,8 @@ def _examples_from_window(index: CRMSSQLiteResearchIndex, *, offset: int,
             if len(sentence) > 360 or _sentence_context_kind(
                     sentence, document.text, start) != "assertion":
                 continue
-            generated = _question_and_answer(sentence)
+            generated = _question_and_answer(sentence,
+                                             question_type=question_type)
             if generated is None:
                 continue
             question, answer = generated
@@ -158,6 +257,7 @@ def _examples_from_window(index: CRMSSQLiteResearchIndex, *, offset: int,
             examples.append({
                 "question": question,
                 "answer": answer,
+                "question_type": question_type,
                 "target_sentence": sentence,
                 "target_source": document_id,
                 "candidates": passing,
@@ -322,6 +422,11 @@ def main() -> None:
     parser.add_argument("--docs-per-window", type=int, default=600)
     parser.add_argument("--train-examples", type=int, default=120)
     parser.add_argument("--test-examples", type=int, default=120)
+    parser.add_argument("--question-type", choices=("WHO", "WHEN", "WHERE",
+                                                       "MEASURE", "COUNT", "DEF"),
+                        default="WHO")
+    parser.add_argument("--threshold", type=float, default=0.3,
+                        help="fixed score threshold; compare only on untouched test windows")
     parser.add_argument("--json-out", type=Path)
     args = parser.parse_args()
     if args.train_offset == args.test_offset:
@@ -343,10 +448,12 @@ def main() -> None:
         train = _examples_from_window(
             index, offset=args.train_offset, max_docs=args.docs_per_window,
             max_examples=args.train_examples,
+            question_type=args.question_type,
             excluded_candidate_source_ids=test_doc_ids)
         test = _examples_from_window(
             index, offset=args.test_offset, max_docs=args.docs_per_window,
-            max_examples=args.test_examples)
+            max_examples=args.test_examples,
+            question_type=args.question_type)
         training_rows, training_sources = _training_rows(train)
         if set(training_sources) & test_doc_ids:
             raise SystemExit("training candidates leaked into the test source window")
@@ -356,10 +463,11 @@ def main() -> None:
                 f"rows={len(training_rows)}, test={len(test)}")
         model = fit_ranker(
             training_rows, training_source_ids=training_sources,
-            trained_on=date.today().isoformat(), threshold=0.3)
+            trained_on=date.today().isoformat(), threshold=args.threshold)
         evaluation = _evaluate(index, test, model)
         result = {
-            "benchmark": "crms-sentence-ranker-fts-self-cloze-v1",
+            "benchmark": "crms-sentence-ranker-fts-self-cloze-v2",
+            "question_type": args.question_type,
             "index": str(args.index),
             "index_documents": index.document_count(),
             "train_window": {"offset": args.train_offset,
@@ -382,7 +490,7 @@ def main() -> None:
             "evaluation": evaluation,
             "elapsed_seconds": time.perf_counter() - started,
             "limitations": [
-                "Self-generated WHO questions from leading-subject sentences only.",
+                f"Self-generated {args.question_type} questions from one bounded sentence pattern.",
                 "The answer-span labels are weak labels from the source sentence.",
                 "Question source windows are disjoint; test-window documents are excluded from training candidates.",
                 "Only gate-passing FTS candidates are ranked; production chat is unchanged.",

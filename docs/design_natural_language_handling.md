@@ -466,9 +466,12 @@ mechanics on a controlled fixture. Two FTS-backed, disjoint-window SimpleWiki ev
 recorded in `benchmark_baselines.md`: the gate and ranker tied on the first 40 generated questions,
 including 16 with multiple gate-passing candidates. A second draw increased multi-candidate
 coverage (14/15 vs. 12/15) but reduced precision (85.7% vs. 91.7%) and added one wrong answer; the
-ranker also took slightly longer. These small WHO-cloze samples show no safe quality gain. Keep the
-ranker disabled in chat until larger independent corpora show a gain specifically on
-multi-candidate questions, and do not describe the pilot as improving user-facing accuracy.
+ranker also took slightly longer. A first self-generated WHERE sample found the same tradeoff:
+threshold 0.3 answered four of 15 ambiguous multi-candidate cases correctly and two incorrectly;
+threshold 0.4 abstained on all 15, matching the gate's abstention. These small, weakly labelled
+samples show no safe quality gain. Keep the ranker disabled in chat until larger independent
+corpora and human-written questions show a gain specifically on multi-candidate questions, and do
+not describe the pilot as improving user-facing accuracy.
 
 *Staged route.* (1) The feature-based ranker tested here. (2) A learned table of wording
 equivalences that is only ever a proposal for human review (section 3.6). (3) Embeddings as a

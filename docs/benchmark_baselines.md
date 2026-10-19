@@ -576,3 +576,29 @@ remains disabled in chat. This is still a narrow check: questions are self-gener
 from leading-subject sentences, and labels are weakly derived from those sentences. Broader
 generated question types, larger independent samples, human-written questions, and non-Wikipedia
 domains remain unmeasured.
+
+### Typed self-cloze extension: WHERE (initial sample)
+
+Command: `python3 experiments/v1_346_fts_sentence_ranker_evaluation.py --question-type WHERE --train-offset 200000 --test-offset 220000 --docs-per-window 600 --train-examples 40 --test-examples 40 --threshold 0.3`
+
+Threshold comparison: rerun the same command with `--threshold 0.4`; the source windows and
+training examples remain unchanged.
+
+The evaluator now supports narrow `WHEN`, `WHERE`, `MEASURE`, `COUNT`, and `DEF` templates in
+addition to the original `WHO` mode. `experiments/v1_347_sentence_ranker_cloze_types.py` checks
+the generated forms and pronoun/negation near misses. In this first WHERE run, 600-document
+training and test windows yielded 33 training questions (59 candidate rows, 16 positive) and 29
+held-out test questions. The unchanged gate answered 14 correctly and abstained on all 15
+multi-candidate questions. At threshold 0.3, the ranker answered 18 correctly and two incorrectly,
+abstaining on nine; among the 15 multi-candidate questions it selected four correct and two wrong
+(66.7% precision). Both wrong selections confused people sharing a surname (Lipscomb and Rhodes)
+with other people in the corpus. At threshold 0.4 it answered the same 14 single-candidate cases as
+the gate and abstained on all 15 multi-candidate cases. Median selector time was 0.23 ms at 0.3
+and 0.24 ms at 0.4, versus 0.10 ms for the gate; full evaluations took 52.6 and 55.5 seconds.
+
+This demonstrates a recall/precision tradeoff, not safe ranker improvement. The higher threshold
+removes the wrong selections by declining every ambiguous case, while the lower threshold adds
+four correct multi-candidate selections alongside two wrong ones. The question templates and
+answer labels are generated from a few exact sentence patterns, and the test set is small; these
+results do not measure human-written query coverage or the efficacy of the additional `WHEN`,
+`MEASURE`, `COUNT`, and `DEF` types. The ranker remains disabled in chat.
