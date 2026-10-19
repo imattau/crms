@@ -36,9 +36,15 @@ CONTEXT_PREDICATES = {
 PREDECESSOR_ACTS = {
     "answer", "clarification-request", "action-result", "close", "other",
 }
+ACTIVE_TASK_INTENTS = {
+    "check-availability", "make-reservation", "change-reservation",
+    "cancel-reservation", "correct-prior-result", "correct-result",
+    "seek-information", "provide-information", "other-task",
+}
 REQUIRED_COLUMNS = {
     "split", "conversation_id", "user_utterance", "dialogue_act",
     "task_intent", "context_state", "predecessor_act", "reviewer", "citation",
+    "source_utterance_index",
 }
 
 
@@ -66,6 +72,22 @@ def induce(rows: list[dict[str, str]], *, min_conversations: int = 2) -> dict:
     excluded_contexts = Counter()
     excluded_predecessors = Counter()
     unlabeled = 0
+    active_before: dict[tuple[str, str], str | None] = {}
+    by_conversation: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for row in train_rows:
+        by_conversation[row["conversation_id"].strip()].append(row)
+    for conversation_id, conversation_rows in by_conversation.items():
+        active_task: str | None = None
+        for row in sorted(conversation_rows,
+                          key=lambda item: int(item["source_utterance_index"])):
+            row_id = row["source_utterance_index"].strip()
+            active_before[(conversation_id, row_id)] = active_task
+            prior_intent = row["task_intent"].strip()
+            if prior_intent == "end-interaction":
+                active_task = None
+            elif prior_intent in ACTIVE_TASK_INTENTS:
+                active_task = prior_intent
+
     for row in train_rows:
         surface = normalize_surface(row["user_utterance"])
         act, intent = row["dialogue_act"].strip(), row["task_intent"].strip()
@@ -81,6 +103,12 @@ def induce(rows: list[dict[str, str]], *, min_conversations: int = 2) -> dict:
         if predecessor not in PREDECESSOR_ACTS:
             excluded_predecessors[predecessor or "<blank>"] += 1
             continue
+        active_task = active_before.get((
+            row["conversation_id"].strip(),
+            row["source_utterance_index"].strip()))
+        if active_task in ACTIVE_TASK_INTENTS:
+            predicates = (*predicates,
+                          "active_task_" + active_task.replace("-", "_"))
         signature = (surface, act, intent, predicates, predecessor)
         groups[signature].append(row)
 
@@ -131,6 +159,7 @@ def induce(rows: list[dict[str, str]], *, min_conversations: int = 2) -> dict:
             "source_split": "train only",
             "training_conversation_ids": sorted({
                 row["conversation_id"].strip() for row in train_rows}),
+            "active_task_context": "derived from preceding labeled turns per conversation",
             "minimum_distinct_conversations": min_conversations,
             "training_turns": len(train_rows),
             "excluded_uncertain_or_blank_rows": unlabeled,
@@ -155,26 +184,49 @@ def self_test() -> None:
         "split": "train", "user_utterance": "Thank you!",
         "dialogue_act": "thanks", "task_intent": "social-contact",
         "context_state": "task-in-progress", "predecessor_act": "answer",
-        "reviewer": "codex-ai-test", "source_record_ordinal": "1",
+        "reviewer": "codex-ai-test", "source_utterance_index": "1",
     }
     rows = [
         {**base, "conversation_id": "conversation-a",
          "citation": "source-a#turn=2"},
         {**base, "conversation_id": "conversation-b",
+         "source_utterance_index": "3",
          "citation": "source-b#turn=4"},
+        {**base, "conversation_id": "booking-a", "source_utterance_index": "1",
+         "user_utterance": "Book a table", "dialogue_act": "request-action",
+         "task_intent": "make-reservation", "context_state": "task-in-progress",
+         "predecessor_act": "other", "citation": "booking-a#turn=1"},
+        {**base, "conversation_id": "booking-a", "source_utterance_index": "3",
+         "user_utterance": "Two people", "dialogue_act": "answer-clarification",
+         "task_intent": "make-reservation", "context_state": "awaiting-user-detail",
+         "predecessor_act": "clarification-request", "citation": "booking-a#turn=3"},
+        {**base, "conversation_id": "booking-b", "source_utterance_index": "1",
+         "user_utterance": "Reserve a table", "dialogue_act": "request-action",
+         "task_intent": "make-reservation", "context_state": "task-in-progress",
+         "predecessor_act": "other", "citation": "booking-b#turn=1"},
+        {**base, "conversation_id": "booking-b", "source_utterance_index": "3",
+         "user_utterance": "Two people", "dialogue_act": "answer-clarification",
+         "task_intent": "make-reservation", "context_state": "awaiting-user-detail",
+         "predecessor_act": "clarification-request", "citation": "booking-b#turn=3"},
         {**base, "split": "dev", "conversation_id": "conversation-c",
          "dialogue_act": "reject", "task_intent": "other-task",
          "citation": "source-c#turn=8"},
     ]
     report = induce(rows)
     frames = report["memory"]["learned_frames"]
-    require(len(frames) == 1
-            and frames[0]["status"] == "candidate"
-            and len(frames[0]["source_citations"]) == 2
-            and frames[0]["surface_patterns"] == ["thank you"],
+    thank_you = [frame for frame in frames
+                 if frame["surface_patterns"] == ["thank you"]]
+    reservation_party = [frame for frame in frames
+                         if frame["surface_patterns"] == ["two people"]]
+    require(len(thank_you) == 1 and thank_you[0]["status"] == "candidate"
+            and len(thank_you[0]["source_citations"]) == 2
+            and len(reservation_party) == 1
+            and "active_task_make_reservation"
+            in reservation_party[0]["context_predicates"]
+            and len(reservation_party[0]["source_citations"]) == 2,
             "candidate grouping, citation retention, or train-only split failed")
     require(report["metadata"]["label_status"] == "single-annotator; provisional"
-            and report["metadata"]["candidate_count"] == 1,
+            and report["metadata"]["candidate_count"] == 2,
             "single-labeler provenance or candidate count was lost")
     print("candidate induction uses consistent train-only examples and citations: PASS")
     print("heldout rows do not contaminate candidate induction: PASS")

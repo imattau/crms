@@ -136,12 +136,14 @@ chat startup, repacking, malformed-frame rejection, and legacy packaging without
 literal frame routes only when its context and predecessor match, its citation survives state
 persistence, and train-only frames remain inert. Candidate induction is now available through
 `experiments/v1_392_induce_dialogue_intent_candidates.py`; on the 563-turn single-Codex-label batch
-it produced 15 exact-surface candidates, all inert, with citations and typed context. This is not
-an accuracy or paraphrase-transfer result, and no independently reviewed intent model is available.
-An offline check with `experiments/v1_393_evaluate_dialogue_intent_candidates.py` on one disjoint,
-Codex-labeled 16-turn dev conversation matched 3 turns (18.75% coverage); all 3 matched the same
-annotator's labels. The other 13 turns abstained. This is a small label-agreement diagnostic, not an
-accuracy estimate or an independent evaluation.
+it produced 13 exact-surface candidates, all inert, with citations and active-task context. An
+offline check with `experiments/v1_393_evaluate_dialogue_intent_candidates.py` on two disjoint,
+Codex-labeled dev conversations matched 2 of 27 turns (7.4% coverage); both matched the same
+annotator's labels and the other 25 abstained. Typed active-task context prevented a search
+constraint candidate from matching a reservation answer. `experiments/v1_394_task_specific_intent_context.py`
+checks that identical wording can select a search constraint or reservation intent according to the
+active goal. These are small single-annotator diagnostics, not accuracy estimates, an independent
+evaluation, or evidence of paraphrase transfer. No independently reviewed intent model is available.
 
 ## Contextual intent: active task and expected slot
 

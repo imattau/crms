@@ -96,8 +96,9 @@ Findings from the review that change the design:
   bounded expected-slot type exposed to licensed intent frames. Answers to six supported task-slot
   questions are retained in session state with their prompting question and can be recalled by a
   direct follow-up; missing values abstain instead of querying factual memory. Offers are transient.
-  The active task label supplies only a
-  `task_in_progress` context predicate to licensed frames.
+  The active task label supplies both `task_in_progress` and a task-specific predicate such as
+  `active_task_make_reservation` to licensed frames. Task-specific context is version-validated and
+  persists with the inspectable task label.
 - **Entity recognition is partly widened.** `_source_entity_mentions` retains capitalised names from
   quoted sentences as candidates; `_canonical_entity` and `_known_entity_surfaces` still look only at
   accepted facts and aliases. Pronoun resolution does not consult entity kind.

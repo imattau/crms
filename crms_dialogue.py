@@ -170,9 +170,16 @@ _HISTORY_FIELD_LIMIT = 200
 _HISTORY_QUESTION_LIMIT = 500
 _INTENT_TRACE_LIMIT = 12
 _INTENT_TASKS = {
-    "seek-information", "provide-information", "continue-current-task",
-    "resolve-ambiguity", "correct-result", "social-contact",
-    "end-interaction", "other-task",
+    "check-availability", "make-reservation", "change-reservation",
+    "cancel-reservation", "provide-constraint", "seek-information",
+    "provide-information", "continue-current-task", "resolve-ambiguity",
+    "correct-prior-result", "correct-result", "social-contact",
+    "end-interaction", "other-task", "uncertain",
+}
+_ACTIVE_TASK_INTENTS = {
+    "check-availability", "make-reservation", "change-reservation",
+    "cancel-reservation", "correct-prior-result", "correct-result",
+    "seek-information", "provide-information", "other-task",
 }
 _SHOWN_LIMIT = 500
 _ELABORATION_BATCH = 3
@@ -314,8 +321,7 @@ class CRMSDialogue:
                 if task_intent == "end-interaction":
                     self.active_task_intent = None
                     self.session_slots = {}
-                elif task_intent in {
-                        "seek-information", "provide-information", "other-task"}:
+                elif task_intent in _ACTIVE_TASK_INTENTS:
                     self.active_task_intent = task_intent
         response = turn.response
         if (turn.status == "answered" and response is not None
@@ -343,6 +349,8 @@ class CRMSDialogue:
             context.add("previous_grounded_answer")
         if self.active_task_intent is not None or self.session_slots:
             context.add("task_in_progress")
+        if self.active_task_intent in _ACTIVE_TASK_INTENTS:
+            context.add("active_task_" + self.active_task_intent.replace("-", "_"))
         if self.last_answered or self.last_question:
             context.add("correction_target_available")
         if self.pending_result is not None:

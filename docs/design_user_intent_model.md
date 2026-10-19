@@ -198,6 +198,12 @@ does not collapse them into a generic task label merely because runtime routing 
 implemented. `experiments/v1_391_dialogue_intent_taxonomy.py` checks representability and confirms
 that candidate frames remain inert.
 
+When a selected turn establishes a high-level task, session state now exposes both the broad
+`task_in_progress` predicate and a typed predicate such as `active_task_make_reservation` or
+`active_task_seek_information`. Clarifications and constraints retain the active goal; a newly
+selected task can replace it, and `end-interaction` clears it. This lets the same short answer be
+interpreted differently in a restaurant search and a reservation exchange.
+
 The minimum context state should remain bounded and typed: recent acts, the current question under
 discussion, the active task/topic, open required slots, pending clarification or offer, and the
 provenance/status of the last answer. Open assistant questions now retain an expected-slot type
@@ -225,7 +231,8 @@ train/holdout conversation IDs. Legacy model versions remain readable.
 
 This is a narrow runtime seam, not learned dialogue competence: an experiment now induces
 exact-surface user-intent candidates from labeled train turns, but it does not generalize wording or
-activate candidates. Surface patterns remain exact phrases rather than slot-generalizing templates,
+activate candidates. Candidate induction derives active-task context from the preceding labeled
+turns. Surface patterns remain exact phrases rather than slot-generalizing templates,
 and task-oriented slots beyond existing dialogue state are not supported. Most ordinary intent
 recognition still uses the hand-checked rules in `crms_conversation.py`. The 40-conversation batch has
 Codex-authored labels, which the project owner has authorized for candidate induction and
@@ -240,17 +247,21 @@ it does not resolve general paraphrase or task-slot ambiguity.
 `experiments/v1_392_induce_dialogue_intent_candidates.py` groups consistent exact normalized
 surfaces by dialogue act, task intent, supported context, and predecessor; it requires evidence from
 at least two distinct training conversations, retains every supporting utterance citation, and
-emits only inert `candidate` frames. On the current single-Codex-label batch it produced 15
+emits only inert `candidate` frames. On the current single-Codex-label batch it produced 13
 candidates from 563 turns. It excluded 23 `social-exchange` turns and turns with unsupported
-predecessors, and recorded 21 repeated surfaces whose labels or contexts conflict. This is a first
+predecessors, and recorded 27 repeated surfaces whose labels or contexts conflict. This is a first
 learning-path diagnostic, not a quality result: all examples are from train conversations, the
 labels have one annotator, and exact-surface repetition does not demonstrate paraphrase transfer.
 `experiments/v1_393_evaluate_dialogue_intent_candidates.py` checks candidate matching on disjoint
-dev conversations and rejects train/evaluation conversation overlap. A provisional, Codex-labeled
-16-turn dev conversation yielded 3 unique candidate matches (18.75% coverage); all 3 matched its
-primary labels, and the other 13 turns had no candidate. Because the same annotator produced both
-sets and the sample is one conversation, this is label agreement on a tiny sample—not accuracy or
-evidence of broad generalization.
+dev conversations and rejects train/evaluation conversation overlap. Two provisional, Codex-labeled
+dev conversations (27 turns) yielded 2 unique candidate matches (7.4% coverage); both matched the
+primary labels, and 25 turns had no candidate. The specific held-out “Two people” reservation reply
+no longer matches the search-constraint candidate after active-task conditioning; the runtime
+open-question path can still classify it from the selected reservation task. The synthetic
+`experiments/v1_394_task_specific_intent_context.py` verifies that the same surface can resolve to
+`provide-constraint` during search and `make-reservation` during booking. These are label-agreement
+and controlled-context checks, not accuracy claims: the dev sample is small and uses the same
+annotator as training.
 
 Once a frame has provenance-recorded training and held-out labels, store it in a versioned `dialogue`
 memory inside the portable SQLite model. Codex may produce the primary labels for both splits under

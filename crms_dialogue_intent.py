@@ -29,6 +29,11 @@ _CONTEXT_PREDICATES = {
     "has_session_slot_date_time", "has_session_slot_seating",
     "has_session_slot_cuisine", "has_session_slot_restaurant_choice",
     "task_in_progress", "task_complete", "correction_target_available",
+    "active_task_check_availability", "active_task_make_reservation",
+    "active_task_change_reservation", "active_task_cancel_reservation",
+    "active_task_correct_prior_result", "active_task_correct_result",
+    "active_task_seek_information", "active_task_provide_information",
+    "active_task_other_task",
 }
 _DIALOGUE_ACTS = {
     "question", "request-action", "provide-information", "answer-clarification",

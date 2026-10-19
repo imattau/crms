@@ -30,6 +30,12 @@ STATE_CONTEXT = {
 REQUIRED_COLUMNS = {
     "split", "conversation_id", "user_utterance", "dialogue_act",
     "task_intent", "context_state", "predecessor_act", "reviewer", "citation",
+    "source_utterance_index",
+}
+ACTIVE_TASK_INTENTS = {
+    "check-availability", "make-reservation", "change-reservation",
+    "cancel-reservation", "correct-prior-result", "correct-result",
+    "seek-information", "provide-information", "other-task",
 }
 
 
@@ -68,12 +74,33 @@ def evaluate(candidate_report: dict, rows: list[dict[str, str]]) -> dict:
     labeled = [row for row in rows
                if row["dialogue_act"].strip() not in {"", "uncertain"}
                and row["task_intent"].strip() not in {"", "uncertain"}]
+    active_before: dict[tuple[str, str], str | None] = {}
+    by_conversation: dict[str, list[dict[str, str]]] = {}
+    for row in rows:
+        by_conversation.setdefault(row["conversation_id"].strip(), []).append(row)
+    for conversation_id, conversation_rows in by_conversation.items():
+        active_task: str | None = None
+        for row in sorted(conversation_rows,
+                          key=lambda item: int(item["source_utterance_index"])):
+            row_id = row["source_utterance_index"].strip()
+            active_before[(conversation_id, row_id)] = active_task
+            intent = row["task_intent"].strip()
+            if intent == "end-interaction":
+                active_task = None
+            elif intent in ACTIVE_TASK_INTENTS:
+                active_task = intent
     matched = confident = exact_pair = act_matches = intent_matches = 0
     conflicts = 0
     predictions = []
     for row in labeled:
         surface = normalize_surface(row["user_utterance"])
         context = STATE_CONTEXT.get(row["context_state"].strip(), set())
+        active_task = active_before.get((
+            row["conversation_id"].strip(),
+            row["source_utterance_index"].strip()))
+        if active_task in ACTIVE_TASK_INTENTS:
+            context = set(context)
+            context.add("active_task_" + active_task.replace("-", "_"))
         predecessor = row["predecessor_act"].strip()
         eligible = [frame for frame in frames
                     if any(normalize_surface(pattern) == surface
@@ -118,6 +145,7 @@ def evaluate(candidate_report: dict, rows: list[dict[str, str]]) -> dict:
         "evaluation_split": sorted({row["split"].strip() for row in rows}),
         "evaluation_labeler": next(iter(reviewers)),
         "evaluation_basis": "agreement with the named single primary annotator",
+        "context_basis": "provisional turn labels plus prior labeled turns in each conversation",
         "labeled_turns": len(labeled),
         "unlabeled_or_uncertain_turns": len(rows) - len(labeled),
         "candidate_matched_turns": matched,
@@ -156,11 +184,13 @@ def self_test() -> None:
         "dialogue_act": "thanks", "task_intent": "social-contact",
         "context_state": "task-in-progress", "predecessor_act": "answer",
         "reviewer": "codex-ai-test", "citation": "dev-a#turn=3",
+        "source_utterance_index": "1",
     }, {
         "split": "dev", "conversation_id": "dev-a", "user_utterance": "Goodbye",
         "dialogue_act": "farewell", "task_intent": "end-interaction",
         "context_state": "task-complete", "predecessor_act": "close",
         "reviewer": "codex-ai-test", "citation": "dev-a#turn=4",
+        "source_utterance_index": "3",
     }]
     result = evaluate(candidate_report, rows)
     require(result["candidate_matched_turns"] == 1
