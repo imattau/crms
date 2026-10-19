@@ -26,7 +26,7 @@ Consequences: no free paraphrase, no fluent filler, no wording chosen to sound g
 | Need | Exists today | Missing |
 |---|---|---|
 | Something to say that is smaller than a sentence (a fact, a typed span) | Stored facts with provenance; proofs; question frames | Facts extracted from real text at useful yield (measured low, see the NL doc section 3.6); a reliable answer-span extractor |
-| Licensed wording for a fact | `write_fact` realises a stored fact as active or passive text, only when the wording has independent supporting examples; "I don't have a verified language rule to paraphrase this result yet" when it has none | Coverage across relations; tense, agreement, plurals, determiners, negation, quantities; question-shaped answer templates |
+| Licensed wording for a fact | `write_fact` realises a stored fact from a fact-backed structural frame with varied subjects and objects; each emitted surface must have at least one recorded alignment | Coverage across relations; tense, agreement, plurals, determiners, negation, quantities; question-shaped answer templates |
 | Combining several facts | none | Aggregation, referring expressions, ordering, connectives |
 | Checking its own output | none | A round trip: parse the reply back with CRMS's own rules and compare |
 | Controlled variation | none | A deterministic choice rule or a user setting |
@@ -102,10 +102,13 @@ from `quoted_only` has no parsed structure and can only be quoted.
 
 ### 3.2 Realisation, in order of preference
 
-1. **Realise from licensed wording.** If a claim's relation has a verified surface pattern (active
-   and passive realisations with independent support, as `write_fact` already requires), render it
-   with that pattern. Morphology comes from verified paradigms (the engine's irregular-verb table,
-   regular rules checked against corpus forms), and determiners come from the cited sentence.
+1. **Realise from licensed wording.** If a claim's relation has a licensed surface pattern, render
+   it with that pattern. `write_fact` currently requires varied fact-backed examples for the
+   structural frame, but an individual surface variant may have only one explicit alignment; do
+   not describe every emitted wording as independently supported. The round-trip and source-support
+   checks below still apply to each rendered claim. Morphology comes from verified paradigms (the
+   engine's irregular-verb table, regular rules checked against corpus forms), and determiners come
+   from the cited sentence.
 2. **Quote the clause.** If the claim came from a parsed source sentence but no verified wording
    exists, show the cited clause, trimmed to the smallest span that carries the claim, with the
    answer marked. Trimming is by constituents from the parse, not by arbitrary cuts.
@@ -133,7 +136,11 @@ Before showing any realised sentence the reply layer parses it with CRMS's own f
 and requires:
 
 1. It parses into exactly the claims in the plan, with the same roles (not just the same words).
-2. Every claim's cited sentence still supports the claim (the existing citation check).
+2. **Independently verify support.** For a source-parsed claim, check that its cited sentence
+   supports the claim using the source-evidence gate, independently of the realisation round trip.
+   For a stored or derived fact, verify its stored evidence or proof lineage. A successful parse of
+   generated text is not evidence that the source supports it: the same parser can accept a
+   self-consistent but unsupported realisation.
 3. The focus span is the object, subject or qualifier the question asked about, in the role the
    question's frame requires.
 4. Span sanity: a span that is a single sentence-initial word is accepted as a name only if the
@@ -160,8 +167,10 @@ the plan: each claim, the wording rule used, and the round-trip result.
 2. **Question-to-statement templates for stored facts first.** Answers backed by an accepted fact
    already have roles; add the ten-pattern set from section 2 on top of the verified wording, and
    measure the round trip on facts (not on question rearrangement).
-3. **Round trip through the real parser** (3.4), with a benchmark of correct and deliberately wrong
-   (question, sentence) pairs.
+3. **Separate source support from the round trip** (3.4): check source support or stored proof
+   independently, then parse the realisation and compare its claim roles. Benchmark both checks on
+   correct and deliberately wrong (question, sentence) pairs; do not let one check stand in for the
+   other.
 4. **Aggregation and ordering** for multi-claim replies (3.3), starting with same-subject claims.
 5. **Proof explanations** with connectives (3.3).
 6. **Wording coverage** for more relations and forms, driven by what the round-trip benchmark shows
@@ -190,9 +199,11 @@ the plan: each claim, the wording rule used, and the round-trip result.
 
 1. **Yield.** Realisation needs facts. If few real-text claims are parsed into facts, most replies
    stay quotations. Fact extraction yield (the NL doc, section 3.6) bounds the benefit.
-2. **Which wording rules count as verified.** Reuse the `write_fact` standard (independent
-   supporting examples per surface form), or adopt a lighter standard for closed-class templates
-   such as "X was released in Y"? A decision is needed.
+2. **Which wording rules count as verified.** The current `write_fact` contract requires a
+   varied, fact-backed structural frame and a recorded alignment for each surface variant, but the
+   variant itself need not have multiple independent examples. Decide whether that is sufficient
+   for reply wording, or whether high-risk forms (negation, quantities, tense changes) need stronger
+   support or a closed template with explicit tests.
 3. **Pronoun rules.** When is a pronoun safe? The prototype pronoun resolution got 4 of 6
    resolvable follow-ups in a small test and bound one wrongly.
 4. **Grammar checking.** Round trip checks meaning, not fluency. Some realisations may parse
