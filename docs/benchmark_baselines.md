@@ -245,6 +245,10 @@ with `and` is also split only when it starts with another question form. A secon
 Torvalds and the birthplace route returns exact-title Helsinki evidence. Shared-verb coordination
 (“Who created Python and Linux?”) is not split and remains covered by
 `experiments/v1_325_coordinated_who_lists.py`, which passes its answer-or-disclose-missing checks.
+The explicit-clause test also checks a supported first clause followed by an
+unsupported “Who developed Minix?” clause: CRMS answers the first, labels and
+processes the second, and reports that the request was only partially
+supported.
 That fixture also pairs an exact title containing a conjunction (“Research and Development”)
 with a shorter title (“Research”); exact-title lookup keeps the longer entity intact and prevents
 a misleading partial list answer.

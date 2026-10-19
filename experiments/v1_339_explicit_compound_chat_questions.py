@@ -97,9 +97,36 @@ def main() -> None:
                 and "Part 2 of 2:" in independent_output,
                 f"independent question parts were not both answered: {independent_output}")
 
+        partial = subprocess.run(
+            [sys.executable, str(PROJECT / "crms_chat.py"),
+             "--knowledge", str(root / "knowledge.json"),
+             "--index", str(root / "research.json"),
+             "--rules", str(root / "rules.json"),
+             "--math", str(root / "math.json"),
+             "--translations", str(root / "translations.json"),
+             "--dialogue-state", str(root / "dialogue3.json"),
+             "--rule-session", str(root / "rule-session3.json"),
+             "--candidate-session", str(root / "candidate-session3.json")],
+            input=("Who created Python? Also who developed Minix?\n/quit\n"),
+            text=True, capture_output=True, cwd=root, timeout=30)
+        partial_output = partial.stdout + partial.stderr
+        require(partial.returncode == 0 and "Part 1 of 2:" in partial_output
+                and "Guido van Rossum" in partial_output
+                and "Part 2 of 2:" in partial_output
+                and "Minix" in partial_output
+                and "Processed all 2 question parts separately." in partial_output,
+                f"mixed supported/unsupported clauses were not both processed: "
+                f"{partial_output}")
+        require(any(marker in partial_output.lower() for marker in (
+                    "couldn't find", "no source", "no evidence", "no matching",
+                    "not supported", "i don't know")),
+                f"unsupported second clause was not identified as a gap: "
+                f"{partial_output}")
+
     print("PASS: repeated explicit question clauses are processed separately")
     print("PASS: shared-verb lists remain with the coordinated-question route")
     print("PASS: a uniquely extracted Who answer binds a later pronoun in the same request")
+    print("PASS: mixed supported/unsupported clauses are both processed and the gap is disclosed")
     print("PASS: each answer is labeled with its part and source")
 
 
