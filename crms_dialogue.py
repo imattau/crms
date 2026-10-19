@@ -127,6 +127,9 @@ class CRMSDialogue:
         self.last_writing_request: str | None = None
         self.last_timeline_subject: str | None = None
         self.last_timeline_order_by: str | None = None
+        # Names extracted from the most recently quoted source passage are
+        # discourse candidates only; they never become facts or answer evidence.
+        self.source_mentions: list[dict[str, str]] = []
 
     def clear(self) -> None:
         self.last_entity = None
@@ -138,6 +141,7 @@ class CRMSDialogue:
         self.last_writing_request = None
         self.last_timeline_subject = None
         self.last_timeline_order_by = None
+        self.source_mentions = []
         self._clear_pending()
 
     def _clear_pending(self) -> None:
@@ -234,8 +238,11 @@ class CRMSDialogue:
         if len(pronouns) > 4:
             return None, ("This question has too many pronoun bindings to resolve; "
                           "please name the entities.")
-        entities = sorted({entity for entity in
-                           (self.subject_entity, self.object_entity) if entity})
+        entities = list(dict.fromkeys(
+            entity for entity in (
+                self.last_entity, self.subject_entity, self.object_entity,
+                *(item.get("entity") for item in self.source_mentions))
+            if entity))
         if not entities and self.last_question:
             focus = self._explicit_research_acronym(self.last_question)
             if focus:
@@ -283,12 +290,26 @@ class CRMSDialogue:
         if len(supported) > 1:
             return None, ("The pronouns have multiple bindings with supported "
                           "answers; please name the entities.")
+        if len(entities) > 1 and self.source_mentions:
+            mentions = list({item["entity"]: item
+                             for item in self.source_mentions}.values())
+            choices = "; ".join(
+                f"{item['entity']} [Source: {item.get('title') or 'source'}]"
+                for item in mentions)
+            return None, ("The last quoted source mentions " + choices
+                          + ". Which entity do you mean? Please restate the "
+                          "question with that name.")
         if len(entities) == 1:
             resolved = question
             for match in reversed(pronouns):
                 resolved = (resolved[:match.start()] + entities[0]
                             + resolved[match.end():])
             return resolved, None
+        if len(entities) > 1:
+            names = ", ".join(entities)
+            return None, ("I couldn't verify one referent for this pronoun. It "
+                          f"could refer to {names}; please name one and restate "
+                          "the question.")
         if self.last_entity:
             return None, (
                 "I could not verify this follow-up with the learned question "
@@ -344,9 +365,64 @@ class CRMSDialogue:
                                _WORD_RE.findall(entity))] = entity
         for alias, record in self.knowledge._entity_alias_records().items():
             surfaces[alias] = record["entity"]
+        for item in self.source_mentions:
+            entity = item.get("entity", "")
+            key = tuple(token.casefold() for token in _WORD_RE.findall(entity))
+            if key:
+                surfaces[key] = entity
         return {key: entity for key, entity in surfaces.items() if key}
 
+    def _source_entity_mentions(
+            self, source_sentences: list[dict[str, Any]] | None
+            ) -> list[dict[str, str]]:
+        """Extract bounded name candidates from exact quoted sentences.
+
+        Capitalisation is used only to offer referents. Resolution still needs
+        a fact-backed or source-backed answer for the substituted question.
+        """
+        if not source_sentences:
+            return []
+        common_sentence_starts = {
+            "a", "an", "the", "this", "that", "these", "those", "when",
+            "while", "after", "before", "during", "he", "she", "it", "they",
+            "we", "i", "in", "on", "at", "for", "by", "as",
+        }
+        mentions: dict[tuple[str, ...], dict[str, str]] = {}
+        pattern = re.compile(
+            r"\b[A-Z][a-z]+(?:['’][A-Z]?[a-z]+)?"
+            r"(?:\s+[A-Z][a-z]+(?:['’][A-Z]?[a-z]+)?)*\b")
+        for source in source_sentences:
+            text = source.get("text")
+            if not isinstance(text, str):
+                continue
+            for match in pattern.finditer(text):
+                entity = match.group().strip()
+                words = tuple(word.casefold() for word in
+                              _WORD_RE.findall(entity))
+                if not words or words[0] in common_sentence_starts:
+                    continue
+                if len(words) == 1 and match.start() == 0:
+                    continue
+                key = tuple(word.casefold() for word in _WORD_RE.findall(entity))
+                mentions.setdefault(key, {
+                    "entity": entity,
+                    "citation": str(source.get("citation", "")),
+                    "title": str(source.get("title", "source")),
+                })
+        keys = sorted(mentions, key=lambda key: (len(key), key))
+        filtered = []
+        for key in keys:
+            contained = any(
+                len(other) > len(key)
+                and any(other[start:start + len(key)] == key
+                        for start in range(len(other) - len(key) + 1))
+                for other in mentions)
+            if not contained:
+                filtered.append(mentions[key])
+        return filtered
+
     def _remember_evidence(self, response: QuestionResult) -> None:
+        self.source_mentions = []
         facts = response.evidence or []
         subjects = {fact.get("subject", "") for fact in facts if fact.get("subject")}
         objects = {fact.get("object", "") for fact in facts if fact.get("object")}
@@ -728,13 +804,23 @@ class CRMSDialogue:
             if (self.last_question is None and self.last_writing_subject is not None):
                 target_candidates = [self.last_writing_subject]
             else:
-                target_candidates = sorted({entity for entity in
-                                            (self.subject_entity,
-                                             self.object_entity,
-                                             self.last_entity) if entity})
+                candidates = [self.subject_entity, self.object_entity,
+                              self.last_entity]
+                candidates.extend(item.get("entity")
+                                  for item in self.source_mentions)
+                target_candidates = sorted({entity for entity in candidates
+                                            if entity})
             target = target_candidates[0] if len(target_candidates) == 1 else None
         else:
-            target = self._canonical_entity(target_phrase.strip())
+            source_match = next((item.get("entity")
+                                 for item in self.source_mentions
+                                 if tuple(word.casefold() for word in
+                                          _WORD_RE.findall(item.get("entity", "")))
+                                 == tuple(word.casefold() for word in
+                                          _WORD_RE.findall(target_phrase.strip()))),
+                                None)
+            target = (source_match or
+                      self._canonical_entity(target_phrase.strip()))
             target_candidates = []
         if target is None and not target_candidates:
             target_words = tuple(word.casefold()
@@ -1127,8 +1213,24 @@ class CRMSDialogue:
         resolved, clarification = self._resolve_pronoun(
             question, research_index=research_index)
         if resolved is None:
-            self.clear()
-            response = QuestionResult("unknown", request=clarification)
+            candidate_entities = list(dict.fromkeys(
+                entity for entity in (
+                    self.last_entity, self.subject_entity, self.object_entity,
+                    *(item.get("entity") for item in self.source_mentions))
+                if entity))
+            if candidate_entities:
+                source_evidence = [
+                    {"entity": item["entity"], "citation": item["citation"],
+                     "title": item["title"]}
+                    for item in self.source_mentions]
+                response = QuestionResult(
+                    "unknown", candidates=candidate_entities,
+                    request=clarification,
+                    language_evidence=[{"kind": "source_entity_candidates",
+                                        "mentions": source_evidence}])
+            else:
+                self.clear()
+                response = QuestionResult("unknown", request=clarification)
             return DialogueTurn("unknown", question, question, response, text=clarification or "")
         counterfactual = self.knowledge.ask_counterfactual_source_question(resolved)
         if counterfactual is not None:
@@ -1189,21 +1291,24 @@ class CRMSDialogue:
                 self.pending_question = resolved
                 self.pending_result = response
             elif research is not None and research.status == "sources_found":
-                # Retain a source-backed acronym as the discourse focus so a
-                # short follow-up such as "How does it handle conflicts?"
-                # can bind to the subject just discussed. The focus is
-                # available only while this explicit, evidenced question is
-                # the most recent turn; an unrelated turn clears it above.
-                focus = self._explicit_research_acronym(resolved)
-                evidence_text = " ".join(
-                    [str(item.get("text", "")) + " "
-                     + str(item.get("title", ""))
-                     for item in (research.source_sentences or [])]
-                    + [str(item.get("excerpt", "")) + " "
-                       + str(item.get("title", ""))
-                       for item in (research.passages or [])])
-                if focus and focus.casefold() in evidence_text.casefold():
+                self.source_mentions = self._source_entity_mentions(
+                    research.source_sentences)
+                if self.source_mentions:
+                    # Keep only entities from text actually quoted this turn;
+                    # they are candidate referents, not accepted knowledge.
                     self.last_question = resolved
+                else:
+                    # Retain a source-backed acronym as a discourse focus.
+                    focus = self._explicit_research_acronym(resolved)
+                    evidence_text = " ".join(
+                        [str(item.get("text", "")) + " "
+                         + str(item.get("title", ""))
+                         for item in (research.source_sentences or [])]
+                        + [str(item.get("excerpt", "")) + " "
+                           + str(item.get("title", ""))
+                           for item in (research.passages or [])])
+                    if focus and focus.casefold() in evidence_text.casefold():
+                        self.last_question = resolved
         return result
 
     def save(self, path: str) -> None:
