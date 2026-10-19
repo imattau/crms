@@ -43,6 +43,17 @@ def main() -> None:
         require("Bistro Alder" not in mentions,
                 f"an unshown source became a referent: {mentions}")
 
+        for query in ("What about the second one?",
+                      "Tell me about the second one.",
+                      "Can you tell me more about the other option?"):
+            ordinal = respond(dialogue, query, research_index=index)
+            require(ordinal.status == "clarify"
+                    and "one source item" in ordinal.text
+                    and "numbered list" in ordinal.text,
+                    f"an ordinal for an unshown result was not clarified: {ordinal.text!r}")
+            require("Bistro Alder" not in ordinal.text,
+                    f"clarification leaked an unshown result: {ordinal.text!r}")
+
         follow_up = respond(dialogue, "Can you tell me more about that one?",
                             research_index=index)
         require(follow_up.status == "sources_found"
@@ -52,6 +63,7 @@ def main() -> None:
                 f"one visible referent incorrectly caused ambiguity: {follow_up.text!r}")
 
     print("only the source entity quoted to the user becomes a referent: PASS")
+    print("an ordinal cannot select an unshown source result: PASS")
     print("a source-backed demonstrative follow-up resolves to the visible entity: PASS")
 
 

@@ -108,8 +108,9 @@ Findings from the review that change the design:
   names from hidden hits must not become conversational context. The runtime replay in
   [`v1_408_visible_source_referents.py`](../experiments/v1_408_visible_source_referents.py) confirms
   that a follow-up resolves to the one quoted entity and an unshown hit is not retained. Pronoun
-  resolution still does not consult entity kind, and ordinal selection across a general list of
-  source results remains unsupported.
+  resolution still does not consult entity kind. An ordinal follow-up cannot select a hidden result:
+  when the preceding brief did not show a numbered list, CRMS now says that and asks for more
+  results or an entity name. Selecting among a numbered set of sources remains unsupported.
 - **The chat loop still post-processes every turn** (count routes, source routes) in a file of about
   10,000 lines.
 - **Chat learning is explicit.** Every `/teach-*` command teaches content. No command teaches a

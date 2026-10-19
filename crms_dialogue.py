@@ -116,6 +116,12 @@ _BARE_YES_NO_RE = re.compile(
 _FOLLOWUP_ENTITY_RE = re.compile(
     r"^(?:and\s+)?what about\s+(.+?)[?!.]*$|^and\s+(.+?)[?!.]*$",
     flags=re.IGNORECASE)
+_SOURCE_ORDINAL_FOLLOWUP_RE = re.compile(
+    r"^(?:(?:what about|tell me about|tell me more about|"
+    r"can you tell me about|can you tell me more about)\s+)"
+    r"(?:the\s+)?(?:first|1st|second|2nd|third|3rd|fourth|4th|last|"
+    r"other|another)\s+(?:one|option|source|result|item)[?!.]*$",
+    flags=re.IGNORECASE)
 _EXPLANATION_FOLLOWUP_RE = re.compile(
     r"^(?:why(?: is that)?|how do you know(?: that)?|what supports that)"
     r"[?!. ]*$", flags=re.IGNORECASE)
@@ -1576,6 +1582,21 @@ class CRMSDialogue:
                 "clarify", question, question,
                 text=("I don't have an open yes/no question in this conversation. "
                       "What would you like to ask or confirm?"))
+        if (_SOURCE_ORDINAL_FOLLOWUP_RE.fullmatch(question)
+                and self.source_mentions):
+            visible_citations = {item.get("citation", "")
+                                 for item in self.source_mentions
+                                 if item.get("citation")}
+            if len(visible_citations) == 1:
+                text = ("I quoted one source item in my last reply, not a numbered "
+                        "list, so I can't identify another one. Ask me for more "
+                        "results or name the source you want to follow up on.")
+            else:
+                text = ("I didn't present the source items as a numbered list, "
+                        "so I can't tell which one you mean. Please name the "
+                        "source or entity you want to follow up on.")
+            return DialogueTurn("clarify", question, self.last_question or question,
+                                text=text)
         repaired = self._repair_entity_reference(
             question, research_index=research_index)
         if repaired is not None:
