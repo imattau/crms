@@ -13,6 +13,7 @@ import sys
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
+from crms_codegen import generate_python
 from crms_model import CRMSModel
 
 
@@ -69,11 +70,32 @@ def evaluate_cross(phrases: tuple[str, str, str], held_out: str) -> dict:
             })
         negatives = {phrase: model.predict(phrase, [8, -2, 5]).status
                      for phrase in NEGATIVES}
+        artifact = generate_python(model, held_out)
+        require(artifact is not None
+                and artifact.domain == "list"
+                and artifact.instruction == held_out
+                and set(artifact.evidence_phrases) == set(order),
+                f"held-out recombination did not generate a traceable artifact: "
+                f"{held_out}: {artifact}")
+        namespace: dict[str, object] = {}
+        exec(compile(artifact.source, "<crms-balanced-recombination>", "exec"),
+             namespace)
+        require(namespace["transform"]([17, -3, 0, 4]) == [4, 0, -3, 17]
+                and namespace["validate_examples"](),
+                f"generated code failed parity for {held_out}: {artifact}")
+        require(generate_python(model, "flip the list") is None,
+                "code was generated for an unsupported operation word")
         permutation_rows.append({
             "training_order": list(order),
             "held_out": held_out,
             "cases": outputs,
             "negative_statuses": negatives,
+            "generated_code": {
+                "resolution": namespace["CRMS_PROVENANCE"]["resolution"],
+                "evidence_phrases": artifact.evidence_phrases,
+                "validation_cases": artifact.validation_cases,
+                "provenance_id": artifact.provenance_id,
+            },
         })
     return {"held_out": held_out, "permutations": permutation_rows}
 
@@ -106,6 +128,8 @@ def evaluate_conflicting_cross() -> None:
             and collision.language_gaps.get("conflicting_bigrams"),
             f"conflicting crossed behavior was not exposed for review: "
             f"{collision}")
+    require(generate_python(model, "invert the list") is None,
+            "code generator resolved an ambiguous crossed phrase")
 
 
 def main() -> None:
@@ -133,6 +157,13 @@ def main() -> None:
     require(evidence_checks == total,
             f"transfer evidence did not name all three teaching phrases: "
             f"{evidence_checks}/{total}")
+    for crossing in results:
+        artifact_ids = {
+            row["generated_code"]["provenance_id"]
+            for row in crossing["permutations"]
+        }
+        require(len(artifact_ids) == 1,
+                f"teaching order changed the generated artifact: {artifact_ids}")
     evaluate_conflicting_cross()
 
     print("Balanced phrase recombination: 2 crossed 2x2 patterns")
@@ -141,10 +172,12 @@ def main() -> None:
           f"abstained={abstained}")
     print(f"all teaching phrases preserved as evidence: "
           f"{evidence_checks}/{total}")
+    print("standalone code for held-out phrases: 12/12, all source-traced and "
+          "parity-checked; stable artifact IDs across teaching orders")
     print(f"unseen operators/entities/order/modifiers abstained: "
           f"{len(results) * 6 * len(NEGATIVES)}/"
           f"{len(results) * 6 * len(NEGATIVES)}")
-    print("crossed reverse/sort role conflict requests distinguishing examples: PASS")
+    print("crossed reverse/sort conflict abstains; no code emitted for conflict: PASS")
 
 
 if __name__ == "__main__":

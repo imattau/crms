@@ -42,7 +42,13 @@ word roles. Read the two learning curves together; the example arrangement is
 part of the measured condition. The experiment also creates overlapping
 reverse/sort language grids where an unseen phrase fits both behaviors; CRMS
 returns `need_examples` with conflicting token and bigram evidence instead of
-choosing one operation.
+choosing one operation. The 12 unambiguous held-out phrases also pass through
+the standalone Python renderer: all artifacts execute, pass parity checks,
+preserve all three training phrases in provenance, and use the retrieved
+procedure. Generated artifact IDs are stable across all teaching orders for
+each crossing. The unsupported `flip` operator and the ambiguous reverse/sort
+cross do not produce code. This is a bounded end-to-end composition check, not
+open-ended software generation.
 
 ## Cross-surface question transfer v1
 

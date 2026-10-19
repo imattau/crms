@@ -2101,7 +2101,12 @@ orders (36/36 held-out input cases, with all three source phrases preserved).
 It abstains on 48/48 controls with an unseen word, reordered words, or an
 unsupported modifier. This result shows that the example arrangement affects
 sample efficiency; it is not synonym transfer or open-ended language
-understanding.
+understanding. For those 12 held-out phrases, it also generates standalone
+Python artifacts that execute and pass parity checks while preserving all
+three training phrases in provenance; unsupported and conflicting queries
+produce no code, and each artifact ID is stable across the six teaching
+orders. This is bounded program composition, not open-ended software
+generation.
 `experiments/v1_241_chat_usability_diagnostics.py` checks that an optional
 question word or contiguous phrase (up to three tokens) is inferred only from
 two aligned, fact-backed examples, carries its source trace through chat and
