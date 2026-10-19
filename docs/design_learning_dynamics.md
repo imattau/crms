@@ -37,12 +37,13 @@ This is an input signal for future review and ledger work: it does **not** chang
 rule status, or answer ranking. Feedback whose answer has no attributable evidence is refused.
 
 `experiments/v1_358_answer_feedback_attribution.py` checks stable attribution, persistence,
-duplicate suppression, and retention of contradictory signals. A temporary-store interactive chat
-run also verified `/wrong` followed by `/right` against a cited answer. Remaining work includes
-persisting the immediate answer context across chat restarts, covering feedback on every specialized
-answer route, and connecting reviewed feedback to the evidence-ledger policy below. Until those
-steps are implemented, the feedback log is inspectable storage for learning signals, not a
-self-modifying rule or fact learner.
+duplicate suppression, and retention of contradictory signals. Temporary-store interactive chat
+runs verified `/wrong` on both a cited direct answer and `/infer-relation`, including its premise
+sources. Inference `why?` follow-ups also retain proof lineage. Remaining work includes persisting
+the immediate answer context across chat restarts, covering feedback on every specialized answer
+route, and connecting reviewed feedback to the evidence-ledger policy below. Until those steps are
+implemented, the feedback log is inspectable storage for learning signals, not a self-modifying
+rule or fact learner.
 
 ## 0. Ground rules (read first)
 

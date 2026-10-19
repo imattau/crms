@@ -27,7 +27,8 @@ def main() -> None:
     response = SimpleNamespace(
         evidence=[{"subject": "Ada", "relation": "designed",
                    "object": "Engine", "sources": ["book:12"]}],
-        proofs=None,
+        proofs=[{"rule": {"rule_id": "direct-proof-rule"},
+                 "premises": [{"fact": {"sources": ["direct:1"]}}]}],
         inference_proofs=[{
             "rule": {"rule_id": "parent-rule"},
             "fact": {"sources": ["family:1"]},
@@ -38,8 +39,10 @@ def main() -> None:
         passages=[])
     refs = collect_feedback_refs(response, research)
     require(refs == [
+        {"kind": "rule", "id": "direct-proof-rule"},
         {"kind": "rule", "id": "parent-rule"},
         {"kind": "source", "id": "book:12"},
+        {"kind": "source", "id": "direct:1"},
         {"kind": "source", "id": "family:1"},
         {"kind": "source", "id": "family:2"},
         {"kind": "source", "id": "s7"},
@@ -69,6 +72,11 @@ def main() -> None:
                     and row["answer"] == "Ada designed Engine."
                     for row in events),
                 "feedback was attached to a different answer")
+        require(reloaded.has_verdict(answer_id, "wrong")
+                and reloaded.has_verdict(answer_id, "right"),
+                "indexed opposite-verdict lookup missed a stored event")
+        require([row["verdict"] for row in reloaded.recent(1)] == ["right"],
+                "bounded recent-event query returned the wrong event")
 
     print("answer feedback attribution: direct facts, rule, and source refs PASS")
     print("SQLite persistence, deterministic IDs, duplicate suppression: PASS")

@@ -5241,10 +5241,7 @@ def main() -> int:
                 print("CRMS> I already recorded that feedback for this answer.")
                 continue
             opposite = "wrong" if line == "/right" else "right"
-            has_opposite = any(
-                event["answer_id"] == feedback_id
-                and event["verdict"] == opposite
-                for event in feedback_store.events())
+            has_opposite = feedback_store.has_verdict(feedback_id, opposite)
             if has_opposite:
                 print("CRMS> I recorded the conflicting feedback for review; "
                       "neither signal changes stored knowledge automatically.")
@@ -5257,7 +5254,7 @@ def main() -> int:
                       "It will inform review; it does not change facts or rules by itself.")
             continue
         if line == "/feedback":
-            events = feedback_store.events()[-10:]
+            events = feedback_store.recent(10)
             if not events:
                 print("CRMS> No answer feedback has been recorded.")
             else:
@@ -6634,6 +6631,11 @@ def main() -> int:
                     rendered += " [context: " + ", ".join(
                         f"{name}={value}" for name, value in sorted(qualifiers.items())) + "]"
                 print(f"CRMS> {rendered}")
+                proof_refs = collect_feedback_refs(result)
+                last_feedback_record = (
+                    {"question": " | ".join(fields[:3]),
+                     "answer": rendered, "evidence": proof_refs}
+                    if result.status == "answered" and proof_refs else None)
             except (TypeError, ValueError) as error:
                 print(f"Could not check that inference: {error}")
             continue
@@ -8412,6 +8414,12 @@ def main() -> int:
                             if isinstance(conclusion, dict) else explanation.text)
                         rendered = fallback
                     print("CRMS> " + rendered)
+                    explanation_refs = collect_feedback_refs(
+                        explanation.response)
+                    last_feedback_record = (
+                        {"question": dialogue.last_question or line,
+                         "answer": rendered, "evidence": explanation_refs}
+                        if explanation_refs else None)
                     last_research_evidence = None
                     continue
             if last_research_evidence is not None:

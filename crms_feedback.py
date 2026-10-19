@@ -47,7 +47,8 @@ def collect_feedback_refs(response: Any = None, research: Any = None
             value = row.get(field)
             if value is not None and str(value).strip():
                 ref_kind = ("rule" if field == "rule_id" else
-                            "fact" if field == "fact_id" else kind)
+                            "fact" if field == "fact_id" else
+                            "schema" if field == "schema_id" else kind)
                 refs.add((ref_kind, str(value).strip()))
         for value in row.get("sources", ()) or ():
             if str(value).strip():
@@ -82,9 +83,12 @@ def collect_feedback_refs(response: Any = None, research: Any = None
             if isinstance(row, Mapping):
                 add_sources(row, "source")
         for proof in (getattr(response, "proofs", None) or []):
-            for row in proof:
-                if isinstance(row, Mapping):
-                    add_sources(row, "source")
+            if isinstance(proof, Mapping):
+                visit_proof(proof)
+            else:
+                for row in proof:
+                    if isinstance(row, Mapping):
+                        add_sources(row, "source")
         for proof in (getattr(response, "inference_proofs", None) or []):
             visit_proof(proof)
     if research is not None:
@@ -153,3 +157,26 @@ class AnswerFeedbackStore:
                  "answer_id": row["answer_id"], "verdict": row["verdict"],
                  "question": row["question"], "answer": row["answer"],
                  "evidence": json.loads(row["evidence_json"])} for row in rows]
+
+    def recent(self, limit: int = 10) -> list[dict[str, Any]]:
+        if not isinstance(limit, int) or isinstance(limit, bool) or limit < 0:
+            raise ValueError("limit must be a non-negative integer")
+        with sqlite3.connect(self.path) as connection:
+            connection.row_factory = sqlite3.Row
+            rows = connection.execute(
+                "SELECT feedback_seq,answer_id,verdict,question,answer,evidence_json "
+                "FROM answer_feedback ORDER BY feedback_seq DESC LIMIT ?",
+                (limit,)).fetchall()
+        rows.reverse()
+        return [{"feedback_seq": row["feedback_seq"],
+                 "answer_id": row["answer_id"], "verdict": row["verdict"],
+                 "question": row["question"], "answer": row["answer"],
+                 "evidence": json.loads(row["evidence_json"])} for row in rows]
+
+    def has_verdict(self, answer_id: str, verdict: str) -> bool:
+        if verdict not in {"right", "wrong"}:
+            raise ValueError("verdict must be 'right' or 'wrong'")
+        with sqlite3.connect(self.path) as connection:
+            return connection.execute(
+                "SELECT 1 FROM answer_feedback WHERE answer_id=? AND verdict=?",
+                (answer_id, verdict)).fetchone() is not None
