@@ -1570,12 +1570,13 @@ positive paraphrase probes remain unresolved, including the stream and waterway 
 ### Reviewed predicate transfer and typed-question composition
 
 `python3 experiments/v1_296_large_corpus_predicate_learning.py` now tests the full transfer path
-against the 1,200-document synthetic corpus. Two cross-document subject/object pairs produce a
-report-only alignment between `flows through` and `passes through`; no facts change before explicit
-acceptance. After acceptance, a held-out typed question, `Which river passes through Nacre City
-0000?`, combines the learned relation wording with a separate cited sentence stating that the
-entity is a river. Chat returns the source sentence and exposes the aligned relation and type as
-reviewable candidates, preserving the fact-review boundary.
+against the 1,200-document synthetic corpus. Two independent cross-document subject/object pairs
+produce each report-only alignment: `flows through` / `passes through` and `flows through` / `runs
+through`. No facts change before explicit acceptance. After acceptance, held-out typed questions
+`Which stream passes through Nacre City 0000?` and `Which waterway runs through Nacre City 0004?`
+combine the learned relation variants with separate cited class sentences. Chat returns the
+answer-bearing source sentences and exposes resulting claims for review, preserving the fact-review
+boundary. The types are explicitly stated in the fixture; CRMS does not infer them from entity names.
 
 I also ran the read-only corpus alignment sampler against four 1,000-document windows of the
 285,478-document SimpleWiki index. Each sampled window produced zero predicate-alignment proposals

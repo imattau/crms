@@ -27,6 +27,14 @@ _TYPE_ADJUNCTS = frozenset({
 })
 
 
+def _entity_key(value: str) -> tuple[str, ...]:
+    """Normalize surface articles before matching mentions to exact titles."""
+    tokens = tuple(_tokens(value))
+    if tokens[:1] in {("the",), ("a",), ("an",)}:
+        tokens = tokens[1:]
+    return tokens
+
+
 def _coarse_head(noun_phrase: str) -> str | None:
     words = list(_tokens(noun_phrase))
     if words[:3] == ["one", "of", "the"]:
@@ -58,6 +66,7 @@ def _title_types(index: CRMSSQLiteResearchIndex,
             continue
         document = index.document(document_id)
         base_title = title.split("(", 1)[0].strip()
+        title_key = _entity_key(base_title)
         pattern = re.compile(
             r"(?:^|(?<=[.!?])\s+|[\r\n]+)(?:the\s+)?"
             + re.escape(base_title)
@@ -69,7 +78,7 @@ def _title_types(index: CRMSSQLiteResearchIndex,
         if match is not None:
             head = _coarse_head(match.group("phrase"))
             if head:
-                candidates[tuple(_tokens(base_title))].add(head)
+                candidates[title_key].add(head)
 
         # Normalized Wikipedia pages often put the lead after an infobox, and
         # their explicit `type` field may be the only concise class statement.
@@ -88,12 +97,15 @@ def _title_types(index: CRMSSQLiteResearchIndex,
                 continue
             head = _coarse_head(field.group(2))
             if head:
-                candidates[tuple(_tokens(base_title))].add(head)
+                candidates[title_key].add(head)
     return {entity: next(iter(heads)) for entity, heads in candidates.items()
             if len(heads) == 1}
 
 
 def main() -> None:
+    assert _entity_key("The Serein River 0000") == _entity_key(
+        "Serein River 0000")
+    assert _entity_key("An Example") == _entity_key("Example")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "index", nargs="?", type=Path,
@@ -129,6 +141,8 @@ def main() -> None:
                 lambda: defaultdict(lambda: defaultdict(set)))
         total_frames = non_is_a_support = 0
         typed_subject = typed_object = typed_both = 0
+        untyped_subjects: dict[str, int] = defaultdict(int)
+        untyped_objects: dict[str, int] = defaultdict(int)
         offsets = [round(index * max(document_count - args.window_documents, 0)
                          / max(args.window_count - 1, 1))
                    for index in range(args.window_count)]
@@ -144,15 +158,19 @@ def main() -> None:
                 relation = frame["relation"].casefold()
                 for row in frame["support"]:
                     non_is_a_support += 1
-                    subject_type = types.get(tuple(_tokens(row["subject"])))
-                    object_type = types.get(tuple(_tokens(row["object"])))
+                    subject_type = types.get(_entity_key(row["subject"]))
+                    object_type = types.get(_entity_key(row["object"]))
                     typed_subject += subject_type is not None
                     typed_object += object_type is not None
+                    if subject_type is None:
+                        untyped_subjects[row["subject"]] += 1
+                    if object_type is None:
+                        untyped_objects[row["object"]] += 1
                     if subject_type is None or object_type is None:
                         continue
                     typed_both += 1
-                    pair = (tuple(_tokens(row["subject"])),
-                            tuple(_tokens(row["object"])))
+                    pair = (_entity_key(row["subject"]),
+                            _entity_key(row["object"]))
                     aggregate[relation][(subject_type, object_type)][pair].add(
                         row["document_id"])
             print(f"offset={offset}: relation_frames={len(frames)}")
@@ -198,6 +216,10 @@ def main() -> None:
         print("typed endpoints across positive non-is-a supports "
               f"(subject/object/both): {typed_subject}/{typed_object}/{typed_both} "
               f"of {non_is_a_support}")
+        print("most frequent untyped subjects:",
+              sorted(untyped_subjects.items(), key=lambda item: (-item[1], item[0]))[:10])
+        print("most frequent untyped objects:",
+              sorted(untyped_objects.items(), key=lambda item: (-item[1], item[0]))[:10])
         print("distinct-pair, cross-document role-type hypotheses "
               f"(one typed pair per wording): {len(weak_hypotheses)}")
         print("same hypotheses with >=2 typed pairs per wording: "

@@ -4403,9 +4403,10 @@ class CRMSKnowledgeBase:
         weak_initials = {
             "a", "all", "an", "another", "any", "because", "before",
             "both", "by", "during", "each", "few", "first", "given",
-            "here", "if", "it", "last", "many", "most", "neither",
-            "next", "none", "other", "our", "second", "several", "since",
-            "some", "such", "that", "the", "their", "there", "these",
+            "here", "if", "in", "it", "last", "lived", "many", "most",
+            "neither", "next", "none", "other", "our", "second", "several",
+            "since", "some", "sometimes", "such", "that", "the", "their",
+            "then", "there", "these",
             "they", "third", "this", "though", "those", "through", "to",
             "unless", "until", "when", "whereas", "while", "with",
             "without", "we",
@@ -4509,6 +4510,14 @@ class CRMSKnowledgeBase:
                     return [candidate]
             return []
         for left, right in zip(spans, spans[1:]):
+            if (left is not spans[0]
+                    and re.search(r"\b(?:a|an|the)\s+$",
+                                  sentence[:left.start()],
+                                  flags=re.IGNORECASE)):
+                # A capitalized common noun following a determiner is usually
+                # an object/complement ("an EP called ...", "for the TV
+                # series ..."), not a new named subject.
+                continue
             subject = left.group().strip()
             object_start = right.start()
             determiner = re.search(r"\b(?:a|an|the)\s+$",
@@ -4887,11 +4896,11 @@ class CRMSKnowledgeBase:
                     subject_is_prep_complement = False
                     if subject_match is not None:
                         before_subject = sentence[:subject_match.start()].rstrip()
-                        previous_word = re.search(r"([A-Za-z]+)$", before_subject)
-                        subject_is_prep_complement = bool(
-                            previous_word and previous_word.group(1).casefold()
-                            in {"of", "in", "at", "on", "from", "near",
-                                "within", "inside", "outside", "behind"})
+                        subject_is_prep_complement = bool(re.search(
+                            r"\b(?:of|in|at|on|from|near|within|inside|outside|"
+                            r"behind|for|with|by)\s+"
+                            r"(?:(?:the|a|an)\s+)?$",
+                            before_subject, flags=re.IGNORECASE))
                     if (candidate.relation != "is-a"
                             and (not re.fullmatch(
                                 r"[A-Za-z][A-Za-z’'-]*(?:\s+[A-Za-z][A-Za-z’'-]*){0,3}",

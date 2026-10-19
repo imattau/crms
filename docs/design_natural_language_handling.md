@@ -393,6 +393,17 @@ source-grounded category fields remain possible, but need held-out precision evi
 support language rules. `experiments/v1_335_role_type_alignment_probe.py` reproduces this read-only
 measurement.
 
+The probe now normalizes a leading `the`, `a`, or `an` when matching a relation endpoint to an
+exact-title type key. In the same five windows this raised typed subjects from 78 to 83 and rows
+typed at both endpoints from 27 to 28, but still produced zero ordered-type alignment hypotheses.
+The audit also traced recurring false endpoints such as `Then`, `Sometimes`, `In 1969`, `TV`, and
+`EP` to discourse openings, temporal phrases, and capitalized common nouns after determiners.
+Corpus frame discovery now rejects those bounded cases. The five-window sample fell from 96 to 84
+relation frames (409 to 355 positive non-`is-a` support rows); typed endpoint counts are now
+83/129/28 (subject/object/both). The repeated-pair and role-type aligners still propose no real
+corpus transfer. This improves frame precision but does not solve entity linking or paraphrase
+coverage.
+
 ### 3.7 Pronouns and follow-ups
 
 Baseline: every pronoun follow-up in nine scripted two-turn dialogues returned "Please name the

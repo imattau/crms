@@ -303,9 +303,10 @@ Command: `python3 experiments/v1_326_corpus_frame_quality.py`
 Corpus-only frame discovery now rejects extraction shapes too weak to license reusable rules:
 pronoun subjects or objects, coordinated clauses flattened into one object, dangling `example`
 complements, relative-clause material absorbed into a class phrase, clipped copular postmodifiers,
-discourse adverbs parsed as subjects, and two-endpoint `connect ... with ...` clauses collapsed to
-one object. These sentences remain searchable evidence; the gates apply only to induced rule
-proposals. The synthetic fixture retains valid repeated `is-a` and active-verb frames.
+discourse openings and temporal phrases parsed as subjects, capitalized common nouns after
+determiners (`an EP called X`, `the TV series X`), and two-endpoint `connect ... with ...` clauses
+collapsed to one object. These sentences remain searchable evidence; the gates apply only to
+induced rule proposals. The synthetic fixture retains valid repeated `is-a` and active-verb frames.
 
 A read-only spot check over 1,000 documents and up to 20,000 sentences in the local SimpleWiki
 index completed in 0.54 seconds and returned three reviewable frame proposals. Before the
@@ -416,6 +417,12 @@ no rules and changed no index data. This role-type signal has no yield in these 
 entity linking or separately sourced category fields need coverage and held-out precision evidence
 before they can support language rules.
 
+The current five-window replay uses leading-article normalization for exact-title endpoint matches
+and excludes several newly inspected false subjects. It retained 84 frames and 355 positive
+non-`is-a` supports; 83 subjects and 129 objects matched a unique type, with 28 supports typed at
+both endpoints. The revised replay still found zero role-type alignment hypotheses. The low yield
+does not justify weakening the review or evidence thresholds.
+
 ## Exact-title structured type answers
 
 Command: `python3 experiments/v1_336_structured_type_field_chat.py`
@@ -521,9 +528,11 @@ not counted as a correct answer unless it is presented as answer-bearing support
 Command: `python3 experiments/v1_296_large_corpus_predicate_learning.py`
 
 On the controlled 1,200-document corpus, repeated pairs in independent documents propose
-`flows through` ↔ `passes through`. The system changes no facts until explicit acceptance. After
-acceptance, chat composes the alternate predicate with a separately cited `is a river` sentence for
-a held-out typed question; it cites the relation sentence and presents the resulting relation and
-type claims for review. This is demonstrated transfer from repeated evidence, not broad language
-parity. A read-only sample of four 1,000-document windows in SimpleWiki produced zero predicate
-alignments, so corpus-derived transfer remains sparse on that real-corpus sample.
+`flows through` ↔ `passes through` and `flows through` ↔ `runs through`. The system changes no facts
+until explicit acceptance. After acceptance, chat composes both alternate predicates with separate
+source sentences explicitly classifying held-out entities as a `stream` or `waterway`. It cites the
+relation sentence and presents resulting claims for review; the class is not inferred from the
+entity name. This is demonstrated transfer from repeated evidence, not broad language parity. A
+read-only sample of four 1,000-document windows in SimpleWiki produced zero predicate alignments,
+and the expanded 5,000-document/60,000-sentence scan also produced zero, so corpus-derived transfer
+remains sparse in the sampled real corpus.

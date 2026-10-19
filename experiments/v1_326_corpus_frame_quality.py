@@ -63,6 +63,14 @@ def main() -> None:
             ("bad-preposition-boundary-2", "The River Vartry flows through the town."),
             ("bad-prep-subject-1", "A campus in Silicon Valley called Apple Campus 3."),
             ("bad-prep-subject-2", "An office in Nacre City called Meridian Tower."),
+            ("bad-discourse-subject-1", "Then he joined ITV."),
+            ("bad-discourse-subject-2", "Sometimes called Pakistani Taliban."),
+            ("bad-temporal-subject-1", "In 1969 he joined the Social Democratic Party."),
+            ("bad-temporal-subject-2", "In 1972 he joined the Civic Party."),
+            ("bad-determiner-subject-1", "In 1990 they released an EP called Inescapable."),
+            ("bad-determiner-subject-2", "In 2008 she released an EP called Untitled."),
+            ("bad-adjunct-subject-1", "He wrote for the TV series Justified."),
+            ("bad-adjunct-subject-2", "She acted in the TV series Unforgotten."),
             ("bad-ordinal-relation-1", "Calhoun becomes the first Vice President to resign."),
             ("bad-ordinal-relation-2", "Sullivan becomes the first American woman to perform a spacewalk."),
             ("bad-clipped-object-1", "Eisenhower becomes Supreme Commander of NATO Europe."),
@@ -98,7 +106,7 @@ def main() -> None:
         rejected_relations = {
             "across", "armies", "adopted", "approved", "versus", "years",
             "played at a stadium called", "species", "flows", "becomes the first",
-            "called",
+            "called", "joined", "series",
         }
         require(not any(proposal["relation"] in rejected_relations
                         for proposal in proposals),
