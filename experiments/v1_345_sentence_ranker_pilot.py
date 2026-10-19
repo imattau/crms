@@ -85,6 +85,9 @@ def main() -> None:
     require(not rank_candidates("Who destroyed Meridian Engine 99?",
                                 candidates, restored),
             "public rank_candidates bypassed the evidence gate")
+    uncited = [{"text": candidates[0]["text"]}]
+    require(not rank_candidates(question, uncited, restored),
+            "ranker selected a sentence without a citation")
     low_threshold_model = SentenceRanker(
         restored.weights, restored.bias, 0.999999, restored.training_examples,
         restored.positive_examples, restored.training_data_sha256,

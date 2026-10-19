@@ -302,9 +302,10 @@ def rank_candidates(question: str, candidates: Sequence[Mapping[str, Any]],
                     ) -> list[dict[str, Any]]:
     """Filter through the existing evidence gate, then rank its passers."""
     from crms_nl_gate import gate_passing_candidates
+    cited = [dict(row) for row in candidates
+             if str(row.get("citation", "")).strip()]
     passing = gate_passing_candidates(
-        question, [dict(row) for row in candidates],
-        licensed_predicates=licensed_predicates)
+        question, cited, licensed_predicates=licensed_predicates)
     return _score_candidates(question, passing, model)
 
 
