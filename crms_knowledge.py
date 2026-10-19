@@ -13139,8 +13139,9 @@ class CRMSKnowledgeBase:
             Besides extensional rules, this evaluates the common recursive
             form ``edge + relation -> relation`` (subject answers) or its
             inverse ``relation + edge -> relation`` (object answers) to a
-            bounded least fixed point. Other derived premises use the ordinary
-            bounded entity scan or report incomplete search.
+            bounded least fixed point. Mutually recursive linear rules use a
+            goal-local fixed point in either answer direction. Other derived
+            premises use the bounded entity scan or report incomplete search.
             """
             relation_key = _tokens(relation)
             target_rules = [rule for rule in self._inference_rules_for_use()
@@ -13272,18 +13273,147 @@ class CRMSKnowledgeBase:
                     if rule.third_relation is not None:
                         return None
                     recursive_field = derived_fields[0]
-                    if ((answer_field == "subject"
-                         and recursive_field != "second_relation")
-                            or (answer_field == "object"
-                                and recursive_field != "first_relation")):
+                    if (answer_field == "subject"
+                            and recursive_field != "second_relation"):
                         return None
-                    edge_field = ("first_relation" if answer_field == "subject"
+                    edge_field = ("first_relation"
+                                  if recursive_field == "second_relation"
                                   else "second_relation")
                     if not premise_is_extensional(getattr(rule, edge_field)):
                         return None
                     recursive.append((rule, recursive_field))
                 if not recursive or not base:
                     return None
+
+                if answer_field == "object":
+                    base_by_relation: dict[tuple[str, ...], list[InferenceRule]] = {}
+                    recursive_by_relation: dict[
+                        tuple[str, ...], list[tuple[InferenceRule, str]]] = {}
+                    for rule in base:
+                        base_by_relation.setdefault(
+                            _tokens(rule.conclusion_relation), []).append(rule)
+                    for rule, recursive_field in recursive:
+                        recursive_by_relation.setdefault(
+                            _tokens(rule.conclusion_relation), []).append(
+                                (rule, recursive_field))
+                    goal_key = (relation_key,
+                                _tokens(self._canonicalize_entity(bound)))
+                    goal_entities = {goal_key: bound}
+                    answers_by_goal: dict[
+                        tuple[tuple[str, ...], tuple[str, ...]],
+                        dict[tuple[str, ...], str]] = {}
+                    incomplete = False
+
+                    def ensure_goal(goal_relation: tuple[str, ...],
+                                    entity: str) -> tuple[
+                                        tuple[str, ...], tuple[str, ...]] | None:
+                        nonlocal incomplete
+                        key = (goal_relation, _tokens(
+                            self._canonicalize_entity(entity)))
+                        if key not in goal_entities:
+                            if len(goal_entities) >= 256:
+                                incomplete = True
+                                return None
+                            goal_entities[key] = entity
+                        return key
+
+                    def add_goal_answer(
+                            goal: tuple[tuple[str, ...], tuple[str, ...]],
+                            answer: str) -> bool:
+                        nonlocal incomplete
+                        values = answers_by_goal.setdefault(goal, {})
+                        key = _tokens(answer)
+                        if key in values:
+                            return False
+                        values[key] = answer
+                        if len(values) > 256:
+                            incomplete = True
+                        return True
+
+                    changed = True
+                    while changed and not incomplete and not scan_exhausted:
+                        changed = False
+                        goal_count = len(goal_entities)
+                        for current_goal in sorted(list(goal_entities)):
+                            current_relation, _entity_key = current_goal
+                            entity = goal_entities[current_goal]
+                            for rule in base_by_relation.get(current_relation, []):
+                                if rule.third_relation is None:
+                                    for head in facts_at(
+                                            rule.first_relation, "subject", entity):
+                                        middle = head.object
+                                        if (rule.middle_kind is not None
+                                                and not has_kind(
+                                                    middle, rule.middle_kind)):
+                                            continue
+                                        for tail in facts_at(
+                                                rule.second_relation,
+                                                "subject", middle):
+                                            changed = add_goal_answer(
+                                                current_goal, tail.object) or changed
+                                else:
+                                    first_kind = rule.middle_kind or ""
+                                    second_kind = rule.second_middle_kind or ""
+                                    for head in facts_at(
+                                            rule.first_relation, "subject", entity):
+                                        middle1 = head.object
+                                        if not has_kind(middle1, first_kind):
+                                            continue
+                                        for middle_edge in facts_at(
+                                                rule.second_relation,
+                                                "subject", middle1):
+                                            middle2 = middle_edge.object
+                                            if not has_kind(middle2, second_kind):
+                                                continue
+                                            for tail in facts_at(
+                                                    rule.third_relation,
+                                                    "subject", middle2):
+                                                changed = add_goal_answer(
+                                                    current_goal,
+                                                    tail.object) or changed
+                            for rule, recursive_field in (
+                                    recursive_by_relation.get(
+                                        current_relation, [])):
+                                if recursive_field == "first_relation":
+                                    dependency = ensure_goal(
+                                        _tokens(rule.first_relation), entity)
+                                    if dependency is None:
+                                        continue
+                                    middles = list(answers_by_goal.get(
+                                        dependency, {}).values())
+                                    for middle in middles:
+                                        if (rule.middle_kind is not None
+                                                and not has_kind(
+                                                    middle, rule.middle_kind)):
+                                            continue
+                                        for tail in facts_at(
+                                                rule.second_relation,
+                                                "subject", middle):
+                                            changed = add_goal_answer(
+                                                current_goal,
+                                                tail.object) or changed
+                                else:
+                                    for head in facts_at(
+                                            rule.first_relation,
+                                            "subject", entity):
+                                        middle = head.object
+                                        if (rule.middle_kind is not None
+                                                and not has_kind(
+                                                    middle, rule.middle_kind)):
+                                            continue
+                                        dependency = ensure_goal(
+                                            _tokens(rule.second_relation), middle)
+                                        if dependency is None:
+                                            continue
+                                        for answer in answers_by_goal.get(
+                                                dependency, {}).values():
+                                            changed = add_goal_answer(
+                                                current_goal, answer) or changed
+                        if len(goal_entities) > goal_count:
+                            changed = True
+                    candidates = answers_by_goal.get(goal_key, {})
+                    return (sorted(candidates.values()), work,
+                            not incomplete and not scan_exhausted)
 
                 answers_by_relation: dict[
                     tuple[str, ...], dict[tuple[str, ...], str]] = {}

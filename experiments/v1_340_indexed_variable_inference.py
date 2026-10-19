@@ -201,6 +201,14 @@ def main() -> None:
     mutual.teach_question(
         "Who is an alpha ancestor of Long4?", relation="alpha ancestor",
         answer_field="subject", bound_entity="Long4", answer="Long0")
+    mutual.teach_question(
+        "Which person is Short0 an alpha ancestor of?",
+        relation="alpha ancestor", answer_field="object",
+        bound_entity="Short0", answer="Short2")
+    mutual.teach_question(
+        "Which person is Long0 an alpha ancestor of?",
+        relation="alpha ancestor", answer_field="object",
+        bound_entity="Long0", answer="Long2")
     for index in range(300):
         mutual.add_fact(f"MutualNoise{index}", "unrelated",
                         f"MutualOther{index}", f"mutual-noise:{index}")
@@ -218,6 +226,19 @@ def main() -> None:
             fact_lookup=mutual._proof_fact_is_present)
         require(verified.valid,
                 f"mutually recursive variable answer has invalid proof: {verified.reason}")
+    mutual_inverse = mutual.ask("Which person is Long0 an alpha ancestor of?")
+    require(mutual_inverse.status == "ambiguous"
+            and set(mutual_inverse.candidates or ()) == {"Long2", "Long4"}
+            and mutual_inverse.inference_proofs,
+            "inverse indexed variable inference should close mutually recursive "
+            f"rules, got {mutual_inverse}")
+    for proof in mutual_inverse.inference_proofs:
+        verified = verify_inference_proof(
+            proof, mutual.facts(), mutual_rules,
+            expected_conclusion=proof["conclusion"],
+            fact_lookup=mutual._proof_fact_is_present)
+        require(verified.valid,
+                f"inverse mutually recursive proof is invalid: {verified.reason}")
     with tempfile.TemporaryDirectory(prefix="crms-mutual-variable-") as folder:
         database = Path(folder) / "mutual.sqlite"
         mutual.save(database)
@@ -225,12 +246,31 @@ def main() -> None:
         mutual_restored = CRMSKnowledgeBase.load(database)
         mutual_sqlite_result = mutual_restored.ask(
             "Who is an alpha ancestor of Long4?")
+        mutual_sqlite_inverse = mutual_restored.ask(
+            "Which person is Long0 an alpha ancestor of?")
         require(mutual_sqlite_result.status == "ambiguous"
                 and set(mutual_sqlite_result.candidates or ())
                 == {"Long0", "Long2"}
                 and mutual_sqlite_result.inference_proofs,
                 "mutually recursive indexed answers did not survive SQLite backing: "
                 f"{mutual_sqlite_result}")
+        require(mutual_sqlite_inverse.status == "ambiguous"
+                and set(mutual_sqlite_inverse.candidates or ())
+                == {"Long2", "Long4"}
+                and mutual_sqlite_inverse.inference_proofs,
+                "inverse mutually recursive answers did not survive SQLite backing: "
+                f"{mutual_sqlite_inverse}")
+        mutual_sqlite_rules = [asdict(rule) for rule in
+                               mutual_restored._inference_rules.values()]
+        for result in (mutual_sqlite_result, mutual_sqlite_inverse):
+            for proof in result.inference_proofs:
+                verified = verify_inference_proof(
+                    proof, mutual_restored.facts(), mutual_sqlite_rules,
+                    expected_conclusion=proof["conclusion"],
+                    fact_lookup=mutual_restored._proof_fact_is_present)
+                require(verified.valid,
+                        "SQLite mutual-recursion proof failed verification: "
+                        f"{verified.reason}")
         mutual_restored.close()
 
     print("Indexed variable inference diagnostic: PASS")
