@@ -254,9 +254,14 @@ def show_generated_code_evidence(result: GeneratedCode) -> str:
                       if row.get("source_id") else " [Source not recorded]")
             labeler = (f" [Declared labeler: {row['labeler_id']}]"
                        if row.get("labeler_id") else " [Labeler not recorded]")
+            wording_source = (
+                " [Instruction source (labeler-selected; semantic relation "
+                f"unchecked): {row['instruction_source_id']}]"
+                if row.get("instruction_source_id")
+                else " [Instruction source not recorded]")
             lines.append(
                 f"'{row['phrase']}': {row['input']} -> {row['output']}"
-                f"{source}{labeler}")
+                f"{source}{labeler}{wording_source}")
     elif result.domain == "list_math_map":
         for row in result.evidence_details:
             if "input" in row:
@@ -265,9 +270,14 @@ def show_generated_code_evidence(result: GeneratedCode) -> str:
                 labeler = (f" [Declared labeler: {row['labeler_id']}]"
                            if row.get("labeler_id")
                            else " [Labeler not recorded]")
+                wording_source = (
+                    " [Instruction source (labeler-selected; semantic relation "
+                    f"unchecked): {row['instruction_source_id']}]"
+                    if row.get("instruction_source_id")
+                    else " [Instruction source not recorded]")
                 lines.append(
                     f"'{row['phrase']}': {row['input']} -> {row['output']}"
-                    f"{source}{labeler}")
+                    f"{source}{labeler}{wording_source}")
             elif row.get("kind") == "grounded_number":
                 lines.append(
                     f"Grounded number '{row['phrase']}' = {row['value']} "

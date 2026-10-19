@@ -30,17 +30,26 @@ UNIQUE_DOC = (
 REVERSE_DOC = (
     ">>> for i in reversed(range(1, 10, 2)):\n"
     "...     print(i)\n...\n9\n7\n5\n3\n1")
+SORT_PROSE = (
+    "A simple ascending sort is very easy: just call the sorted() function.")
+UNIQUE_PROSE = "Returns the sorted unique elements of an array."
+REVERSE_PROSE = (
+    "To loop over a sequence in reverse, first specify the sequence in a "
+    "forward direction and then call the reversed() function.")
 SOURCES = (
     ("python-sort", "Python Sorting HOWTO",
      "https://docs.python.org/3/howto/sorting.html",
-     "sort the list", SORT_DOC, [5, 2, 3, 1, 4], [1, 2, 3, 4, 5]),
+     "sort the list", SORT_DOC, SORT_PROSE,
+     [5, 2, 3, 1, 4], [1, 2, 3, 4, 5]),
     ("numpy-unique", "NumPy: numpy.unique",
      "https://numpy.org/doc/stable/reference/generated/numpy.unique.html",
-     "remove duplicate values", UNIQUE_DOC, [1, 2, 6, 4, 2, 3, 2],
+     "remove duplicate values", UNIQUE_DOC, UNIQUE_PROSE,
+     [1, 2, 6, 4, 2, 3, 2],
      [1, 2, 3, 4, 6]),
     ("python-reverse", "Python Tutorial: Data Structures",
      "https://docs.python.org/3/tutorial/datastructures.html",
-     "reverse the list", REVERSE_DOC, [1, 3, 5, 7, 9], [9, 7, 5, 3, 1]),
+     "reverse the list", REVERSE_DOC, REVERSE_PROSE,
+     [1, 3, 5, 7, 9], [9, 7, 5, 3, 1]),
 )
 COMPOUNDS = (
     ("sort the list then reverse the values", ("sort", "reverse")),
@@ -99,8 +108,9 @@ def apply_sequence(values: list[int], operations: tuple[str, ...]
 
 
 def citation_for(index: CRMSResearchIndex, source: tuple
-                 ) -> str:
-    document_id, title, location, _instruction, text, inputs, outputs = source
+                 ) -> tuple[str, str]:
+    (document_id, title, location, _instruction, text, prose,
+     _inputs, _outputs) = source
     index.add_document(document_id, title, text, location)
     query = "reversed" if "reversed(" in text else (
         "unique" if "unique(" in text else "sorted")
@@ -110,7 +120,18 @@ def citation_for(index: CRMSResearchIndex, source: tuple
     citation = index.citation(hit)
     require(index.resolve_citation(citation) == text,
             f"citation did not resolve to exact example {document_id}")
-    return citation
+    prose_document_id = document_id + "-instruction"
+    index.add_document(prose_document_id, title + " instruction prose",
+                       prose, location)
+    prose_hit = next((hit for hit in index.search(
+        prose, limit=10, context_chars=0)
+        if hit.document_id == prose_document_id), None)
+    require(prose_hit is not None,
+            f"retrieval missed instruction prose {prose_document_id}")
+    prose_citation = index.citation(prose_hit)
+    require(index.resolve_citation(prose_citation) == prose,
+            f"instruction citation did not resolve exactly: {prose_document_id}")
+    return citation, prose_citation
 
 
 def launch(root: Path, lines: list[str]) -> subprocess.CompletedProcess[str]:
@@ -141,14 +162,18 @@ def main() -> None:
 
         index = CRMSResearchIndex()
         source_citations = {}
+        instruction_citations = {}
         teaching = []
         for source in SOURCES:
-            document_id, _title, _location, phrase, _text, inputs, outputs = source
-            citation = citation_for(index, source)
+            (document_id, _title, _location, phrase, _text, _prose,
+             inputs, outputs) = source
+            citation, instruction_citation = citation_for(index, source)
             source_citations[phrase] = citation
+            instruction_citations[phrase] = instruction_citation
             teaching.append(
                 f"/teach-rule {phrase}|{','.join(map(str, inputs))}|"
-                f"{','.join(map(str, outputs))}|{citation}|codex:labeler-v1")
+                f"{','.join(map(str, outputs))}|{citation}|codex:labeler-v1|"
+                f"{instruction_citation}")
             # The source pair is only one demonstration and is often
             # underdetermined. Add an attributed set of varied examples and a
             # contrast that helps separate the intended operation.
@@ -175,7 +200,7 @@ def main() -> None:
                     "reverse the values": "reverse the list"}[phrase]
                 == source[3])
             citation = source_citations[supporting_source[3]]
-            source_input, source_output = supporting_source[5:7]
+            source_input, source_output = supporting_source[6:8]
             teaching.append(
                 f"/teach-rule {phrase}|{','.join(map(str, source_input))}|"
                 f"{','.join(map(str, source_output))}|{citation}|codex:labeler-v1")
@@ -226,7 +251,10 @@ def main() -> None:
                     f"Codex-authored examples were mislabeled as sourced: {phrase}")
             require(all(record.get("labeler_id") == "codex:labeler-v1"
                         for record in records),
-                    f"declared labeler attribution was lost: {phrase}")
+                    f"declared labeler attribution was lost: {phrase}: {records!r}")
+            require(any(record.get("instruction_source_id")
+                        == instruction_citations[phrase] for record in records),
+                    f"instruction prose citation was lost: {phrase}")
 
         artifact = generate_python(learned, HELD_OUT_TEXT)
         require(artifact is not None, "no standalone composition was generated")
@@ -260,6 +288,17 @@ def main() -> None:
                 "user-facing evidence omitted a component citation")
         require("[Declared labeler: codex:labeler-v1]" in evidence,
                 "user-facing evidence omitted declared labeler attribution")
+        used_instruction_citations = {
+            instruction_citations[phrase]
+            for phrase in artifact.evidence_phrases
+            if phrase in instruction_citations
+        }
+        require(used_instruction_citations
+                and all(f"[Instruction source (labeler-selected; "
+                        f"semantic relation unchecked): {citation}]" in evidence
+                        for citation in used_instruction_citations),
+                "user-facing evidence omitted instruction-source citations: "
+                + repr(evidence))
 
         replay = launch(root, [answer])
         require(replay.returncode == 0
@@ -278,7 +317,7 @@ def main() -> None:
                 "chat generated code with an unsupported middle operation: "
                 + repr(generated_lines))
 
-    print("three operation examples resolved to official-source citations: PASS")
+    print("code-pair and instruction-prose citations resolve independently: PASS")
     print("unique rule sorts distinct values on a non-monotonic input: PASS")
     print("chat composed unique→sort→reverse on four held-out lists: PASS")
     print("generated artifact kept component citations and passed checks: PASS")

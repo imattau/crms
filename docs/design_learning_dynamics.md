@@ -723,20 +723,28 @@ independent publishers or origins.
 Each example can also retain a separate `labeler_id`, supplied through
 `CRMSModel.teach(..., labeler_ids=...)` or the optional fifth `/teach-rule`
 field. This records who supplied the instruction-to-example association,
-separately from the document that contains the input/output pair. Generated
-artifact provenance and its evidence view retain both fields. Labeler IDs are
-declared metadata: they do not validate the mapping, raise confidence, count as
-independent sources, or change rule search. Older memories load with an
-unrecorded labeler (`labeler_id=None`); CRMS does not guess who supplied a
-historical example. Memories without source metadata load with `source_id=None`.
-Source IDs identify origin only: they do not establish source independence,
-truth, or rule validity, and they do not affect candidate search or licensing.
+separately from the document that contains the input/output pair. A third
+optional `instruction_source_id` can cite prose the labeler selected as support
+for the instruction wording. It is supplied through
+`CRMSModel.teach(..., instruction_source_ids=...)` or the sixth `/teach-rule`
+field. Generated artifact provenance and its evidence view retain all three
+fields separately. The CLI verifies that both citations resolve; it verifies
+the code citation against the numeric pair, but does not semantically validate
+that prose supports the instruction. Labeler IDs and instruction-source
+citations do not raise confidence, count as independent sources, or change
+rule search. Older memories load with an unrecorded labeler
+(`labeler_id=None`) and wording citation (`instruction_source_id=None`); CRMS
+does not guess either. Memories without pair-source metadata load with
+`source_id=None`. Source IDs identify origin only: they do not establish
+source independence, truth, or rule validity.
 
 The initial runtime check uses fixture IDs and demonstrates only persistence,
 artifact traceability, and a held-out composition. It is not yet a transfer
-result from independent natural-language documents. `/teach-rule` now accepts
-an optional exact source citation and verifies that it resolves in the active
-index and demonstrates the exact input/output list pair before storing it.
+result from independent natural-language documents. `/teach-rule` accepts an
+exact pair citation, a declared labeler, and an optional separate
+instruction-source citation. It verifies that citations resolve in the active
+index, and verifies that the pair citation demonstrates the exact input/output
+list pair before storing them.
 The citation checker accepts the explicit list-pair form and a deliberately
 small, non-executing AST subset of Python/NumPy doctests (`sorted`, `np.sort`,
 `np.unique`, `np.flip`, `list(reversed(...))`, and reverse slicing over literal

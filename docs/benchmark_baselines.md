@@ -1666,7 +1666,7 @@ must retain its own citation or the generated artifact loses that component's
 lineage. The cited NumPy example now uses a non-monotonic input, so the
 source-backed pair itself distinguishes sorted-unique from stable-unique.
 
-## Rule-example labeler provenance (2026-10-20)
+## Procedure evidence and labeler provenance (2026-10-20)
 
 Commands:
 
@@ -1677,20 +1677,24 @@ python3 run_experiments.py --match 301 --match 428 --match 429 --match 430 \
 python3 run_experiments.py --match 177 --match 208 --match 223 --timeout 300
 ```
 
-Each procedure example can retain a `labeler_id` independently of its
-`source_id`. `/teach-rule` accepts an optional fifth field for the declared
-labeler; older chat forms record `user`, while old memories and direct API
-calls without attribution remain explicitly unknown. The distinction survives
-retry, JSON and SQLite round trips, generated-code provenance, and the readable
-artifact-evidence view. Forget removes the attribution with the associated
-examples. The loader rejects malformed or misaligned metadata and never
-invents a labeler for legacy records.
+Each procedure example can retain a code-pair `source_id`, an optional prose
+`instruction_source_id`, and a declared `labeler_id`. `/teach-rule` accepts the
+instruction citation as a sixth field; earlier command forms remain compatible
+and default the labeler to `user`. The three fields survive retry, JSON and
+SQLite round trips, generated-code provenance, and the readable artifact view.
+Forget removes them with the associated examples. The loader rejects malformed
+or misaligned metadata and leaves old memories unlabelled.
 
-Runtime result: the eight provenance, citation, and recombination experiments
-passed, followed by three primitive-learning regressions (11/11). The
-composition experiment labels Codex-authored examples `codex:labeler-v1`, so
-the artifact distinguishes those labels from the cited document and from a
-user-reviewed contrast. A labeler ID is a declared attribution only: CRMS does
-not authenticate the actor, use the ID to select rules, treat it as evidence,
-or count it as an independent source. The natural-language link between the
-source prose and instruction remains teacher supplied and unverified.
+`v1_433` carries exact citations for an executable pair and for source prose
+selected to support the instruction. It tests a paraphrase with no matching
+wording citation and confirms the citation is not inherited from a different
+phrase. `v1_434` checks mixed metadata, JSON/SQLite persistence, legacy memory,
+and malformed-input controls. The complete focused regression set passed:
+8/8 provenance/citation/recombination diagnostics and 3/3 primitive-learning
+diagnostics (11/11 total). `py_compile` and `git diff --check` also passed.
+
+These fields improve auditability; they do not independently validate the
+meaning link. The labeler declaration is not authenticated, neither labeler nor
+wording citation changes rule selection, and none of these records count as
+independent-source evidence. The natural-language mapping is still a reviewed
+teacher judgment, not autonomous induction.

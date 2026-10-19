@@ -224,8 +224,9 @@ HELP = """Commands:
                  teach a sourced counterfactual question frame
   /teach-counterfactual-path-question Q|REL1>REL2|START|TARGET|SOURCE[|KEY=VALUE...]
                  teach a frame that varies both endpoints and source
-  /teach-rule I|INPUT CSV|OUTPUT CSV[|SOURCE CITATION[|LABELER ID]]
-                 teach one example; record source and labeler separately
+  /teach-rule I|INPUT CSV|OUTPUT CSV[|PAIR CITATION|LABELER ID[|INSTRUCTION CITATION]]
+                 retain code evidence, wording evidence, and labeler separately
+                 leave PAIR CITATION empty to provide wording evidence alone
   /retry-rule I   rerun stored demonstrations under current rule bounds
   Try to learn the rule for INSTRUCTION
                  rerun stored examples in ordinary CRMS language
@@ -7670,13 +7671,13 @@ def main() -> int:
             continue
         if line.startswith("/teach-rule "):
             fields = [value.strip() for value in line[len("/teach-rule "):].split("|")]
-            if len(fields) not in {3, 4, 5} or not fields[0]:
-                print("Use: /teach-rule INSTRUCTION|INPUT INTEGER CSV|OUTPUT INTEGER CSV[|SOURCE CITATION[|LABELER ID]]")
+            if len(fields) not in {3, 4, 5, 6} or not fields[0]:
+                print("Use: /teach-rule INSTRUCTION|INPUT INTEGER CSV|OUTPUT INTEGER CSV[|PAIR CITATION|LABELER ID[|INSTRUCTION CITATION]]")
                 continue
             try:
                 inputs = _parse_integer_list(fields[1], allow_empty=True)
                 outputs = _parse_integer_list(fields[2], allow_empty=True)
-                labeler_id = fields[4] if len(fields) == 5 else "user"
+                labeler_id = fields[4] if len(fields) >= 5 else "user"
                 if not labeler_id:
                     raise ValueError("provide a declared labeler ID")
                 if len(fields) == 4 and not fields[3]:
@@ -7690,9 +7691,18 @@ def main() -> int:
                         raise ValueError(
                             "source citation does not contain this exact input/output pair")
                     source_ids = [fields[3]]
+                instruction_source_ids = [None]
+                if len(fields) == 6:
+                    if not fields[5]:
+                        raise ValueError(
+                            "provide an instruction-source citation after the labeler ID")
+                    index.resolve_citation(fields[5])
+                    instruction_source_ids = [fields[5]]
                 learned = rules.teach(fields[0], [(inputs, outputs)],
                                       source_ids=source_ids,
-                                      labeler_ids=[labeler_id])
+                                      labeler_ids=[labeler_id],
+                                      instruction_source_ids=
+                                          instruction_source_ids)
                 rules.save(args.rules)
                 pending_rule = (
                     (fields[0], learned.contrastive_input)
@@ -7709,6 +7719,9 @@ def main() -> int:
                     print("The cited text demonstrates this exact numeric pair; "
                           "CRMS has not independently checked that its wording "
                           "licenses the instruction.")
+                if instruction_source_ids[0] is not None:
+                    print("Recorded instruction-source citation selected by "
+                          "the labeler; semantic support has not been assessed.")
             except ValueError as error:
                 print(f"Could not teach rule: {error}")
             continue
