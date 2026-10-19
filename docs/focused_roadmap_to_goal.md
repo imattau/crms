@@ -301,6 +301,110 @@ runtime experiment, then run the relevant regression subset. Commit only the
 slice's files. Avoid broad corpus expansion until the retrieval and answer
 selection metrics improve.
 
+### Overall alignment review (2026-10-20)
+
+The project remains on track toward its stated goal, with an important
+qualification: it has built a credible inspectable substrate, not yet an
+integrated broad language system. The goal and the priority order still fit the
+evidence. In particular, recombination and learned-rule transfer must remain a
+central capability test; reasoning must remain proof-checked and reachable
+through ordinary language; and dialogue/contextual intent is a first-class
+research area rather than a polish task. The portable SQLite model is an
+enabler for distribution and learning, not the project outcome by itself.
+
+The main planning correction is to sequence by integration risk. Recent chat
+driving found that short follow-ups and named topic switches can work, while an
+unresolved “it” can bind to the wrong entity after a topic switch; source-only
+turns can lose usable context; and “why?” can explain a stale answer. These are
+more urgent than expanding the dialogue-move pilot. Likewise, the recent large
+corpus audit found that volume exposes retrieval and language failures rather
+than fixing them. Fix and measure answer selection before adding more corpus.
+
+The working tree currently contains ongoing changes in `crms_chat.py` and
+`crms_research.py`, plus a user-edited audit report and untracked experiments.
+Treat those as in-progress inputs: inspect their ownership and scope, run their
+focused checks, and do not fold them into a roadmap commit. Preserve the stale
+dialogue-state file and feedback database. The FTS contentless-index work needs
+old/new layout, rebuild, update/delete, and retrieval-parity checks before it
+can count as a storage improvement.
+
+### Immediate sequence
+
+1. **Freeze the current checkpoint.** Inspect the in-progress dialogue and
+   research-index diffs and the untracked `v1_411`, `v1_412`, `v1_414`, and
+   `v1_418` experiments. Run each in its documented scratch mode. Record which
+   are user-authored and which are implementation work; do not overwrite or
+   stage user material. For the storage change, compare legacy and contentless
+   indexes across create, reopen, search, replacement, deletion, and clean
+   rebuild. Keep the portable-model source-text and knowledge round trip as a
+   separate release contract.
+
+2. **Close the dialogue correctness loop in actual chat.** Add full-session
+   regression cases for the reported Eiffel/Colosseum pronoun switch, “and
+   [entity]?” after source-only evidence, context retention after unanswered or
+   review-only turns, and “why?” after a topic change. Require paragraph/entity
+   grounding for pronoun-led source sentences; update context from the current
+   turn even when it is source-only; and bind explanations to the latest
+   answer, not an earlier successful one. Include the already-working short
+   follow-ups and explicit named switches as controls.
+
+   **Gate:** the whole transcript passes through a fresh CLI process with no
+   wrong-entity citations, stale explanations, or lost valid context. A source
+   quote remains distinct from accepted knowledge.
+
+3. **Make end-to-end composition the next capability milestone.** Use one
+   source-disjoint benchmark grid to test learned components, induced rules,
+   argument roles, ordering, values, and unseen combinations through natural
+   language. Pair each success with a near-miss and unsupported-middle-step
+   case. Capture the composed output or proof, independently validate it, and
+   recover its complete component and source lineage. Do not let corpus growth,
+   candidate counts, or a single successful demo stand in for transfer.
+
+   **Gate:** at least one held-out unseen composition succeeds through chat;
+   contrastive controls abstain; and the result survives save, load, and
+   portable-model distribution without losing rule status or provenance.
+
+4. **Advance governed self-learning and reasoning together, but keep their
+   evidence roles separate.** First test derivation as proposal → independent
+   verification → stored derived case. Exercise duplicate suppression,
+   dependency correction/invalidation, and retrieval weighting against taught
+   evidence. In parallel, route ordinary-language questions to the verified
+   reasoning engine and preserve unknown, negative, conflict, missing-premise,
+   and incomplete-search distinctions. Add cycle/integrity regressions and
+   proof explanations only where the tests demonstrate a gap.
+
+   **Gate:** derived cases cannot validate themselves; changed premises make
+   descendants stale; chat and direct inference agree; and no cycle or search
+   limit is rendered as an unqualified positive or negative.
+
+5. **Develop contextual intent and dialogue after state correctness is
+   stable.** Keep user act, task intent, context conditions, and discourse
+   state explicit and separate from factual knowledge. Continue the bounded
+   source-disjoint move pilot with the authorized Codex labeling, but first
+   measure candidate quality and compare against the deterministic baseline.
+   Promote a frame only if held-out conversations show better task progress or
+   fewer unhelpful turns without more inappropriate actions.
+
+6. **Broaden math, coding, translation, and writing through the same natural
+   language interface.** Expand one validated request family at a time, each
+   with ordinary paraphrases, negative cases, a task-specific validator, and
+   multi-turn repair. Prioritize compositions across learned components over
+   nominal domain coverage. Mark generated creative content separately from
+   evidence-backed claims.
+
+7. **Run a release-shaped evaluation.** Query the portable model from a clean
+   location with no external source files. Measure accuracy, wrong answers,
+   abstention, omitted parts, context handling, proof/source validity,
+   recombination transfer, derived-memory behavior, latency, memory, and model
+   size per capability. Compare interaction breadth qualitatively with the
+   70B-class reference; do not require a live model run or claim parity without
+   representative evidence.
+
+**Progress rule:** treat each milestone as evidence about a specific
+capability. The project is ready to claim broader progress only when held-out
+natural-language tasks compose across knowledge, rules, reasoning, and dialogue
+without trading away traceability or honest uncertainty.
+
 ### 1. Lock down end-to-end correctness
 
 First turn the latest dialogue and natural-language findings into repeatable
