@@ -63,7 +63,10 @@ def infer_open_question_slot(prompt: str, answer_kind: str) -> str:
                 "is that right", "is that correct", "that's right",
                 "that's correct", "that's tonight", "that's today",
                 "that's tomorrow", "that's at ", "that's for ",
-                "so i have", "correct?", "right?")):
+                "so i have", "correct?", "right?", "should i book",
+                "shall i book", "should i make the reservation",
+                "should i place the reservation",
+                "do you want me to book", "would you like me to book")):
             return "confirmation"
         return "yes_no"
     if any(cue in text for cue in (

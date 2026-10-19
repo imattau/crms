@@ -7,8 +7,9 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from crms_conversation import classify_user_intent, respond
-from crms_dialogue import CRMSDialogue, infer_open_question_slot
+from crms_conversation import (
+    classify_user_intent, is_open_yes_no_prompt, respond)
+from crms_dialogue import CRMSDialogue, DialogueTurn, infer_open_question_slot
 from crms_knowledge import CRMSKnowledgeBase
 
 
@@ -130,6 +131,93 @@ def main() -> None:
     require(confirmation is not None and confirmation.dialogue_act == "confirm"
             and confirmation.task_intent == "make-reservation",
             f"confirmation was collapsed into a generic clarification: {confirmation}")
+    live_booking_confirmation = CRMSDialogue(CRMSKnowledgeBase())
+    live_booking_confirmation.active_task_intent = "make-reservation"
+    live_booking_confirmation.open_dialogue_question = {
+        "prompt": "Should I book this now?", "answer_kind": "yes-no",
+        "expected_slot": infer_open_question_slot("Should I book this now?", "yes-no"),
+    }
+    booking_turn = respond(live_booking_confirmation, "Yes, please.")
+    require(booking_turn.intent_hypothesis is not None
+            and booking_turn.intent_hypothesis.dialogue_act == "confirm"
+            and booking_turn.intent_hypothesis.task_intent == "make-reservation"
+            and live_booking_confirmation.open_dialogue_question is None,
+            "live booking confirmation was not typed as a confirmation")
+    live_summary_prompt = CRMSDialogue(CRMSKnowledgeBase())
+    live_summary_prompt.turn = lambda text, **_kwargs: DialogueTurn(
+        "clarify", text, text,
+        text="So I have a reservation for 5 people at 8pm tonight.")
+    respond(live_summary_prompt, "Can you help me with this booking?")
+    require(live_summary_prompt.open_dialogue_question is not None
+            and live_summary_prompt.open_dialogue_question["answer_kind"] == "yes-no"
+            and live_summary_prompt.open_dialogue_question["expected_slot"]
+            == "confirmation",
+            "a declarative booking summary was not saved as a confirmation prompt")
+    require(is_open_yes_no_prompt("And you said for two people?")
+            and is_open_yes_no_prompt("Sure, did you need a reservation?")
+            and is_open_yes_no_prompt("Great that's tonight?")
+            and is_open_yes_no_prompt(
+                "Did you have any restaurant preferences? For example, "
+                "outdoor seating, full bar, etc.")
+            and is_open_yes_no_prompt(
+                "So I have a reservation for 5 people at 8pm tonight.")
+            and infer_open_question_slot("Should I book this now?", "yes-no")
+            == "confirmation",
+            "contextual yes/no and booking-confirmation prompts were not typed")
+
+    reservation_need = classify(
+        "Sure, did you need a reservation?", "yes_no", "seek-information",
+        "Yes.", answer_kind="yes-no")
+    require(reservation_need is not None
+            and reservation_need.dialogue_act == "answer-clarification"
+            and reservation_need.task_intent == "make-reservation",
+            f"affirmative reservation need did not enter the booking task: {reservation_need}")
+    live_reservation_need = CRMSDialogue(CRMSKnowledgeBase())
+    live_reservation_need.active_task_intent = "seek-information"
+    live_reservation_need.open_dialogue_question = {
+        "prompt": "Sure, did you need a reservation?",
+        "answer_kind": "yes-no", "expected_slot": "yes_no",
+    }
+    reservation_turn = respond(live_reservation_need, "Yes.")
+    require(reservation_turn.intent_hypothesis is not None
+            and reservation_turn.intent_hypothesis.task_intent == "make-reservation"
+            and live_reservation_need.active_task_intent == "make-reservation"
+            and live_reservation_need.open_dialogue_question is None,
+            "live affirmative reservation answer did not change the active task")
+    reservation_declined = classify(
+        "Sure, did you need a reservation?", "yes_no", "seek-information",
+        "No, not a reservation.", answer_kind="yes-no")
+    require(reservation_declined is not None
+            and reservation_declined.task_intent == "continue-current-task",
+            f"declining a reservation incorrectly started booking: {reservation_declined}")
+
+    bare_preference_yes = classify(
+        "Did you have any restaurant preferences?", "yes_no", "seek-information",
+        "Yes.", answer_kind="yes-no")
+    require(bare_preference_yes is not None
+            and bare_preference_yes.decision == "ambiguous"
+            and bare_preference_yes.matched_frame == "yes-without-preference-details",
+            "a bare yes to a preference question was accepted without preference values")
+    live_preference_yes = CRMSDialogue(CRMSKnowledgeBase())
+    live_preference_yes.active_task_intent = "seek-information"
+    live_preference_yes.open_dialogue_question = {
+        "prompt": "Did you have any restaurant preferences?",
+        "answer_kind": "yes-no", "expected_slot": "yes_no",
+    }
+    preference_clarification = respond(live_preference_yes, "Yes.")
+    require(preference_clarification.status == "clarify"
+            and preference_clarification.text
+            == "What restaurant preferences should I use?"
+            and live_preference_yes.open_dialogue_question is not None
+            and live_preference_yes.open_dialogue_question["prompt"]
+            == "What restaurant preferences should I use?",
+            "live dialogue did not ask for the values behind a bare preference yes")
+    bare_preference_no = classify(
+        "Did you have any restaurant preferences?", "yes_no", "seek-information",
+        "No.", answer_kind="yes-no")
+    require(bare_preference_no is not None
+            and bare_preference_no.task_intent == "continue-current-task",
+            "a bare no to a preference question did not preserve the current task")
     rejection = classify("Are you sure?", "confirmation", "continue-current-task",
                          "No.", answer_kind="yes-no")
     require(rejection is not None and rejection.dialogue_act == "reject",
@@ -176,6 +264,9 @@ def main() -> None:
     print("missing task evidence retains the conservative continuation label: PASS")
     print("explicit yes/no confirmation and rejection use distinct acts: PASS")
     print("confirmation rejection opens a correction-detail question: PASS")
+    print("transcript question typing distinguishes booking offers and confirmations: PASS")
+    print("reservation yes/no answers update task intent according to polarity: PASS")
+    print("bare preference answers request details or continue without inventing values: PASS")
 
 
 if __name__ == "__main__":

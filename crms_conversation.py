@@ -58,6 +58,9 @@ _AFFIRMATIVE_DETAIL_RE = re.compile(
     r"^(?:yes|yeah|yep|yup|sure)[, ]+(?:i(?:'d| would| want| prefer| need)\b|"
     r"we(?:'d| would| want| prefer| need)\b|one\s+that\b|something\s+that\b|"
     r"with\b|and\b)", re.IGNORECASE)
+_NEGATIVE_DETAIL_RE = re.compile(
+    r"^(?:no|nope|nah|not really)\b(?:[, ]+(?P<detail>.+))?[.!? ]*$",
+    re.IGNORECASE)
 _CORRECTION_RE = re.compile(
     r"^(?:(?:no|nope|sorry)[,.!]?\s+)?(?:i\s+meant|i\s+mean)\s+"
     r"(?P<entity>\S.*?)[?!. ]*$", re.IGNORECASE)
@@ -151,8 +154,21 @@ _CANCEL_FOLLOWUP_RE = re.compile(
 _WH_QUESTION_RE = re.compile(
     r"^(?:who|whom|whose|what|which|when|where|why|how)\b", re.IGNORECASE)
 _YES_NO_QUESTION_RE = re.compile(
-    r"^(?:am|is|are|was|were|do|does|did|has|have|had|can|could|will|would|"
-    r"shall|should|may|might)\b.+\?\s*$", re.IGNORECASE)
+    r"^(?:(?:okay|ok|sure|great|and|so|well)[, ]+)*(?:(?:am|is|are|was|were|"
+    r"do|does|did|has|have|had|can|could|will|would|shall|should|may|might)"
+    r"\b.+|you said\b.+|(?:so\s+)?i have\b.+|that(?:['’]s| is)\b.+)"
+    r"\?(?:\s+(?:for example|for instance|e\.g\.).*)?\s*$",
+    re.IGNORECASE)
+_CONFIRMATION_STATEMENT_RE = re.compile(
+    r"^(?:(?:okay|ok|sure|great|and|so)[, ]+)*so i have\b.+$",
+    re.IGNORECASE)
+
+
+def is_open_yes_no_prompt(text: str) -> bool:
+    """Recognize yes/no questions and reservation summaries awaiting approval."""
+    stripped = text.strip()
+    return bool(_YES_NO_QUESTION_RE.fullmatch(stripped)
+                or _CONFIRMATION_STATEMENT_RE.fullmatch(stripped))
 
 
 def _elaboration_topic_reply(text: str) -> re.Match[str] | None:
@@ -483,6 +499,8 @@ def _open_question_task_intent(dialogue: CRMSDialogue,
         return "change-reservation"
     if (re.search(r"\b(?:book|booking)\b", prompt)
             or (re.search(r"\bmake\b", prompt)
+                and re.search(r"\breserv(?:ation|ations)\b", prompt))
+            or (re.search(r"\b(?:need|want)\b", prompt)
                 and re.search(r"\breserv(?:ation|ations)\b", prompt))):
         return "make-reservation"
 
@@ -656,6 +674,7 @@ def classify_user_intent(
                              is not None)
         social_act = classify_act(text)
         expected_yes_no = open_question["answer_kind"] == "yes-no"
+        is_negative_answer = _NEGATIVE_DETAIL_RE.fullmatch(text.strip()) is not None
         if (expected_yes_no
                 and _AFFIRMATIVE_DETAIL_RE.match(text.strip())
                 and not is_fresh_question):
@@ -670,6 +689,44 @@ def classify_user_intent(
                                         "awaiting_yes_no_answer",
                                         "restaurant_preference_prompt"),
                     selected_value=text.strip(),
+                )
+        if (expected_yes_no
+                and open_question.get("expected_slot") != "confirmation"
+                and is_negative_answer):
+            prompt_task = _open_question_task_intent(dialogue, open_question)
+            if prompt_task in {"make-reservation", "provide-constraint"}:
+                return UserIntentHypothesis(
+                    dialogue_act="answer-clarification",
+                    task_intent="continue-current-task",
+                    decision="selected",
+                    matched_frame="negative-answer-to-task-question",
+                    context_predicates=("pending_assistant_question",
+                                        "awaiting_yes_no_answer"),
+                    selected_value=text.strip(),
+                )
+        if (expected_yes_no and is_yes_no
+                and open_question.get("expected_slot") != "confirmation"):
+            prompt_task = _open_question_task_intent(dialogue, open_question)
+            if prompt_task == "provide-constraint":
+                if text.strip().casefold().startswith("no"):
+                    return UserIntentHypothesis(
+                        dialogue_act="answer-clarification",
+                        task_intent="continue-current-task",
+                        decision="selected",
+                        matched_frame="no-additional-preferences",
+                        context_predicates=("pending_assistant_question",
+                                            "restaurant_preference_prompt"),
+                        selected_value=text.strip(),
+                    )
+                return UserIntentHypothesis(
+                    dialogue_act="answer-clarification",
+                    task_intent=None,
+                    decision="ambiguous",
+                    matched_frame="yes-without-preference-details",
+                    context_predicates=("pending_assistant_question",
+                                        "restaurant_preference_prompt"),
+                    alternatives=("provide the restaurant preferences",
+                                  "continue without additional preferences"),
                 )
         if is_yes_no and not expected_yes_no:
             slot = open_question.get("expected_slot", "detail")
@@ -837,6 +894,7 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         intent is not None and (
             intent.matched_frame == "elaboration-topic-slot"
             or intent.matched_frame == "yes-no-response-to-detail-question"
+            or intent.matched_frame == "yes-without-preference-details"
             or (intent.decision == "selected"
                 and intent.dialogue_act in {
                     "answer-clarification", "provide-information",
@@ -863,12 +921,14 @@ def respond(dialogue: CRMSDialogue, text: str, *,
               and intent.dialogue_act in {"confirm", "reject"}
               and dialogue.open_dialogue_question is not None):
             dialogue.open_dialogue_question = None
-        elif (turn.status == "clarify" and turn.text.rstrip().endswith("?")
+        elif (turn.status == "clarify"
+              and (turn.text.rstrip().endswith("?")
+                   or _CONFIRMATION_STATEMENT_RE.fullmatch(turn.text.strip()))
               and dialogue.open_dialogue_question is None
               and not dialogue.offers and dialogue.pending_result is None
               and dialogue.pending_binding is None):
-            answer_kind = ("yes-no" if _YES_NO_QUESTION_RE.fullmatch(
-                turn.text.strip()) else "detail")
+            answer_kind = ("yes-no" if is_open_yes_no_prompt(turn.text)
+                           else "detail")
             expected_slot = infer_open_question_slot(
                 turn.text.strip(), answer_kind)
             if expected_slot in dialogue.session_slots:
@@ -1000,6 +1060,13 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             "social", text, text,
             text=(f"Got it: {value}. I’ll treat that as your reply to my "
                   f"question: {prompt}")))
+
+    if (intent is not None
+            and intent.matched_frame == "yes-without-preference-details"):
+        dialogue.open_dialogue_question = None
+        return with_intent(DialogueTurn(
+            "clarify", text, text,
+            text="What restaurant preferences should I use?"))
 
     if (intent is not None
             and intent.matched_frame == "yes-no-response-to-detail-question"

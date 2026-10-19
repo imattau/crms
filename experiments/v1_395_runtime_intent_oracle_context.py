@@ -16,7 +16,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from crms_conversation import _YES_NO_QUESTION_RE, classify_user_intent
+from crms_conversation import classify_user_intent, is_open_yes_no_prompt
 from crms_dialogue import CRMSDialogue, infer_open_question_slot
 from crms_dialogue_intent import CRMSDialogueIntentModel
 from crms_knowledge import CRMSKnowledgeBase
@@ -44,8 +44,7 @@ def make_dialogue(row: dict[str, str], active_task: str | None,
         prompt = assistant_turns[-1] if assistant_turns else ""
         answer_kind = "yes-no" if state == "awaiting-confirmation" else "detail"
         if question_type_from_prompt:
-            answer_kind = ("yes-no" if _YES_NO_QUESTION_RE.fullmatch(prompt.strip())
-                           else "detail")
+            answer_kind = ("yes-no" if is_open_yes_no_prompt(prompt) else "detail")
         dialogue.open_dialogue_question = {
             "prompt": prompt[:512], "answer_kind": answer_kind,
             "expected_slot": infer_open_question_slot(prompt, answer_kind),
