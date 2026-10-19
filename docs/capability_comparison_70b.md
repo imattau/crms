@@ -89,10 +89,12 @@ These results are component evidence, not a single overall capability score:
   sequence with a second formula that returns exact fractions. It also checks
   deterministic provenance, refusal when either stage lacks support, a polite
   natural-language function request, and chat explanation/evidence follow-ups.
+  The connective transfers to a new remove-duplicates→sort pair before math is
+  applied.
   It also checks that stage-specific failures suggest the right next step and
   that an explanation after a failed generation does not reuse stale code.
-  This demonstrates reuse across two
-  cross-domain combinations, not the planning breadth or interaction
+  This demonstrates bounded reuse across a small cross-product, not the
+  planning breadth or interaction
   flexibility of a 70B+ model.
 - `v1_350` and `v1_351` test direct-edge preference and verified proof
   explanations. The explanation set achieved 31/31 verified and round-tripped

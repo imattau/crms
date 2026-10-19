@@ -45,8 +45,10 @@ composition provenance, checks both component artifacts and four composed
 probes, and answers a polite function request followed by explanation and
 evidence questions. The same learned sequence also composes with `x divided by 2`,
 preserving exact `Fraction` outputs and the second formula's provenance.
-Missing list or math support abstains. This checks two formula crossings with
-one learned sequence, not arbitrary task planning or broader coding parity.
+It also transfers the learned connective to the unseen `remove duplicate
+values then sort` pair before applying exact division. Missing list or math
+support abstains. This checks a small cross-product of learned sequence and
+math stages, not arbitrary task planning or broader coding parity.
 The chat response now identifies whether the unsupported component is the
 list procedure or math expression, suggests a matching teaching/rephrasing
 step, and clears stale generated-code context so an explanation follow-up

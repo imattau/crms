@@ -42,17 +42,29 @@ def require(condition: bool, message: str) -> None:
 
 def sequence(values: list[int], first: str, second: str) -> list[int]:
     def apply(items: list[int], operation: str) -> list[int]:
-        return sorted(items) if operation == "sort" else list(reversed(items))
+        if operation == "sort":
+            return sorted(items)
+        if operation == "reverse":
+            return list(reversed(items))
+        if operation == "unique":
+            return list(dict.fromkeys(items))
+        raise ValueError(f"unknown operation: {operation}")
     return apply(apply(values, first), second)
 
 
 def trained_rules() -> CRMSModel:
     model = CRMSModel(max_composition_depth=2, max_workers=1)
     base = (("sort the list", "sort"), ("reverse the list", "reverse"),
-            ("sort the values", "sort"), ("reverse the values", "reverse"))
+            ("sort the values", "sort"), ("reverse the values", "reverse"),
+            ("remove duplicate values", "unique"))
     for phrase, operation in base:
-        outputs = [sorted(values) if operation == "sort"
-                   else list(reversed(values)) for values in (*INPUTS, CONTRAST)]
+        if operation == "sort":
+            outputs = [sorted(values) for values in (*INPUTS, CONTRAST)]
+        elif operation == "reverse":
+            outputs = [list(reversed(values)) for values in (*INPUTS, CONTRAST)]
+        else:
+            outputs = [list(dict.fromkeys(values))
+                       for values in (*INPUTS, CONTRAST)]
         learned = model.teach(phrase, list(zip((*INPUTS, CONTRAST), outputs)))
         require(learned.status == "learned",
                 f"base list operation failed to learn: {phrase}: {learned}")
@@ -137,6 +149,24 @@ def main() -> None:
                 ["expression_artifact_id"]
                 == rational_namespace["MATH_MAP_PROVENANCE"]["expression_artifact_id"],
             "division composition lost exact fractions or math lineage")
+    unseen_pair_request = (
+        "remove duplicate values then sort the list then apply x divided by 2 "
+        "to each value")
+    unseen_pair_artifact = generate_list_then_math_python(
+        rules, math, unseen_pair_request)
+    require(unseen_pair_artifact is not None,
+            "learned connective did not compose a new list operation pair "
+            "with the math stage")
+    unseen_pair_namespace: dict[str, object] = {}
+    exec(compile(unseen_pair_artifact.source,
+                 "<crms-cross-domain-unseen-pair>", "exec"),
+         unseen_pair_namespace)
+    require(unseen_pair_namespace["transform"]([4, 1, 4, 2])
+            == [Fraction(1, 2), Fraction(1), Fraction(2)]
+            and unseen_pair_namespace["validate_examples"]()
+            and "remove duplicate values"
+                in unseen_pair_artifact.evidence_phrases,
+            "unseen list-pair composition returned wrong output or lost evidence")
     evidence = show_generated_code_evidence(artifact)
     require("learned list procedure" in describe_generated_code(artifact)
             and "Generated composed Python" in render(artifact, REQUEST)
@@ -207,6 +237,8 @@ def main() -> None:
           "abstention: PASS")
     print("same learned sequence recombined with a second formula; exact "
           "fractional output and lineage: PASS")
+    print("learned connective transferred to a new list-operation pair before "
+          "exact division: PASS")
     print("natural-language chat generation, explanation, and evidence: PASS")
 
 
