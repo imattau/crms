@@ -320,6 +320,40 @@ The sequence below is the near-term queue. Keep each cycle small enough to
 review, reproduce, and commit independently. Dialogue stays active alongside
 the core capability work; it is not deferred until the end.
 
+**Current next slice — make topic switches safe across source-only turns.**
+The latest user-driven chat review shows that short follow-ups and explicitly
+named topic changes work in the tested corpus, but a pronoun-led source sentence
+can still bind to the wrong entity after a switch. Source-only answers also
+need to preserve usable context without leaving `why?` attached to an older
+answer. Treat this as a correctness issue before adding more dialogue coverage.
+
+1. Freeze the full Rome/Paris and Eiffel Tower/Colosseum transcripts as
+   end-to-end regressions, including the known-good follow-ups and named
+   switches.
+2. Bind pronoun-led evidence to the active entity using local discourse
+   evidence (such as its paragraph or explicit entity anchor); if ownership is
+   ambiguous, ask or abstain instead of choosing whichever entity happens to
+   have a supported answer.
+3. Separate context retention from answer status. Preserve source-only topic
+   context while its citations are valid; update or clear the explanation
+   target on every turn so `why?` never explains a previous topic after a new
+   unresolved turn.
+4. Add the reported elliptical switches (“and Italy?”, “and the Colosseum?”),
+   question-history requests (“what did I just ask?”), and ordinal references
+   (“the first one”) as explicit probes. Implement only the smallest behavior
+   supported by the discourse state; otherwise clarify or abstain.
+5. Keep the code-structure review findings separate from behavior fixes.
+   Refactor `turn()` or the resolver only when the regression boundary yields
+   clearer, independently testable stages without changing established
+   routing behavior.
+
+**Gate:** the complete transcript passes through a fresh chat process; no
+pronoun-led evidence is attributed to a different active entity; a source-only
+answer remains followable while its evidence is available; and `why?` targets
+the latest answer or says there is no current answer to explain. Existing
+short follow-ups, named switches, and abstentions remain intact. Record the
+tested commit and do not infer broad dialogue competence from these cases.
+
 **Cycle 1 — Re-pin the integrated baseline and close one user-visible failure.**
 Run the selected scorecard from a clean scratch location on a recorded commit,
 then add the newest user-reported dialogue transcripts to it. First verify
