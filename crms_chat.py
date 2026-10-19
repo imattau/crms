@@ -14,7 +14,8 @@ from typing import Any
 from crms_dialogue import CRMSDialogue
 from crms_explain import render_verified_explanation
 from crms_codegen import (
-    describe_generated_code, generate_math_python, generate_python,
+    describe_generated_code, generate_mapped_math_python,
+    generate_math_python, generate_python,
     generate_unit_conversion_python, natural_language_request,
     render as render_codegen, show_generated_code_evidence,
 )
@@ -8404,6 +8405,10 @@ def main() -> int:
         if code_instruction is not None:
             generated_code = generate_python(rules, code_instruction)
             if generated_code is None:
+                generated_code = generate_mapped_math_python(
+                    math_model, code_instruction,
+                    grounded_cardinals=rules.grounded_cardinal_phrases())
+            if generated_code is None:
                 generated_code = generate_math_python(
                     math_model, code_instruction,
                     grounded_cardinals=rules.grounded_cardinal_phrases())
@@ -9523,7 +9528,8 @@ def main() -> int:
         why_question = bool(re.match(r"\s*why\b", line, flags=re.IGNORECASE))
         why_evidence = None
         why_route_used = False
-        if (why_question and turn.status in {"unknown", "sources_found"}
+        if (why_question and not explanation_followup
+                and turn.status in {"unknown", "sources_found"}
                 and not (turn.response is not None
                          and turn.response.status in {"answered", "ambiguous"})
                 and not (turn.response is not None

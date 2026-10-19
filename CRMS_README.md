@@ -4572,6 +4572,17 @@ supported. The generated function retains those examples and checks the same
 arithmetic bound as CRMS. Scalar-expression generation accepts only licensed operators
 and integer arguments. These code-generation paths do not cover arbitrary
 programs or unit-bearing algebra and abstain on unsupported requests.
+The scalar math path now composes with list code generation through
+`generate_mapped_math_python`: “Write Python code to apply x times x plus 3 to
+each value in the list” emits a bounded `transform(list[int])` function. It
+reuses the exact scalar evaluator rather than parsing or rewriting the formula
+as new math. The outer artifact records the scalar artifact ID, learned
+operator examples, list contract, and exact list probes; exact division keeps
+`Fraction` outputs. Units, extra variables, unsupported operators, bools, and
+lists longer than 10,000 are refused. This is elementwise math→code composition,
+not general program generation. `experiments/v1_356_grounded_math_list_composition.py`
+checks the artifact and ordinary-language chat, including explanation and
+evidence follow-ups.
 After generating code in the current chat session, a user can ask “Explain that
 code” or “What does it do?” to inspect its learned operation, aligned examples,
 and recorded parity checks. The explanation is rendered from the typed artifact

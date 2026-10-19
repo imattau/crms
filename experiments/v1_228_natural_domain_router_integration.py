@@ -170,13 +170,16 @@ def main() -> None:
                 "The mission used the Sojourner rover to study rocks.",
                 "Retracted that source's support; other citations remain.",
                 "Retracted the final source support; the fact is no longer stored.",
-                "I don't know this from the sources and facts I have. "
-                "Add a source or teach the fact.",
+                "I understand the 'likes' question frame, but have no accepted "
+                "fact for 'alice'. Tell me the fact or point me to a source.",
                 "There is no previous grounded answer to explain yet."):
             require(expected in run.stdout,
                     f"natural-language route missed {expected!r}:\n{run.stdout}")
         require(run.stdout.count("Answer: tea.") == 2,
                 "Why? reused an answer after its final source was retracted")
+        require("I found topic matches, but no retrieved sentence states a cause."
+                not in run.stdout,
+                "Why? after an unanswered query fell through to corpus-wide cause search")
         require(run.stdout.count("Generated Python for 'reverse the list'") == 2,
                 "explicit Python task wording did not reach grounded code generation")
         require(run.stdout.count("Bonjour, Rowan.") >= 2,

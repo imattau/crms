@@ -16,6 +16,21 @@ head-to-head score still requires a pinned model/runtime on the same held-out
 tasks and context. Report component results and unsupported cases separately;
 make no parity claim.
 
+## Grounded math-to-list-code composition
+
+Command: `python3 experiments/v1_356_grounded_math_list_composition.py`
+
+The experiment learns exact `times` and `plus` operators from two examples
+each. A natural-language code request maps `x times x plus 3` over integer-list
+values. The generated standalone artifact returns `[19, 19, 7]` for
+`[4, 4, 2]`; its exact scalar expression artifact, operator examples, list
+contract, and four elementwise parity probes are retained in provenance. A
+separate `x / 2` map preserves exact `Fraction` results. Unsupported operators,
+extra variables, units, scalar-only formulas, booleans, and oversized lists
+produce no usable map artifact or are rejected by its input contract. The
+terminal path supports code generation, explanation, and evidence follow-up.
+This is a bounded elementwise math→code composition, not general coding.
+
 ## Elliptical entity-switch follow-up
 
 Command: `python3 experiments/v1_161_dialogue_demonstratives.py`

@@ -217,6 +217,13 @@ def describe_generated_code(result: GeneratedCode) -> str:
                 f"{result.validation_cases} exact-output probes. This validates "
                 f"the emitted expression against those probes. Artifact id: "
                 f"{result.provenance_id}.")
+    if result.domain == "math_map":
+        return ("The generated function applies the learned exact math "
+                "expression independently to each integer in the input list. "
+                f"Its operator wording is supported by "
+                f"{result.evidence_examples} aligned examples; the combined "
+                f"artifact passed {result.validation_cases} list probes. "
+                f"Artifact id: {result.provenance_id}.")
     if result.domain == "unit":
         descriptor = result.procedure[0]
         return (f"The function converts {descriptor['source_unit']} to "
@@ -239,7 +246,7 @@ def show_generated_code_evidence(result: GeneratedCode) -> str:
         for row in result.evidence_details:
             lines.append(
                 f"'{row['phrase']}': {row['input']} -> {row['output']}")
-    elif result.domain == "math":
+    elif result.domain in {"math", "math_map"}:
         for row in result.evidence_details:
             if row.get("kind") == "grounded_number":
                 lines.append(
@@ -642,6 +649,163 @@ def generate_math_python(
     )
 
 
+def generate_mapped_math_python(
+        model: CRMSMath, instruction: str, *,
+        grounded_cardinals: dict[
+            tuple[str, ...], tuple[int, tuple[str, ...]]] | None = None
+        ) -> GeneratedCode | None:
+    """Compose a learned exact scalar expression over each integer in a list.
+
+    The expression must use exactly the variable ``x`` and no units. The
+    scalar expression is independently rendered by ``generate_math_python``;
+    the list wrapper adds a fixed input contract and exact parity probes.
+    """
+    patterns = (
+        re.compile(
+            r"\s*(?:please\s+)?apply\s+(.+?)\s+to\s+each\s+"
+            r"(?:integer|number|value|item)(?:\s+in\s+(?:the\s+)?"
+            r"(?:list|input))?\s*[.!?]*\s*", re.IGNORECASE),
+        re.compile(
+            r"\s*(?:please\s+)?map\s+(.+?)\s+over\s+each\s+"
+            r"(?:integer|number|value|item)(?:\s+in\s+(?:the\s+)?"
+            r"(?:list|input))?\s*[.!?]*\s*", re.IGNORECASE),
+    )
+    expression = None
+    for pattern in patterns:
+        match = pattern.fullmatch(instruction)
+        if match is not None:
+            expression = match.group(1).strip()
+            break
+    if not expression:
+        return None
+    scalar = generate_math_python(
+        model, expression, grounded_cardinals=grounded_cardinals)
+    if scalar is None:
+        return None
+    try:
+        scalar_ast = ast.parse(scalar.source)
+        scalar_provenance = next(
+            ast.literal_eval(statement.value)
+            for statement in scalar_ast.body
+            if isinstance(statement, ast.Assign)
+            and any(isinstance(target, ast.Name)
+                    and target.id == "CRMS_PROVENANCE"
+                    for target in statement.targets))
+    except (SyntaxError, StopIteration, ValueError, TypeError):
+        return None
+    if not isinstance(scalar_provenance, dict):
+        return None
+
+    question = expression.strip()
+    if not re.match(r"^(?:what\s+is|how\s+much\s+is|calculate|compute)\b",
+                    question, flags=re.IGNORECASE):
+        question = f"What is {question}?"
+    expression_tokens = model._expression_tokens(question)
+    if expression_tokens is None:
+        return None
+    parser = _ExpressionParser(model, expression_tokens,
+                               grounded_cardinals or {})
+    try:
+        node = parser.parse()
+    except ValueError:
+        return None
+    if (not isinstance(node, (MathBinary, MathLiteral, MathVariable))
+            or _math_node_variables(node) != {"x"}):
+        return None
+
+    def contains_unit(value: Any) -> bool:
+        if isinstance(value, MathLiteral):
+            return value.unit is not None
+        return (isinstance(value, MathBinary)
+                and (contains_unit(value.left) or contains_unit(value.right)))
+
+    if contains_unit(node):
+        return None
+
+    validation_inputs = ([], [0], [1, -1, 2], [4, 4, -1])
+    validation_cases = []
+    for values in validation_inputs:
+        outputs = [_evaluate_math_node(node, {"x": value}) for value in values]
+        validation_cases.append({
+            "input": list(values),
+            "output": [[value.numerator, value.denominator]
+                       for value in outputs],
+        })
+    descriptor = {
+        "operation": "map_exact_math_expression",
+        "variable": "x",
+        "expression": _math_node_descriptor(node),
+        "input_type": "list[int]",
+        "output_type": "list[exact rational]",
+    }
+    provenance = {
+        "schema": "crms-math-map-code-provenance-v1",
+        "requested_instruction": instruction.strip(),
+        "expression_artifact_id": scalar.provenance_id,
+        "scalar_artifact_provenance": scalar_provenance,
+        "expression": _math_node_descriptor(node),
+        "descriptor": descriptor,
+        "evidence_phrases": list(scalar.evidence_phrases),
+        "evidence_details": list(scalar.evidence_details),
+        "validation_cases": validation_cases,
+        "bounds": {"maximum_list_length": 10_000,
+                   "integer_bits": 4096},
+    }
+    provenance_id = "crms-code-v1-" + hashlib.sha256(
+        json.dumps(provenance, sort_keys=True, separators=(",", ":"),
+                   ensure_ascii=False).encode("utf-8")).hexdigest()
+    provenance["artifact_id"] = provenance_id
+    source = scalar.source.replace(
+        "CRMS-generated standalone implementation of a learned math expression.",
+        "CRMS-generated standalone list mapping over a learned math expression.",
+        1).replace(
+        "def validate_examples() -> bool:",
+        "def validate_math_examples() -> bool:", 1)
+    if source == scalar.source:
+        return None
+    source = re.sub(
+        r"^CRMS_PROVENANCE = .*?$",
+        "CRMS_PROVENANCE = " + repr(provenance), source,
+        count=1, flags=re.MULTILINE)
+    source += (
+        "\n\nMAP_VALIDATION_CASES = " + repr(validation_cases) + "\n\n"
+        "def transform(values: list[int]) -> list[int | Fraction]:\n"
+        '    """Apply the exact learned expression to every integer value."""\n'
+        "    if not isinstance(values, list) or len(values) > 10000:\n"
+        "        raise TypeError('values must be a list of at most 10000 integers')\n"
+        "    if any(not isinstance(value, int) or isinstance(value, bool)\n"
+        "           for value in values):\n"
+        "        raise TypeError('values must contain only integers')\n"
+        "    return [compute(x=value) for value in values]\n\n"
+        "def validate_examples() -> bool:\n"
+        '    """Check scalar and list behavior against exact math evaluation."""\n'
+        "    if not validate_math_examples():\n"
+        "        return False\n"
+        "    for row in MAP_VALIDATION_CASES:\n"
+        "        expected = [Fraction(numerator, denominator)\n"
+        "                    for numerator, denominator in row['output']]\n"
+        "        actual = [Fraction(value) for value in transform(row['input'])]\n"
+        "        if actual != expected:\n"
+        "            return False\n"
+        "    return True\n"
+    )
+    try:
+        ast.parse(source)
+        namespace: dict[str, Any] = {"__name__": "crms_generated"}
+        exec(compile(source, "<crms-math-map-generated>", "exec"), namespace)
+        if not namespace["validate_examples"]():
+            return None
+    except (SyntaxError, TypeError, ValueError, OverflowError, ZeroDivisionError):
+        return None
+    return GeneratedCode(
+        instruction=instruction.strip(), source=source,
+        evidence_examples=scalar.evidence_examples,
+        validation_cases=len(validation_cases), procedure=(descriptor,),
+        evidence_phrases=scalar.evidence_phrases,
+        provenance_id=provenance_id, domain="math_map",
+        evidence_details=scalar.evidence_details)
+
+
 def generate_unit_conversion_python(
         model: CRMSMath, instruction: str) -> GeneratedCode | None:
     """Render a source-backed unit ratio as an exact standalone function."""
@@ -833,6 +997,14 @@ def render(result: GeneratedCode | None, instruction: str) -> str:
                 f"parity checked on {result.validation_cases} scalar inputs). "
                 f"The standalone source records its expression and "
                 f"provenance id {result.provenance_id}:\n\n"
+                f"```python\n{result.source}```")
+    if result.domain == "math_map":
+        return (f"Generated exact-arithmetic list-mapping Python for "
+                f"'{result.instruction}' using learned evidence from {sources} "
+                f"({result.evidence_examples} operator examples; exact list "
+                f"parity checked on {result.validation_cases} probes). The "
+                f"artifact retains the scalar expression provenance and its "
+                f"composition record, id {result.provenance_id}:\n\n"
                 f"```python\n{result.source}```")
     if result.domain == "unit":
         return (f"Generated exact Python conversion for '{result.instruction}' "

@@ -1,10 +1,14 @@
 # Roadmap: natural-language math, coding, and translation
 
-**Status:** staged. CRMS has working, bounded natural-language paths for exact
-arithmetic and simple equations (`crms_math.py`), example-grounded translation
-and rewriting (`crms_translation.py`), and Python rendering for learned list
-procedures (`crms_codegen.py`). These are domain-specific prototypes, not broad
-competence. The shared evaluation and coverage work below remains open.
+**Status:** staged, with a first checked math→code composition implemented.
+CRMS has working, bounded natural-language paths for exact arithmetic and
+simple equations (`crms_math.py`), example-grounded translation and rewriting
+(`crms_translation.py`), and Python rendering for learned list procedures
+(`crms_codegen.py`). `generate_mapped_math_python` now composes one licensed
+exact scalar expression over each integer in a bounded list, and chat accepts
+a natural-language code request for that task. These remain domain-specific
+prototypes, not broad competence; the shared evaluation and cross-domain
+coverage work below remains open.
 
 **Goal:** users should reach each capability through the same natural-language
 chat interface used for knowledge and reasoning. A command or structured form
@@ -108,6 +112,19 @@ After each domain has stable individual checks, evaluate bounded compositions:
   operation and types are explicit;
 - explain a computed or generated result using the underlying proof or
   operation trace.
+
+The first math→code slice is implemented in
+`generate_mapped_math_python` and checked by
+`experiments/v1_356_grounded_math_list_composition.py`. It parses a scalar
+expression with the existing exact math grammar, requires exactly one integer
+variable (`x`), refuses units and unsupported operators, then applies the
+verified scalar function to each item of a bounded integer list. Its
+standalone artifact carries the scalar expression's evidence and artifact ID,
+an outer composition record, exact-rational list probes, and input bounds.
+The CLI exposes the task through “Write Python code to apply x times x plus 3
+to each value in the list”, then supports the existing code explanation and
+evidence follow-ups. This establishes only an elementwise map composition;
+translation→math/code and other cross-domain task structures remain untested.
 
 Each composition must retain the lineage of every contributing frame, rule,
 fact, and intermediate result. If one stage is unsupported, the whole result
