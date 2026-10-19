@@ -179,7 +179,8 @@ examples.
    instruction labels, induced rule, and validator outcomes as separate
    artifacts. Use complete-document holdout, unseen compositions, independent
    wording, near misses, and an independent output checker. The current
-   phrase-grid and `unique → sort → reverse` results are controls, not the
+   phrase-grid and the revised `stable unique → sort → reverse` result are
+   controls, not the
    target evidence: the former is synthetic; the latter still depends on
    teacher-authored connective evidence and sparse operation examples.
 
@@ -384,14 +385,14 @@ misses, missing steps, and unsupported compositions. Record source IDs,
 example lineage, validation split, and the rule's tested scope. Test the full
 path through chat and generated artifacts.
 
-`v1_433_document_sourced_procedure_composition.py` is a new stepping stone:
-three operation examples are cited to official Python/NumPy documentation,
-and a learned `unique → sort → reverse` artifact passes four held-out lists
-through chat and a fresh process. It preserves component citations and refuses
-an unsupported middle step. The contrast examples and sequence connective are
-Codex-authored, and there is only one source numeric pair per operation. It
-does not meet the source-disjoint transfer gate; the next round must improve
-the source example yield and test independent natural-language formulations.
+`v1_433_document_sourced_procedure_composition.py` is a stepping stone: the
+revised `stable unique → sort → reverse` artifact passes four held-out lists
+through chat and a fresh process, and ablation confirms that every stage affects
+the tested outputs. Sort and reverse have cited code pairs; stable-unique
+examples are Codex-labeled and linked to Python dictionary-ordering semantics.
+The contrast examples, instruction mappings, and sequence connective remain
+teacher-attributed. The test still lacks complete-document holdout and does not
+meet the source-disjoint transfer gate.
 
 Keep source demonstration, teacher attribution, rule induction, and output
 validation separate. A citation proving an input/output pair does not by

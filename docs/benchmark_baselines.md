@@ -1704,23 +1704,27 @@ Command: `python3 experiments/v1_433_document_sourced_procedure_composition.py`.
 The chat learns numeric sort, sorted-unique, and reverse procedures using one
 exact numeric code example cited to each official documentation source, plus
 Codex-authored contrast examples. It also learns the `then` sequence connective
-from separate Codex-authored examples. The held-out natural-language request
-composes `unique → sort → reverse`; its generated Python passes four separate
-lists, preserves all three source citations, reproduces after a fresh chat
-restart, and refuses an unsupported `encrypt` middle step. A standalone
-non-monotonic input also confirms that the unique component sorts its distinct
-values, rather than preserving their first-seen order.
+from separate Codex-authored examples. The initial held-out composition was
+`unique → sort → reverse`. An ablation check found that NumPy's sorted-unique
+operation made the sort stage redundant: removing `sort` left all held-out
+outputs unchanged. That original result was therefore not strong evidence that
+all three stages had recombined.
 
-Runtime result: all checks passed. The sources are Python and NumPy
-documentation (two publisher origins), but each operation has only one cited
-numeric example. Additional examples and the connective are teacher-attributed;
-the source pair checker verifies the code/result pair, not that source prose
-licenses the natural-language instruction. This is a source-cited,
+The experiment now composes `stable unique → sort → reverse`. Stable-unique
+examples are explicitly Codex-labeled and linked to Python's documented
+insertion-order semantics; the docs do not themselves state the natural-language
+instruction mapping. Sort and reverse retain exact cited code pairs. Each of
+the three non-empty held-out lists changes when any one stage is removed; the
+empty list remains an unchanged control.
+Chat-generated Python passes those lists, preserves the citations and labeler
+attribution, reproduces after a fresh chat restart, and refuses an unsupported
+`encrypt` middle step.
+
+Runtime result: all checks passed. This remains a source-cited,
 teacher-guided composition result, not source-only induction or broad coding
-competence. It also exposed that the wording variant used by a composition
-must retain its own citation or the generated artifact loses that component's
-lineage. The cited NumPy example now uses a non-monotonic input, so the
-source-backed pair itself distinguishes sorted-unique from stable-unique.
+competence. The component examples, connective, and instruction mappings are
+not held out by complete document, so this still does not meet the
+source-disjoint transfer gate.
 
 ## Procedure evidence and labeler provenance (2026-10-20)
 
