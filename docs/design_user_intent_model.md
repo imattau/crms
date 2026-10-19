@@ -254,14 +254,16 @@ learning-path diagnostic, not a quality result: all examples are from train conv
 labels have one annotator, and exact-surface repetition does not demonstrate paraphrase transfer.
 `experiments/v1_393_evaluate_dialogue_intent_candidates.py` checks candidate matching on disjoint
 dev conversations and rejects train/evaluation conversation overlap. Two provisional, Codex-labeled
-dev conversations (27 turns) yielded 2 unique candidate matches (7.4% coverage); both matched the
-primary labels, and 25 turns had no candidate. The specific held-out “Two people” reservation reply
+four dev conversations (48 classifiable turns; two additional turns were marked uncertain) yielded
+2 unique candidate matches (4.2% coverage); both matched the primary labels, and 46 turns had no
+candidate. The specific held-out “Two people” reservation reply
 no longer matches the search-constraint candidate after active-task conditioning; the runtime
 open-question path can still classify it from the selected reservation task. The synthetic
 `experiments/v1_394_task_specific_intent_context.py` verifies that the same surface can resolve to
 `provide-constraint` during search and `make-reservation` during booking. These are label-agreement
 and controlled-context checks, not accuracy claims: the dev sample is small and uses the same
-annotator as training.
+annotator as training. The low exact-match coverage makes slot-template or broader frame induction
+the next language-generalization requirement; promoting these candidates would not solve it.
 
 Once a frame has provenance-recorded training and held-out labels, store it in a versioned `dialogue`
 memory inside the portable SQLite model. Codex may produce the primary labels for both splits under
