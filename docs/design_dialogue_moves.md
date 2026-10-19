@@ -1,9 +1,10 @@
 # Research direction: explicit dialogue moves
 
 **Status:** research proposal; no dialogue-move induction or move store is implemented.
-**Relationship to** [design_conversation.md](design_conversation.md): that document proposes the
-near-term conversation layer and places learned acts late in its delivery order. This note records a
-more ambitious, auditable route for that later work.
+**Relationship to** [design_conversation.md](design_conversation.md): that document describes the
+conversation layer and its current baseline. Dialogue is an active research priority alongside
+recombination, self-learning rules, and reasoning; this note records the auditable move-learning
+track, which remains unimplemented.
 
 ## Claim
 
@@ -58,8 +59,11 @@ corpus and still be wrong to use in the current state.
 
 ## Bounded experiment
 
-Run this only after the near-term dispatcher and discourse-state work in
-`design_conversation.md` has a stable baseline:
+The current baseline is sufficient to begin a dialogue pilot: content-free turns avoid retrieval,
+source-only names can be retained as referents across a restart after citation revalidation, and
+ambiguous follow-ups request a named choice. The pilot should build on that measured baseline rather
+than wait for a complete conversation architecture. Keep it scoped so it can reveal whether learned
+moves add value over the current explicit handlers.
 
 - Choose one bounded domain and a licensed, documented corpus; do not mix subtitles, forums, and
   support transcripts as if they represented one policy.
@@ -96,5 +100,9 @@ abstention.
 
 CRMS has a small set of explicit conversation handlers and typed evidence/referent behavior; these
 are useful baselines, not examples of corpus-induced dialogue moves. Source-quoted names retained by
-the dialogue layer are candidate referents only and are not accepted facts. A follow-up must still
-be supported by the existing answer path or lead to a clarification request.
+the dialogue layer are candidate referents only and are not accepted facts. They persist only when
+their citation resolves against the currently loaded index. A follow-up must still be supported by
+the existing answer path or lead to a clarification request. The immediate research step is to
+compare this baseline with human-labeled, source-disjoint move frames in one explicitly selected
+domain, then decide from coverage, appropriateness, abstention, and annotation cost whether Path B
+deserves further implementation.
