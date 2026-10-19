@@ -61,9 +61,11 @@ These results are component evidence, not a single overall capability score:
   records zero wrong near-misses in its fixed set, but that is not a general
   safety guarantee.
 - `v1_327_paraphrase_benchmark_nl_layer.py`: the language layer raised
-  development accuracy from 45/78 to 73/78, held-out accuracy from 28/45 to
-  44/45, and unseen-set accuracy from 26/44 to 42/44, with zero wrong answers
-  on those sets. Its controlled refusal checks also abstained on all negatives.
+  development accuracy from 50/78 to 73/78, held-out accuracy from 31/45 to
+  44/45, and unseen-set accuracy from 29/44 to 42/44, with zero wrong answers
+  on those sets in the current runtime. Its controlled refusal checks also
+  abstained on all negatives. These remain benchmark-wrapper results, not a
+  70B comparison or a claim about production chat coverage.
 - `v1_242_grounded_recombination_benchmark.py`: learned components recombine
   successfully in a structured grid at larger example counts (16/16 at k=8
   and 8/16 at k=12); all controlled negatives abstained and no wrong answers

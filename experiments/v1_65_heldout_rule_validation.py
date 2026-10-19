@@ -228,7 +228,10 @@ def main() -> None:
                 or "Accepted validated rule parent-transitivity" not in process.stdout
                 or "2 independent sources" not in process.stdout
                 or "parent-transitivity [validated]" not in process.stdout
-                or "Derived: Nia — ancestor → Pia." not in process.stdout):
+                or "Nia — ancestor → Pia" not in process.stdout
+                or "Because Nia — parent → Oren and Oren — parent → Pia, "
+                    "Nia — ancestor → Pia (rule parent-transitivity)."
+                    not in process.stdout):
             raise SystemExit(f"CLI review/accept/use flow failed:\n{process.stdout}")
         saved = json.loads(knowledge_path.read_text(encoding="utf-8"))
         if len(saved.get("inference_rules", [])) != 1:
