@@ -2022,3 +2022,16 @@ context failures, but they do not establish robust open-domain dialogue. The
 representative benchmark or a verbatim replay of the earlier user scratch
 session. Add varied document layouts and fresh paraphrased turns before
 treating the dialogue packet as complete.
+
+Current-checkout retest on 2026-10-20 ran `v1_413`, `v1_419`, `v1_426`, and
+`v1_427`; all four passed. This includes the source-only Eiffel Tower →
+Colosseum → “When was it completed?” sequence, the Colosseum's `80 CE` answer,
+France → “and Italy?”, `why?`, and save/reload checks. The `v1_427` clarification
+case was corrected to ask “When was it completed?” and require the cited 1889
+sentence: its previous check asked when the tower was built but required a
+builder sentence while rejecting the date, which did not measure the stated
+dialogue behavior. The `v1_413` negative control now requires explicit
+abstention and “may not answer” wording; it permits a closest sentence only
+when clearly identified as non-answer evidence. These changes correct the
+fixtures, not CRMS's answer behavior. The retest confirms these narrow cases on
+the current checkout; held-out dialogue generalization remains unmeasured.

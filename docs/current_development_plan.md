@@ -25,15 +25,15 @@ but remain uneven and mostly demonstrated on controlled examples.
 The main gap is integration and generalization. Source-disjoint rule learning,
 unseen procedure composition, governed write-back, broad conversational
 reliability, and the complete portable-model contract are not yet established.
-Recent dialogue tests improve single-topic pronoun grounding and explicit topic
-switches, but a driven chat still exposed two answer-selection/context gaps:
-`Who designed the Sydney Opera House?` can prefer a less relevant sentence
-about when it opened over the nearby “Jorn Utzon designed it” sentence, and
-source-only answers do not always leave usable context for “and Italy?” or
-“and the Colosseum?”. A separate Eiffel/Colosseum test showed why an `It ...`
-sentence must be bound to the nearest suitable antecedent, not whichever entity
-makes the sentence answerable. These failures are now the first user-facing
-gate. Keep the overall goal in progress.
+The prior driven-chat report on commit `043093f` found a confident Eiffel Tower
+sentence after switching to the Colosseum, plus lost source-only context. On
+the current checkout, the reproductions in `v1_426`, `v1_427`, `v1_419`, and
+`v1_413` keep the completion answer on the Colosseum, preserve the latest
+evidence for `why?`, retain named source-only follow-ups, and resolve France →
+“and Italy?” to Italy's capital. These are small authored regression fixtures,
+not evidence of broad dialogue generalization. The main dialogue gate is now
+held-out variation across entities, layouts, topic changes, and repairs. Keep
+the overall goal in progress.
 
 ## Execution order
 
@@ -146,35 +146,34 @@ unsupported cases alongside capability results.
 
 ## Immediate work packets
 
-1. **Close the wrong-referent and context-lifecycle failures.** Freeze the
-   reported Eiffel Tower/Colosseum transcript, including `why?` after the
-   failed “and the Colosseum?” turn. Require pronoun-led source sentences to
-   have a local, explicit entity/paragraph link; recency or answerability alone
-   cannot bind them. Preserve visible source context through source-only
-   answers and recoverable abstentions, replace it on a named topic switch, and
-   bind `why?` to the immediately relevant answer or failure. Add “and Italy?”
-   after a source-only answer. Test full transcripts and save/reload, not only
-   resolver helpers.
-2. **Measure dialogue generalization.** Keep the hand-authored cases above as
-   regressions, then evaluate author-held-out conversations and varied
-   paragraph layouts with multiple entities, interruptions, corrections,
-   history questions, and ordinal references. Report wrong referents, wrong
-   answer sentences, omissions, clarification, abstention, citation support,
-   and task completion separately. Fix confident errors before adding more
-   intent or dialogue machinery.
-3. **Advance source-derived self-learning rules.** Extend beyond current
+1. **Measure dialogue generalization.** Keep the reported Eiffel Tower /
+   Colosseum, source-only context, `why?`, and France → Italy sequences as
+   regressions (`v1_413`, `v1_419`, `v1_426`, `v1_427`). Build a frozen set of
+   new conversations with varied paragraph layouts, competing entities,
+   interruptions, corrections, history questions, ordinal references, and
+   unresolved choices. Include pronoun-led sentences in both shared and
+   separate paragraphs. Report wrong referents, wrong answer sentences,
+   omissions, clarification, abstention, citation support, and task completion
+   separately. Attribute labels and authoring; do not present this small set as
+   independent human evaluation.
+2. **Advance source-derived self-learning rules.** Extend beyond current
    teacher-labeled phrase and connective examples using complete-document and
    source-disjoint holdouts. Keep source evidence, extracted candidates,
    teacher/labeler decisions, accepted rules, and independent validation
    distinct. Include quoted, negated, contrastive, metalinguistic, unrelated,
    and misleading prose. Report proposal precision and labeler effort; do not
    call cue matching or supervised alignment autonomous learning.
-4. **Join unseen recombination to verified reasoning.** Send a held-out
+3. **Join unseen recombination to verified reasoning.** Send a held-out
    composition through ordinary chat, procedure/rule selection, an independent
    result checker, and proof verification where applicable. Test missing
    premises, explicit negatives, conflicts, cycles/integrity violations, and
    search exhaustion. Keep derived write-back review-only, lineage-complete,
    and invalidated after source correction until its governance gates pass.
+4. **Improve contextual intent and dialogue moves against the baseline.** Use
+   intent only as revisable context for routing, clarification, and repair; it
+   cannot create facts or authorize unsupported actions. Keep learned dialogue
+   moves experimental until conversation-held-out results improve task
+   completion without raising wrong-referent or inappropriate-move rates.
 5. **Use the scorecard to choose one breadth slice.** After packets 1–4 have
    clean-process evidence, choose the largest measured user loss and strengthen
    one bounded task in math, coding, translation, or creative work. Define

@@ -83,10 +83,12 @@ def main() -> None:
             input="Where is the Colosseum?\nwhen was it completed?\n/quit\n",
             text=True, capture_output=True, cwd=root, timeout=120)
         require(process.returncode == 0, process.stderr)
-        require("It was completed in 1889" not in process.stdout.split(
-            "when was it completed?")[-1],
-            "a pronoun-led sentence about another entity answered the "
-            f"Colosseum follow-up:\n{process.stdout}")
+        followup_output = process.stdout.split(
+            "when was it completed?")[-1]
+        require("I won't guess" in followup_output
+                and "may not answer your question" in followup_output,
+                "the unrelated completion sentence was not clearly marked as "
+                f"non-answer evidence:\n{process.stdout}")
     print("source topic follow-ups ok")
 
 

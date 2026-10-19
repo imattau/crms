@@ -42,7 +42,7 @@ TRANSCRIPT = (
     "What did I just ask?",
     "The first one",
     "Who designed the Analytical Engine?",
-    "When was it built?",
+    "When was it completed?",
     "What about the Eiffel Tower?",
     "When was it completed?",
     "What is the capital of France?",
@@ -105,9 +105,9 @@ def main() -> None:
     recovered = turns[18]
     require(recovered.status == "sources_found"
             and recovered.resolved_question
-                == "When was the Eiffel Tower built?"
-            and "The tower was designed and built by Gustave Eiffel" in recovered.text
-            and "1889" not in recovered.text
+                == "When was the Eiffel Tower completed?"
+            and "1889" in recovered.text
+            and "Gustave Eiffel" not in recovered.text
             and recovered.research is not None
             and recovered.research.source_sentences,
             f"named entity did not fill the open pronoun clarification: {recovered!r}")
@@ -123,28 +123,28 @@ def main() -> None:
 
     # The pending entity slot is a one-step clarification, not a sticky mode.
     interrupted = CRMSDialogue(CRMSKnowledgeBase())
-    respond(interrupted, "When was it built?", research_index=index)
+    respond(interrupted, "When was it completed?", research_index=index)
     respond(interrupted, "Tell me a joke", research_index=index)
     after_interruption = respond(
         interrupted, "What about the Eiffel Tower?", research_index=index)
     require(after_interruption.status == "unknown"
             and after_interruption.resolved_question
-                != "When was the Eiffel Tower built?",
+                != "When was the Eiffel Tower completed?",
             f"an unrelated turn left a stale entity clarification open: {after_interruption!r}")
     lowercase_reply = CRMSDialogue(CRMSKnowledgeBase())
-    respond(lowercase_reply, "When was it built?", research_index=index)
+    respond(lowercase_reply, "When was it completed?", research_index=index)
     lowercase_recovered = respond(
         lowercase_reply, "what about the eiffel tower?", research_index=index)
     require(lowercase_recovered.resolved_question
-                == "When was the Eiffel Tower built?"
+                == "When was the Eiffel Tower completed?"
             and lowercase_recovered.status == "sources_found",
             f"lowercase entity reply did not resolve against the index: {lowercase_recovered!r}")
     bare_confirmation = CRMSDialogue(CRMSKnowledgeBase())
-    respond(bare_confirmation, "When was it built?", research_index=index)
+    respond(bare_confirmation, "When was it completed?", research_index=index)
     confirmation_reply = respond(
         bare_confirmation, "and yes", research_index=index)
     require(confirmation_reply.resolved_question
-                != "When was yes built?",
+                != "When was yes completed?",
             f"a bare confirmation was inserted as an entity name: {confirmation_reply!r}")
     built = turns[25]
     require(built.status == "sources_found"
