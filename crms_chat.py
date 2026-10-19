@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 from dataclasses import asdict, replace
 import copy
 import hashlib
@@ -585,7 +586,7 @@ def _parse_integer_list(value: str, *, allow_empty: bool = False) -> list[int]:
 
 def _citation_contains_integer_pair(source_text: str, inputs: list[int],
                                     outputs: list[int]) -> bool:
-    """Check that a cited span states the exact supplied list transformation."""
+    """Check a cited list pair or a small, recognized doctest example."""
     for match in _CITED_INTEGER_PAIR_RE.finditer(source_text):
         try:
             cited_input = _parse_integer_list(match.group("input"), allow_empty=True)
@@ -593,6 +594,124 @@ def _citation_contains_integer_pair(source_text: str, inputs: list[int],
         except ValueError:
             continue
         if cited_input == inputs and cited_output == outputs:
+            return True
+
+    # Many primary technical sources present examples as code and REPL output,
+    # not as prose arrows. Interpret only a deliberately small AST subset; do
+    # not execute source text. The recognized calls below are deterministic
+    # integer-list transformations already represented by CRMS's rule library.
+    environment: dict[str, list[int]] = {}
+
+    def integer_list(node: ast.AST) -> list[int] | None:
+        if isinstance(node, ast.Name):
+            value = environment.get(node.id)
+            return list(value) if value is not None else None
+        if isinstance(node, ast.List):
+            values: list[int] = []
+            for item in node.elts:
+                if (not isinstance(item, ast.Constant)
+                        or type(item.value) is not int):
+                    return None
+                values.append(item.value)
+            return values
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+            if (isinstance(node.func.value, ast.Name)
+                    and node.func.value.id == "np"
+                    and node.func.attr == "array"
+                    and len(node.args) == 1 and not node.keywords):
+                return integer_list(node.args[0])
+        return None
+
+    def demonstrated_result(node: ast.AST) -> tuple[list[int], list[int]] | None:
+        operation: str | None = None
+        argument: ast.AST | None = None
+        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+                and node.func.id == "sorted" and len(node.args) == 1
+                and not node.keywords):
+            operation, argument = "sort", node.args[0]
+        elif (isinstance(node, ast.Call)
+              and isinstance(node.func, ast.Attribute)
+              and isinstance(node.func.value, ast.Name)
+              and node.func.value.id == "np"
+              and node.func.attr in {"sort", "unique", "flip"}
+              and len(node.args) == 1 and not node.keywords):
+            operation = {"sort": "sort", "unique": "unique",
+                         "flip": "reverse"}[node.func.attr]
+            argument = node.args[0]
+        elif (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+              and node.func.id == "list" and len(node.args) == 1
+              and not node.keywords
+              and isinstance(node.args[0], ast.Call)
+              and isinstance(node.args[0].func, ast.Name)
+              and node.args[0].func.id == "reversed"
+              and len(node.args[0].args) == 1
+              and not node.args[0].keywords):
+            operation, argument = "reverse", node.args[0].args[0]
+        elif (isinstance(node, ast.Subscript)
+              and isinstance(node.slice, ast.Slice)
+              and node.slice.lower is None and node.slice.upper is None
+              and isinstance(node.slice.step, ast.UnaryOp)
+              and isinstance(node.slice.step.op, ast.USub)
+              and isinstance(node.slice.step.operand, ast.Constant)
+              and node.slice.step.operand.value == 1):
+            operation, argument = "reverse", node.value
+        if operation is None or argument is None:
+            return None
+        values = integer_list(argument)
+        if values is None:
+            return None
+        if operation == "sort":
+            result = sorted(values)
+        elif operation == "unique":
+            # NumPy's documented unique operation returns sorted values.
+            result = sorted(set(values))
+        else:
+            result = list(reversed(values))
+        return values, result
+
+    lines = source_text.splitlines()
+    for position, line in enumerate(lines):
+        prompt = re.match(r"^\s*>>>\s*(.*?)\s*$", line)
+        if prompt is None:
+            continue
+        try:
+            tree = ast.parse(prompt.group(1), mode="exec")
+        except SyntaxError:
+            continue
+        if (len(tree.body) == 1 and isinstance(tree.body[0], ast.Assign)
+                and len(tree.body[0].targets) == 1
+                and isinstance(tree.body[0].targets[0], ast.Name)):
+            assigned = integer_list(tree.body[0].value)
+            if assigned is not None:
+                environment[tree.body[0].targets[0].id] = assigned
+            else:
+                environment.pop(tree.body[0].targets[0].id, None)
+            continue
+        if len(tree.body) != 1 or not isinstance(tree.body[0], ast.Expr):
+            continue
+        pair = demonstrated_result(tree.body[0].value)
+        if pair is None:
+            continue
+        cited_input, computed_output = pair
+        output_lines = []
+        for output_line in lines[position + 1:]:
+            if re.match(r"^\s*(?:>>>|\.\.\.)", output_line):
+                break
+            if output_line.strip():
+                output_lines.append(output_line.strip())
+        if not output_lines:
+            continue
+        rendered = " ".join(output_lines)
+        array_match = re.fullmatch(r"array\((\[.*\])\)", rendered)
+        literal_text = array_match.group(1) if array_match else rendered
+        try:
+            printed_output = ast.literal_eval(literal_text)
+        except (ValueError, SyntaxError):
+            continue
+        if (isinstance(printed_output, list)
+                and all(type(value) is int for value in printed_output)
+                and cited_input == inputs
+                and computed_output == printed_output == outputs):
             return True
     return False
 
@@ -7490,7 +7609,7 @@ def main() -> int:
                 if source_ids:
                     print("Recorded source attribution for this example: "
                           + source_ids[0])
-                    print("The cited text contains this exact numeric pair; "
+                    print("The cited text demonstrates this exact numeric pair; "
                           "CRMS has not independently checked that its wording "
                           "licenses the instruction.")
             except ValueError as error:

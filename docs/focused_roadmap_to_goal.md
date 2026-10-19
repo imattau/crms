@@ -398,8 +398,16 @@ volume or relaxing abstention.
    connective from cited examples across separate fixture documents and
    composes an unseen three-step sequence through chat; a held-out source is
    excluded from the artifact, which validates against four held-out inputs
-   and survives a fresh chat process. This passes the minimum controlled
-   composition gate, not generalization across natural or independent sources.
+   and survives a fresh chat process. `v1_432_cited_doctest_rule_learning.py`
+   adds citation validation for a small non-executing subset of Python and
+   NumPy doctest forms. On official docs excerpts, two cited sort examples were
+   insufficient to identify the procedure; the system correctly asked for
+   contrastive examples. With two additional unattributed Codex examples, the
+   rule transferred to three held-out lists and retained the two citations
+   separately from the teacher examples. This is a useful source-ingestion
+   slice, but not source-only induction or broad transfer. The fixture
+   composition gate is still the only passing end-to-end unseen-composition
+   result.
 
    **Controlled gate:** passed for one fixture composition. **Full stage gate:**
    repeat with naturally occurring, independently sourced teaching examples,

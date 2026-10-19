@@ -728,10 +728,30 @@ The initial runtime check uses fixture IDs and demonstrates only persistence,
 artifact traceability, and a held-out composition. It is not yet a transfer
 result from independent natural-language documents. `/teach-rule` now accepts
 an optional exact source citation and verifies that it resolves in the active
-index and contains the exact input/output list pair before storing it. This is
-still a user-provided attribution: the current flow does not verify that the
-cited wording licenses the instruction, and natural-language and contrastive
-teaching still lack per-example source capture. Before a source-disjoint
-recombination claim, validate each cited demonstration, record source-disjoint
-training/validation/test partitions, and verify the composed result with a
-validator that did not produce the examples.
+index and demonstrates the exact input/output list pair before storing it.
+The citation checker accepts the explicit list-pair form and a deliberately
+small, non-executing AST subset of Python/NumPy doctests (`sorted`, `np.sort`,
+`np.unique`, `np.flip`, `list(reversed(...))`, and reverse slicing over literal
+integer lists or simple assigned arrays). Other source code remains
+unrecognized and must not be treated as verified. The citation still does not
+prove that the source wording licenses the natural-language instruction, and
+natural-language and contrastive teaching still lack automatic per-example
+source capture.
+
+`v1_432_cited_doctest_rule_learning.py` exercises this path using exact code
+excerpts from the official Python Sorting HOWTO and NumPy documentation. The
+two cited examples are both positive-only, so the learner correctly refuses
+to commit a rule from them alone. It learns after two additional
+Codex-authored, unattributed contrast examples; generated code retains the two
+source citations and explicitly keeps the other examples unattributed. The
+artifact passes three held-out lists and rejects an unsupported operation.
+This is evidence that ordinary doctest citations can enter the reviewable
+teaching path, not that CRMS induced sorting from source documents alone. It
+also shows that source examples may be underdetermined and that the system
+must keep asking for counterexamples rather than guess. The experiment uses
+one documentation page from each of two publishers and a single procedure;
+this does not establish broad source-disjoint transfer.
+
+Before a source-disjoint recombination claim, validate each cited
+demonstration, record source-disjoint training/validation/test partitions, and
+verify the composed result with a validator that did not produce the examples.

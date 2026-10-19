@@ -159,7 +159,7 @@ def main() -> None:
         require("Generated Python for '" + HELD_OUT + "'" in run.stdout,
                 f"chat did not generate the unseen composition: {run.stdout[-2400:]!r}")
         require("Evidence for generated artifact" in run.stdout
-                and "The cited text contains this exact numeric pair" in run.stdout,
+                and "The cited text demonstrates this exact numeric pair" in run.stdout,
                 "chat did not expose artifact evidence or attribution limits")
 
         rules = CRMSModel(root / "rules.json", max_workers=1)

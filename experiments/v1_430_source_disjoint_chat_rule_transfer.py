@@ -111,7 +111,7 @@ def main() -> None:
                 and "Generated Python for 'sort the numbers'" in run.stdout,
                 f"chat did not learn and generate from cited examples: "
                 f"{run.stdout[-2200:]!r}")
-        require("The cited text contains this exact numeric pair" in run.stdout,
+        require("The cited text demonstrates this exact numeric pair" in run.stdout,
                 "chat omitted its attribution limitation")
 
         rules = CRMSModel(root / "rules.json", max_workers=1)
