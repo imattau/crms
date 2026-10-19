@@ -20,7 +20,10 @@ _ACTS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("acknowledgement", re.compile(
         r"^(?:ok|okay|got\s+it|understood)[.! ]*$", re.IGNORECASE)),
     ("elaboration", re.compile(
-        r"^(?:tell\s+me\s+more|go\s+on|anything\s+else)[?.! ]*$",
+        r"^(?:(?:(?:can|could|would|will)\s+you\s+)?"
+        r"(?:please\s+)?(?:tell\s+me\s+more|say\s+more|go\s+on|"
+        r"go\s+into\s+more\s+detail|elaborate|expand)|anything\s+else)"
+        r"(?:[, ]+please)?[?.! ]*$",
         re.IGNORECASE)),
     ("help", re.compile(
         r"^(?:help|what\s+can\s+you\s+do|how\s+do\s+i\s+use\s+this)"

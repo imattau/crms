@@ -23,6 +23,13 @@ the versioned dialogue state and validated when reloaded, so the diagnostic surv
 Regression coverage is in
 `experiments/v1_365_contextual_clarification_intent.py`.
 
+The elaboration baseline recognizes a small set of equivalent content-free forms, including
+“Could you tell me more?”, “Can you say more?”, and “Could you elaborate?”. These use the same
+context policy as “Tell me more”: continue the current grounded topic, or ask which accepted entity
+to expand on when no topic is active. Requests that name their own topic and ordinary information
+requests remain content turns. This remains a hand-checked phrase family, not learned paraphrase
+coverage; see [`v1_378_contextual_elaboration_paraphrases.py`](../experiments/v1_378_contextual_elaboration_paraphrases.py).
+
 The runtime now also retains one typed open dialogue slot:
 `pending_dialogue_slot = "elaboration_topic"`. If “tell me more” has no current topic, CRMS asks
 which entity with accepted facts to elaborate on. A bare entity name is then classified as an answer

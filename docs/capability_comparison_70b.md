@@ -153,6 +153,11 @@ These results are component evidence, not a single overall capability score:
   or a new question, and does not send unmatched topic text to retrieval. This
   is one bounded follow-up slot, not broad task-state understanding or a learned
   intent model.
+- `v1_378_contextual_elaboration_paraphrases.py` adds a small set of polite,
+  content-free continuation forms and checks that they use the same active-topic
+  context or open the existing topic clarification. Topic-bearing information
+  requests remain content turns. This is hand-checked phrase coverage, not
+  learned paraphrase understanding.
 
 The detailed experiment conditions and caveats are recorded in
 [`benchmark_baselines.md`](benchmark_baselines.md). Do not add these unlike
