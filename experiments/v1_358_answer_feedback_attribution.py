@@ -20,12 +20,13 @@ from crms_feedback import (
     AnswerFeedbackStore, collect_codegen_feedback_refs,
     collect_feedback_refs,
     collect_math_feedback_refs, collect_translation_feedback_refs,
-    feedback_answer_id, render_feedback_refs,
+    collect_summary_feedback_refs, feedback_answer_id, render_feedback_refs,
 )
 from crms_knowledge import CRMSKnowledgeBase
 from crms_math import CRMSMath
 from crms_model import CRMSModel
 from crms_codegen import generate_python
+from crms_research import CRMSResearchIndex
 from crms_translation import CRMSTranslation
 
 
@@ -110,6 +111,28 @@ def main() -> None:
             "code feedback hid its instruction evidence")
     require(collect_codegen_feedback_refs(None) == [],
             "missing code artifact was offered as feedback evidence")
+
+    research_index = CRMSResearchIndex()
+    research_index.add_document(
+        "helion", "Helion probe notes",
+        "The Helion probe measured plasma temperature. "
+        "The probe was assembled by the university team.",
+        "https://research.test/helion")
+    summary_result = research_index.summarize("Helion probe plasma temperature")
+    summary_refs = collect_summary_feedback_refs(summary_result)
+    require(any(item["kind"] == "source"
+                and item["id"].startswith("helion#")
+                for item in summary_refs),
+            f"summary feedback omitted exact source citation: {summary_refs}")
+    expansion_refs = collect_feedback_refs(research={
+        "source_sentences": [],
+        "query_expansions": [{"kind": "question-frame", "evidence": "frame-1",
+                              "text": "probe heat", "sources": ["src-1"],
+                              "rules": ["rule-1"]}],
+    })
+    require({("source", "src-1"), ("rule", "rule-1")} <= {
+                (item["kind"], item["id"]) for item in expansion_refs},
+            f"summary feedback omitted query-expansion lineage: {expansion_refs}")
     fact_ref = next((item for item in refs if item["kind"] == "fact"), None)
     require(fact_ref is not None
             and fact_ref["subject"] == "Ada"
@@ -360,6 +383,69 @@ def main() -> None:
                         for item in events[0]["evidence"]),
                 f"code correction lost its generated-artifact attribution: {events}")
 
+    with tempfile.TemporaryDirectory(prefix="crms-summary-feedback-chat-") as directory:
+        root = Path(directory)
+        research_index.save(root / "index.json")
+        args = [sys.executable, str(ROOT / "crms_chat.py"),
+                "--knowledge", str(root / "knowledge.json"),
+                "--feedback-db", str(root / "feedback.sqlite3"),
+                "--dialogue-state", str(root / "dialogue.json"),
+                "--rules", str(root / "rules.json"),
+                "--rule-session", str(root / "rule-session.json"),
+                "--math", str(root / "math.json"),
+                "--math-session", str(root / "math-session.json"),
+                "--translations", str(root / "translations.json"),
+                "--translation-session", str(root / "translation-session.json"),
+                "--index", str(root / "index.json")]
+        run = subprocess.run(
+            args,
+            input="/summarize Helion probe plasma temperature\n"
+                  "/wrong\n/feedback\n/quit\n",
+            text=True, capture_output=True, timeout=30)
+        require(run.returncode == 0, run.stderr or run.stdout)
+        events = AnswerFeedbackStore(root / "feedback.sqlite3").recent(1)
+        require(len(events) == 1
+                and any(item["kind"] == "source"
+                        and item["id"].startswith("helion#")
+                        for item in events[0]["evidence"]),
+                f"summary correction lost its source citation: {events}")
+
+    with tempfile.TemporaryDirectory(prefix="crms-paper-feedback-chat-") as directory:
+        root = Path(directory)
+        paper_index = CRMSResearchIndex()
+        paper_index.add_document(
+            "helion-study", "Helion Probe Study",
+            "Authors: Mira Chen, Dev Patel\n"
+            "Abstract: We demonstrate a probe that measures plasma temperature.",
+            "https://research.test/helion-study")
+        paper_index.save(root / "index.json")
+        args = [sys.executable, str(ROOT / "crms_chat.py"),
+                "--knowledge", str(root / "knowledge.json"),
+                "--feedback-db", str(root / "feedback.sqlite3"),
+                "--dialogue-state", str(root / "dialogue.json"),
+                "--rules", str(root / "rules.json"),
+                "--rule-session", str(root / "rule-session.json"),
+                "--math", str(root / "math.json"),
+                "--math-session", str(root / "math-session.json"),
+                "--translations", str(root / "translations.json"),
+                "--translation-session", str(root / "translation-session.json"),
+                "--index", str(root / "index.json")]
+        run = subprocess.run(
+            args,
+            input=("Who are the authors of the Helion Probe Study paper?\n"
+                   "/right\nWhat is the main result of the Helion Probe Study?\n"
+                   "/wrong\n/feedback\n/quit\n"),
+            text=True, capture_output=True, timeout=30)
+        require(run.returncode == 0, run.stderr or run.stdout)
+        events = AnswerFeedbackStore(root / "feedback.sqlite3").events()
+        require(len(events) == 2
+                and all(any(item["kind"] == "source"
+                            and item["id"].startswith("helion-study#")
+                            for item in event["evidence"])
+                        for event in events),
+                f"paper metadata/result feedback lost exact citations: {events}\n"
+                f"chat output: {run.stdout}")
+
     print("answer feedback attribution: direct facts, rule, and source refs PASS")
     print("translation feedback ties to deterministic aligned-frame evidence: PASS")
     print("interactive translation feedback persists its frame attribution: PASS")
@@ -367,6 +453,9 @@ def main() -> None:
     print("interactive math feedback persists its derivation attribution: PASS")
     print("code feedback ties to artifact provenance and parity evidence: PASS")
     print("interactive code feedback persists artifact attribution: PASS")
+    print("summary feedback retains exact citations and expansion lineage: PASS")
+    print("interactive summary feedback persists cited sources: PASS")
+    print("paper author and main-result feedback retain exact citations: PASS")
     print("SQLite persistence, deterministic IDs, duplicate suppression: PASS")
     print("conflicting feedback retained for review without changing knowledge: PASS")
     print("wrong proof feedback suspends only validated learned rules: PASS")

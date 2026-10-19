@@ -17,6 +17,7 @@ from crms_feedback import (
     AnswerFeedbackStore, collect_feedback_refs,
     collect_codegen_feedback_refs,
     collect_math_feedback_refs,
+    collect_summary_feedback_refs,
     collect_translation_feedback_refs, render_feedback_refs,
 )
 from crms_explain import render_verified_explanation
@@ -8699,6 +8700,13 @@ def main() -> int:
                 index, paper_authors_reference)
             if authors_text:
                 print("CRMS> " + authors_text)
+                source_refs = collect_feedback_refs(research={
+                    "source_sentences": [last_research_evidence]
+                }) if last_research_evidence else []
+                remember_feedback(
+                    {"question": line, "answer": authors_text,
+                     "evidence": source_refs}
+                    if source_refs else None)
                 continue
         main_result_reference = _natural_main_result_request(line)
         if main_result_reference is not None:
@@ -8706,6 +8714,13 @@ def main() -> int:
             main_result_text, last_research_evidence = _render_main_result(
                 index, main_result_reference)
             print("CRMS> " + main_result_text)
+            source_refs = collect_feedback_refs(research={
+                "source_sentences": [last_research_evidence]
+            }) if last_research_evidence else []
+            remember_feedback(
+                {"question": line, "answer": main_result_text,
+                 "evidence": source_refs}
+                if source_refs else None)
             continue
         if _natural_corpus_topics_request(line):
             dialogue.clear()
@@ -8897,7 +8912,13 @@ def main() -> int:
             if action == "more" and len(summary.sentences) <= previous_limit:
                 print("CRMS> No additional matching source sentences are available "
                       "within the summary limit.")
-            print(f"CRMS> {summary.render()}")
+            summary_text = summary.render()
+            print(f"CRMS> {summary_text}")
+            summary_refs = collect_summary_feedback_refs(summary)
+            remember_feedback(
+                {"question": line, "answer": summary_text,
+                 "evidence": summary_refs}
+                if summary_refs else None)
             continue
         summary_query = (line[len("/summarize "):].strip()
                          if line.startswith("/summarize ") else
@@ -8943,7 +8964,13 @@ def main() -> int:
                 expansion_licenses=expansion_licenses,
                 precomputed_hits=([last_summary_scoped_hit]
                                   if last_summary_scoped_hit is not None else None))
-            print(f"CRMS> {summary.render()}")
+            summary_text = summary.render()
+            print(f"CRMS> {summary_text}")
+            summary_refs = collect_summary_feedback_refs(summary)
+            remember_feedback(
+                {"question": line, "answer": summary_text,
+                 "evidence": summary_refs}
+                if summary_refs else None)
             continue
         natural_rule = _natural_rule_requests(line)
         if natural_rule is not None:

@@ -64,6 +64,10 @@ def collect_feedback_refs(response: Any = None, research: Any = None
     """Collect stable fact triples, rule ids, and source refs for an answer."""
     refs: dict[tuple[str, str], dict[str, Any]] = {}
 
+    def get_field(value: Any, name: str, default: Any = None) -> Any:
+        return (value.get(name, default) if isinstance(value, Mapping)
+                else getattr(value, name, default))
+
     def add_ref(kind: str, value: str, **details: Any) -> None:
         key = (kind, value)
         row = refs.setdefault(key, {"kind": kind, "id": value})
@@ -129,24 +133,51 @@ def collect_feedback_refs(response: Any = None, research: Any = None
             visit_proof(premise)
 
     if response is not None:
-        for row in (getattr(response, "evidence", None) or []):
+        for row in (get_field(response, "evidence") or []):
             if isinstance(row, Mapping):
                 add_fact(row)
-        for proof in (getattr(response, "proofs", None) or []):
+        for proof in (get_field(response, "proofs") or []):
             if isinstance(proof, Mapping):
                 visit_proof(proof)
             else:
                 for row in proof:
                     if isinstance(row, Mapping):
                         add_fact(row)
-        for proof in (getattr(response, "inference_proofs", None) or []):
+        for proof in (get_field(response, "inference_proofs") or []):
             visit_proof(proof)
     if research is not None:
-        for field in ("source_sentences", "passages"):
-            for row in (getattr(research, field, None) or []):
+        for field_name in ("source_sentences", "passages"):
+            for row in (get_field(research, field_name) or []):
                 if isinstance(row, Mapping):
                     add_sources(row, "source")
+        for record in (get_field(research, "query_expansions") or []):
+            if not isinstance(record, Mapping):
+                continue
+            add_sources(record, "source")
+            for rule_id in record.get("rules", ()) or ():
+                if str(rule_id).strip():
+                    add_ref("rule", str(rule_id).strip())
     return [refs[key] for key in sorted(refs)]
+
+
+def collect_summary_feedback_refs(summary: Any) -> list[dict[str, Any]]:
+    """Collect source citations and expansion licenses behind an extractive summary."""
+    rows = []
+    for sentence in getattr(summary, "sentences", ()) or ():
+        row = {
+            "document_id": getattr(sentence, "document_id", None),
+            "citation": getattr(sentence, "citation", None),
+            "title": getattr(sentence, "title", None),
+            "text": getattr(sentence, "text", None),
+        }
+        if row["citation"] or row["document_id"]:
+            rows.append(row)
+    if not rows:
+        return []
+    return collect_feedback_refs(research={
+        "source_sentences": rows,
+        "query_expansions": getattr(summary, "expansion_licenses", ()) or (),
+    })
 
 
 def collect_translation_feedback_refs(result: Any) -> list[dict[str, Any]]:
