@@ -261,7 +261,10 @@ def main() -> None:
                    "Write Python code to sort the list then apply x zarg 3 to "
                    "each value\nExplain that code\n"
                    "Write Python code to rotate the list then apply x times x "
-                   "plus 3 to each value\n/quit\n"),
+                   "plus 3 to each value\n"
+                   "Write Python code to sort the list then rotate the list "
+                   "then reverse the list then apply x times x plus 3 to each "
+                   "value\n/quit\n"),
             text=True, capture_output=True, cwd=root, check=False, timeout=30)
         require(run.returncode == 0
                 and "Generated composed Python" in run.stdout
@@ -275,9 +278,19 @@ def main() -> None:
                     "math expression" in run.stdout
                 and "There is no recent generated code artifact to explain."
                     in run.stdout
-                and "I couldn't resolve the first list step" in run.stdout,
+                and "I couldn't resolve the first list step" in run.stdout
+                and "I couldn't resolve list step 2 ('rotate the list') to a "
+                    "supported learned procedure" in run.stdout,
                 f"natural-language composed chat flow failed:\n"
                 f"{run.stdout}\n{run.stderr}")
+        middle_diagnostic = (
+            "I couldn't resolve list step 2 ('rotate the list') to a "
+            "supported learned procedure")
+        middle_result = run.stdout.split(middle_diagnostic, 1)
+        require(len(middle_result) == 2
+                and "Generated composed Python" not in middle_result[1],
+                "chat emitted a complete-looking artifact after an unsupported "
+                "middle operation")
 
     print("cross-domain list→math composition: PASS")
     print("learned sequence transferred to exact math mapping; component and "
@@ -290,6 +303,7 @@ def main() -> None:
           "exact division: PASS")
     print("three unseen list operations compose in order with exact math and lineage: PASS")
     print("natural-language chat generation, explanation, and evidence: PASS")
+    print("chat names an unsupported middle operation and emits no artifact: PASS")
 
 
 if __name__ == "__main__":

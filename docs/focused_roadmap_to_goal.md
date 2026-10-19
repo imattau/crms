@@ -434,12 +434,17 @@ standalone corpus scan:
    topic and return review-pending evidence without promoting it to an accepted
    fact. Keep this as a bounded dialogue regression; do not mistake the small
    transcript for broad conversation coverage.
-2. **Advance recombination and self-learning rule transfer.** Use ordinary chat to
-   test a genuinely unseen composition from learned components, plus a
-   contrastive near-miss and missing-step case. Verify the result with an
-   independent task check and preserve rule examples, holdout boundary, and
-   lineage. Do not count more demonstrations of an existing composition as
-   transfer. Keep this core capability active alongside the dialogue work.
+2. **Measure recombination beyond the synthetic fixtures.** The current
+   v1_355, v1_357, and v1_424 witnesses already demonstrate unseen sequences,
+   contrastive teaching, chat generation, independent exact-output checks,
+   and an unsupported-middle-step refusal. Their small synthetic list and
+   math distributions do not meet the source-disjoint transfer gate. Build
+   the next evaluation around held-out source documents and independently
+   written natural-language requests, with unseen component combinations,
+   role/order changes, near-misses, and missing stages. Keep the learner and
+   task validator independent; retain examples, validation split, and lineage.
+   Do not count more synthetic demonstrations of the same connective as
+   evidence of broad transfer.
 3. **Strengthen reasoning on the composition path.** Reuse the unseen
    compositions to exercise proof and task validators, then target explicit
    integrity constraints, contradiction handling, missing premises, and

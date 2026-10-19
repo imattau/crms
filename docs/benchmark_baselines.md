@@ -299,8 +299,16 @@ conjunctive list operation independently when a composed request fails: an
 unsupported middle operation is named as step 2 instead of being mislabeled as
 an unsupported first step. If each individual operation is learned but the
 exact sequence is not, it reports that the combination itself needs examples.
-This improves failure localization; it does not change which procedures are
-licensed or generated.
+The chat transcript now exercises sort → rotate → reverse → math, confirms
+that step 2 is named, and asserts that no generated artifact appears after
+that diagnostic. This improves failure localization and integration coverage;
+it does not change which procedures are licensed or generated.
+
+The existing v1_355, v1_357, and v1_424 cases together provide bounded
+evidence for unseen rule recombination, source/evidence lineage, contrastive
+teaching, and chat recovery. They use small synthetic list and math fixtures,
+so they do not satisfy the roadmap's source-disjoint generalization gate or
+establish broad natural-language transfer.
 
 ## Elliptical entity-switch follow-up
 
