@@ -80,7 +80,10 @@ def apply(values: list[int], operation: str) -> list[int]:
     if operation == "sort":
         return sorted(values)
     if operation == "unique":
-        return list(dict.fromkeys(values))
+        # Match numpy.unique's documented sorted-unique semantics. The
+        # previous stable-unique behavior happened to be hidden by the later
+        # sort stage in every composition probe.
+        return sorted(set(values))
     if operation == "reverse":
         return list(reversed(values))
     raise ValueError(operation)
@@ -221,6 +224,10 @@ def main() -> None:
 
         artifact = generate_python(learned, HELD_OUT_TEXT)
         require(artifact is not None, "no standalone composition was generated")
+        unique_probe = learned.predict("remove duplicate values", [4, 1, 4, 2])
+        require(unique_probe.status == "ok"
+                and unique_probe.output == [1, 2, 4],
+                "unique rule did not preserve the source's sorted-unique behavior")
         namespace: dict[str, object] = {}
         exec(compile(artifact.source, "<document-sourced-composition>", "exec"),
              namespace)
@@ -261,6 +268,7 @@ def main() -> None:
                 + repr(generated_lines))
 
     print("three operation examples resolved to official-source citations: PASS")
+    print("unique rule sorts distinct values on a non-monotonic input: PASS")
     print("chat composed unique→sort→reverse on four held-out lists: PASS")
     print("generated artifact kept component citations and passed checks: PASS")
     print("saved rules reproduced the artifact in a fresh chat process: PASS")

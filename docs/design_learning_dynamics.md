@@ -751,11 +751,16 @@ and teacher-attributed instruction link remain unchanged.
 to a small multi-operation code artifact. Sort, unique, and reverse each have
 an exact numeric example cited to Python or NumPy documentation. Codex supplies
 the additional numeric contrasts and sequence-connective examples, explicitly
-unattributed. The composed `unique → sort → reverse` artifact passes four
-held-out lists, keeps its three component citations, survives a fresh chat
-process, and refuses an unsupported middle operation. This demonstrates
-teacher-guided recombination using source-cited component examples; the source
-text alone did not license the instructions or the connective.
+unattributed. The unique operation now matches `numpy.unique`'s sorted-unique
+semantics; a non-monotonic standalone probe catches this distinction, which
+the later sort stage had previously hidden. The composed `unique → sort →
+reverse` artifact passes four held-out lists, keeps its three component
+citations, survives a fresh chat process, and refuses an unsupported middle
+operation. This demonstrates teacher-guided recombination using source-cited
+component examples; the source text alone did not license the instructions or
+the connective. The cited NumPy pair itself is monotonic, so the new probe is
+an implementation check, not evidence that the citation's particular numeric
+pair distinguishes sorted unique from stable unique.
 
 `v1_432_cited_doctest_rule_learning.py` exercises this path using exact code
 excerpts from the official Python Sorting HOWTO and NumPy documentation. The
