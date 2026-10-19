@@ -5204,7 +5204,8 @@ def main() -> int:
     dialogue = CRMSDialogue(knowledge)
     if args.dialogue_state.exists():
         try:
-            dialogue = CRMSDialogue.load(knowledge, str(args.dialogue_state))
+            dialogue = CRMSDialogue.load(
+                knowledge, str(args.dialogue_state), research_index=index)
         except (ValueError, OSError) as error:
             stale = args.dialogue_state.with_name(
                 args.dialogue_state.name + ".stale")

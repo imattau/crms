@@ -419,7 +419,7 @@ class CRMSDialogue:
                 for other in mentions)
             if not contained:
                 filtered.append(mentions[key])
-        return filtered
+        return filtered[:100]
 
     def _remember_evidence(self, response: QuestionResult) -> None:
         self.source_mentions = []
@@ -1316,10 +1316,11 @@ class CRMSDialogue:
         destination = Path(path)
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(
-            json.dumps({"format_version": 7, "last_entity": self.last_entity,
+            json.dumps({"format_version": 8, "last_entity": self.last_entity,
                         "subject_entity": self.subject_entity,
                         "object_entity": self.object_entity,
                         "last_question": self.last_question,
+                        "source_mentions": self.source_mentions,
                         "last_selected_answer": self.last_selected_answer,
                         "last_writing_subject": self.last_writing_subject,
                         "last_writing_request": self.last_writing_request,
@@ -1332,9 +1333,10 @@ class CRMSDialogue:
             encoding="utf-8")
 
     @classmethod
-    def load(cls, knowledge: CRMSKnowledgeBase, path: str) -> "CRMSDialogue":
+    def load(cls, knowledge: CRMSKnowledgeBase, path: str, *,
+             research_index: Any | None = None) -> "CRMSDialogue":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
-        if payload.get("format_version") not in (1, 2, 3, 4, 5, 6, 7):
+        if payload.get("format_version") not in (1, 2, 3, 4, 5, 6, 7, 8):
             raise ValueError("unsupported dialogue-state format version")
         dialogue = cls(knowledge)
         last_question = payload.get("last_question")
@@ -1342,6 +1344,41 @@ class CRMSDialogue:
             if not isinstance(last_question, str):
                 raise ValueError("stored previous question is malformed")
             dialogue.last_question = last_question
+        source_mentions = payload.get("source_mentions", [])
+        if not isinstance(source_mentions, list) or len(source_mentions) > 100:
+            raise ValueError("stored source referents are malformed")
+        if research_index is not None:
+            verified_mentions = []
+            for item in source_mentions:
+                if not isinstance(item, dict):
+                    raise ValueError("stored source referent is malformed")
+                entity, citation = item.get("entity"), item.get("citation")
+                if (not isinstance(entity, str) or not entity.strip()
+                        or not isinstance(citation, str) or not citation.strip()):
+                    raise ValueError("stored source referent is malformed")
+                title = item.get("title", "source")
+                if not isinstance(title, str):
+                    raise ValueError("stored source title is malformed")
+                try:
+                    cited_text = research_index.resolve_citation(citation)
+                    document_id = citation.partition("#sha256=")[0]
+                    indexed_title = research_index.document(document_id).title
+                except (AttributeError, KeyError, TypeError, ValueError):
+                    # A source may have been removed or revised since the
+                    # dialogue was saved. Its names must not remain usable as
+                    # referents unless the current index still verifies it.
+                    continue
+                recovered = dialogue._source_entity_mentions([{
+                    "text": cited_text, "citation": citation,
+                    "title": indexed_title,
+                }])
+                if any(candidate["entity"].casefold() == entity.casefold()
+                       for candidate in recovered):
+                    verified_mentions.append({
+                        "entity": entity, "citation": citation,
+                        "title": indexed_title or title,
+                    })
+            dialogue.source_mentions = verified_mentions
         selected_answer = payload.get("last_selected_answer")
         if selected_answer is not None:
             if not isinstance(selected_answer, str):

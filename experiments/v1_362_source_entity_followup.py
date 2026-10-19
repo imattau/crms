@@ -51,6 +51,17 @@ def main() -> None:
             f"ambiguous source-only referent was guessed or hidden: {pronoun}")
     require(not kb.facts(),
             "dialogue referent candidates were promoted into the fact store")
+    with tempfile.TemporaryDirectory(prefix="crms-source-state-") as folder:
+        state_path = Path(folder) / "dialogue.json"
+        dialogue.save(str(state_path))
+        restored = CRMSDialogue.load(kb, str(state_path), research_index=index)
+        require({item["entity"] for item in restored.source_mentions}
+                == {"Ada Lovelace", "Charles Babbage"},
+                "current-index citations did not restore source referents")
+        stale = CRMSDialogue.load(
+            kb, str(state_path), research_index=CRMSResearchIndex())
+        require(not stale.source_mentions,
+                "referents survived when their citations were absent from the index")
 
     # Exercise the actual terminal route as well: the user must see the source
     # label first, then a concrete clarification rather than a retrieved
@@ -67,13 +78,27 @@ def main() -> None:
              "--dialogue-state", str(root / "dialogue.json"),
              "--rules", str(root / "rules.json"),
              "--rule-session", str(root / "session.json")],
-            input="Who worked with Charles Babbage?\nWhere did she work?\n/quit\n",
+            input="Who worked with Charles Babbage?\n/quit\n",
             text=True, capture_output=True, check=True, timeout=20)
         require("Ada Lovelace worked with Charles Babbage." in process.stdout
                 and "quoted evidence, not an accepted fact" in process.stdout
-                and "Which entity do you mean?" in process.stdout
                 and "Lovelace biography" in process.stdout,
-                f"terminal hid source evidence or clarification: {process.stdout}")
+                f"terminal hid quoted source evidence: {process.stdout}")
+        resumed = subprocess.run(
+            [sys.executable, str(project / "crms_chat.py"),
+             "--knowledge", str(root / "knowledge.json"),
+             "--index", str(root / "index.json"),
+             "--dialogue-state", str(root / "dialogue.json"),
+             "--rules", str(root / "rules.json"),
+             "--rule-session", str(root / "session.json")],
+            input="Where did she work?\n/quit\n",
+            text=True, capture_output=True, check=True, timeout=20)
+        require("Which entity do you mean?" in resumed.stdout
+                and "Ada Lovelace" in resumed.stdout
+                and "Charles Babbage" in resumed.stdout
+                and "Lovelace biography" in resumed.stdout,
+                f"terminal did not restore the verified source referents: "
+                f"{resumed.stdout}")
 
     # Once the required question frames are licensed, existing evidence can
     # resolve subject/object pronouns by supported substitution.
@@ -117,7 +142,7 @@ def main() -> None:
 
     print("source-only names stay cited referent candidates, never accepted facts: PASS")
     print("ambiguous follow-up asks for a named choice instead of guessing: PASS")
-    print("terminal shows quoted evidence then source-named clarification: PASS")
+    print("terminal restores source referents across restart and asks for clarification: PASS")
     print("licensed fact frames still resolve supported she/him substitutions: PASS")
 
 
