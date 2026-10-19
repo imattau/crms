@@ -447,7 +447,12 @@ independent second labels were created, and the original train/dev/test source s
 modified. One concrete held-out phrase, “I'd like you to book a restaurant for me,” also received
 no intent hypothesis from the previous runtime. The explicit reservation-request recognizer now
 handles that wording, with “How do I book a restaurant?” retained as an information-seeking
-negative. This repairs one bounded frame; it does not change the negative transfer result above.
+negative. The same change adds a direct search-request frame for first-turn forms such as “Looking
+for a place to eat lunch in Sacramento” and “I need to find a restaurant,” setting the explicit
+information-seeking goal. The regression keeps “How do I find a restaurant?” as a content question
+and treats “I'm looking for a steakhouse” as a constraint when the restaurant-type slot is open.
+This repairs bounded runtime intent frames; it does not change the negative transfer result above
+or demonstrate general task understanding, search quality, or retrieval success.
 
 ### Context is part of intent, not an optional feature
 

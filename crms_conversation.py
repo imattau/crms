@@ -276,6 +276,16 @@ _RESERVATION_REQUEST_QUESTION_RE = re.compile(
     r"(?:(?:a|the)\s+)?(?:(?:dinner|lunch)\s+)?"
     r"(?:reservation|booking|table)\b",
     re.IGNORECASE)
+_DIRECT_SEARCH_REQUEST_RE = re.compile(
+    r"(?:^|[.!?,;]\s*)"
+    r"(?:(?:hi|hello|hey)(?:\s+there)?[, ]+)?"
+    r"(?:(?:i|we)(?:['’]m|\s+am|\s+was)\s+looking\s+for|"
+    r"looking\s+for|"
+    r"(?:i|we)\s+(?:need|want)\s+to\s+"
+    r"(?:find|look\s+for|search\s+for|locate)|"
+    r"(?:i|we)\s+(?:need|want)\s+(?:a|the)\s+"
+    r"(?:place|restaurant|recommendation|option)\b)\s+\S",
+    re.IGNORECASE)
 
 
 def natural_feedback_verdict(text: str) -> str | None:
@@ -889,6 +899,19 @@ def classify_user_intent(
             matched_frame="explicit-reservation-request",
             context_predicates=("direct-user-request",),
             goal_intent="make-reservation",
+        )
+
+    # A direct search statement establishes an information-seeking goal.
+    # This runs after open-question handling and explicit booking detection so
+    # a cuisine/slot answer or reservation commitment keeps its active intent.
+    if _DIRECT_SEARCH_REQUEST_RE.search(reservation_request):
+        return UserIntentHypothesis(
+            dialogue_act="request-action",
+            task_intent="seek-information",
+            goal_intent="seek-information",
+            decision="selected",
+            matched_frame="explicit-search-request",
+            context_predicates=("direct-user-request",),
         )
 
     # Portable dialogue frames are additive: built-in content-free and

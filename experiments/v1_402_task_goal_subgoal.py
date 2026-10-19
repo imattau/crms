@@ -44,12 +44,42 @@ def main() -> None:
     for how_to_text in (
             "How do I make a reservation?",
             "How do I book a restaurant?",
+            "How do I find a restaurant?",
             "Could you please tell me how to make a reservation?",
             "Could you tell me how to book a restaurant?"):
         how_to = classify_user_intent(
             CRMSDialogue(CRMSKnowledgeBase()), how_to_text)
         require(how_to is not None and how_to.task_intent == "seek-information",
                 f"a how-to question was mistaken for booking: {how_to_text!r}: {how_to}")
+
+    for search_request in (
+            "Looking for a place to eat lunch in Sacramento, California.",
+            "I'm looking for a restaurant in San Francisco, California.",
+            "Yeah. I need to find a restaurant in San Francisco, California.",
+            "Hey, I'm inside the Arden Fair Mall in Sacramento, California. "
+            "I was looking for a place that sells snack food."):
+        hypothesis = classify_user_intent(
+            CRMSDialogue(CRMSKnowledgeBase()), search_request)
+        require(hypothesis is not None
+                and hypothesis.dialogue_act == "request-action"
+                and hypothesis.task_intent == "seek-information"
+                and hypothesis.goal_intent == "seek-information"
+                and hypothesis.matched_frame == "explicit-search-request",
+                f"direct search request was not recognized: {search_request!r}: {hypothesis}")
+
+    search_detail = CRMSDialogue(CRMSKnowledgeBase())
+    search_detail.active_task_intent = "seek-information"
+    search_detail.open_dialogue_question = {
+        "prompt": "What type of restaurant are you looking for?",
+        "answer_kind": "detail", "expected_slot": "restaurant_type",
+    }
+    detail_hypothesis = classify_user_intent(
+        search_detail, "I'm looking for a steakhouse.")
+    require(detail_hypothesis is not None
+            and detail_hypothesis.dialogue_act == "provide-information"
+            and detail_hypothesis.task_intent == "provide-constraint"
+            and detail_hypothesis.matched_frame == "answer-to-open-dialogue-question",
+            "search wording in an open slot was mistaken for a new search goal")
 
     dialogue = CRMSDialogue(CRMSKnowledgeBase())
     dialogue.active_task_intent = "make-reservation"
@@ -217,11 +247,25 @@ def main() -> None:
                     in direct_request.stdout,
                 "natural-language booking request did not set the reservation goal")
 
+        search_request_command = list(command)
+        search_dialogue_arg = search_request_command.index("--dialogue-state") + 1
+        search_request_command[search_dialogue_arg] = str(root / "search-request.json")
+        search_run = subprocess.run(
+            search_request_command,
+            input=("Looking for a place to eat lunch in Sacramento, California.\n"
+                   "/intent\n/quit\n"),
+            text=True, capture_output=True, check=True, timeout=30)
+        require("Active goal: seek-information" in search_run.stdout
+                and '"matched_frame": "explicit-search-request"'
+                    in search_run.stdout,
+                "natural-language search request did not set its information goal")
+
     print("reservation goal survives search and information subgoals: PASS")
     print("goal and subgoal context persist and validate: PASS")
     print("explicit reset clears both levels: PASS")
     print("interactive chat displays contextual goal and subgoal: PASS")
     print("natural-language 'book a restaurant' wording sets reservation goal: PASS")
+    print("natural-language search statement sets information goal without swallowing slot answers: PASS")
 
 
 if __name__ == "__main__":
