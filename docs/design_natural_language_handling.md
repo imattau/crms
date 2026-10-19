@@ -746,7 +746,11 @@ The generated-corpus probe exposed a smaller, exact inflection gap: `_stem("cros
 `crosse`, while `_stem("crossed")` returned `cross`, so “What body of water crosses Nacre City
 0133?” rejected the source sentence “Nacre City 0133 is crossed by Serein River 0133.” The gate now
 normalizes a narrow set of regular `-es` forms (`-sses`, `-xes`, `-zzes`, `-ches`, `-shes`) while
-preserving ordinary final-e words such as `sizes`, `shoes`, and `uses`. The new
+preserving ordinary final-e words such as `sizes`, `shoes`, and `uses`. A related `-ied` rule now
+maps regular consonant-y verbs (`studied`→`study`, `carried`→`carry`) while preserving the final-e
+past forms `died`, `lied`, and `tied`. `experiments/v1_417_ied_relation_gate.py` checks that “What did
+Meridian Institute 0266 study?” matches “Meridian Institute 0266 studied metallurgy,” while an
+unrelated `investigate` question and a mismatched entity remain rejected. The new
 `experiments/v1_416_regular_es_gate_morphology.py` accepts the active/passive exact-predicate pair,
 and still rejects the wrong numbered entity and the unrelated `flows through` predicate.
 `v1_329_runtime_nl_gate.py` also passes with the updated normalizer. This is morphological

@@ -53,6 +53,12 @@ def _stem(token: str) -> str:
                            if value in forms), None)
     if irregular_base is not None:
         value = irregular_base
+    elif value in {"died", "lied", "tied"}:
+        # These verbs retain the e when adding -d; they are not consonant-y
+        # verbs written with -ied.
+        value = value[:-1]
+    elif value.endswith("ied") and len(value) > 4:
+        value = value[:-3] + "y"
     elif value.endswith("ies") and len(value) > 4:
         value = value[:-3] + "y"
     elif (value.endswith(("sses", "xes", "zzes", "ches", "shes"))

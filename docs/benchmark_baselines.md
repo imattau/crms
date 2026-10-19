@@ -129,7 +129,9 @@ No overall capability or parity claim follows from this run.
 ## Active/passive exact-predicate morphology
 
 Commands: `python3 experiments/v1_416_regular_es_gate_morphology.py` and
-`python3 experiments/v1_329_runtime_nl_gate.py`.
+`python3 experiments/v1_417_ied_relation_gate.py`, followed by
+`python3 experiments/v1_329_runtime_nl_gate.py` and
+`python3 experiments/v1_347_grounded_passive_question_recombination.py`.
 
 The large-corpus audit had a clear sentence but the evidence gate rejected it:
 the question used `crosses`, while the source used passive `is crossed by`.
@@ -139,6 +141,13 @@ positive is accepted; the wrong numbered entity and an unrelated `flows through`
 question remain rejected. Both focused experiments pass. This demonstrates a
 specific inflection/voice transfer, not semantic synonym coverage; questions
 using `run` still need a licensed relation or must abstain.
+
+The same gate also normalizes regular consonant-y past forms (`studied`→`study`),
+which lets a question and a sentence share the predicate without relying on
+other overlapping content words. It preserves `died`→`die` and rejects a
+same-entity question with the unrelated verb `investigate`. These targeted
+controls and the broader quoted-evidence and passive-question regressions pass;
+they do not measure broad paraphrase recall.
 
 ## Grounded math-to-list-code composition
 
