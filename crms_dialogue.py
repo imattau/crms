@@ -758,7 +758,8 @@ class CRMSDialogue:
                           "please name the entities.")
         entities = list(dict.fromkeys(
             entity for entity in (
-                self.last_entity, self.subject_entity, self.object_entity,
+                self.topic_entity, self.last_entity, self.subject_entity,
+                self.object_entity,
                 *(item.get("entity") for item in self.source_mentions))
             if entity))
         if not entities and self.last_question:
@@ -785,16 +786,13 @@ class CRMSDialogue:
                 options.setdefault(binding[0], resolved)
             self._pronoun_options = list(options.items())
 
-        # A source-confirmed topic is the discourse anchor for a bare
-        # referential follow-up. Do this before probing which bindings happen
-        # to have stored answers: evidence availability must not pull "it"
-        # back to an older entity that is easier to answer about. The answer
-        # path still checks that the resulting claim is supported for this
-        # named entity.
+        # The current topic is the discourse anchor for a single referential
+        # follow-up. Do this before probing which bindings happen to have
+        # stored answers: evidence availability must not pull a pronoun back
+        # to an older entity that is easier to answer about. The answer path
+        # still checks that the resulting claim is supported for this entity.
         if (self.topic_entity and self.topic_entity in entities
-                and all(match.group(0).casefold() in
-                        {"it", "its", "this", "that"}
-                        for match in pronouns)):
+                and len(pronouns) == 1):
             resolved = question
             for match in reversed(pronouns):
                 resolved = (resolved[:match.start()] + self.topic_entity
@@ -1656,6 +1654,17 @@ class CRMSDialogue:
                 # Re-enter the normal pipeline with the full question so the
                 # same source checks and context updates apply.
                 carried = self.turn(swapped, research_index=research_index)
+                if (carried.status not in {"answered", "sources_found",
+                                           "needs_review"}
+                        and target_phrase.strip()):
+                    # The user explicitly supplied the new topic even when
+                    # the old question does not apply to it. Retain that name
+                    # as dialogue context so the next pronoun can resolve;
+                    # it is not a fact or source claim, and answer retrieval
+                    # still has to ground any response independently.
+                    self.topic_entity = re.sub(
+                        r"^(?:the|a|an)\s+", "", target_phrase.strip(),
+                        flags=re.IGNORECASE)
                 carried.question = message
                 return carried
         if not target_candidates:

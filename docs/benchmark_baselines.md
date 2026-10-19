@@ -234,6 +234,28 @@ paragraph control and focused dialogue regressions `v1_412`, `v1_413`,
 These are small authored fixtures; they test topic grounding and one answer
 type, not broad coreference or semantic answerability.
 
+## Current-topic binding for gendered and neutral follow-up pronouns
+
+Command: `python3 experiments/v1_438_dialogue_topic_pronoun_context.py`.
+
+The prior topic anchor handled neutral `it` follow-ups but still let a gendered
+pronoun such as “he” probe older entities and source mentions. On a source-only
+switch from the Eiffel Tower to Alan Turing, “Where did he work?” could ask the
+user to choose among Turing, Bletchley Park, and the Second World War. A single
+pronoun now binds to the explicitly current topic before checking which entity
+happens to have answerable evidence. An explicit user-named topic also remains
+available as dialogue context after the carried question fails, but that name
+does not enter factual memory or establish evidence. The experiment verifies
+the next pronoun resolves to the named target and that an unsupported question
+still abstains without reusing the Eiffel Tower's date. A later switch to the
+Sydney Opera House also stays anchored despite the earlier answerable topic.
+
+This is a deterministic single-pronoun context rule, not general coreference.
+Plural or multiple-pronoun turns still need candidate resolution or
+clarification, and the source sentence must independently support the answer.
+`v1_438` plus the established topic, persistence, citation, and transcript
+regressions passed 10/10 in the focused runtime suite.
+
 ## Failed entity follow-up must not leave a stale explanation target
 
 Command: `python3 experiments/v1_419_failed_entity_followup_state.py`.
@@ -1895,9 +1917,10 @@ python3 experiments/v1_422_direct_search_request_results.py
 python3 experiments/v1_426_dialogue_paragraph_grounding.py
 python3 experiments/v1_427_dialogue_multiturn_transcript.py
 python3 experiments/v1_435_dialogue_visible_evidence_anchor.py
+python3 experiments/v1_438_dialogue_topic_pronoun_context.py
 ```
 
-All nine scripts passed. Together they exercise visible-only source referents,
+All ten scripts passed. Together they exercise visible-only source referents,
 numbered source selection and citation revalidation, named topic switches,
 pronoun follow-ups, paragraph-local antecedent grounding, save/reload, failed
 follow-up cleanup, and `why?` behavior. The CLI subprocess in `v1_419` checks a
