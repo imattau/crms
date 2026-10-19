@@ -358,16 +358,20 @@ the goal but cannot substitute for transfer, task completion, or safe context.
    instruction is not itself verified. `v1_428_procedure_example_provenance.py`
    and `v1_429_chat_rule_source_attribution.py` validate memory, artifact, and
    chat plumbing. Natural-language and contrastive teaching still lack source
-   capture. `v1_430_source_disjoint_chat_rule_transfer.py` now transfers one
-   exact sort procedure from two fixture training documents to a third held-out
-   document through chat and generated code. It does not test an unseen
-   multi-step composition or independent publishers; keep those as explicit
-   blockers to the gate below.
+   capture. `v1_430_source_disjoint_chat_rule_transfer.py` transfers one exact
+   sort procedure from two fixture training documents to a third held-out
+   document. `v1_431_cited_sequence_rule_recombination.py` teaches the
+   connective from cited examples across separate fixture documents and
+   composes an unseen three-step sequence through chat; a held-out source is
+   excluded from the artifact, which validates against four held-out inputs
+   and survives a fresh chat process. This passes the minimum controlled
+   composition gate, not generalization across natural or independent sources.
 
-   **Gate:** at least one genuinely unseen composition works through ordinary
-   chat, passes an independent task validator, and survives save/reload with
-   lineage intact; near-miss and unsupported cases abstain. Prefer one new
-   transferred composition over more demonstrations of an existing one.
+   **Controlled gate:** passed for one fixture composition. **Full stage gate:**
+   repeat with naturally occurring, independently sourced teaching examples,
+   held-out tasks, and independently written wording; preserve exact lineage
+   and verify near-miss and unsupported abstention through chat. Do not infer
+   breadth from the fixture result.
 
 4. **Connect reasoning to those compositions and govern derived learning.**
    Route natural-language questions to proof paths; test joins, cycles,
@@ -449,21 +453,20 @@ standalone corpus scan:
    fact. Keep this as a bounded dialogue regression; do not mistake the small
    transcript for broad conversation coverage.
 2. **Measure recombination beyond the synthetic fixtures.** The current
-   v1_355, v1_357, and v1_424 witnesses already demonstrate unseen sequences,
-   contrastive teaching, chat generation, independent exact-output checks,
-   and an unsupported-middle-step refusal. Their small synthetic list and
-   math distributions do not meet the source-disjoint transfer gate. Procedure
-   example provenance is now preserved by the model API, generated artifact,
-   and optional cited `/teach-rule` path (`v1_428`, `v1_429`). The cited numeric
-   pair is checked, but the source-to-instruction link remains teacher-attributed
-   rather than semantically verified. `v1_430` adds a document-held-out chat
-   transfer for one exact procedure using fixture sources. Build the next
-   evaluation around cited connective examples in separate training documents
-   and a held-out, unseen composition, with independently written natural-
-   language requests, role/order changes, near-misses, and missing stages. Keep
-   the learner and task validator independent; retain examples, validation
-   split, and lineage. Follow with naturally occurring documents before making
-   broad transfer claims.
+   v1_355, v1_357, and v1_424 witnesses demonstrate unseen sequences,
+   contrastive teaching, chat generation, independent exact-output checks, and
+   refusal of unsupported middle steps. `v1_431` adds cited, document-held-out
+   transfer of an unseen three-step composition through chat and its generated
+   artifact. The fixture documents use one wording family and are not
+   independently sourced, so natural-corpus generalization remains unproven.
+   Procedure example provenance is preserved by the model API, generated
+   artifact, and optional cited `/teach-rule` path (`v1_428`, `v1_429`). The
+   cited numeric pair is checked, but the source-to-instruction link remains
+   teacher-attributed rather than semantically verified. Next use naturally
+   occurring documents and varied independent requests, with role/order
+   changes, near-misses, and missing stages. Keep the learner and task validator
+   independent; retain examples, validation split, and lineage. Do not infer
+   broad transfer from the controlled fixture.
    Do not count more synthetic demonstrations of the same connective as
    evidence of broad transfer.
 3. **Strengthen reasoning on the composition path.** Reuse the unseen

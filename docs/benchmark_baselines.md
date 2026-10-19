@@ -1598,3 +1598,26 @@ multi-step composition, broad language transfer, or independent source
 reliability. The next recombination benchmark should teach connective patterns
 from cited examples in separate source documents and test a held-out combination
 through the same chat and artifact path.
+
+## Cited connective transfer to an unseen composition (2026-10-20)
+
+Command: `python3 experiments/v1_431_cited_sequence_rule_recombination.py`.
+
+The chat learns five list operations and two examples of the `then` connective,
+with each numeric demonstration cited to one of seven training documents. It
+then writes code for a three-stage `unique → sort → reverse` composition, a
+combination not directly taught. The held-out input/output pairs are in an
+eighth indexed document whose citations are never given to rule teaching. The
+generated artifact retains the rule and component citations and excludes all
+held-out citations. It returns the correct output on four held-out inputs,
+passes code checks, and survives a fresh chat process with a deterministic
+artifact ID. A chat request with an unsupported middle operation emits no
+artifact.
+
+Runtime result: all checks passed. The documents are authored fixtures, the
+examples share a narrow wording family, and source IDs establish document
+separation only. This is stronger than a single-procedure transfer check, but
+it does not show independence across publishers, robust paraphrase handling, or
+general rule induction over naturally occurring text. The next evaluation must
+use naturally occurring, independently sourced instructions and independently
+written requests while retaining these controls.
