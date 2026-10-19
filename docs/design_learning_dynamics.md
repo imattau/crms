@@ -6,8 +6,10 @@ follow-through is implemented in `crms_chat.py` and covered by
 `experiments/v1_296_missing_premise_source_followup.py`. Section 3's report-only equivalence
 analysis is implemented in `crms_equivalence_dream.py` and covered by
 `experiments/v1_297_equivalence_dream_diagnostic.py`. The `/right` and `/wrong` feedback signal
-and its evidence-attributed SQLite event log are implemented; ledger weighting, preference,
-automated belief revision, and feedback effects on answers in sections 1 and 4 remain proposed.
+and its evidence-attributed SQLite event log are implemented. The standalone SQLite ledger engine
+is now implemented in `crms_ledger.py` and covered by `experiments/v1_368_evidence_ledger.py`;
+connecting it to accepted model items, answer preference, automated belief revision, and feedback
+effects on answers in sections 1 and 4 remain open work.
 Prototype results below are design evidence;
 their throwaway code (`ledger.py`, `exp_belief*.py`, `gap_followup.py`, `dream2.py`) is not
 imported. Separately, explicit `practice_relation` and `practice_question` can write a complete,
@@ -22,6 +24,15 @@ the exact contradicted conclusion remains ambiguous with its supporting proof. T
 rules remain active and report the conflict at the affected conclusion. `/inference-rules` exposes
 rule status and the cited counterexample so a user can inspect and correct it. Loading an older
 accepted-rule store also rechecks saved negative evidence and suspends rules that it contradicts.
+The ledger experiment checks deterministic registration and event updates, protected items, a
+preference margin, dependency-safe dormancy, stale-item listing, outer-transaction savepoints, and
+noisy revision. Across 200 synthetic 20%-noise seeds, the margin 0.30 policy averaged 1.27
+preference flips and 1.91 stale answers versus 5.46 stale answers with margin 0, with 14.40
+abstentions per 60 observations. This validates only the ledger equations on a synthetic signal;
+it is not a CRMS user-feedback result. The engine is not yet connected to fact/rule/frame registration
+or answer-selection paths: `/right` still does not change answer preferences, and item weights are
+not correctness evidence. Integration needs a source-strength-aware conflict policy and must
+preserve the existing evidence gates.
 **Origin:** ideas reviewed from the HPM Learning Agent repo (belief weights, demand-driven
 learning, "dreaming"), re-expressed without vectors.
 
