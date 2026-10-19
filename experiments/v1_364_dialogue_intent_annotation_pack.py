@@ -108,6 +108,13 @@ def main() -> None:
                     "task_intent_2", "adjudicated_dialogue_act",
                     "adjudicated_task_intent")),
                 "the preparation tool assigned labels automatically")
+        require(all(field in assistant_rows[0] for field in (
+                    "reviewed_at", "protocol_version", "reviewed_at_2",
+                    "protocol_version_2", "adjudicated_at"))
+                and all(field in user_rows[0] for field in (
+                    "reviewed_at", "protocol_version", "reviewed_at_2",
+                    "protocol_version_2", "adjudicated_at")),
+                "annotation provenance fields are incomplete")
 
     print("contextual user-intent rows and assistant-move rows: PASS")
     print("domain selection, repeated IDs, empty records, unknown speakers: PASS")

@@ -128,15 +128,17 @@ Check class coverage, disagreement, and annotation time before expanding. Keep d
 from frame induction and policy tuning. If a target class has too few independently supported
 examples, report it as underpowered rather than borrowing turns across the split.
 
-The worksheet stores the first label in `move_label`, `context_license`, `predecessor_label`, and
-`reviewer`. For rows marked `double_label_required=true`, a second annotator fills the corresponding
-`*_2` columns and `reviewer_2`. After independent labels are locked, an adjudicator fills
-`adjudicated_label` and `adjudicator`; record explanations in `annotator_note`. Do not overwrite a
-disagreement with the adjudicated result.
+The assistant worksheet stores the first label in `move_label`, `context_license`,
+`predecessor_label`, and `reviewer`. Record `reviewed_at` and `protocol_version` for that label. For
+rows marked `double_label_required=true`, a second annotator fills the corresponding `*_2` columns,
+`reviewer_2`, `reviewed_at_2`, and `protocol_version_2`. After independent labels are locked, an
+adjudicator fills `adjudicated_label`, `adjudicator`, and `adjudicated_at`; record explanations in
+`annotator_note`. Do not overwrite a disagreement with the adjudicated result.
 
 In the user worksheet, the primary fields are `dialogue_act`, `task_intent`, `context_state`,
 `predecessor_act`, and `reviewer`; second-rater fields end in `_2`. The adjudicated fields are
-`adjudicated_dialogue_act` and `adjudicated_task_intent`.
+`adjudicated_dialogue_act` and `adjudicated_task_intent`. Use the same reviewer, timestamp, protocol
+version, adjudicator, and note fields as the assistant worksheet.
 
 ## Evaluation against dialogue comparators
 

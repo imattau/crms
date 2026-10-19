@@ -112,3 +112,10 @@ capability comparator, not a label oracle.
 The current corpus preparation now emits `user_turns_to_label.csv` alongside the assistant move
 sheet. Both are in `/tmp/crms_taskmaster_pilot` in the current development environment; no labels
 have yet been supplied, so all quality claims remain open.
+
+`experiments/v1_366_dialogue_annotation_evaluation.py` checks split integrity, label values, audit
+coverage, raw agreement, Cohen's kappa, and adjudication of disagreements. On the current pack it
+reports `awaiting_annotations`, 6,227 user turns, 7,312 assistant turns, and no agreement score; an
+empty sheet is not evidence of agreement. It supports `--strict` to prevent incomplete annotations
+from being reported as a completed evaluation, and `--self-test` for the agreement formula,
+split-leakage checks, and required label provenance.
