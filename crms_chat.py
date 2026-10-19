@@ -7451,6 +7451,11 @@ def main() -> int:
                 outputs = _parse_integer_list(fields[2], allow_empty=True)
                 learned = rules.teach(fields[0], [(inputs, outputs)])
                 rules.save(args.rules)
+                pending_rule = (
+                    (fields[0], learned.contrastive_input)
+                    if learned.status in {"need_more_examples", "no_fit"}
+                    and learned.contrastive_input is not None else None)
+                _save_pending_rule(args.rule_session, args.rules, pending_rule)
                 _print_rule_learning_result(learned)
             except ValueError as error:
                 print(f"Could not teach rule: {error}")

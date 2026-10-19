@@ -1342,6 +1342,30 @@ language chat probe reaches one of those conclusions through the learned rule, a
 near-miss does not receive a positive inference. This exercises the full pipeline on a controlled
 corpus, not broad natural-language or open-domain learning quality.
 
+## Contrastive procedure learning through chat and cross-domain composition (2026-10-20)
+
+Command: `python3 experiments/v1_424_contrastive_rule_learning_composition.py`.
+
+The previously unlicensed instruction “sort the numbers” now has an end-to-end
+learning-path regression. A fresh chat first abstains on the code request. The
+user supplies five input/output examples; the learner asks for a contrastive
+output on `[0, 0]`, which distinguishes sorting from deduplication. That reply
+licenses the procedure, after which the same natural-language request composes
+it with a separately learned exact math map. The chat exposes both provenance
+stages, validates the generated artifact, and the learned rule still works
+after reload on an unseen integer list. A request to rotate the numbers remains
+unsupported and abstains. The same deterministic composed artifact is
+recreated after a fresh chat process starts.
+
+This exposed and fixed a chat integration defect: `/teach-rule` displayed the
+requested contrastive probe but did not save it as pending lesson state, so the
+teacher's output was routed as an unrelated question. The command now persists
+that pending probe and consumes a plain list reply. The focused experiment and
+the existing CLI teaching, cross-domain composition, and portable validated
+rule-transfer experiments pass. This is evidence for one teacher-guided rule
+shape and one exact-math composition, not autonomous language acquisition or
+broad coding competence.
+
 ## Sentence-ranker fresh-index diagnostic (2026-10-20)
 
 Command:
