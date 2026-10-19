@@ -183,9 +183,59 @@ def main() -> None:
             "fact-scan exhaustion must remain incomplete, got "
             f"{exhausted}")
 
+    mutual = CRMSKnowledgeBase()
+    mutual.add_inference_rule(
+        "alpha-base", "parent", "parent", "alpha ancestor")
+    mutual.add_inference_rule(
+        "beta-from-alpha", "parent", "alpha ancestor", "beta ancestor")
+    mutual.add_inference_rule(
+        "alpha-from-beta", "parent", "beta ancestor", "alpha ancestor")
+    for prefix, length in (("Short", 2), ("Long", 4), ("Beta", 3)):
+        chain = [f"{prefix}{index}" for index in range(length + 1)]
+        for subject, obj in zip(chain, chain[1:]):
+            mutual.add_fact(subject, "parent", obj,
+                            f"mutual:{subject}-{obj}")
+    mutual.teach_question(
+        "Who is an alpha ancestor of Short2?", relation="alpha ancestor",
+        answer_field="subject", bound_entity="Short2", answer="Short0")
+    mutual.teach_question(
+        "Who is an alpha ancestor of Long4?", relation="alpha ancestor",
+        answer_field="subject", bound_entity="Long4", answer="Long0")
+    for index in range(300):
+        mutual.add_fact(f"MutualNoise{index}", "unrelated",
+                        f"MutualOther{index}", f"mutual-noise:{index}")
+    mutual_result = mutual.ask("Who is an alpha ancestor of Long4?")
+    require(mutual_result.status == "ambiguous"
+            and set(mutual_result.candidates or ()) == {"Long0", "Long2"}
+            and mutual_result.inference_proofs,
+            "indexed variable inference should close mutually recursive alpha/beta "
+            f"rules over more than 256 entities, got {mutual_result}")
+    mutual_rules = [asdict(rule) for rule in mutual._inference_rules.values()]
+    for proof in mutual_result.inference_proofs:
+        verified = verify_inference_proof(
+            proof, mutual.facts(), mutual_rules,
+            expected_conclusion=proof["conclusion"],
+            fact_lookup=mutual._proof_fact_is_present)
+        require(verified.valid,
+                f"mutually recursive variable answer has invalid proof: {verified.reason}")
+    with tempfile.TemporaryDirectory(prefix="crms-mutual-variable-") as folder:
+        database = Path(folder) / "mutual.sqlite"
+        mutual.save(database)
+        mutual.close()
+        mutual_restored = CRMSKnowledgeBase.load(database)
+        mutual_sqlite_result = mutual_restored.ask(
+            "Who is an alpha ancestor of Long4?")
+        require(mutual_sqlite_result.status == "ambiguous"
+                and set(mutual_sqlite_result.candidates or ())
+                == {"Long0", "Long2"}
+                and mutual_sqlite_result.inference_proofs,
+                "mutually recursive indexed answers did not survive SQLite backing: "
+                f"{mutual_sqlite_result}")
+        mutual_restored.close()
+
     print("Indexed variable inference diagnostic: PASS")
     print("subject and object directions, recursive fixed-point proofs, exhaustive misses, "
-          "SQLite backing, and fact-scan exhaustion: PASS")
+          "mutual recursion, SQLite backing, and fact-scan exhaustion: PASS")
 
 
 if __name__ == "__main__":

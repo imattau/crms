@@ -13169,41 +13169,6 @@ class CRMSKnowledgeBase:
                         dict(case.get("qualifiers", ()))) == qualifier_key
                     for case in self._derived_cases.values())
 
-            base_rules = []
-            recursive_rules = []
-            for rule in target_rules:
-                if rule.third_relation is not None:
-                    premise_relations = [rule.first_relation,
-                                         rule.second_relation,
-                                         rule.third_relation]
-                    if not all(premise_is_extensional(item)
-                               for item in premise_relations):
-                        return None
-                    base_rules.append(rule)
-                    continue
-                recursive_positions = [
-                    field for field in ("first_relation", "second_relation")
-                    if _tokens(getattr(rule, field)) == relation_key]
-                if not recursive_positions:
-                    if not all(premise_is_extensional(item) for item in
-                               (rule.first_relation, rule.second_relation)):
-                        return None
-                    base_rules.append(rule)
-                    continue
-                if len(recursive_positions) != 1:
-                    return None
-                recursive_field = recursive_positions[0]
-                if ((answer_field == "subject"
-                     and recursive_field != "second_relation")
-                        or (answer_field == "object"
-                            and recursive_field != "first_relation")):
-                    return None
-                edge_relation = (rule.first_relation if answer_field == "subject"
-                                 else rule.second_relation)
-                if not premise_is_extensional(edge_relation):
-                    return None
-                recursive_rules.append(rule)
-
             def facts_at(relation_name: str, bound_field: str,
                          value: str) -> list[FactEvidence]:
                 nonlocal work, scan_exhausted
@@ -13240,6 +13205,223 @@ class CRMSKnowledgeBase:
             def has_kind(entity: str, kind: str) -> bool:
                 return any(_tokens(fact.object) == _tokens(kind)
                            for fact in facts_at("is-a", "subject", entity))
+
+            def mutually_recursive_answers(
+                    ) -> tuple[list[str], int, bool] | None:
+                """Close a bounded family of mutually recursive linear rules."""
+                all_rules = self._inference_rules_for_use()
+                rules_by_conclusion: dict[tuple[str, ...], list[InferenceRule]] = {}
+                for rule in all_rules:
+                    rules_by_conclusion.setdefault(
+                        _tokens(rule.conclusion_relation), []).append(rule)
+                closure = {relation_key}
+                pending = [relation_key]
+                while pending:
+                    current_relation = pending.pop()
+                    current_rules = rules_by_conclusion.get(current_relation, [])
+                    if not current_rules:
+                        return None
+                    for rule in current_rules:
+                        premise_relations = [rule.first_relation,
+                                             rule.second_relation]
+                        if rule.third_relation is not None:
+                            premise_relations.append(rule.third_relation)
+                        for premise_relation in premise_relations:
+                            premise_key = _tokens(premise_relation)
+                            if premise_key in rules_by_conclusion:
+                                if premise_key not in closure:
+                                    closure.add(premise_key)
+                                    pending.append(premise_key)
+                            elif self._relation_has_inference_schema(
+                                    premise_relation, qualifier_key):
+                                # This join path handles learned-rule recursion;
+                                # other schemas keep their existing solver.
+                                return None
+                if not any(
+                        _tokens(rule.conclusion_relation) != premise_key
+                        for relation in closure
+                        for rule in rules_by_conclusion[relation]
+                        for premise_key in (
+                            _tokens(rule.first_relation),
+                            _tokens(rule.second_relation),
+                            *(() if rule.third_relation is None else
+                              (_tokens(rule.third_relation),))
+                        ) if premise_key in closure):
+                    return None
+
+                rule_rows = [rule for relation in sorted(closure)
+                             for rule in sorted(
+                                 rules_by_conclusion[relation],
+                                 key=lambda item: item.rule_id)]
+                recursive: list[tuple[InferenceRule, str]] = []
+                base: list[InferenceRule] = []
+                for rule in rule_rows:
+                    premise_fields = ["first_relation", "second_relation"]
+                    if rule.third_relation is not None:
+                        premise_fields.append("third_relation")
+                    derived_fields = [field for field in premise_fields
+                                      if _tokens(getattr(rule, field)) in closure]
+                    if len(derived_fields) > 1:
+                        return None
+                    if not derived_fields:
+                        if not all(premise_is_extensional(
+                                getattr(rule, field)) for field in premise_fields):
+                            return None
+                        base.append(rule)
+                        continue
+                    if rule.third_relation is not None:
+                        return None
+                    recursive_field = derived_fields[0]
+                    if ((answer_field == "subject"
+                         and recursive_field != "second_relation")
+                            or (answer_field == "object"
+                                and recursive_field != "first_relation")):
+                        return None
+                    edge_field = ("first_relation" if answer_field == "subject"
+                                  else "second_relation")
+                    if not premise_is_extensional(getattr(rule, edge_field)):
+                        return None
+                    recursive.append((rule, recursive_field))
+                if not recursive or not base:
+                    return None
+
+                answers_by_relation: dict[
+                    tuple[str, ...], dict[tuple[str, ...], str]] = {}
+
+                def add_answer(rule: InferenceRule, answer: str) -> bool:
+                    relation = _tokens(rule.conclusion_relation)
+                    rows = answers_by_relation.setdefault(relation, {})
+                    key = _tokens(answer)
+                    if key in rows:
+                        return False
+                    rows[key] = answer
+                    return True
+
+                for rule in base:
+                    if rule.third_relation is None:
+                        if answer_field == "subject":
+                            for tail in facts_at(rule.second_relation,
+                                                 "object", bound):
+                                middle = tail.subject
+                                if (rule.middle_kind is not None
+                                        and not has_kind(middle, rule.middle_kind)):
+                                    continue
+                                for head in facts_at(rule.first_relation,
+                                                     "object", middle):
+                                    add_answer(rule, head.subject)
+                        else:
+                            for head in facts_at(rule.first_relation,
+                                                 "subject", bound):
+                                middle = head.object
+                                if (rule.middle_kind is not None
+                                        and not has_kind(middle, rule.middle_kind)):
+                                    continue
+                                for tail in facts_at(rule.second_relation,
+                                                     "subject", middle):
+                                    add_answer(rule, tail.object)
+                    else:
+                        first_kind = rule.middle_kind or ""
+                        second_kind = rule.second_middle_kind or ""
+                        if answer_field == "subject":
+                            for tail in facts_at(rule.third_relation,
+                                                 "object", bound):
+                                middle2 = tail.subject
+                                if not has_kind(middle2, second_kind):
+                                    continue
+                                for middle_edge in facts_at(
+                                        rule.second_relation, "object", middle2):
+                                    middle1 = middle_edge.subject
+                                    if not has_kind(middle1, first_kind):
+                                        continue
+                                    for head in facts_at(
+                                            rule.first_relation, "object", middle1):
+                                        add_answer(rule, head.subject)
+                        else:
+                            for head in facts_at(rule.first_relation,
+                                                 "subject", bound):
+                                middle1 = head.object
+                                if not has_kind(middle1, first_kind):
+                                    continue
+                                for middle_edge in facts_at(
+                                        rule.second_relation, "subject", middle1):
+                                    middle2 = middle_edge.object
+                                    if not has_kind(middle2, second_kind):
+                                        continue
+                                    for tail in facts_at(
+                                            rule.third_relation, "subject", middle2):
+                                        add_answer(rule, tail.object)
+
+                if any(len(values) > 256 for values in
+                       answers_by_relation.values()):
+                    return (sorted(answers_by_relation.get(
+                        relation_key, {}).values()), work, False)
+
+                changed = True
+                while changed:
+                    changed = False
+                    for rule, recursive_field in recursive:
+                        derived_relation = _tokens(getattr(rule, recursive_field))
+                        current = list(answers_by_relation.get(
+                            derived_relation, {}).values())
+                        for middle in current:
+                            if (rule.middle_kind is not None
+                                    and not has_kind(middle, rule.middle_kind)):
+                                continue
+                            if answer_field == "subject":
+                                edges = facts_at(rule.first_relation,
+                                                 "object", middle)
+                                additions = (edge.subject for edge in edges)
+                            else:
+                                edges = facts_at(rule.second_relation,
+                                                 "subject", middle)
+                                additions = (edge.object for edge in edges)
+                            for answer in additions:
+                                changed = add_answer(rule, answer) or changed
+                                if any(len(values) > 256 for values in
+                                       answers_by_relation.values()):
+                                    return (sorted(answers_by_relation.get(
+                                        relation_key, {}).values()), work, False)
+                candidates = answers_by_relation.get(relation_key, {})
+                return (sorted(candidates.values()), work, not scan_exhausted)
+
+            mutual = mutually_recursive_answers()
+            if mutual is not None:
+                return mutual
+
+            base_rules = []
+            recursive_rules = []
+            for rule in target_rules:
+                if rule.third_relation is not None:
+                    premise_relations = [rule.first_relation,
+                                         rule.second_relation,
+                                         rule.third_relation]
+                    if not all(premise_is_extensional(item)
+                               for item in premise_relations):
+                        return None
+                    base_rules.append(rule)
+                    continue
+                recursive_positions = [
+                    field for field in ("first_relation", "second_relation")
+                    if _tokens(getattr(rule, field)) == relation_key]
+                if not recursive_positions:
+                    if not all(premise_is_extensional(item) for item in
+                               (rule.first_relation, rule.second_relation)):
+                        return None
+                    base_rules.append(rule)
+                    continue
+                if len(recursive_positions) != 1:
+                    return None
+                recursive_field = recursive_positions[0]
+                if ((answer_field == "subject"
+                     and recursive_field != "second_relation")
+                        or (answer_field == "object"
+                            and recursive_field != "first_relation")):
+                    return None
+                edge_relation = (rule.first_relation if answer_field == "subject"
+                                 else rule.second_relation)
+                if not premise_is_extensional(edge_relation):
+                    return None
+                recursive_rules.append(rule)
 
             for rule in base_rules:
                 if rule.third_relation is None:

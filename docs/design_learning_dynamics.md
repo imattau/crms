@@ -403,9 +403,12 @@ The remaining issues are:
   inverse orientation for object answers. `experiments/v1_340_indexed_variable_inference.py`
   verifies both directions, independent proof trees, complete misses, SQLite persistence, and
   honest abstention after the fact-scan budget is reached. It also finds all nine ancestors of a
-  deepest leaf in a 2,047-node binary tree despite the 256-entity cutoff. Other recursive shapes
-  and mutually recursive rules still use the bounded entity-scan fallback; broader recursive join
-  ordering and visible expansion-truncation handling remain open.
+  deepest leaf in a 2,047-node binary tree despite the 256-entity cutoff. The same diagnostic now
+  checks a bounded mutually recursive pair of linear rules on both in-memory and SQLite stores,
+  including independent proof verification. This covers subject-answer traversal; inverse
+  mutually recursive queries, nonlinear recursion, and other recursive shapes still use the
+  bounded entity-scan fallback. Broader recursive join ordering and visible expansion-truncation
+  handling remain open.
 - Learned path-question frames can also do bounded forward expansion from a known entity. A
   two-example frame handles possessive wording such as “Who are Ann's grandchildren?”, including
   ASCII and curly apostrophes, and returns the two-edge proof. The system still needs those
@@ -433,11 +436,12 @@ The remaining issues are:
    applications, a 2,047-node tree, repeated recursive subgoals, proof caps, shortest paths, and
    retraction between calls. Add larger branching graphs and report rule depth, expansions, proof
    count, elapsed time, peak memory, and termination reason before raising limits further.
-2. **Extend variable queries and inverse relations.** Indexed joins now cover extensional rules
-   and a common linear recursive form in either supported endpoint orientation. Next, evaluate
-   mutually recursive rules, selective join ordering, and explicit partial-answer presentation.
-   Keep candidate and fact-scan bounds, with incomplete status whenever they prevent an exhaustive
-   answer set.
+2. **Extend variable queries and inverse relations.** Indexed joins now cover extensional rules,
+   a common self-recursive form in either supported endpoint orientation, and mutually recursive
+   linear rules for subject answers. Next, extend the mutually recursive join to inverse queries,
+   evaluate nonlinear recursion and selective join ordering, and improve explicit partial-answer
+   presentation. Keep candidate and fact-scan bounds, with incomplete status whenever they prevent
+   an exhaustive answer set.
 3. **Measure recursive and premise-join performance** on broader graph shapes, including multiple
    converging subgoals and adversarial branching. Keep support-cap and shortest-proof reporting
    explicit; never interpret 64 listed proofs as the total.
