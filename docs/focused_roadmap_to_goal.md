@@ -70,6 +70,130 @@ goal marked in progress.
    searchable source text, knowledge, rules, and provenance in a copied SQLite
    model; evaluate that clean copy across the fixed task suite.
 
+## Execution sequence from the current snapshot
+
+The priority list above describes the enduring work areas. This sequence says
+what to do next and what evidence unlocks the following step. Keep dialogue and
+intent research active alongside the learning work; do not postpone them until
+reasoning is “finished.”
+
+### Milestone A — Close the known chat correctness gaps
+
+Use the recent multi-topic transcript and source-only follow-ups as the fixed
+starting set. The 30-turn Eiffel Tower/Colosseum diagnostic now passes its
+reported topic-switch and stale-explanation cases, but it is only a
+two-paragraph fixture. Preserve those fixes, then vary document structure,
+entity names, intervening turns, and follow-up wording to find the boundary.
+Add any reproduced wrong-entity answer, lost valid context, or stale `why?`
+target as a regression. Separate turn classification, referent resolution,
+answering, and context update only where that makes regressions easier to
+prevent. Preserve a complete transcript and expected answer/abstention for
+every case.
+
+**Exit evidence:** fresh-process replays preserve the current regression wins
+across varied documents and entity names, with no confident wrong-entity
+answers or stale explanations; ambiguous references ask or abstain; valid
+source-only context survives the follow-up; citations refer to displayed
+evidence. The gate must be broader than the current Rome/Paris fixture.
+
+### Milestone B — Demonstrate source-disjoint rule learning and recombination
+
+Treat `v1_433` as a useful vertical slice, not as proof of source-driven
+learning: it has three narrow numeric examples, one example per operation,
+Codex-authored contrast/connective evidence, and four held-out lists. Expand
+one useful procedure family with multiple independently sourced examples per
+component. Keep the source sentence, executable example, proposed instruction
+mapping, teacher/labeler input, induced rule, and validator result as distinct
+records. A citation to code is evidence for the code behavior; it does not by
+itself establish that prose licenses an instruction.
+
+Hold out complete documents and at least one composition. Vary natural-language
+requests, component order, input values, and near-miss instructions. Include
+wrong outputs, missing steps, unsupported operations, and conflicting examples.
+Run the experiment through chat, verify outputs with an independent checker,
+then save, reload, and repeat it in a clean process. Track coverage, correct,
+wrong, abstained, provenance retained, and teacher effort separately.
+
+**Exit evidence:** the held-out source and unseen composition pass through chat
+and reload with correct independently checked outputs and complete lineage;
+unsupported operations abstain; no generated output validates the rule that
+generated it. If source text cannot support instruction alignment without
+hand-authored connective evidence, record that boundary and test a clearly
+scoped teacher-assisted route instead of claiming autonomous induction.
+
+### Milestone C — Join learned procedures to verified reasoning
+
+Choose a single composition family from Milestone B and pass it through the
+natural-language router, rule/proof selection, output validation, explanation,
+and optional derived-case proposal. Include complete, missing, contradictory,
+cyclic, and budget-limited cases. Keep derivations review-only with lineage;
+test correction and invalidation before allowing reuse. This is the point where
+recombination and reasoning become one demonstrated capability rather than
+separate engine experiments.
+
+**Exit evidence:** chat and direct-engine outcomes agree; every positive result
+has an independently verified proof or task result; incomplete searches never
+become positive answers; corrections identify dependent proposals; derived
+knowledge cannot outrank conflicting taught/source evidence.
+
+### Milestone D — Grow contextual dialogue and intent with task evidence
+
+In parallel with B and C, extend the multi-turn benchmark beyond simple factual
+follow-ups. Include topic switches, ambiguous references, user corrections,
+clarification cycles, “what did I ask?”, multiple open choices, and the same
+utterance under different context. Keep intent as a confidence-bearing,
+revisable hypothesis from the utterance plus explicit discourse state. Use it to
+route, clarify, or repair; it must not create facts or authorize unsupported
+actions. Compare any learned dialogue moves with the explicit baseline on held-
+out conversations and record label provenance and domain policy.
+
+**Exit evidence:** held-out multi-turn task completion improves over the
+current baseline without increasing wrong referents, stale context, or
+inappropriate actions. Dialogue-move induction remains experimental unless it
+beats the baseline on those measures.
+
+### Milestone E — Expand one bounded slice per domain
+
+Only after the shared gates above are stable, choose one user-useful task slice
+each for math, coding, translation, and creative writing. Define the supported
+request forms, independent checker, evidence/provenance policy, negative cases,
+and repair flow before implementation. Test each through ordinary CRMS
+language, then test cross-domain composition only after the component slices
+pass independently. The current arithmetic, list transforms, grounded
+translation, and story grammar are starting points, not domain-completion
+claims.
+
+**Exit evidence:** each slice reports held-out coverage, correct/wrong/abstained,
+completeness, provenance, repair success, and cost through chat. Creative work
+also gets human ratings for coherence and requested constraints; template
+validity alone is insufficient.
+
+### Milestone F — Freeze the portable model contract and compare capabilities
+
+Once the records needed by A–E are explicit and stable, finish the SQLite
+schema and migration path. Copy a built model to a clean location, remove
+access to ingestion files, query it, learn through supported paths, export or
+reload it, and query again. Run the same versioned chat scorecard against that
+copy. Compare task range and interaction qualitatively with the 70B-class
+reference, and publish resource use and unsupported cases.
+
+**Exit evidence:** the clean copy preserves searchable source text, facts,
+rules, procedures, dialogue state where appropriate, and lineage across build,
+learn, reload, and query. Distribution is complete only when this works without
+the original source files. Capability comparison must report measured CRMS
+results and must not imply parity from selected examples.
+
+### Review cadence and scope control
+
+At each milestone review, update the benchmark report and roadmap from actual
+runtime evidence. Select the next implementation task by expected reduction in
+wrong answers or increase in held-out useful coverage, while preserving the
+recombination, self-learning-rule, reasoning, and dialogue priorities. Do not
+add corpus volume, domains, UI polish, or storage migration just to show
+activity; each must unlock or measure a capability. Keep one end-to-end
+vertical slice usable before starting another, and retain all failed probes as
+negative controls.
+
 ## Execution plan
 
 ### 0. Keep one authoritative evaluation contract
