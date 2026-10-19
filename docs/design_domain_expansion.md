@@ -134,7 +134,10 @@ operation wording) and then maps an exact learned math expression across the
 result. Both stage artifacts and the outer composition retain lineage, and the
 standalone output is checked against exact composed probes. This still handles
 one typed list operation followed by one elementwise formula; it does not
-establish general task planning or arbitrary code composition.
+establish general task planning or arbitrary code composition. Its request
+surface accepts a small set of equivalent orderings (“then”, “and then”, or
+“after [list stage], map …”), while operation selection remains grounded in
+the same learned procedure and math evidence.
 
 Each composition must retain the lineage of every contributing frame, rule,
 fact, and intermediate result. If one stage is unsupported, the whole result

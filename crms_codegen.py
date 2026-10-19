@@ -831,11 +831,18 @@ def generate_list_then_math_python(
             tuple[str, ...], tuple[int, tuple[str, ...]]] | None = None
         ) -> GeneratedCode | None:
     """Compose a learned list procedure with an exact learned math mapping."""
-    match = re.fullmatch(
-        r"\s*(.+?)\s+then\s+(?:apply|map)\s+(.+?)\s+to\s+each\s+"
+    suffix = (
+        r"\s*(?:apply|map)\s+(.+?)\s+(?:to|over)\s+each\s+"
         r"(?:integer|number|value|item)(?:\s+in\s+(?:the\s+)?"
-        r"(?:list|input))?\s*[.!?]*\s*",
+        r"(?:list|input))?\s*[.!?]*\s*")
+    match = re.fullmatch(
+        r"\s*(.+?)\s*,?\s+(?:(?:and\s+)?then\s+)" + suffix,
         instruction, flags=re.IGNORECASE)
+    if match is None:
+        # A common alternative ordering: "After [list operation], apply ...".
+        match = re.fullmatch(
+            r"\s*after\s+(.+?),\s*" + suffix,
+            instruction, flags=re.IGNORECASE)
     if match is None:
         return None
     list_instruction, expression = match.group(1).strip(), match.group(2).strip()

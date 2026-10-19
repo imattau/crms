@@ -4589,7 +4589,9 @@ examples, and provenance into a single generated artifact. A learned
 sort→reverse sequence followed by `x times x plus 3` maps `[4, 1, 4, 2]` to
 `[19, 19, 7, 4]`. Each component and the composed function are checked;
 missing or unsupported stages abstain. This remains a fixed two-stage pattern,
-not general task planning. See
+not general task planning. Its request parser accepts “then”, “and then”, and
+“After [list stage], map … over each value” formulations while requiring the
+same learned operation support. See
 `experiments/v1_357_cross_domain_list_math_composition.py`.
 After generating code in the current chat session, a user can ask “Explain that
 code” or “What does it do?” to inspect its learned operation, aligned examples,

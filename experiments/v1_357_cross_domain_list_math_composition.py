@@ -27,6 +27,12 @@ COMPOUNDS = (
 )
 REQUEST = ("sort the list then reverse the list then apply x times x plus 3 "
            "to each value")
+REQUEST_VARIANTS = (
+    "sort the list then reverse the list and then apply x times x plus 3 to "
+    "each value in the list",
+    "After sort the list then reverse the list, map x times x plus 3 over "
+    "each value",
+)
 
 
 def require(condition: bool, message: str) -> None:
@@ -100,6 +106,17 @@ def main() -> None:
     require(repeated is not None
             and repeated.provenance_id == artifact.provenance_id,
             "composed artifact id changed for identical learned state")
+    for variant in REQUEST_VARIANTS:
+        variant_artifact = generate_list_then_math_python(rules, math, variant)
+        require(variant_artifact is not None,
+                f"common instruction wording did not resolve: {variant}")
+        variant_namespace: dict[str, object] = {}
+        exec(compile(variant_artifact.source, "<crms-cross-domain-variant>", "exec"),
+             variant_namespace)
+        require(variant_namespace["transform"]([4, 1, 4, 2])
+                == [19, 19, 7, 4]
+                and variant_namespace["validate_examples"](),
+                f"wording variant changed supported task semantics: {variant}")
     evidence = show_generated_code_evidence(artifact)
     require("learned list procedure" in describe_generated_code(artifact)
             and "Generated composed Python" in render(artifact, REQUEST)
@@ -132,7 +149,7 @@ def main() -> None:
         ]
         run = subprocess.run(
             command,
-            input=(f"Write Python code to {REQUEST}\nExplain that code\n"
+            input=(f"Write Python code to {REQUEST_VARIANTS[1]}\nExplain that code\n"
                    "Show the examples for that code\n/quit\n"),
             text=True, capture_output=True, cwd=root, check=False, timeout=30)
         require(run.returncode == 0

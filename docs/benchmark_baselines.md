@@ -37,7 +37,9 @@ Command: `python3 experiments/v1_357_cross_domain_list_math_composition.py`
 
 This diagnostic learns two oppositely ordered sequence patterns using a
 contrastive duplicate-only input, then applies the transferred sort→reverse
-sequence before an exact learned `x*x+3` map. The generated artifact returns
+sequence before an exact learned `x*x+3` map. The request route also accepts
+“and then” and “After [list stage], map … over each value” formulations; these
+wording variants keep the same typed operations and evidence. The generated artifact returns
 `[19, 19, 7, 4]` for `[4, 1, 4, 2]`, records list-stage, math-stage, and outer
 composition provenance, checks both component artifacts and four composed
 probes, and answers ordinary chat requests for generation, explanation, and
