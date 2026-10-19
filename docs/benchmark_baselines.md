@@ -149,6 +149,39 @@ same-entity question with the unrelated verb `investigate`. These targeted
 controls and the broader quoted-evidence and passive-question regressions pass;
 they do not measure broad paraphrase recall.
 
+## Reported natural-language chat failures
+
+Command: `python3 experiments/v1_418_reported_chat_language_regressions.py`.
+
+This scratch-chat regression checks source-only answers for the previously
+reported Everest location, Alan Turing workplace, Eiffel Tower builder, and
+active-question/passive-evidence cases. It also checks a source-backed yes/no
+answer. The `Who built the Eiffel Tower?` case uncovered a route-order bug: a
+review-only candidate for the compound source predicate `designed and built`
+preempted the already-supported `built` question. Chat now applies the exact
+question-evidence gate to that candidate sentence first, quotes it when the
+predicate and roles are directly supported, and keeps extracted facts
+unaccepted. The same corpus still sends `Who made the Eiffel Tower?` to review,
+and abstains on the unlicensed `Where does the Serein River 0133 run?` and a
+mismatched city identifier. The end-to-end experiment passes. This is a fix for
+direct predicate containment and route order, not a synonym or open-domain
+semantic parser.
+
+## Failed entity follow-up must not leave a stale explanation target
+
+Command: `python3 experiments/v1_419_failed_entity_followup_state.py`.
+
+The source-only dialogue sequence moves from Eiffel Tower to Colosseum, then
+tries the unsupported elliptical switch “And Italy?”. The turn remains
+unanswered, but the prior Colosseum question had remained available to the
+`why?` handler, which replayed evidence for the wrong conversational move.
+When a named entity substitution has no grounded answer, dialogue now clears
+the explainable-question pointer while retaining the last cited topic as a
+candidate for repair. The regression checks both `CRMSDialogue.turn` and the
+interactive CLI in an isolated directory. It does not claim that all elliptical
+topic changes are understood; unsupported switches still need clarification or
+abstention.
+
 ## Grounded math-to-list-code composition
 
 Command: `python3 experiments/v1_356_grounded_math_list_composition.py`

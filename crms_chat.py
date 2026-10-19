@@ -9766,6 +9766,7 @@ def main() -> int:
         who_evidence = None
         realized = None
         who_route_used = False
+        source_predicate_directly_entails = False
         conjunctive_who_route_used = False
         coordinated_who = _natural_coordinated_who(line, index=index)
         if (coordinated_who is not None
@@ -9856,45 +9857,64 @@ def main() -> int:
                         knowledge, index, line,
                         turn.research.query_expansions or []))
             if surface_relation_candidate is not None:
-                who_route_used = True
-                turn.status = "needs_review"
-                existing = list(turn.research.candidates or [])
-                existing_keys = {
-                    (tuple(normalized_tokens(item.subject)),
-                     tuple(normalized_tokens(item.relation)),
-                     tuple(normalized_tokens(item.object)), item.source)
-                    for item in existing
-                }
-                candidate_key = (
-                    tuple(normalized_tokens(surface_relation_candidate.subject)),
-                    tuple(normalized_tokens(surface_relation_candidate.relation)),
-                    tuple(normalized_tokens(surface_relation_candidate.object)),
-                    surface_relation_candidate.source)
-                if candidate_key not in existing_keys:
-                    existing.append(surface_relation_candidate)
-                turn.research.candidates = existing
-                turn.research.status = "needs_review"
                 source_title = index.document(
                     surface_relation_candidate.source.split("#", 1)[0]).title
-                turn.research.source_sentences = [{
+                candidate_sentence = {
                     "document_id": surface_relation_candidate.source.split("#", 1)[0],
                     "title": source_title,
                     "text": surface_relation_candidate.sentence,
                     "citation": surface_relation_candidate.source,
                     "context_kind": "assertion",
-                }]
-                relation_record = next(
-                    (record for record in surface_relation_candidate.language_evidence
-                     if record.get("method")
-                     == "question-anchored source relation comparison"), {})
-                turn.text = (
-                    f"I can't answer with '{relation_record.get('requested_predicate', '')}' "
-                    f"yet: the source uses '{surface_relation_candidate.relation}'. "
-                    f"Review the source-backed candidate "
-                    f"{surface_relation_candidate.subject} — "
-                    f"{surface_relation_candidate.relation} → "
-                    f"{surface_relation_candidate.object} [Source: {source_title}]; "
-                    "confirm that the wording and roles match before teaching this rule.")
+                }
+                direct_sentence_support = gate_quoted_evidence(
+                    normalized_who_question, [candidate_sentence],
+                    licensed_predicates=(
+                        turn.research.query_expansions or []))
+                if direct_sentence_support["status"] == "accepted":
+                    # A broad candidate relation can contain a predicate that
+                    # directly answers the user (for example, "designed and
+                    # built" supports "Who built X?"). Quote the exact source
+                    # sentence; keep its extracted relation out of accepted
+                    # knowledge and don't require the user to review an alias.
+                    who_evidence = dict(candidate_sentence)
+                    who_evidence["normalized_question"] = normalized_who_question
+                    turn.status = "sources_found"
+                    turn.research.source_sentences = [candidate_sentence]
+                    turn.research.candidates = []
+                    turn.research.status = "sources_found"
+                    source_predicate_directly_entails = True
+                else:
+                    who_route_used = True
+                    turn.status = "needs_review"
+                    existing = list(turn.research.candidates or [])
+                    existing_keys = {
+                        (tuple(normalized_tokens(item.subject)),
+                         tuple(normalized_tokens(item.relation)),
+                         tuple(normalized_tokens(item.object)), item.source)
+                        for item in existing
+                    }
+                    candidate_key = (
+                        tuple(normalized_tokens(surface_relation_candidate.subject)),
+                        tuple(normalized_tokens(surface_relation_candidate.relation)),
+                        tuple(normalized_tokens(surface_relation_candidate.object)),
+                        surface_relation_candidate.source)
+                    if candidate_key not in existing_keys:
+                        existing.append(surface_relation_candidate)
+                    turn.research.candidates = existing
+                    turn.research.status = "needs_review"
+                    turn.research.source_sentences = [candidate_sentence]
+                    relation_record = next(
+                        (record for record in surface_relation_candidate.language_evidence
+                         if record.get("method")
+                         == "question-anchored source relation comparison"), {})
+                    turn.text = (
+                        f"I can't answer with '{relation_record.get('requested_predicate', '')}' "
+                        f"yet: the source uses '{surface_relation_candidate.relation}'. "
+                        f"Review the source-backed candidate "
+                        f"{surface_relation_candidate.subject} — "
+                        f"{surface_relation_candidate.relation} → "
+                        f"{surface_relation_candidate.object} [Source: {source_title}]; "
+                        "confirm that the wording and roles match before teaching this rule.")
             if (who_evidence is not None
                     and not who_evidence.get("ambiguous_pages")
                     and not who_evidence.get("realized_answer")):
@@ -9930,6 +9950,7 @@ def main() -> int:
                     f"'{line.strip()}': {page_names}. Which page do you mean?")
             elif who_evidence is not None:
                 reviewable = ([] if who_evidence.get("structured_metadata")
+                              or source_predicate_directly_entails
                               else _reviewable_who_candidates(
                                   knowledge, index,
                                   str(who_evidence.get("normalized_question", line)),

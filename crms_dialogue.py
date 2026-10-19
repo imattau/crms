@@ -1553,7 +1553,13 @@ class CRMSDialogue:
                 "please restate the full question."
                 if len(answered) > 1 else
                 "I could not verify that follow-up from stored evidence.")
-            return DialogueTurn("unknown", message, self.last_question,
+            # This turn attempted to move the active question to a different
+            # entity. Keep the cited topic mentions for a possible repair, but
+            # do not let a later "why?" silently explain the previous entity's
+            # answer as if it answered this failed follow-up.
+            self.last_question = None
+            self.last_selected_answer = None
+            return DialogueTurn("unknown", message, message,
                                 text=response_text)
         resolved_question, (response, text, research) = next(iter(answered.items()))
         assert response is not None
