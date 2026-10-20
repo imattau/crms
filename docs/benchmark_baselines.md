@@ -53,6 +53,29 @@ complete-document sample or a proposal precision/coverage estimate. The new
 case demonstrates a concrete subject-boundary failure and a local repair; the
 full-document corpus-fit and publisher-held-out gates remain open.
 
+## Local arXiv full-text corpus-fit audit (2026-10-20)
+
+Command: `python3 experiments/v1_473_arxiv_source_fit_audit.py`.
+
+Read-only scan of `data/crms_arxiv_cc0_ccby.sqlite` (database SHA-256
+`7a96b66d4451526f0bcdb7ab3d9fb504382283aceee4b95606ba6e56c0d1d451`). It
+contains 1,697 records, but only 8 are imported full-paper texts (7 declared
+CC BY and 1 CC0); 1,689 are metadata/abstract records. The frozen candidate
+grammar found **0 candidates in the 8 full papers** and 3 in metadata/abstract
+records. Codex reviewed all 3: a predicted causal effect, a likely misbound
+“objective function” phrase, and an administrative code-release statement;
+none is a useful operation phrase. A fresh chat process surfaced the same
+three as cited, review-only suggestions and left `/rules` empty.
+
+This falsifies the assumption that the installed arXiv index is a useful
+positive corpus for the current “subject will predicate” procedure grammar.
+The positive examples are too few even for a stable precision estimate, and
+metadata hits are not full-text evidence. It remains a useful knowledge source
+and a negative corpus-fit control, but must not be counted as 1,697 full
+papers. The procedure-transfer gate needs complete technical references with
+naturally occurring operation descriptions; academic papers may need a
+different rule-discovery signal.
+
 ## Proof-guided procedure composition (2026-10-20)
 
 Command: `python3 run_experiments.py --match v1_451 --timeout 300`.

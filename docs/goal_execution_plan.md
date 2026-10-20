@@ -201,6 +201,17 @@ research material, retain source/version/license metadata, and include genuine
 non-proposal passages. If the construction is too rare in those sources, treat
 that as a yield result and reconsider whether it is the right learning signal.
 
+`v1_473` audited the local arXiv index rather than trusting its record count:
+1,697 records resolve to only 8 full-paper texts and 1,689 metadata/abstract
+records. The frozen grammar found no candidate in the 8 full papers and three
+in metadata/abstract text; Codex labeled all three non-useful for procedure
+learning. Fresh chat rendered those three as cited review-only candidates and
+did not change the rule store. This is a corpus-fit failure, not evidence that
+academic text is useless for CRMS generally. Stop using this arXiv index as a
+positive transfer set for this grammar; keep it as a negative control and
+knowledge source, and evaluate a different discovery signal if scholarly
+papers are the intended learning domain.
+
 **Gate:** a frozen method finds useful candidates on held-out documents and a
 second publisher with measured precision and review effort; sampled
 non-proposals and negative controls do not become positive rules. Accepted
@@ -301,8 +312,9 @@ academic-paper sources.
    effort on precision tuning. Label candidate and non-candidate passages for
    relation/operation meaning, argument roles, polarity, quotation, scope, and
    assertion status. Treat
-   `v1_469`/`v1_436` as integration controls and `v1_464`/`v1_468` as noisy
-   baselines. Apply the frozen revised candidate generator to complete
+   `v1_469`/`v1_436` as integration controls, `v1_464`/`v1_468` as noisy
+   baselines, and `v1_473` as an arXiv corpus-fit negative control. Apply the
+   frozen revised candidate generator to complete technical-reference
    documents from discovery publishers and the held-out publisher. Sample
    proposals and non-proposals; include
    polarity, quotation, contrast, role-reversal, boundary, and unrelated
