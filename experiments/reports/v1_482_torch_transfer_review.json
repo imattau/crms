@@ -1,0 +1,669 @@
+{
+  "audit": "v1_482_review_torch_transfer_sample",
+  "candidate_label_counts": {
+    "boundary_error": 12,
+    "context_needed": 2,
+    "reviewable": 6
+  },
+  "candidate_sample": [
+    {
+      "api_unit": "torch.nn.modules.rnn.LSTM",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "be used",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [
+            "before: If ``proj_size > 0`` is specified"
+          ],
+          "subject": "LSTM with projections"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "The LSTM projection condition and selected behavior are explicit.",
+      "sample_key": "00e1c03326e4b746bde7b00775f199da091c8a683590a8b681c08b22101ccdf5",
+      "sentence_sha256": "ed4e09dbd2243ee7ae579c73957c3d97f279697bc712e4245d70d121cea5fa07",
+      "source_citation": "torch.nn.modules.rnn.LSTM#sha256=999923e3dbc195439462348e31674acdff9941d046113157e5ab58744a687828&chars=1488:1558",
+      "source_sentence": "If ``proj_size > 0`` is specified, LSTM with projections will be used."
+    },
+    {
+      "api_unit": "torch.nn.modules.container.Sequential",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "be used as the input to the first",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "The output of # `Conv2d(1,20,5)`"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "The sentence is a truncated code-example line; the predicate ends at 'first'.",
+      "sample_key": "027b49c1fa02062e4e6ea230533944817d165fa1b21a5accf8c14012dceb38eb",
+      "sentence_sha256": "820c9c2a0864eb07cd1fcb2ba216ef0c76c3a387f416c1bcd95c01539f5a547a",
+      "source_citation": "torch.nn.modules.container.Sequential#sha256=6e4d48106bc8fd693de6539009a6350189832944506068cea0bbd26b1abf792e&chars=1097:1172",
+      "source_sentence": "The output of\n    # `Conv2d(1,20,5)` will be used as the input to the first"
+    },
+    {
+      "api_unit": "torch.nn.modules.loss.CrossEntropyLoss",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "be applied, ``'mean'``: the weighted mean of the output is taken",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "``'none'``: no reduction"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "The reduction list alternatives are merged into one candidate.",
+      "sample_key": "02d01684f84059003075f65d3575fbd54472aa91f114f14c7958a9b4cae2b846",
+      "sentence_sha256": "15b04944ab458503bb96d15b7f6f7524491f4d41a6d406882b9aa7facc81fdd0",
+      "source_citation": "torch.nn.modules.loss.CrossEntropyLoss#sha256=37e555bb26fc830840b210f93584d59fd799d6c3fff2c4a752033ee072325193&chars=4663:4766",
+      "source_sentence": "``'none'``: no reduction will\n        be applied, ``'mean'``: the weighted mean of the output is taken,"
+    },
+    {
+      "api_unit": "torch.nn.modules.pooling.MaxPool3d",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "use `ceil` instead of `floor` to compute the output shape",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "Useful for :class:`torch.nn.MaxUnpool3d` later ceil_mode: when True"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "The subject absorbs a neighboring note and the ceil_mode condition.",
+      "sample_key": "0548e78011f18b61270b79b7507fde449d7bfbc8663f33137416fb3c3fb9fadb",
+      "sentence_sha256": "b8644b7ad7bfe9926962c8dbf44deb479848b9220068bb6caf586d5713e14ae9",
+      "source_citation": "torch.nn.modules.pooling.MaxPool3d#sha256=ac30fd881de5752ef1f79df307bd727ca63c814a985914290c715b700893c4cc&chars=2002:2137",
+      "source_sentence": "Useful for :class:`torch.nn.MaxUnpool3d` later\n    ceil_mode: when True, will use `ceil` instead of `floor` to compute the output shape"
+    },
+    {
+      "api_unit": "torch.nn.modules.fold.Fold",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "be replicated across all spatial dimensions",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [
+            "before: If :attr:`output_size`, :attr:`kernel_size`, :attr:`dilation`, :attr:`padding` or :attr:`stride` is an int or a tuple of length 1"
+          ],
+          "subject": "their values"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "The plural values subject and replication behavior are explicit, with its condition retained.",
+      "sample_key": "06a495d081bb5a06461cd89a0de0976d654a6b735efb383889e3da71174ccb0c",
+      "sentence_sha256": "d722d694098ca75d13ba0d4c6df2c776549ead53a702fd236ba8f7f6d5485567",
+      "source_citation": "torch.nn.modules.fold.Fold#sha256=5f29769862df9d874a0243bb865898da71a90b961998f78b30757ca5d0b577c4&chars=2597:2800",
+      "source_sentence": "* If :attr:`output_size`, :attr:`kernel_size`, :attr:`dilation`,\n  :attr:`padding` or :attr:`stride` is an int or a tuple of length 1 then\n  their values will be replicated across all spatial dimensions."
+    },
+    {
+      "api_unit": "torch.nn.modules.pooling.MaxPool1d",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "return the argmax along with the max values",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "return_indices: If ``True``"
+        }
+      ],
+      "codex_review_label": "context_needed",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "return_indices is a condition; the action subject is implicit in the API operation.",
+      "sample_key": "0755ee3df6e884e45b287e605a86528e83225e76d4f5d95cf31306653175b5ad",
+      "sentence_sha256": "9d5fe5651d03714e7b762f80f41c78947de5703635a6d0819100c55c243409fe",
+      "source_citation": "torch.nn.modules.pooling.MaxPool1d#sha256=d3f92826cfd6b816f0faff29e87d49a478db6b24f553ab77c02501ecb497edf4&chars=1216:1294",
+      "source_sentence": "return_indices: If ``True``, will return the argmax along with the max values."
+    },
+    {
+      "api_unit": "torch.nn.modules.dropout.FeatureAlphaDropout",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "do this operation in-place",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "Default: 0.5 inplace (bool, optional): If set to ``True``"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "Default and parameter-description text are absorbed into the subject.",
+      "sample_key": "07ced4a10017a33fc7993d1bd6e714100337778fa429dd0a6541accdde481971",
+      "sentence_sha256": "5089201ca285cf3e472338dcb4261d4458714a62ea3cd1d8dfb7da90a9b2c1b3",
+      "source_citation": "torch.nn.modules.dropout.FeatureAlphaDropout#sha256=f2b244aca74204fcf3a4410295f6e59ed7c5811a747e100fd9b8302dab6fbf16&chars=1303:1405",
+      "source_sentence": "Default: 0.5\n    inplace (bool, optional): If set to ``True``, will do this operation\n        in-place"
+    },
+    {
+      "api_unit": "torch._C._linalg.linalg_vector_norm",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "be computed over these dimensions and the other dimensions will be treated as batch dimensions",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [
+            "before: If :attr:`dim` is an `int` or a `tuple`"
+          ],
+          "subject": "the norm"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "Two coordinated norm claims are combined into one predicate.",
+      "sample_key": "07f1f870e63eb6ab5afb8b7bb3cc0ded751abdf595bdb802f1cec573f290de80",
+      "sentence_sha256": "26f8d6a5e4ca3ab3c701bda2fed526df9007a856179adfb6f61d09fadd1235bd",
+      "source_citation": "torch._C._linalg.linalg_vector_norm#sha256=6410338b775953cb3653df6943247ae86be19c5d952ca1493f06b153a87f1fc2&chars=439:593",
+      "source_sentence": "- If :attr:`dim` is an `int` or a `tuple`, the norm will be computed over these dimensions\n  and the other dimensions will be treated as batch dimensions."
+    },
+    {
+      "api_unit": "torch.nn.modules.dropout.Dropout2d",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "change in a future release to interpret 3D inputs as no-batch-dim inputs",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "This behavior"
+        }
+      ],
+      "codex_review_label": "context_needed",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "This behavior depends on an antecedent outside the cited sentence.",
+      "sample_key": "08620d9d51cc6cad583d053746329b79a9b72e844c8462802086706e1f4fb8ef",
+      "sentence_sha256": "d4ef918afe7ff338f7df76fad2de3f56815f0cfde45259f161b5a4addc067374",
+      "source_citation": "torch.nn.modules.dropout.Dropout2d#sha256=30a7b9dfc9fc165d2c703ad6fe5bdd09858d07094e100e9883767b1ca55cba69&chars=1251:1351",
+      "source_sentence": "This\n    behavior will change in a future release to interpret 3D inputs as no-batch-dim\n    inputs."
+    },
+    {
+      "api_unit": "torch.nn.parameter.Parameter",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "still have `requires_grad=True` in :class:`~no_grad` mode",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "Parameter creation--the Parameter"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "The Parameter remains an explicit subject and the no_grad qualification is preserved.",
+      "sample_key": "08dfdc0b574f62c9397b65fdb3f681362271be0d4c3bf4743aca98b3515be6fb",
+      "sentence_sha256": "0199ece690418d6692e9ec3ab8ca9050f88e016bd65624f3a102f4449ae2f73e",
+      "source_citation": "torch.nn.parameter.Parameter#sha256=e64f0585ca832653b76ac6f1b69bc391c634c6cb1cf2107ce5011ba71b03a782&chars=806:911",
+      "source_sentence": "Parameter creation--the Parameter will still have `requires_grad=True` in\n        :class:`~no_grad` mode."
+    },
+    {
+      "api_unit": "torch.utils.data.datapipes.datapipe.IterDataPipe",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "have a different copy of the DataPipe object, so it is often desired to configure each copy independently to avoid having duplicate data returned from the workers",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [
+            "before: When :attr:`num_workers > 0`"
+          ],
+          "subject": "each worker process"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "The worker-process subject and num_workers condition are explicit.",
+      "sample_key": "0c0fa6c4b136f2af8b94d2d3144577d95af1277b03cb932d5d1c75c56ba05664",
+      "sentence_sha256": "3def60f73d9bd546e8dbf6291f9709837b0cac8b9f3ca33cec610dce33db77df",
+      "source_citation": "torch.utils.data.datapipes.datapipe.IterDataPipe#sha256=8d7a3d99e14a6aedb78ac14d32de6406836280fbde0125b09b52f28e2677255a&chars=1938:2168",
+      "source_sentence": "When :attr:`num_workers > 0`, each worker process will have a\n    different copy of the DataPipe object, so it is often desired to configure\n    each copy independently to avoid having duplicate data returned from the\n    workers."
+    },
+    {
+      "api_unit": "torch.optim.sparse_adam.SparseAdam",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "update the first moment, the second moment, and the parameters based on all values of the gradients, SparseAdam only updates the moments and parameters corresponding to the non-zero values of the gradients",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "Whereas the Adam algorithm"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "The comparative Whereas clause is extracted as subject and the contrasting claim is merged.",
+      "sample_key": "0d3ca6b7c3417777d34ecabce1034ab35b18bef6b12571ad7878160a8436e8a1",
+      "sentence_sha256": "6f5add866678c32e9dc834d1b20f4cfd289d72cad42537f9372ee65722a51170",
+      "source_citation": "torch.optim.sparse_adam.SparseAdam#sha256=c1270a8b6f32c272a13263afc58e4bbfc2d0a525905f4b81779963da687a36d9&chars=615:853",
+      "source_sentence": "Whereas the Adam algorithm\nwill update the first moment, the second moment, and the parameters based on all values\nof the gradients, SparseAdam only updates the moments and parameters corresponding\nto the non-zero values of the gradients."
+    },
+    {
+      "api_unit": "torch.nn.modules.transformer.TransformerEncoderLayer",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "use a special optimized implementation described in",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "Fast path: forward()"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "The source excerpt is an incomplete sentence ending at 'described in'.",
+      "sample_key": "1063d842f4b7071817354be8c2074e87507475560fc86fd9f0ef21c95429d8cb",
+      "sentence_sha256": "2345b5c6e4ce59d98d5930416a7c43ae7c14f914b1a0242d1037261e8c23cb24",
+      "source_citation": "torch.nn.modules.transformer.TransformerEncoderLayer#sha256=159567fc25e1f405dcb7b1782f57c9940bc52eb98ff1135073d53ca2df3be04a&chars=2752:2833",
+      "source_sentence": "Fast path:\n    forward() will use a special optimized implementation described in"
+    },
+    {
+      "api_unit": "torch.nn.modules.loss.PoissonNLLLoss",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "override :attr:`reduction`",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "Note: :attr:`size_average` and :attr:`reduce` are in the process of being deprecated, and in the meantime, specifying either of those two args"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "The note and deprecated-argument context are absorbed into the subject.",
+      "sample_key": "10a03256ea5106bcd72d2fa58b9a324f62d822d75f33d6bde9d24ff312f38ebb",
+      "sentence_sha256": "2d2c66fca2e65abe8bef74561f467c4bb77890c625637f7c327c33d4bfec404f",
+      "source_citation": "torch.nn.modules.loss.PoissonNLLLoss#sha256=d29fa0ee31380d349668da5c3bb27c6ad8203d5f0fcb75ddc4a08f53e034b9c3&chars=2151:2342",
+      "source_sentence": "Note: :attr:`size_average`\n        and :attr:`reduce` are in the process of being deprecated, and in the meantime,\n        specifying either of those two args will override :attr:`reduction`."
+    },
+    {
+      "api_unit": "torch.nn.modules.conv.Conv3d",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "use :ref:`different precision<fp16_on_mi200>` for backward",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "On certain ROCm devices, when using float16 inputs this module"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "Device and dtype conditions are incorrectly part of the subject.",
+      "sample_key": "10a4a6be8cd8c02829fd035e8d67d236a5be104b194566b25804816ebf3ec863",
+      "sentence_sha256": "05cebc3ac4aa2fd6054b80099c9f382d7720e9cc685eaa4859279ef63bf6256b",
+      "source_citation": "torch.nn.modules.conv.Conv3d#sha256=d350be3eaaff9de0ebc5e2b9317d92faff661bf7e569ada33d6d76f5f2995c77&chars=547:674",
+      "source_sentence": "On certain ROCm devices, when using float16 inputs this module will use :ref:`different precision<fp16_on_mi200>` for backward."
+    },
+    {
+      "api_unit": "torch.nn.modules.loss.NLLLoss2d",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "be applied, ``'mean'``: the weighted mean of the output is taken",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "``'none'``: no reduction"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "The reduction alternatives are merged, as in the analogous NLLLoss case.",
+      "sample_key": "110a4c443d8458f00e147a13fc696faf44c799ea7a09417c60ea5c07bb0bfcf0",
+      "sentence_sha256": "15b04944ab458503bb96d15b7f6f7524491f4d41a6d406882b9aa7facc81fdd0",
+      "source_citation": "torch.nn.modules.loss.NLLLoss2d#sha256=49203f8008e413ac54f8c46d061643ab1ea2769ac05ed3a8e6753a1bba53fb58&chars=3083:3186",
+      "source_sentence": "``'none'``: no reduction will\n        be applied, ``'mean'``: the weighted mean of the output is taken,"
+    },
+    {
+      "api_unit": "torch.nn.modules.activation.MultiheadAttention",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "be split across ``num_heads``",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "Note that ``embed_dim``"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "embed_dim is the explicit subject; 'Note that' is harmless framing.",
+      "sample_key": "1135c4d0a021213efc51f1b61515da1caee160bd3fbba9aca280e00f2344114f",
+      "sentence_sha256": "ddf2c1bc87033f944c4d946b2e8f65994d87fb3339334bc303a3af913bd350d6",
+      "source_citation": "torch.nn.modules.activation.MultiheadAttention#sha256=6262807b367aa75fba2f26b564f802164edfe9dd8f52cc4d55a139cf004e81cf&chars=2386:2458",
+      "source_sentence": "Note that ``embed_dim`` will be split\n        across ``num_heads`` (i.e."
+    },
+    {
+      "api_unit": "torch.nn.modules.conv.LazyConvTranspose1d",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "be added to both sides of the input",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "Default: 1 padding (int or tuple, optional): ``dilation * (kernel_size - 1) - padding`` zero-padding"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "The padding declaration contaminates the zero-padding subject.",
+      "sample_key": "1138eb48745db76a90961319013ff4c4a821d56b66b2e8cbea1171093be3e0a8",
+      "sentence_sha256": "fe7c0119248ef7c5e1b1ebd6cc535d4f382aa0f4d4086613cb5c8f2827df388b",
+      "source_citation": "torch.nn.modules.conv.LazyConvTranspose1d#sha256=543bd904e15eab50674e513fcc4239c079ff4bc0e764b2e8245c2a1864318677&chars=607:761",
+      "source_sentence": "Default: 1\n    padding (int or tuple, optional): ``dilation * (kernel_size - 1) - padding`` zero-padding\n        will be added to both sides of the input."
+    },
+    {
+      "api_unit": "torch.nn.modules.upsampling.Upsample",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "be used to infer new scales for the interpolation",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "The computed output `size`"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "The computed output size and interpolation behavior are explicit.",
+      "sample_key": "117b4264a51b041af08c32e40c59e55d3ad9e08db2cdd575cb1d280f83e8a49c",
+      "sentence_sha256": "35ed5196bdae64f6a018f21cd69330a68aff1eba8ba990cb85e6d8b3436eaede",
+      "source_citation": "torch.nn.modules.upsampling.Upsample#sha256=eecf5d3390f198bfa62ffa589021157329aff12fd415e79c54462ebd0583f21e&chars=1676:1766",
+      "source_sentence": "The computed output `size` will be used to infer new scales for\n        the interpolation."
+    },
+    {
+      "api_unit": "torch._C._linalg.linalg_svd",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "span the same subspace: https://en",
+          "quoted": false,
+          "review_status": "needs_review",
+          "scope": [],
+          "subject": "_the resulting vectors"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "context_citation": null,
+      "context_text": null,
+      "discovery_method": "direct",
+      "review_note": "A footnote/link fragment contaminates the subject and the URL is absorbed into the predicate.",
+      "sample_key": "12545053821e0d1d108ecb6758eca562b20b5724d55079a81a990d89b887effe",
+      "sentence_sha256": "4ab49128a876034b4e870f8999d00b04d744450e7205eec3157fd99c6370bb2d",
+      "source_citation": "torch._C._linalg.linalg_svd#sha256=3e785c6474402906e924ec0508a4d9942f85853f6afba6df296e960a458d6bdf&chars=7073:7252",
+      "source_sentence": "_the resulting vectors will span the same subspace:\n    https://en.wikipedia.org/wiki/Singular_value_decomposition#Singular_values,_singular_vectors,_and_their_relation_to_the_SVD"
+    }
+  ],
+  "corpus_sha256": "fd5d9b08bb4d314b883348f5171313f8656a338c71e06337f2a2b24582fc7cf7",
+  "label_protocol": "One unblinded Codex pass over the frozen exact source sentences and candidate fields. These categories diagnose extraction; they are not a probability-sample accuracy or precision estimate.",
+  "limits": [
+    "This is an exploratory source-disjoint diagnostic, not a probability sample or independent validation.",
+    "Docstrings are complete callable reference units, not complete documentation pages.",
+    "The scan is limited to sentences containing 'will'; other constructions are outside this measurement.",
+    "Candidate status does not mean the sentence states useful behavior or that extracted fields are correct.",
+    "Do not tune against this sample and still describe the result as held-out transfer.",
+    "The selected non-candidate rows contain repeated bias-option boilerplate, so they are not 19 independent linguistic patterns.",
+    "No parser change was made from this review; use the findings to design a new sample or a new general extraction method, not to retrofit these rows."
+  ],
+  "manifest": "v1_481_torch_publisher_transfer_manifest.json",
+  "non_candidate_label_counts": {
+    "incomplete_source_fragment": 1,
+    "missed_conditional_behavior": 17,
+    "missed_shared_subject": 1
+  },
+  "non_candidate_sample": [
+    {
+      "api_unit": "torch.nn.modules.batchnorm.LazyBatchNorm2d",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "04511538307e9508c14e78322dd28bfbe9bbd7e9283d02044e609db65e13c27c",
+      "sentence_sha256": "e0b19411f306eab20bd9684ec8373eec1d35f4d482f042c0b614f65d38105ca8",
+      "source_citation": "torch.nn.modules.batchnorm.LazyBatchNorm2d#sha256=a4cb40a6d9ebe358902e835d1e3b224b3261878531bed9d71bc776bc0f9c3cf9&chars=1263:1371",
+      "source_sentence": "Default: ``True``\n    bias: If set to ``False``, the layer will not learn an additive bias (only relevant if"
+    },
+    {
+      "api_unit": "torch.optim.adam.Adam",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The decoupled-weight-decay condition contains an explicit negative behavior claim.",
+      "sample_key": "313a55ea2be51a2ddeb99762f7a1236b850d932f86901c69f4d48f1636012040",
+      "sentence_sha256": "28a25cd767564bf03c9e44628c194b0353058faf4acd04dea1c7c66f47b0ad8f",
+      "source_citation": "torch.optim.adam.Adam#sha256=606baf0879c0ba7ebd69b172e83796d871e26a5e03fa612941a662d24ed92583&chars=3434:3833",
+      "source_sentence": "(default: (0.9, 0.999))\n    eps (float, optional): term added to the denominator to improve\n        numerical stability (default: 1e-8)\n    weight_decay (float, optional): weight decay (L2 penalty) (default: 0)\n    decoupled_weight_decay (bool, optional): if True, this optimizer is\n        equivalent to AdamW and the algorithm will not accumulate weight\n        decay in the momentum nor variance."
+    },
+    {
+      "api_unit": "torch.nn.modules.batchnorm.SyncBatchNorm",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "51cada2e47eb87119dee91d46b52f7f95e3299347c240d05fa27f763849a9144",
+      "sentence_sha256": "7b79c5fc4fb75d492b500e08390d48611ea6a87ff9717026b26ce2b61b9c7b83",
+      "source_citation": "torch.nn.modules.batchnorm.SyncBatchNorm#sha256=49e844dc9f477c2517d62d722c73f9629956655cc56d7f7bff58d6efcd34a31f&chars=3229:3386",
+      "source_sentence": "Default behavior is synchronization across the whole\n        world\n    bias: If set to ``False``, the layer will not learn an additive bias (only relevant if"
+    },
+    {
+      "api_unit": "torch.nn.modules.normalization.LayerNorm",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "5537164ae957b3b785a8237b807c7d311f91c154726150fe53d6401e25fbca71",
+      "sentence_sha256": "e0b19411f306eab20bd9684ec8373eec1d35f4d482f042c0b614f65d38105ca8",
+      "source_citation": "torch.nn.modules.normalization.LayerNorm#sha256=c2b8d514d55ff2fa25e3856c3f77b36ebc91b037ab44ba9de5bfd502e13175bf&chars=1955:2063",
+      "source_sentence": "Default: ``True``\n    bias: If set to ``False``, the layer will not learn an additive bias (only relevant if"
+    },
+    {
+      "api_unit": "torch.nn.modules.normalization.GroupNorm",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "5eab9c3d15bb46763f123cd7d3ed5008f9982395636907af5e2cd0f5df083447",
+      "sentence_sha256": "e0b19411f306eab20bd9684ec8373eec1d35f4d482f042c0b614f65d38105ca8",
+      "source_citation": "torch.nn.modules.normalization.GroupNorm#sha256=7cc2b8c91f37ac6889b2349f244d21e04f2a2b21310c772859193e360646603b&chars=1285:1393",
+      "source_sentence": "Default: ``True``\n    bias: If set to ``False``, the layer will not learn an additive bias (only relevant if"
+    },
+    {
+      "api_unit": "torch.nn.modules.batchnorm.BatchNorm1d",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "702bbe34dceaa6cb4e83b5950c498db1c28e3a18a288030a8799b7e9c527429a",
+      "sentence_sha256": "e0b19411f306eab20bd9684ec8373eec1d35f4d482f042c0b614f65d38105ca8",
+      "source_citation": "torch.nn.modules.batchnorm.BatchNorm1d#sha256=130c5ced836377d86a506f6847e8d439e6d9bfd6d9edc3d42de343530202ee12&chars=2831:2939",
+      "source_sentence": "Default: ``True``\n    bias: If set to ``False``, the layer will not learn an additive bias (only relevant if"
+    },
+    {
+      "api_unit": "torch.nn.modules.linear.Bilinear",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "779c8a7c7a37f5f49c6fbc650ca3e29a0f544953ef235b161fd30fcfb95d0ae5",
+      "sentence_sha256": "52811837b9df716bb6beb52b1605b3c710bff5c71c2bd6be28a3f6b2ba1a9014",
+      "source_citation": "torch.nn.modules.linear.Bilinear#sha256=83fd31a87e0743e8dbc7aa7b859ff520f00b6ca9fb5b795a864189d09e13191a&chars=86:350",
+      "source_sentence": "Args:\n    in1_features: size of each first input sample, must be > 0\n    in2_features: size of each second input sample, must be > 0\n    out_features: size of each output sample, must be > 0\n    bias: If set to ``False``, the layer will not learn an additive bias."
+    },
+    {
+      "api_unit": "torch.nn.modules.batchnorm.BatchNorm2d",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "86128aaa01713c001e03bd713ab2b7ac3226aefc4cfb41d63170d67deb0c89da",
+      "sentence_sha256": "e0b19411f306eab20bd9684ec8373eec1d35f4d482f042c0b614f65d38105ca8",
+      "source_citation": "torch.nn.modules.batchnorm.BatchNorm2d#sha256=ffe2356861e7402c055c05dc73806a782d66124a2be6aaae3fd841e4d3853e02&chars=2898:3006",
+      "source_sentence": "Default: ``True``\n    bias: If set to ``False``, the layer will not learn an additive bias (only relevant if"
+    },
+    {
+      "api_unit": "torch.nn.modules.instancenorm.InstanceNorm2d",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "8bacf4fd4ef3323b31345d13fb19ba18c04c83b62db51d076df1462fb8c39da8",
+      "sentence_sha256": "0ac6bac9712286375e4e0db1405e3a278502593899fe209fa33d9fb323de134c",
+      "source_citation": "torch.nn.modules.instancenorm.InstanceNorm2d#sha256=7c5f8b31c2ebe3d5c204ef562e2c7bd7abe4e3b674dc934d18a9954b8ca6a8fc&chars=2737:2846",
+      "source_sentence": "Default: ``False``\n    bias: If set to ``False``, the layer will not learn an additive bias (only relevant if"
+    },
+    {
+      "api_unit": "torch.nn.modules.batchnorm.LazyBatchNorm1d",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "94b6f9230739c469b2359b39f1fecfeaa4210f0becd8e43b7ce4e8e010fc9163",
+      "sentence_sha256": "e0b19411f306eab20bd9684ec8373eec1d35f4d482f042c0b614f65d38105ca8",
+      "source_citation": "torch.nn.modules.batchnorm.LazyBatchNorm1d#sha256=e9c10a3e4bf107f3f05159bd501fa33186b3d809d88cd8b4621c9119c084ce4c&chars=1260:1368",
+      "source_sentence": "Default: ``True``\n    bias: If set to ``False``, the layer will not learn an additive bias (only relevant if"
+    },
+    {
+      "api_unit": "torch.nn.modules.batchnorm.LazyBatchNorm3d",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "97eec7bb4911dfcc2bf4053d5cb17fca08848ce5b33faa00ab56c7fe6b0f583a",
+      "sentence_sha256": "e0b19411f306eab20bd9684ec8373eec1d35f4d482f042c0b614f65d38105ca8",
+      "source_citation": "torch.nn.modules.batchnorm.LazyBatchNorm3d#sha256=6f5a1c92568057979c8e0e1d9b43f23836626e9dc97806654b35627f0831b78e&chars=1263:1371",
+      "source_sentence": "Default: ``True``\n    bias: If set to ``False``, the layer will not learn an additive bias (only relevant if"
+    },
+    {
+      "api_unit": "torch.nn.modules.rnn.LSTM",
+      "codex_review_label": "incomplete_source_fragment",
+      "review_note": "The cited span ends at 'the shape will be' and does not contain a recoverable predicate.",
+      "sample_key": "a28521df12a27c6f83263a8a50c65f361ac3955fca294e9f245cecacf994e68a",
+      "sentence_sha256": "8460ad5bdf1f7ac444a4cfd2ad2a1b51e31cfe9c5537d6a62678a9ab2e24c521",
+      "source_citation": "torch.nn.modules.rnn.LSTM#sha256=999923e3dbc195439462348e31674acdff9941d046113157e5ab58744a687828&chars=6303:6364",
+      "source_sentence": "If\n        ``proj_size > 0`` was specified, the shape will be"
+    },
+    {
+      "api_unit": "torch.nn.modules.container.ParameterList",
+      "codex_review_label": "missed_shared_subject",
+      "review_note": "The coordinated 'will be visible' clause inherits Tensors from the preceding clause.",
+      "sample_key": "a2db2639614eb341552fe2149b2d6cb3c7e3fd7f31cce613eae591e5ac95fd7a",
+      "sentence_sha256": "b634de99c8604f820ed77ff4120a3e317c981e8a30174d04d2460ebbe9a4a58b",
+      "source_citation": "torch.nn.modules.container.ParameterList#sha256=2680d52e5ca8b1d084bc545e930de1605b22647e19016676f991d8c49811cc78&chars=29:238",
+      "source_sentence": ":class:`~torch.nn.ParameterList` can be used like a regular Python\nlist, but Tensors that are :class:`~torch.nn.Parameter` are properly registered,\nand will be visible by all :class:`~torch.nn.Module` methods."
+    },
+    {
+      "api_unit": "torch.nn.modules.instancenorm.LazyInstanceNorm1d",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "b0ab7dce41fc55908df78d26615e2d15e5c5d33278c39f96a0ba6a09b33bd9d5",
+      "sentence_sha256": "0ac6bac9712286375e4e0db1405e3a278502593899fe209fa33d9fb323de134c",
+      "source_citation": "torch.nn.modules.instancenorm.LazyInstanceNorm1d#sha256=64f7ffe3e1c5b8f6f15ea2cff4d29faadadd5573300b4f186868b083cdc0d1a0&chars=1183:1292",
+      "source_sentence": "Default: ``False``\n    bias: If set to ``False``, the layer will not learn an additive bias (only relevant if"
+    },
+    {
+      "api_unit": "torch.nn.modules.batchnorm.BatchNorm3d",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "c068f2e472a9b033d2c36650e3c7de9f8a70d04c7622be9b0c36c86da341ff13",
+      "sentence_sha256": "e0b19411f306eab20bd9684ec8373eec1d35f4d482f042c0b614f65d38105ca8",
+      "source_citation": "torch.nn.modules.batchnorm.BatchNorm3d#sha256=51dcbb5d6259d72de9b27dd72d0f05451d8c82c5ff962fc6653e4fa7d9473562&chars=2941:3049",
+      "source_sentence": "Default: ``True``\n    bias: If set to ``False``, the layer will not learn an additive bias (only relevant if"
+    },
+    {
+      "api_unit": "torch.nn.modules.instancenorm.InstanceNorm3d",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "d091fb6e12d8b51c5bd14a46e595fd45f03924ed35f7f8ccf9162fe4f6ae479c",
+      "sentence_sha256": "0ac6bac9712286375e4e0db1405e3a278502593899fe209fa33d9fb323de134c",
+      "source_citation": "torch.nn.modules.instancenorm.InstanceNorm3d#sha256=62d3d17199d2166d13e2f8dddb0f8b57ffc11903476d681d0ff74a5badcb6b5b&chars=2753:2862",
+      "source_sentence": "Default: ``False``\n    bias: If set to ``False``, the layer will not learn an additive bias (only relevant if"
+    },
+    {
+      "api_unit": "torch.nn.modules.instancenorm.InstanceNorm1d",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "e252a8ed06ecc339c7af6191c5493d5cd75c7d8edf123a4ff7bf42b074ec7fde",
+      "sentence_sha256": "0ac6bac9712286375e4e0db1405e3a278502593899fe209fa33d9fb323de134c",
+      "source_citation": "torch.nn.modules.instancenorm.InstanceNorm1d#sha256=7f08abeb5ae82d8c01a9a24a66e0c8535fa3ad86a76940694ec9b35dadfd5fb8&chars=2707:2816",
+      "source_sentence": "Default: ``False``\n    bias: If set to ``False``, the layer will not learn an additive bias (only relevant if"
+    },
+    {
+      "api_unit": "torch.nn.modules.instancenorm.LazyInstanceNorm2d",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "eadd6cdac8fa303dafa5c1a32d0c4472403459fecddd5f20c55ae84f8f732524",
+      "sentence_sha256": "0ac6bac9712286375e4e0db1405e3a278502593899fe209fa33d9fb323de134c",
+      "source_citation": "torch.nn.modules.instancenorm.LazyInstanceNorm2d#sha256=efa20ebabf64403e555df17d60d6446da819a5e8cab1dff2f355a2758d8ab0a4&chars=1189:1298",
+      "source_sentence": "Default: ``False``\n    bias: If set to ``False``, the layer will not learn an additive bias (only relevant if"
+    },
+    {
+      "api_unit": "torch.nn.modules.instancenorm.LazyInstanceNorm3d",
+      "codex_review_label": "missed_conditional_behavior",
+      "review_note": "The bias option's condition and the layer's behavior are stated, but the parser abstains.",
+      "sample_key": "f562110aea303916fdbe6a5c86e07721d7efbd2fb86e098d77989e2d11840b5b",
+      "sentence_sha256": "0ac6bac9712286375e4e0db1405e3a278502593899fe209fa33d9fb323de134c",
+      "source_citation": "torch.nn.modules.instancenorm.LazyInstanceNorm3d#sha256=64c7c7ab3cc1c85596fe7e42c2e9cce5c8d24adbe4423bbeb2f3468af3df6228&chars=1195:1304",
+      "source_sentence": "Default: ``False``\n    bias: If set to ``False``, the layer will not learn an additive bias (only relevant if"
+    }
+  ],
+  "source_version": "2.13.0"
+}

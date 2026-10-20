@@ -35,6 +35,15 @@ metre metres meter meters m km kilometre kilometres kilometer kilometers
 mile miles foot feet ft inch inches cm mm kg kilogram kilograms tonne tonnes
 degree degrees celsius fahrenheit years year seconds minutes hours
 """.split())
+_WHEN_CUES = re.compile(
+    r"\b(?:1[0-9]{3}|20[0-9]{2}|January|February|March|April|May|June|"
+    r"July|August|September|October|November|December|Monday|Tuesday|"
+    r"Wednesday|Thursday|Friday|Saturday|Sunday|if|unless|whenever|"
+    r"provided\s+that|as\s+long\s+as|only\s+when|only\s+if|"
+    r"before|after|until|once|while|at\s+(?:\d{1,2}(?::\d{2})?\s*"
+    r"(?:a\.?m\.?|p\.?m\.?)|night|noon|midnight|dawn|dusk)|"
+    r"in\s+the\s+(?:morning|afternoon|evening|night))\b",
+    re.IGNORECASE)
 _SUPERLATIVES = frozenset("""
 longest largest biggest smallest tallest highest oldest youngest deepest
 fastest nearest farthest first last
@@ -361,8 +370,8 @@ def _check_candidate(question: str, sentence: str,
         if absent:
             reasons.append("named entity missing: " + " ".join(group))
 
-    if kind == "WHEN" and not re.search(r"\b(?:1[0-9]{3}|20[0-9]{2})\b", sentence):
-        reasons.append("no year stated")
+    if kind == "WHEN" and not _WHEN_CUES.search(sentence):
+        reasons.append("no date, time, or condition stated")
     elif kind == "MEASURE":
         unit_pattern = r"\b(?:" + "|".join(sorted(_MEASURE_UNITS, key=len, reverse=True)) + r")\b"
         if not re.search(r"\d[\d,.]*\s*" + unit_pattern, sentence, re.IGNORECASE):

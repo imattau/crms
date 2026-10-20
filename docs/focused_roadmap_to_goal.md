@@ -184,6 +184,40 @@ transfer test must use a publisher not yet inspected, freeze its documents and
 sample before review, and include independently selected proposal and
 non-proposal cases. See [`v1_480 report`](../experiments/reports/v1_480_sklearn_procedure_candidate_review.json).
 
+The PyTorch 2.13.0 sample was then frozen before review in `v1_481`, on a
+corpus fingerprint distinct from the NumPy/pandas/scikit-learn development
+material. It covers 251 callable API units from four modules; among 320
+`will`-sentences, the current route returned 301 proposals (297 direct, 4
+parameter-context) and abstained on 19. The sample contains 20 candidate and
+all 19 non-candidate sentences, selected by hash with at most one row per API
+unit. In the recorded Codex review (`v1_482`), six candidate rows were
+structurally reviewable, two needed context, and twelve had boundary errors.
+Of the 19 no-candidate rows, 18 stated behavior that the current path missed
+(17 conditional and one shared-subject case); one was an incomplete fragment.
+These are labeled row counts from one unblinded reviewer, not accuracy or
+precision estimates; the non-candidate sample also contains repeated API
+boilerplate. Still, the boundary errors and missed claims are concrete
+counterexamples to treating the implementation as transferred. No parser
+change was made against the frozen sample, and source discovery was not routed
+through chat for this corpus, so the full learning/review/chat gate remains
+open. Keep the PyTorch rows as development controls from now on. Redesign the
+general clause/context representation using these controls, then freeze a
+different publisher and a new sample before the next transfer evaluation.
+See [`v1_481 manifest`](../experiments/reports/v1_481_torch_publisher_transfer_manifest.json)
+and [`v1_482 review`](../experiments/reports/v1_482_torch_transfer_review.json).
+
+The same PyTorch corpus exposed a chat-level natural-language error: “When
+does an LSTM use projections?” was classified as a calendar-date question and
+rejected for lacking a year, despite a cited condition in the source. The
+quoted-evidence gate now accepts explicit date, time, or condition cues for
+`when` questions and rejects a same-entity sentence with no such cue.
+`v1_483_when_condition_evidence_gate.py` passes direct positive/negative
+checks and a fresh-process replay; the answer is still labeled as quoted
+evidence, not an accepted fact. This repairs one question-type boundary, not
+general paraphrase understanding or source-derived learning. The other
+source-only yes/no question in the same probe still abstains and remains an
+open natural-language coverage gap.
+
 Use the existing excerpt and real-source acceptance experiments as regression
 controls, not as a corpus-level result. If a suitable corpus does not contain
 enough examples, change the learning signal or narrow the claim; do not add
