@@ -3428,6 +3428,7 @@ class CRMSModel:
             str, tuple[tuple, tuple, list[int], list[list[int]]]
         ] = {}
         self._aligned_phrase_cache: dict[int, tuple[dict, dict, dict]] = {}
+        self._procedure_role_frame_cache: tuple[dict, dict] | None = None
         self._optional_span_cache: dict | None = None
         self._number_word_cache: dict[
             tuple[str, ...], tuple[int, set[str]]
@@ -4448,8 +4449,85 @@ class CRMSModel:
         self._aligned_phrase_cache[length] = cached
         return cached
 
+    def _procedure_role_frame_index(self) -> tuple[dict, dict]:
+        """Cache repeated action/object/direction evidence by behavior."""
+        if self._procedure_role_frame_cache is not None:
+            return self._procedure_role_frame_cache
+
+        role_entries: dict[
+            tuple, list[tuple[str, tuple[Step, ...], tuple[str, ...]]]
+        ] = {}
+        chunk_entries: dict[
+            tuple, list[tuple[str, tuple[Step, ...], tuple[str, ...]]]
+        ] = {}
+        for phrase, procedure in self._procedures.items():
+            words = tuple(self._instruction_sequence(phrase))
+            if len(words) < 3:
+                continue
+            behavior = _semantic_key(procedure)
+            entry = (phrase, procedure, words)
+            chunk_entries.setdefault(behavior, []).append(entry)
+            if len(words) == 3:
+                role_entries.setdefault(behavior, []).append(entry)
+
+        role_index = {}
+        for behavior, entries in role_entries.items():
+            distinct = {phrase: words for phrase, _procedure, words in entries}
+            if len(distinct) < 2:
+                continue
+            columns: list[dict[str, set[str]]] = [{} for _ in range(3)]
+            for phrase, words in distinct.items():
+                for position, word in enumerate(words):
+                    columns[position].setdefault(word, set()).add(phrase)
+
+            affix_roots: dict[
+                tuple[int, str, str, str], set[str]
+            ] = {}
+            affix_sources: dict[
+                tuple[int, str, str, str], set[str]
+            ] = {}
+            for position in range(3):
+                contexts: dict[tuple[str, ...], dict[str, set[str]]] = {}
+                for phrase, words in distinct.items():
+                    context = words[:position] + words[position + 1:]
+                    contexts.setdefault(context, {}).setdefault(
+                        words[position], set()).add(phrase)
+                for alternatives in contexts.values():
+                    for left_word, right_word in combinations(
+                            sorted(alternatives), 2):
+                        edit = self._word_affix_edit(left_word, right_word)
+                        if edit is None:
+                            continue
+                        root, side, old_affix, new_affix = edit
+                        key = (position, side, old_affix, new_affix)
+                        affix_roots.setdefault(key, set()).add(root)
+                        affix_sources.setdefault(key, set()).update(
+                            alternatives[left_word] | alternatives[right_word])
+            role_index[behavior] = (
+                entries[0][1], columns, affix_roots, affix_sources)
+
+        chunk_index = {}
+        for behavior, entries in chunk_entries.items():
+            distinct = {phrase: words for phrase, _procedure, words in entries}
+            if len(distinct) < 2:
+                continue
+            action_sources: dict[str, set[str]] = {}
+            object_sources: dict[str, set[str]] = {}
+            direction_sources: dict[tuple[str, ...], set[str]] = {}
+            for phrase, words in distinct.items():
+                action_sources.setdefault(words[0], set()).add(phrase)
+                object_sources.setdefault(words[1], set()).add(phrase)
+                direction_sources.setdefault(words[2:], set()).add(phrase)
+            chunk_index[behavior] = (
+                entries[0][1], action_sources, object_sources,
+                direction_sources)
+
+        self._procedure_role_frame_cache = (role_index, chunk_index)
+        return self._procedure_role_frame_cache
+
     def _invalidate_language_indexes(self) -> None:
         self._aligned_phrase_cache.clear()
+        self._procedure_role_frame_cache = None
         self._optional_span_cache = None
         self._procedure_scaffold_cache.clear()
         self._number_word_cache = None
@@ -4855,60 +4933,14 @@ class CRMSModel:
         # It preserves the learned role order and does not infer a role from a
         # single example: each queried value must occur in at least two
         # distinct phrases at the same learned position.
-        role_groups: dict[
-            tuple, list[tuple[str, tuple[Step, ...], tuple[str, ...]]]
-        ] = {}
-        for phrase, procedure in self._procedures.items():
-            words = tuple(self._instruction_sequence(phrase))
-            if len(words) != 3:
-                continue
-            role_groups.setdefault(_semantic_key(procedure), []).append(
-                (phrase, procedure, words))
-
         function_words = {"a", "an", "the", "in", "order"}
         role_matches: dict[tuple, tuple[tuple[Step, ...], list[str], str]] = {}
-        for behavior, entries in role_groups.items():
-            distinct = {phrase: words for phrase, _procedure, words in entries}
-            if len(distinct) < 2:
-                continue
-            columns: list[dict[str, set[str]]] = [{} for _ in range(3)]
-            for phrase, words in distinct.items():
-                for position, word in enumerate(words):
-                    columns[position].setdefault(word, set()).add(phrase)
+        role_index, chunk_index = self._procedure_role_frame_index()
+        for behavior, (procedure, columns, affix_roots,
+                       affix_sources) in role_index.items():
             varying_roles = sum(len(column) > 1 for column in columns)
             if varying_roles < 2:
                 continue
-
-            # Derive productive affixes only from two distinct word roots
-            # that share this behavior and differ at one role position.
-            # Evidence from other procedure groups cannot license morphology
-            # for the current role frame.
-            affix_roots: dict[
-                tuple[int, str, str, str], set[str]
-            ] = {}
-            affix_sources: dict[
-                tuple[int, str, str, str], set[str]
-            ] = {}
-            phrase_items = sorted(distinct.items())
-            for left_index, (left_phrase, left_words) in enumerate(phrase_items):
-                for right_phrase, right_words in phrase_items[left_index + 1:]:
-                    differences = [
-                        index for index, (left_word, right_word)
-                        in enumerate(zip(left_words, right_words))
-                        if left_word != right_word
-                    ]
-                    if len(differences) != 1:
-                        continue
-                    position = differences[0]
-                    edit = self._word_affix_edit(
-                        left_words[position], right_words[position])
-                    if edit is None:
-                        continue
-                    root, side, old_affix, new_affix = edit
-                    key = (position, side, old_affix, new_affix)
-                    affix_roots.setdefault(key, set()).add(root)
-                    affix_sources.setdefault(key, set()).update(
-                        (left_phrase, right_phrase))
 
             role_options: list[list[tuple[str, set[str], int]]] = []
             for position, column in enumerate(columns):
@@ -4973,7 +5005,6 @@ class CRMSModel:
                         in enumerate(valid_selections[0])]
             supporting_phrases = sorted(set().union(
                 *(sources for _position, _word, sources in selected)))
-            procedure = entries[0][1]
             frame = "role_frame:" + " ".join(
                 f"role{position}={word}"
                 for position, word, _sources in selected)
@@ -4983,6 +5014,58 @@ class CRMSModel:
             procedure, sources, frame = next(iter(role_matches.values()))
             return procedure, False, sources, frame
         if len(role_matches) > 1:
+            return None, True, [], None
+
+        # Learn a variable-width third role from repeated successful phrases.
+        # This supports requests such as "order items from low to high" when
+        # the action, object, and exact multiword direction phrase each have
+        # repeated support within the same behavior group.
+        chunk_matches: dict[
+            tuple, tuple[tuple[Step, ...], list[str], str]
+        ] = {}
+        for behavior, (procedure, action_sources, object_sources,
+                       direction_sources) in chunk_index.items():
+            varying_roles = sum((len(action_sources) > 1,
+                                 len(object_sources) > 1,
+                                 len(direction_sources) > 1))
+            if varying_roles < 2:
+                continue
+
+            candidates = []
+            for action, supported_action_sources in action_sources.items():
+                if (len(supported_action_sources) < 2 or not query
+                        or query[0] != action):
+                    continue
+                object_position = 1
+                while (object_position < len(query)
+                       and query[object_position] in {"a", "an", "the"}):
+                    object_position += 1
+                if object_position >= len(query):
+                    continue
+                object_word = query[object_position]
+                supported_object_sources = object_sources.get(object_word, set())
+                if len(supported_object_sources) < 2:
+                    continue
+                direction = query[object_position + 1:]
+                if not direction:
+                    continue
+                supported_direction_sources = direction_sources.get(
+                    direction, set())
+                if len(supported_direction_sources) < 2:
+                    continue
+                support = sorted(supported_action_sources
+                                 | supported_object_sources
+                                 | supported_direction_sources)
+                frame = (f"role_chunk_frame:action={action};object={object_word};"
+                         f"direction={' '.join(direction)}")
+                candidates.append((procedure, support, frame))
+            if len(candidates) == 1:
+                chunk_matches[behavior] = candidates[0]
+
+        if len(chunk_matches) == 1:
+            procedure, sources, frame = next(iter(chunk_matches.values()))
+            return procedure, False, sources, frame
+        if len(chunk_matches) > 1:
             return None, True, [], None
         return None, False, [], None
 
@@ -6299,7 +6382,8 @@ class CRMSModel:
             route_message = (
                 'Applied a procedure through a learned role frame grounded '
                 'by repeated examples.'
-                if analogy_template and analogy_template.startswith('role_frame:')
+                if analogy_template and analogy_template.startswith(
+                        ('role_frame:', 'role_chunk_frame:'))
                 else ('Applied a procedure through a positional analogy '
                       'grounded by behaviorally equivalent cases.'))
             return Prediction('ok', _apply_procedure(analogous, xs), key,

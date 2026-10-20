@@ -2024,37 +2024,43 @@ cue design.
 
 Command: `python3 experiments/v1_452_natural_request_frame_transfer.py`.
 
-After learning six labeled action/object/direction combinations and two
-additional inflection pairs, a fresh chat process receives ten positive
-requests in syntactic forms not represented by
-the training phrases: “put items in increasing order,” “sort numbers from low
-to high,” “arrange values in ascending order,” “order the numbers
+After learning six labeled action/object/direction combinations, two
+additional inflection pairs, and two multiword direction examples, a fresh chat
+process receives eleven positive requests in syntactic forms not represented
+by the training phrases: “put items in increasing order,” “sort numbers from
+minimum to maximum,” “arrange values in ascending order,” “order the numbers
 ascendingly,” “make the values go from smallest to largest,” “sort the values
 in ascending order,” “sort numbers in ascending order,” “order the numbers in
-ascending order,” “arrange numbers upwardly,” and “sort values increasingly.”
+ascending order,” “arrange numbers upwardly,” “sort values increasingly,” and
+“order items from low to high.”
 The original positional frame abstained on the first five. The learned-role
-route first answered four of the eight, transferring licensed
+route first answered four of eight, transferring licensed
 action/object/direction values through articles and “in ... order”. With two
 Codex-labeled inflection pairs (`ascending`/`ascendingly` and
-`increasing`/`increasingly`), same-behavior evidence now licenses the `-ly`
-edit and transfers it to an unseen third root (`upwardly`). Current coverage is
-7/10; three positive requests still abstain. “Sort items descending” and
-“arrange numbers downwardly” receive no generated code (0 false positives).
+`increasing`/`increasingly`), same-behavior evidence licenses the `-ly` edit
+and transfers it to an unseen third root (`upwardly`). Two additionally labeled
+examples ground the multiword direction span “from low to high”; CRMS recombines
+it with a held-out action/object pair. Current coverage is 8/11; three positive
+requests still abstain. “Sort items descending,” “arrange numbers downwardly,”
+and “order items from high to low” receive clear abstentions (0 false
+positives).
 This establishes a concrete residual coverage gap in natural request
 transfer; the existing 27-phrase positional grid does not show broad language
 understanding. Expected interpretations and labels were written by Codex, and
 the procedure examples use Codex labels, so this is a controlled diagnostic
 rather than an independent language benchmark.
 
-The learned-role route requires each role value to be supported in at least
-two distinct successful phrases, preserves their learned order, and records
-those phrase sources as evidence. It improves four tested grammatical
-variants and learns `-ly` from two roots in one behavior group before applying
-it to a held-out third root. Generated code passes four list oracles. It does
-not license the unsupported direction or the shuffled-role negative. The next
-model change should learn additional request structures and ordering patterns
-with explicit training evidence; it must improve positive held-out coverage
-without licensing conflicting meanings.
+The learned-role routes require each single-token role value and each direction
+span to be supported by at least two distinct successful phrases, preserve the
+learned action/object/direction order, and retain supporting phrase and labeler
+provenance. They transfer four tested grammatical variants, learn `-ly` from
+two roots in one behavior group before applying it to an unseen third root, and
+compose the multiword direction with a held-out action/object pair. Generated
+code passes independent list oracles. They do not license the unsupported
+directions or shuffled-role negative. The next model change should learn
+additional request structures and ordering patterns with explicit training
+evidence; it must improve positive held-out coverage without licensing
+conflicting meanings.
 
 After adding the role path, the 18-diagnostic cross-domain replay initially
 found a false positive: treating “please” as a removable function word made
@@ -2062,9 +2068,17 @@ found a false positive: treating “please” as a removable function word made
 from the allowed grammatical tokens restored abstention. The full replay then
 passed 18/18 in 13.89 seconds before adding the morphology extension, including
 language transfer, source-derived rules, procedure recombination, reasoning,
-dialogue, code/math, translation, and creative revision. After the morphology
-extension, the same 18 diagnostics passed in 14.06 seconds. This protects the
-adjacent tested paths; it is not a representative task-distribution score.
+dialogue, code/math, translation, and creative revision. After morphology
+integration, the same 18 diagnostics passed in 14.06 seconds; after the
+multiword role extension and single-evidence abstention control, they passed
+in 14.02 seconds. After the role-evidence index was cached and a teach-then-query
+invalidation control was added, the same 18 diagnostics passed in 14.26
+seconds. The focused experiment confirms that adding a second distinct
+multiword-direction example clears the cached index and permits the newly
+supported held-out request, while the one-example case still abstains. No
+latency improvement is claimed from this run; it verifies index reuse and
+correct invalidation. This protects adjacent tested paths; it is not a
+representative task-distribution score.
 
 ## Source-grounded procedure phrase recombination (2026-10-20)
 
