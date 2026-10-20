@@ -23,6 +23,36 @@ or rule learning. Keep the extractor frozen for the complete-document,
 publisher-held-out evaluation; do not interpret 6/6 component regressions as a
 cross-corpus score.
 
+## Multi-publisher procedure phrase excerpt probe (2026-10-20)
+
+Command: `python3 experiments/v1_472_multi_publisher_procedure_phrase_probe.py`.
+
+The adjacent learning/recombination replay ran `v1_433`, `v1_436`, `v1_437`,
+`v1_441`, `v1_469`, `v1_470`, `v1_471`, and `v1_472`; all 8 passed in 4.43
+seconds.
+
+Four source-checked positive excerpts from MDN, NumPy, AWS, and Microsoft Learn
+produce the expected phrase and retain their nearby condition when present.
+The negative control comes from Microsoft's `Arrays.CopyOfRange` page: the
+sentence's grammatical subject is the *length* of the returned array. The
+earlier matcher incorrectly skipped the subject and treated “returned array”
+as the subject. A new boundary guard abstains when a matched noun phrase is
+nested under an `of`/`in`/similar prepositional modifier. The Microsoft Learn
+`tools.json` excerpt also established that the complete subject can be “items
+in the array”; the grammar now keeps that phrase together instead of binding
+to the nested `array`. Exact citation resolution is checked for every excerpt.
+
+Sources: [MDN `Array.prototype.sort`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort),
+[NumPy `sort`](https://numpy.org/doc/stable/reference/generated/numpy.sort.html),
+[AWS `LambdaInvocationType`](https://docs.aws.amazon.com/cdk/api/v2/java/software/amazon/awscdk/services/ses/actions/LambdaInvocationType.html),
+[Microsoft Learn `Preferences.Keys`](https://learn.microsoft.com/en-us/dotnet/api/java.util.prefs.preferences.keys?view=net-android-36.0),
+and [Microsoft Learn `Arrays.CopyOfRange`](https://learn.microsoft.com/en-us/dotnet/api/java.util.arrays.copyofrange?view=net-android-37.0).
+
+This is five selected sentence excerpts with Codex-authored labels, not a
+complete-document sample or a proposal precision/coverage estimate. The new
+case demonstrates a concrete subject-boundary failure and a local repair; the
+full-document corpus-fit and publisher-held-out gates remain open.
+
 ## Proof-guided procedure composition (2026-10-20)
 
 Command: `python3 run_experiments.py --match v1_451 --timeout 300`.

@@ -13,7 +13,9 @@ import re
 
 _PREDICATE_CLAUSE = re.compile(
     r"\b(?P<subject>(?:the\s+)?(?:following\s+)?"
-    r"(?:function|method|program|code|returned\s+array|array|output|result))"
+    r"(?:(?:items?|elements?|records?|values?)\s+in\s+(?:the\s+)?array|"
+    r"function|method|program|code|returned\s+array|array|output|result|"
+    r"items?|elements?|records?|values?))"
     r"\s+will\s+(?P<polarity>not\s+)?"
     r"(?P<predicate>[a-z](?:\.(?=\d)|[^.!?;()]){1,180}?)"
     r"(?=(?:,?\s+(?:but|if|unless|when|provided\s+that|assuming)\b)"
@@ -131,6 +133,14 @@ def propose_procedure_phrase_candidates(
         return ()
     match = _PREDICATE_CLAUSE.search(sentence)
     if match is None:
+        return ()
+    prefix = sentence[:match.start("subject")]
+    if re.search(
+            r"\b(?:[\w-]+\s+){1,4}(?:of|in|from|for|with|to)\s+"
+            r"(?:the\s+)?$", prefix, re.IGNORECASE):
+        # Avoid promoting the object of a preposition to subject, as in
+        # "The length of the returned array will be N". The true subject
+        # precedes "of"; the array itself is not said to be N.
         return ()
     predicate = " ".join(match.group("predicate").split()).strip(
         " \t\r\n,;:'\"“”‘’«»`")

@@ -179,6 +179,16 @@ does not claim. Keep the corrected source sentence and its condition locked as
 a regression; provenance review must check that the cited source entails the
 claim, not only that a local offset resolves to the supplied text.
 
+`v1_472` now probes five exact sentence excerpts across four publisher
+families, including positive constructions from each. A Microsoft sentence
+exposed a subject-boundary error (“length of the returned array” was misread
+as “returned array”); the extractor now abstains on that nested noun phrase.
+The related Microsoft `tools.json` excerpt also shows a complete subject
+“items in the array”, now retained as one phrase. All eight nearby
+learning/recombination diagnostics pass. This improves the local controls but
+remains a sentence-excerpt probe with Codex labels; it does not close the
+full-document transfer gate.
+
 An initial corpus-fitness probe against the locally installed indexes found
 that they are not suitable positive corpora for this construction: a bounded
 full-document scan of 2,339 SimpleWiki documents and 40 arXiv documents

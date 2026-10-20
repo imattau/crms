@@ -50,12 +50,13 @@ def main() -> None:
     candidates = propose_procedure_phrase_candidates(
         evidence, source_citation=citation)
     require(len(candidates) == 1
+            and candidates[0].subject.casefold() == "the items in the array"
             and candidates[0].predicate_phrase
                 == "be sorted in descending, SemVer 2.0.0 order"
             and candidates[0].polarity
             and candidates[0].assertion_status == "asserted"
             and not candidates[0].quoted,
-            f"held-out publisher phrase or qualifier was lost: {candidates!r}")
+            f"held-out publisher subject or phrase was misread: {candidates!r}")
     require(not propose_procedure_phrase_candidates(
         NEGATIVE, source_citation=citation),
         "unrelated sentence was emitted as a procedure candidate")
