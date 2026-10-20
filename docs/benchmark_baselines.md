@@ -2527,6 +2527,52 @@ surface wording, or a broader independently sourced corpus where such overlap
 can be measured. Do not count same-page field/prose repetitions as independent
 publisher support.
 
+## Cross-domain runtime replay on current checkout (2026-10-20)
+
+At `edb2893`, the selected runtime set was rerun with isolated working
+directories:
+
+```sh
+python3 run_experiments.py --match 327 --match 242 --match 376 \
+  --match 357 --match 207 --match 389 --match 413 --match 414 --timeout 300
+```
+
+All 10 selected diagnostics passed in 11.34 seconds. The selected domains
+cover phrase transfer, list recombination/retrieval, graph reasoning,
+list→math/code composition, grounded translation, story revision, and
+source-topic dialogue/persistence. These pass results mean only that the
+selected assertions held; they do not provide a broad task success rate.
+
+The current `v1_327` scores are:
+
+| Set | Baseline correct | Layer correct | Layer wrong | Layer abstained | Must-refuse accepted |
+|---|---:|---:|---:|---:|---:|
+| Dev | 46/78 | 73/78 | 0 | 5 | 11/11 |
+| Held | 34/45 | 44/45 | 0 | 1 | 12/12 |
+| Unseen | 31/44 | 42/44 | 0 | 2 | 14/14 |
+
+The paraphrase layer retained the earlier correct/wrong/abstain counts, while
+the direct baseline changed from the prior recorded snapshot (`d597615`):
+dev 50→46, held 31→34, unseen 29→31. A repeat run on this checkout produced
+the same new figures. The datasets are small and partly tuned; the shift is
+not evidence of a general regression or improvement. Preserve both snapshots
+and investigate the baseline change before using that baseline for trend
+claims.
+
+The direct `v1_376` run independently verified positive proofs and reproduced
+the expected distinctions: the depth-35 chain and depth-9 tree answered; the
+diamond result was incomplete at the 64-proof cap; explicit positive plus
+negative was ambiguous; a negative-only open-world case and a complete miss
+were unknown; exhausted expansion remained incomplete; the cycle-backed
+self-relation was ambiguous; and an irreflexive constraint denied its self
+link. These are controlled engine checks, not evidence of broad natural-
+language reasoning.
+
+The current worktree also contained the user's uncommitted corpus audit report
+and local dialogue scratch files. The scorecard did not edit or depend on
+those artifacts. The older `d597615` result above remains a historical
+snapshot rather than a substitute for this rerun.
+
 `python3 experiments/v1_338_structured_field_predicate_learning.py` passed all
 checks: the proposal remained inert before review, six training pages licensed
 two held-out question forms, cited evidence survived SQLite reload, stale

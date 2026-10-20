@@ -60,6 +60,18 @@ The gap is integration and generalization. Most strong results are bounded exper
 
 This is **on track architecturally, not yet on track to claim the capability goal**. The priority is to turn the strongest components into one measured, reproducible chat-level capability, then widen coverage without hiding abstentions or errors.
 
+The latest selected runtime replay on `edb2893` passed 10/10 diagnostics across
+phrase transfer, recombination, graph reasoning, math/code, translation,
+creative revision, and dialogue persistence. This is healthy regression
+coverage, not a user-level success rate: the checks are controlled and do not
+measure broad task completion. The current paraphrase layer answered 73/78
+dev, 44/45 held, and 42/44 unseen items with no wrong outputs; five, one, and
+two items respectively abstained. Its direct baseline shifted from the older
+snapshot, so comparisons need a pinned, investigated baseline before they can
+support trend claims. The main unmet risks remain independent dialogue
+generalization and source-derived rule discovery; the project should spend its
+next cycle measuring those instead of adding domain breadth.
+
 ## What counts as progress
 
 Maintain one versioned end-to-end scorecard. For every task set, keep source documents or dialogue splits disjoint where relevant, freeze expected answers and negative controls, and report:
@@ -166,6 +178,46 @@ projects. Contextual intent research may continue on frozen data, but may only
 route, clarify, and repair; it cannot supply facts or evidence. Reasoning
 improvements should be driven by failures in packet 3, not by engine depth in
 isolation.
+
+### Next-cycle deliverables and decision gates
+
+1. **Dialogue transfer benchmark.** Create an independently authored, held-out
+   set of multi-turn transcripts and document layouts that varies entity names,
+   paragraph boundaries, topic switches, pronouns, source-only answers,
+   unanswered turns, corrections, `why?`, history questions, and ordinal
+   references. Record expected answer, acceptable clarification, evidence
+   span, and failure type before running CRMS. Keep the existing Colosseum /
+   Eiffel regressions as controls. Gate: no confident wrong referents on the
+   locked set; report coverage, abstentions, clarifications, omissions, task
+   completion, and layout/source diversity. If it fails, fix context lifetime
+   and referent grounding before adding more intent or move machinery.
+2. **Blinded source-rule discovery study.** Use corpora with actual overlap in
+   relation and wording. Freeze the candidate generator before labeling; sample
+   proposals and non-proposals, and label cited evidence for relation match,
+   role direction, polarity, and sentence scope. Keep Codex labels identified
+   as model-generated and audit a separate sample. Gate: report precision,
+   yield/coverage, label effort, and source independence; retain review-only
+   status unless negative controls and non-proposal checks support promotion.
+   If yield or precision is inadequate, improve evidence extraction rather
+   than hard-coding more aliases.
+3. **One chat-level recombination/reasoning demonstration.** After packets 1
+   and 2 clear their gates, use an unseen multi-step request whose components
+   were learned separately. Run it through ordinary chat and a fresh process;
+   independently verify its answer/proof; exercise missing premises,
+   contradiction, unsupported operations, incomplete search, correction, and
+   derived-case invalidation. Gate: no unsupported positive result, provenance
+   survives reload, and teacher/labeler contributions are reported. Keep
+   self-generated cases as review-gated proposals until these controls work.
+
+For every deliverable, preserve the corpus and code snapshot, run the same
+locked cross-domain regressions, and update
+[`benchmark_baselines.md`](benchmark_baselines.md). A packet advances only on
+held-out chat evidence, not because its component experiment passes. Once
+these gates hold, select a single domain slice (math, coding, translation, or
+creative work) by measured user-facing errors, then validate the copied SQLite
+model without access to its original source files. This order keeps the core
+goal visible: broad natural-language use, safe recombination, contextual
+dialogue, and evidence-governed learning in a portable model.
 
 ### Next packets after those gates
 
