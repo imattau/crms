@@ -445,7 +445,7 @@ regression already fixed in the current tree should not trigger duplicate code.
 | 5 | Use the common scorecard to select one bounded task each in coding, math, translation, and creative work, after steps 1–3 establish a stable chat and recombination baseline. | For each selected task: held-out prompts, a validator independent of generation, ordinary-chat and repair results, and a portability check. | Each task shows useful completion, valid outputs, honest limits, and repair on unseen examples before scope expands. |
 | 6 | Exercise the SQLite model as the complete distributable runtime after the preceding learning paths stabilize. | A clean copied model with source files unavailable, replaying query, learn, compose, reason, explain, correct, save/reload, and the shared scorecard. | Behavior, provenance, searchable source text, and correction lineage survive from the copy alone; size and compatibility are documented. |
 
-**Current checkpoint (2026-10-20, `f87038d`):** the fixed multi-turn
+**Current checkpoint (2026-10-20):** the fixed multi-turn
 regression packet passes 8/8, including the reported topic switch, source-only
 continuity, history, ordinal selection, and follow-ups after abstention. These
 are targeted controls, not independently authored transfer evidence. The
@@ -490,6 +490,14 @@ the learned `and` sequence, and the output/proofs survive fresh chat and
 explanation. An unknown member still blocks composition. This is meaningful
 synthetic entity/value transfer, but request authoring and expected results are
 not independent of the development work; the benchmark gate remains open.
+
+`v1_502` adds a math task to that route: a contrastively learned sum procedure
+aggregates the proof-selected values, and `CRMSMath` checks the exact total
+independently. The natural-language reply states the scalar as a total; unknown
+or conflicting members block it. This demonstrates one narrow
+reasoning-to-math composition, not broad word-problem solving. The same finite
+set format still dominates, so add a distinct math request family and
+independent prompts before claiming domain transfer.
 
 An opt-in `/practice-composition` command now re-runs and verifies each distinct
 positive relation result from the last successful composition and stores it as
@@ -577,6 +585,10 @@ transfer beyond the original entity. They do not yet show independent
 generalization or task breadth; the next valid gate is a frozen, separately
 authored request set with an independent checker, followed by a second task
 family.
+`v1_502` adds exact summation and a separate arithmetic check after proof-based
+selection, giving one reasoning→math task beyond list transformation. All
+three are authored controls; the math path still needs varied request forms,
+more than one aggregate operation, and independent evaluation.
 
 **Gate:** frozen held-out requests complete through chat; an independent
 checker accepts valid outputs and rejects tampered or invalid ones; unknown,

@@ -423,10 +423,18 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
         f" Recognized the grammatical form '{morphology_note}' in "
         f"'{surface_procedure}' using the licensed procedure '{procedure}'."
         if morphology_note else "")
-    text = (f"Verified values satisfying {subject} {relation}: {included}"
-            f"{exclusions}. After '{procedure}': {list(output)}. "
-            f"Evidence sources: {evidence}.{support_note}{language_note}"
-            f"{procedure_note}")
+    if (prediction.procedure
+            and prediction.procedure[-1].get("operation") == "sum_values"
+            and len(output) == 1):
+        answer_line = (f"Verified values satisfying the relation "
+                       f"'{subject} {relation}': {included}{exclusions}. "
+                       f"Their total is {output[0]}.")
+    else:
+        answer_line = (f"Verified values satisfying {subject} {relation}: "
+                       f"{included}{exclusions}. After '{procedure}': "
+                       f"{list(output)}.")
+    text = (f"{answer_line} Evidence sources: {evidence}.{support_note}"
+            f"{language_note}{procedure_note}")
     return ReasonedListComposition(
         "answered", text, subject, relation, values, tuple(included),
         tuple(negative), (), output, procedure, tuple(sorted(sources)), checks,

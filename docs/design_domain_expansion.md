@@ -1,6 +1,7 @@
 # Roadmap: natural-language math, coding, and translation
 
-**Status:** staged, with a first checked math→code composition implemented.
+**Status:** staged, with checked math→code and reasoning→math composition
+slices implemented.
 CRMS has working, bounded natural-language paths for exact arithmetic and
 simple equations (`crms_math.py`), example-grounded translation and rewriting
 (`crms_translation.py`), and Python rendering for learned list procedures
@@ -155,6 +156,16 @@ The CLI exposes the task through “Write Python code to apply x times x plus 3
 to each value in the list”, then supports the existing code explanation and
 evidence follow-ups. This establishes only an elementwise map composition;
 translation→math/code and other cross-domain task structures remain untested.
+
+The new `experiments/v1_502_reasoned_numeric_aggregation.py` checks another
+cross-domain path through chat: an accepted three-premise reasoning rule
+classifies a finite set, an explicitly learned sum procedure aggregates only
+the proved-positive values, and `CRMSMath` independently checks the exact
+integer total. The natural-language answer realizes the scalar as a total
+rather than a one-item list. Unknown or conflicted membership blocks the
+aggregate. This is one controlled relation-to-math task with Codex-labeled
+examples, not general word-problem solving; follow it with held-out math
+requests and a distinct second aggregate operation before widening the surface.
 
 A second, two-stage crossing is checked by
 `generate_list_then_math_python` and

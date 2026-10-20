@@ -3474,3 +3474,24 @@ must add a second task family rather than increase examples in this finite-list
 task alone.
 
 Report: [experiment](../experiments/v1_501_reasoned_sequence_entity_transfer.py).
+
+## Proof-selected exact numeric aggregation (`v1_502`, 2026-10-20)
+
+Command: `python3 experiments/v1_502_reasoned_numeric_aggregation.py`.
+
+CRMS learns `sum the values` from labeled examples. The procedure learner asks
+for two contrastive examples (the empty list and a negative singleton) before
+accepting one exact `sum_values` procedure. In fresh chat, a three-premise
+inference rule selects Mira's supported values from `[23, 5, 23, 8]`; the
+explicit negative excludes 8; the learned procedure reports “Their total … is
+51.” The separate exact arithmetic engine independently checks `23 + 5 + 23 =
+51`. Unknown value 11 and conflicting support for 23 prevent an aggregate.
+Proof, source, and procedure-label provenance remain available to `why?`.
+
+This connects supervised procedure learning, rule-based reasoning, and exact
+math in an ordinary chat task. It remains one synthetic integer aggregation
+frame with Codex-labeled examples; it does not establish open-ended word
+problem solving or independent math transfer. Preserve the contrastive,
+unknown, conflict, and exact-cross-check cases as controls.
+
+Report: [experiment](../experiments/v1_502_reasoned_numeric_aggregation.py).
