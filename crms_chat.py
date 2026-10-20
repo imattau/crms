@@ -10350,7 +10350,7 @@ def main() -> int:
                     prefix = ("The source sentence doesn't state an explicit "
                               "number: ")
                 else:
-                    prefix = "The source states: "
+                    prefix = f"The source gives the count as {quantity}: "
                 turn.text = (f"{prefix}“{sentence}” [Source: {title}; "
                              "quoted evidence, not an accepted fact]")
                 if current_effort == "thorough":

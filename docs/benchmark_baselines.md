@@ -18,10 +18,11 @@ Three cited claims from two SimpleWiki pages now answer through fresh CLI using
 a copied source index: Marie Curie, 2 Nobel Prizes (one sentence mentions both
 an individual prize and the total); Curie family, 5 Nobel Prizes; International
 Committee of the Red Cross, 3 Nobel Peace Prizes. Nearby count/aggregation and
-quoted evidence controls pass (`v1_329`, `v1_502`, `v1_507`). This does not establish
-general count understanding: the examples share one page, the route still
-quotes source wording, and other count constructions, paraphrases, and verb
-alternations remain untested. See the
+quoted evidence controls pass (`v1_329`, `v1_502`, `v1_507`). This does not
+establish general count understanding: two examples share one page, the route
+leads with the extracted count and follows with the exact cited source sentence.
+Other count constructions, paraphrases, and verb alternations remain untested.
+See the
 [runner](../experiments/v1_524_natural_count_article_and_post_object.py) and
 [report](../experiments/reports/v1_524_natural_count_article_and_post_object.json).
 

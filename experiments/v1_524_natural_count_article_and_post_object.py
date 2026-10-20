@@ -64,8 +64,8 @@ def main() -> None:
         require(index.resolve_citation(row["citation"]) == row["source_text"],
                 f"copied source did not resolve the count citation: {row}")
 
-    # The same one-document source copy must support ordinary fresh-process
-    # chat without access to the installed research index.
+    # The minimal source copy must support ordinary fresh-process chat
+    # without access to the installed research index.
     with tempfile.TemporaryDirectory(prefix="crms-v1-524-") as temp:
         root = Path(temp)
         index_path = root / "source-copy.json"
@@ -95,6 +95,8 @@ def main() -> None:
         for reply, (_question, quantity, excerpt) in zip(replies, QUESTIONS):
             require(quantity in reply.casefold() and excerpt in reply,
                     f"fresh CLI did not state the supported count: {reply!r}")
+            require(f"The source gives the count as {quantity}:" in reply,
+                    f"fresh CLI did not lead with the extracted count: {reply!r}")
             require("couldn't find a source sentence" not in reply.casefold(),
                     f"fresh CLI abstained despite direct evidence: {reply!r}")
         cli_output = output
@@ -110,6 +112,7 @@ def main() -> None:
             "count_after_object_with_times_extracted": True,
             "repeated_object_mentions_select_explicit_count": True,
             "fresh_cli_answers_from_source_copy": True,
+            "reply_leads_with_extracted_count": True,
             "citations_resolve_from_source_copy": True,
             "no_accepted_facts_written": True,
         },
@@ -117,7 +120,7 @@ def main() -> None:
         "cli_output": cli_output,
         "limits": [
             "Three count claims from two encyclopedia pages do not establish broad count understanding.",
-            "The count route returns cited source wording rather than a general learned numeric procedure.",
+            "The count route leads with the extracted count and quotes its source rather than performing a general learned numeric procedure.",
             "Compound counts, paraphrases, and semantically equivalent verbs remain untested.",
         ],
     }
