@@ -72,6 +72,36 @@ unscored feature program. Stage 7 validates the stable learning lifecycle.
 5. After the recombination gate passes, exercise derived proposals and
    correction propagation before allowing normal retrieval to reuse them.
 
+## Current baseline check (2026-10-20)
+
+On the current checkout, the following runtime controls passed:
+
+- `v1_427`: 30-turn dialogue transcript, including the Colosseum topic switch,
+  history, stale explanation, clarification, and persistence.
+- `v1_501` and `v1_502`: learned sequence and proof-selected numeric
+  aggregation in fresh chat, including unknown/conflict controls.
+- `v1_514` and `v1_516`: reviewed relation wording plus type reasoning across
+  held-out routes, including unsupported-type abstention.
+- `v1_533`: cited dated percentage-point comparison, independent decimal
+  check, and direction, unsupported-measure, and conflicting-source controls.
+
+These are component/regression passes, not an independent user-task score.
+Most use authored controls; `v1_533` uses two documents from one PMC
+collection and remains narrow.
+
+A focused request probe against the current learned facts and procedures
+confirmed the next language-transfer target. The canonical request
+“remove duplicate values and reverse the list” composes successfully, while
+natural alternatives such as “return the distinct values … in reverse order”
+and “deduplicate, then reverse” do not resolve through
+`compose_verified_filter`. The evidence and learned operations are present;
+the request-to-operation binding is the gap. The next recombination change
+should address this through explicit, reviewable operation-language learning
+and held-out phrase transfer, preserving order and abstaining on unlicensed
+operations. Do not hard-code this probe's alternate phrases as a passing
+result; freeze them as held-out evaluation items before implementing the
+resolver.
+
 The current experiments already demonstrate controlled reasoning-to-math,
 typed relation/paraphrase recombination, learned sequence operations, and
 targeted dialogue repairs. Preserve them as regression controls; do not expand
