@@ -4225,6 +4225,32 @@ def _render_research_explanation(index: CRMSSQLiteResearchIndex,
             "simpler-sentence examples.")
 
 
+def _render_quoted_source_explanation(
+        index: CRMSSQLiteResearchIndex, evidence: dict) -> str:
+    """Explain the evidence status of a quoted answer without rewriting it."""
+    citation = str(evidence.get("citation", ""))
+    document_id = str(evidence.get("document_id", ""))
+    if not document_id and citation:
+        document_id = citation.split("#", 1)[0]
+    if not citation or not document_id:
+        return ("I can't verify the previous source sentence now. Ask the "
+                "question again to retrieve current evidence.")
+    try:
+        sentence = index.resolve_citation(citation).strip()
+        document = index.document(document_id)
+    except (KeyError, TypeError, ValueError):
+        return ("I can't verify the previous source sentence now. Ask the "
+                "question again to retrieve current evidence.")
+    if not sentence:
+        return ("I can't verify the previous source sentence now. Ask the "
+                "question again to retrieve current evidence.")
+    source = (f"[{document.title}]({document.location})"
+              if document.location else document.title)
+    return ("I used this quoted source sentence as evidence; it has not been "
+            f"accepted as a fact: “{sentence}”\nSource: {source}\n"
+            f"Citation: {citation}")
+
+
 def _render_latest_research(index: CRMSSQLiteResearchIndex,
                             topic: str) -> tuple[str, dict | None, list[dict]]:
     hits = index.search_latest(topic, limit=min(index.document_count(), 100))
@@ -5975,6 +6001,7 @@ def main() -> int:
     last_summary_scoped_hit = None
     last_research_evidence: dict | None = None
     last_answer_had_inference_proof = False
+    last_answer_was_quoted_evidence = False
     last_reasoned_filter = None
     last_reasoned_filter_request: str | None = None
     last_reasoned_filter_practiced = False
@@ -6272,6 +6299,7 @@ def main() -> int:
             continue
         if not explanation_followup:
             last_answer_had_inference_proof = False
+            last_answer_was_quoted_evidence = False
         previous_latest_documents = latest_research_documents
         latest_research_documents = []
         previous_translation_clarification = pending_translation_clarification
@@ -9774,6 +9802,11 @@ def main() -> int:
                         if explanation_refs else None)
                     last_research_evidence = None
                     continue
+            if (last_answer_was_quoted_evidence
+                    and last_research_evidence is not None):
+                print("CRMS> " + _render_quoted_source_explanation(
+                    index, last_research_evidence))
+                continue
             if last_research_evidence is not None:
                 print("CRMS> " + _render_research_explanation(
                     index, last_research_evidence, translation_model,
@@ -11509,6 +11542,7 @@ def main() -> int:
                 last_research_evidence = None
         else:
             last_research_evidence = None
+        last_answer_was_quoted_evidence = quoted_evidence_reply
         if (auto_practice_questions and turn.status == "answered"
                 and turn.response is not None
                 and turn.response.inference_proofs):
