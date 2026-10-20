@@ -1,7 +1,71 @@
 # Focused plan from current CRMS to its goal
 
-**Reviewed:** 2026-10-20 (runtime probes through `v1_525`)
+**Reviewed:** 2026-10-20 (runtime probes through `v1_527`)
 **Status:** active; the capability goal is not yet demonstrated.
+
+## Direction review and priority
+
+CRMS is still pointed at the intended goal, but progress is not yet evidenced
+at the required breadth. Its differentiated path—explicit evidence, reusable
+rules and procedures, proof-checked reasoning, correction, and a portable
+model—is present in pieces. The gap is transfer: ordinary user requests do
+not yet reliably compose these pieces across unseen wording, entities, and
+source layouts. Dialogue fixes are useful controls, not evidence of general
+conversation; successful recombination and reasoning fixtures are not yet a
+held-out chat capability; and current corpus-derived rule proposals are not
+reliable enough to promote automatically.
+
+The next work should therefore optimize **held-out task completion with
+controlled errors**, not component count, indexed text volume, or feature
+breadth. Keep dialogue safety on every chat change, but do not make perfect
+dialogue a prerequisite for advancing recombination and reasoning. Source-rule
+learning can proceed as a bounded research track alongside them. Keep
+derived-case write-back review-gated until composition and correction pass
+independent checks.
+
+### Ordered work packets
+
+1. **Dialogue transfer and safety packet (now; chat release gate).** Expand
+   the frozen multi-turn set beyond the existing Paris/Rome and
+   Marie/Einstein controls: vary entity type, paragraph layout, topic distance,
+   interruption, correction, source-only answers, and save/reload. Track wrong
+   bindings and stale explanations separately from omissions, clarification,
+   abstention, and successful follow-up. Add a test only when it represents a
+   user-visible behavior; keep the set independently authored and untouched
+   during tuning.
+2. **Reasoning-to-procedure transfer packet (main capability gate).** Route
+   held-out, source-backed tasks through ordinary chat: retrieve separate
+   premises, derive a checked result, then consume it in a separately learned
+   procedure. Vary entities, wording, evidence order, and operation order.
+   Include compound/partial requests, missing premises, negatives,
+   contradictions, cycles, and resource limits. Run in fresh processes and
+   verify outputs with an independent checker.
+3. **Source-rule learning transfer (parallel research lane).** Freeze the
+   candidate method and review proposals plus sampled non-proposals on
+   untouched documents and a new publisher. Preserve roles, scope, conditions,
+   polarity, contrast, and citations. Codex labels are recorded supervision,
+   not independent validation; proposals remain review-only.
+4. **Governed derivation and self-learning (after packet 2 passes).** Promote
+   verified compositions only to lineage-bearing, lower-trust proposals.
+   Inject wrong derivations and test correction propagation, invalidation,
+   duplicate suppression, trust ordering, restart, and bounded growth before
+   allowing reuse or automation.
+5. **Broaden one task domain at a time.** Select a bounded coding, math,
+   translation, or creative task from measured failures. Define its independent
+   checker or quality rubric before implementation; reuse the natural-language,
+   recombination, evidence, repair, and abstention path.
+6. **Prove the distributable model end to end.** Copy SQLite to a clean
+   location without source files and rerun query, learning, recombination,
+   reasoning, correction, explanation, and reload. Then measure size,
+   compatibility, and licensing metadata.
+
+**Promotion rule:** a packet advances only when its held-out chat results
+improve useful completion without confident invalid answers, and its evidence,
+proofs, limits, and correction behavior pass their independent checks. If a
+gate fails, preserve the counterexample and repair that mechanism before
+widening scope. Qualitative comparison with an instruction-tuned 70B-class
+system is a capability rubric only; no parity claim or live model run is
+required.
 
 ## Goal
 
@@ -197,21 +261,13 @@ gaps, not to claim parity.
 
 ## Immediate next action
 
-The immediate dialogue task is to expand the frozen independent conversation
-set and evaluate the citation-verified visible-entity state across entity
-types, longer topic distances, corrections, interruptions, and save/reload.
-Include event/date paraphrases, pronouns with and without antecedents, “why?”,
-history, and repair. Keep the Eiffel/Colosseum and Marie/Einstein cases as
-fixed controls. Measure task completion, omissions, clarification, abstention,
-and confident misbindings separately; do not rely on intent-label agreement
-alone. In parallel, prepare the next capability packet to transfer
-reasoning-to-procedure composition beyond curated demonstrations using real
-source-backed material; vary held-out entities,
-evidence order, layout, and request forms; include partial, unsupported,
-conflicting, and multi-source cases; and check results independently in fresh
-CLI processes and a copied model. Keep source-rule quality research moving in
-parallel. Keep derived write-back review-gated until recombination, correction,
-and invalidation pass on held-out tasks.
+Start with work packet 1 and freeze its cases before changing dialogue code.
+In parallel, specify and freeze the task set and independent checker for work
+packet 2; use reviewed components while packet 3 continues as research. Do not
+wait for a broad dialogue score before running the composition experiment.
+Keep the Eiffel/Colosseum and Marie/Einstein failures as permanent controls,
+and keep derived write-back review-gated until recombination, correction, and
+invalidation pass on held-out tasks.
 
 For detailed implementation history and experiment evidence, see
 [`focused_roadmap_to_goal.md`](focused_roadmap_to_goal.md) and
