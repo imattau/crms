@@ -114,6 +114,35 @@ decide whether its current representation can retain a usable, licensed
 operation claim. If not, redesign role, condition, and markup extraction as a
 general boundary model, then reserve new documents for confirmation.
 
+That review is now done in `v1_475`: in a deterministic but non-probability
+sample from the same two package corpora, all 20 candidate field sets needed
+their source sentences to restore a role, condition, qualifier, contrast, or
+markup boundary; all 20 sampled no-candidate sentences described plausible
+API behavior outside the current subject grammar. This is unblinded Codex
+error analysis, not a precision/recall estimate, and the source-cited review
+path still prevents these candidates from becoming accepted knowledge. Keep
+these cases as development controls; the current clause-aware redesign is
+described below, and confirmation must use untouched API units and a new
+publisher.
+
+The clause-aware redesign is now implemented as a review-only proposal path
+and exercised by `v1_476`. Its 16 cited fixtures cover full subjects,
+conditions, contrast, list items, parenthesized values, literals, polarity,
+quotation, denial, uncertainty, and a fresh chat replay; candidates remain
+review-only. The full-package replay `v1_477` finds 649
+sentences across 249 NumPy API units and 214 across 60 pandas units, compared
+with 303/177 and 24/16 in `v1_474`; NumPy has 274 normalized candidate
+patterns. A re-run of six topic-switch, source-only,
+paragraph-grounding, multi-turn, cross-paragraph, and unsupported-switch
+dialogue controls passed 6/6; this is regression coverage, not dialogue
+transfer evidence. The source counts are yield only: the replay
+still exposes malformed boundaries in complex parameter and conditional
+prose, and the frozen sample was used during redesign. Do not call the yield
+increase improved precision or transfer. The next gate is a predeclared
+review of a frozen sample from `v1_477`, followed by a publisher- and
+API-unit-held-out confirmation that was not used to revise the parser. Codex
+labels are supervision, not independent validation.
+
 Use the existing excerpt and real-source acceptance experiments as regression
 controls, not as a corpus-level result. If a suitable corpus does not contain
 enough examples, change the learning signal or narrow the claim; do not add
@@ -201,20 +230,32 @@ academic-paper sources.
 
 ## Immediate sequence
 
-1. Freeze a compact scorecard and independently authored dialogue holdout;
-   replay all fixed regressions and fix any reproduced wrong referent or lost
-   visible context.
-2. In parallel, review a fixed sample of the `v1_474` candidates and
-   non-proposals, keeping Codex labels identified as such. Then freeze the
-   source-rule transfer study on document- and publisher-disjoint technical
-   references. The `v1_473` arXiv result is a negative control for its
-   specific grammar.
-3. Use the first passing learning path to build one unseen chat-level
-   recombination task with proof checks and an independent output oracle.
-4. Only after that succeeds, exercise correction-aware derived proposals and
-   invalidation end to end.
-5. Keep dialogue/intent evaluation active throughout; then choose the next
-   domain slice by measured loss and finish the copied SQLite-model scorecard.
+1. Freeze the shared scorecard and independently authored dialogue holdout.
+   Replay all fixed topic-switch, source-only-context, stale-`why?`, history,
+   ordinal, repair, and save/reload transcripts. Fix only reproduced safety
+   failures, then report task completion, wrong referents, clarification,
+   omissions, and abstention separately. Dialogue is a parallel research and
+   release gate for every chat-facing change.
+2. Freeze the `v1_477` clause-aware parser and review a predeclared sample of
+   candidate and non-candidate sentences. Use Codex labels as explicitly
+   identified supervision; preserve the exact source sentence and boundary
+   errors. Do not tune on confirmation data. Confirm on untouched API units
+   and a new publisher, measuring useful proposal precision, missed useful
+   claims, review effort, and source coverage. If this gate fails, revise the
+   boundary representation and reserve a new confirmation set. The `v1_473`
+   arXiv result remains a negative control for this specific grammar.
+3. If source learning transfers, use reviewed components to build one unseen
+   natural-language recombination task through chat and fresh-process reload.
+   Independently check the result and its proof; include missing-premise,
+   conflict, negative, unsupported, and incomplete-search cases. Keep the
+   connective supervision and any hand-coded mappings visible.
+4. After that composition passes, test derived-case proposals, correction
+   propagation, invalidation, duplicate control, trust weighting, and growth
+   limits. Keep write-back review-gated until those controls pass.
+5. Continue dialogue-intent and move research against held-out task outcomes.
+   Only then select a bounded math, coding, translation, or creative task by
+   measured loss; finish with the copied SQLite-model scorecard using no source
+   files. Do not expand corpus or domain breadth just to increase activity.
 
 Do not expand the corpus, add a dialogue mechanism, widen domains, or migrate
 the runtime store merely to show activity. After each gate, ask whether

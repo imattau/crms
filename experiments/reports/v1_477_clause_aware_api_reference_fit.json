@@ -1,0 +1,248 @@
+{
+  "audit": "v1_477_clause_aware_api_reference_fit",
+  "chat_replay": {
+    "candidate_predicate": "be set to the ufunc result",
+    "candidate_scope_notes": [
+      "before: At locations where the condition is True"
+    ],
+    "candidate_subject": "the `out` array",
+    "citation_resolved": true,
+    "fresh_process_succeeded": true,
+    "query": "/suggest-procedure-phrases out array ufunc result",
+    "renderer_displayed_subject": true,
+    "rule_store_unchanged": true,
+    "source": "numpy.add API docstring"
+  },
+  "limits": [
+    "API docstrings are individual reference units, not complete documentation sites.",
+    "The two packages are not independent publishers for transfer claims.",
+    "Candidate counts do not measure semantic precision or useful rule yield.",
+    "This audit does not label candidates, install rules, or validate learned mappings.",
+    "Results depend on installed package versions and their published docstrings."
+  ],
+  "method": "Scan complete public callable docstrings for the frozen, review-only subject-will-predicate grammar. Store no source text; verify each generated sentence citation against the in-memory research index.",
+  "packages": [
+    {
+      "candidate_api_units": 249,
+      "candidate_sentences": 649,
+      "corpus_sha256": "e0de3744dad3b18a02a455b04bcb31ec59c7d51543b21674cea6496b930f6567",
+      "license_label": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
+      "package": "numpy",
+      "public_callable_docstrings": 415,
+      "source_sentences": 13391,
+      "top_repeated_patterns": [
+        {
+          "assertion_status": "asserted",
+          "count": 84,
+          "positive": true,
+          "predicate": "be set to the ufunc result",
+          "quoted": false,
+          "subject": "the `out` array"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 84,
+          "positive": true,
+          "predicate": "retain its original value",
+          "quoted": false,
+          "subject": "the `out` array"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 84,
+          "positive": true,
+          "predicate": "remain uninitialized",
+          "quoted": false,
+          "subject": "locations within it where the condition is false"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 21,
+          "positive": true,
+          "predicate": "be defined by it",
+          "quoted": false,
+          "subject": "the result"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 11,
+          "positive": true,
+          "predicate": "broadcast correctly against the input array",
+          "quoted": false,
+          "subject": "with this option, the result"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 10,
+          "positive": true,
+          "predicate": "be raised",
+          "quoted": true,
+          "subject": "if the sub-class' method does not implement `keepdims` any exceptions"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 8,
+          "positive": true,
+          "predicate": "broadcast correctly against the original `a`",
+          "quoted": false,
+          "subject": "with this option, the result"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 6,
+          "positive": true,
+          "predicate": "be cast",
+          "quoted": false,
+          "subject": "the type"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 6,
+          "positive": true,
+          "predicate": "be cast",
+          "quoted": false,
+          "subject": "the type (of the output"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 5,
+          "positive": true,
+          "predicate": "be inserted into this array",
+          "quoted": false,
+          "subject": "the out parameter"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 4,
+          "positive": true,
+          "predicate": "broadcast correctly against the array",
+          "quoted": false,
+          "subject": "with this option, the result"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 4,
+          "positive": true,
+          "predicate": "still be used, in the order in which they come up in the dtype, to break ties",
+          "quoted": false,
+          "subject": "unspecified fields"
+        }
+      ],
+      "unique_normalized_candidates": 274,
+      "version": "2.5.1"
+    },
+    {
+      "candidate_api_units": 60,
+      "candidate_sentences": 214,
+      "corpus_sha256": "77c2241d955527380a76b6a493e2341e52e3db1b06c37255f730aa1ae6f2cbc1",
+      "license_label": "BSD 3-Clause License",
+      "package": "pandas",
+      "public_callable_docstrings": 100,
+      "source_sentences": 5384,
+      "top_repeated_patterns": [
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "be ordered",
+          "quoted": false,
+          "subject": "the resulting categorical"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "be used to determine the engine",
+          "quoted": false,
+          "subject": "the following logic"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "be used",
+          "quoted": false,
+          "subject": "`odf <https://pypi.org/project/odfpy/>`_"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "be used",
+          "quoted": false,
+          "subject": "``xlrd``"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "be inferred from `data`",
+          "quoted": false,
+          "subject": "this"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "have no impact on the method",
+          "quoted": false,
+          "subject": "copy : bool, default false this keyword is now ignored; changing its value"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "have ``periods`` linearly spaced elements between ``start`` and ``end``",
+          "quoted": false,
+          "subject": "the resulting ``datetimeindex``"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "be used in the same manner as column values",
+          "quoted": false,
+          "subject": "it must be the same length as the data and"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "be used and automatically detect the separator from only the first valid row of the file by python's builtin sniffer tool, ``csv.sniffer``",
+          "quoted": false,
+          "subject": "the python parsing engine can, meaning the latter"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "be interpreted as regular expressions",
+          "quoted": false,
+          "subject": "in addition, separators longer than 1 character and different from ``'\\s+'``"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "be skipped",
+          "quoted": false,
+          "subject": "intervening rows that are not specified"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "be formed for the row labels",
+          "quoted": false,
+          "subject": "class:`~pandas.multiindex`"
+        }
+      ],
+      "unique_normalized_candidates": 182,
+      "version": "3.0.5"
+    }
+  ],
+  "runtime_code_sha256": {
+    "crms_chat.py": "47a62ec007446a81ad4892032bcc26630d2770c4efc38d6ae0c197436211ef83",
+    "crms_procedure_discovery.py": "f755fe2dd2201c7d810f96a02cc5d40ae8589c02f87d67b1c3cb11fc04d75c55"
+  }
+}

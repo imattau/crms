@@ -230,6 +230,38 @@ reproduction script and output are
 and
 [`v1_474_installed_api_docstring_fit.json`](../experiments/reports/v1_474_installed_api_docstring_fit.json).
 
+`v1_475` now applies a deterministic SHA-256 selection to ten candidate and
+ten no-candidate `will` sentences from each pinned package. Codex's unblinded
+review found information loss in all 20 candidate field sets (roles,
+conditions, qualifiers, contrasts, or markup boundaries) and labeled all 20
+sampled non-candidates as plausible API behavior outside the subject grammar.
+These are development diagnostics, not precision/recall estimates or
+independent semantic validation. The exact source sentences remain available
+to reviewers, and no rules were accepted. The reviewed set now clears the
+roadmap's sample-review prerequisite. It is a development set for the
+clause-aware redesign; it cannot also serve as confirmation data. See
+[`v1_475_api_candidate_sample_review.py`](../experiments/audits/v1_475_api_candidate_sample_review.py)
+and
+[`v1_475_api_candidate_sample_review.json`](../experiments/reports/v1_475_api_candidate_sample_review.json).
+
+The clause-aware proposal path is exercised by `v1_476` and replayed
+against the same complete installed-package docstrings by `v1_477`. The
+`numpy.add` fresh-process chat replay now displays the subject ``the `out`
+array`` and the condition while keeping the proposal cited, review-only, and
+out of the rule store. The full scan yields 649 candidate sentences across
+249 NumPy API units and 214 across 60 pandas API units (up from 303/177 and
+24/16 in `v1_474`); NumPy has 274 normalized candidate patterns. This is
+improved extraction yield, not evidence of improved precision: complex
+parameter descriptions, contrastive clauses, and conditional scope still
+produce malformed boundaries, and the parser was redesigned using the earlier
+same-corpus sample. Freeze the current parser for confirmation. Review a fixed
+sample of current proposals and non-proposals,
+then evaluate untouched API units and at least one new publisher without
+tuning on those results. Keep all candidates review-only. See
+[`v1_476_clause_aware_procedure_claims.py`](../experiments/v1_476_clause_aware_procedure_claims.py),
+[`v1_477_clause_aware_api_reference_fit.py`](../experiments/audits/v1_477_clause_aware_api_reference_fit.py),
+and [`v1_477 report`](../experiments/reports/v1_477_clause_aware_api_reference_fit.json).
+
 **Gate:** a frozen method finds useful candidates on held-out documents and a
 second publisher with measured precision and review effort; sampled
 non-proposals and negative controls do not become positive rules. Accepted
@@ -317,55 +349,32 @@ academic-paper sources.
 
 ## Immediate work queue — execute in this order
 
-1. **Freeze the evaluation before tuning.** Preserve current dialogue and
-   learning regressions, including fixed topic-switch/source-only-context cases
-   and `v1_470`/`v1_471`. Record commit, corpus, splits, and scoring rubric.
-   Do not use inspected holdout rows to change the implementation.
-2. **Establish corpus fitness, then run source-learning transfer.** Build a
-   frozen set of complete, source-versioned documents from technical references
-   and relevant open research, with at least two publisher families for
-   discovery and a third held out for transfer. Confirm that the documents
-   contain enough naturally occurring target constructions to evaluate
-   coverage; otherwise stop and reconsider the representation before spending
-   effort on precision tuning. Label candidate and non-candidate passages for
-   relation/operation meaning, argument roles, polarity, quotation, scope, and
-   assertion status. Treat
-   `v1_469`/`v1_436` as integration controls, `v1_464`/`v1_468` as noisy
-   baselines, and `v1_473` as an arXiv corpus-fit negative control. Apply the
-   frozen revised candidate generator to complete technical-reference
-   documents from discovery publishers and the held-out publisher. Sample
-   proposals and non-proposals; include
-   polarity, quotation, contrast, role-reversal, boundary, and unrelated
-   negatives. Report precision, useful yield, missed opportunities, source
-   independence, and review effort. Keep proposals inert. If useful precision
-   and coverage transfer, proceed to rule induction; otherwise identify the
-   failing boundary, revise the method, and reserve a new publisher for
-   confirmation. Do not substitute a larger scan of one corpus.
-3. **Evaluate dialogue transfer in parallel.** Keep fixed pronoun/topic-switch,
-   source-only-context, stale-`why?`, history, and ordinal regressions locked.
-   Add independently authored transcripts and varied source layouts; score
-   wrong referents, irrelevant evidence, omissions, clarification, repair, and
-   task completion before changing runtime behavior. Fix reproduced failures,
-   then replay fixed and held-out cases in fresh processes. This is a release
-   gate for chat-facing work, not a reason to defer the source-learning study.
-4. **Prove recombination with reasoning on real evidence.** After the
-   source-learning gate, take separately reviewed evidence, rules, and
-   procedures through an unseen multi-step request in ordinary chat and a fresh
-   process. Independently verify proof and output. Include missing premises,
-   explicit negatives, conflicts, cycles/integrity failures, incomplete search,
-   unsupported operations, source correction, and derived-case invalidation.
-   Keep `v1_451`/`v1_456` as controls, not evidence that learning is autonomous.
-5. **Close the self-learning loop under governance.** Only after the composed
-   path is reliable, propose verified derived cases with lineage. Test
-   correction propagation, invalidation, duplicate suppression, trust weighting,
-   and storage limits before allowing automatic retrieval or reuse. Derived
-   cases must never validate their generating rules or evidence.
-6. **Expand breadth and distribution from measured losses.** Choose one
-   bounded math, coding, translation, or creative task based on the scorecard;
-   validate it through the same language interface before composing domains.
-   Once learning and correction records stabilize, verify a copied SQLite
-   model with searchable source text and accepted knowledge/rules, with original
-   documents unavailable. Measure portability, size, compatibility, and task
+1. **Freeze the scorecard and dialogue holdout.** Preserve all fixed
+   topic-switch, source-only-context, stale-`why?`, history, ordinal, repair,
+   and save/reload regressions. Add independently authored transcripts with
+   competing entities and varied layouts; report task completion, wrong
+   referents, irrelevant evidence, clarification, omissions, and abstention.
+   Dialogue remains a parallel research and release gate for chat-facing work.
+2. **Measure the current source-claim boundary, then test transfer.** Keep the
+   `v1_475` sample as development data. Freeze the clause-aware parser, review a
+   fixed sample from `v1_477` including non-proposals, and report useful
+   precision, missed claims, boundary errors, and review effort. Then confirm
+   without tuning on untouched API units and a new publisher. Keep `v1_473` as
+   a negative corpus-fit control for this grammar. If transfer fails, revise
+   the smallest faulty boundary and reserve a fresh confirmation set.
+3. **Prove recombination through chat and reasoning.** Once the source-learning
+   gate passes, route separately reviewed components into an unseen multi-step
+   natural-language task, fresh-process reload, proof checker, and independent
+   output oracle. Include missing premises, negatives, conflicts, integrity
+   failures, unsupported steps, and incomplete search. Keep hand-coded mapping
+   and connective supervision explicit.
+4. **Govern derived learning.** After recombination works, test review-gated
+   derived proposals, lineage, correction propagation, invalidation, duplicate
+   control, trust weighting, and storage limits before automatic reuse.
+5. **Expand task breadth and distribution from measured losses.** Select one
+   bounded math, coding, translation, or creative task using the scorecard.
+   Then run the complete scorecard from a copied SQLite model with original
+   sources unavailable, recording portability, size, compatibility, and task
    outcomes.
 
 The dialogue packet is a parallel release-quality gate; it must not displace

@@ -3080,3 +3080,65 @@ Reports: [corpus-fit JSON](reports/v1_474_installed_api_docstring_fit.json),
 [reproduction script](audits/v1_474_installed_api_docstring_fit.py). The
 reference units come from the [NumPy API reference](https://numpy.org/doc/stable/reference/generated/numpy.add.html)
 and the [pandas API reference](https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html).
+
+## Deterministic candidate and non-candidate review (`v1_475`, 2026-10-20)
+
+Command: `python3 experiments/audits/v1_475_api_candidate_sample_review.py`.
+
+Using the exact package/corpus fingerprints from `v1_474`, the audit selects
+the ten lowest SHA-256 keyed candidate sentences and ten lowest keyed
+no-candidate sentences containing `will` from each package. Codex reviewed
+the exact cited sentences and labels; source spans were verified against the
+installed package docstrings. In all 20 candidate examples, at least one of
+subject, predicate, condition, qualifier, contrast, or inline-code boundaries
+was missing or misbound in the extracted fields. All 20 sampled no-candidate
+sentences described plausible API behavior outside the current subject
+grammar. These 20/20 observations are unblinded error analysis, not precision
+or recall estimates: the sample is deterministic but not a probability sample,
+the labels have one author, and plausible API behavior does not mean a useful
+learnable rule. The complete cited source remains available to the review
+path, so the finding is a high review burden and weak candidate structure,
+not evidence of accepted bad knowledge. No rule was accepted or changed.
+
+Keep the sampled cases frozen as development diagnostics. The next grammar
+must represent a full subject and predicate with conditions and contrast kept
+separate, and it must allow relevant behavior claims whose subjects are
+outside the current noun whitelist. Confirm those changes on untouched API
+units and a publisher not used to design the grammar.
+
+Report: [labeled sample JSON](reports/v1_475_api_candidate_sample_review.json),
+[reproduction script](audits/v1_475_api_candidate_sample_review.py).
+
+## Clause-aware technical-reference replay (`v1_476`/`v1_477`, 2026-10-20)
+
+`python3 experiments/v1_476_clause_aware_procedure_claims.py` checks 16 cited
+source fixtures for complete subjects, conditions, contrast, parenthesized
+values, code literals, polarity, and multi-claim list items. Its fresh-process
+chat check confirms that the review-only `numpy.add` candidate displays `the
+\`out\` array` and its conditional scope, and that no procedure rule is added.
+The targeted source-learning controls (`v1_470` through `v1_472`) passed 3/3.
+Six dialogue regressions (`v1_413`, `v1_419`, `v1_426`, `v1_427`, `v1_449`,
+and `v1_465`) passed 6/6; these are fixed controls, not transfer evidence.
+
+`python3 experiments/audits/v1_477_clause_aware_api_reference_fit.py` replayed
+the complete locally installed API-docstring corpora:
+
+| Package | API docstrings | Sentences | Candidate sentences | API units with candidates | Unique normalized candidates |
+|---|---:|---:|---:|---:|---:|
+| NumPy 2.5.1 | 415 | 13,391 | 649 | 249 | 274 |
+| pandas 3.0.5 | 100 | 5,384 | 214 | 60 | 182 |
+
+Compared with `v1_474`, the candidate counts rose from 303 to 649 for NumPy
+and from 24 to 214 for pandas. The replay also found malformed subjects in
+complex parameter descriptions and nested conditions. It is a corpus-fit and
+implementation diagnostic only: it does not measure semantic precision,
+missed-claim rate, transfer, or rule-learning quality. The same package
+corpora were used to diagnose and revise the parser, so they cannot serve as
+confirmation data. Keep the method frozen for a labeled review and
+publisher/API-unit-held-out confirmation. Codex labels remain supervision,
+not independent validation.
+
+Reports: [clause-aware corpus-fit JSON](reports/v1_477_clause_aware_api_reference_fit.json),
+[frozen review sample](reports/v1_475_api_candidate_sample_review.json),
+[source-claim fixtures](../experiments/v1_476_clause_aware_procedure_claims.py), and
+[replay script](audits/v1_477_clause_aware_api_reference_fit.py).

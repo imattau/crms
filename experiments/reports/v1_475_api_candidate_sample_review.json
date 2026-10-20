@@ -1,0 +1,491 @@
+{
+  "audit": "v1_475_api_candidate_sample_review",
+  "labeler": "Codex",
+  "labeling_status": "single-labeler, unblinded, exploratory",
+  "limits": [
+    "This deterministic sample is not a probability sample of all documentation sentences.",
+    "Codex labels are not independent semantic validation.",
+    "Potential API behavior is not automatically a useful or learnable rule.",
+    "The exact source sentence remains citable for review even when candidate fields lose context.",
+    "No rule was accepted or changed by this audit.",
+    "Source text is not persisted; citations resolve against the package docstrings at the pinned versions."
+  ],
+  "review": [
+    {
+      "api_export": "full_like",
+      "candidate_predicate": "use the sub-class type of `a`, otherwise it will be a base-class array",
+      "candidate_scope_notes": [],
+      "candidate_subject": "array",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "leading condition and contrast are not represented in scope",
+      "package": "numpy",
+      "sample_class": "candidate",
+      "sentence_sha256": "df274f3861d9575ba2382a95ed7b2b3c263f5a5034232d9a50bc5f659266106f",
+      "source_citation": "numpy:numpy.full_like:6828f8fc4bf3#sha256=6828f8fc4bf3c1bbb8537a14149fe50035fb7c5dc74133068b95ea6a4e04aa11&chars=591:709"
+    },
+    {
+      "api_export": "logaddexp2",
+      "candidate_predicate": "retain its original value",
+      "candidate_scope_notes": [],
+      "candidate_subject": "array",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "out argument role is dropped from the subject",
+      "package": "numpy",
+      "sample_class": "candidate",
+      "sentence_sha256": "4a24da07eb152b0f6e609b4db6a8baeceab63c500dc7f0105e20befefa8bccdc",
+      "source_citation": "numpy:numpy.logaddexp2:76b7c28be404#sha256=76b7c28be404eb7da3d3ffe9f945ea6fc064f54bd22d893f5105d256ad6d33bb&chars=1238:1296"
+    },
+    {
+      "api_export": "logical_not",
+      "candidate_predicate": "be set to the ufunc result",
+      "candidate_scope_notes": [],
+      "candidate_subject": "array",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "out argument role and where-condition are dropped",
+      "package": "numpy",
+      "sample_class": "candidate",
+      "sentence_sha256": "ece7e505a46620bc6bd0dc08a6b6f2084e4d4026a9b3c165061636e41da2c8d8",
+      "source_citation": "numpy:numpy.logical_not:b2d8b0e035b1#sha256=b2d8b0e035b13ddaa6ddb1bbc36b917540c1684c954796c5d32834caf9b801ae&chars=669:763"
+    },
+    {
+      "api_export": "radians",
+      "candidate_predicate": "retain its original value",
+      "candidate_scope_notes": [],
+      "candidate_subject": "array",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "out argument role is dropped from the subject",
+      "package": "numpy",
+      "sample_class": "candidate",
+      "sentence_sha256": "4a24da07eb152b0f6e609b4db6a8baeceab63c500dc7f0105e20befefa8bccdc",
+      "source_citation": "numpy:numpy.radians:56aa81dc1fe7#sha256=56aa81dc1fe79e2c713e36bc92fb34f8b33ae683b6672dbdf30023dac5900f0f&chars=734:792"
+    },
+    {
+      "api_export": "nan_to_num",
+      "candidate_predicate": "be replaced with a very large number",
+      "candidate_scope_notes": [],
+      "candidate_subject": "values",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "positive-infinity qualifier and branch condition are dropped",
+      "package": "numpy",
+      "sample_class": "candidate",
+      "sentence_sha256": "66e30f5f01ed30552e463eb8cfdf7f50b137ba929c4a22c51a21fadd1522f190",
+      "source_citation": "numpy:numpy.nan_to_num:a189155243f9#sha256=a189155243f955b92d53336300d480aac052584260a58dc07ca55729aa7fc87b&chars=1321:1425"
+    },
+    {
+      "api_export": "fmax",
+      "candidate_predicate": "retain its original value",
+      "candidate_scope_notes": [],
+      "candidate_subject": "array",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "out argument role is dropped from the subject",
+      "package": "numpy",
+      "sample_class": "candidate",
+      "sentence_sha256": "4a24da07eb152b0f6e609b4db6a8baeceab63c500dc7f0105e20befefa8bccdc",
+      "source_citation": "numpy:numpy.fmax:59e651b2aaaf#sha256=59e651b2aaaf826fdb069b89eb018cb68b11d76f0805f127c627bd7c9a27fb0a&chars=1295:1353"
+    },
+    {
+      "api_export": "pow",
+      "candidate_predicate": "return ``nan",
+      "candidate_scope_notes": [],
+      "candidate_subject": "value",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "qualified subject and balanced inline literal are not preserved",
+      "package": "numpy",
+      "sample_class": "candidate",
+      "sentence_sha256": "102aa8c23f1342c4a7df6f81a1898c5038d55e31da228725b266016bfd6699be",
+      "source_citation": "numpy:numpy.power:9fde8d08911d#sha256=9fde8d08911d3b6da1beff976e099e30d140682dbe5de6bab9000d06862a8fdf&chars=395:462"
+    },
+    {
+      "api_export": "less_equal",
+      "candidate_predicate": "be set to the ufunc result",
+      "candidate_scope_notes": [],
+      "candidate_subject": "array",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "out argument role and where-condition are dropped",
+      "package": "numpy",
+      "sample_class": "candidate",
+      "sentence_sha256": "ece7e505a46620bc6bd0dc08a6b6f2084e4d4026a9b3c165061636e41da2c8d8",
+      "source_citation": "numpy:numpy.less_equal:4b50157d5bf4#sha256=4b50157d5bf476e70d3e45541663f88ddc040de9b49426330ae72acfa72cc501&chars=772:866"
+    },
+    {
+      "api_export": "fromfile",
+      "candidate_predicate": "be defined by it",
+      "candidate_scope_notes": [
+        "before: If an array-like passed in as ``like`` supports the ``__array_function__`` protocol"
+      ],
+      "candidate_subject": "the result",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "predicate object is an unresolved pronoun",
+      "package": "numpy",
+      "sample_class": "candidate",
+      "sentence_sha256": "78950353bcf693b17df9c22b9a4ad2026fa538c44197a587335b78c075b6ba86",
+      "source_citation": "numpy:numpy.fromfile:9fb0218d7150#sha256=9fb0218d715075e1d541cac3597ffa682b78c7a748141c1da7db51a26abdd5b3&chars=1423:1549"
+    },
+    {
+      "api_export": "modf",
+      "candidate_predicate": "be set to the ufunc result",
+      "candidate_scope_notes": [],
+      "candidate_subject": "array",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "out argument role and where-condition are dropped",
+      "package": "numpy",
+      "sample_class": "candidate",
+      "sentence_sha256": "ece7e505a46620bc6bd0dc08a6b6f2084e4d4026a9b3c165061636e41da2c8d8",
+      "source_citation": "numpy:numpy.modf:99027ec67ff1#sha256=99027ec67ff1d920cf97b2aced063b1e4a43d577b2f6e7c14bf4130e4cb560db&chars=755:849"
+    },
+    {
+      "api_export": "savetxt",
+      "citation_resolves": true,
+      "label_reason": "argument value behavior; subject outside grammar",
+      "package": "numpy",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "fcc6bf0972a9c90a4e3758c5833a1fe3a49a47277dd7824acfa40acde5034e6b",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "numpy:numpy.savetxt:0e2852b2fb90#sha256=0e2852b2fb908de88fa2c10a5d5b4ce18b4395ba34029f7a807c1731cb2de24f&chars=1298:1428"
+    },
+    {
+      "api_export": "load",
+      "citation_resolves": true,
+      "label_reason": "deserialization behavior; subject outside grammar",
+      "package": "numpy",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "399e5d2a122cb9b0c0463e0547b4cfbe7f8b9003f288d46182e9bbabdc4d5251",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "numpy:numpy.load:85b3ebe726ea#sha256=85b3ebe726ea8ca2a5f36ab493c1f7c81771685bb99400aa4cdba9adef6ea61b&chars=1581:1695"
+    },
+    {
+      "api_export": "nextafter",
+      "citation_resolves": true,
+      "label_reason": "conditional output-state behavior; subject outside grammar",
+      "package": "numpy",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "db7ac0bb6c05b330d233a2dc0ca4e9fce2f309f2675d6892abf4faaf852356b4",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "numpy:numpy.nextafter:2f4b34dc1d8d#sha256=2f4b34dc1d8d547d7b4d03aa888653f2c80baee6f955f6c9bae8beac01c639a2&chars=1074:1240"
+    },
+    {
+      "api_export": "vectorize",
+      "citation_resolves": true,
+      "label_reason": "argument-passing behavior; antecedent needs context",
+      "package": "numpy",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "94bdb99c241115770c3e87cc12313f8fcf4c003cd1d9d7afe082b502288f5b44",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "numpy:numpy.vectorize:78a129854016#sha256=78a129854016f84000572296fe73d10329d9b813d46a602fb20ac3e675042450&chars=1317:1374"
+    },
+    {
+      "api_export": "nanmedian",
+      "citation_resolves": true,
+      "label_reason": "conditional error behavior; subject is deictic",
+      "package": "numpy",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "b1b427db6bec2022584a2819cbc2dbf4b791f5cd8314ffa3866f64410945800f",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "numpy:numpy.nanmedian:e844ea80b3ce#sha256=e844ea80b3cecbf3fcd81832dfd839579980ba8615a48700b026ccb68b51a6f2&chars=1520:1633"
+    },
+    {
+      "api_export": "multiply",
+      "citation_resolves": true,
+      "label_reason": "conditional output-state behavior; subject outside grammar",
+      "package": "numpy",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "db7ac0bb6c05b330d233a2dc0ca4e9fce2f309f2675d6892abf4faaf852356b4",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "numpy:numpy.multiply:f098991d8f89#sha256=f098991d8f8906822b399151cd9f549381deaeb2b26cfa20fa8655689c400afb&chars=931:1097"
+    },
+    {
+      "api_export": "unique_inverse",
+      "citation_resolves": true,
+      "label_reason": "shape behavior; subject is anaphoric",
+      "package": "numpy",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "66f6d8de558fd6f858518b0cc7578d7cc818b490f510b7adabbf844445fb7f76",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "numpy:numpy.unique_inverse:96a02acc7336#sha256=96a02acc7336f63e192711e6d684890cc5debcb82a887c761068d317026b23c3&chars=438:484"
+    },
+    {
+      "api_export": "hypot",
+      "citation_resolves": true,
+      "label_reason": "conditional output-state behavior; subject outside grammar",
+      "package": "numpy",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "db7ac0bb6c05b330d233a2dc0ca4e9fce2f309f2675d6892abf4faaf852356b4",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "numpy:numpy.hypot:d2aa86b30b18#sha256=d2aa86b30b18b1a535407137d15fc5992014db09d58c5385d07ddeac070706d0&chars=1165:1331"
+    },
+    {
+      "api_export": "isin",
+      "citation_resolves": true,
+      "label_reason": "algorithm-selection behavior; subject is omitted in this clause",
+      "package": "numpy",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "362d722129f1065457fc9ec96c685489fa0fd0e77d61e426cd760434007534b0",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "numpy:numpy.isin:62e32b4e68f1#sha256=62e32b4e68f1e925c9a92ce868758c38097722016bd0831d129d02c968c8d843&chars=1778:1873"
+    },
+    {
+      "api_export": "nditer",
+      "citation_resolves": true,
+      "label_reason": "read/write operand behavior; subject outside grammar",
+      "package": "numpy",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "0f12fc53b1c49246483fb51040791aa1df8db59d63986a8dc9e5c2ee362798a6",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "numpy:numpy.nditer:0413382a8f93#sha256=0413382a8f9363d2da72e242ef46bff0ad6509dc6de481d85c3645f5ad732382&chars=2269:2340"
+    },
+    {
+      "api_export": "pivot_table",
+      "candidate_predicate": "be dropped",
+      "candidate_scope_notes": [
+        "after: see ``dropna`` parameter in :meth:``DataFrame.groupby``"
+      ],
+      "candidate_subject": "values",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "subject is misbound from keys to values in a bullet span",
+      "package": "pandas",
+      "sample_class": "candidate",
+      "sentence_sha256": "f12b6b3ffe2ed32652dd18101a41fe3e0ea030bc132ecf2a8a57374c7c9c7761",
+      "source_citation": "pandas:pandas.pivot_table:5688bdebcd27#sha256=5688bdebcd2740c4a0799bc9a35c2f7933f4ebf43b80973153b8e0adda9bd6b0&chars=1822:2027"
+    },
+    {
+      "api_export": "read_table",
+      "candidate_predicate": "be evaluated against the column names, returning names where the callable function evaluates to ``True",
+      "candidate_scope_notes": [],
+      "candidate_subject": "function",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "callable condition and balanced inline literal are not preserved",
+      "package": "pandas",
+      "sample_class": "candidate",
+      "sentence_sha256": "7b671f55856300624d113e8a7fef7bce7911ecf18a4021cc045d3908e6c76bd6",
+      "source_citation": "pandas:pandas.read_table:f9865145b1c3#sha256=f9865145b1c3ab378db754c81b7b448c0dddd08bd2795f14a4ce64d6372310ce&chars=4477:4626"
+    },
+    {
+      "api_export": "to_datetime",
+      "candidate_predicate": "render the cache unusable and may slow down parsing",
+      "candidate_scope_notes": [],
+      "candidate_subject": "values",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "subject is misbound from presence to values",
+      "package": "pandas",
+      "sample_class": "candidate",
+      "sentence_sha256": "4574af22f542b86241949006f2faa11ec9df685b1275360999d8a5693ab146a5",
+      "source_citation": "pandas:pandas.to_datetime:640eeb022893#sha256=640eeb02289372917f62a9748f663b19387b4cc34ff574196e032ff979ec4063&chars=4686:4788"
+    },
+    {
+      "api_export": "read_csv",
+      "candidate_predicate": "be evaluated against the row indices, returning ``True",
+      "candidate_scope_notes": [
+        "after: if the row should be skipped and ``False`` otherwise"
+      ],
+      "candidate_subject": "function",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "callable condition and false branch are not represented in the candidate",
+      "package": "pandas",
+      "sample_class": "candidate",
+      "sentence_sha256": "639769f808778255205a092f311e7c4629e7300e8cee9d58f25b2712351ed6fe",
+      "source_citation": "pandas:pandas.read_csv:a9b22b0d16d5#sha256=a9b22b0d16d5a8ec22454e93c9ff73aee759b96b9a40a8c035fb849367b1d30f&chars=6353:6511"
+    },
+    {
+      "api_export": "read_excel",
+      "candidate_predicate": "be evaluated against the row indices, returning True",
+      "candidate_scope_notes": [
+        "after: if the row should be skipped and"
+      ],
+      "candidate_subject": "function",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "condition and predicate tail are incomplete",
+      "package": "pandas",
+      "sample_class": "candidate",
+      "sentence_sha256": "7d0c076a3dae652b6535fc090d6edc574d3cef3e93353e6204d39c22b7ddd207",
+      "source_citation": "pandas:pandas.read_excel:185c644d0cae#sha256=185c644d0caec9bd5ba1f3fdc5365cf5fb48ef67c9784f7b51ad7a5109527a52&chars=4930:5059"
+    },
+    {
+      "api_export": "read_excel",
+      "candidate_predicate": "be forward filled to allow roundtripping with ``to_excel`` for ``merged_cells=True",
+      "candidate_scope_notes": [],
+      "candidate_subject": "values",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "missing-value qualifier and balanced inline literals are not preserved",
+      "package": "pandas",
+      "sample_class": "candidate",
+      "sentence_sha256": "5e54fe50fe8dcbcee8bb876ccb934ea993dc7c37acc95c1116d161147a42c2bd",
+      "source_citation": "pandas:pandas.read_excel:185c644d0cae#sha256=185c644d0caec9bd5ba1f3fdc5365cf5fb48ef67c9784f7b51ad7a5109527a52&chars=2177:2286"
+    },
+    {
+      "api_export": "read_table",
+      "candidate_predicate": "cause the function to return a ``TextFileReader`` object for iteration",
+      "candidate_scope_notes": [],
+      "candidate_subject": "value",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "gerund subject is reduced to its object",
+      "package": "pandas",
+      "sample_class": "candidate",
+      "sentence_sha256": "01cf9df2a8cfc42da3b81d04a89c15f1b575b2b3f3790c3ec60352e1f4f6b650",
+      "source_citation": "pandas:pandas.read_table:f9865145b1c3#sha256=f9865145b1c3ab378db754c81b7b448c0dddd08bd2795f14a4ce64d6372310ce&chars=10937:11033"
+    },
+    {
+      "api_export": "qcut",
+      "candidate_predicate": "be NA in the resulting Categorical object",
+      "candidate_scope_notes": [],
+      "candidate_subject": "values",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "out-of-bounds qualifier is dropped from the subject",
+      "package": "pandas",
+      "sample_class": "candidate",
+      "sentence_sha256": "1f15ebbd90ed4a0828d28e16a087338c908f731c4a431c742ed4239e00471cdf",
+      "source_citation": "pandas:pandas.qcut:592675d93eea#sha256=592675d93eea5e67eb4cc823825e5de144f94378ae49570d9d97609afff9c8a0&chars=1581:1648"
+    },
+    {
+      "api_export": "Timestamp",
+      "candidate_predicate": "be stored in nanoseconds, and the unit attribute will be set as ``'ns",
+      "candidate_scope_notes": [],
+      "candidate_subject": "the result",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "inline literal is unbalanced and predicate is incomplete",
+      "package": "pandas",
+      "sample_class": "candidate",
+      "sentence_sha256": "b9c7232462eb05d46e70a5b1b6f4fc9f5022b22d7399f035c056d598d601263b",
+      "source_citation": "pandas:pandas.Timestamp:44cf29afb76d#sha256=44cf29afb76d6b28278d0945f03cf8c36ce941fe2b8a92d4d7e1d1d80a829ac6&chars=1172:1283"
+    },
+    {
+      "api_export": "factorize",
+      "candidate_predicate": "be encoded as non-negative integers and will not drop the",
+      "candidate_scope_notes": [],
+      "candidate_subject": "values",
+      "citation_resolves": true,
+      "extraction_outcome": "requires_source_context_or_repair",
+      "label_reason": "NaN qualifier, false-condition branch, and predicate tail are incomplete",
+      "package": "pandas",
+      "sample_class": "candidate",
+      "sentence_sha256": "8811ee4cad3a44f9ef602dc4a884d151b86b9a50bfbb0fc8d5e6ab8c125080cb",
+      "source_citation": "pandas:pandas.factorize:ec16f065d4f1#sha256=ec16f065d4f1306bdeb6878bad9998a86eed20eea40b97b0d68398a8359256f7&chars=686:773"
+    },
+    {
+      "api_export": "array",
+      "citation_resolves": true,
+      "label_reason": "dtype inference behavior; subject is the package name",
+      "package": "pandas",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "31841279305011add00dfc1ae7f99d16a45854b428ab3d2b5db3881f5c70720e",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "pandas:pandas.array:4495d9b46460#sha256=4495d9b4646096a61312713f0682695a8c3d8c3baf1fcdcce8c5c7a1adb4cab9&chars=1262:1326"
+    },
+    {
+      "api_export": "ExcelFile",
+      "citation_resolves": true,
+      "label_reason": "dependency failure behavior; subject outside grammar",
+      "package": "pandas",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "425f5b8e90e2895cc50b2d6329e091f26843bf2be09e9c1a365e0be5260f378e",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "pandas:pandas.ExcelFile:5181a13f1e11#sha256=5181a13f1e1104ba3ec19c99a20c1a4ab33d8029299b17c148bdb923aefb4354&chars=1559:1636"
+    },
+    {
+      "api_export": "to_datetime",
+      "citation_resolves": true,
+      "label_reason": "error-coercion behavior; subject is the argument value",
+      "package": "pandas",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "851f8c93f4fd1d862a74c56620be03761f965df19f50ff23c9fbd548efee7c94",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "pandas:pandas.to_datetime:640eeb022893#sha256=640eeb02289372917f62a9748f663b19387b4cc34ff574196e032ff979ec4063&chars=9504:9656"
+    },
+    {
+      "api_export": "read_table",
+      "citation_resolves": true,
+      "label_reason": "parameter behavior; subject outside grammar",
+      "package": "pandas",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "0a09f1d036d0fd80e7f2ee46bea9f6048f8c111e7fcc02f7bdfcfcfda59950af",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "pandas:pandas.read_table:f9865145b1c3#sha256=f9865145b1c3ab378db754c81b7b448c0dddd08bd2795f14a4ce64d6372310ce&chars=8469:8510"
+    },
+    {
+      "api_export": "ExcelFile",
+      "citation_resolves": true,
+      "label_reason": "engine-selection behavior; subject outside grammar",
+      "package": "pandas",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "7fed32450598382b34582456128e5dd3219f68b705ce9cc73e3af30896f44ed9",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "pandas:pandas.ExcelFile:5181a13f1e11#sha256=5181a13f1e1104ba3ec19c99a20c1a4ab33d8029299b17c148bdb923aefb4354&chars=1313:1432"
+    },
+    {
+      "api_export": "cut",
+      "citation_resolves": true,
+      "label_reason": "result-order behavior; subject outside grammar",
+      "package": "pandas",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "2fc3e506b2baf1bc19c461f716357f021411abade763a2c94e2c264896488b58",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "pandas:pandas.cut:ee622f373126#sha256=ee622f373126383e21c02b9d4aa4c4fda10dd4d8dd381def4b04d174e2438229&chars=2195:2250"
+    },
+    {
+      "api_export": "read_stata",
+      "citation_resolves": true,
+      "label_reason": "output-order behavior; subject outside grammar",
+      "package": "pandas",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "bf61e4910196e26152ab35c5dcc2032515b2f4711be4e3760167c54090693893",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "pandas:pandas.read_stata:2f1489638a14#sha256=2f1489638a144a831cf7b1e6b4d7c7ce1571c4c90d851adb72761e35dec74780&chars=1378:1422"
+    },
+    {
+      "api_export": "to_datetime",
+      "citation_resolves": true,
+      "label_reason": "timezone parsing/error behavior; subject is a gerund phrase",
+      "package": "pandas",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "2d72412e534ab4543466ae8052f9807794f4bbf895c4361ffee66d4abb030ae1",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "pandas:pandas.to_datetime:640eeb022893#sha256=640eeb02289372917f62a9748f663b19387b4cc34ff574196e032ff979ec4063&chars=10640:10726"
+    },
+    {
+      "api_export": "read_table",
+      "citation_resolves": true,
+      "label_reason": "format parsing behavior; subject is an inline-code token",
+      "package": "pandas",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "2206775327f5daffc7c19fc2d6ff92e5c7493aa7054ab829c15b0d45b6be916f",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "pandas:pandas.read_table:f9865145b1c3#sha256=f9865145b1c3ab378db754c81b7b448c0dddd08bd2795f14a4ce64d6372310ce&chars=9858:10056"
+    },
+    {
+      "api_export": "read_table",
+      "citation_resolves": true,
+      "label_reason": "conditional NA parsing behavior; subject is omitted",
+      "package": "pandas",
+      "sample_class": "no_candidate",
+      "sentence_sha256": "889b9df512d656f34ed136974c054a73196c31999bcfde041aee9c96680bab8c",
+      "source_behavior_label": "potential_api_behavior",
+      "source_citation": "pandas:pandas.read_table:f9865145b1c3#sha256=f9865145b1c3ab378db754c81b7b448c0dddd08bd2795f14a4ce64d6372310ce&chars=8254:8373"
+    }
+  ],
+  "sample_method": "For each frozen package, choose the ten lowest SHA-256 keys of cited sentences containing 'will' that do or do not produce a candidate. The v1_474 full-docstring corpus fingerprints must match.",
+  "summary": {
+    "candidate_fields_self_contained_without_source_sentence": 0,
+    "candidate_sentences_reviewed": 20,
+    "candidate_sentences_with_information_loss": 20,
+    "noncandidate_sentences_labeled_potential_api_behavior": 20,
+    "noncandidate_sentences_reviewed": 20
+  }
+}

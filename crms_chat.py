@@ -2583,7 +2583,8 @@ def _render_procedure_phrase_candidates(index: CRMSSQLiteResearchIndex,
         else:
             evidence_type = "positive-polarity claim; operation meaning unverified"
         lines.append(
-            f"{number}. {candidate.predicate_phrase!r} — {evidence_type}")
+            f"{number}. {candidate.subject} — {candidate.predicate_phrase!r} "
+            f"— {evidence_type}")
         if candidate.scope_notes:
             lines.append("   Scope: " + "; ".join(candidate.scope_notes))
         lines.append(f"   Source: {evidence['title']}")

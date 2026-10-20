@@ -59,9 +59,11 @@ PASSAGES = (
         "title": "Arrays.CopyOfRange Method (Java.Util)",
         "url": "https://learn.microsoft.com/en-us/dotnet/api/java.util.arrays.copyofrange?view=net-android-37.0",
         "sentence": "The length of the returned array will be to - from.",
-        # The grammatical subject is "length". The matcher must not skip it
-        # and relabel "returned array" as the subject.
-        "expected": None,
+        # The complete grammatical subject is "The length of the returned
+        # array"; a broad boundary must retain it rather than choosing only
+        # the nested "returned array" phrase.
+        "expected": "be to - from",
+        "expected_subject": "The length of the returned array",
         "scope": (),
     },
 )
@@ -92,6 +94,8 @@ def main() -> None:
         else:
             require(len(candidates) == 1
                     and candidates[0].predicate_phrase == row["expected"]
+                    and ("expected_subject" not in row
+                         or candidates[0].subject == row["expected_subject"])
                     and candidates[0].scope_notes == row["scope"]
                     and candidates[0].polarity
                     and not candidates[0].quoted
@@ -108,7 +112,7 @@ def main() -> None:
 
     print("PASS: exact cited excerpts from four publisher families were handled")
     print("PASS: four positive constructions retained phrase and condition")
-    print("PASS: nested 'length of returned array' subject control abstained")
+    print("PASS: nested 'length of returned array' subject stayed intact")
     print("LIMIT: five selected excerpts, Codex labels, and no complete-document recall/precision estimate")
 
 
