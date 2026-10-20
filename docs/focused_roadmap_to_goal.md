@@ -446,7 +446,7 @@ not to add more demonstrations of the same finite-list operations.
 | 5 | **Expand breadth only through validated task slices.** Use the same natural-language interface for coding, math, translation, and creative work. Select the next task from observed failures; define held-out requests, negative cases, an independent checker or rubric, and repair behavior before implementation. Test each domain before cross-domain composition. | Per-task ordinary-chat scorecards for coverage, correctness/quality, unsupported output, provenance, repair, and cost. | Each slice demonstrates useful held-out completion and honest limits. A feature, corpus, or one-off success does not count as domain competence. |
 | 6 | **Validate SQLite as the complete distributable runtime.** Once learning and correction lifecycles stabilize, copy the model where source files are unavailable and replay the shared scorecard, including query, learning, recombination, reasoning, explanation, correction, and reload. | Reproducible copy-only report including searchable source text, accepted knowledge, rules, provenance, correction lineage, licensing metadata, size, and migration behavior. | Tested behavior depends only on the copied model and runtime, and evidence/corrections remain inspectable after reload. |
 
-**Current checkpoint (`53ddfa1`, 2026-10-20):** the project has
+**Current checkpoint (`21ecbff`, 2026-10-20):** the project has
 well-instrumented controlled paths for proof-checked reasoning, bounded
 recombination, source-backed retrieval, contextual dialogue state, reviewed
 learning, and SQLite portability. The prior multi-turn dialogue failures now
@@ -470,10 +470,11 @@ source-rule learner has passed selected controls but has not passed transfer:
 frozen SymPy and NetworkX diagnostics each found only 10/20 sampled proposals
 structurally reviewable, with the remainder context-dependent or boundary
 errors. These are small, single-rater diagnostics, not precision estimates.
-The next capability milestone is independently authored, paraphrased
-recombination through chat; dialogue remains a release gate, and source-rule
-extraction proceeds separately. Broad capability and reliable self-learning
-remain unproven.
+The `v1_516` packet below is an initial controlled transfer result; the next
+capability milestone is a broader, independently authored multi-step task set
+with varied request forms and adversarial reasoning cases. Dialogue remains a
+release gate, and source-rule extraction proceeds separately. Broad capability
+and reliable self-learning remain unproven.
 
 The new `v1_514` composition control combines an accepted source-backed
 predicate alignment with an accepted, proof-checked type hierarchy in ordinary
@@ -481,7 +482,7 @@ chat. On a third route, “Which waterway runs through …?” returns the sourc
 answer with separate relation and type provenance; “Which stream runs through
 …?” does not inherit an unsupported narrower type. This advances the tested
 composition path, but its small synthetic fixture and pre-accepted components
-do not establish independent transfer. The next gate remains a frozen,
+do not establish independent transfer. The next gate is a broader, frozen,
 independently authored request set with varied source layouts and an
 independent checker.
 
