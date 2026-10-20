@@ -3020,3 +3020,63 @@ next experiment: freeze candidate features before review and test role,
 qualifier, and parser controls against a blinded sample of both proposals and
 non-proposals. No candidate was accepted or stored. Full output is in
 [`v1_468_pair_overlap_discovery.json`](reports/v1_468_pair_overlap_discovery.json).
+
+## Current dialogue safety replay (`bcc076a`, 2026-10-20)
+
+Command:
+
+```sh
+python3 run_experiments.py \
+  --match v1_413_source_topic_followups \
+  --match v1_419_failed_entity_followup_state \
+  --match v1_426_dialogue_paragraph_grounding \
+  --match v1_427_dialogue_multiturn_transcript \
+  --match v1_449_cross_paragraph_pronoun_grounding \
+  --match v1_465_dialogue_unsupported_topic_switch --timeout 300
+```
+
+All six selected controls passed in 1.35 seconds. They cover source-only
+follow-ups and topic switches, paragraph-bound pronouns, stale `why?`, and the
+curated multi-turn transcript. This confirms those targeted runtime behaviors
+at this snapshot; it is not independent dialogue transfer or a task-completion
+rate. The larger held-out dialogue and intent-transfer gate remains open.
+
+## Installed API-reference corpus fit for procedure candidates (`v1_474`, 2026-10-20)
+
+Command: `python3 experiments/audits/v1_474_installed_api_docstring_fit.py`.
+
+The read-only audit scanned complete callable API docstrings from locally
+installed NumPy 2.5.1 and pandas 3.0.5 packages. It does not save the source
+text. Every candidate citation was resolved against the exact in-memory
+docstring sentence before counting.
+
+| Package | API docstrings | Sentences | Candidate sentences | API units with a candidate | Unique normalized candidates |
+|---|---:|---:|---:|---:|---:|
+| NumPy 2.5.1 | 415 | 13,391 | 303 | 177 | 65 |
+| pandas 3.0.5 | 100 | 5,384 | 24 | 16 | 20 |
+
+The NumPy result is dominated by two repeated `out`-array statements, each
+found 84 times. The extractor records `array` as the subject and omits `out`;
+on the `numpy.add` source-only chat replay it displayed only the predicate,
+while the cited sentence carried the missing subject and a condition. The
+manual spot-check also found incomplete spans around qualifiers and inline
+code markup in both packages. These are unblinded error observations, not a
+precision estimate. The audit proves that relevant API docs contain candidate
+material and that citations resolve; it does not prove candidate utility,
+semantic transfer, rule learning, or end-to-end recombination. The package
+docstrings are API-reference units, not complete documentation websites, and
+NumPy plus pandas are only two source families.
+
+The runtime replay built an isolated research index from the installed
+`numpy.add` docstring, queried `/suggest-procedure-phrases out array ufunc
+result`, then checked `/rules` in a fresh chat process. CRMS returned a cited,
+review-only predicate and left the rule store empty. The response hid the
+candidate subject even though the exact evidence sentence included it. Keep
+this behavior inert; the next learner work is to preserve grammatical roles,
+conditions, and markup boundaries, then measure a labeled sample of proposals
+and non-proposals before changing or promoting the grammar.
+
+Reports: [corpus-fit JSON](reports/v1_474_installed_api_docstring_fit.json),
+[reproduction script](audits/v1_474_installed_api_docstring_fit.py). The
+reference units come from the [NumPy API reference](https://numpy.org/doc/stable/reference/generated/numpy.add.html)
+and the [pandas API reference](https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html).

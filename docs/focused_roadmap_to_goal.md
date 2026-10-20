@@ -29,8 +29,14 @@ successes rely on small or synthetic fixtures, hand-coded extraction/mapping,
 Codex-provided labels, and deliberately orchestrated experiments. The latest
 arXiv audit found 8 full papers among 1,697 records and no useful procedure
 candidates in those papers; that index is unsuitable for the tested grammar,
-not evidence against academic sources in general. The source-learning route
-therefore needs a better-matched corpus and a frozen, source-disjoint test.
+not evidence against academic sources in general. A read-only scan of 415
+NumPy and 100 pandas callable API docstrings now shows the grammar can find
+candidate material in relevant reference text, but its 327 candidate spans
+are not yet useful-rule evidence: repeated boilerplate dominates, and a
+source replay exposed lost subject and condition information. The source
+learning route has corpus-fit evidence but still needs labeled proposal and
+non-proposal review, better role/context preservation, and a frozen,
+source-disjoint transfer test.
 Dialogue has targeted fixes for topic switches, source-only context, and
 pronoun grounding, but its independent transfer results remain weak and do
 not establish reliable conversation. Recombination and reasoning work, but
@@ -94,6 +100,19 @@ reversals, negation, quotation, contrast, conditions, scope, and misleading
 near misses. Keep each candidate cited, review-only, and unable to alter the
 rule store until accepted through existing gates. Record labeler identity,
 teacher effort, precision, useful yield, missed cases, and review burden.
+
+The `v1_474` audit establishes candidate yield in two installed API-reference
+collections: NumPy produced 303 candidates from 13,391 sentences, and pandas
+produced 24 from 5,384. This is corpus fit, not precision or transfer. A
+source-backed `/suggest-procedure-phrases` replay hid the candidate subject;
+review of its cited `numpy.add` sentence showed the candidate had dropped
+`out` and the conditional location. Repeated NumPy boilerplate accounts for
+168 of its candidates, and the spot-check found other incomplete spans around
+qualifiers and inline code. Preserve these as failure cases. Before changing
+the frozen grammar, review a fixed sample of proposals and non-proposals and
+decide whether its current representation can retain a usable, licensed
+operation claim. If not, redesign role, condition, and markup extraction as a
+general boundary model, then reserve new documents for confirmation.
 
 Use the existing excerpt and real-source acceptance experiments as regression
 controls, not as a corpus-level result. If a suitable corpus does not contain
@@ -185,9 +204,11 @@ academic-paper sources.
 1. Freeze a compact scorecard and independently authored dialogue holdout;
    replay all fixed regressions and fix any reproduced wrong referent or lost
    visible context.
-2. In parallel, prepare a corpus-fit report for complete technical documents
-   and freeze the source-rule transfer study before labeling. The previous
-   arXiv corpus result is a negative control for its specific grammar.
+2. In parallel, review a fixed sample of the `v1_474` candidates and
+   non-proposals, keeping Codex labels identified as such. Then freeze the
+   source-rule transfer study on document- and publisher-disjoint technical
+   references. The `v1_473` arXiv result is a negative control for its
+   specific grammar.
 3. Use the first passing learning path to build one unseen chat-level
    recombination task with proof checks and an independent output oracle.
 4. Only after that succeeds, exercise correction-aware derived proposals and

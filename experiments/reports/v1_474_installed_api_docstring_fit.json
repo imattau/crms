@@ -1,0 +1,242 @@
+{
+  "audit": "v1_474_installed_api_docstring_fit",
+  "chat_replay": {
+    "candidate_predicate": "be set to the ufunc result",
+    "candidate_scope_notes": [],
+    "candidate_subject": "array",
+    "citation_resolved": true,
+    "fresh_process_succeeded": true,
+    "query": "/suggest-procedure-phrases out array ufunc result",
+    "renderer_displayed_subject": false,
+    "rule_store_unchanged": true,
+    "source": "numpy.add API docstring"
+  },
+  "limits": [
+    "API docstrings are individual reference units, not complete documentation sites.",
+    "The two packages are not independent publishers for transfer claims.",
+    "Candidate counts do not measure semantic precision or useful rule yield.",
+    "This audit does not label candidates, install rules, or validate learned mappings.",
+    "Results depend on installed package versions and their published docstrings."
+  ],
+  "method": "Scan complete public callable docstrings for the frozen, review-only subject-will-predicate grammar. Store no source text; verify each generated sentence citation against the in-memory research index.",
+  "packages": [
+    {
+      "candidate_api_units": 177,
+      "candidate_sentences": 303,
+      "corpus_sha256": "e0de3744dad3b18a02a455b04bcb31ec59c7d51543b21674cea6496b930f6567",
+      "license_label": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
+      "package": "numpy",
+      "public_callable_docstrings": 415,
+      "source_sentences": 13391,
+      "top_repeated_patterns": [
+        {
+          "assertion_status": "asserted",
+          "count": 84,
+          "positive": true,
+          "predicate": "be set to the ufunc result",
+          "quoted": false,
+          "subject": "array"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 84,
+          "positive": true,
+          "predicate": "retain its original value",
+          "quoted": false,
+          "subject": "array"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 21,
+          "positive": true,
+          "predicate": "be defined by it",
+          "quoted": false,
+          "subject": "the result"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 11,
+          "positive": true,
+          "predicate": "broadcast correctly against the input array",
+          "quoted": false,
+          "subject": "the result"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 8,
+          "positive": true,
+          "predicate": "broadcast correctly against the original `a",
+          "quoted": false,
+          "subject": "the result"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 7,
+          "positive": true,
+          "predicate": "be cast",
+          "quoted": false,
+          "subject": "values"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 5,
+          "positive": true,
+          "predicate": "be inserted into this array",
+          "quoted": false,
+          "subject": "the result"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 4,
+          "positive": true,
+          "predicate": "broadcast correctly against the array",
+          "quoted": false,
+          "subject": "the result"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 4,
+          "positive": true,
+          "predicate": "have this dtype",
+          "quoted": false,
+          "subject": "array"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 4,
+          "positive": true,
+          "predicate": "broadcast correctly against the original array `a",
+          "quoted": false,
+          "subject": "the result"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 3,
+          "positive": true,
+          "predicate": "be forced to be a base-class array",
+          "quoted": false,
+          "subject": "the returned array"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 3,
+          "positive": true,
+          "predicate": "use the sub-class type of `a`, otherwise it will be a base-class array",
+          "quoted": false,
+          "subject": "array"
+        }
+      ],
+      "unique_normalized_candidates": 65,
+      "version": "2.5.1"
+    },
+    {
+      "candidate_api_units": 16,
+      "candidate_sentences": 24,
+      "corpus_sha256": "77c2241d955527380a76b6a493e2341e52e3db1b06c37255f730aa1ae6f2cbc1",
+      "license_label": "BSD 3-Clause License",
+      "package": "pandas",
+      "public_callable_docstrings": 100,
+      "source_sentences": 5384,
+      "top_repeated_patterns": [
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "have no impact on the method",
+          "quoted": false,
+          "subject": "value"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "be evaluated against the column names, returning names where the callable function evaluates to ``true",
+          "quoted": false,
+          "subject": "function"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "be evaluated against the row indices, returning ``true",
+          "quoted": false,
+          "subject": "function"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 2,
+          "positive": true,
+          "predicate": "cause the function to return a ``textfilereader`` object for iteration",
+          "quoted": false,
+          "subject": "value"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 1,
+          "positive": true,
+          "predicate": "also be treated as the key in groups",
+          "quoted": false,
+          "subject": "values"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 1,
+          "positive": true,
+          "predicate": "be stored in nanoseconds, and the unit attribute will be set as ``'ns",
+          "quoted": false,
+          "subject": "the result"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 1,
+          "positive": true,
+          "predicate": "be extracted from `data",
+          "quoted": false,
+          "subject": "array"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 1,
+          "positive": true,
+          "predicate": "be selected",
+          "quoted": false,
+          "subject": "the values"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 1,
+          "positive": true,
+          "predicate": "be na in the result",
+          "quoted": false,
+          "subject": "values"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 1,
+          "positive": true,
+          "predicate": "be na in the resulting series or categorical object",
+          "quoted": false,
+          "subject": "values"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 1,
+          "positive": true,
+          "predicate": "be encoded as non-negative integers and will not drop the",
+          "quoted": false,
+          "subject": "values"
+        },
+        {
+          "assertion_status": "asserted",
+          "count": 1,
+          "positive": true,
+          "predicate": "generate names separated by sep",
+          "quoted": false,
+          "subject": "records"
+        }
+      ],
+      "unique_normalized_candidates": 20,
+      "version": "3.0.5"
+    }
+  ]
+}

@@ -212,6 +212,24 @@ positive transfer set for this grammar; keep it as a negative control and
 knowledge source, and evaluate a different discovery signal if scholarly
 papers are the intended learning domain.
 
+The follow-up `v1_474` audit scanned complete callable API docstrings from
+installed NumPy 2.5.1 and pandas 3.0.5 packages, verifying each candidate
+sentence against an exact in-memory source citation. NumPy yielded 303 spans
+across 177 API units (65 normalized candidates); pandas yielded 24 across 16
+units (20 normalized candidates). This confirms a relevant reference corpus
+contains candidate material, but does not measure useful precision, transfer,
+or rule learning. The NumPy count is dominated by two boilerplate `out`-array
+statements repeated 84 times each; extraction loses the `out` subject, and the
+chat proposal renderer showed only the predicate. A source-backed sample also
+exposed dropped conditions and incomplete markup/qualifier spans. Keep the
+grammar frozen until a labeled sample of proposals and non-proposals is
+reviewed; if it cannot preserve the operation's roles and conditions, redesign
+the boundary representation before starting transfer evaluation. The
+reproduction script and output are
+[`v1_474_installed_api_docstring_fit.py`](../experiments/audits/v1_474_installed_api_docstring_fit.py)
+and
+[`v1_474_installed_api_docstring_fit.json`](../experiments/reports/v1_474_installed_api_docstring_fit.json).
+
 **Gate:** a frozen method finds useful candidates on held-out documents and a
 second publisher with measured precision and review effort; sampled
 non-proposals and negative controls do not become positive rules. Accepted
