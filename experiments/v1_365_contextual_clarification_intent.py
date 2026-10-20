@@ -215,7 +215,7 @@ def main() -> None:
                 and '"task_intent": "resolve-ambiguity"' in completed.stdout
                 and '"selected_value": "the Difference Engine"' in completed.stdout
                 and "Active goal: seek-information" in completed.stdout
-                and "Current subgoal: none" in completed.stdout
+                and "Current subgoal: resolve-ambiguity" in completed.stdout
                 and "Recent intent trace:" in completed.stdout
                 and "hand-checked runtime rules; not learned" in completed.stdout,
                 f"/intent did not expose the selected contextual intent: {completed.stdout}")

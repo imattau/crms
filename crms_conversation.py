@@ -763,6 +763,8 @@ def classify_user_intent(
     # “Tell me a joke” as the entity or detail requested by the prior turn.
     direct_imperative = _DIRECT_IMPERATIVE_REQUEST_RE.fullmatch(text.strip())
     if (direct_imperative is not None
+            and _YES_NO_QUESTION_RE.fullmatch(text.strip()) is None
+            and classify_act(text) is None
             and _session_slot_correction(text) is None):
         verb = direct_imperative.group("verb").casefold()
         task_intent = ("seek-information" if verb in _INFORMATION_REQUEST_VERBS

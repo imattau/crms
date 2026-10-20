@@ -2573,6 +2573,40 @@ and local dialogue scratch files. The scorecard did not edit or depend on
 those artifacts. The older `d597615` result above remains a historical
 snapshot rather than a substitute for this rerun.
 
+## Contextual dialogue-intent replay and question/command correction (2026-10-20)
+
+The current transcript-context replay was run with
+`experiments/v1_436_transcript_context_intent_replay.py` on the 131 labeled
+user turns from ten Taskmaster-1 development conversations in the local
+`/tmp/crms_dialogue_dev_v4` pilot. Conversations were replayed independently;
+the predictor received only each row's visible preceding context and carried
+forward state selected by CRMS itself. The labels were supplied by one Codex
+annotator and were already used during dialogue development, so this is a
+development diagnostic, not independent accuracy or untouched holdout
+evidence.
+
+Before the correction in `crms_conversation.py`, transcript replay produced
+83/131 hypotheses (63.4%) and 62/131 exact dialogue-act plus task-intent label
+matches (47.3%). After preventing auxiliary yes/no questions from matching the
+imperative-request rule, the replay produced the same 83 hypotheses and 64/131
+joint matches (48.9%). Context-free classification on these same rows produced
+59 hypotheses (45.0%) and 40/131 joint matches (30.5%) after the change. These
+figures measure agreement with provisional labels, not user task completion.
+The two added matches include “Do they have booth seating?” and “Do they have
+bars and outdoor seating?”, which are now classified as questions. The fix
+also preserves true imperatives and keeps “Tell me more” attached to the
+current topic. The narrow regression passed, as did 9/9 selected dialogue
+diagnostics and the cross-domain regression replay (11/11 diagnostics in
+11.58 seconds).
+
+Remaining dialogue-label disagreements show why this is only a local
+correction: a bare “yes” can be a clarification answer or confirmation, short
+slot values need the assistant's preceding question, and a polite closing can
+be mistaken for a negative answer. Continue with independently labeled,
+conversation-held-out transcripts and report unsafe intent selections and
+task completion separately from label coverage. Preserve the label source and
+the small single-domain scope in any later comparison.
+
 `python3 experiments/v1_338_structured_field_predicate_learning.py` passed all
 checks: the proposal remained inert before review, six training pages licensed
 two held-out question forms, cited evidence survived SQLite reload, stale
