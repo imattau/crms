@@ -1,0 +1,89 @@
+{
+  "generated_at": "2026-10-20T19:10:41+00:00",
+  "metadata": {
+    "platform": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39",
+    "project": "/home/lostcause/workspace/crms",
+    "python": "3.12.3"
+  },
+  "suite": "family_a",
+  "summary": {
+    "by_category": {
+      "composition": {
+        "errors": 0,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 4,
+        "total": 4
+      }
+    },
+    "duration_s": {
+      "max": 0.408,
+      "median": 0.213,
+      "p95": 0.408
+    },
+    "errors": 0,
+    "failed": 0,
+    "gated_total": 4,
+    "known_failures": 0,
+    "known_failures_passed": 0,
+    "observed": {
+      "abstained": 1,
+      "answered": 2,
+      "clarified": 1
+    },
+    "pass_rate": 1.0,
+    "passed": 4,
+    "total": 4,
+    "unsafe_answers": 0
+  },
+  "tasks": [
+    {
+      "category": "composition",
+      "duration_s": 0.2135478419950232,
+      "failures": [],
+      "id": "family-a-filter-sum",
+      "known_failure": false,
+      "notes": "Family A: proof-selected values then a learned sum procedure, with citations.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "composition",
+      "duration_s": 0.40781045699259266,
+      "failures": [],
+      "id": "family-a-filter-sum-reload",
+      "known_failure": false,
+      "notes": "Family A after save/reload: facts and the learned procedure survive a fresh process.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "composition",
+      "duration_s": 0.2095468289917335,
+      "failures": [],
+      "id": "family-a-unknown-value",
+      "known_failure": false,
+      "notes": "Family A control: an unknown value blocks a partial selection and total.",
+      "observed": "abstained",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "composition",
+      "duration_s": 0.21331599401310086,
+      "failures": [],
+      "id": "family-a-untaught-procedure",
+      "known_failure": false,
+      "notes": "Family A control: verified selection without a taught aggregate procedure clarifies instead of guessing.",
+      "observed": "clarified",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    }
+  ]
+}

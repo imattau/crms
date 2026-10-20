@@ -9,6 +9,7 @@ explicit oracles. It is not a replacement for the unit diagnostics in
 
 ```sh
 python3 run_scorecard.py --suite smoke
+python3 run_scorecard.py --suite family_a
 python3 run_scorecard.py --suite smoke --list
 python3 run_scorecard.py --suite experiments/scorecard/smoke.jsonl --keep-workspaces
 ```
@@ -16,6 +17,13 @@ python3 run_scorecard.py --suite experiments/scorecard/smoke.jsonl --keep-worksp
 Reports are written to `experiments/reports/scorecard/<date>-<suite>/` as
 `report.json` and `report.md`. Runs never overwrite an existing report
 directory.
+
+Current suites:
+
+- `smoke` — 12 cross-capability tasks (research, dialogue, reload, math,
+  abstention, procedures).
+- `family_a` — 4 proof-selected value → learned procedure tasks, including a
+  fresh reload and an unknown-value abstention.
 
 The command exits non-zero when a gated task fails or an expected abstention
 becomes a confident answer.

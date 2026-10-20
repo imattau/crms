@@ -16,6 +16,8 @@ ABSTENTION_MARKERS = (
     "i couldn't find",
     "i can't give",
     "i cannot give",
+    "i can't determine",
+    "i cannot determine",
     "won't guess",
     "will not guess",
     "not established",
