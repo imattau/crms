@@ -3,6 +3,27 @@
 **Reviewed:** 2026-10-20
 **Status:** aligned in direction; the overall capability goal remains unmet.
 
+## Focus for the next development cycle
+
+The next cycle should close three integration gaps before adding more surface
+area. Dialogue safety is a prerequisite for evaluating the rest of the system;
+source-derived rule learning and recombination are the main capability bet;
+verified reasoning and governed derivation must ensure composed outputs remain
+correctable.
+
+| Order | Work packet | Immediate outcome | Do not claim yet |
+|---|---|---|---|
+| 1 | Reproduce and close the current dialogue failures | Replay the reported topic-switch, source-only follow-up, reset, and `why?` sequence against a fresh process; fix any confident wrong referent or lost visible context; add varied-layout controls. | Robust conversation from a handful of passing fixtures. |
+| 2 | Learn and recombine rules from source material | Extend beyond hand-coded sentence forms to source-disjoint proposals, review, held-out phrase transfer, and unseen multi-step compositions through ordinary chat. Report teacher effort and proposal precision. | Autonomous rule learning from cue matching or teacher-labeled alignments. |
+| 3 | Couple recombination to verified reasoning and governed learning | Run source-grounded tasks through rule selection, proof/checking, composition, correction, and derived-case invalidation. Preserve distinct negative, conflict, missing-premise, and incomplete-search outcomes. | General planning or safe self-improvement from synthetic fixtures. |
+
+Run the contextual-intent/dialogue track alongside these packets, but let intent
+route, clarify, or repair only; it cannot supply evidence. Expand math, coding,
+translation, creative work, and the portable SQLite model after the shared
+chat-level evaluation contract can measure them. Choose each next task from a
+measured failure or a gate blocker, and stop expanding when a packet fails its
+negative controls.
+
 ## Goal
 
 CRMS aims to become a lightweight, distributable language system that can understand and complete a broad range of ordinary requests, continue across turns, recombine learned knowledge and procedures, and improve from evidence and use. Its answers and generated artifacts should be inspectable, correctable, and clear about uncertainty. It should support coding, math, translation, creative work, and other domains through its natural-language interface.
