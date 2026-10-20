@@ -2025,21 +2025,38 @@ cue design.
 Command: `python3 experiments/v1_452_natural_request_frame_transfer.py`.
 
 After learning six labeled action/object/direction combinations, a fresh chat
-process receives five positive requests in syntactic forms not represented by
+process receives eight positive requests in syntactic forms not represented by
 the training phrases: “put items in increasing order,” “sort numbers from low
 to high,” “arrange values in ascending order,” “order the numbers
-ascendingly,” and “make the values go from smallest to largest.” It generates
-code for 0/5. The negative “sort items descending” also receives no generated
-code (0 false positives). This establishes a concrete coverage gap in natural
-request transfer; the existing 27-phrase positional grid does not show broad
-language understanding. The expected request interpretations and labels were
-written by Codex, and the procedure examples use Codex labels, so this is a
-controlled diagnostic rather than an independent language benchmark.
+ascendingly,” “make the values go from smallest to largest,” “sort the values
+in ascending order,” “sort numbers in ascending order,” and “order the numbers
+in ascending order.” The original positional frame abstained on the first
+five. The learned-role route now answers four of the eight, transferring
+licensed action/object/direction values through articles and “in ... order”.
+It still abstains on the other four. The negative “sort items descending” also
+receives no generated code (0 false positives). This establishes a concrete
+residual coverage gap in natural request transfer; the existing 27-phrase
+positional grid does not show broad language understanding. The expected
+request interpretations and labels were written by Codex, and the procedure
+examples use Codex labels, so this is a controlled diagnostic rather than an
+independent language benchmark.
 
-The next model change should learn request structure across differing word
-order and function-word patterns, with provenance for each role alignment. It
-must improve the positive held-out coverage without licensing the unsupported
-descending request or other conflicting meanings.
+The learned-role route requires each role value to be supported in at least
+two distinct successful phrases, preserves their learned order, and records
+those phrase sources as evidence. It improves four tested grammatical
+variants without licensing the unsupported descending request or the
+shuffled-role negative. The next model change should learn additional request
+structures and ordering patterns with explicit training evidence; it must
+improve positive held-out coverage without licensing conflicting meanings.
+
+After adding the role path, the 18-diagnostic cross-domain replay initially
+found a false positive: treating “please” as a removable function word made
+“reverse please the list” inherit a learned reversal rule. Removing “please”
+from the allowed grammatical tokens restored abstention. The full replay then
+passed 18/18 in 13.89 seconds, including language transfer, source-derived
+rules, procedure recombination, reasoning, dialogue, code/math, translation,
+and creative revision. This protects the adjacent tested paths; it is not a
+representative task-distribution score.
 
 ## Source-grounded procedure phrase recombination (2026-10-20)
 

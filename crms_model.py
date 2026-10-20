@@ -4788,14 +4788,15 @@ class CRMSModel:
     def _retrieve_analogical_frame(
         self, instruction: str,
     ) -> tuple[tuple[Step, ...] | None, bool, list[str], str | None]:
-        """Complete a grounded positional frame across same-behavior cases.
+        """Complete grounded positional and role frames across similar cases.
 
-        This is a discrete structural analogy, not a synonym model. The frame
-        is token position; its role values are licensed only by independently
-        taught phrases in one behaviorally equivalent procedure group. At
-        least two positions must vary, and each queried role value must recur
-        in two distinct phrases. Ordinary one-slot substitutions remain the
-        responsibility of the stricter aligned-phrase route.
+        These are discrete structural analogies, not a synonym model. Role
+        values are licensed only by independently taught phrases in one
+        behaviorally equivalent procedure group. Each queried role value must
+        recur in two distinct phrases; a limited function-word path preserves
+        role order and refuses unrecognized content words. Ordinary one-slot
+        substitutions remain the responsibility of the stricter aligned-phrase
+        route.
         """
         query = tuple(self._instruction_sequence(instruction))
         if len(query) < 2:
@@ -4845,6 +4846,88 @@ class CRMSModel:
             procedure, sources, template = next(iter(matches.values()))
             return procedure, False, sources, f'analogy_frame:{template}'
         if len(matches) > 1:
+            return None, True, [], None
+
+        # Learn a small role frame from phrases whose three positions vary
+        # within one behaviorally equivalent procedure. Unlike the strict
+        # positional analogy above, this route can pass through a few
+        # grammatical function words between the three learned role values.
+        # It preserves the learned role order and does not infer a role from a
+        # single example: each queried value must occur in at least two
+        # distinct phrases at the same learned position.
+        role_groups: dict[
+            tuple, list[tuple[str, tuple[Step, ...], tuple[str, ...]]]
+        ] = {}
+        for phrase, procedure in self._procedures.items():
+            words = tuple(self._instruction_sequence(phrase))
+            if len(words) != 3:
+                continue
+            role_groups.setdefault(_semantic_key(procedure), []).append(
+                (phrase, procedure, words))
+
+        function_words = {"a", "an", "the", "in", "order"}
+        role_matches: dict[tuple, tuple[tuple[Step, ...], list[str], str]] = {}
+        for behavior, entries in role_groups.items():
+            distinct = {phrase: words for phrase, _procedure, words in entries}
+            if len(distinct) < 2:
+                continue
+            columns: list[dict[str, set[str]]] = [{} for _ in range(3)]
+            for phrase, words in distinct.items():
+                for position, word in enumerate(words):
+                    columns[position].setdefault(word, set()).add(phrase)
+            varying_roles = sum(len(column) > 1 for column in columns)
+            if varying_roles < 2:
+                continue
+
+            role_options: list[list[tuple[str, set[str], int]]] = []
+            for column in columns:
+                options = []
+                for word, sources in column.items():
+                    if len(sources) < 2:
+                        continue
+                    options.extend(
+                        (word, sources, position)
+                        for position, query_word in enumerate(query)
+                        if query_word == word)
+                role_options.append(options)
+            if any(not options for options in role_options):
+                continue
+
+            valid_selections = []
+            for candidate in product(*role_options):
+                role_tokens = [word for word, _sources, _position in candidate]
+                if len(set(role_tokens)) != 3:
+                    continue
+                positions = [position
+                             for _word, _sources, position in candidate]
+                if len(set(positions)) != 3:
+                    continue
+                if positions != sorted(positions):
+                    continue
+                selected_positions = set(positions)
+                unassigned = [word for position, word in enumerate(query)
+                              if position not in selected_positions]
+                if any(word not in function_words for word in unassigned):
+                    continue
+                valid_selections.append(candidate)
+            if len(valid_selections) != 1:
+                continue
+
+            selected = [(position, word, sources)
+                        for position, (word, sources, _query_position)
+                        in enumerate(valid_selections[0])]
+            supporting_phrases = sorted(set().union(
+                *(sources for _position, _word, sources in selected)))
+            procedure = entries[0][1]
+            frame = "role_frame:" + " ".join(
+                f"role{position}={word}"
+                for position, word, _sources in selected)
+            role_matches[behavior] = (procedure, supporting_phrases, frame)
+
+        if len(role_matches) == 1:
+            procedure, sources, frame = next(iter(role_matches.values()))
+            return procedure, False, sources, frame
+        if len(role_matches) > 1:
             return None, True, [], None
         return None, False, [], None
 
@@ -6158,10 +6241,15 @@ class CRMSModel:
                 matched_templates=[contrastive_template])
 
         if analogous is not None:
+            route_message = (
+                'Applied a procedure through a learned role frame grounded '
+                'by repeated examples.'
+                if analogy_template and analogy_template.startswith('role_frame:')
+                else ('Applied a procedure through a positional analogy '
+                      'grounded by behaviorally equivalent cases.'))
             return Prediction('ok', _apply_procedure(analogous, xs), key,
                               procedure=_procedure_dict(analogous),
-                              message=('Applied a procedure through a positional analogy '
-                                       'grounded by behaviorally equivalent cases.'),
+                              message=route_message,
                               evidence_phrases=analogy_sources,
                               matched_tokens=[], matched_bigrams=[],
                               matched_templates=[analogy_template])

@@ -2,9 +2,9 @@
 
 The model learns six labeled action/object/direction combinations and is then
 asked five semantically positive requests with different syntax, plus an
-unsupported descending request. This baseline reports the current gap: safe
-abstention is preserved, but the positive paraphrases are not yet understood.
-The positive forms and expected operation are Codex-authored labels.
+unsupported descending request. This baseline tracks partial transfer and
+safe abstention as the learner improves. The positive forms and expected
+operation are Codex-authored labels.
 """
 from __future__ import annotations
 
@@ -43,6 +43,9 @@ POSITIVE_REQUESTS = (
     "arrange values in ascending order",
     "order the numbers ascendingly",
     "make the values go from smallest to largest",
+    "sort the values in ascending order",
+    "sort numbers in ascending order",
+    "order the numbers in ascending order",
 )
 NEGATIVE_REQUESTS = ("sort items descending",)
 LABELER = "codex:natural-request-frame-baseline-v1"
@@ -64,6 +67,27 @@ def main() -> None:
                 labeler_ids=[LABELER] * len(EXAMPLES))
             require(learned.status == "learned",
                     f"seed procedure failed to learn for {phrase!r}: {learned}")
+
+        transferred = model.predict(
+            POSITIVE_REQUESTS[2], [3, 1, 2])
+        require(transferred.status == "ok"
+                and transferred.output == [1, 2, 3]
+                and transferred.matched_templates
+                and transferred.matched_templates[0].startswith("role_frame:")
+                and "learned role frame" in (transferred.message or "")
+                and set(transferred.evidence_phrases or ()) >= {
+                    "arrange numbers upward", "arrange values increasing",
+                    "order numbers ascending", "sort values ascending",
+                },
+                f"role transfer lost output or source phrases: {transferred}")
+        artifact = generate_python(model, POSITIVE_REQUESTS[2])
+        require(artifact is not None,
+                "learned role frame did not generate code")
+        namespace: dict[str, object] = {}
+        exec(compile(artifact.source, "<natural-role-frame>", "exec"), namespace)
+        for values in ([3, 1, 2], [7, -2, 7], [], [5]):
+            require(namespace["transform"](values) == sorted(values),
+                    f"role-frame code failed independent oracle on {values}")
 
         for path, save in (
                 (root / "knowledge.json", CRMSKnowledgeBase().save),
@@ -102,6 +126,13 @@ def main() -> None:
                           if request in generated]
         require(not false_positive,
                 f"unsupported direction received generated code: {false_positive}")
+        require(POSITIVE_REQUESTS[2] in generated,
+                "learned role support did not transfer through the article and "
+                "directional function words in 'arrange values in ascending order'")
+        require(set(POSITIVE_REQUESTS[2:3] + POSITIVE_REQUESTS[5:8])
+                <= set(generated),
+                "a regression lost one of the three licensed function-word "
+                "variants")
         lowered_output = output.casefold()
         for request in missed_positive:
             require(f"could not resolve '{request}'" in lowered_output,
