@@ -9,6 +9,8 @@
   "checks": {
     "ordinary_chat_area_comparison": "pass",
     "ordinary_chat_population_comparison": "pass",
+    "disjoint_page_pair_field_variants": "pass",
+    "metropolitan_scope_and_boundary_caveat": "pass",
     "why_followup_stays_on_latest_comparison": "pass",
     "area_units_independently_normalized_to_km2": "pass",
     "exact_value_and_date_citations": "pass",
@@ -18,6 +20,7 @@
   "limitations": [
     "This is a narrow exact-title settlement comparison, not a general comparison engine.",
     "Population figures have different reference dates and are reported as supplied, without claiming same-date counts.",
+    "The three page pairs are from the same SimpleWiki collection and were selected for schema coverage; they are not a representative or publisher-independent holdout.",
     "Area values are compared only after explicit unit normalization; no other settlement fields are compared.",
     "The task wording and expected interpretation are Codex-authored; the source values and citations are checked against the read-only index."
   ]

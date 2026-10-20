@@ -94,10 +94,11 @@ On the current checkout, the following runtime controls passed:
   source-backed percentage-point comparison; unsupported measures/labels and
   a contradictory requested direction are controlled.
 - `v1_538`: ordinary chat compares Paris and Rome using exact-title
-  settlement fields, normalizes square miles to square kilometres, cites
-  both population values and their distinct reference dates, avoids the
-  “Prix de Rome” lexical co-mention, keeps `why?` anchored to the latest
-  comparison, and abstains for an unsupported entity.
+  settlement fields, normalizes square miles to square kilometres, handles
+  city-total and metro-population field variants on additional page pairs,
+  cites values and reference dates, avoids the “Prix de Rome” lexical
+  co-mention, keeps `why?` anchored to the latest comparison, and abstains
+  for an unsupported entity.
 
 These are component/regression passes, not an independent user-task score.
 They now exercise three different source collections (SimpleWiki, arXiv

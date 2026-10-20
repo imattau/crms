@@ -554,17 +554,22 @@ settlement pages and compares their cited area fields, converting the Rome
 value from square miles to square kilometres with an independently checked
 decimal calculation. A metric-specific population request also reads Paris's
 `population_total` and Rome's explicitly labeled `Comune` total, cites both
-values and both reference dates, and warns that the dates differ. A request
-containing unsupported Atlantis abstains. A `why?` after the comparison
-repeats the latest comparison rather than explaining the preceding Paris
-population lookup. The source index is read-only and the CLI state is isolated
-in a temporary directory.
+values and both reference dates, and warns that the dates differ. The same
+field resolver also transfers to London/Tokyo page totals and finds a shared
+`population_metro` field for New York City/Los Angeles when one page lacks a
+city total; it warns that metro boundaries may differ. These extra page pairs
+are schema-coverage controls selected from the same collection, not an
+independent holdout. A request containing unsupported Atlantis abstains. A
+`why?` after the comparison repeats the latest comparison rather than
+explaining the preceding Paris population lookup. The source index is
+read-only and the CLI state is isolated in a temporary directory.
 
 All checks pass, including exact citation resolution for each structured
 field and date. This is one real-source, manually interpreted task family; it
 does not establish general entity comparison, arbitrary measure matching,
 semantic extraction, or independent evaluator transfer. The routine compares
-only exact-title settlement area and population fields. See the
+only exact-title settlement area and population fields, and only chooses a
+population scope shared by both pages. See the
 [runner](../experiments/v1_538_source_backed_settlement_comparison.py) and
 [report](../experiments/reports/v1_538_source_backed_settlement_comparison.json).
 

@@ -4998,15 +4998,18 @@ def _answer_contrast_from_sources(
 
 def _settlement_population_record(
         index: CRMSSQLiteResearchIndex, entity: str,
-        match: ExactTitleMatch) -> dict[str, Any] | None:
-    """Read an administrative settlement population and its cited date."""
+        match: ExactTitleMatch) -> dict[str, dict[str, Any]] | None:
+    """Read source-labeled settlement and metropolitan population fields."""
     document = index.document(match.document_id)
     settlement_types = _infobox_field_rows(document, "settlement_type")
     if len({normalized_tokens(value) for value, _, _ in settlement_types}) != 1:
         return None
 
-    rows = _infobox_field_rows(document, "population_total")
-    if not rows:
+    field_sets: dict[str, tuple[str, list[tuple[str, int, int]],
+                                list[tuple[str, int, int]]]] = {}
+    total_rows = _infobox_field_rows(document, "population_total")
+    scope_rows = []
+    if not total_rows:
         # Some normalized settlement infoboxes give the city-level total a
         # specific administrative label instead of `population_total`.
         for number in range(1, 11):
@@ -5017,23 +5020,16 @@ def _settlement_population_record(
                             for token in normalized_tokens(value)}
             if (values and len({normalized_tokens(value)
                                 for value, _, _ in values}) == 1
-                    and label_tokens & {"commune", "comune", "municipality"}):
-                rows = values
+                    and label_tokens & {"commune", "comune", "municipality"}
+                    and len(labels) == 1):
+                total_rows = values
+                scope_rows = labels
                 break
-    if len({normalized_tokens(value) for value, _, _ in rows}) != 1:
-        return None
-    value, start, end = rows[0]
-    number = re.search(r"[\d,]+(?:\.\d+)?", value)
-    if number is None:
-        return None
-    try:
-        population = Decimal(number.group().replace(",", ""))
-    except ArithmeticError:
-        return None
-    field_citation = _cited_sentence_evidence(
-        index, match, start, end, tuple(normalized_tokens(value)))
-    if field_citation is None:
-        return None
+    if total_rows:
+        field_sets["settlement"] = ("settlement", total_rows, scope_rows)
+    metro_rows = _infobox_field_rows(document, "population_metro")
+    if metro_rows:
+        field_sets["metropolitan"] = ("metropolitan", metro_rows, [])
 
     as_of_rows = _infobox_field_rows(document, "population_as_of")
     as_of = None
@@ -5045,35 +5041,71 @@ def _settlement_population_record(
             tuple(normalized_tokens(as_of)))
         if as_of_evidence is not None:
             as_of_citation = as_of_evidence["citation"]
-    return {
-        "entity": entity, "population": population,
-        "display_value": number.group(), "as_of": as_of,
-        "title": match.title, "citation": field_citation["citation"],
-        "as_of_citation": as_of_citation,
-    }
+    records = {}
+    for scope, (field_label, rows, labels) in field_sets.items():
+        if len({normalized_tokens(value) for value, _, _ in rows}) != 1:
+            continue
+        value, start, end = rows[0]
+        number_match = re.search(r"[\d,]+(?:\.\d+)?", value)
+        if number_match is None:
+            continue
+        try:
+            population = Decimal(number_match.group().replace(",", ""))
+        except ArithmeticError:
+            continue
+        field_citation = _cited_sentence_evidence(
+            index, match, start, end, tuple(normalized_tokens(value)))
+        if field_citation is None:
+            continue
+        scope_label = None
+        if labels:
+            label, label_start, label_end = labels[0]
+            scope_evidence = _cited_sentence_evidence(
+                index, match, label_start, label_end,
+                tuple(normalized_tokens(label)))
+            if scope_evidence is not None:
+                scope_label = {"text": label,
+                               "citation": scope_evidence["citation"]}
+        records[scope] = {
+            "entity": entity, "population": population,
+            "display_value": number_match.group(), "as_of": as_of,
+            "title": match.title, "citation": field_citation["citation"],
+            "as_of_citation": as_of_citation,
+            "scope_label": scope_label, "field": field_label,
+        }
+    return records or None
 
 
 def _answer_settlement_population_comparison(
         index: CRMSSQLiteResearchIndex, left: str, right: str) -> str | None:
-    records = []
+    records_by_entity = []
     for entity in (left, right):
         matches = [match for match in _exact_title_hits(index, entity)
                    if not _is_code_source(match.location)]
         if len({match.document_id for match in matches}) != 1:
             return None
-        record = _settlement_population_record(index, entity, matches[0])
-        if record is None:
+        records = _settlement_population_record(index, entity, matches[0])
+        if records is None:
             return None
-        records.append(record)
-    first, second = records
+        records_by_entity.append(records)
+    first_by_scope, second_by_scope = records_by_entity
+    scope = next((candidate for candidate in ("settlement", "metropolitan")
+                  if candidate in first_by_scope and candidate in second_by_scope),
+                 None)
+    if scope is None:
+        return None
+    first, second = first_by_scope[scope], second_by_scope[scope]
     if first["population"] > second["population"]:
         larger = first["entity"]
     elif second["population"] > first["population"]:
         larger = second["entity"]
     else:
         larger = None
-    comparison = ("The reported administrative populations are equal." if larger is None
-                  else f"The reported figure is larger for {larger}.")
+    scope_name = ("settlement" if scope == "settlement" else "metropolitan")
+    comparison = (f"The reported {scope_name} population figures are equal."
+                  if larger is None else
+                  f"The reported {scope_name} population figure is larger for "
+                  f"{larger}.")
     date_text = ""
     if first["as_of"] or second["as_of"]:
         date_text = (
@@ -5085,6 +5117,9 @@ def _answer_settlement_population_comparison(
                  if first["as_of"] and second["as_of"]
                  and normalized_tokens(first["as_of"])
                      != normalized_tokens(second["as_of"]) else "")
+    scope_note = (" The source pages may define metropolitan areas differently; "
+                  "this compares their reported metro fields, not harmonized "
+                  "boundaries." if scope == "metropolitan" else "")
     citations = (
         f"[Source: {first['title']}; {first['citation']}] "
         f"[Source: {second['title']}; {second['citation']}]"
@@ -5094,10 +5129,16 @@ def _answer_settlement_population_comparison(
             f" [Source: {first['title']}; {first['as_of_citation']}]"
             f" [Source: {second['title']}; {second['as_of_citation']}]"
         )
+    for record in (first, second):
+        scope_label = record["scope_label"]
+        if scope_label is not None:
+            citations += (f" [Source: {record['title']}; "
+                          f"{scope_label['citation']}]")
     return (
-        f"The indexed settlement records list {first['entity']} at "
+        f"The indexed {scope_name} population fields list {first['entity']} at "
         f"{first['display_value']} and {second['entity']} at "
-        f"{second['display_value']}.{date_text}{date_note} {comparison} "
+        f"{second['display_value']}.{date_text}{date_note}{scope_note} "
+        f"{comparison} "
         f"{citations}"
     )
 
