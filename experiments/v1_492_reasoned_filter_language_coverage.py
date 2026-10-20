@@ -204,6 +204,29 @@ def main() -> None:
                         in result.text,
                     f"learned relation wording lost its evidence: {result}")
 
+    # The generic request path must also retain the observed licensed clause
+    # so the answer carries alignment citations, rather than silently
+    # replacing it with the canonical relation before proof composition.
+    generic_request = (
+        "Among 12, 4, 4, 9, and 7 Nia can reach, remove duplicate values.")
+    generic = compose_verified_filter(generic_request, knowledge, procedures)
+    require(generic is not None and generic.status == "answered"
+            and generic.subject == "Nia" and generic.relation == "reaches"
+            and generic.included_values == (12, 4, 4, 9)
+            and generic.excluded_negative == (7,)
+            and generic.output_values == (12, 4, 9)
+            and len(generic.inference_proofs) == 3
+            and len(generic.language_evidence) == 1
+            and generic.language_evidence[0]["document_count"] == 3
+            and set(generic.language_evidence[0]["sources"])
+                == set(alias_sources),
+            f"generic request lost its licensed claim or lineage: {generic}")
+    generic_unlicensed = compose_verified_filter(
+        "Among 12, 4, 4, 9, and 7 Nia can get to, remove duplicate values.",
+        knowledge, procedures)
+    require(generic_unlicensed is None,
+            f"generic request invented an unlicensed relation: {generic_unlicensed}")
+
     # The parser may normalize an explicit connective, but it must not invent
     # operation synonyms or broaden relation vocabulary without supervision.
     unlicensed_operation = compose_verified_filter(
@@ -270,6 +293,7 @@ def main() -> None:
             command,
             input="\n".join((
                 *(request for request, _expected in cases),
+                generic_request,
                 "why?",
                 "From [12, 4, 8], return the values Nia reaches, then remove "
                 "duplicate values then reverse the list.",
@@ -283,11 +307,14 @@ def main() -> None:
                 and "The relation wording 'can reach' was matched to 'reaches'" in output
                 and "Recognized the grammatical form 'removing → remove'" in output
                 and all(source in output for source in alias_sources)
+                and "Verified values satisfying Nia reaches" in output
+                and "After 'remove duplicate values': [12, 4, 9]" in output
                 and "I can't determine whether 8 satisfy Nia reaches" in output,
                 f"fresh-process chat did not answer all licensed variants:\n{output}")
 
-    print("four request frames across seven cases, including learned relation")
-    print("wording and an order-sensitive duplicate case: PASS")
+    print("four request frames across seven cases plus a generic relation-")
+    print("licensed clause with source evidence: PASS")
+    print("learned relation wording and order-sensitive duplicates: PASS")
     print("target operation orders were not directly taught; component and")
     print("connective evidence retained: PASS")
     print("verified proof set and explicit-negative handling are preserved: PASS")

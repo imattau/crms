@@ -553,6 +553,17 @@ shows teacher-supervised interactive learning and recombination; pronoun
 meaning and operation meaning are not autonomously induced, and Codex's labels
 are not independent validation.
 
+A current-checkout replay of the dialogue and recombination controls found two
+ordering seams. The explicit current-topic pronoun anchor now runs before the
+gendered-pronoun ambiguity guard, so a named switch to Alan Turing survives
+other entities in the cited sentence. In the reasoning path, an exact
+cross-source-taught predicate alignment now takes precedence over parsing a
+modal word as part of the subject, so `Nia can reach` correctly queries the
+stored `reaches` relation. `v1_438`, `v1_427`, `v1_426`, `v1_412`, `v1_491`,
+`v1_492`, `v1_502`, `v1_507`, and `v1_510` pass on this checkout. The
+improvements close targeted regressions; they do not establish independent
+dialogue, language, or task transfer.
+
 The immediate bottleneck is therefore no longer “can the components compose in
 a fixture?” It is whether a fresh user request can cause CRMS to select and
 compose the right components, complete the whole task, and survive independent

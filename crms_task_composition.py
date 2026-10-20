@@ -324,9 +324,6 @@ def _generic_request_parts(
             rf"(?<!\w){re.escape(f'{subject} {relation}').replace(r'\ ', r'\s+')}(?!\w)",
             instruction, flags=re.IGNORECASE)
     }
-    if len(claims) != 1:
-        return None
-
     matched_phrases: set[str] = set()
     for phrase in learned_phrases:
         words = re.escape(phrase).replace(r"\ ", r"\s+")
@@ -354,8 +351,35 @@ def _generic_request_parts(
             command_occurrences.append(phrase_match)
     if not command_occurrences:
         return None
+
+    # A relation phrase explicitly licensed from cited examples may appear
+    # between the finite value set and the operation (for example, "Nia can
+    # reach"). Recover it from that clause using the same grounded alignment
+    # API used for direct relation claims. This does not admit a lexical
+    # synonym: an unlicensed phrase still produces no claim and abstains.
+    claim_region = instruction[value_span.end():
+                               command_occurrences[0].start()]
+    claim_region = re.sub(
+        r"^\s*(?:(?:to|keep|return)\s+)?(?:only\s+)?(?:the\s+)?"
+        r"values?\s+(?:(?:that|which)\s+)?", "", claim_region,
+        flags=re.IGNORECASE)
+    claim_region = re.sub(
+        r"\s*[,;]?\s*(?:(?:and\s+)?then|and)\s*$", "", claim_region,
+        flags=re.IGNORECASE).strip(" \t,;:")
+    licensed_claim = None
+    if claim_region:
+        aligned = knowledge.match_fact_pattern_relation_claim(claim_region)
+        if (aligned is not None
+                and aligned.get("subject") in mentioned_subjects):
+            claims.add((aligned["subject"], aligned["relation"]))
+            licensed_claim = claim_region
+    if len(claims) != 1:
+        return None
     subject, relation = next(iter(claims))
-    return values_text, f"{subject} {relation}", selected_phrase
+    # Keep the observed surface for the normal resolver to attach the
+    # alignment's source evidence to the final composition record.
+    claim_text = licensed_claim or f"{subject} {relation}"
+    return values_text, claim_text, selected_phrase
 
 
 def _proof_sources(proof: dict[str, Any]) -> set[str]:
@@ -416,14 +440,18 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
     if not values or len(values) > 32:
         return ReasonedListComposition(
             "unsupported", "I can check a finite list of 1 to 32 integer values.")
-    parsed = _relation_and_subject(claim_text, knowledge)
     language_evidence: tuple[dict[str, Any], ...] = ()
-    if parsed is None:
-        learned_match = knowledge.match_fact_pattern_relation_claim(
-            claim_text)
-        if learned_match is not None:
-            parsed = (learned_match["subject"], learned_match["relation"])
-            language_evidence = (learned_match,)
+    # Prefer an exact, source-licensed predicate alignment over interpreting
+    # its modal words as part of the subject ("Nia can reach" must not become
+    # subject "Nia can" + relation "reaches"). The alignment already carries
+    # its independent-source evidence; otherwise use canonical or inflected
+    # relation parsing as before.
+    learned_match = knowledge.match_fact_pattern_relation_claim(claim_text)
+    if learned_match is not None:
+        parsed = (learned_match["subject"], learned_match["relation"])
+        language_evidence = (learned_match,)
+    else:
+        parsed = _relation_and_subject(claim_text, knowledge)
     if parsed is None:
         return ReasonedListComposition(
             "unsupported", "I couldn't identify one unambiguous stored relation and subject.")

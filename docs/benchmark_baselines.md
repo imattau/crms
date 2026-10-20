@@ -3296,6 +3296,19 @@ then test more than one composition shape through chat.
 
 Report: [experiment](../experiments/v1_492_reasoned_filter_language_coverage.py).
 
+A fresh rerun after `12abe1f` initially failed its licensed `Nia can reach`
+case: the canonical relation suffix parser interpreted “Nia can” as the
+subject before consulting the cited predicate alignment. Composition now
+prefers the exact, cross-source-supported predicate mapping for the whole
+claim, preserving `Nia` as subject and the canonical `reaches` relation. The
+experiment now passes its seven request cases and an added generic-frame case
+that verifies the predicate-alignment citations survive composition; it
+continues to reject the single-document mapping, the unlicensed `can get to`
+relation, and the unlicensed `deduplicate` operation. On the current checkout,
+`v1_491`, `v1_492`, `v1_502`, `v1_507`, and `v1_510` all pass their
+fresh-process runtime checks. These are controlled task-family checks, not
+independent transfer evidence.
+
 ## Coordinated source-only question follow-ups (`v1_493`, 2026-10-20)
 
 `experiments/v1_493_dialogue_coordinated_followup.py` exposed that an initial
