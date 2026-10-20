@@ -20,20 +20,21 @@ from crms_procedure_discovery import (
 _CONDITION_WORDS = {
     "if", "unless", "when", "whenever", "provided", "assuming",
 }
-_LEADING_SCOPE = re.compile(
-    r"^\s*(?P<scope>(?:by\s+default|generally|typically|usually|"
-    r"in\s+general|in\s+practice|for\s+example)\b[^,]{0,120}),",
+_LEADING_CONTEXT = re.compile(
+    r"^\s*(?P<scope>(?:if|unless|when|whenever|provided\s+that)"
+    r"\b[^,]{1,100}|by\s+default|generally|typically|usually|"
+    r"in\s+general|in\s+practice|in\s+this\s+case|for\s+example)"
+    r"\s*,?\s+",
     re.IGNORECASE)
-_IF_NONE = re.compile(r"^\s*(?P<scope>if\s+[^,]{1,80}),", re.IGNORECASE)
 
 
-def _source_span(doc: Any, tokens: list[Any]) -> str:
+def _source_span(source_text: str, tokens: list[Any]) -> str:
     """Return the exact source span covered by a dependency subtree."""
     if not tokens:
         return ""
     start = min(token.idx for token in tokens)
     end = max(token.idx + len(token.text) for token in tokens)
-    return doc.text[start:end].strip()
+    return source_text[start:end].strip()
 
 
 def _subject_roots(predicate: Any) -> tuple[list[Any], bool]:
@@ -60,12 +61,16 @@ def _condition_roots(predicate: Any) -> list[Any]:
     return conditions
 
 
-def _proposal_for_will(doc: Any, will_token: Any,
+def _proposal_for_will(doc: Any, source_text: str, will_token: Any,
                        source_citation: str
                        ) -> ProcedurePhraseCandidate | None:
     predicate = will_token.head
     if predicate.pos_ not in {"VERB", "AUX"}:
         return None
+    leading_context = _LEADING_CONTEXT.match(source_text)
+    if (leading_context is not None
+            and leading_context.end() > will_token.idx):
+        leading_context = None
     subjects, inherited = _subject_roots(predicate)
     conditions = _condition_roots(predicate)
     # Parsers can attach an elliptical condition (for example, "If None") as
@@ -76,40 +81,43 @@ def _proposal_for_will(doc: Any, will_token: Any,
             conditions.append(subject)
             subjects.remove(subject)
     subjects = [subject for subject in subjects
-                if subject.pos_ in {"NOUN", "PROPN", "PRON", "VERB"}]
-    if not subjects:
+                if subject.pos_ in {"NOUN", "PROPN", "PRON", "VERB", "X"}]
+    subject_tokens = [token for subject in subjects for token in subject.subtree]
+    subject_phrase = _source_span(source_text, subject_tokens)
+    if leading_context is not None:
+        # The explicit source prefix is a safer boundary than a parser subtree
+        # when it attaches an elliptical condition to the grammatical subject.
+        subject_phrase = source_text[leading_context.end():will_token.idx].strip(
+            " \t\r\n,;:")
+        scope_kind = ("condition" if leading_context.group("scope").casefold().startswith(
+            ("if", "unless", "when", "whenever", "provided")) else "context")
+        scope_note = (scope_kind + ": "
+                      + leading_context.group("scope").strip().rstrip(","))
+        if scope_kind == "condition":
+            conditions.append(leading_context)
+    if not subjects and leading_context is None:
         # Do not bind a source claim to a guessed entity or parameter.
         return None
-    subject_tokens = [token for subject in subjects for token in subject.subtree]
-    condition_tokens = [token for root in conditions for token in root.subtree]
+    if not subject_phrase:
+        return None
     predicate_end = max(token.idx + len(token.text)
                         for token in predicate.subtree)
     trailing_conditions = [root for root in conditions
-                           if min(token.idx for token in root.subtree)
+                           if hasattr(root, "subtree")
+                           and min(token.idx for token in root.subtree)
                            > will_token.idx]
     if trailing_conditions:
         predicate_end = min(predicate_end, min(
             min(token.idx for token in root.subtree)
             for root in trailing_conditions))
-    predicate_phrase = doc.text[will_token.idx:predicate_end].strip()
-    subject_phrase = _source_span(doc, subject_tokens)
-    if not subject_phrase or not predicate_phrase:
+    predicate_phrase = source_text[will_token.idx:predicate_end].strip()
+    if not predicate_phrase:
         return None
 
-    notes = ["condition: " + _source_span(doc, list(root.subtree))
-             for root in conditions]
-    # Some API descriptions use elliptical conditions such as "If None, the
-    # input will ..."; dependency parsers may attach the condition as a second
-    # subject. Retain the source prefix explicitly and remove it from the
-    # proposed subject when it precedes that subject.
-    leading = _IF_NONE.match(doc.text)
-    if leading and leading.end() <= min(token.idx for token in subject_tokens):
-        note = "condition: " + leading.group("scope").strip().rstrip(",")
-        if note not in notes:
-            notes.append(note)
-    discourse = _LEADING_SCOPE.match(doc.text)
-    if discourse:
-        notes.append("context: " + discourse.group("scope").strip())
+    notes = ["condition: " + _source_span(source_text, list(root.subtree))
+             for root in conditions if hasattr(root, "subtree")]
+    if leading_context is not None and scope_note not in notes:
+        notes.append(scope_note)
 
     if inherited:
         notes.append("shared subject inherited from coordinated clause")
@@ -118,11 +126,11 @@ def _proposal_for_will(doc: Any, will_token: Any,
         predicate_phrase=" ".join(predicate_phrase.split()),
         polarity=not any(token.dep_ == "neg"
                          for token in predicate.children),
-        quoted=_is_quoted(doc.text, will_token.idx),
+        quoted=_is_quoted(source_text, will_token.idx),
         source_citation=source_citation,
-        source_sentence=doc.text,
+        source_sentence=source_text,
         scope_notes=tuple(notes),
-        assertion_status=_assertion_status(doc.text, will_token.idx),
+        assertion_status=_assertion_status(source_text, will_token.idx),
         status="needs_review",
     )
 
@@ -142,14 +150,17 @@ def propose_dependency_procedure_phrase_candidates(
             or "&chars=" not in source_citation):
         return ()
     try:
-        doc = parser(sentence)
+        # Strip Markdown backticks only for parsing. Replacing them with spaces
+        # preserves offsets so extracted spans still point into exact source.
+        parser_text = re.sub(r"`", " ", sentence)
+        doc = parser(parser_text)
     except Exception:
         return ()
     candidates = []
     for token in doc:
         if token.lower_ != "will" or token.pos_ != "AUX":
             continue
-        candidate = _proposal_for_will(doc, token, source_citation)
+        candidate = _proposal_for_will(doc, sentence, token, source_citation)
         if candidate is not None:
             candidates.append(candidate)
     # Preserve repeated clauses only when their structured claims differ.

@@ -8,6 +8,10 @@
     "model": "en_core_web_sm",
     "model_version": "3.8.0"
   },
+  "implementation_sha256": {
+    "prototype": "e76606b2ab1ccc93fac00b33fe331990e0f4b1d20ae1e974269ed935f53c398d",
+    "core_assertion_status": "c5244a250ecb45d183ab046ea3c74eed20c1061df825bbd4febff3ed6d990cc1"
+  },
   "method": "For each AUX 'will', use dependency subject roots, remove simple condition subtrees from the predicate span, and preserve exact source text and citation. Candidates remain needs_review.",
   "samples": {
     "candidate_sample": [
@@ -31,7 +35,7 @@
         ],
         "dependency_candidates": [
           {
-            "subject": "a ``ValueError",
+            "subject": "a ``ValueError``",
             "predicate_phrase": "will be raised.",
             "polarity": true,
             "quoted": false,
@@ -63,12 +67,14 @@
         ],
         "dependency_candidates": [
           {
-            "subject": "which sample",
+            "subject": "it is not well defined which sample",
             "predicate_phrase": "will be chosen at the point of overlap",
             "polarity": true,
             "quoted": false,
-            "scope_notes": [],
-            "assertion_status": "asserted",
+            "scope_notes": [
+              "context: In this\n        case"
+            ],
+            "assertion_status": "uncertain",
             "status": "needs_review"
           }
         ]
@@ -153,7 +159,7 @@
         ],
         "dependency_candidates": [
           {
-            "subject": "The",
+            "subject": "The final ``x``",
             "predicate_phrase": "will usually have fewer correct digits, depending on ``cond(A)`` and the size of LAMBDA.)",
             "polarity": true,
             "quoted": false,
@@ -304,7 +310,7 @@
             "polarity": true,
             "quoted": false,
             "scope_notes": [],
-            "assertion_status": "asserted",
+            "assertion_status": "uncertain",
             "status": "needs_review"
           },
           {
@@ -315,7 +321,7 @@
             "scope_notes": [
               "condition: if `f` returns an array"
             ],
-            "assertion_status": "asserted",
+            "assertion_status": "uncertain",
             "status": "needs_review"
           }
         ]
@@ -374,11 +380,13 @@
         ],
         "dependency_candidates": [
           {
-            "subject": "None``, the input",
+            "subject": "the input",
             "predicate_phrase": "will be raveled before computing the statistic.",
             "polarity": true,
             "quoted": false,
-            "scope_notes": [],
+            "scope_notes": [
+              "condition: If ``None``"
+            ],
             "assertion_status": "asserted",
             "status": "needs_review"
           }
@@ -408,7 +416,9 @@
             "predicate_phrase": "will be a scalar or ``np.ndarray`` of appropriate shape rather than a 2D ``np.matrix``.",
             "polarity": true,
             "quoted": false,
-            "scope_notes": [],
+            "scope_notes": [
+              "context: In\nthis case"
+            ],
             "assertion_status": "asserted",
             "status": "needs_review"
           }
@@ -560,11 +570,13 @@
         ],
         "dependency_candidates": [
           {
-            "subject": "input",
+            "subject": "an array of the same dtype as input",
             "predicate_phrase": "will be created",
             "polarity": true,
             "quoted": false,
-            "scope_notes": [],
+            "scope_notes": [
+              "context: By default"
+            ],
             "assertion_status": "asserted",
             "status": "needs_review"
           }
@@ -823,7 +835,7 @@
         "sentence": "`basinhopping` will, by\ndefault, adjust `stepsize` to find an optimal value, but this may take\nmany iterations.",
         "dependency_candidates": [
           {
-            "subject": "basinhopping",
+            "subject": "`basinhopping`",
             "predicate_phrase": "will, by default, adjust `stepsize` to find an optimal value, but this may take many iterations.",
             "polarity": true,
             "quoted": false,
@@ -854,7 +866,7 @@
         "dependency_candidates": [
           {
             "subject": "numpy.inf`",
-            "predicate_phrase": "will be treated as a number, that is to say ``[[1, inf],",
+            "predicate_phrase": "will be treated as a number, that is to say ``",
             "polarity": true,
             "quoted": false,
             "scope_notes": [],
@@ -956,9 +968,9 @@
     ]
   },
   "observations": [
-    "Synthetic controls preserve explicit subjects, negation and simple if/when scope; an embedded denial is flagged and a subjectless passive abstains.",
-    "Dependency subjects recover several passive subjects and simple output relations that the phrase boundary alone obscures.",
-    "The prototype still misbinds or truncates subjects around inline code, fragments, contrast, ellipsis, and documentation metadata.",
+    "Synthetic controls preserve passive and inline-code subjects, explicit parameter conditions, by-default context, and simple if/when scope; an embedded denial is flagged and a subjectless passive abstains.",
+    "Dependency subjects recover several passive subjects and simple output relations; equal-length Markdown stripping preserves offsets and fixes several inline-code boundaries.",
+    "The prototype still misbinds or truncates subjects around some inline code, fragments, contrast, ellipsis, and documentation metadata.",
     "Conditions and shared subjects are not consistently separated from the proposition.",
     "This sample was used for prototype inspection and is development data, not a holdout."
   ],
@@ -970,7 +982,7 @@
   ],
   "manual_review": {
     "reviewer": "Codex",
-    "candidate_sample_structurally_coherent": 4,
+    "candidate_sample_structurally_coherent": 11,
     "candidate_sample_size": 20,
     "unhandled_sample_plausible_dependency_claims": 7,
     "unhandled_sample_size": 20,

@@ -283,15 +283,21 @@ new publisher. The script and cited sample are
 An optional spaCy dependency-parser proposal path was then prototyped against
 the same frozen SciPy development sample in `v1_487`. It produced candidates
 for 19/20 previously proposed rows and 11/20 sampled non-proposal rows; the
-single-rater review found four structurally coherent rows in the first sample
-and seven plausible missed behavior/property claims in the second. It handles
-several simple passive subjects and explicit `if`/`when` conditions, but still
-misbinds inline-code subjects, fragments, contrast, ellipsis, and document
-metadata. This is an exploratory parser comparison, not transfer evidence;
-the parser and model remain optional and are not wired into CRMS. Keep both
-methods as development baselines, and only continue with dependency parsing if
-a revised representation can reduce review burden while preserving these
-positive, negative, conditional, and malformed-boundary controls. See the
+single-rater review initially found four structurally coherent rows. A
+development-only refinement then stripped Markdown delimiters for parsing
+while preserving source offsets, recovered several explicit leading
+conditions, and improved the reviewed result to 11/20 structurally coherent
+candidate rows; seven of 20 sampled non-proposal rows still gained plausible
+behavior candidates. The same review also prompted a small production fix:
+“not well defined which …” and “as though/as if” now mark embedded claims as
+uncertain, so they cannot be rendered as ordinary positive evidence. The
+refined parser still misbinds some inline-code subjects, fragments, contrast,
+ellipsis, and metadata. This remains an exploratory comparison on development
+data, not transfer evidence; the parser and model are optional and are not
+wired into CRMS. Keep both methods as development baselines, and only continue
+with dependency parsing if a revised representation reduces review burden
+while preserving positive, negative, conditional, uncertainty, and
+malformed-boundary controls. See the
 [`v1_487 prototype`](../experiments/audits/v1_487_spacy_dependency_prototype.py)
 and [`v1_487 report`](../experiments/reports/v1_487_spacy_dependency_prototype.json).
 

@@ -7,6 +7,7 @@ source claims.
 from __future__ import annotations
 
 import importlib.metadata
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -34,6 +35,10 @@ def candidate_record(candidate: object) -> dict[str, object]:
     }
 
 
+def file_digest(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def check_controls(nlp: object) -> None:
     citation = "control#sha256=0123456789&chars=0:100"
     cases = (
@@ -44,6 +49,15 @@ def check_controls(nlp: object) -> None:
          "a ValueError", True, "condition: If a NaN is present"),
         ("NaNs will be omitted when performing the calculation.",
          "NaNs", True, "condition: when performing the calculation"),
+        ("If None, the input will be raveled before computing the statistic.",
+         "the input", True, "condition: If None"),
+        ("By default an array of the same dtype as input will be created.",
+         "an array of the same dtype as input", True, "context: By default"),
+        ("If a NaN is present, a ``ValueError`` will be raised.",
+         "a ``ValueError``", True, "condition: If a NaN is present"),
+        ("The final ``x`` will usually have fewer correct digits, depending "
+         "on ``cond(A)`` and the size of LAMBDA.",
+         "The final ``x``", True, ""),
     )
     for sentence, expected_subject, expected_polarity, expected_scope in cases:
         candidates = propose_dependency_procedure_phrase_candidates(
@@ -51,7 +65,7 @@ def check_controls(nlp: object) -> None:
         if not any(
                 candidate.subject == expected_subject
                 and candidate.polarity is expected_polarity
-                and expected_scope in candidate.scope_notes
+                and (not expected_scope or expected_scope in candidate.scope_notes)
                 for candidate in candidates):
             raise SystemExit(
                 f"dependency parser control failed: {sentence!r}: {candidates!r}")
@@ -100,15 +114,22 @@ def main() -> None:
             "model": "en_core_web_sm",
             "model_version": importlib.metadata.version("en-core-web-sm"),
         },
+        "implementation_sha256": {
+            "prototype": file_digest(
+                PROJECT / "experiments" / "prototypes"
+                / "procedure_discovery_spacy.py"),
+            "core_assertion_status": file_digest(
+                PROJECT / "crms_procedure_discovery.py"),
+        },
         "method": (
             "For each AUX 'will', use dependency subject roots, remove simple "
             "condition subtrees from the predicate span, and preserve exact "
             "source text and citation. Candidates remain needs_review."),
         "samples": groups,
         "observations": [
-            "Synthetic controls preserve explicit subjects, negation and simple if/when scope; an embedded denial is flagged and a subjectless passive abstains.",
-            "Dependency subjects recover several passive subjects and simple output relations that the phrase boundary alone obscures.",
-            "The prototype still misbinds or truncates subjects around inline code, fragments, contrast, ellipsis, and documentation metadata.",
+            "Synthetic controls preserve passive and inline-code subjects, explicit parameter conditions, by-default context, and simple if/when scope; an embedded denial is flagged and a subjectless passive abstains.",
+            "Dependency subjects recover several passive subjects and simple output relations; equal-length Markdown stripping preserves offsets and fixes several inline-code boundaries.",
+            "The prototype still misbinds or truncates subjects around some inline code, fragments, contrast, ellipsis, and documentation metadata.",
             "Conditions and shared subjects are not consistently separated from the proposition.",
             "This sample was used for prototype inspection and is development data, not a holdout.",
         ],
@@ -120,7 +141,7 @@ def main() -> None:
         ],
         "manual_review": {
             "reviewer": "Codex",
-            "candidate_sample_structurally_coherent": 4,
+            "candidate_sample_structurally_coherent": 11,
             "candidate_sample_size": len(groups["candidate_sample"]),
             "unhandled_sample_plausible_dependency_claims": 7,
             "unhandled_sample_size": len(groups["unhandled_sample"]),
@@ -140,7 +161,7 @@ def main() -> None:
     for name, rows in groups.items():
         produced = sum(bool(row["dependency_candidates"]) for row in rows)
         print(f"{name}: {produced}/{len(rows)} rows produced review candidates")
-    print("manual review: 4/20 existing candidates structurally coherent; "
+    print("manual review: 11/20 existing candidates structurally coherent; "
           "7/20 no-candidate rows gain plausible dependency proposals")
     print("scope: development-only parser comparison; no transfer claim")
 

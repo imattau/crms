@@ -368,13 +368,19 @@ def _assertion_status(text: str, subject_start: int) -> str:
     uncertain = re.search(
         r"\b(?:unclear|uncertain|unknown)\s+whether\b[^.!?]{0,140}$",
         prefix, re.IGNORECASE)
+    unspecified = re.search(
+        r"\bnot\s+well[-\s]+defined\s+(?:which|what|whether|if)\b"
+        r"[^.!?]{0,140}$", prefix, re.IGNORECASE)
+    hypothetical = re.search(
+        r"\bas\s+(?:though|if)\b[^.!?]{0,140}$",
+        prefix, re.IGNORECASE)
     unverified = re.search(
         r"\b(?:has|have|had)\s+not\s+(?:verified|validated|proven|"
         r"shown|established|confirmed)\s+that\b[^.!?]{0,140}$",
         prefix, re.IGNORECASE)
     if denied or no_support:
         return "denied"
-    if uncertain or unverified:
+    if uncertain or unverified or unspecified or hypothetical:
         return "uncertain"
     return "asserted"
 
