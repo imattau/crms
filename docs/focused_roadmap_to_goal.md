@@ -432,7 +432,7 @@ recombination with already reviewed components.
 ### Next execution card
 
 This is the order for the next development cycle, based on the current checkout
-(`629f42f`) and the latest dialogue and recombination findings. It deliberately
+(`3559b21`) and the latest dialogue and recombination findings. It deliberately
 starts by checking current behavior: reports describe earlier commits, and a
 regression already fixed in the current tree should not trigger duplicate code.
 
@@ -455,6 +455,14 @@ the existing procedure learner accepts the resulting taught operation
 sequence, and shows the mapping in the answer. The main remaining recombination
 gap is transfer to independently authored requests with changed wording,
 entities, values, and operation order.
+
+The new `v1_498` fresh-chat diagnostic completed 3/6 authored request forms.
+Exact licensed wording, “after removing”, and source-backed “can reach” worked;
+the system abstained on an unlicensed operation alias, an unlicensed relation
+paraphrase, and a broader request frame. These are distinct language seams,
+not failures of the proof checker. The sample is small and not independent
+transfer evidence; preserve it as a development control and freeze a separate
+request set before tuning against the next evaluation.
 
 An opt-in `/practice-composition` command now re-runs and verifies each distinct
 positive relation result from the last successful composition and stores it as
@@ -513,7 +521,8 @@ explicit negatives, conflicts, cycles/integrity violations, unsupported
 operations, and search limits. Run through ordinary chat, a new process, and
 the copied model once its serialization path is exercised.
 
-The integrated `v1_492` probe now covers four request frames across six cases
+The integrated `v1_492` probe now covers four request frames across seven cases
+through the composition API. The separate `v1_491` check runs the base request
 through fresh-process chat. An interleaved-duplicate input confirms `reverse
 then deduplicate` differs from `deduplicate then reverse`; both target
 sequences are composed from separately learned primitives and other ordered

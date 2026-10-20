@@ -3380,3 +3380,28 @@ and labels remain controlled synthetic fixtures; no general learning or
 transfer claim follows.
 
 Report: [experiment](../experiments/v1_497_composition_derived_practice.py).
+
+## Chat wording coverage for proof-backed composition (`v1_498`, 2026-10-20)
+
+Command: `python3 experiments/v1_498_composition_request_coverage.py`.
+
+Six requests were run in isolated fresh chat sessions against the same
+source-cited relation facts and separately learned list procedures. Three
+completed with the verified output: the licensed request frame, the licensed
+“after removing” construction, and the source-backed `Nia can reach` relation
+wording. Three abstained: an unlicensed operation alias (`deduplicate`), an
+unlicensed relation paraphrase (`reachable by Nia`), and a broader request
+frame (“Take …; retain …”). The exact operation and relation phrases still
+compose with proof checks, explicit-negative handling, and the learned
+deduplicate-then-reverse procedure.
+
+This is a small Codex-authored development diagnostic, not an independent
+transfer benchmark or a representative measure of natural-language coverage.
+The 3/6 result identifies three distinct seams to measure separately: operation
+phrase learning, relation-language transfer, and request-frame understanding.
+Keep the abstentions as controls while improving these routes; do not replace
+them with broad lexical aliases. The next transfer evaluation needs frozen
+requests authored independently from the implementation and components, plus
+an independent result checker.
+
+Report: [experiment](../experiments/v1_498_composition_request_coverage.py).
