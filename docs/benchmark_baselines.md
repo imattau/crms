@@ -1,5 +1,35 @@
 # Language and recombination benchmark baselines
 
+## Regular agent-noun question over a large corpus (2026-10-20)
+
+`experiments/v1_515_regular_agent_noun_evidence.py` covers the natural-language
+question “Who was the designer of the Vela instrument 0000?” when the source
+states “Researcher 0000 designed the Vela instrument 0000.” CRMS now uses a
+bounded regular agent-noun form to retrieve the corresponding verb, then
+requires a positive, cited assertion that directly contains the requested
+object. The reply is still labeled quoted evidence and is not accepted as a
+fact. An irregular `builder` / `built` negative control abstains rather than
+guessing a generated `builded` form.
+
+The change recovered this wording in the 1,200-document `v1_251` corpus audit:
+expected sentences surfaced in 5/11 positive wording probes, up from 4/11 on
+the same current checkout before the fix. All 30 exact targets, all 3 negative
+relation controls, and both unknown-query abstentions remained intact. The
+tracked, user-edited report says 7/11, so two outcomes still differ; that
+report was left untouched. “Responsible for designing” and “credited with
+designing” remain unsupported. This is one morphology transfer and retrieval
+improvement, not general paraphrase coverage or an accepted-fact result.
+
+Regression command:
+
+```sh
+python3 run_experiments.py --match v1_449 --match v1_513 --match v1_514 \
+  --match v1_515 --timeout 300
+```
+
+All four selected diagnostics passed in 1.73 seconds. The full 1,200-document
+audit was run separately with its report directed to `/tmp`.
+
 ## Publisher-disjoint procedure phrase excerpt (2026-10-20)
 
 Command: `python3 run_experiments.py --match v1_470 --match v1_471

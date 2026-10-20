@@ -3044,6 +3044,39 @@ def _natural_who_evidence(index: CRMSSQLiteResearchIndex,
                         for item in matched_by_answer.values()}),
                     "text": "",
                 }
+        # A regular agent noun can be a nominal form of a verb stated in the
+        # source ("designer of X" / "designed X"). Treat this as a bounded
+        # morphology hypothesis: the generated predicate is retrieval-only,
+        # and the usual sentence-level Who route must still find a positive,
+        # cited assertion with the requested object. If the form is irregular
+        # (for example, "builder" / "built"), this route simply finds no
+        # evidence and abstains.
+        if (role_tokens and len(role_tokens) <= 2
+                and role_tokens[-1].endswith(("er", "or", "ist"))):
+            object_text = re.sub(
+                r"^(?:the|a|an)\s+", "", nominal_who.group("object").strip(),
+                flags=re.IGNORECASE)
+            object_text = re.sub(r"[?!.]+$", "", object_text).strip()
+            role = role_tokens[-1]
+            if role.endswith("er") and len(role) > 3:
+                candidate_predicate = role[:-2] + "ed"
+            elif role.endswith("or") and len(role) > 3:
+                candidate_predicate = role[:-2] + "ed"
+            elif role.endswith("ist") and len(role) > 4:
+                candidate_predicate = role[:-3] + "ed"
+            else:
+                candidate_predicate = ""
+            if candidate_predicate:
+                direct_question = (
+                    f"Who {candidate_predicate} {object_text}?")
+                evidence = _natural_who_evidence(
+                    index, direct_question, query_expansions)
+                if evidence is not None:
+                    evidence = dict(evidence)
+                    evidence["normalized_question"] = direct_question
+                    evidence["derived_nominal_role"] = True
+                    evidence["nominal_role"] = " ".join(role_tokens)
+                    return evidence
     else:
         # Try a source-checked deverbal agent noun for a regular past-tense
         # predicate (e.g. "authored" -> "author of", "designed" ->
@@ -3200,12 +3233,20 @@ def _natural_who_evidence(index: CRMSSQLiteResearchIndex,
                 continue
             leading_name = re.match(
                 r"\s*([A-Z][\w'’.-]*(?:\s+(?:[A-Z][\w'’.-]*|"
-                r"van|von|de|del|da|di|der|la|le|bin|al)){0,3})\b",
+                r"van|von|de|del|da|di|der|la|le|bin|al|\d{2,})){0,3})\b",
                 sentence)
             if leading_name is None:
                 continue
             name_terms = tuple(normalized_tokens(leading_name.group(1)))
-            if (len(name_terms) < 2 or set(name_terms) & set(focus)
+            shared_focus = set(name_terms) & set(focus)
+            # Synthetic and real entity names can carry a disambiguating
+            # number that is repeated in the question's object ("Researcher
+            # 0000" / "Vela instrument 0000"). That shared identifier does
+            # not make the person name an object echo; lexical overlap still
+            # does. Keep every non-numeric overlap disqualifying.
+            lexical_overlap = {term for term in shared_focus
+                               if not term.isdigit()}
+            if (len(name_terms) < 2 or lexical_overlap
                     or name_terms[0] in {
                         "a", "an", "the", "this", "that", "these", "those",
                         "during", "after", "before", "when", "while",
