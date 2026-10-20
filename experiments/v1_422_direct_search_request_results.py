@@ -48,6 +48,9 @@ def main() -> None:
         require("Garden Cafe serves vegetarian lunch" in first.text
                 and "Source: sacramento_lunch.txt" in first.text,
                 f"the relevant source excerpt was not surfaced: {first.text!r}")
+        require("Partial location match" in first.text
+                and "does not state: california" in first.text.casefold(),
+                "an excerpt omitting the comma-qualified region was not labelled as a partial location match")
         require("not verified recommendations" in first.text
                 and "capital of California" not in first.text
                 and "New York" not in first.text,

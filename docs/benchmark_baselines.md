@@ -21,14 +21,22 @@ stays `make-reservation` rather than being swallowed as source selection.
 Existing contextual confirmation and task-slot regressions also pass (3/3
 including `v1_518`).
 
+The neighboring direct-search regression `v1_422` found that requiring every
+comma-separated location token rejected an excerpt that named Sacramento but
+omitted “California”. The filter now requires the primary locality exactly
+and labels the excerpt as a partial location match when the comma-qualified
+region is absent. A different city in the same state does not pass. This is
+checked alongside the three-source cuisine/location fixture; other location
+syntax remains untested.
+
 Report: [v1_518](../experiments/reports/v1_518_contextual_intent_search_request.json).
 Its labels are Codex-authored development labels; the five controls are not an
 intent-accuracy or task-completion estimate. The raw Taskmaster transcript
 used by `v1_462` is not in this checkout, so its full replay was not rerun. The
-runtime search check covers one explicit two-constraint request; broader
-constraint combinations, paraphrases, and partial-match handling remain
-untested. Re-evaluate this change on a frozen, source-disjoint conversation set
-before claiming broader intent improvement.
+runtime search check covers one explicit cuisine/locality request; broader
+constraint combinations and paraphrases remain untested. Re-evaluate this
+change on a frozen, source-disjoint conversation set before claiming broader
+intent improvement.
 
 ## History recall and ordinal source selection in one conversation (`v1_517`)
 

@@ -1266,6 +1266,7 @@ def _present_direct_search_matches(
         r"need|want)\s+(?P<target>.+?)(?:[.!?]|$)", request)
     target_terms: set[str] = set()
     location_terms: set[str] = set()
+    location_qualifier_terms: set[str] = set()
     if target_match is not None:
         target_parts = re.split(
             r"\b(?:in|near|around|at|within)\b",
@@ -1275,12 +1276,25 @@ def _present_direct_search_matches(
             "i", "we", "am", "are", "was", "were", "a", "an", "the",
             "to", "for", "me", "us", "some", "any", "please", "just",
             "looking", "look", "need", "want", "find", "search", "locate",
-            "place", "option",
+            "eat", "place", "option",
         }
         if len(target_parts) == 2:
-            location_terms = set(re.findall(r"[a-z0-9]+", target_parts[1])) - {
+            # In an appositive location such as "Sacramento, California",
+            # the city is the primary locality and the comma-following region
+            # disambiguates it. A source naming the city is still a useful
+            # match even when it omits the state; requiring every region token
+            # rejects that valid source. Keep the primary locality exact so a
+            # different city in the same state does not pass.
+            location_parts = target_parts[1].split(",", maxsplit=1)
+            primary_location = location_parts[0]
+            location_terms = set(re.findall(r"[a-z0-9]+", primary_location)) - {
                 "i", "we", "a", "an", "the", "please", "just",
             }
+            if len(location_parts) == 2:
+                location_qualifier_terms = set(re.findall(
+                    r"[a-z0-9]+", location_parts[1])) - {
+                        "i", "we", "a", "an", "the", "please", "just",
+                    }
     passages = research.passages or []
     visible: list[dict[str, str]] = []
     for passage in passages:
@@ -1307,6 +1321,8 @@ def _present_direct_search_matches(
             "title": str(passage.get("title") or "source"),
             "location": str(passage.get("location") or ""),
             "citation": citation,
+            "unstated_location_qualifier": ", ".join(sorted(
+                location_qualifier_terms - matched_terms)),
         })
         if len(visible) == 3:
             break
@@ -1319,6 +1335,9 @@ def _present_direct_search_matches(
     lines = ["Matching source excerpts (quoted evidence, not verified recommendations):"]
     for number, item in enumerate(visible, 1):
         lines.append(f"{number}. {item['text']}\n   Source: {item['title']}")
+        if item["unstated_location_qualifier"]:
+            lines.append("   Partial location match; this excerpt does not state: "
+                         f"{item['unstated_location_qualifier']}.")
     choices = ["first", "second", "third"][:len(visible)]
     lines.append("Ask about the " + ", ".join(choices)
                  + " result to select it.")

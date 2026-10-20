@@ -432,7 +432,7 @@ recombination with already reviewed components.
 ### Next execution card
 
 This is the order for the next development cycles, reviewed against the current
-checkout (`6b7b437`, 2026-10-20). Recheck reported behavior before changing
+checkout (`0c4476a`, 2026-10-20). Recheck reported behavior before changing
 code; historical reports describe earlier snapshots and should not trigger
 duplicate fixes. The objective is to improve held-out user task completion,
 not to add more demonstrations of the same finite-list operations.
