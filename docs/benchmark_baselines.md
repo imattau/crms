@@ -2392,3 +2392,26 @@ This is a narrow, source-explicit type-to-description link, not general noun
 phrase coreference. The positive and negative fixtures were authored together;
 they do not estimate accuracy on natural corpora. Unstated aliases and
 description chains still require abstention or clarification.
+
+## Current dialogue regression replay (2026-10-20)
+
+On checkout `c229e3d`, the following targeted dialogue suite passed 5/5:
+
+```sh
+python3 run_experiments.py \
+  --match v1_412_dialogue_topic_anchor_grounding \
+  --match v1_426_dialogue_paragraph_grounding \
+  --match v1_427_dialogue_multiturn_transcript \
+  --match v1_442_heldout_dialogue_transfer \
+  --match v1_449_cross_paragraph_pronoun_grounding --timeout 300
+```
+
+The suite covers the reported Eiffel Tower/Colosseum switch, paragraph-local
+pronoun grounding, source-only follow-ups, unrelated interruption and `why?`,
+fresh-process/reload persistence, and abstention when a pronoun lacks a valid
+source anchor. Total runner time was 0.88 seconds. These five passing
+diagnostics confirm the named regression controls on this checkout; most
+transcripts and labels are Codex-authored, so the result does not show broad
+dialogue reliability or independent generalization. Keep the dialogue packet
+open for varied, independently authored conversations and measure wrong
+referents, omissions, clarifications, and task completion separately.
