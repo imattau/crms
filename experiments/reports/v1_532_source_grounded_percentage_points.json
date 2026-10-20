@@ -38,6 +38,7 @@
     "independent_decimal_oracle": "0.644 - 0.605 = 0.039; * 100 = 3.9",
     "unsupported_measure": "abstained",
     "unscaled_unitless_fraction": "abstained",
+    "unscaled_unitless_score": "abstained",
     "opposite_requested_direction": "reported observed direction (higher)",
     "two_source_conflict": "abstained pending review"
   },

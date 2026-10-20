@@ -174,7 +174,7 @@ def main() -> None:
     print("unsupported operands and division by zero abstain: PASS")
     print("consistent teaching is accepted; conflicting operator meaning rejected: PASS")
     print("fresh CLI with read-only PMC index: PASS")
-    print("source-to-operand extraction remains untested")
+    print("source-to-operand extraction is covered separately by v1_532/v1_533")
     print("report:", REPORT)
 
 

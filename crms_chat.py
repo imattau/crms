@@ -1981,19 +1981,34 @@ def _natural_object_wh_source_evidence(
 
 
 def _natural_percentage_point_question(
-        message: str) -> tuple[str, str, str, str] | None:
-    """Parse a named-measure comparison asking for percentage points."""
+        message: str) -> tuple[str, str, str, str, str] | None:
+    """Parse a direct or time-bounded percentage-point comparison."""
     match = re.fullmatch(
         r"\s*how\s+many\s+percentage\s+points\s+"
         r"(?P<direction>higher|lower)\s+(?:is|was|are|were)\s+"
         r"(?P<measure>.+?)\s+on\s+(?P<target>[^?!.]+?)\s+"
         r"than\s+on\s+(?P<baseline>[^?!.]+?)\s*[?!.]*\s*",
         message, flags=re.IGNORECASE)
+    if match is not None:
+        values = tuple(match.group(name).strip()
+                       for name in ("measure", "target", "baseline", "direction"))
+        return (*values, "on") if all(values) else None
+    match = re.fullmatch(
+        r"\s*(?:by\s+)?how\s+many\s+percentage\s+points\s+did\s+"
+        r"(?P<measure>.+?)\s+(?P<trend>increase|increased|rise|rose|"
+        r"grow|grew|decrease|decreased|fall|fell|decline|declined)\s+"
+        r"(?:from\s+(?P<baseline>20\d{2})\s+to\s+(?P<target>20\d{2})|"
+        r"between\s+(?P<baseline_between>20\d{2})\s+and\s+"
+        r"(?P<target_between>20\d{2}))\s*[?!.]*\s*",
+        message, flags=re.IGNORECASE)
     if match is None:
         return None
-    values = tuple(match.group(name).strip()
-                   for name in ("measure", "target", "baseline", "direction"))
-    return values if all(values) else None
+    baseline = (match.group("baseline") or match.group("baseline_between"))
+    target = match.group("target") or match.group("target_between")
+    increasing = match.group("trend").casefold() in {
+        "increase", "increased", "rise", "rose", "grow", "grew"}
+    return (match.group("measure").strip(), target, baseline,
+            "higher" if increasing else "lower", "in")
 
 
 def _format_exact_decimal(value: Fraction) -> str:
@@ -2027,7 +2042,7 @@ def _natural_percentage_point_evidence(
     parsed = _natural_percentage_point_question(message)
     if parsed is None:
         return None
-    measure, target, baseline, direction = parsed
+    measure, target, baseline, direction, label_preposition = parsed
     measure_terms = set(normalized_tokens(measure)) - _RESEARCH_STOPWORDS
     target_terms = set(normalized_tokens(target)) - _RESEARCH_STOPWORDS - {
         "callset", "assembly", "reference", "dataset"}
@@ -2045,12 +2060,14 @@ def _natural_percentage_point_evidence(
         document_hits.setdefault(hit.document_id, hit)
 
     label_pattern = re.compile(
-        r"(?P<value>[+-]?(?:\d+(?:\.\d+)?|\.\d+))\s+"
-        r"(?:on|under|for)\s+(?P<label>[A-Za-z0-9][A-Za-z0-9.-]*)",
+        r"(?P<value>[+-]?(?:\d+(?:\.\d+)?|\.\d+))"
+        r"(?P<percent>%)?\s*(?:\([^)]*\)\s*)?"
+        r"(?:on|under|for|in)\s+"
+        r"(?P<label>[A-Za-z0-9][A-Za-z0-9.-]*)",
         re.IGNORECASE)
     matches: dict[
-        tuple[Fraction, Fraction],
-        list[tuple[dict[str, Any], str, str]],
+        tuple[Fraction, Fraction, int],
+        list[tuple[dict[str, Any], str, str, bool]],
     ] = {}
     matched_terms = tuple(sorted(required_terms))
     for hit in document_hits.values():
@@ -2065,59 +2082,67 @@ def _natural_percentage_point_evidence(
             sentence_terms = set(normalized_tokens(sentence))
             if not required_terms <= sentence_terms:
                 continue
-            values_by_label: dict[str, list[Fraction]] = {}
-            literals_by_label: dict[str, list[str]] = {}
+            values_by_label: dict[str, list[tuple[Fraction, str, bool]]] = {}
             for numeric in label_pattern.finditer(sentence):
                 labels = normalized_tokens(numeric.group("label"))
                 if len(labels) != 1:
                     continue
                 label = labels[0]
                 literal = numeric.group("value")
-                values_by_label.setdefault(label, []).append(
-                    Fraction(Decimal(literal)))
-                literals_by_label.setdefault(label, []).append(literal)
+                values_by_label.setdefault(label, []).append((
+                    Fraction(Decimal(literal)), literal,
+                    bool(numeric.group("percent"))))
             target_label = next(iter(target_terms)) if len(target_terms) == 1 else None
             baseline_label = (next(iter(baseline_terms))
                               if len(baseline_terms) == 1 else None)
             if not target_label or not baseline_label or target_label == baseline_label:
                 continue
-            target_values = values_by_label.get(target_label, [])
-            baseline_values = values_by_label.get(baseline_label, [])
-            if len(target_values) != 1 or len(baseline_values) != 1:
+            target_rows = values_by_label.get(target_label, [])
+            baseline_rows = values_by_label.get(baseline_label, [])
+            if len(target_rows) != 1 or len(baseline_rows) != 1:
+                continue
+            target_value, target_literal, target_is_percent = target_rows[0]
+            baseline_value, baseline_literal, baseline_is_percent = baseline_rows[0]
+            if target_is_percent != baseline_is_percent:
                 continue
             fractional_values = all(
                 Fraction(0) <= value <= Fraction(1)
-                for value in (target_values[0], baseline_values[0]))
-            if (fractional_values
+                for value in (target_value, baseline_value))
+            if (fractional_values and not target_is_percent
                     and not sentence_terms.intersection(
                         {"fraction", "proportion", "probability"})):
                 continue
+            if (not fractional_values and not target_is_percent
+                    and not sentence_terms.intersection(
+                        {"percent", "percentage"})):
+                continue
+            scale = 100 if fractional_values and not target_is_percent else 1
             evidence = _cited_sentence_evidence(
                 index, hit, start, end, matched_terms)
             if evidence is None:
                 continue
-            pair = (target_values[0], baseline_values[0])
+            pair = (target_value, baseline_value, scale)
             matches.setdefault(pair, []).append((
-                evidence, literals_by_label[target_label][0],
-                literals_by_label[baseline_label][0]))
+                evidence, target_literal, baseline_literal, target_is_percent))
     if not matches:
         return None
     if len(matches) > 1:
         return {"conflicts": [
             {"target_value": rows[0][1], "baseline_value": rows[0][2],
+             "scale": pair[2],
+             "explicit_percent": rows[0][3],
              "evidence": [item[0] for item in rows]}
             for pair, rows in sorted(matches.items())]}
-    (target_value, baseline_value), matched_rows = next(iter(matches.items()))
+    (target_value, baseline_value, scale), matched_rows = next(iter(matches.items()))
     # A fraction difference such as 0.644 - 0.605 is 0.039, or 3.9
     # percentage points. Values already expressed on a percentage scale are
     # differenced directly.
-    scale = (100 if all(Fraction(0) <= value <= Fraction(1)
-                        for value in (target_value, baseline_value)) else 1)
     delta = (target_value - baseline_value) * scale
     matched_rows.sort(key=lambda item: (
         len(item[0]["text"]), item[0]["document_id"], item[0]["citation"]))
-    selected, target_literal, baseline_literal = dict(matched_rows[0][0]), \
-        matched_rows[0][1], matched_rows[0][2]
+    selected, target_literal, baseline_literal, explicit_percent = (
+        dict(matched_rows[0][0]), matched_rows[0][1], matched_rows[0][2],
+        matched_rows[0][3])
     selected["operands"] = [
         {"label": target, "value": target_literal,
          "citation": selected["citation"]},
@@ -2126,6 +2151,9 @@ def _natural_percentage_point_evidence(
     ]
     selected["difference"] = delta
     selected["scale"] = scale
+    selected["input_unit"] = (
+        "percent" if explicit_percent else "fraction" if scale == 100 else "number")
+    selected["label_preposition"] = label_preposition
     selected["observed_direction"] = (
         "higher" if target_value > baseline_value
         else "lower" if target_value < baseline_value else "equal")
@@ -10561,7 +10589,10 @@ def main() -> int:
             elif percentage_point_evidence.get("conflicts"):
                 conflicts = percentage_point_evidence["conflicts"]
                 values = "; ".join(
-                    f"{item['target_value']} vs {item['baseline_value']}"
+                    f"{item['target_value']}"
+                    f"{'%' if item.get('explicit_percent') else ''} vs "
+                    f"{item['baseline_value']}"
+                    f"{'%' if item.get('explicit_percent') else ''}"
                     for item in conflicts)
                 rows = [row for item in conflicts for row in item["evidence"]]
                 titles = sorted({row.get("title", "source") for row in rows})
@@ -10578,18 +10609,24 @@ def main() -> int:
                 amount = abs(difference)
                 observed = percentage_point_evidence["observed_direction"]
                 title = percentage_point_evidence.get("title") or "source"
+                prep = percentage_point_evidence["label_preposition"]
                 if observed == "equal":
-                    claim = (f"The values are equal on {target_operand['label']} "
-                             f"and {baseline_operand['label']}: 0 percentage points")
+                    claim = (
+                        f"The values are equal {prep} {target_operand['label']} "
+                        f"and {prep} {baseline_operand['label']}: "
+                        "0 percentage points")
                 else:
                     claim = (
                         f"{_format_exact_decimal(amount)} percentage points "
-                        f"{observed} on {target_operand['label']} than on "
+                        f"{observed} {prep} {target_operand['label']} than {prep} "
                         f"{baseline_operand['label']}")
                     if observed != percentage_point_question[3]:
                         claim = "The comparison is " + claim
+                value_suffix = ("%" if percentage_point_evidence["input_unit"]
+                                == "percent" else "")
                 calculation = (
-                    f"({target_operand['value']} − {baseline_operand['value']})"
+                    f"({target_operand['value']}{value_suffix} − "
+                    f"{baseline_operand['value']}{value_suffix})"
                     f"{' × 100' if scale == 100 else ''} = "
                     f"{_format_exact_decimal(difference)}")
                 turn.text = (

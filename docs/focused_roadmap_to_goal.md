@@ -1,6 +1,6 @@
 # Focused roadmap from the current CRMS to its goal
 
-**Reviewed:** 2026-10-20, including the `v1_532` runtime result
+**Reviewed:** 2026-10-20, including the `v1_532` and `v1_533` runtime results
 **Status:** execution plan; the capability goal remains unmet.
 
 ## Destination
@@ -487,11 +487,11 @@ recombination with already reviewed components.
 ### Next execution card
 
 This is the order for the next development cycles, reviewed against core code
-snapshot `e350425`, with the source-grounded math increment `v1_532` validated
-and recorded below. Recheck reported behavior before changing code; historical
-reports describe earlier snapshots and should not trigger duplicate fixes. The
-objective is to improve held-out user task completion, not to add more
-demonstrations of the same finite-list operations.
+snapshot `e350425`, with source-grounded math increments `v1_532` and `v1_533`
+validated and recorded below. Recheck reported behavior before changing code;
+historical reports describe earlier snapshots and should not trigger duplicate
+fixes. The objective is to improve held-out user task completion, not to add
+more demonstrations of the same finite-list operations.
 
 | Order | Work | Concrete output | Advance when |
 | --- | --- | --- | --- |
@@ -532,14 +532,15 @@ with varied request forms and adversarial reasoning cases. Dialogue remains a
 release gate, and source-rule extraction proceeds separately. Broad capability
 and reliable self-learning remain unproven.
 
-The math controls now cover conventional arithmetic language and one
-source-grounded percentage-point calculation: `v1_532` extracts two decimal
-values from a cited assertion sentence, retains a citation for each operand,
-and reports the exact `3.9 percentage points` result through fresh-process
-chat. It also abstains on an unsupported measure and conflicting source
-values. The result is limited to one question frame and one article layout;
-table extraction, publisher transfer, and broad mathematical reasoning remain
-open.
+The math controls now cover conventional arithmetic language and two
+source-grounded percentage-point calculations. `v1_532` extracts proportion
+values from one cited assertion sentence; `v1_533` handles explicit percent
+values with year labels and parenthetical counts in a second article document.
+Both retain operand citations, calculate through fresh-process chat, and
+abstain on unsupported measures and conflicts; `why?` resolves to the exact
+supporting source sentence. This is early document-level transfer within one
+PMC collection. Table extraction, publisher transfer, and broad mathematical
+reasoning remain open.
 
 The new `v1_514` composition control combines an accepted source-backed
 predicate alignment with an accepted, proof-checked type hierarchy in ordinary

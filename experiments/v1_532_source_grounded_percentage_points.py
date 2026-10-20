@@ -158,6 +158,16 @@ def main() -> None:
         require(_natural_percentage_point_evidence(
                     conflict_index, unscaled_question) is None,
                 "unit fractions without fraction/proportion semantics were scaled")
+        unscaled_score_question = (
+            "How many percentage points higher was the score on GroupB "
+            "than on GroupA?")
+        conflict_index.add_document(
+            "unscaled-score-points", "Unscaled score points",
+            "The score was 4.2 on GroupA and 5.1 on GroupB.",
+            "score-points.txt")
+        require(_natural_percentage_point_evidence(
+                    conflict_index, unscaled_score_question) is None,
+                "unitless score values were treated as percentages")
         conflict_replies = run_chat(
             conflict_root, command_for(conflict_root, conflict_index_path,
                                        read_only=False), (QUESTION,))
@@ -201,6 +211,7 @@ def main() -> None:
                 "independent_decimal_oracle": "0.644 - 0.605 = 0.039; * 100 = 3.9",
                 "unsupported_measure": "abstained",
             "unscaled_unitless_fraction": "abstained",
+            "unscaled_unitless_score": "abstained",
                 "opposite_requested_direction": "reported observed direction (higher)",
                 "two_source_conflict": "abstained pending review",
             },

@@ -50,6 +50,32 @@ numeric-source evaluation open.
 Report: [experiment](../experiments/v1_532_source_grounded_percentage_points.py),
 [results](../experiments/reports/v1_532_source_grounded_percentage_points.json).
 
+## Dated percentage-point reasoning (`v1_533`, 2026-10-20)
+
+Command: `python3 experiments/v1_533_temporal_percentage_point_reasoning.py`.
+
+A second article document has the sentence “The proportion of XDR isolates
+increased from 1.7% (1/58) in 2018 to 22.0% (24/109) in 2023 …”. For the
+request “How many percentage points did the proportion of XDR isolates
+increase from 2018 to 2023?”, which does not supply the values, CRMS binds the
+year labels to the explicit percentages, retains a citation for each operand,
+and answers “20.3 percentage
+points higher in 2023 than in 2018.” The fresh-chat control also rejects a
+request claiming a decrease, abstains for an unsupported measure, refuses to
+choose between conflicting source records, and answers `why?` with the exact
+cited source sentence and citation. All controls pass.
+
+This transfers the calculation to a second source document and a different
+question and source layout (year labels, explicit percent signs, parenthetical
+counts). Both documents are from the same PMC collection, and this one example
+does not establish publisher-independent extraction or broad mathematical
+reasoning. The cited sentence limits the denominator to isolates with
+phenotypic data available for all four antimicrobials; CRMS preserves that
+qualification by returning the exact source sentence for inspection.
+
+Report: [experiment](../experiments/v1_533_temporal_percentage_point_reasoning.py),
+[results](../experiments/reports/v1_533_temporal_percentage_point_reasoning.json).
+
 ## arXiv category/year reasoning-to-sort (`v1_530`, 2026-10-20)
 
 Command: `python3 experiments/v1_530_arxiv_reasoned_sort_transfer.py`.

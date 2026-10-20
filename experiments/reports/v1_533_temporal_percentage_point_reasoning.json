@@ -1,0 +1,48 @@
+{
+  "experiment": "v1_533_temporal_percentage_point_reasoning",
+  "date": "2026-10-20",
+  "source": {
+    "document_id": "pmc:PMC13675696.v1.r2afb793f4ee80c68",
+    "title": "High levels of domestic transmission and drug resistance –analysis of national surveillance data for shigellosis, the Netherlands, 2018 to 2024",
+    "license": "CC BY, recorded in the local PMC document metadata",
+    "sentence": "The proportion of XDR isolates increased from 1.7% (1/58) in 2018 to 22.0% (24/109) in 2023 (p < 0.001), based on isolates with phenotypic data available for all four antimicrobials.",
+    "citation": "pmc:PMC13675696.v1.r2afb793f4ee80c68#sha256=250adf6ef38c59fba177abe2fdc3dc489e7f61d48a7ac76c177c74423f3f2fec&chars=21311:21493"
+  },
+  "calculation": {
+    "operands": [
+      {
+        "label": "2023",
+        "value": "22.0",
+        "citation": "pmc:PMC13675696.v1.r2afb793f4ee80c68#sha256=250adf6ef38c59fba177abe2fdc3dc489e7f61d48a7ac76c177c74423f3f2fec&chars=21311:21493"
+      },
+      {
+        "label": "2018",
+        "value": "1.7",
+        "citation": "pmc:PMC13675696.v1.r2afb793f4ee80c68#sha256=250adf6ef38c59fba177abe2fdc3dc489e7f61d48a7ac76c177c74423f3f2fec&chars=21311:21493"
+      }
+    ],
+    "formula": "22.0% - 1.7%",
+    "difference_percentage_points": "20.3",
+    "both_operand_citations_resolve_to_the_exact_sentence": true
+  },
+  "questions": {
+    "from_to": "How many percentage points did the proportion of XDR isolates increase from 2018 to 2023?",
+    "between_rise": "How many percentage points did the proportion of XDR isolates rise between 2018 and 2023?",
+    "contradictory_direction": "How many percentage points did the proportion of XDR isolates decrease from 2018 to 2023?",
+    "unsupported_measure": "How many percentage points did the proportion of unicorn isolates increase from 2018 to 2023?"
+  },
+  "chat": {
+    "answer": "20.3 percentage points higher in 2023 than in 2018. Calculation: (22.0% − 1.7%) = 20.3. [Source: High levels of domestic transmission and drug resistance –analysis of national surveillance data for shigellosis, the Netherlands, 2018 to 2024; inputs are quoted evidence, not accepted facts]",
+    "why_answer": "I used this quoted source sentence as evidence; it has not been accepted as a fact: “The proportion of XDR isolates increased from 1.7% (1/58) in 2018 to 22.0% (24/109) in 2023 (p < 0.001), based on isolates with phenotypic data available for all four antimicrobials.”\nSource: [High levels of domestic transmission and drug resistance –analysis of national surveillance data for shigellosis, the Netherlands, 2018 to 2024](https://doi.org/10.2807/1560-7917.ES.2026.31.41.2600075)\nCitation: pmc:PMC13675696.v1.r2afb793f4ee80c68#sha256=250adf6ef38c59fba177abe2fdc3dc489e7f61d48a7ac76c177c74423f3f2fec&chars=21311:21493",
+    "alternate_question_frame": "20.3 percentage points higher in 2023 than in 2018. Calculation: (22.0% − 1.7%) = 20.3. [Source: High levels of domestic transmission and drug resistance –analysis of national surveillance data for shigellosis, the Netherlands, 2018 to 2024; inputs are quoted evidence, not accepted facts]",
+    "wrong_direction_control": "The comparison is 20.3 percentage points higher in 2023 than in 2018. Calculation: (22.0% − 1.7%) = 20.3. [Source: High levels of domestic transmission and drug resistance –analysis of national surveillance data for shigellosis, the Netherlands, 2018 to 2024; inputs are quoted evidence, not accepted facts]",
+    "unsupported_measure_control": "I couldn't find one source sentence that states the measure, both named conditions, and both numeric values together, so I can't calculate the percentage-point difference.",
+    "conflicting_source_control": "Matching source sentences disagree on the numeric comparison (22.0% vs 1.7%; 22.0% vs 2.1%) across Study A, Study B. I can't choose one without review."
+  },
+  "limitations": [
+    "This is one dated comparison from a second source document in the same PMC collection.",
+    "It tests the from-year-to-year language frame, explicit percentages, and inline parenthetical counts.",
+    "It does not establish publisher-independent transfer, table extraction, or general scientific reasoning.",
+    "The article restricts the denominator to isolates with phenotype data available for all four antimicrobials; the extracted sentence is cited verbatim."
+  ]
+}
