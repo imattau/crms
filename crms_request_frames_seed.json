@@ -240,6 +240,114 @@
       "goal": "select-then-procedure",
       "source_id": "seed:request-frame:from-procedure-claim-2",
       "fixed_procedure": null
+    },
+    {
+      "text": "Who created {entity:text:Python}?",
+      "goal": "research-answer",
+      "source_id": "seed:request-frame:research-created-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Who created {entity:text:Linux}?",
+      "goal": "research-answer",
+      "source_id": "seed:request-frame:research-created-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Who wrote {work:text:Hamlet}?",
+      "goal": "research-answer",
+      "source_id": "seed:request-frame:research-wrote-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Who wrote {work:text:1984}?",
+      "goal": "research-answer",
+      "source_id": "seed:request-frame:research-wrote-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Compute {expression:text:2 plus 3}.",
+      "goal": "math-compute",
+      "source_id": "seed:request-frame:math-compute-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Compute {expression:text:12 times 7}.",
+      "goal": "math-compute",
+      "source_id": "seed:request-frame:math-compute-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "What is the value of {expression:text:5 plus 3}?",
+      "goal": "math-compute",
+      "source_id": "seed:request-frame:math-value-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "What is the value of {expression:text:9 plus 14}?",
+      "goal": "math-compute",
+      "source_id": "seed:request-frame:math-value-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "How many {unit:text:metres} are in {quantity:text:5 kilometres}?",
+      "goal": "unit-convert",
+      "source_id": "seed:request-frame:unit-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "How many {unit:text:centimetres} are in {quantity:text:3 metres}?",
+      "goal": "unit-convert",
+      "source_id": "seed:request-frame:unit-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Translate {source_text:text:hello} into {target_language:text:French}.",
+      "goal": "translate",
+      "source_id": "seed:request-frame:translate-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Translate {source_text:text:good morning} into {target_language:text:Spanish}.",
+      "goal": "translate",
+      "source_id": "seed:request-frame:translate-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Write Python code that {task:text:reverse the list}.",
+      "goal": "generate-code",
+      "source_id": "seed:request-frame:code-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Write Python code that {task:text:add 4 to each value}.",
+      "goal": "generate-code",
+      "source_id": "seed:request-frame:code-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Write a short story about {topic:text:Python}.",
+      "goal": "write-story",
+      "source_id": "seed:request-frame:story-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Write a short story about {topic:text:a lighthouse}.",
+      "goal": "write-story",
+      "source_id": "seed:request-frame:story-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Tell me a short story about {topic:text:a robot}.",
+      "goal": "write-story",
+      "source_id": "seed:request-frame:story-tell-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Tell me a short story about {topic:text:the sea}.",
+      "goal": "write-story",
+      "source_id": "seed:request-frame:story-tell-2",
+      "fixed_procedure": null
     }
   ]
 }

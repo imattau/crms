@@ -143,7 +143,9 @@ class FunctionAction(Action):
 PlanVerifier = Callable[[Plan, Mapping[str, Any], ExecutionContext],
                         Verification]
 
-_REFERENCE = re.compile(r"^(?P<step>[A-Za-z0-9-]+)\.output$")
+_REFERENCE = re.compile(
+    r"^(?P<step>[A-Za-z0-9-]+)\.output"
+    r"(?P<path>(?:\.[A-Za-z0-9_]+)*)$")
 
 
 class PlanExecutor:
@@ -258,7 +260,15 @@ class PlanExecutor:
             if source not in outputs:
                 raise ExecutionError(
                     f"input references {source!r}.output before it is available")
-            return outputs[source]
+            value = outputs[source]
+            path = [part for part in match.group("path").split(".") if part]
+            for part in path:
+                if not isinstance(value, Mapping) or part not in value:
+                    raise ExecutionError(
+                        f"input references {source!r}.output.{'.'.join(path)}, "
+                        "which is not available")
+                value = value[part]
+            return value
         if isinstance(value, list):
             return [self._resolve_value(item, outputs) for item in value]
         if isinstance(value, dict):

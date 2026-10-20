@@ -1,9 +1,11 @@
 # Design: learned request frames
 
-**Status:** implemented for the `select-then-procedure` goal and governed by the
-rule registry. Chat uses request frames as its only natural-language composition
-router; the regex compiler in `crms_task_composition.py` remains as a reference
-path for parity tests.
+**Status:** implemented for seven goals (`select-then-procedure`,
+`research-answer`, `math-compute`, `unit-convert`, `translate`,
+`generate-code`, `write-story`) and governed by the rule registry. Chat uses
+request frames as its only learned natural-language composition router; the
+regex compiler in `crms_task_composition.py` remains as a reference path for
+parity tests.
 **Date:** 2026-10-21
 
 ## Why
@@ -93,9 +95,12 @@ the same plan actions as the reference path.
 
 `crms_request_frames_seed.json` is packaged teacher data, not code:
 
-- 40 marked examples license 20 `select-then-procedure` frames;
+- 58 marked examples license 29 frames: 20 `select-then-procedure` frames and
+  9 Family B frames across research, math, unit conversion, translation, code
+  generation, and fictional writing;
 - it covers the explicit filter/procedure wordings, linked aggregate questions,
-  method-first forms, and a few generic claim-first and list-first forms;
+  method-first forms, a few generic claim-first and list-first forms, plus
+  bounded Family B request wordings;
 - the store defaults to `--rules` with a `_frames.json` suffix; pass
   `--request-frames PATH` to choose another file.
 
@@ -130,7 +135,7 @@ review mode; the family is not eligible for scoped auto-acceptance.
   reference paths for `v1_552` and direct diagnostics.
 - Frames share registry lifecycle, validation, use counts, retirement, and
   rollback. Inference schemas and fact frames still need the same integration.
-- Only `select-then-procedure` is implemented. Other goals need their own typed
-  actions and slot contracts.
+- Only the seven bounded goals are implemented. Other goals need their own
+  typed actions and slot contracts.
 - The seed file is a starting curriculum, not a claim of general paraphrase
   coverage. Unknown wording abstains until a frame is taught.

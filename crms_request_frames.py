@@ -19,7 +19,15 @@ from typing import Any, Iterable, Mapping
 
 FRAME_VERSION = 1
 SLOT_KINDS = ("integer-list", "claim", "procedure", "text")
-GOALS = ("select-then-procedure",)
+GOALS = (
+    "select-then-procedure",
+    "research-answer",
+    "math-compute",
+    "unit-convert",
+    "translate",
+    "generate-code",
+    "write-story",
+)
 MAX_VALUES = 32
 MAX_SLOT_TOKENS = 96
 MAX_MATCHES = 64
@@ -494,6 +502,13 @@ def _bind_slots(frame: RequestFrame, raw: Mapping[str, str]
                     return None
             if part.kind == "procedure":
                 if words[0] in {"then", "and", "after"}:
+                    return None
+            if part.kind == "text":
+                if "<end>" in words:
+                    return None
+                if any(left == "and" and right in {
+                        "who", "what", "where", "when", "why", "how"}
+                       for left, right in zip(words, words[1:])):
                     return None
             slots[part.name] = value.strip()
         else:

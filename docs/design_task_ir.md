@@ -2,12 +2,14 @@
 
 **Status:** active contract; `crms_tasks.py` implements the data and invariants.
 `crms_planner.py` implements the action contract and a deterministic executor.
-`crms_actions.py` implements the first two Family A adapters
-(`select-verified-positive`, `apply-learned-procedure`). Request goals now come
-from learned request frames (`docs/design_request_frames.md`); chat no longer
-uses the regex compiler for composition. Licensed frames are mirrored into the
-governed rule registry as family `request-frame`, and only active rules may
-match. The regex path remains as a reference for parity tests.
+`crms_actions.py` implements the two Family A adapters
+(`select-verified-positive`, `apply-learned-procedure`);
+`crms_family_b.py` implements the Family B domain actions. Request goals now
+come from learned request frames (`docs/design_request_frames.md`); chat no
+longer uses the regex compiler for composition. Licensed frames are mirrored
+into the governed rule registry as family `request-frame`, and only active rules
+may match. Typed plan executions are appended to `--plan-log` and summarized by
+`run_compounding.py`. The regex path remains as a reference for parity tests.
 **Date:** 2026-10-21
 
 ## Why
@@ -131,7 +133,8 @@ Phase 2 uses learned request frames, implemented in
 `crms_request_frames.py` and documented in `docs/design_request_frames.md`:
 
 - the frame identifies the goal kind (`select-then-procedure`,
-  `retrieve-then-infer`, `retrieve-then-domain`);
+  `research-answer`, `math-compute`, `unit-convert`, `translate`,
+  `generate-code`, `write-story`);
 - slots bind entities, relations, numbers, lists, qualifiers, and the requested
   output form;
 - at least two varied grounded examples license a frame;
@@ -148,6 +151,19 @@ Frozen specification: `experiments/scorecard/family_a_spec.md`.
 Shape: a finite list of values, a relation with explicit positive and negative
 evidence, and a learned list procedure. The request asks for the selected
 values, a procedure applied to them, or both, in varied wording.
+
+## Family B: retrieval → reasoning → domain action
+
+Frozen specification: `experiments/scorecard/family_b_spec.md`.
+
+Shape: a learned frame binds one of six domain goals. The typed plan retrieves a
+cited source and re-resolves the citation, evaluates exact math or unit
+evidence, applies a learned translation frame, generates a parseable Python
+artifact from committed rules, or composes a deterministic fictional story.
+Each action has an independent replay/parity verifier; failed steps abstain
+instead of falling through to another route. `crms_plan_log.py` records the
+request, frame, plan, steps, evidence, and failure candidate for the first
+compounding baseline.
 
 Independent oracle: a standalone Python function over the fixture fact set and
 the taught procedure, not the planner.

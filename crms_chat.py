@@ -29,6 +29,11 @@ from crms_feedback import (
     collect_translation_feedback_refs, render_feedback_refs,
 )
 from crms_explain import render_verified_explanation
+from crms_family_b import FamilyBComposition, compose_family_b_via_frames
+from crms_plan_log import (
+    append_plan, plan_trace, record_plan, render_plan_explanation,
+    render_plan_line,
+)
 from crms_codegen import (
     describe_generated_code, diagnose_list_then_math_support,
     generate_list_then_math_python,
@@ -6199,6 +6204,8 @@ def build_parser() -> argparse.ArgumentParser:
                         help="pending contrastive rule example (default: %(default)s)")
     parser.add_argument("--request-frames", type=Path, default=None,
                         help="learned request-frame store (default: next to --rules)")
+    parser.add_argument("--plan-log", type=Path, default=None,
+                        help="append-only plan learning log (default: next to --rules)")
     parser.add_argument("--candidate-session", type=Path,
                         default=None,
                         help="persisted pending fact review candidates (default: next to --knowledge)")
@@ -6763,6 +6770,9 @@ def main() -> int:
     if args.request_frames is None:
         args.request_frames = args.rules.with_name(
             args.rules.stem + "_frames.json")
+    if args.plan_log is None:
+        args.plan_log = args.rules.with_name(
+            args.rules.stem + "_plan_log.jsonl")
     try:
         rule_registry = (RuleRegistry.load(args.rule_registry)
                          if args.rule_registry.is_file() else RuleRegistry())
@@ -6866,6 +6876,8 @@ def main() -> int:
     last_comparison_entities: tuple[str, str] | None = None
     last_reasoned_filter_request: str | None = None
     last_reasoned_filter_practiced = False
+    last_family_b: FamilyBComposition | None = None
+    last_answer_was_family_b = False
     last_feedback_record: dict[str, Any] | None = restored_feedback_context
 
     def remember_feedback(record: dict[str, Any] | None) -> None:
@@ -6876,6 +6888,76 @@ def main() -> int:
         else:
             feedback_store.set_pending(
                 record["question"], record["answer"], record["evidence"])
+
+    def try_family_b(request_line: str) -> bool:
+        nonlocal last_family_b, last_answer_was_family_b, last_story
+        nonlocal pending_story_tone
+        governed = governed_frame_ids(request_frames, rule_registry)
+        composition = compose_family_b_via_frames(
+            request_line, knowledge, rules, request_frames, index, math_model,
+            translation_model, allowed_frame_ids=governed)
+        if composition is None:
+            return False
+        if composition.status != "answered" and composition.domain == "translate":
+            # Preserve clarification and "no learned frame" replies from the
+            # dedicated translation route; a failed translation plan is not a
+            # second composition attempt.
+            return False
+        last_family_b = composition
+        last_answer_was_family_b = True
+        if composition.status == "answered":
+            dialogue.record_external_question(request_line)
+            if composition.domain == "write-story":
+                slots = ((composition.plan or {}).get("request") or {}).get(
+                    "slots") or {}
+                topic = str(slots.get("topic", "")).strip()
+                if topic:
+                    try:
+                        last_story = generate_short_story(topic)
+                        pending_story_tone = None
+                    except ValueError:
+                        last_story = None
+        print("CRMS> " + composition.text)
+        trace = plan_trace(composition.plan, composition.steps)
+        if trace:
+            print(render_plan_line(composition.plan, trace))
+        if (composition.status == "answered"
+                and composition.request_frame_id):
+            record_request_frame_use(
+                rule_registry, composition.request_frame_id, success=True)
+        try:
+            append_plan(args.plan_log, record_plan(
+                request=request_line,
+                route="family-b",
+                status=composition.status,
+                goal=composition.domain,
+                domain=composition.domain,
+                frame_id=composition.request_frame_id,
+                plan=composition.plan,
+                steps=trace,
+                failures=composition.failures,
+            ))
+        except OSError as error:
+            print(f"Could not append the plan log: {error}")
+        evidence_refs = []
+        for step in trace:
+            for item in step.get("evidence", ()) or ():
+                if isinstance(item, dict):
+                    evidence_refs.append({
+                        "kind": str(item.get("kind", "")),
+                        "id": str(item.get("ref", "")),
+                        "source": item.get("source"),
+                    })
+        if composition.request_frame_id:
+            evidence_refs.append({
+                "kind": "request-frame",
+                "id": composition.request_frame_id,
+            })
+        remember_feedback(
+            {"question": request_line, "answer": composition.text,
+             "evidence": evidence_refs}
+            if evidence_refs else None)
+        return True
     latest_research_documents: list[dict] = []
     current_effort = "standard"
     queued_natural_parts: list[str] = []
@@ -6917,6 +6999,8 @@ def main() -> int:
             last_reasoned_filter_request = None
             last_reasoned_filter_practiced = False
             last_comparison_explanation = None
+            last_family_b = None
+            last_answer_was_family_b = False
         story_revision_tone = _natural_story_revision(line)
         if story_revision_tone is not None and last_story is not None:
             pending_story_tone = None
@@ -10662,6 +10746,8 @@ def main() -> int:
             except (OSError, ValueError) as error:
                 print(f"Could not infer a safe translation frame: {error}")
             continue
+        if compound_part is None and try_family_b(line):
+            continue
         story_request = _natural_story_request(line)
         if story_request is not None:
             story_topic, story_tone = story_request
@@ -10730,11 +10816,38 @@ def main() -> int:
                 pending_translation_clarification)
             continue
         if explanation_followup:
+            if last_answer_was_family_b and last_family_b is not None:
+                trace = plan_trace(last_family_b.plan, last_family_b.steps)
+                rendered = render_plan_explanation({
+                    "plan": last_family_b.plan,
+                    "goal": last_family_b.domain,
+                    "steps": trace,
+                    "failures": last_family_b.failures,
+                })
+                print("CRMS> " + rendered)
+                remember_feedback(
+                    {"question": "why?", "answer": rendered,
+                     "evidence": [
+                         {"kind": str(item.get("kind", "")),
+                          "id": str(item.get("ref", ""))}
+                         for step in trace
+                         for item in (step.get("evidence", ()) or ())
+                         if isinstance(item, dict)
+                     ]} or None)
+                continue
             if last_comparison_explanation is not None:
                 print("CRMS> " + last_comparison_explanation)
                 continue
             if last_reasoned_filter is not None:
                 explanation_parts = [last_reasoned_filter.text]
+                if last_reasoned_filter.plan:
+                    explanation_parts.append(render_plan_explanation({
+                        "plan": last_reasoned_filter.plan,
+                        "goal": "select-then-procedure",
+                        "steps": plan_trace(
+                            last_reasoned_filter.plan,
+                            last_reasoned_filter.plan_steps),
+                    }))
                 for proof in last_reasoned_filter.inference_proofs:
                     conclusion = proof.get("conclusion", {})
                     short_answer = (
@@ -10883,6 +10996,23 @@ def main() -> int:
             last_reasoned_filter_request = line
             last_reasoned_filter_practiced = False
             print("CRMS> " + reasoned_filter.text)
+            trace = plan_trace(reasoned_filter.plan, reasoned_filter.plan_steps)
+            if trace:
+                print(render_plan_line(reasoned_filter.plan, trace))
+            try:
+                append_plan(args.plan_log, record_plan(
+                    request=line,
+                    route="family-a",
+                    status=reasoned_filter.status,
+                    goal="select-then-procedure",
+                    frame_id=reasoned_filter.request_frame_id,
+                    plan=reasoned_filter.plan,
+                    steps=trace,
+                    failures=((reasoned_filter.text,)
+                              if reasoned_filter.status != "answered" else ()),
+                ))
+            except OSError as error:
+                print(f"Could not append the plan log: {error}")
             evidence_refs = collect_feedback_refs(response=reasoned_filter)
             if reasoned_filter.request_frame_id:
                 evidence_refs.append({

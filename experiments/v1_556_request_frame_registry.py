@@ -33,8 +33,8 @@ def main() -> None:
     store = RequestFrameStore()
     store.add_seed_file(SEED)
     licensed = {frame.frame_id: frame for frame in store.frames()}
-    require(len(licensed) == 20,
-            f"expected 20 licensed seed frames, got {len(licensed)}")
+    require(len(licensed) == 29,
+            f"expected 29 licensed seed frames, got {len(licensed)}")
 
     registry = RuleRegistry()
     sync_request_frame_registry(store, registry)

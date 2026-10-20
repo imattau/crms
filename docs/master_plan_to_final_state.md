@@ -361,10 +361,9 @@ the first self-learning loop instrumented.
 Deliverables:
 - `crms_tasks.py`: `TaskRequest`, `Goal`, `Step`, `ActionRef`, `EvidenceRef`,
   `Check`, `Plan`, `PlanResult`; stable IDs; JSON serialization.
-- `crms_planner.py`: bounded best-first planner (≤6 steps, explicit expansion
-  budget) over a uniform action registry. Actions declare preconditions,
-  postconditions, evidence, and a verifier. Ambiguity or missing support
-  abstains; no partial execution.
+- `crms_planner.py`: bounded deterministic plan constructor/executor (≤6 steps)
+  over a uniform action registry. Actions declare preconditions, evidence, and
+  a verifier. Ambiguity or missing support abstains; no partial execution.
 - `crms_rule_registry.py` v0: records for procedure and plan rules, lifecycle
   states, utility counters, rollback; wiring from the procedure learner.
 - Adapters for fact lookup, inference, list procedures, math, translation,
@@ -388,6 +387,17 @@ Deliverables:
 reject tampered outputs; incomplete/conflicting cases abstain; works after
 reload; harness does not choose evidence or sequence steps; rule-use records are
 complete enough to compute the first compounding baseline.
+
+**Status (2026-10-21): bounded Phase 2 gate passed.** Family A: 30/30.
+Family B: 30/30 scenario tasks plus 6/6 abstention controls. Smoke: 12/12.
+Zero unsafe answers in every suite. Action-level tampering tests reject altered
+research and math outputs. Chat renders a plan line with step checks and
+evidence; `why?` expands it. `crms_plan_log.py` and `run_compounding.py` compute
+the first baseline from completed and failed plans
+(`experiments/reports/phase2_compounding_baseline.json`: 8 plans, 7 answered,
+6/6 Family B domains, one unsupported control). Family B remains bounded to
+the six declared domain actions; general planning search and derived Family B
+artifacts are later work.
 
 ### Phase 3 — Self-learning from documents (weeks 10–24, measured lane)
 
@@ -641,17 +651,22 @@ redesigned or dropped.
    follow.
 6. **Learning baseline** — instrument current rules/procedures with use counts
    and outcomes; measure today's compounding curve before changing it. —
-   procedure and frame use counts are live; the compounding benchmark is not.
+   procedure and frame use counts are live; typed plan records and
+   `run_compounding.py` now compute the first baseline.
 7. **Family A specification** — 10 tasks + independent oracle, frozen before
    planner code. — done
-   (`experiments/scorecard/family_a_spec.md`); the suite now has 12 tasks,
-   including wording variants and negative controls.
-8. **Corpus manifest v0** — inventory of candidate sources, licences, sizes,
+   (`experiments/scorecard/family_a_spec.md`); the suite now has 30 tasks,
+   including wording/entity/value variants and negative controls.
+8. **Family B specification** — retrieval/reasoning/domain-action tasks through
+   learned frames and typed actions. — done
+   (`experiments/scorecard/family_b_spec.md`); 30 scenario tasks plus 6 controls
+   cover research, math, units, translation, code generation, and writing.
+9. **Corpus manifest v0** — inventory of candidate sources, licences, sizes,
    and domain targets. — done
    (`corpus/manifest_v0.json`, `docs/corpus_manifest.md`,
    `experiments/v1_557_corpus_manifest.py`); 20 candidate groups, 4 documented
    exclusions, and a 94.5M-word core planning estimate.
-9. **Consolidate plan docs** — this file is canonical; link the others as
+10. **Consolidate plan docs** — this file is canonical; link the others as
    history. — canonical status recorded; remaining docs still need pruning.
 
 ---
@@ -687,3 +702,6 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Request frames join the governed rule registry: `request-frame` family, stored-template replay validation, active-rule matching gate, use counts, contest/retire/rollback, stale retirement, and versioned successors on explicit re-teaching | `crms_frame_registry.py`, `crms_rule_registry.py`, `crms_request_frames.py`, `crms_task_composition.py`, `crms_chat.py`, `experiments/v1_556_request_frame_registry.py` |
 | 2026-10-21 | Family A scorecard grows to 12/12: explicit negative exclusion, conflict, missing output, and four licensed wording variants; conflict replies count as abstentions | `experiments/scorecard/family_a.jsonl`, `crms_eval/oracles.py`, `experiments/scorecard/family_a_spec.md` |
 | 2026-10-21 | Corpus manifest v0: 20 candidate source groups across core/extended/research, licence classes, domain targets, 4 documented exclusions, and a validated 94.5M-word core planning estimate | `corpus/manifest_v0.json`, `crms_corpus_manifest.py`, `docs/corpus_manifest.md`, `experiments/v1_557_corpus_manifest.py` |
+| 2026-10-21 | Family B typed composition: six new learned goals (research, math, unit conversion, translation, code generation, writing), independent replay/parity verifiers, cited research with re-resolved citations, and no fall-through after a failed plan | `crms_family_b.py`, `crms_request_frames.py`, `crms_request_frames_seed.json`, `crms_planner.py`, `crms_tasks.py`, `crms_chat.py` |
+| 2026-10-21 | Plan instrumentation: append-only JSONL records for completed and failed plans, per-step actions/checks/evidence, failure learning candidates, `Plan plan-…` chat rendering, detailed `why?`, and `run_compounding.py` baseline summary | `crms_plan_log.py`, `crms_chat.py`, `run_compounding.py`, `experiments/v1_558_family_b_plan.py` |
+| 2026-10-21 | Phase 2 gate measured: Family A 30/30, Family B 30/30 plus 6/6 controls, smoke 12/12, zero unsafe answers; tampered research/math outputs rejected; nested plan inputs and dialogue history wired | `experiments/scorecard/family_a.jsonl`, `experiments/scorecard/family_b.jsonl`, `experiments/scorecard/family_b_spec.md`, `crms_dialogue.py`, `crms_eval/oracles.py` |

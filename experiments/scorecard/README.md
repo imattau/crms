@@ -10,6 +10,7 @@ explicit oracles. It is not a replacement for the unit diagnostics in
 ```sh
 python3 run_scorecard.py --suite smoke
 python3 run_scorecard.py --suite family_a
+python3 run_scorecard.py --suite family_b
 python3 run_scorecard.py --suite smoke --list
 python3 run_scorecard.py --suite experiments/scorecard/smoke.jsonl --keep-workspaces
 ```
@@ -22,10 +23,13 @@ Current suites:
 
 - `smoke` — 12 cross-capability tasks (research, dialogue, reload, math,
   abstention, procedures).
-- `family_a` — 12 proof-selected value → learned procedure tasks, including a
+- `family_a` — 30 proof-selected value → learned procedure tasks, including
   fresh reload, explicit negatives, unknown values, conflict, an untaught
   procedure, a missing output request, wording variants, and a frame taught in
   chat and reloaded from its store.
+- `family_b` — 30 retrieval/reasoning/domain-action tasks plus 6 negative
+  controls: cited research, exact math, unit conversion, translation, bounded
+  code generation, and fictional writing through learned request frames.
 
 The command exits non-zero when a gated task fails or an expected abstention
 becomes a confident answer.

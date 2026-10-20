@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-21",
+  "description": "First compounding baseline from typed Family A and Family B plans. One Family A plan, seven Family B plans (six answered domains plus one unsupported research control).",
+  "format": "crms-compounding-baseline",
+  "name": "phase2-mixed-baseline",
+  "notes": [
+    "Success rate is plan completion, not model quality.",
+    "distinct_procedures counts procedure evidence references.",
+    "The corresponding chat run is reproducible with run_compounding.py against its --plan-log."
+  ],
+  "summary": {
+    "answered": 7,
+    "by_goal": {
+      "generate-code": 1,
+      "math-compute": 1,
+      "research-answer": 2,
+      "select-then-procedure": 1,
+      "translate": 1,
+      "unit-convert": 1,
+      "write-story": 1
+    },
+    "by_route": {
+      "family-a": 1,
+      "family-b": 7
+    },
+    "by_status": {
+      "answered": 7,
+      "unsupported": 1
+    },
+    "distinct_actions": 8,
+    "distinct_frames": 7,
+    "distinct_procedures": 1,
+    "failure_count": 1,
+    "success_rate": 0.875,
+    "total": 8
+  },
+  "version": 1
+}

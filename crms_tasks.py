@@ -22,7 +22,7 @@ MAX_STEPS = 6
 
 EVIDENCE_KINDS = frozenset({
     "fact", "source", "proof", "procedure", "rule", "computation",
-    "translation", "generated-code",
+    "translation", "generated-code", "generated-text",
 })
 CHECK_KINDS = frozenset({
     "exact", "set", "proof", "citation", "parity", "oracle", "domain",

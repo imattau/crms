@@ -452,13 +452,21 @@ reported as `need_more_examples`. Slots are declared inline as
 `text`. Unknown wording, malformed slots, and ambiguous frame collisions
 abstain rather than execute.
 
+The seven goals are `select-then-procedure`, `research-answer`, `math-compute`,
+`unit-convert`, `translate`, `generate-code`, and `write-story`. Family B
+requests (`experiments/scorecard/family_b_spec.md`) route through the same
+store and typed planner; research answers carry a resolved citation, math and
+unit answers carry exact evidence, translation uses aligned learned frames,
+code generation is limited to committed learned operations, and writing uses a
+deterministic fictional story grammar.
+
 Frames are stored next to `--rules` with a `_frames.json` suffix by default;
 use `--request-frames PATH` to choose another file. The packaged
-`crms_request_frames_seed.json` supplies 40 starting demonstrations for the
-filter/procedure family. Chat uses frames only; the older regex compiler is
-retained as a reference path for parity diagnostics. Request-frame stores are
-local sidecars in this integration; packaging them inside portable model files
-is later work.
+`crms_request_frames_seed.json` supplies 58 starting demonstrations licensing
+29 frames (20 Family A and 9 Family B). Chat uses frames only; the older regex
+compiler is retained as a reference path for parity diagnostics. Request-frame
+stores are local sidecars in this integration; packaging them inside portable
+model files is later work.
 
 Licensed frames are mirrored into the governed rule registry as family
 `request-frame`. Validation replays the marked examples against the stored
@@ -467,6 +475,13 @@ retiring, or rolling back a frame rule changes whether matching may use it:
 chat matches only frames whose registry rule is active. `/frames` shows each
 frame's rule id, lifecycle state, uses, successes, and corrections; the usual
 `/rule-health` and `/rule-detail` commands include frame rules.
+
+Typed plan executions are appended to `--plan-log` (default: next to
+`--rules`). Each record contains the request, route, frame, plan artifact id,
+actions, step outcomes, evidence references, failures, and a learning
+candidate. `python3 run_compounding.py PATH` summarizes the first compounding
+baseline from that log. Chat prints a compact `Plan plan-…` line for every
+completed or failed plan; `why?` expands each step, its check, and its evidence.
 
 The parameterized rule family can also discover multipliers beyond doubling:
 

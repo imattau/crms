@@ -178,6 +178,8 @@ class ReasonedListComposition:
     procedure_records: tuple[dict[str, Any], ...] = ()
     language_evidence: tuple[dict[str, Any], ...] = ()
     request_frame_id: str | None = None
+    plan: dict[str, Any] | None = None
+    plan_steps: tuple[dict[str, Any], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -937,7 +939,16 @@ def _execute_verified_filter_request(
     result = PlanExecutor(
         registry, plan_verifier=check_output).execute(
             plan, ExecutionContext({"instruction": instruction}))
-    return _composition_from_plan(request, result)
+    composition = _composition_from_plan(request, result)
+    plan_payload = None
+    if result.plan is not None:
+        plan_payload = result.plan.to_dict()
+        plan_payload["artifact_id"] = result.plan.artifact_id
+    return replace(
+        composition,
+        plan=plan_payload,
+        plan_steps=tuple(step.to_dict() for step in result.steps),
+    )
 
 
 def compose_verified_filter_via_plan(
@@ -987,6 +998,8 @@ def compose_verified_filter_via_frames(
             + templates + ".")
     match = match_result.match
     if match is None:
+        return None
+    if match.frame.goal != "select-then-procedure":
         return None
     values = match.slots.get("values")
     claim = match.slots.get("claim")

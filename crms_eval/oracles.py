@@ -33,6 +33,8 @@ ABSTENTION_MARKERS = (
     "no stored",
     "not in the sources",
     "i lack",
+    "no learned source frame",
+    "couldn't verify",
     "both positive and negative",
     "conflicting evidence",
 )

@@ -429,6 +429,19 @@ class CRMSDialogue:
                 "answer": answer[:_HISTORY_QUESTION_LIMIT],
             }
 
+    def record_external_question(self, utterance: str) -> None:
+        """Record a question answered by a typed route outside ``turn``."""
+        text = " ".join(utterance.split())[:_HISTORY_FIELD_LIMIT]
+        if not text:
+            return
+        self.last_question = text
+        self.history.append({
+            "act": "question",
+            "utterance": text,
+            "status": "answered",
+        })
+        del self.history[:-_HISTORY_LIMIT]
+
     def intent_context(self) -> tuple[set[str], str | None]:
         """Expose bounded, observable predicates to the intent-frame matcher."""
         open_task = bool(self.pending_result or self.pending_binding

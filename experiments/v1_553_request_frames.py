@@ -28,13 +28,13 @@ def require(condition: bool, message: str) -> None:
 
 def main() -> None:
     store = RequestFrameStore()
-    require(store.add_seed_file(SEED) == 40,
+    require(store.add_seed_file(SEED) == 58,
             "seed file did not load the expected example count")
     require(store.add_seed_file(SEED) == 0,
             "seed examples were not deduplicated")
     frames = store.frames()
-    require(len(frames) == 20,
-            f"expected 20 derived seed frames, got {len(frames)}")
+    require(len(frames) == 29,
+            f"expected 29 derived seed frames, got {len(frames)}")
     require(all(len(frame.examples) >= 2 for frame in frames),
             "a licensed frame has fewer than two examples")
 

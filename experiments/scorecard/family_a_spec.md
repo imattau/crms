@@ -2,9 +2,9 @@
 
 **Status:** frozen design for the Phase 2 recombination milestone. The typed
 actions execute through the plan path, and chat routes requests through learned
-request frames (`docs/design_request_frames.md`). Twelve scorecard tasks cover
+request frames (`docs/design_request_frames.md`). Thirty scorecard tasks cover
 filter+sum, reload, explicit negatives, unknown values, conflict, an untaught
-procedure, a missing output request, several wording variants, and a frame
+procedure, a missing output request, wording/entity/value variants, and a frame
 taught in chat and reloaded (`experiments/scorecard/family_a.jsonl`); tampered
 step results and source retraction remain unit-tested rather than scorecard
 fixtures.
