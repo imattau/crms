@@ -160,6 +160,22 @@ narrow location/date task; it does not close the independently authored
 conversation-transfer gate. Keep improving the transcript set while moving
 the main capability experiment forward in parallel.
 
+The source-backed composition diagnostic (`v1_529`) is a narrow positive
+transfer result: it discovers a two-premise rule from two SimpleWiki training
+articles, validates against two separate articles, removes the validation
+conclusions, then derives Marie Curie's two award years and counts them with
+a separately learned procedure. A different SimpleWiki article independently
+lists those awards, the proof verifier accepts both derivations, and an
+unknown 1912 input blocks partial output. The copied runtime uses selected
+source text rather than the original 1.3 GB index. This moves the main
+capability gate beyond synthetic fixtures for one real-source task. It does
+not establish publisher transfer, automatic fact extraction, broad task
+composition, or robust rule induction: all data come from one publisher, the
+holdout has two examples, and source facts and procedure examples are
+Codex-labeled. The next composition work should vary both the relation pattern
+and the operation using a second corpus or publisher, with source-disjoint
+validation and independent output checking.
+
 ## Execution order
 
 Dialogue safety is a release gate for every chat-facing change. Source-rule
@@ -274,12 +290,13 @@ gaps, not to claim parity.
 Extend work packet 1 with independently authored, complete conversations that
 vary entity class, discourse distance, and the same utterance under different
 contexts; score correct outcomes and wrong bindings separately. In parallel,
-freeze the task set and independent checker for work packet 2, then run its
-reasoning-to-procedure composition experiment through chat using reviewed
-components. Do not wait for a broad dialogue score before running that
-experiment. Keep the Eiffel/Colosseum and Marie/Einstein failures as permanent
-controls, and keep derived write-back review-gated until recombination,
-correction, and invalidation pass on held-out tasks.
+extend `v1_529` to a second relation pattern and a second operation, preferably
+using a new corpus or publisher, with held-out source documents, evidence-order
+and wording variation, an independent checker, and unknown, negative, and
+conflicting controls. Run this through chat using reviewed components. Keep
+the Eiffel/Colosseum and Marie/Einstein failures as permanent controls, and
+keep derived write-back review-gated until recombination, correction, and
+invalidation pass on held-out tasks.
 
 For detailed implementation history and experiment evidence, see
 [`focused_roadmap_to_goal.md`](focused_roadmap_to_goal.md) and

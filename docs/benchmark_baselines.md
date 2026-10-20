@@ -1,5 +1,34 @@
 # Language and recombination benchmark baselines
 
+## Source-backed rule-to-count composition (`v1_529`, 2026-10-20)
+
+Command: `python3 experiments/v1_529_source_reasoned_procedure_transfer.py`.
+
+This diagnostic uses a read-only SimpleWiki SQLite index. The system discovers
+`received + awarded in → won in` from Max Planck and Albert Einstein article
+facts, validates it against Pierre Curie and Henri Becquerel from two disjoint
+articles, then removes the validation conclusions. It derives Marie Curie's
+1903 and 1911 award years from her article, independently verifies each proof,
+and feeds only those proved values to a separately learned count procedure.
+A separate Nobel Prize article lists the same two awards; its citation is
+checked and its count agrees. An added 1912 value remains unresolved and
+blocks partial output. The copied runtime database contains only the selected
+source articles, accepted facts/rule, and procedure; a fresh CLI answers and
+explains from that copy without the 1.3 GB input index. All targeted checks
+pass.
+
+This is one narrow positive transfer across source documents, not a broad
+estimate. The two-premise rule candidate has only two training and two
+validation people, all sources come from one publisher, fact extraction and
+labels are manually reviewed by Codex, and count learning uses Codex-labeled
+procedure examples. The source article's structured award fields were
+manually mapped to relations. The separate article is a source-level oracle,
+not an independent publisher. This advances the reasoning-to-procedure chat
+gate for one real-source task but does not establish open-ended recombination
+or autonomous source-rule learning. No external 70B-class model was run. See
+the [runner](../experiments/v1_529_source_reasoned_procedure_transfer.py) and
+[report](../experiments/reports/v1_529_source_reasoned_procedure_transfer.json).
+
 ## Full-chat dialogue context transfer (`v1_528`, 2026-10-20)
 
 Command: `python3 experiments/v1_528_dialogue_context_transfer_cli.py`.

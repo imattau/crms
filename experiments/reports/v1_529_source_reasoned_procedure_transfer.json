@@ -1,0 +1,59 @@
+{
+  "experiment": "v1_529_source_reasoned_procedure_transfer",
+  "source_index": "data/crms_simplewiki_research.sqlite (read-only input)",
+  "copied_source_documents": [
+    "evaluation:wiki:simplewiki:47196",
+    "holdout:wiki:simplewiki:230071",
+    "holdout:wiki:simplewiki:70876",
+    "oracle:wiki:simplewiki:6494",
+    "train:wiki:simplewiki:2138",
+    "train:wiki:simplewiki:8106"
+  ],
+  "training_people": [
+    "Max Planck",
+    "Albert Einstein"
+  ],
+  "validation_people": [
+    "Pierre Curie",
+    "Henri Becquerel"
+  ],
+  "evaluation_entity": "Marie Curie",
+  "rule": {
+    "premises": [
+      "received",
+      "awarded in"
+    ],
+    "conclusion": "won in",
+    "holdout": "validated",
+    "validation_examples": 2,
+    "validation_label_coverage": 1.0
+  },
+  "learned_procedure": "count the matching entries",
+  "result": {
+    "verified_years": [
+      1903,
+      1911
+    ],
+    "count": 2
+  },
+  "independent_check": {
+    "kind": "separate cited Nobel Prize article listing the two awards",
+    "source_citations_resolve": true,
+    "count_agrees": true
+  },
+  "unknown_control": {
+    "candidate_year": 1912,
+    "status": "unknown",
+    "procedure_not_run": true
+  },
+  "proofs_independently_verified": 2,
+  "all_fact_citations_resolve_from_copy": true,
+  "clean_model_copy_chat": true,
+  "limitations": [
+    "The fact and relation labels were manually reviewed by Codex; extraction was not autonomous.",
+    "All source documents come from SimpleWiki, and the rule holdout has only two examples.",
+    "The procedure is separately supervised with Codex-labeled examples.",
+    "This proves one source-backed reasoning-to-count composition, not general task-planning or broad corpus learning.",
+    "No external 70B-class model was run; the comparator remains a qualitative task rubric."
+  ]
+}
