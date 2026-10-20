@@ -317,6 +317,9 @@ class CRMSDialogue:
         # The one entity the user named and the shown source confirmed; it
         # is the preferred referent for a bare pronoun. Not persisted.
         self.topic_entity: str | None = None
+        # Exact source spans backing the most recent multi-clause answer.
+        # Transient by design; a fresh turn or reset replaces this context.
+        self.last_compound_evidence: dict[str, Any] | None = None
         # Ordinal selection is valid only for citations actually shown as a list.
         self.presented_sources: list[dict[str, str]] = []
         # Conversation memory that outlives a refused turn. ``clear`` drops
@@ -579,6 +582,7 @@ class CRMSDialogue:
         self.last_timeline_order_by = None
         self.source_mentions = []
         self.topic_entity = None
+        self.last_compound_evidence = None
         self.presented_sources = []
         self.pending_dialogue_slot = None
         self.open_dialogue_question = None

@@ -3317,3 +3317,24 @@ requires the ordinary evidence and source-anchor checks before an answer is
 shown.
 
 Report: [experiment](../experiments/v1_494_compound_question_entity_binding.py).
+
+## Multi-clause source answers with citation per clause (`v1_495`, 2026-10-20)
+
+`experiments/v1_495_compound_question_evidence.py` tests “Who designed the
+Eiffel Tower and when was it completed?” The two answers are in separate
+sentences. CRMS answers both parts in one turn, with one exact citation per
+quoted sentence. `why?` revalidates and shows both citations; a subsequent
+“How tall is it?” still resolves to the Eiffel Tower. If the second clause
+asks when the tower opened, but the source only gives its completion date,
+CRMS labels the turn partial and does not present `1889` as the opening date.
+A compound request naming both Eiffel Tower and Colosseum as possible
+antecedents for “it” is clarified before its clauses are run, so decomposition
+does not bypass the pronoun ambiguity gate.
+
+The experiment plus `v1_493`, `v1_494`, and eight focused dialogue regressions
+passed. Clause splitting is limited to two or three WH clauses joined by `and`.
+It returns cited source quotations, not newly accepted facts, and does not
+establish broad clause planning, multi-source synthesis, or paraphrase
+understanding. The corpus and expected labels are authored fixtures.
+
+Report: [experiment](../experiments/v1_495_compound_question_evidence.py).

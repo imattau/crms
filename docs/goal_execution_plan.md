@@ -55,7 +55,11 @@ The dialogue review that reported a pronoun-led source sentence attributed to
 the wrong entity and source-only context loss has since been replayed against
 focused fixes. The selected current-checkout regressions pass, including topic
 switch, source-only context, persisted evidence, and stale `why?` behavior.
-Treat those as repaired controls, not as proof of general dialogue competence:
+The latest `v1_495` slice also answers two- and three-part WH questions from
+separate cited sentences, revalidates them on `why?`, and abstains when one
+requested part lacks evidence. These are repaired controls, not evidence of
+general compound-question understanding. Treat these as repaired controls,
+not as proof of general dialogue competence:
 history recall and numbered-result selection have targeted regression checks,
 but independently authored multi-turn transfer still needs a broader held-out
 evaluation. The bounded reservation draft (`v1_467`) demonstrates one request →
@@ -366,58 +370,56 @@ Report size, runtime, compatibility, migration behavior, and unsupported
 cases. Keep source acquisition and packaging policy explicit, including
 academic-paper sources.
 
-## Immediate work queue — execute in this order
+## Immediate work queue
 
-1. **Freeze the scorecard and dialogue holdout.** Preserve all fixed
-   topic-switch, source-only-context, stale-`why?`, history, ordinal, repair,
-   and save/reload regressions. Add independently authored transcripts with
-   competing entities and varied layouts; report task completion, wrong
-   referents, irrelevant evidence, clarification, omissions, and abstention.
-   Dialogue remains a parallel research and release gate for chat-facing work.
-2. **Measure the current source-claim boundary, then test transfer.** Keep the
-   `v1_475` sample as development data. Freeze the clause-aware parser, review a
-   fixed sample from `v1_477` including non-proposals, and report useful
-   precision, missed claims, boundary errors, and review effort. Then confirm
-   without tuning on untouched API units and a new publisher. Keep `v1_473` as
-   a negative corpus-fit control for this grammar. If transfer fails, revise
-   the smallest faulty boundary and reserve a fresh confirmation set.
-3. **Prove recombination through chat and reasoning.** Once the source-learning
-   gate passes, route separately reviewed components into an unseen multi-step
-   natural-language task, fresh-process reload, proof checker, and independent
-   output oracle. Include missing premises, negatives, conflicts, integrity
-   failures, unsupported steps, and incomplete search. Keep hand-coded mapping
-   and connective supervision explicit.
-4. **Govern derived learning.** After recombination works, test review-gated
-   derived proposals, lineage, correction propagation, invalidation, duplicate
-   control, trust weighting, and storage limits before automatic reuse.
-5. **Expand task breadth and distribution from measured losses.** Select one
-   bounded math, coding, translation, or creative task using the scorecard.
-   Then run the complete scorecard from a copied SQLite model with original
-   sources unavailable, recording portability, size, compatibility, and task
-   outcomes.
+1. **Freeze the shared end-to-end scorecard.** Keep the topic-switch,
+   source-only continuity, stale-`why?`, history, ordinal, repair, citation,
+   and save/reload controls. Include the new separately sourced compound
+   question path. Add independently authored multi-turn transcripts and
+   compound requests with competing entities and varied paragraph layouts.
+   Report task completion, wrong referents, irrelevant evidence, omitted
+   clauses, clarification, abstention, and evidence validity separately. Keep
+   a qualitative comparison with the documented 70B-class reference focused on
+   request breadth, paraphrase, multi-part completion, continuity, and repair;
+   no live large-model run or parity claim is required.
+   This is the chat safety/release gate, not a reason to postpone capability
+   work.
+2. **Advance recombination plus reasoning through ordinary chat.** Extend the
+   current proof-filter/procedure slice to frozen, source-disjoint tasks with
+   varied language, values, and operation order. Require fresh-process
+   execution, independent output checking, proof verification, and negative,
+   missing-premise, conflict, cycle, and search-limit cases. Keep labels and
+   hand-coded mappings explicit. This is the primary capability milestone.
+3. **Run source-rule transfer in parallel.** The installed NumPy/pandas and
+   later package scans are development evidence, not held-out transfer. Freeze
+   a method and review proposal plus non-proposal samples from untouched units
+   and a new publisher; measure useful yield, errors, missed claims, abstention,
+   and review effort. Do not block recombination on this lane, and do not tune
+   on its confirmation set.
+4. **Close the governed self-learning loop only after step 2.** Permit verified
+   derivations to become reviewable proposals with lineage. Test correction,
+   invalidation, trust weighting, duplicates, stale lineage, and bounded store
+   growth before reuse or automation.
+5. **Keep dialogue/intent research active throughout.** Evaluate contextual
+   intent and any learned moves against the explicit baseline on held-out task
+   outcomes. Preserve abstention and clarification; context may route or repair
+   but never supply facts. Do not ship a mechanism that increases wrong
+   referents or inappropriate actions.
+6. **Widen user-task breadth one validated domain at a time.** Use the same
+   natural-language path for bounded coding, math, translation, and creative
+   tasks. Pick from measured user failures, define an independent checker or
+   quality rubric first, then measure coverage, quality, repair, and abstention.
+7. **Validate the SQLite model as the distributable product.** Once record and
+   correction lifecycles are stable, copy the model to a clean location with
+   source files unavailable and rerun the shared scorecard, including query,
+   learning, reasoning, correction, citation, and reload. Record size,
+   compatibility, and licensing metadata.
 
-The dialogue packet is a parallel release-quality gate; it must not displace
-the learning experiment. The source-rule result decides whether CRMS advances
-the learner or redesigns the evidence-extraction step. Recombination can
-proceed with reviewed components while that decision is pending; reasoning
-checks are built into its acceptance criteria. Math, coding, translation, and
-creative tasks remain next-stage domain slices, not current distractions.
-
-Self-learning write-back comes later because error amplification cannot be
-evaluated until independently checked recombination works. This ordering keeps
-the central capability bet explicit: learn from attributable evidence, combine
-what was learned through reasoning and procedures, and only then let verified
-outputs become reviewable new knowledge.
-
-
-
-
-Do not enlarge the corpus, add a new dialogue mechanism, expand domain
-coverage, or migrate the model store unless it clears one of these gates.
-Dialogue measurement runs alongside the learning/reasoning path, not after
-them. After these packets pass, choose one bounded math, coding, translation,
-or creative task from measured user-task loss; then verify the copied SQLite
-model against the same scorecard without original source files.
+The sequence is gated where dependencies require it: source-rule transfer is
+parallel to recombination; governed write-back depends on verified
+recombination; broad domain expansion and full distribution follow measured
+core-path results. Dialogue quality is measured throughout and gates every
+chat-facing release.
 
 ## Reassessment rule
 

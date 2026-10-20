@@ -8,6 +8,7 @@ from typing import Any
 
 from crms_dialogue import (CRMSDialogue, DialogueTurn, UserIntentHypothesis,
                            infer_open_question_slot)
+from crms_knowledge import QuestionResult, ResearchResult
 
 
 _ACTS: tuple[tuple[str, re.Pattern[str]], ...] = (
@@ -224,6 +225,9 @@ _CANCEL_FOLLOWUP_RE = re.compile(
     r"^(?:never mind|forget it|cancel that|cancel)[.! ]*$", re.IGNORECASE)
 _WH_QUESTION_RE = re.compile(
     r"^(?:who|whom|whose|what|which|when|where|why|how)\b", re.IGNORECASE)
+_COMPOUND_WH_SPLIT_RE = re.compile(
+    r"\s+and\s+(?=(?:who|whom|whose|what|which|when|where|why|how)\b)",
+    re.IGNORECASE)
 _YES_NO_QUESTION_RE = re.compile(
     r"^(?:(?:okay|ok|sure|great|and|so|well)[, ]+)*(?:(?:am|is|are|was|were|"
     r"do|does|did|has|have|had|can|could|will|would|shall|should|may|might)"
@@ -1330,11 +1334,161 @@ def _present_direct_search_matches(
     return turn
 
 
+def _compound_wh_parts(text: str) -> list[str] | None:
+    clauses = [part.strip().rstrip("?.! ")
+               for part in _COMPOUND_WH_SPLIT_RE.split(text.strip())]
+    if (2 <= len(clauses) <= 3
+            and all(_WH_QUESTION_RE.match(part) for part in clauses)):
+        return clauses
+    return None
+
+
+def _answer_compound_wh(dialogue: CRMSDialogue, original_text: str,
+                        clauses: list[str], research_index: Any
+                        ) -> DialogueTurn:
+    local_entities = dialogue._question_entity_phrases(original_text)
+    has_referential_pronoun = bool(re.search(
+        r"\b(?:it|he|she|they|him|her|them|this|that)\b",
+        original_text, flags=re.IGNORECASE))
+    if len(local_entities) > 1 and has_referential_pronoun:
+        names = ", ".join(local_entities)
+        clarification = (
+            "This compound question names multiple possible entities for "
+            f"its pronoun ({names}); please restate the intended entity before "
+            "I answer its parts.")
+        return DialogueTurn(
+            "unknown", original_text, original_text,
+            response=QuestionResult("unknown", request=clarification),
+            text=clarification)
+
+    clause_turns = [dialogue.turn(clause.rstrip("?.! ") + "?",
+                                  research_index=research_index)
+                    for clause in clauses]
+    part_evidence = []
+    part_lines = []
+    all_parts_supported = True
+    for clause, clause_turn in zip(clauses, clause_turns):
+        research = clause_turn.research
+        source = (research.source_sentences[0]
+                  if research is not None and research.source_sentences else None)
+        citation = source.get("citation") if source else None
+        sentence = source.get("text") if source else None
+        title = source.get("title", "source") if source else "source"
+        exact = None
+        if isinstance(citation, str) and isinstance(sentence, str):
+            try:
+                exact = research_index.resolve_citation(citation)
+            except (AttributeError, KeyError, TypeError, ValueError):
+                exact = None
+        if (clause_turn.status not in {"sources_found", "needs_review"}
+                or exact != sentence):
+            all_parts_supported = False
+            part_lines.append(f"- I could not find source evidence for: {clause}.")
+            continue
+        record = {"clause": clause, "text": exact, "citation": citation,
+                  "title": title, "document_id": source.get("document_id"),
+                  "location": source.get("location")}
+        part_evidence.append(record)
+        part_lines.append(
+            f"- {clause}: {exact} [Source: {title}; "
+            "quoted evidence, not an accepted fact]")
+    if all_parts_supported:
+        status = "sources_found"
+        text = "\n".join([
+            "Source evidence for each part:", *part_lines,
+            "These are quoted source sentences, not accepted facts.",
+        ])
+    else:
+        status = "unknown"
+        text = "\n".join([
+            "I found only partial evidence for this compound question:",
+            *part_lines,
+            "I can't answer every part from the available sources.",
+        ])
+    response = QuestionResult(
+        "unknown", request=("Compound source answers remain quoted evidence "
+                            "and are not accepted facts."))
+    research = ResearchResult(
+        status="sources_found" if part_evidence else "unknown",
+        response=response, source_sentences=part_evidence,
+        query=original_text)
+    turn = DialogueTurn(
+        status, original_text,
+        " and ".join(item.resolved_question for item in clause_turns),
+        response=response, research=research, text=text)
+    if part_evidence:
+        dialogue.last_question = None
+        dialogue.last_answered = None
+        dialogue.presented_sources = [
+            {"citation": item["citation"], "title": item["title"]}
+            for item in part_evidence]
+        explicit = dialogue._question_entity_mentions(
+            original_text, part_evidence, research_index)
+        mentions = dialogue._source_entity_mentions(part_evidence)
+        dialogue.source_mentions = mentions
+        dialogue.topic_entity = (
+            explicit[0]["entity"] if len(explicit) == 1 else
+            mentions[0]["entity"] if len(mentions) == 1 else None)
+        dialogue.last_compound_evidence = {
+            "question": original_text, "parts": part_evidence,
+            "missing_clauses": [
+                clause for clause in clauses
+                if clause not in {item["clause"] for item in part_evidence}],
+            "complete": all_parts_supported,
+        }
+    return turn
+
+
+def _explain_compound_sources(dialogue: CRMSDialogue, text: str,
+                              research_index: Any) -> DialogueTurn | None:
+    stored = dialogue.last_compound_evidence
+    if stored is None:
+        return None
+    validated_parts = []
+    for item in stored.get("parts", []):
+        citation = item.get("citation")
+        expected = item.get("text")
+        if not isinstance(citation, str) or not isinstance(expected, str):
+            continue
+        try:
+            exact = research_index.resolve_citation(citation)
+        except (AttributeError, KeyError, TypeError, ValueError):
+            continue
+        if exact == expected:
+            validated_parts.append({**item, "text": exact})
+    if len(validated_parts) != len(stored.get("parts", [])):
+        return DialogueTurn(
+            "unknown", text, stored["question"],
+            text="I can no longer revalidate every source sentence for that answer.")
+    complete = bool(stored.get("complete", True))
+    lines = [
+        (f"Evidence for each part of ‘{stored['question']}’:" if complete else
+         f"Evidence found for supported parts of ‘{stored['question']}’:")]
+    for item in validated_parts:
+        lines.append(
+            f"- {item['clause']}: {item['text']} "
+            f"[Source: {item['title']}; citation: {item['citation']}]")
+    for clause in stored.get("missing_clauses", []):
+        lines.append(f"- No source evidence was found for: {clause}.")
+    response = QuestionResult(
+        "unknown", request=("These are exact quoted source sentences; they "
+                            "have not been promoted to accepted facts."))
+    research = ResearchResult(
+        status="sources_found", response=response,
+        source_sentences=validated_parts, query=stored["question"])
+    return DialogueTurn("sources_found" if complete else "unknown",
+                        text, stored["question"],
+                        response=response, research=research,
+                        text="\n".join(lines))
+
+
 def respond(dialogue: CRMSDialogue, text: str, *,
             research_index: Any | None = None,
             pending_claims: int = 0) -> DialogueTurn:
     """Handle dialogue acts and route embedded WH requests to question handling."""
     original_text = text
+    if _EXPLANATION_FOLLOWUP_RE.fullmatch(text.strip()) is None:
+        dialogue.last_compound_evidence = None
     if (dialogue.last_question and dialogue.topic_entity
             and _COORDINATED_QUESTION_PREFIX_RE.match(text)):
         # Treat "and when ...?" as a continuation of the current grounded
@@ -1419,6 +1573,20 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         dialogue.record_turn(original_text, history_act, turn, intent)
         _offer(dialogue, turn)
         return turn
+
+    if (act is None and _EXPLANATION_FOLLOWUP_RE.fullmatch(text.strip())
+            and dialogue.last_compound_evidence is not None
+            and research_index is not None):
+        explanation = _explain_compound_sources(
+            dialogue, text, research_index)
+        if explanation is not None:
+            return with_intent(explanation)
+
+    if act is None and research_index is not None:
+        clauses = _compound_wh_parts(text)
+        if clauses:
+            return with_intent(_answer_compound_wh(
+                dialogue, original_text, clauses, research_index))
 
     def reservation_draft_prompt(utterance: str) -> DialogueTurn:
         missing_slot = next((slot for slot in _RESERVATION_DRAFT_SLOT_ORDER

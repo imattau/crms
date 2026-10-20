@@ -508,6 +508,14 @@ regressions, not dialogue transfer: questions whose clauses need separate
 source sentences and lexical paraphrases such as “constructed” for “built”
 remain open.
 
+`v1_495` now covers the separate-sentence case for two or three WH clauses
+joined by “and”. It returns exact source quotations per clause, revalidates
+both on `why?`, abstains when any requested part lacks evidence, and rejects
+pronoun-ambiguous compound requests before decomposition. This closes one
+runtime gap, but remains a bounded parser over authored fixtures rather than
+general multi-part understanding; evaluate independently authored compounds
+and varied source layouts before widening the parser.
+
 **Gate:** unseen conversations complete more tasks than the baseline without
 more confident errors; ambiguous or unsupported turns recover through a
 focused question or honest abstention. If learned moves do not improve the
