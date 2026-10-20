@@ -3244,26 +3244,29 @@ and derived-reasoning controls, and seven dialogue/pending-review regressions
 
 Report: [experiment](../experiments/v1_491_one_turn_reasoning_filter_recombination.py).
 
-## Request-frame transfer for proof-filter composition (`v1_492`, 2026-10-20)
+## Learned sequence recombination through proof-filter chat (`v1_492`, 2026-10-20)
 
 `experiments/v1_492_reasoned_filter_language_coverage.py` tests three ordinary
 request frames over the same proof-checked task: “Filter … to values …; then
 …”, “Given …, keep the values …, and then …”, and “From […], return the values
 …, then …”. It also varies the procedure connective from `then` to `and then`.
-All four requests completed through a fresh chat process and returned the same
-`[9, 4, 12]` result, preserving three verified positive proofs and excluding
-the explicit negative value. An unlicensed operation paraphrase (`deduplicate`)
-and an unlicensed relation wording (`Nia can reach`) remain unsupported in the
-direct composition API. The existing `v1_491` controls still pass, including
-unknown and conflicting values, so this parser broadening did not bypass the
-proof gates in these cases.
+The procedure learner now learns the primitive operations and two different
+ordered examples (`sort then reverse` and `reverse then sort`); it is not taught
+the target `remove duplicate values then reverse the list` sequence. All four
+requests completed through a fresh chat process and returned the same
+`[9, 4, 12]` result, preserving three verified positive proofs, the primitive
+and connective evidence, and exclusion of the explicit negative value. An
+unknown value also blocks the whole result through chat; unknown and
+positive/negative-conflicting values block it through the direct composition
+API. An unlicensed operation paraphrase (`deduplicate`) and relation wording
+(`Nia can reach`) remain unsupported.
 
-This is a narrow syntactic request-frame transfer result, not evidence of
-general paraphrase understanding: relation and learned operation phrases are
-still the exact licensed forms. The test fixtures, relation graph, procedure
-examples, and test author are not independent or held out. The next evaluation
-should freeze new user-written task forms and independently reviewed
-components, then test varied operation order and more than one composition
-shape through chat.
+This is a narrow recombination result with syntax variation, not evidence of
+general paraphrase understanding: relation and primitive operation phrases
+are still the exact licensed forms, and the connective evidence is
+Codex-labeled. The test fixtures, relation graph, procedure examples, and test
+author are not independent or held out. The next evaluation should freeze new
+user-written task forms and independently reviewed components, then test
+varied operation order and more than one composition shape through chat.
 
 Report: [experiment](../experiments/v1_492_reasoned_filter_language_coverage.py).

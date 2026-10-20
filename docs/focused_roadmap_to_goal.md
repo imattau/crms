@@ -458,12 +458,14 @@ explicit negatives, conflicts, cycles/integrity violations, unsupported
 operations, and search limits. Run through ordinary chat, a new process, and
 the copied model once its serialization path is exercised.
 
-The first syntax-only step is now measured in `v1_492`: three request frames
-complete through fresh-process chat while preserving the existing proof gates.
-The relation and operation phrases remain exact, and all fixtures are
-Codex-authored, so this is not semantic paraphrase transfer. Continue from
-these controls with frozen, independently reviewed tasks rather than treating
-the parser variants as a completed recombination milestone.
+The first integrated transfer step is now measured in `v1_492`: four request
+surfaces complete through fresh-process chat, and the target operation order
+is recombined from separately learned primitives and two other ordered
+examples rather than taught directly. Proof gates and evidence lineage remain
+intact. Relations and primitive operation phrases remain exact, and connective
+labels and fixtures are Codex-supplied, so this is not independent semantic
+transfer. Continue with frozen, independently reviewed tasks rather than
+treating these controls as a completed recombination milestone.
 
 **Gate:** frozen held-out requests complete through chat; an independent
 checker accepts valid outputs and rejects tampered or invalid ones; unknown,
