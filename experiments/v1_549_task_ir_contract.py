@@ -169,6 +169,11 @@ def main() -> None:
         "requires at least one reason", "a failure without a reason was accepted")
 
     expect_error(lambda: PlanResult(
+        status="execution_failed", plan=plan).validate(),
+        "requires at least one reason",
+        "an execution failure without a reason was accepted")
+
+    expect_error(lambda: PlanResult(
         status="unsupported",
         steps=(StepResult("filter", "ok", output=[]),),
     ).validate(), "cannot carry executed steps", "unsupported carried steps")

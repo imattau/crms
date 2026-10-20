@@ -1,7 +1,8 @@
 # Design: typed task and plan IR
 
 **Status:** proposed contract; `crms_tasks.py` implements the data and
-invariants. Planning and action adapters are not implemented yet.
+invariants. `crms_planner.py` implements the action contract and a deterministic
+executor. Goal planning and production action adapters are not implemented yet.
 **Date:** 2026-10-21
 
 ## Why
@@ -53,8 +54,8 @@ class Action(Protocol):
     name: str
     def can_apply(self, inputs: Mapping[str, Any], context: ActionContext) -> bool: ...
     def apply(self, inputs: Mapping[str, Any], context: ActionContext) -> StepResult: ...
-    def verify(self, step: Step, result: StepResult,
-               context: ActionContext) -> Verification: ...
+    def verify(self, step: Step, inputs: Mapping[str, Any],
+               result: StepResult, context: ActionContext) -> Verification: ...
 ```
 
 Rules:
@@ -79,6 +80,26 @@ Initial adapters, in order:
 6. `generate-code` — learned procedure → standalone Python.
 7. `retrieve-source` — cited passage retrieval.
 8. `write-grounded` — stored facts plus licensed sentence frames.
+
+## Executor
+
+`crms_planner.py` implements:
+
+- `ActionRegistry` — named, typed actions; duplicate names rejected.
+- `FunctionAction` — adapt a handler plus an independent verifier. A missing
+  verifier fails the step; self-verification must be requested explicitly and
+  is only appropriate for test fixtures.
+- `ExecutionContext` — bounded data passed to actions and verifiers.
+- `PlanExecutor` — resolves `STEP.output` references (including inside lists
+  and dictionaries), runs steps in order, validates every `StepResult`,
+  independently verifies each step, and stops at the first failure. It runs the
+  optional plan-level verifier only after every step passes.
+- Statuses: `execution_failed` for action/precondition/reference problems,
+  `verification_failed` for a rejected step or plan check, and `ok` only when
+  every planned step and the plan check pass.
+
+The executor never catches programming errors from an action; it converts only
+explicit `ExecutionError` failures into a refused result.
 
 ## Planner
 

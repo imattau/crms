@@ -29,6 +29,7 @@ CHECK_KINDS = frozenset({
 })
 RESULT_STATUSES = frozenset({
     "ok", "not_planned", "unsupported", "ambiguous", "verification_failed",
+    "execution_failed",
 })
 STEP_STATUSES = frozenset({"ok", "failed", "skipped"})
 
@@ -388,10 +389,10 @@ class PlanResult:
             if completed != planned:
                 raise TaskIRError(
                     "an ok result requires every planned step to complete")
-        elif self.status == "verification_failed":
+        elif self.status in {"verification_failed", "execution_failed"}:
             if not self.failures:
                 raise TaskIRError(
-                    "a verification failure requires at least one reason")
+                    f"a {self.status.replace('_', ' ')} requires at least one reason")
         elif self.steps:
             raise TaskIRError(
                 f"a {self.status!r} result cannot carry executed steps")
