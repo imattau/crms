@@ -1,6 +1,6 @@
 # Focused plan from current CRMS to its goal
 
-**Reviewed:** 2026-10-20 (current runtime evidence through `v1_539`; recent
+**Reviewed:** 2026-10-20 (current runtime evidence through `v1_540`; recent
 dialogue-context commits through `d1576a0`)
 **Status:** active plan; broad capability is not yet demonstrated.
 
@@ -32,6 +32,15 @@ wrong-predicate, polarity, example, and conflicting-agent controls. This
 improves one user-facing path but does not change the main assessment: broad
 held-out recombination and reasoning through normal chat remain the next
 capability gate.
+
+The isolated `v1_540` recheck exercised 1,200 documents and 7,200 sentences.
+All 30 canonical questions found their expected text, and the copied SQLite
+model retained all documents. Separately labeled outcomes matched 8/14
+wording probes: four received source-backed answers, three received related
+evidence only, and seven abstained. Six answer-expected cases remain
+incomplete. This is a synthetic scale stress test, not a representative
+language-transfer score; it gives the next baseline concrete wording failures
+instead of treating lexical overlap as task success.
 
 The central gap is transfer through the complete user path. Most positive
 results still use small or synthetic fixtures, prepared labels, hand-mapped

@@ -140,7 +140,11 @@ def main() -> None:
             gap_queries[4]: "Researcher 0133 designed the Vela instrument 0133.",
             gap_queries[5]: "Researcher 0133 designed the Vela instrument 0133.",
             gap_queries[6]: "The Serein River 0133 flows through Nacre City 0133.",
-            gap_queries[7]: "The Serein River 0133 flows through Nacre City 0133.",
+            # This query asks for the subject of the passive ``is crossed by``
+            # clause, not for the separate ``flows through`` sentence in the
+            # same record. Score the answer realization entailed by that
+            # clause rather than requiring an unrelated source sentence.
+            gap_queries[7]: "Serein River 0133 crosses Nacre City 0133.",
             gap_queries[8]: "The Serein River 0133 flows through Nacre City 0133.",
             gap_queries[9]: "Researchers at the Meridian Institute 0266 studied quartz field 0266.",
             gap_queries[10]: "Researchers at the Meridian Institute 0266 studied quartz field 0266.",
@@ -154,6 +158,25 @@ def main() -> None:
         expected_probe_hits[gap_queries[5]] = False
         expected_probe_hits[gap_queries[12]] = False
         expected_probe_hits[gap_queries[13]] = False
+        # Text overlap is only a retrieval diagnostic. These authored task
+        # outcomes distinguish a real answer from a relevant sentence shown
+        # with an explicit limitation, and from a correct abstention.
+        expected_probe_outcomes = {
+            gap_queries[0]: "answer",
+            gap_queries[1]: "answer",
+            gap_queries[2]: "related_evidence_only",
+            gap_queries[3]: "answer",
+            gap_queries[4]: "answer",
+            gap_queries[5]: "abstain",
+            gap_queries[6]: "answer",
+            gap_queries[7]: "answer",
+            gap_queries[8]: "answer",
+            gap_queries[9]: "answer",
+            gap_queries[10]: "answer",
+            gap_queries[11]: "answer",
+            gap_queries[12]: "abstain",
+            gap_queries[13]: "abstain",
+        }
         turns.extend(gap_queries)
         unknown_queries = [
             "Who invented the Zorblax engine?",
@@ -262,6 +285,7 @@ def main() -> None:
                 }
                 for question in gap_queries
             },
+            "natural_language_task_outcomes": {},
             "unknown_query_examples": unknown_queries,
             "unknown_reply_classifications": {
                 question: classify_unknown_reply(response_by_turn[question])
@@ -277,6 +301,47 @@ def main() -> None:
                 for question in gap_queries
             },
         }
+        for question in gap_queries:
+            response = response_by_turn[question]
+            lowered = response.casefold()
+            target_found = (natural_language_targets[question]
+                            in response)
+            if any(marker in lowered for marker in (
+                    "does not establish the requested relation",
+                    "does not support a grounded answer",
+                    "closest source sentence:",
+                    "closest related source says:")):
+                observed = "related_evidence_only"
+            elif any(marker in lowered for marker in (
+                    "i couldn't find", "i can't answer", "i won't guess")):
+                observed = "abstain"
+            elif target_found:
+                observed = ("source_answer" if any(marker in lowered for marker in (
+                    "quoted evidence", "awaiting review", "not yet an accepted fact"))
+                    else "answer")
+            else:
+                observed = "other"
+            expected_outcome = expected_probe_outcomes[question]
+            accepted_observations = {
+                "answer": {"answer", "source_answer"},
+                "related_evidence_only": {"related_evidence_only"},
+                "abstain": {"abstain"},
+            }[expected_outcome]
+            report["natural_language_task_outcomes"][question] = {
+                "expected": expected_outcome,
+                "observed": observed,
+                "pass": observed in accepted_observations,
+            }
+        report["task_outcome_counts"] = {
+            outcome: sum(
+                item["observed"] == outcome
+                for item in report["natural_language_task_outcomes"].values())
+            for outcome in ("answer", "source_answer",
+                            "related_evidence_only", "abstain", "other")
+        }
+        report["task_outcome_pass_count"] = sum(
+            item["pass"]
+            for item in report["natural_language_task_outcomes"].values())
         classification_counts: dict[str, int] = {}
         for classification in report["unknown_reply_classifications"].values():
             classification_counts[classification] = (

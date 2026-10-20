@@ -1,5 +1,37 @@
 # Language and recombination benchmark baselines
 
+## Large-corpus chat recheck with task outcomes (`v1_540`, 2026-10-20)
+
+Command: `python3 experiments/v1_540_large_corpus_chat_recheck.py`.
+
+The current chat was driven against 1,200 generated documents (7,200
+sentences). It found the expected text for all 30 canonical queries and
+returned the active, cited answer to the passive subject-gap question from
+`v1_539`. The same corpus and fresh CLI path were copied into a portable model
+and all 1,200 documents remained searchable. Two unsupported questions and
+three explicit negative-relation controls abstained.
+
+Task outcomes were also labeled separately from text overlap. Of 14 wording
+probes, 4 received a source-backed answer, 3 produced only related evidence,
+and 7 abstained. The expected outcomes were: 10 answers, 1 deliberately
+related-evidence-only response, and 3 abstentions; 8/14 outcome categories
+matched. Thus the `6/11` expected-text hits are not an answer-accuracy score.
+Two clear answer gaps are “Where does the Serein River 0133 run?” and “What
+did the Meridian Institute 0266 investigate?”: both surfaced relevant text
+but did not answer. Four further positive probes abstained on wording or type
+transfer: “Which stream passes through …?”, “Which waterway runs through
+…?”, “Who was responsible for designing …?”, and “Who is credited with
+designing …?”. “Who created …?” remains a correct abstention because its
+source only states “designed.”
+
+This is a deterministic synthetic scale stress test with a small set of
+Codex-authored outcomes, not a representative user study or independent
+language-transfer benchmark. Its outcome labels are one-rater judgments. The
+held-out source/rule/procedure transfer gate remains open. The isolated report
+and runner are [report](../experiments/reports/v1_540_large_corpus_chat_recheck.json)
+and [runner](../experiments/v1_540_large_corpus_chat_recheck.py); the modified
+legacy audit report was not overwritten.
+
 ## Subject-gap realization from explicit active/passive clauses (`v1_539`, 2026-10-20)
 
 Command: `python3 experiments/v1_539_natural_subject_gap_realization.py`.
