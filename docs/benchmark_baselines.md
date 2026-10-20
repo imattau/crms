@@ -2761,16 +2761,22 @@ index. The candidate remains inert before acceptance. CRMS revalidates the
 field and prose citations, learns the question frame from five pages, validates
 it on one held-out page, saves the accepted facts and frame to SQLite, reloads
 them, and answers through a fresh `crms_chat.py` process with a resolvable
-source. The unsupported “largest city of” wording remains unknown. The
-experiment passed in 0.49 seconds under the isolated runner.
+source. It then exports those learned facts and all six source pages into a
+single portable SQLite model, copies that model into a clean directory,
+removes the temporary source index and separate memories, and answers again
+using only `--model-db`. The embedded source citation still resolves. The
+unsupported “largest city of” wording remains unknown. The expanded experiment
+passed in 0.91 seconds under the isolated runner.
 
 This closes one real-source integration seam from candidate review through
-ordinary chat and persistence. It does not clear the source-learning gate:
-the field-to-relation mapping and question construction are hand-coded, the
-Codex review is unblinded, and all pages come from SimpleWiki. It also does not
-demonstrate publisher transfer or autonomous rule induction. Keep the
-existing synthetic `v1_338` path as a regression; use `v1_469` as the real-page
-vertical slice, not as a precision estimate.
+ordinary chat, persistence, and re-integration into a copied distributable
+model. It does not clear the source-learning gate: the field-to-relation
+mapping and question construction are hand-coded, the Codex review is
+unblinded, and all pages come from SimpleWiki. It also does not validate
+general correction/retraining or dialogue-state migration, demonstrate
+publisher transfer, or establish autonomous rule induction. Keep the existing
+synthetic `v1_338` path as a regression; use `v1_469` as one real-page
+distribution slice, not as a full model lifecycle result.
 
 ## Unsupported dialogue topic switch and `why?` (`v1_465`, 2026-10-20)
 

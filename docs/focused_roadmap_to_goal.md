@@ -62,12 +62,15 @@ blindly on publisher-disjoint sources. See the [follow-up report](../experiments
 
 `v1_469` now carries the reviewed `capital city of` candidate from actual
 SimpleWiki pages through explicit acceptance, a five-page training/one-page
-holdout check, SQLite reload, and fresh-process cited chat; an unsupported
-relation wording remains unknown. This is stronger end-to-end source evidence
-than the synthetic `v1_338` fixture, but it still uses the hand-coded capital
-field map, Codex review, and one encyclopedia. It does not clear the
-publisher-transfer or autonomous-learning gate. Keep it as an integration
-control while developing and measuring a frozen candidate method.
+holdout check, SQLite persistence, and fresh-process cited chat. It then
+exports the learned knowledge and source text to a single SQLite model, copies
+the model to a clean directory, removes the temporary source/memory files, and
+answers using the copied model alone. Unsupported relation wording stays
+unknown. This is a real-source distribution slice, but it still uses the
+hand-coded capital field map, Codex review, and one encyclopedia. It does not
+clear the publisher-transfer or autonomous-learning gate, nor validate the
+complete correction and dialogue lifecycle. Keep it as an integration control
+while developing and measuring a frozen candidate method.
 
 | Order | Work packet | Immediate outcome | Do not claim yet |
 |---|---|---|---|

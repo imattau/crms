@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -24,6 +25,12 @@ PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
 from crms_knowledge import CRMSKnowledgeBase  # noqa: E402
+from crms_model import CRMSModel  # noqa: E402
+from crms_package import (  # noqa: E402
+    export_model_database,
+    inspect_model_database,
+    model_database_research_stats,
+)
 from crms_research import CRMSSQLiteResearchIndex  # noqa: E402
 
 SOURCE_INDEX = PROJECT / "data" / "crms_simplewiki_research.sqlite"
@@ -157,10 +164,53 @@ def main() -> None:
                 f"fresh chat did not answer with cited knowledge:\n{process.stdout}")
         index.close()
 
+        # Reintegrate the reviewed new knowledge and the source text into a
+        # single distributable model, then query only a copied model file.
+        # The temporary source and memory files are removed before the clean
+        # process starts; the project-wide source database is never modified.
+        rules_path = root / "rules.sqlite"
+        CRMSModel().save(rules_path)
+        portable = root / "portable.sqlite"
+        export_model_database(
+            portable, knowledge=knowledge_path, rules=rules_path,
+            research_index=subset_path)
+        memories = inspect_model_database(portable)
+        require({"knowledge", "rules"} <= memories.keys(),
+                f"portable model omitted learned memories: {memories}")
+        corpus_stats = model_database_research_stats(portable)
+        require(corpus_stats is not None and corpus_stats["documents"] == 6,
+                f"portable model did not embed the source documents: {corpus_stats}")
+
+        clean_dir = root / "clean"
+        clean_dir.mkdir()
+        clean_model = clean_dir / "model.sqlite"
+        shutil.copy2(portable, clean_model)
+        for external_path in (subset_path, knowledge_path, rules_path):
+            external_path.unlink()
+        clean_chat = subprocess.run(
+            [sys.executable, str(PROJECT / "crms_chat.py"),
+             "--model-db", str(clean_model),
+             "--dialogue-state", str(clean_dir / "dialogue.json"),
+             "--candidate-session", str(clean_dir / "candidates.json"),
+             "--rule-session", str(clean_dir / "rule-session.json"),
+             "--math-session", str(clean_dir / "math-session.json"),
+             "--translation-session", str(clean_dir / "translation-session.json")],
+            input=held_question + "\n/quit\n", text=True,
+            capture_output=True, cwd=clean_dir, timeout=60,
+            env=os.environ.copy(), check=False)
+        require(clean_chat.returncode == 0,
+                f"copied SQLite model chat failed: {clean_chat.stderr}\n"
+                f"{clean_chat.stdout}")
+        require(validation["answer"] in clean_chat.stdout
+                and "Source:" in clean_chat.stdout,
+                "copied SQLite model could not answer with its embedded source: "
+                f"{clean_chat.stdout}")
+
     print("PASS: real source candidates remain inert before explicit review")
     print(f"PASS: reviewed capital wording learned from {len(proposal['training_support'])} pages")
     print(f"PASS: held-out question passed on {len(validation['checks'])} page(s)")
     print("PASS: SQLite reload and fresh chat preserve answer and citation")
+    print("PASS: copied single-file model retains learned facts and source text")
     print("PASS: unsupported relation wording remains unknown")
     print("LIMIT: one SimpleWiki relation, hand-coded field map, Codex review")
 
