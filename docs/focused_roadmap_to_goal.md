@@ -58,6 +58,14 @@ The project is still pointed at the right goal. The architecture has meaningful 
 
 The gap is integration and generalization. Most strong results are bounded experiments on authored or controlled examples. They do not yet demonstrate broad task coverage, robust dialogue, autonomous rule learning from source material, or a distributable model that can learn and operate without the original files. The report on commit `043093f` found a wrong Eiffel Tower referent after a Colosseum topic switch and source-only context loss. Current-checkout replays (`v1_413`, `v1_419`, `v1_426`, and `v1_427`) now keep the cited completion answer on the Colosseum, preserve the latest evidence for `why?`, retain named source-only follow-ups, and resolve France → “and Italy?” to Italy's capital. `v1_449` closes a further integration gap: a pronoun-led date passes the final chat evidence gate only when the exact cited paragraph names the current topic before the pronoun; a pronoun-only paragraph abstains. An added interruption sequence in `v1_442` reports 32/32 supported evidence steps, no wrong answers, and 8/8 abstentions after an unsupported question, with follow-up context preserved. These are regression fixtures, not independent evidence of general dialogue reliability; held-out variation remains untested. Procedure composition has useful source-document holdout slices, while instruction alignment and connective evidence still depend on teacher-authored labels. Verified graph reasoning is stronger than its natural-language routing and breadth of rule coverage.
 
+A four-conversation Taskmaster-1 test slice, disjoint from the labeled dev
+conversations and earlier twelve test conversations, now gives a transfer
+warning: the current transcript-context intent replay matched both
+Codex-primary labels on 12/46 turns (26.1%), versus 64/131 (48.9%) on dev.
+All 46 source spans verified, but labels are single-annotator and do not
+measure task completion. Treat the dialogue-transfer gate as unmet; keep this
+slice frozen and develop against disjoint conversations.
+
 This is **on track architecturally, not yet on track to claim the capability goal**. The priority is to turn the strongest components into one measured, reproducible chat-level capability, then widen coverage without hiding abstentions or errors.
 
 The latest selected runtime replay on `edb2893` passed 10/10 diagnostics across

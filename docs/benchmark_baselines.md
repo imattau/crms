@@ -2607,6 +2607,36 @@ conversation-held-out transcripts and report unsafe intent selections and
 task completion separately from label coverage. Preserve the label source and
 the small single-domain scope in any later comparison.
 
+## Untouched Taskmaster test conversations (2026-10-20)
+
+To check whether the development replay transfers, the current classifier was
+also evaluated on the four-conversation
+`movie_test_untouched4_codex_primary.csv` slice from the Taskmaster-1 test
+split. Its 46 utterance citations were checked against source-file SHA-256
+digests and exact character spans (46/46 valid). Conversation IDs are disjoint
+from the ten labeled development conversations and the earlier twelve test
+conversations in the local pilot. The slice was selected and labeled by Codex;
+it has not had an independent human review, and the result is a small
+single-domain diagnostic rather than a reliable accuracy estimate.
+
+Using the same transcript-context replay, CRMS emitted 26/46 intent
+hypotheses (56.5% coverage), selected 22, marked four ambiguous, and abstained
+on 20. It matched both dialogue-act and task-intent labels on 12/46 turns
+(26.1% of all labeled turns; 12/26, 46.2% of hypotheses). The context-free
+baseline emitted 17 hypotheses (37.0%) and matched 6/46 (13.0%). Thus context
+raises coverage and agreement over this baseline, but the lower joint match
+rate than the ten-conversation development diagnostic (64/131, 48.9%) means
+the transfer gate is not met. The four conversations are too few to support a
+generalization claim.
+
+Observed disagreements include answers to assistant prompts being assigned
+the wrong move/intent, “Yes” answers needing an active confirmation or choice,
+availability questions collapsing into generic information seeking, and
+polite follow-up requests classified as actions rather than questions. Since
+this is the test slice, do not tune against these individual rows and then
+reuse its score. Develop any representation changes on disjoint training or
+development conversations, then evaluate them on a newly reserved sample.
+
 `python3 experiments/v1_338_structured_field_predicate_learning.py` passed all
 checks: the proposal remained inert before review, six training pages licensed
 two held-out question forms, cited evidence survived SQLite reload, stale
