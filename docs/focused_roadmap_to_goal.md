@@ -531,6 +531,17 @@ value changes, filtering, and endpoint selection distinct. This is a bounded
 exhaustive check over the stated finite domain, not a proof for all integer
 lists. Keep it as a permanent control when changing the procedure grammar.
 
+`v1_509` returns to the frozen list-first sum wording. The request remains
+unsupported until “add together only the numbers” is taught from labeled
+input/output examples. The generic composer then applies that learned
+operation phrase to proof-selected values for both the original Mira case and
+a new Tavi/value set through copied-model chat; an unknown list member still
+blocks the aggregate, and an independent arithmetic check agrees. This shows
+supervised phrase learning recombining with a new entity and request ordering
+without a phrase-specific parser rule. The labels are Codex-supplied and the
+task is still finite-list summation; it does not show autonomous synonym
+discovery or broader word-problem learning.
+
 The immediate bottleneck is therefore no longer “can the components compose in
 a fixture?” It is whether a fresh user request can cause CRMS to select and
 compose the right components, complete the whole task, and survive independent
