@@ -445,6 +445,16 @@ regression already fixed in the current tree should not trigger duplicate code.
 | 5 | Use the common scorecard to select one bounded task each in coding, math, translation, and creative work, after steps 1–3 establish a stable chat and recombination baseline. | For each selected task: held-out prompts, a validator independent of generation, ordinary-chat and repair results, and a portability check. | Each task shows useful completion, valid outputs, honest limits, and repair on unseen examples before scope expands. |
 | 6 | Exercise the SQLite model as the complete distributable runtime after the preceding learning paths stabilize. | A clean copied model with source files unavailable, replaying query, learn, compose, reason, explain, correct, save/reload, and the shared scorecard. | Behavior, provenance, searchable source text, and correction lineage survive from the copy alone; size and compatibility are documented. |
 
+**Current checkpoint (2026-10-20):** the fixed multi-turn regression packet
+passes 8/8, including the reported topic switch, source-only continuity,
+history, ordinal selection, and follow-ups after abstention. These are targeted
+controls, not independently authored transfer evidence. The latest recombination
+slice now passes seven requests across four bounded frames, including an
+“after removing” construction. It converts that gerund only when the existing
+procedure learner accepts the resulting taught operation sequence, and shows
+the mapping in the answer. This improves one compositional language seam; broad
+paraphrase, task planning, and transfer remain unproven.
+
 Dialogue intent and multi-turn safety are evaluated in every chat-facing step,
 not deferred to step 5. Research into induced dialogue moves may proceed
 alongside the baseline, but it advances only if it improves held-out task

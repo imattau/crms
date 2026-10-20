@@ -162,6 +162,11 @@ def main() -> None:
         # [9, 12, 4]. Deduplicating first would instead yield [9, 4, 12].
         ("Filter 12, 4, 12, 9, and 7 to values Nia reaches; then reverse the "
          "list then remove duplicate values.", (9, 12, 4)),
+        # A second natural request frame states the reverse order as "A after
+        # B". The interleaved duplicate distinguishes that order from reversing
+        # before deduplication.
+        ("Please filter [12, 4, 12, 9, 7] to the values Nia reaches, then "
+         "reverse the list after removing duplicate values.", (9, 4, 12)),
         ("Filter 12, 4, 4, 9, and 7 to values Nia can reach; then remove "
          "duplicate values then reverse the list.", (9, 4, 12)),
     )
@@ -181,6 +186,11 @@ def main() -> None:
                             for record in result.procedure_records},
                 f"ordinary request frame did not preserve verified composition: "
                 f"{request!r}: {result}")
+        if "after removing duplicate values" in request:
+            require("removing → remove" in result.text
+                    and "remove duplicate values then reverse the list"
+                        in result.text,
+                    f"grammatical normalization was not disclosed: {result.text}")
         if "can reach" in request:
             require(result.subject == "Nia"
                     and len(result.language_evidence) == 1
@@ -203,6 +213,13 @@ def main() -> None:
             and unlicensed_operation.status == "unsupported_procedure"
             and not unlicensed_operation.output_values,
             f"unlicensed operation paraphrase was executed: {unlicensed_operation}")
+    unlicensed_gerund_object = compose_verified_filter(
+        "Please filter [12, 4, 4, 9, 7] to the values Nia reaches, then "
+        "reverse the list after removing duplicates.", knowledge, procedures)
+    require(unlicensed_gerund_object is not None
+            and unlicensed_gerund_object.status == "unsupported_procedure"
+            and not unlicensed_gerund_object.output_values,
+            "gerund normalization also invented an unlicensed object synonym")
     unlicensed_relation = compose_verified_filter(
         "From [12, 4, 4, 9, 7], return the values Nia can get to, then remove "
         "duplicate values then reverse the list.", knowledge, procedures)
@@ -264,11 +281,12 @@ def main() -> None:
                         for _request, expected in cases)
                 and "Taught relation wording: 'can reach' → 'reaches'" in output
                 and "The relation wording 'can reach' was matched to 'reaches'" in output
+                and "Recognized the grammatical form 'removing → remove'" in output
                 and all(source in output for source in alias_sources)
                 and "I can't determine whether 8 satisfy Nia reaches" in output,
                 f"fresh-process chat did not answer all licensed variants:\n{output}")
 
-    print("four request frames across six cases, including learned relation")
+    print("four request frames across seven cases, including learned relation")
     print("wording and an order-sensitive duplicate case: PASS")
     print("target operation orders were not directly taught; component and")
     print("connective evidence retained: PASS")

@@ -40,6 +40,11 @@ _REQUESTS = (
         r"(?:the\s+)?values\s+(?:that\s+|which\s+)?"
         r"(?P<claim>.+?),\s*then\s+"
         r"(?P<procedure>.+?)\s*[.!?]*\s*$", re.IGNORECASE),
+    re.compile(
+        rf"^\s*(?:Please\s+)?Filter\s+\[(?P<values>{_INTEGER_LIST})\]"
+        r"\s+to\s+(?:the\s+)?values\s+(?:that\s+|which\s+)?"
+        r"(?P<claim>.+?),\s*(?:and\s+)?then\s+"
+        r"(?P<procedure>.+?)\s*[.!?]*\s*$", re.IGNORECASE),
 )
 
 
@@ -53,6 +58,53 @@ def _normalize_procedure_sequence(instruction: str) -> str:
         # 'A after B' explicitly orders B before A.
         text = f"{after.group(2).strip()} then {after.group(1).strip()}"
     return text
+
+
+def _predict_licensed_procedure(procedures: CRMSModel, instruction: str,
+                                values: list[int]
+                                ) -> tuple[str, Any, str | None]:
+    """Use a licensed phrase, allowing a checked gerund-to-base-form mapping.
+
+    Each morphology candidate is still passed through the ordinary procedure
+    learner. This changes only the grammatical form of an operation token; it
+    cannot authorize a procedure the model does not already support.
+    """
+    direct = procedures.predict(instruction, values)
+    if direct.status == "ok":
+        return instruction, direct, None
+
+    parts = instruction.split(" then ")
+    candidates: set[str] = set()
+    for index, part in enumerate(parts):
+        match = re.match(r"^(?P<verb>[a-z]+ing)(?P<rest>\b.*)$", part,
+                         flags=re.IGNORECASE)
+        if match is None:
+            continue
+        verb = match.group("verb")
+        stem = verb[:-3]
+        bases = {stem, stem + "e"}
+        if len(stem) > 2 and stem[-1] == stem[-2]:
+            bases.add(stem[:-1])
+        for base in bases:
+            rewritten = list(parts)
+            rewritten[index] = base + match.group("rest")
+            candidate = " then ".join(rewritten)
+            if candidate != instruction:
+                candidates.add(candidate)
+
+    licensed = [(candidate, procedures.predict(candidate, values))
+                for candidate in sorted(candidates)]
+    licensed = [(candidate, prediction)
+                for candidate, prediction in licensed
+                if prediction.status == "ok" and prediction.output is not None]
+    if len(licensed) != 1:
+        return instruction, direct, None
+    candidate, prediction = licensed[0]
+    changed = next((
+        f"{original.split()[0]} → {normalized.split()[0]}"
+        for original, normalized in zip(parts, candidate.split(" then "))
+        if original != normalized), None)
+    return candidate, prediction, changed
 
 
 @dataclass(frozen=True)
@@ -232,7 +284,9 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
             inference_proofs=tuple(verified_proofs),
             language_evidence=language_evidence)
 
-    prediction = procedures.predict(procedure, included)
+    surface_procedure = procedure
+    procedure, prediction, morphology_note = _predict_licensed_procedure(
+        procedures, procedure, included)
     if prediction.status != "ok" or prediction.output is None:
         return ReasonedListComposition(
             "unsupported_procedure",
@@ -271,9 +325,14 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
                                               for row in language_evidence
                                               for source in row.get("sources", ())}))
                          + ".")
+    procedure_note = (
+        f" Recognized the grammatical form '{morphology_note}' in "
+        f"'{surface_procedure}' using the licensed procedure '{procedure}'."
+        if morphology_note else "")
     text = (f"Verified values satisfying {subject} {relation}: {included}"
             f"{exclusions}. After '{procedure}': {list(output)}. "
-            f"Evidence sources: {evidence}.{support_note}{language_note}")
+            f"Evidence sources: {evidence}.{support_note}{language_note}"
+            f"{procedure_note}")
     return ReasonedListComposition(
         "answered", text, subject, relation, values, tuple(included),
         tuple(negative), (), output, procedure, tuple(sorted(sources)), checks,

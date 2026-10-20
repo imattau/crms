@@ -3246,16 +3246,24 @@ Report: [experiment](../experiments/v1_491_one_turn_reasoning_filter_recombinati
 
 ## Learned sequence recombination through proof-filter chat (`v1_492`, 2026-10-20)
 
-`experiments/v1_492_reasoned_filter_language_coverage.py` tests three ordinary
-request frames over the same proof-checked task: “Filter … to values …; then
-…”, “Given …, keep the values …, and then …”, and “From […], return the values
-…, then …”. It also varies the procedure connective from `then` to `and then`.
+`experiments/v1_492_reasoned_filter_language_coverage.py` tests four request
+frames over the same proof-checked task: “Filter … to values …; then …”,
+“Given …, keep the values …, and then …”, “From […], return the values …, then
+…”, and “Please filter […] to the values …, then …”. It also varies procedure
+connectives and order wording, including “reverse … after removing duplicate
+values”. That form is converted to the corresponding ordered procedure only
+when the normal procedure learner accepts the resulting licensed phrase; the
+reply exposes the gerund-to-base-form mapping. `removing duplicates` remains
+unsupported because that object wording is not taught.
 The procedure learner now learns the primitive operations and two different
 ordered examples (`sort then reverse` and `reverse then sort`); neither target
 deduplicate/reverse sequence is taught directly. Four request frames across
-six cases with different input ordering, duplicate placement, and one taught
+seven cases with different input ordering, duplicate placement, and one taught
 relation wording completed through fresh chat, yielding `[9, 4, 12]`,
 `[4, 12, 9]`, `[9, 12, 4]`, `[4, 9, 12]`, `[9, 12, 4]`, and `[9, 4, 12]`.
+The seventh case uses the new bracketed-list frame and tests grammatical
+normalization while preserving a distinguishable deduplicate/reverse order;
+it also yields `[9, 4, 12]`.
 The fifth case reverses before deduplication and uses an
 interleaved duplicate so its expected output differs from deduplication before
 reversal (`[9, 4, 12]`). Each preserves three verified positive proofs,
