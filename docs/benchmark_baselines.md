@@ -2766,3 +2766,37 @@ current runtime.
 This confirms the two specific context-safety behaviors on a small authored
 corpus. It does not estimate multi-turn dialogue accuracy or transfer; the
 independent-transcript and task-completion gate remains open.
+
+## Current cross-domain replay at `80d2a60` (2026-10-20)
+
+Command:
+
+```sh
+python3 run_experiments.py --match 327 --match v1_242 --match v1_376 \
+  --match v1_357 --match v1_207 --match v1_389 --match v1_413_source \
+  --match v1_414_persisted_source --match v1_427 --match v1_449 \
+  --match v1_436_source_derived --match v1_437_heldout_publisher \
+  --match v1_448 --match v1_250 --match v1_192 --match v1_379 \
+  --match v1_465 --timeout 300
+```
+
+All 18 selected diagnostics passed in 13.71 seconds. The runner gave each
+experiment an isolated working directory.
+
+| Capability slice | Diagnostics | Result |
+| --- | --- | ---: |
+| Language transfer and retrieval | `v1_327`, `v1_242` (two diagnostics) | 3/3 |
+| Source-derived rules and recombination | `v1_250`, `v1_436`, `v1_437`, `v1_448` | 4/4 |
+| Verified reasoning and governed learning | `v1_192`, `v1_376`, `v1_379` | 3/3 |
+| Math/code and translation | `v1_357`, `v1_207` | 2/2 |
+| Creative revision | `v1_389` | 1/1 |
+| Dialogue continuity and evidence grounding | `v1_413`, `v1_414`, `v1_427`, `v1_449`, `v1_465` | 5/5 |
+| **Total** | **18 diagnostics** | **18/18** |
+
+This refreshes the selected regression evidence at commit `80d2a60`, including
+source-only follow-up, cross-paragraph grounding, and stale-explanation
+controls. The tests remain separately designed and mostly controlled; the
+pass count is not a common accuracy or task-completion score. It does not show
+independent dialogue transfer, broad language coverage, or parity with a 70B+
+instruction model. See `capability_comparison_70b.md` for the qualitative
+capability reference and limits.
