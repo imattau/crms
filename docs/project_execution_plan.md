@@ -97,8 +97,9 @@ On the current checkout, the following runtime controls passed:
   settlement fields, normalizes square miles to square kilometres, handles
   city-total and metro-population field variants on additional page pairs,
   cites values and reference dates, avoids the “Prix de Rome” lexical
-  co-mention, keeps `why?` anchored to the latest comparison, and abstains
-  for an unsupported entity.
+  co-mention, carries entities into population/area follow-ups within the
+  current process, expires them after an unrelated turn, keeps `why?` anchored
+  to the latest comparison, and abstains for an unsupported entity.
 
 These are component/regression passes, not an independent user-task score.
 They now exercise three different source collections (SimpleWiki, arXiv

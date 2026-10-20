@@ -137,25 +137,44 @@ def main() -> None:
         output = run_cli(root, (
             "What is the population of Paris?",
             "Compare Paris and Rome.",
+            "What about their population?",
             "why?",
             "Compare the population of Paris and Rome.",
             "Compare the population of New York City and Los Angeles.",
+            "What about their area?",
             "Compare the population of Paris and Atlantis.",
         ))
     lines = [line for line in output.splitlines() if "CRMS>" in line]
-    require(len(lines) == 6
+    require(len(lines) == 8
             and "2,140,526" in lines[0]
             and "Rome's listed settlement area is larger" in lines[1]
-            and "105.4 km²" in lines[2] and "496.3 sq mi" in lines[2]
-            and "2,140,526" not in lines[2]
-            and "different reference dates" in lines[3]
-            and "metropolitan population" in lines[4]
-            and "may define metropolitan areas differently" in lines[4]
-            and "I won't infer a comparison" in lines[5]
+            and "2,879,728" in lines[2]
+            and "2,140,526" in lines[2]
+            and "2,879,728" in lines[3]
+            and "105.4 km²" not in lines[3]
+            and "different reference dates" in lines[4]
+            and "metropolitan population" in lines[5]
+            and "may define metropolitan areas differently" in lines[5]
+            and "1299.01 km²" in lines[6]
+            and "Los Angeles's listed settlement area is larger" in lines[6]
+            and "I won't infer a comparison" in lines[7]
             and "Prix de Rome" not in lines[1],
             f"ordinary chat did not preserve comparison boundaries: {lines}")
     require("Traceback" not in output,
             "ordinary chat crashed during a comparison session")
+
+    with tempfile.TemporaryDirectory(prefix="crms-v1-538-expiry-") as temp:
+        interrupted = run_cli(Path(temp), (
+            "Compare Paris and Rome.",
+            "Tell me a joke.",
+            "What about their population?",
+        ))
+    interrupted_lines = [line for line in interrupted.splitlines()
+                         if "CRMS>" in line]
+    require(len(interrupted_lines) == 3
+            and "Rome" not in interrupted_lines[2]
+            and "Paris" not in interrupted_lines[2],
+            f"comparison referents leaked after an unrelated task: {interrupted_lines}")
 
     report = {
         "experiment": "v1_538_source_backed_settlement_comparison",
@@ -171,6 +190,7 @@ def main() -> None:
             "disjoint_page_pair_field_variants": "pass",
             "metropolitan_scope_and_boundary_caveat": "pass",
             "why_followup_stays_on_latest_comparison": "pass",
+            "contextual_measure_followup_and_expiry": "pass",
             "area_units_independently_normalized_to_km2": "pass",
             "exact_value_and_date_citations": "pass",
             "lexical_decoy_avoided": "pass",
@@ -181,6 +201,7 @@ def main() -> None:
             "Population figures have different reference dates and are reported as supplied, without claiming same-date counts.",
             "The three page pairs are from the same SimpleWiki collection and were selected for schema coverage; they are not a representative or publisher-independent holdout.",
             "Area values are compared only after explicit unit normalization; no other settlement fields are compared.",
+            "Population/area follow-ups retain entity pairs only within the current process and expire after an unrelated user turn; comparison context is not restored after restart.",
             "The task wording and expected interpretation are Codex-authored; the source values and citations are checked against the read-only index.",
         ],
     }

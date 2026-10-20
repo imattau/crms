@@ -569,7 +569,10 @@ field and date. This is one real-source, manually interpreted task family; it
 does not establish general entity comparison, arbitrary measure matching,
 semantic extraction, or independent evaluator transfer. The routine compares
 only exact-title settlement area and population fields, and only chooses a
-population scope shared by both pages. See the
+population scope shared by both pages. The selected entities support short
+population/area follow-ups only within the current process; an unrelated turn
+expires that binding, and cross-restart comparison context is not implemented.
+See the
 [runner](../experiments/v1_538_source_backed_settlement_comparison.py) and
 [report](../experiments/reports/v1_538_source_backed_settlement_comparison.json).
 

@@ -4861,6 +4861,16 @@ def _natural_measure_comparison_request(
     return match.group("measure").casefold(), left, right
 
 
+def _natural_comparison_measure_followup(message: str) -> str | None:
+    """Recognize a short attribute follow-up to an active comparison."""
+    match = re.fullmatch(
+        r"\s*(?:(?:and|what\s+about|how\s+about)\s+)?"
+        r"(?:(?:their|the)\s+)?(?P<measure>population|area)"
+        r"(?:\s+(?:for|of)\s+(?:them|both))?\s*[?!.]?\s*",
+        message, flags=re.IGNORECASE)
+    return match.group("measure").casefold() if match else None
+
+
 def _natural_what_subject_query(question: str
                                 ) -> tuple[str, str] | None:
     """Parse a bounded ``What VERB OBJECT?`` query for role checks.
@@ -6632,6 +6642,7 @@ def main() -> int:
     last_answer_was_quoted_evidence = False
     last_reasoned_filter = None
     last_comparison_explanation = None
+    last_comparison_entities: tuple[str, str] | None = None
     last_reasoned_filter_request: str | None = None
     last_reasoned_filter_practiced = False
     last_feedback_record: dict[str, Any] | None = restored_feedback_context
@@ -6675,6 +6686,11 @@ def main() -> int:
         if not line:
             continue
         explanation_followup = _natural_research_explanation_request(line)
+        comparison_measure_followup = (
+            _natural_comparison_measure_followup(line))
+        if (not explanation_followup
+                and comparison_measure_followup is None):
+            last_comparison_entities = None
         if not explanation_followup and line != "/practice-composition":
             last_reasoned_filter = None
             last_reasoned_filter_request = None
@@ -10671,9 +10687,27 @@ def main() -> int:
                   "general theorem proofs yet. I won't use a loosely matching "
                   "paper as a proof.")
             continue
+        if (comparison_measure_followup is not None
+                and last_comparison_entities is not None):
+            measure = comparison_measure_followup
+            left, right = last_comparison_entities
+            answer = (
+                _answer_settlement_population_comparison(index, left, right)
+                if measure == "population" else
+                _answer_settlement_area_comparison(index, left, right))
+            last_comparison_explanation = answer or (
+                f"I couldn't find comparable {measure} fields for the two "
+                f"entities in our comparison, {left} and {right}. I won't "
+                "infer a result.")
+            last_research_evidence = None
+            last_answer_was_quoted_evidence = False
+            last_answer_had_inference_proof = False
+            print("CRMS> " + last_comparison_explanation)
+            continue
         measure_comparison = _natural_measure_comparison_request(line)
         if measure_comparison is not None:
             measure, left, right = measure_comparison
+            last_comparison_entities = (left, right)
             answer = (
                 _answer_settlement_population_comparison(index, left, right)
                 if measure == "population" else
@@ -10690,6 +10724,7 @@ def main() -> int:
         contrast_pair = _natural_contrast_pair(line)
         if contrast_pair is not None:
             dialogue.clear()
+            last_comparison_entities = contrast_pair
             settlement_comparison = _answer_settlement_area_comparison(
                 index, *contrast_pair)
             last_comparison_explanation = (
