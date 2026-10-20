@@ -54,6 +54,11 @@ Other things it can currently do:
   from two "parent of" facts, and show each step of the reasoning.
 - Learn small rules from examples, such as how to reverse or reshape a list of
   numbers.
+- For an explicit finite list of integers, keep only values supported by a
+  complete, verified relation proof, exclude explicitly negative values, then
+  apply a learned list procedure in one chat turn. It abstains if any supplied
+  value is unknown or conflicting; this is a bounded composition, not general
+  task planning.
 - Learn new ways of phrasing questions, with your approval.
 - Compose a short, template-based fictional story from a topic, choose funny,
   mystery, or adventure, revise among those modes in the same chat, and label

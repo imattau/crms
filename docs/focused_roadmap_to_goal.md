@@ -454,7 +454,16 @@ label their provenance honestly.
    held-out composition; an independent checker accepts valid results and
    rejects invalid ones; unsupported or incomplete requests do not yield
    confident answers. If only an experiment orchestrator can compose the
-   components, the gate remains open.
+   components, the gate remains open. The first runtime slice now exists in
+   `v1_491`: one natural-language request filters an explicit finite integer
+   list by complete, independently checked relation proofs, then applies a
+   learned list procedure. It preserves explicit negatives, blocks output if
+   any member is unknown or conflicted, cites proof and procedure-example
+   provenance, explains its current proof on `why?`, clears stale explanation
+   context on a new turn, and works after fresh-process reload. The source graph
+   is a controlled fixture and procedure labels are Codex-supplied; the next
+   step is held-out wording and independently reviewed task cases, not a broad
+   reasoning or planning claim.
 3. **Run one bounded source-learning transfer checkpoint.** Use the
    NumPy/pandas/PyTorch/SciPy/Pydantic findings as development controls. Test
    separately cited context bundles on those controls, but do not treat

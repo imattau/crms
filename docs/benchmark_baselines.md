@@ -3213,3 +3213,33 @@ through fresh chat, proof-backed derived cases, and lineage revalidation. This
 replay confirms the controlled capability slices still run together on the
 current checkout. It does not establish independent language transfer,
 general-purpose learning, or robustness beyond their authored cases.
+
+## One-turn proof-filter and procedure composition (`v1_491`, 2026-10-20)
+
+Command: `python3 experiments/v1_491_one_turn_reasoning_filter_recombination.py`.
+
+A natural-language request supplies a finite integer list, a stored relation,
+and a learned procedure. In a fresh chat process CRMS checked each candidate
+with the inference engine and independent proof verifier, passed only verified
+positive values to the procedure, excluded a source-backed negative, and
+returned `[9, 4, 12]`. It included both inference-source IDs and the procedure
+example labeler in its answer and feedback provenance. Unknown value `8`, a
+positive/negative conflict, and unsupported procedure wording each prevented
+a composed result. A `why?` follow-up renders the verified proof chain and
+procedure example provenance; a new unrelated request clears that context so a
+later `why?` does not repeat stale reasoning. The test also checks that the
+Oxford-comma list and the relative clause “values that Nia reaches” reach this
+route.
+
+This closes a runtime seam that `v1_451`/`v1_456` had only exercised through
+the experiment orchestrator. It remains narrow: integer-only finite lists,
+an explicit stored relation phrase, one already learned procedure, and
+Codex-authored relation/procedure fixtures. It does not establish open-ended
+planning, general paraphrase transfer, or 70B-class parity. The standalone
+component controls also passed in the same checkout: `v1_441`, `v1_448`,
+`v1_451`, `v1_456`, `v1_72`, and `v1_82` (6/6 selected controls). The
+expanded current replay also passed 13/13 across this composition, its source-
+and derived-reasoning controls, and seven dialogue/pending-review regressions
+(`v1_412`, `v1_419`, `v1_426`, `v1_427`, `v1_449`, `v1_454`, `v1_465`).
+
+Report: [experiment](../experiments/v1_491_one_turn_reasoning_filter_recombination.py).

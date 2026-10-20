@@ -70,6 +70,7 @@ from crms_translation import (
     CRMSTranslation, infer_shared_slot_templates,
     render as render_translation,
 )
+from crms_task_composition import compose_verified_filter
 
 
 HELP = """Commands:
@@ -219,6 +220,9 @@ HELP = """Commands:
                  store a verified inference separately as a derived case
   /practice-question QUESTION
                  answer and retain one unique proof-backed inference
+  Natural-language composition: "From values 12, 4, and 7, keep only the
+                 values that Nia reaches, then remove duplicates and reverse"
+                 every value must be proved positive/negative without a conflict
   /auto-practice on|off
                  session-only write-back for unique proof-backed answers
   /derived-cases inspect practice artifacts and current proof validity
@@ -5964,6 +5968,7 @@ def main() -> int:
     last_summary_scoped_hit = None
     last_research_evidence: dict | None = None
     last_answer_had_inference_proof = False
+    last_reasoned_filter = None
     last_feedback_record: dict[str, Any] | None = restored_feedback_context
 
     def remember_feedback(record: dict[str, Any] | None) -> None:
@@ -6004,6 +6009,9 @@ def main() -> int:
                 print(f"Handling {natural_part_total} explicit questions separately.")
         if not line:
             continue
+        explanation_followup = _natural_research_explanation_request(line)
+        if not explanation_followup:
+            last_reasoned_filter = None
         story_revision_tone = _natural_story_revision(line)
         if story_revision_tone is not None and last_story is not None:
             pending_story_tone = None
@@ -6251,7 +6259,6 @@ def main() -> int:
                 print(json.dumps(dialogue.intent_trace[-5:],
                                  ensure_ascii=False, indent=2))
             continue
-        explanation_followup = _natural_research_explanation_request(line)
         if not explanation_followup:
             last_answer_had_inference_proof = False
         previous_latest_documents = latest_research_documents
@@ -6366,6 +6373,7 @@ def main() -> int:
         if line == "/reset":
             dialogue.clear()
             dialogue.reset_history()
+            last_reasoned_filter = None
             last_story = None
             pending_story_tone = None
             pending_candidates = []
@@ -9587,6 +9595,37 @@ def main() -> int:
                 pending_translation_clarification)
             continue
         if explanation_followup:
+            if last_reasoned_filter is not None:
+                explanation_parts = [last_reasoned_filter.text]
+                for proof in last_reasoned_filter.inference_proofs:
+                    conclusion = proof.get("conclusion", {})
+                    short_answer = (
+                        f"{conclusion.get('subject', '')} — "
+                        f"{conclusion.get('relation', '')} → "
+                        f"{conclusion.get('object', '')}")
+                    rendered_proof = render_verified_explanation(
+                        knowledge, proof, short_answer=short_answer)
+                    if rendered_proof is not None:
+                        explanation_parts.append(rendered_proof)
+                if last_reasoned_filter.procedure_records:
+                    labels = sorted({str(record.get("labeler_id"))
+                                     for record in last_reasoned_filter.procedure_records
+                                     if record.get("labeler_id")})
+                    explanation_parts.append(
+                        f"The list operation used "
+                        f"{len(last_reasoned_filter.procedure_records)} stored "
+                        f"procedure examples"
+                        + (f" from labeler(s) {', '.join(labels)}" if labels else "")
+                        + ".")
+                rendered = "\n\n".join(explanation_parts)
+                print("CRMS> " + rendered)
+                explanation_refs = collect_feedback_refs(
+                    response=last_reasoned_filter)
+                remember_feedback(
+                    {"question": "why?", "answer": rendered,
+                     "evidence": explanation_refs}
+                    if explanation_refs else None)
+                continue
             if last_answer_had_inference_proof:
                 explanation = dialogue.turn(line)
                 if (explanation.response is not None
@@ -9677,6 +9716,23 @@ def main() -> int:
             print("CRMS> " + _render_source_lookup(index, source_lookup_topic))
             last_research_evidence = None
             latest_research_documents = []
+            continue
+        reasoned_filter = compose_verified_filter(line, knowledge, rules)
+        if reasoned_filter is not None:
+            last_reasoned_filter = reasoned_filter
+            print("CRMS> " + reasoned_filter.text)
+            evidence_refs = collect_feedback_refs(response=reasoned_filter)
+            evidence_refs.extend(
+                {"kind": "procedure", "id": str(record.get("phrase", "")),
+                 "sources": [value for value in (
+                     record.get("source_id"),
+                     record.get("instruction_source_id")) if value],
+                 "labeler_id": record.get("labeler_id")}
+                for record in reasoned_filter.procedure_records)
+            remember_feedback(
+                {"question": line, "answer": reasoned_filter.text,
+                 "evidence": evidence_refs}
+                if evidence_refs else None)
             continue
         code_instruction = natural_language_request(line)
         if code_instruction is not None:
