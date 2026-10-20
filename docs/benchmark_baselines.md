@@ -3427,3 +3427,26 @@ not an independent transfer set. Continue toward independent supervision and
 held-out task phrasing while retaining the unsupported-alias control.
 
 Report: [experiment](../experiments/v1_499_learned_operation_in_reasoned_composition.py).
+
+## Learned `and` sequence in proof-backed composition (`v1_500`, 2026-10-20)
+
+Command: `python3 experiments/v1_500_learned_and_reasoned_composition.py`.
+
+The experiment teaches five component procedures and two different ordered
+compound procedures, each with explicit Codex label and source IDs. One
+compound does not license a sequence connective. After the second independently
+paired compound is taught, CRMS induces the `and` connective and composes a new
+pair: `remove duplicate values and reverse the list`. An interleaved-duplicate
+input distinguishes that order from `reverse the list and remove duplicate
+values`; both held-out outputs are correct. The same learned sequence runs in
+fresh chat after reload, but only after each set member is proof-checked. An
+unknown member and an unlicensed `but` connective abstain.
+
+This demonstrates a second connected learning step: a sequence rule is induced
+from separate procedure examples and transferred to a new operation pair,
+alongside proof-backed reasoning and answer explanation. It is still a
+Codex-authored synthetic task with explicit teacher labels, not an independent
+language-transfer benchmark or autonomous self-learning. Keep the single-pair
+negative and order-sensitive cases in the regression set.
+
+Report: [experiment](../experiments/v1_500_learned_and_reasoned_composition.py).

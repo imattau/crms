@@ -473,6 +473,16 @@ The combined target was not taught directly, and an unsupported alias still
 abstained. This advances supervised recombination, but does not establish
 independent transfer or learning from the system's own outputs.
 
+`v1_500` tests a harder form of recombination: two separately taught ordered
+procedure pairs induce `and` as a sequence rule, which then composes a third,
+unseen pair. An interleaved-duplicate input proves that changing the order
+changes the result, and both orders return the correct output. Fresh chat uses
+the learned sequence only after checking every membership proof; unknown
+members and an unlicensed connective remain blocked. This is a controlled
+teacher-labeled demonstration of connective induction, not independent
+natural-language transfer. The next milestone work remains to broaden the
+held-out request/task set and verify more than this one finite-list domain.
+
 An opt-in `/practice-composition` command now re-runs and verifies each distinct
 positive relation result from the last successful composition and stores it as
 a separate derived case. It also stores the complete output, request, proofs,
