@@ -542,6 +542,16 @@ without a phrase-specific parser rule. The labels are Codex-supplied and the
 task is still finite-list summation; it does not show autonomous synonym
 discovery or broader word-problem learning.
 
+`v1_510` exercises that acquisition path through the actual chat commands,
+not a direct model API call. After the same two-clause request abstains, CRMS
+asks for contrastive inputs; Codex labels the requested sum outputs and records
+its labeler identity. The learned “add up the ones she reaches” procedure then
+combines with Mira's proof-selected values, survives a clean copied-model
+process, and refuses an unknown value. Independent arithmetic agrees. This
+shows teacher-supervised interactive learning and recombination; pronoun
+meaning and operation meaning are not autonomously induced, and Codex's labels
+are not independent validation.
+
 The immediate bottleneck is therefore no longer “can the components compose in
 a fixture?” It is whether a fresh user request can cause CRMS to select and
 compose the right components, complete the whole task, and survive independent
