@@ -1,5 +1,29 @@
 # Language and recombination benchmark baselines
 
+## Natural count retrieval: article subjects and post-object counts (`v1_524`, 2026-10-20)
+
+Command: `python3 experiments/v1_524_natural_count_article_and_post_object.py`.
+
+Driving the full SimpleWiki index found that “How many Nobel Prizes did the
+Curie family receive?” abstained despite a direct sentence in the Nobel Prize
+article. The retrieval precheck required stopwords such as `the` to appear in
+the search hit's matched-term set, where they are intentionally omitted. The
+same audit found that an explicit cardinal after the object (“Nobel Peace Prize
+three times”) was not extracted. The route now ignores stopwords for hit
+eligibility, allows a regular plural in the requested object to match the
+singular source form, and recognizes a post-object count only when followed by
+`time` or `times`.
+
+Two cited claims from one SimpleWiki page now answer through fresh CLI using a
+copied source index: Curie family, 5 Nobel Prizes; International Committee of
+the Red Cross, 3 Nobel Peace Prizes. Nearby count/aggregation and quoted
+evidence controls pass (`v1_329`, `v1_502`, `v1_507`). This does not establish
+general count understanding: the examples share one page, the route still
+quotes source wording, and other count constructions, paraphrases, and verb
+alternations remain untested. See the
+[runner](../experiments/v1_524_natural_count_article_and_post_object.py) and
+[report](../experiments/reports/v1_524_natural_count_article_and_post_object.json).
+
 ## Source-backed multi-hop question-frame transfer (`v1_523`, 2026-10-20)
 
 Command: `python3 experiments/v1_523_simplewiki_path_question_transfer.py`.

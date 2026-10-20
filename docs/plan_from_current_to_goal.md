@@ -1,6 +1,6 @@
 # Focused plan from current CRMS to its goal
 
-**Reviewed:** 2026-10-20 (HEAD `663ace0`; runtime probe `v1_523`)  
+**Reviewed:** 2026-10-20 (runtime probes through `v1_524`)
 **Status:** active; the capability goal is not yet demonstrated.
 
 ## Goal
@@ -45,6 +45,12 @@ procedure composition already has controlled demonstrations (`v1_451`,
 source-backed tasks. Treat the recent
 Colosseum/Eiffel pronoun report as an open dialogue release-gate regression;
 older dialogue controls do not invalidate that counterexample.
+
+The subsequent live count audit also found and repaired a stopword retrieval
+failure and a post-object quantity boundary (`v1_524`). Two real source claims
+now answer in a copied-index CLI replay. This advances a named language seam;
+one source page and two forms do not establish broad count comprehension or
+change the overall transfer assessment.
 
 ## Execution order
 

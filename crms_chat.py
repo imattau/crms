@@ -2001,7 +2001,13 @@ def _natural_count_evidence(index: CRMSSQLiteResearchIndex,
     predicate_terms = tuple(normalized_tokens(predicate))
     if not subject_terms or not object_terms or len(predicate_terms) != 1:
         return None
-    query = " ".join((*subject_terms, *object_terms))
+    required_terms = {
+        token for token in (*subject_terms, *object_terms)
+        if token not in _RESEARCH_STOPWORDS
+    }
+    if not required_terms:
+        return None
+    query = " ".join(sorted(required_terms))
     quantity_words = {
         "zero", "one", "two", "three", "four", "five", "six", "seven",
         "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen",
@@ -2010,7 +2016,6 @@ def _natural_count_evidence(index: CRMSSQLiteResearchIndex,
         "hundred", "thousand", "million", "billion",
     }
     evidence_by_count: dict[str | None, list[dict[str, Any]]] = {}
-    required_terms = set(subject_terms) | set(object_terms)
     for hit in index.search(query, limit=100, context_chars=240):
         if not required_terms <= set(hit.matched_terms) or _is_code_source(hit.location):
             continue
@@ -2027,12 +2032,25 @@ def _natural_count_evidence(index: CRMSSQLiteResearchIndex,
                 continue
             words = tuple(normalized_tokens(sentence))
 
-            def occurrences(phrase: tuple[str, ...]) -> list[int]:
-                return [position for position in range(len(words) - len(phrase) + 1)
-                        if words[position:position + len(phrase)] == phrase]
+            def occurrences(phrase: tuple[str, ...], *,
+                            regular_plural: bool = False) -> list[int]:
+                positions = []
+                for position in range(len(words) - len(phrase) + 1):
+                    observed = words[position:position + len(phrase)]
+                    if observed == phrase:
+                        positions.append(position)
+                        continue
+                    if (regular_plural and len(observed) == len(phrase)
+                            and all(actual == requested
+                                    or (requested.endswith("s")
+                                        and requested[:-1] == actual)
+                                    for actual, requested
+                                    in zip(observed, phrase))):
+                        positions.append(position)
+                return positions
 
             subjects = occurrences(subject_terms)
-            objects = occurrences(object_terms)
+            objects = occurrences(object_terms, regular_plural=True)
             if len(subjects) != 1 or len(objects) != 1:
                 continue
             subject_end = subjects[0] + len(subject_terms)
@@ -2066,6 +2084,22 @@ def _natural_count_evidence(index: CRMSSQLiteResearchIndex,
             ]
             if quantity_candidates:
                 quantity = quantity_candidates[-1]
+            else:
+                # Some sources place the count after the counted item:
+                # "received the Nobel Peace Prize three times". Accept this
+                # post-object form only when the quantity is explicitly
+                # attached to a time-unit, avoiding nearby years or unrelated
+                # numbers as counts.
+                object_end = objects[0] + len(object_terms)
+                following = words[object_end:object_end + 3]
+                for following_index, token in enumerate(following):
+                    if (token.isdigit() or token.replace(",", "").isdigit()
+                            or token in quantity_words):
+                        if (following_index + 1 < len(following)
+                                and following[following_index + 1]
+                                in {"time", "times"}):
+                            quantity = token
+                            break
             matched = tuple(sorted(
                 required_terms | {words[position] for position in relation_positions}))
             evidence = _cited_sentence_evidence(index, hit, start, end, matched)
