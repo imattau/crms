@@ -75,9 +75,11 @@ from crms_translation import (
     render as render_translation,
 )
 from crms_task_composition import (
-    compose_verified_filter_via_plan, create_derived_composition_record,
+    compose_verified_filter_via_frames,
+    create_derived_composition_record,
     is_explicit_aggregate_question, revalidate_derived_composition,
 )
+from crms_request_frames import RequestFrameError, RequestFrameStore
 
 
 HELP = """Commands:
@@ -252,6 +254,12 @@ HELP = """Commands:
   /teach-rule I|INPUT CSV|OUTPUT CSV[|PAIR CITATION|LABELER ID[|INSTRUCTION CITATION]]
                  retain code evidence, wording evidence, and labeler separately
                  leave PAIR CITATION empty to provide wording evidence alone
+  /teach-frame GOAL|UTTERANCE|SOURCE[|FIXED PROCEDURE]
+                 teach a request template; mark slots as {name:kind:filler}
+                 example: /teach-frame select-then-procedure|From values
+                 {values:integer-list:1, 2}, keep {claim:claim:Mira reaches},
+                 then {procedure:procedure:sum the values}.|lesson:frame
+  /frames        inspect licensed request frames and their examples
   /retry-rule I   rerun stored demonstrations under current rule bounds
   Try to learn the rule for INSTRUCTION
                  rerun stored examples in ordinary CRMS language
@@ -326,6 +334,7 @@ HELP_SHORT = """CRMS is a bounded, source-grounded learning system. Try:
                                          teach one cited fact
   Teach a question frame from examples: "Who likes juice?" => "Carol"; "Who likes coffee?" => "Bob"
                                          license a reusable question pattern
+  /teach-frame GOAL|TEMPLATE|SOURCE     license a reusable request frame
   2 + 3 * 4                              use exact arithmetic
 
 Use /help all for the complete command reference. Unknown facts and wording
@@ -6184,6 +6193,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--rule-session", type=Path,
                         default=None,
                         help="pending contrastive rule example (default: %(default)s)")
+    parser.add_argument("--request-frames", type=Path, default=None,
+                        help="learned request-frame store (default: next to --rules)")
     parser.add_argument("--candidate-session", type=Path,
                         default=None,
                         help="persisted pending fact review candidates (default: next to --knowledge)")
@@ -6745,6 +6756,9 @@ def main() -> int:
     if args.rule_registry is None:
         args.rule_registry = args.rules.with_name(
             args.rules.stem + "_registry.sqlite")
+    if args.request_frames is None:
+        args.request_frames = args.rules.with_name(
+            args.rules.stem + "_frames.json")
     try:
         rule_registry = (RuleRegistry.load(args.rule_registry)
                          if args.rule_registry.is_file() else RuleRegistry())
@@ -6771,6 +6785,29 @@ def main() -> int:
         vsa_min_margin=args.rule_vsa_min_margin,
         enable_position_arithmetic=args.rule_enable_position_arithmetic,
         rule_registry=rule_registry)
+    try:
+        request_frames = RequestFrameStore.load(args.request_frames)
+    except (RequestFrameError, OSError) as error:
+        stale = args.request_frames.with_name(
+            args.request_frames.name + ".stale")
+        try:
+            args.request_frames.replace(stale)
+            kept = f"saved as {stale}"
+        except OSError:
+            kept = "left in place"
+        print(f"Ignoring saved request frames ({error}); {kept}.")
+        request_frames = RequestFrameStore()
+    seed_frames = Path(__file__).with_name("crms_request_frames_seed.json")
+    try:
+        added_frames = request_frames.add_seed_file(seed_frames)
+    except RequestFrameError as error:
+        print(f"Ignoring request-frame seed ({error}).")
+        added_frames = 0
+    if added_frames:
+        try:
+            request_frames.save(args.request_frames)
+        except OSError as error:
+            print(f"Could not save seeded request frames: {error}")
     pending_rule = _load_pending_rule(args.rule_session, args.rules)
     if pending_rule and pending_rule[0] in rules._procedures:
         pending_rule = None
@@ -7185,6 +7222,10 @@ def main() -> int:
                                      args.index, pending_candidates, pending_question,
                                      invalidated_candidates)
             rule_registry.save(args.rule_registry)
+            try:
+                request_frames.save(args.request_frames)
+            except OSError as error:
+                print(f"Could not save request frames: {error}")
             if args.model_db is not None:
                 current_model_memory_state = {
                     path: _memory_file_state(path) for path in model_memory_paths
@@ -8738,7 +8779,8 @@ def main() -> int:
                 print("CRMS> This composition has already been practiced in this "
                       "session; no additional practice event was recorded.")
                 continue
-            current = compose_verified_filter_via_plan(request, knowledge, rules)
+            current = compose_verified_filter_via_frames(
+                request, knowledge, rules, request_frames)
             if (current is None or current.status != "answered"
                     or current.output_values != result.output_values
                     or current.inference_proofs != result.inference_proofs
@@ -8757,7 +8799,7 @@ def main() -> int:
                 if item.get("artifact_id") == artifact["artifact_id"]), None)
             if existing_artifact is not None:
                 validity, _reason = revalidate_derived_composition(
-                    existing_artifact, knowledge, rules)
+                    existing_artifact, knowledge, rules, request_frames)
                 if validity == "current":
                     print("CRMS> This exact composition is already stored with "
                           "current evidence; no new practice count was recorded.")
@@ -8833,7 +8875,7 @@ def main() -> int:
                 continue
             for record in records:
                 validity, reason = revalidate_derived_composition(
-                    record, knowledge, rules)
+                    record, knowledge, rules, request_frames)
                 conclusion = (f"{record['subject']} — {record['relation']} → "
                               f"{record['output_values']}")
                 print(f"Derived composition [{validity}]: {conclusion}")
@@ -9095,6 +9137,40 @@ def main() -> int:
             for document_id, title, location_value in documents:
                 location = f" ({location_value})" if location_value else ""
                 print(f"{document_id}: {title}{location}")
+            continue
+        if line.startswith("/teach-frame "):
+            fields = [value.strip() for value in
+                      line[len("/teach-frame "):].split("|")]
+            if len(fields) not in {3, 4} or not fields[0] or not fields[1]:
+                print("Use: /teach-frame GOAL|UTTERANCE WITH {slot:kind:filler} "
+                      "MARKERS|SOURCE ID[|FIXED PROCEDURE]")
+                continue
+            source_id = fields[2] if fields[2] else "user:request-frame"
+            fixed_procedure = fields[3] if len(fields) == 4 and fields[3] else None
+            try:
+                learned = request_frames.add_example(
+                    fields[1], fields[0], source_id, fixed_procedure)
+            except RequestFrameError as error:
+                print(f"Could not teach request frame: {error}")
+                continue
+            print(f"Request-frame learning status: {learned.status}. "
+                  f"{learned.message}")
+            if learned.frame is not None:
+                print(f"Frame {learned.frame.frame_id} "
+                      f"({learned.frame.goal}): "
+                      f"{learned.frame.template_text()}")
+            else:
+                print("Teach another example with the same literal wording "
+                      "and a different slot filler.")
+            try:
+                request_frames.save(args.request_frames)
+            except OSError as error:
+                print(f"Could not save request frames: {error}")
+            continue
+        if line == "/frames":
+            lines = request_frames.describe()
+            print("\n".join(lines) if lines
+                  else "No request frames are licensed yet.")
             continue
         if line.startswith("/teach-rule "):
             fields = [value.strip() for value in line[len("/teach-rule "):].split("|")]
@@ -10752,7 +10828,8 @@ def main() -> int:
             last_research_evidence = None
             latest_research_documents = []
             continue
-        reasoned_filter = compose_verified_filter_via_plan(line, knowledge, rules)
+        reasoned_filter = compose_verified_filter_via_frames(
+            line, knowledge, rules, request_frames)
         if reasoned_filter is not None:
             last_reasoned_filter = reasoned_filter
             last_reasoned_filter_request = line

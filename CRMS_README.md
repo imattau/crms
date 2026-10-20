@@ -432,6 +432,34 @@ states, validation gaps, duplicates, and orphan dependencies, and
 local sidecar in this first integration; packaging it inside portable model
 files is later work.
 
+### Learned request frames
+
+Multi-step composition is routed by learned request frames rather than a regex
+per wording. A frame is an exact token template with typed slots; it can propose
+a goal, but selection, procedure application, and acceptance remain independent
+plan checks. See `docs/design_request_frames.md`.
+
+```text
+/teach-frame select-then-procedure|Send {values:integer-list:1, 2} to {claim:claim:Mira reaches}.|lesson:frame:1|sum every value
+/teach-frame select-then-procedure|Send {values:integer-list:3, 4} to {claim:claim:Nia reaches}.|lesson:frame:2|sum every value
+/frames
+Send 23, 5 to Mira reaches.
+```
+
+At least two varied examples are required to license a frame. One example is
+reported as `need_more_examples`. Slots are declared inline as
+`{name:kind:filler}` with kinds `integer-list`, `claim`, `procedure`, or
+`text`. Unknown wording, malformed slots, and ambiguous frame collisions
+abstain rather than execute.
+
+Frames are stored next to `--rules` with a `_frames.json` suffix by default;
+use `--request-frames PATH` to choose another file. The packaged
+`crms_request_frames_seed.json` supplies 40 starting demonstrations for the
+filter/procedure family. Chat uses frames only; the older regex compiler is
+retained as a reference path for parity diagnostics. Request-frame stores are
+local sidecars in this integration; packaging them inside portable model files
+is later work.
+
 The parameterized rule family can also discover multipliers beyond doubling:
 
 ```python

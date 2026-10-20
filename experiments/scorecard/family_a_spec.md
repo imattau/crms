@@ -1,10 +1,11 @@
 # Family A specification: verified selection → learned procedure
 
 **Status:** frozen design for the Phase 2 recombination milestone. The typed
-actions execute through the plan path and chat uses it for the explicit
-verified-filter frame. Four scorecard tasks cover filter+sum, reload, unknown
-values, and an untaught procedure (`experiments/scorecard/family_a.jsonl`);
-the remaining wording variations and controls await learned request frames.
+actions execute through the plan path, and chat routes requests through learned
+request frames (`docs/design_request_frames.md`). Five scorecard tasks cover
+filter+sum, reload, unknown values, an untaught procedure, and a frame taught in
+chat and reloaded (`experiments/scorecard/family_a.jsonl`); the remaining
+wording variations and negative controls still need scorecard fixtures.
 **Date:** 2026-10-21
 **Provenance:** authored specification. Fixtures, expected outputs, and the
 oracle are defined before implementation and must not be tuned to the planner.

@@ -16,6 +16,7 @@ crms_translations.json
 crms_dialogue.json
 crms_rule_session.json
 crms_rules.json
+crms_*_frames.json
 
 # Stray empty file created by a mistyped shell redirect
 /-l

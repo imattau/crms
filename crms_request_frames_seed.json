@@ -1,0 +1,245 @@
+{
+  "version": 1,
+  "examples": [
+    {
+      "text": "Which values in {values:integer-list:23, 5, and 8} does {claim:claim:Mira reach}, and what do they sum to?",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:linked-sum-1",
+      "fixed_procedure": "sum every value"
+    },
+    {
+      "text": "Which values in {values:integer-list:4, 12, and 9} does {claim:claim:Nia reach}, and what do they sum to?",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:linked-sum-2",
+      "fixed_procedure": "sum every value"
+    },
+    {
+      "text": "What is the total of the values {claim:claim:Mira reaches} among {values:integer-list:23, 5, and 8}?",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:wh-total-1",
+      "fixed_procedure": "sum every value"
+    },
+    {
+      "text": "What is the total of the values {claim:claim:Nia reaches} among {values:integer-list:4, 12, and 9}?",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:wh-total-2",
+      "fixed_procedure": "sum every value"
+    },
+    {
+      "text": "What is the total of the values that {claim:claim:Mira reaches} among {values:integer-list:23, 5, and 8}?",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:wh-total-that-1",
+      "fixed_procedure": "sum every value"
+    },
+    {
+      "text": "What is the total of the values that {claim:claim:Nia reaches} among {values:integer-list:4, 12, and 9}?",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:wh-total-that-2",
+      "fixed_procedure": "sum every value"
+    },
+    {
+      "text": "From values {values:integer-list:23, 5, 23, and 8}, keep only the values {claim:claim:Mira reaches}, then {procedure:procedure:sum the values}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:from-values-keep-only-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "From values {values:integer-list:4, 12, 4, 9, and 7}, keep only the values {claim:claim:Nia reaches}, then {procedure:procedure:remove duplicate values then reverse the list}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:from-values-keep-only-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "From values {values:integer-list:12, 4, 4, 9, and 7}, keep only the values that {claim:claim:Nia can reach}, then {procedure:procedure:remove duplicate values then reverse the list}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:from-values-keep-only-that-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "From values {values:integer-list:23, 5, 23, and 8}, keep only the values that {claim:claim:Mira can reach}, then {procedure:procedure:sum the values}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:from-values-keep-only-that-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Filter {values:integer-list:23, 5, 23, and 8} to values {claim:claim:Mira reaches}, then {procedure:procedure:sum the values}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:filter-to-values-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Filter {values:integer-list:12, 4, 4, 9, and 7} to values {claim:claim:Nia reaches}, then {procedure:procedure:remove duplicate values then reverse the list}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:filter-to-values-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Filter {values:integer-list:23, 5, 23, and 8} to the values {claim:claim:Mira reaches}, then {procedure:procedure:sum the values}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:filter-to-the-values-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Filter {values:integer-list:12, 4, 12, 9, and 7} to the values {claim:claim:Nia reaches}, then {procedure:procedure:reverse the list then remove duplicate values}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:filter-to-the-values-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Given {values:integer-list:23, 5, 23, and 8}, keep the values {claim:claim:Mira reaches}, and then {procedure:procedure:sum the values}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:given-keep-the-values-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Given {values:integer-list:9, 12, 4, 4, and 7}, keep the values {claim:claim:Nia reaches}, and then {procedure:procedure:remove duplicate values then reverse the list}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:given-keep-the-values-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Given {values:integer-list:23, 5, 23, and 8}, keep only the values {claim:claim:Mira reaches}, and then {procedure:procedure:sum the values}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:given-keep-only-values-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Given {values:integer-list:9, 12, 4, 4, and 7}, keep only the values {claim:claim:Nia reaches}, and then {procedure:procedure:remove duplicate values then reverse the list}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:given-keep-only-values-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "From [{values:integer-list:23, 5, 23, 8}], return the values {claim:claim:Mira reaches}, then {procedure:procedure:sum the values}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:from-bracket-return-the-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "From [{values:integer-list:4, 12, 9, 4, 7}], return the values {claim:claim:Nia reaches}, then {procedure:procedure:remove duplicate values then reverse the list}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:from-bracket-return-the-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "From [{values:integer-list:23, 5, 23, 8}], return values {claim:claim:Mira reaches}, then {procedure:procedure:reverse the list and remove duplicate values}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:from-bracket-return-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "From [{values:integer-list:4, 12, 9, 4, 7}], return values {claim:claim:Nia reaches}, then {procedure:procedure:remove duplicate values and reverse the list}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:from-bracket-return-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Please filter [{values:integer-list:12, 4, 12, 9, 7}] to the values {claim:claim:Nia reaches}, then {procedure:procedure:reverse the list after removing duplicate values}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:please-filter-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Please filter [{values:integer-list:23, 5, 23, 8}] to the values {claim:claim:Mira reaches}, then {procedure:procedure:sum the values}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:please-filter-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "{procedure:procedure:Sum every value} in {values:integer-list:23, 5, 23, and 8} that {claim:claim:Mira reaches}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:procedure-in-that-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "{procedure:procedure:Add up every value} in {values:integer-list:41, 6, 41, and 10} that {claim:claim:Tavi reaches}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:procedure-in-that-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "{claim:claim:Mira reaches} some of {values:integer-list:23, 5, 23, and 8}. {procedure:procedure:Sum every value}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:claim-some-of-procedure-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "{claim:claim:Tavi reaches} some of {values:integer-list:41, 6, 41, and 10}. {procedure:procedure:Add up every value}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:claim-some-of-procedure-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "{procedure:procedure:Count the matching entries} among {values:integer-list:41, 6, 41, and 10} that {claim:claim:Tavi reaches}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:procedure-among-that-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "{procedure:procedure:Sum every value} among {values:integer-list:23, 5, 23, and 8} that {claim:claim:Mira reaches}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:procedure-among-that-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "From {values:integer-list:23, 5, 23, and 8}, keep the values {claim:claim:Mira reaches}, then {procedure:procedure:sum the values}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:from-comma-keep-the-values-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "From {values:integer-list:41, 6, 41, and 10}, keep the values {claim:claim:Tavi reaches}, then {procedure:procedure:add up every value}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:from-comma-keep-the-values-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "From {values:integer-list:23, 5, 23, and 8}, add together only the numbers {claim:claim:Mira reaches}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:from-comma-add-together-1",
+      "fixed_procedure": "add together only the numbers"
+    },
+    {
+      "text": "From {values:integer-list:41, 6, 41, and 10}, add together only the numbers {claim:claim:Tavi reaches}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:from-comma-add-together-2",
+      "fixed_procedure": "add together only the numbers"
+    },
+    {
+      "text": "Take values {values:integer-list:23, 5, 23, and 8}; among those {claim:claim:Mira reaches}, then {procedure:procedure:keep unique entries and flip their order}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:take-among-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Take values {values:integer-list:41, 6, 41, and 10}; among those {claim:claim:Tavi reaches}, then {procedure:procedure:keep unique entries and flip their order}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:take-among-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Among {values:integer-list:12, 4, 4, 9, and 7} {claim:claim:Nia can reach} {procedure:procedure:remove duplicate values}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:among-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "Among {values:integer-list:23, 5, 23, and 8} {claim:claim:Mira can reach} {procedure:procedure:remove duplicate values}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:among-2",
+      "fixed_procedure": null
+    },
+    {
+      "text": "From {values:integer-list:23, 5, 23, and 8} {procedure:procedure:add together only the numbers} {claim:claim:Mira reaches}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:from-procedure-claim-1",
+      "fixed_procedure": null
+    },
+    {
+      "text": "From {values:integer-list:41, 6, 41, and 10} {procedure:procedure:add together only the numbers} {claim:claim:Tavi reaches}.",
+      "goal": "select-then-procedure",
+      "source_id": "seed:request-frame:from-procedure-claim-2",
+      "fixed_procedure": null
+    }
+  ]
+}

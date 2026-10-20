@@ -22,8 +22,9 @@ Current suites:
 
 - `smoke` — 12 cross-capability tasks (research, dialogue, reload, math,
   abstention, procedures).
-- `family_a` — 4 proof-selected value → learned procedure tasks, including a
-  fresh reload and an unknown-value abstention.
+- `family_a` — 5 proof-selected value → learned procedure tasks, including a
+  fresh reload, an unknown-value abstention, and a frame taught in chat and
+  reloaded from its store.
 
 The command exits non-zero when a gated task fails or an expected abstention
 becomes a confident answer.

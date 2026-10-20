@@ -7,7 +7,7 @@ members prevent a final result.
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 import hashlib
 import json
 import re
@@ -18,6 +18,7 @@ from crms_knowledge import (
 )
 from crms_model import CRMSModel
 from crms_rule_proof import verify_inference_proof
+from crms_request_frames import RequestFrameStore
 from crms_actions import (
     ApplyLearnedProcedureAction, SelectVerifiedPositiveAction,
 )
@@ -87,6 +88,22 @@ def _normalize_procedure_sequence(instruction: str) -> str:
         # 'A after B' explicitly orders B before A.
         text = f"{after.group(2).strip()} then {after.group(1).strip()}"
     return text
+
+
+def _canonicalize_procedure_phrase(procedures: CRMSModel,
+                                   instruction: str) -> str:
+    """Use the stored spelling of a learned phrase when one matches exactly."""
+    text = _normalize_procedure_sequence(instruction)
+    learned = {
+        " ".join(phrase.casefold().split()): phrase
+        for phrase in procedures.learned_procedure_phrases()
+    }
+    parts = re.split(r"\s+then\s+", text, flags=re.IGNORECASE)
+    canonical = []
+    for part in parts:
+        key = " ".join(part.casefold().split())
+        canonical.append(learned.get(key, part.strip()))
+    return " then ".join(canonical)
 
 
 def _predict_licensed_procedure(procedures: CRMSModel, instruction: str,
@@ -160,6 +177,7 @@ class ReasonedListComposition:
     inference_proofs: tuple[dict[str, Any], ...] = ()
     procedure_records: tuple[dict[str, Any], ...] = ()
     language_evidence: tuple[dict[str, Any], ...] = ()
+    request_frame_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -217,7 +235,7 @@ def _parse_verified_filter_request(
         return None, ReasonedListComposition(
             "unsupported", "I couldn't identify one unambiguous stored relation and subject.")
     subject, relation = parsed
-    procedure = _normalize_procedure_sequence(procedure_text)
+    procedure = _canonicalize_procedure_phrase(procedures, procedure_text)
     return VerifiedFilterRequest(
         values=values,
         procedure=procedure,
@@ -283,6 +301,7 @@ def create_derived_composition_record(
         "negative_evidence": [dict(item) for item in result.evidence],
         "language_evidence": [dict(item) for item in result.language_evidence],
         "knowledge_fingerprint": knowledge_fingerprint,
+        "request_frame_id": result.request_frame_id,
         "lineage": {
             "sources": sorted(sources),
             "rule_ids": sorted(rule_ids),
@@ -298,10 +317,19 @@ def create_derived_composition_record(
 
 def revalidate_derived_composition(
         record: dict[str, Any], knowledge: CRMSKnowledgeBase,
-        procedures: CRMSModel) -> tuple[str, str]:
+        procedures: CRMSModel,
+        frames: RequestFrameStore | None = None) -> tuple[str, str]:
     """Re-run the exact request before presenting a stored composition as current."""
-    current = compose_verified_filter(record.get("request", ""),
-                                      knowledge, procedures)
+    request = record.get("request", "")
+    frame_id = record.get("request_frame_id")
+    if frames is not None and frame_id:
+        current = compose_verified_filter_via_frames(
+            request, knowledge, procedures, frames)
+        if current is None or current.request_frame_id != frame_id:
+            return ("stale",
+                    "the licensed request frame no longer matches this request")
+    else:
+        current = compose_verified_filter(request, knowledge, procedures)
     if current is None or current.status != "answered":
         return "stale", "the current evidence no longer proves a complete result"
     rebuilt = create_derived_composition_record(
@@ -792,7 +820,7 @@ def _composition_from_plan(
     if failed is not None and failed.reason_code == "unknown_values":
         unresolved = tuple(failed.metadata.get("unresolved", ()))
         incomplete = tuple(failed.metadata.get("incomplete", ()))
-        unresolved = tuple(dict.fromkeys((*unresolved, *incomplete)))
+        unresolved = (*unresolved, *incomplete)
         rendered = ", ".join(map(str, sorted(set(unresolved))))
         return ReasonedListComposition(
             "unknown",
@@ -839,22 +867,13 @@ def _composition_from_plan(
         language_evidence=request.language_evidence)
 
 
-def compose_verified_filter_via_plan(
-        instruction: str, knowledge: CRMSKnowledgeBase,
-        procedures: CRMSModel) -> ReasonedListComposition | None:
-    """Execute the explicit verified-filter frame through the typed planner.
-
-    This is a migration path: request parsing is still shared with
-    ``compose_verified_filter``, but selection and procedure execution run as
-    independently verified plan steps.
-    """
-    request, early = _parse_verified_filter_request(
-        instruction, knowledge, procedures)
-    if early is not None:
-        return early
-    if request is None:
-        return None
-
+def _execute_verified_filter_request(
+        instruction: str, request: VerifiedFilterRequest,
+        knowledge: CRMSKnowledgeBase, procedures: CRMSModel, *,
+        goal: str = "select-then-procedure",
+        provenance: dict[str, Any] | None = None,
+        ) -> ReasonedListComposition:
+    """Build and execute the typed plan for one resolved request."""
     select_step = Step(
         id="select",
         action="select-verified-positive",
@@ -881,14 +900,14 @@ def compose_verified_filter_via_plan(
         request=TaskRequest(
             id=request_id(instruction, "verified-filter"),
             text=instruction,
-            goal="verified-filter-then-procedure",
+            goal=goal,
             slots={
                 "subject": request.subject,
                 "relation": request.relation,
                 "values": list(request.values),
                 "procedure": request.procedure,
             },
-            provenance={"parser": "shared-explicit-frame"},
+            provenance=dict(provenance or {"parser": "explicit-frame"}),
         ),
         steps=(select_step, procedure_step),
         verification=check_for("oracle", ref="integer-list-output"),
@@ -916,3 +935,101 @@ def compose_verified_filter_via_plan(
         registry, plan_verifier=check_output).execute(
             plan, ExecutionContext({"instruction": instruction}))
     return _composition_from_plan(request, result)
+
+
+def compose_verified_filter_via_plan(
+        instruction: str, knowledge: CRMSKnowledgeBase,
+        procedures: CRMSModel) -> ReasonedListComposition | None:
+    """Execute the explicit regex-compiled frame through the typed planner.
+
+    Kept as the reference path for parity tests and direct diagnostics; chat
+    routes composition through learned request frames.
+    """
+    request, early = _parse_verified_filter_request(
+        instruction, knowledge, procedures)
+    if early is not None:
+        return early
+    if request is None:
+        return None
+    return _execute_verified_filter_request(
+        instruction, request, knowledge, procedures,
+        provenance={"parser": "explicit-regex-frame"})
+
+
+def compose_verified_filter_via_frames(
+        instruction: str, knowledge: CRMSKnowledgeBase,
+        procedures: CRMSModel, frames: RequestFrameStore,
+        ) -> ReasonedListComposition | None:
+    """Execute a request only when a licensed frame binds typed slots.
+
+    Unknown wording returns ``None`` so the caller can abstain or use another
+    route. Ambiguous frames never execute.
+    """
+    match_result = frames.match(
+        instruction,
+        procedure_phrases=procedures.learned_procedure_phrases())
+    if match_result.status == "no_match":
+        return None
+    if match_result.status == "ambiguous":
+        templates = "; ".join(
+            match.frame.template_text() for match in match_result.matches[:3])
+        return ReasonedListComposition(
+            "ambiguous",
+            "I found more than one licensed request frame for this wording. "
+            "Please rephrase, or teach a narrower frame. Candidates: "
+            + templates + ".")
+    match = match_result.match
+    if match is None:
+        return None
+    values = match.slots.get("values")
+    claim = match.slots.get("claim")
+    if not isinstance(values, tuple) or not isinstance(claim, str):
+        return replace(
+            ReasonedListComposition(
+                "unsupported",
+                "The licensed request frame did not bind the required values "
+                "and claim slots."),
+            request_frame_id=match.frame.frame_id)
+    procedure_slot = match.slots.get("procedure")
+    procedure_text = (match.frame.fixed_procedure
+                      if match.frame.fixed_procedure is not None
+                      else procedure_slot)
+    if not isinstance(procedure_text, str) or not procedure_text.strip():
+        return replace(
+            ReasonedListComposition(
+                "unsupported",
+                "The licensed request frame did not bind a procedure."),
+            request_frame_id=match.frame.frame_id)
+
+    language_evidence: tuple[dict[str, Any], ...] = ()
+    learned_match = knowledge.match_fact_pattern_relation_claim(claim)
+    if learned_match is not None:
+        parsed = (learned_match["subject"], learned_match["relation"])
+        language_evidence = (learned_match,)
+    else:
+        parsed = _relation_and_subject(claim, knowledge)
+    if parsed is None:
+        return replace(
+            ReasonedListComposition(
+                "unsupported",
+                "I couldn't identify one unambiguous stored relation and "
+                "subject."),
+            request_frame_id=match.frame.frame_id,
+            input_values=values)
+    subject, relation = parsed
+    request = VerifiedFilterRequest(
+        values=values,
+        procedure=_canonicalize_procedure_phrase(procedures, procedure_text),
+        subject=subject,
+        relation=relation,
+        language_evidence=language_evidence,
+    )
+    result = _execute_verified_filter_request(
+        instruction, request, knowledge, procedures,
+        goal=match.frame.goal,
+        provenance={
+            "parser": "learned-request-frame",
+            "frame_id": match.frame.frame_id,
+            "frame_template": match.frame.template_text(),
+        })
+    return replace(result, request_frame_id=match.frame.frame_id)

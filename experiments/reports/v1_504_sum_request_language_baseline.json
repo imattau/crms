@@ -33,7 +33,7 @@
       "composition_status": "no_route",
       "composition_output": [],
       "chat_answered_with_expected_total": false,
-      "chat_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> CRMS> I don't know this from the sources and facts I have. Add a source or teach the fact.\nyou> CRMS state saved. Goodbye."
+      "chat_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> CRMS> I have no taught phrase evidence for token(s) ['up']. Please provide an input list and the intended output for this instruction.\nyou> CRMS state saved. Goodbye."
     },
     {
       "case_id": "wh_total_frame",
@@ -53,7 +53,7 @@
       "composition_status": "no_route",
       "composition_output": [],
       "chat_answered_with_expected_total": false,
-      "chat_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> CRMS> I don't know this from the sources and facts I have. Add a source or teach the fact.\nyou> CRMS state saved. Goodbye."
+      "chat_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> CRMS> I have no taught phrase evidence for token(s) ['numbers', 'only', 'together']. Please provide an input list and the intended output for this instruction.\nyou> CRMS state saved. Goodbye."
     },
     {
       "case_id": "two_clause_pronoun",
@@ -62,7 +62,7 @@
       "composition_status": "no_route",
       "composition_output": [],
       "chat_answered_with_expected_total": false,
-      "chat_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> CRMS> I don't know this from the sources and facts I have. Add a source or teach the fact.\nyou> CRMS state saved. Goodbye."
+      "chat_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> CRMS> I have no taught phrase evidence for token(s) ['ones', 'reaches', 'she', 'up']. Please provide an input list and the intended output for this instruction.\nyou> CRMS state saved. Goodbye."
     },
     {
       "case_id": "wh_filter_and_aggregate",

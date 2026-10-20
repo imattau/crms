@@ -3,10 +3,10 @@
 **Status:** active contract; `crms_tasks.py` implements the data and invariants.
 `crms_planner.py` implements the action contract and a deterministic executor.
 `crms_actions.py` implements the first two Family A adapters
-(`select-verified-positive`, `apply-learned-procedure`). The chat path for the
-explicit verified-filter frame now executes through this plan; its regex parser
-remains only as a transitional request compiler. Learned request frames are not
-implemented yet.
+(`select-verified-positive`, `apply-learned-procedure`). Request goals now come
+from learned request frames (`docs/design_request_frames.md`); chat no longer
+uses the regex compiler for composition. The regex path remains as a reference
+for parity tests.
 **Date:** 2026-10-21
 
 ## Why
@@ -126,7 +126,8 @@ explicit `ExecutionError` failures into a refused result.
 
 ## Natural language → goal
 
-Phase 2 uses learned request frames:
+Phase 2 uses learned request frames, implemented in
+`crms_request_frames.py` and documented in `docs/design_request_frames.md`:
 
 - the frame identifies the goal kind (`select-then-procedure`,
   `retrieve-then-infer`, `retrieve-then-domain`);
@@ -164,11 +165,16 @@ procedure (clarify), unsupported procedure (unsupported), partial request
    text parity (`experiments/v1_552_family_a_plan_parity.py`).
 4. Flip chat to the plan path. — done for the explicit verified-filter frame.
 5. Replace the transitional regex request compiler with learned request frames
-   and typed slots, then remove the old dispatch. — next.
+   and typed slots, then remove the old dispatch. — done for chat:
+   `crms_request_frames.py`, `experiments/v1_553_request_frames.py`,
+   `experiments/v1_554_request_frame_composition.py`, and
+   `experiments/v1_555_request_frame_chat.py`; the old compiler remains only as
+   a reference path for parity and direct diagnostics.
 
 The old `compose_verified_filter` remains as the reference path used by the
-parity experiment and derived-composition checks; chat uses
-`compose_verified_filter_via_plan`.
+parity experiment and derived-composition checks. Chat uses only
+`compose_verified_filter_via_frames`; it does not fall back to the regex
+compiler.
 
 ## Open questions
 
