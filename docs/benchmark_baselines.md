@@ -3476,10 +3476,18 @@ This is a small Codex-authored development diagnostic, not an independent
 transfer benchmark or a representative measure of natural-language coverage.
 The 3/6 result identifies three distinct seams to measure separately: operation
 phrase learning, relation-language transfer, and request-frame understanding.
-Keep the abstentions as controls while improving these routes; do not replace
-them with broad lexical aliases. The next transfer evaluation needs frozen
-requests authored independently from the implementation and components, plus
-an independent result checker.
+On the current checkout, the “Take …; retain …, then remove duplicate values
+and reverse the list” negative exposed a partial-completion bug: CRMS returned
+the filtered and deduplicated intermediate list while silently omitting the
+requested reversal. The parser now rejects a generic composition when another
+command-like learned operation falls outside the selected licensed sequence;
+the request abstains instead. The regression also asserts that no intermediate
+is presented as the completed result. The 3/6 coverage count is unchanged; this
+fix strengthens completeness and uncertainty handling, not breadth. Keep the
+other abstentions as controls rather than replacing them with broad lexical
+aliases. The next transfer evaluation needs frozen requests authored
+independently from the implementation and components, plus an independent
+result checker.
 
 Report: [experiment](../experiments/v1_498_composition_request_coverage.py).
 

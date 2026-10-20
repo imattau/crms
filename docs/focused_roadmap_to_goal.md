@@ -605,13 +605,16 @@ compose the right components, complete the whole task, and survive independent
 checking on requests withheld from development. The next implementation cycle
 should freeze that evaluation and dialogue baseline before extending mechanisms.
 
-The new `v1_498` fresh-chat diagnostic completed 3/6 authored request forms.
-Exact licensed wording, “after removing”, and source-backed “can reach” worked;
-the system abstained on an unlicensed operation alias, an unlicensed relation
-paraphrase, and a broader request frame. These are distinct language seams,
-not failures of the proof checker. The sample is small and not independent
-transfer evidence; preserve it as a development control and freeze a separate
-request set before tuning against the next evaluation.
+The `v1_498` fresh-chat diagnostic completes 3/6 authored request forms. Exact
+licensed wording, “after removing”, and source-backed “can reach” work; the
+other three cases abstain. A current rerun exposed that the broader request
+frame had previously returned only a filtered/deduplicated intermediate while
+omitting the requested reversal. The composition parser now refuses a request
+when a second command-like operation falls outside the selected licensed
+sequence, and the regression asserts that no intermediate is presented as a
+completed result. This improves task completeness and honest abstention, not
+coverage. The sample remains small and is not independent transfer evidence;
+freeze a separate request set before tuning against the next evaluation.
 
 `v1_499` shows a concrete learning route for one of those seams: after an
 unlicensed operation was rejected, five labeled demonstrations triggered a

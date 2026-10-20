@@ -339,18 +339,41 @@ def _generic_request_parts(
         return None
     selected_phrase = selected[0]
     words = re.escape(selected_phrase).replace(r"\ ", r"\s+")
-    command_occurrences = []
-    for phrase_match in re.finditer(rf"(?<!\w){words}(?!\w)", instruction,
-                                    flags=re.IGNORECASE):
+    def is_command_occurrence(phrase_match: re.Match[str]) -> bool:
         prefix = instruction[:phrase_match.start()].rstrip()
-        if (not prefix
-                or re.search(r"[,;:.!?]\s*$", prefix)
+        return (not prefix
+                or re.search(r"[,;:.!?]\s*$", prefix) is not None
                 or re.search(r"\b(?:please|then|and|now|can you|could you|"
                              r"i need to|i want to)\s*$", prefix,
-                             flags=re.IGNORECASE)):
-            command_occurrences.append(phrase_match)
+                             flags=re.IGNORECASE) is not None)
+
+    command_occurrences = [
+        phrase_match for phrase_match in re.finditer(
+            rf"(?<!\w){words}(?!\w)", instruction, flags=re.IGNORECASE)
+        if is_command_occurrence(phrase_match)
+    ]
     if not command_occurrences:
         return None
+    if len(command_occurrences) != 1:
+        return None
+
+    # Do not silently drop a second learned operation from a compound request.
+    # A licensed multi-step phrase contains its component phrases inside its
+    # own span; any other command-like operation needs a separately licensed
+    # sequence parse, which this filter grammar does not supply.
+    selected_match = command_occurrences[0]
+    selected_span = (selected_match.start(), selected_match.end())
+    for phrase in learned_phrases:
+        phrase_words = re.escape(phrase).replace(r"\ ", r"\s+")
+        for occurrence in re.finditer(
+                rf"(?<!\w){phrase_words}(?!\w)", instruction,
+                flags=re.IGNORECASE):
+            if not is_command_occurrence(occurrence):
+                continue
+            contained = (selected_span[0] <= occurrence.start()
+                         and occurrence.end() <= selected_span[1])
+            if not contained:
+                return None
 
     # A relation phrase explicitly licensed from cited examples may appear
     # between the finite value set and the operation (for example, "Nia can

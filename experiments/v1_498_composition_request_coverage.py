@@ -93,6 +93,10 @@ def main() -> None:
                 require(expected_gap in output and "[9, 4, 12]" not in output,
                         f"{name} did not preserve its current abstention boundary:\n"
                         f"{output}")
+                require("Verified values satisfying" not in output
+                        and "After 'remove duplicate values'" not in output,
+                        f"{name} exposed a partial intermediate as its result:\n"
+                        f"{output}")
                 abstained += 1
                 print(f"{name}: no unsupported positive result: PASS")
 
