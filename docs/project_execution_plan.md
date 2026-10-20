@@ -78,6 +78,10 @@ On the current checkout, the following runtime controls passed:
 
 - `v1_427`: 30-turn dialogue transcript, including the Colosseum topic switch,
   history, stale explanation, clarification, and persistence.
+- `v1_523`: source-cited two-edge geographic path from the SimpleWiki index,
+  with a held-out river and unsupported-route abstention.
+- `v1_530`: held-out arXiv metadata rule validation and proof-selected sort,
+  independently checked against raw metadata.
 - `v1_501` and `v1_502`: learned sequence and proof-selected numeric
   aggregation in fresh chat, including unknown/conflict controls.
 - `v1_514` and `v1_516`: reviewed relation wording plus type reasoning across
@@ -91,8 +95,11 @@ On the current checkout, the following runtime controls passed:
   a contradictory requested direction are controlled.
 
 These are component/regression passes, not an independent user-task score.
-Most use authored controls; `v1_533` uses two documents from one PMC
-collection and remains narrow.
+They now exercise three different source collections (SimpleWiki, arXiv
+metadata, and PMC text) and several task types, but remain separate authored
+experiments with manual source-to-fact labels. `v1_533` and `v1_535` use one
+PMC collection and a single measure; this is source diversity across tests,
+not publisher-independent or representative user-task transfer.
 
 A focused request probe found that alternate operation wording was not
 recognized. `v1_534` now demonstrates one bounded path through this gap:
