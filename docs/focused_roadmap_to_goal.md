@@ -1,7 +1,7 @@
 # Focused roadmap from current CRMS to its goal
 
 **Reviewed:** 2026-10-20, against the current checkout and recorded runtime
-evidence through `v1_541`.
+evidence through `v1_542`.
 **Status:** active execution plan. The broad capability goal is not yet
 demonstrated.
 
@@ -43,6 +43,15 @@ and multiple locations are controlled; multiple cited locations are reported
 together rather than ranked. The new case and four adjacent natural-language
 and dialogue suites pass. This is a narrow source-grounded route, not evidence
 of general predicate or location understanding.
+
+The `v1_542` dialogue check fixes one user-visible history mismatch: after a
+pronoun follow-up, “What did I just ask?” now recalls the user's original
+wording, not the internally resolved entity-filled query. Explanation requests
+such as “Why?” are skipped when selecting the last substantive question. The
+new fresh-CLI regression and the 30-turn dialogue, paragraph-grounding, and
+source-topic controls pass. This improves one history operation; history,
+ordinal references, and open-ended continuity still need broader held-out
+conversation evaluation.
 
 Recombination, self-learning rules, reasoning, and dialogue are the central
 research priorities. Dialogue safety is also a release gate for every

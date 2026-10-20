@@ -2102,19 +2102,21 @@ class CRMSDialogue:
                 text=("I don't have an open yes/no question in this conversation. "
                       "What would you like to ask or confirm?"))
         if _RECALL_LAST_QUESTION_RE.fullmatch(question):
-            if self.last_question:
-                return DialogueTurn(
-                    "smalltalk", question, question,
-                    text=f"Your last question was: {self.last_question}")
             previous_question = next((
                 entry.get("utterance", "") for entry in reversed(self.history)
                 if entry.get("act") == "question"
                 and isinstance(entry.get("utterance"), str)
-                and entry["utterance"].strip()), None)
+                and entry["utterance"].strip()
+                and _EXPLANATION_FOLLOWUP_RE.fullmatch(
+                    entry["utterance"].strip()) is None), None)
             if previous_question:
                 return DialogueTurn(
                     "smalltalk", question, question,
                     text=f"Your last question was: {previous_question}")
+            if self.last_question:
+                return DialogueTurn(
+                    "smalltalk", question, question,
+                    text=f"Your last question was: {self.last_question}")
             return DialogueTurn(
                 "smalltalk", question, question,
                 text="I have no earlier question in this conversation.")

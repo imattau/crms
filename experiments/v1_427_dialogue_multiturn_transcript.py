@@ -94,9 +94,10 @@ def main() -> None:
                 f"turn {number} lost its expected evidence {expected!r}: {text}")
         require("1889" not in text,
                 f"turn {number} leaked Eiffel Tower evidence: {text}")
-    require("How many people could Colosseum hold?" in turns[12].text,
+    require(turns[12].text ==
+            "Your last question was: How many people could it hold?",
             f"history recall did not report the preceding question: {turns[12]!r}")
-    require("And Italy?" in turns[14].text,
+    require(turns[14].text == "Your last question was: And Italy?",
             f"history recall was not updated after an unanswered turn: {turns[14]!r}")
     unbound_ordinal = turns[15]
     require(unbound_ordinal.status == "clarify"

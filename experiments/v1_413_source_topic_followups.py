@@ -86,7 +86,8 @@ def main() -> None:
         followup_output = process.stdout.split(
             "when was it completed?")[-1]
         require("I won't guess" in followup_output
-                and "may not answer your question" in followup_output,
+                and "does not support a grounded answer"
+                    in followup_output,
                 "the unrelated completion sentence was not clearly marked as "
                 f"non-answer evidence:\n{process.stdout}")
     print("source topic follow-ups ok")

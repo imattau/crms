@@ -4365,3 +4365,22 @@ location extraction from implicit subjects. Preserve the abstention and
 multiple-location controls as regressions.
 
 Report: [experiment](../experiments/v1_541_subject_anchored_where_questions.py).
+
+## Exact last-question recall (`v1_542`, 2026-10-20)
+
+Command: `python3 experiments/v1_542_exact_question_recall.py`.
+
+After a source-backed question and an elliptical pronoun follow-up, “What did
+I just ask?” now returns the user's actual last substantive question
+(“When was it completed?”), not the internal resolved form
+(“When was Eiffel Tower completed?”). Explanation requests such as “Why?” are
+skipped when finding that prior question. The fresh CLI case, the 30-turn
+`v1_427` transcript, and the `v1_413` source-topic and `v1_426`
+paragraph-grounding controls pass.
+
+This is a bounded history-recall behavior, not general conversation memory or
+discourse understanding. It skips a specific explanation-follow-up class and
+uses the explicit bounded turn history; other conversational references still
+need held-out evaluation.
+
+Report: [experiment](../experiments/v1_542_exact_question_recall.py).
