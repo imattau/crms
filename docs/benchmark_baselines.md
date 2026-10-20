@@ -2719,3 +2719,35 @@ new imperative instead of a response to an open reservation-name question.
 unrelated imperative still interrupts the slot. The relevant runtime checks
 `v1_402`, `v1_444`, `v1_461`, and `v1_463` pass. This repairs a narrow, visible
 failure class; it is not a rerun of the holdout and does not improve its score.
+
+## Map-free structured/prose predicate discovery (`v1_464`, 2026-10-20)
+
+`experiments/v1_464_unmapped_structured_predicate_discovery.py` scanned all
+285,478 documents in the local SimpleWiki SQLite research index. It did not
+use a field-to-relation map: infobox field names only grouped examples, while
+predicate phrases came from CRMS sentence parsing. The deterministic split
+held out one fifth of document IDs. Of 243,211 field/sentence co-mentions,
+2,656 produced one role-compatible parse; the experiment formed 45 repeated
+field/role groups and emitted 30 report-only candidates. Sixteen candidates
+had at least one held-out pair, and fourteen had candidate and dominant
+wording represented in held-out pages.
+
+An unblinded, single-reviewer Codex pass over the surfaced examples labeled
+four candidate groups as plausible same-relation wording, eight as related
+but unsafe global substitutions, four as parser/boundary artifacts, and
+fourteen as false or composite candidates. The 360 cited spans in candidate,
+held-out, and dominant examples matched both source hash and exact text
+offset. This review describes these surfaced groups only: it is not blinded,
+independent, publisher-disjoint, or a precision/recall estimate. The held-out
+pages share the same encyclopedia, and the weak infobox grouping signal
+produces role and qualifier confounds. No candidate was accepted or written to
+memory. Full records and labels are in the [run report](reports/v1_464_unmapped_structured_predicate_discovery.json)
+and [review file](reports/v1_464_unmapped_structured_predicate_review.json).
+
+The experiment advances the research question from “can a hand-coded map
+recover the capital wording?” to “can the system discover a typed relation
+variant without that map?” The answer is “some candidate signal, with too much
+noise to learn safely.” Next work should improve relation/role typing and
+test transfer across publishers before adding automatic rule learning. This
+supports the roadmap’s emphasis on recombination and self-learning rules while
+keeping those capabilities unclaimed until their evidence gates pass.

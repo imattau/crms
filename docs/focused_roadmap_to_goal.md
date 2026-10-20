@@ -33,10 +33,25 @@ Codex's unblinded review found all eight cited capital sentences directly
 express the relation; this does not estimate proposal precision or recall. See
 the [review record](../experiments/reports/structured_predicate_alignment_review.json).
 
+The next map-free probe (`v1_464`) removed the hand-coded field→relation map
+and scanned all 285,478 SimpleWiki documents. It grouped 45 repeated
+field/role patterns and emitted 30 report-only candidate groups; 16 had at
+least one held-out candidate pair, and 14 had held-out support for both the
+candidate and dominant wording. An unblinded Codex review of the displayed
+examples marked four as plausible same-relation candidates, eight as related
+but unsafe to substitute globally, four as parser/boundary artifacts, and
+fourteen as false or composite candidates. All 360 cited field/sentence spans
+matched their source hashes and offsets. The positive signal justifies a
+better discovery experiment, but the noise and same-corpus split mean this is
+not a rule-learning result. Improve candidate typing and test
+publisher-disjoint transfer before proposing automatic review or acceptance.
+See the [run report](../experiments/reports/v1_464_unmapped_structured_predicate_discovery.json)
+and [label review](../experiments/reports/v1_464_unmapped_structured_predicate_review.json).
+
 | Order | Work packet | Immediate outcome | Do not claim yet |
 |---|---|---|---|
 | 1 | Validate dialogue transfer and safety | Preserve current clean-process regressions; test independently authored transcripts, varied layouts, visible-context carryover, topic switching, repairs, and history questions. Measure wrong referents, omissions, clarifications, and task completion separately. | Robust open-domain conversation from authored fixtures. |
-| 2 | Turn source alignment into a useful discovery experiment | Generalize structured-field/prose alignment without hard-coded field→relation truth; emit cited, report-only candidates with entity-role checks, source-disjoint splits, and negative controls. Measure yield and precision on a larger, blinded corpus sample before building more extraction machinery. | Autonomous rule learning or reliable paraphrase discovery from one repeated field. |
+| 2 | Turn source alignment into a useful discovery experiment | Reduce role, qualifier, and parser noise in map-free candidates; keep them report-only; then measure on publisher-disjoint examples with blinded review and negative controls. | Autonomous rule learning or reliable paraphrase discovery from one repeated field. |
 | 3 | Recombine learned components through reasoning | Route accepted, source-backed rules through natural-language chat, held-out composition, proof/checking, and an independent output validator. Include correction and derived-case invalidation; distinguish negative, conflict, missing premise, and incomplete search. | General planning or safe self-improvement from synthetic fixtures. |
 
 Run the contextual-intent/dialogue track alongside these packets, but let intent

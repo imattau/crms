@@ -261,7 +261,12 @@ Report size, runtime, compatibility requirements, and unsupported cases.
    clarification, and completion separately. The recent-paper topic repair is
    one regression control, not a conversation benchmark.
 2. **Prove source-derived rules and recombination beyond hand-labeled phrases.**
-   Use complete documents with document- and publisher-held-out splits. Freeze
+   The map-free `v1_464` full SimpleWiki scan surfaced useful relation wording
+   alongside substantial parser and role noise; keep all candidates
+   report-only.
+   Next reduce those errors and validate on publisher-held-out material before
+   building a learner. Use complete documents with document- and
+   publisher-held-out splits. Freeze
    positive, quoted, negated, contrastive, conditional, metalinguistic, and
    unrelated passages before implementing extraction. Track proposal
    precision, useful coverage, false proposals, review burden, and Codex label
