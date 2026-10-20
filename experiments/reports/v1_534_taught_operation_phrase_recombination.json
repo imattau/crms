@@ -1,0 +1,112 @@
+{
+  "experiment": "v1_534_taught_operation_phrase_recombination",
+  "date": "2026-10-20",
+  "status": "pass",
+  "training": {
+    "operation_phrases": [
+      "keep unique entries",
+      "flip their order"
+    ],
+    "operation_labeler": "teacher:operation-phrase",
+    "sequence_connectives": [
+      "and",
+      "then"
+    ],
+    "connective_labels": [
+      "codex:sequence-teacher",
+      "codex:sequence-then-teacher"
+    ],
+    "held_out_components": [
+      "operation combinations",
+      "operation order",
+      "request instances",
+      "entity values"
+    ]
+  },
+  "cases": [
+    {
+      "request": "Take values 23, 5, 23, and 8; among those Mira reaches, then keep unique entries and flip their order.",
+      "expected": [
+        5,
+        23
+      ],
+      "actual": [
+        5,
+        23
+      ],
+      "proof_sources": [
+        "mira:record-23",
+        "mira:record-5"
+      ],
+      "negative_source": "mira:record-8-negative",
+      "procedure_lineage": [
+        "teacher:operation-phrase:flip their order:0",
+        "teacher:operation-phrase:flip their order:1",
+        "teacher:operation-phrase:flip their order:2",
+        "teacher:operation-phrase:flip their order:3",
+        "teacher:operation-phrase:flip their order:contrast:1",
+        "teacher:operation-phrase:keep unique entries:0",
+        "teacher:operation-phrase:keep unique entries:1",
+        "teacher:operation-phrase:keep unique entries:2",
+        "teacher:operation-phrase:keep unique entries:3",
+        "teacher:operation-phrase:keep unique entries:contrast:1",
+        "teacher:compound:reverse the list and add one to values:0",
+        "teacher:compound:reverse the list and add one to values:1",
+        "teacher:compound:reverse the list and add one to values:2",
+        "teacher:compound:sort the list and flip the values:0",
+        "teacher:compound:sort the list and flip the values:1",
+        "teacher:compound:sort the list and flip the values:2"
+      ],
+      "sequence_labeler": "codex:sequence-teacher"
+    },
+    {
+      "request": "Take values 23, 5, 23, and 8; among those Mira reaches, then flip their order then keep unique entries.",
+      "expected": [
+        23,
+        5
+      ],
+      "actual": [
+        23,
+        5
+      ],
+      "proof_sources": [
+        "mira:record-23",
+        "mira:record-5"
+      ],
+      "negative_source": "mira:record-8-negative",
+      "procedure_lineage": [
+        "teacher:operation-phrase:flip their order:0",
+        "teacher:operation-phrase:flip their order:1",
+        "teacher:operation-phrase:flip their order:2",
+        "teacher:operation-phrase:flip their order:3",
+        "teacher:operation-phrase:flip their order:contrast:1",
+        "teacher:operation-phrase:keep unique entries:0",
+        "teacher:operation-phrase:keep unique entries:1",
+        "teacher:operation-phrase:keep unique entries:2",
+        "teacher:operation-phrase:keep unique entries:3",
+        "teacher:operation-phrase:keep unique entries:contrast:1",
+        "teacher:compound:reverse the list then add one to values:0",
+        "teacher:compound:reverse the list then add one to values:1",
+        "teacher:compound:reverse the list then add one to values:2",
+        "teacher:compound:sort the list then flip the values:0",
+        "teacher:compound:sort the list then flip the values:1",
+        "teacher:compound:sort the list then flip the values:2"
+      ],
+      "sequence_labeler": "codex:sequence-then-teacher"
+    }
+  ],
+  "controls": {
+    "unknown_member": "unknown",
+    "unlicensed_connective": "unsupported_procedure",
+    "unlicensed_operation": "unsupported_procedure",
+    "before_phrase_teaching": "abstained",
+    "copied_model_fresh_chat_and_why": true
+  },
+  "independent_oracle": "Python stable de-duplication and list reversal",
+  "limitations": [
+    "Operation wording and connective were explicitly teacher-labeled.",
+    "Request combinations, order, and values were held out from those examples.",
+    "The fixtures are controlled; this is not independent natural-language transfer.",
+    "The input evidence is a synthetic proof graph, not a representative corpus."
+  ]
+}

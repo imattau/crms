@@ -89,18 +89,17 @@ These are component/regression passes, not an independent user-task score.
 Most use authored controls; `v1_533` uses two documents from one PMC
 collection and remains narrow.
 
-A focused request probe against the current learned facts and procedures
-confirmed the next language-transfer target. The canonical request
-“remove duplicate values and reverse the list” composes successfully, while
-natural alternatives such as “return the distinct values … in reverse order”
-and “deduplicate, then reverse” do not resolve through
-`compose_verified_filter`. The evidence and learned operations are present;
-the request-to-operation binding is the gap. The next recombination change
-should address this through explicit, reviewable operation-language learning
-and held-out phrase transfer, preserving order and abstaining on unlicensed
-operations. Do not hard-code this probe's alternate phrases as a passing
-result; freeze them as held-out evaluation items before implementing the
-resolver.
+A focused request probe found that alternate operation wording was not
+recognized. `v1_534` now demonstrates one bounded path through this gap:
+explicitly teach two operation phrases, learn `and` and `then` sequence
+connectives from separate examples, and combine the held-out phrases and
+orders in fresh chat. Operation order changes the output; evidence, operation
+labels, and connective provenance remain visible. Unknown values and
+unlicensed operations/connectives abstain, and the copied SQLite model
+reproduces the result. This is controlled transfer over supervised phrases
+and a synthetic proof graph, not broad language transfer. The next step is a
+frozen task set with newly written wording and a second, non-list task family;
+measure useful transfer and teacher burden before adding more phrase examples.
 
 The current experiments already demonstrate controlled reasoning-to-math,
 typed relation/paraphrase recombination, learned sequence operations, and

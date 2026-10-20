@@ -4203,3 +4203,30 @@ feedback database so unrelated user-local correction history cannot affect
 the result.
 
 Report: [experiment](../experiments/v1_514_typed_relation_recombination_chat.py).
+
+## Taught operation-phrase recombination (`v1_534`, 2026-10-20)
+
+Command: `python3 experiments/v1_534_taught_operation_phrase_recombination.py`.
+
+Two new operation phrases (“keep unique entries” and “flip their order”) are
+learned from labeled input/output examples. The sequence connectives `and` and
+`then` are licensed by separate, distinct compound demonstrations. In fresh
+chat, CRMS combines the two taught operation phrases in both orders over
+proof-selected values for a new entity/value set. Stable de-duplication then
+reversal returns `[5, 23]`; reversal then de-duplication returns `[23, 5]`,
+matching an independent Python oracle. The output retains the positive and
+negative fact sources, operation-teacher labels, and sequence-teacher
+provenance. An unknown list member, an unlicensed `but` connective, and an
+unlicensed `cube` operation all prevent a result. The copied SQLite model
+answers and supports `why?` after reload.
+
+This confirms that the generic request path can pass a multi-operation clause
+to the procedure learner and use explicitly taught operation phrases in a new
+combination. The request frames, operation labels, relation graph, and values
+are controlled fixtures; phrase supervision is explicit, and the holdout is
+only the composition/order/request instance. It does not establish independent
+language transfer, source-derived operation learning, or broad task
+competence. Preserve the before-teaching abstention and all negative controls.
+
+Report: [experiment](../experiments/v1_534_taught_operation_phrase_recombination.py),
+[results](../experiments/reports/v1_534_taught_operation_phrase_recombination.json).

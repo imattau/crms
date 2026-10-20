@@ -285,8 +285,8 @@ def _generic_request_parts(
 
     This does not infer operation synonyms or relation paraphrases. It accepts
     a request only when the text contains one unambiguous integer set, one
-    subject/relation pair already represented in the knowledge base, and one
-    learned procedure phrase.
+    subject/relation pair already represented in the knowledge base, and a
+    learned procedure or sequence of learned procedure phrases.
     """
     learned_phrases = procedures.learned_procedure_phrases()
     if not any(re.search(
@@ -324,21 +324,6 @@ def _generic_request_parts(
             rf"(?<!\w){re.escape(f'{subject} {relation}').replace(r'\ ', r'\s+')}(?!\w)",
             instruction, flags=re.IGNORECASE)
     }
-    matched_phrases: set[str] = set()
-    for phrase in learned_phrases:
-        words = re.escape(phrase).replace(r"\ ", r"\s+")
-        if re.search(rf"(?<!\w){words}(?!\w)", instruction,
-                     flags=re.IGNORECASE):
-            matched_phrases.add(phrase)
-    if not matched_phrases:
-        return None
-    longest = max(len(phrase) for phrase in matched_phrases)
-    selected = sorted(phrase for phrase in matched_phrases
-                      if len(phrase) == longest)
-    if len(selected) != 1:
-        return None
-    selected_phrase = selected[0]
-    words = re.escape(selected_phrase).replace(r"\ ", r"\s+")
     def is_command_occurrence(phrase_match: re.Match[str]) -> bool:
         prefix = instruction[:phrase_match.start()].rstrip()
         return (not prefix
@@ -347,41 +332,45 @@ def _generic_request_parts(
                              r"i need to|i want to)\s*$", prefix,
                              flags=re.IGNORECASE) is not None)
 
-    command_occurrences = [
-        phrase_match for phrase_match in re.finditer(
-            rf"(?<!\w){words}(?!\w)", instruction, flags=re.IGNORECASE)
-        if is_command_occurrence(phrase_match)
-    ]
-    if not command_occurrences:
-        return None
-    if len(command_occurrences) != 1:
-        return None
-
-    # Do not silently drop a second learned operation from a compound request.
-    # A licensed multi-step phrase contains its component phrases inside its
-    # own span; any other command-like operation needs a separately licensed
-    # sequence parse, which this filter grammar does not supply.
-    selected_match = command_occurrences[0]
-    selected_span = (selected_match.start(), selected_match.end())
+    matched_phrases: set[str] = set()
+    phrase_occurrences: list[tuple[str, re.Match[str]]] = []
+    command_occurrences: list[tuple[str, re.Match[str]]] = []
     for phrase in learned_phrases:
-        phrase_words = re.escape(phrase).replace(r"\ ", r"\s+")
-        for occurrence in re.finditer(
-                rf"(?<!\w){phrase_words}(?!\w)", instruction,
+        words = re.escape(phrase).replace(r"\ ", r"\s+")
+        for phrase_match in re.finditer(
+                rf"(?<!\w){words}(?!\w)", instruction,
                 flags=re.IGNORECASE):
-            if not is_command_occurrence(occurrence):
-                continue
-            contained = (selected_span[0] <= occurrence.start()
-                         and occurrence.end() <= selected_span[1])
-            if not contained:
-                return None
+            matched_phrases.add(phrase)
+            phrase_occurrences.append((phrase, phrase_match))
+            if is_command_occurrence(phrase_match):
+                command_occurrences.append((phrase, phrase_match))
+    if not matched_phrases or not command_occurrences:
+        return None
+    command_occurrences.sort(
+        key=lambda item: (item[1].start(), -item[1].end(), -len(item[0])))
+    procedure_start = command_occurrences[0][1].start()
+    first_phrase = max(
+        (phrase for phrase, match in phrase_occurrences
+         if match.start() == procedure_start), key=len)
+    first_phrase_end = max(
+        match.end() for phrase, match in phrase_occurrences
+        if phrase == first_phrase and match.start() == procedure_start)
+    later_command_start = any(
+        match.start() > procedure_start for _phrase, match in command_occurrences)
+    trailing_text = instruction[first_phrase_end:].strip(" \t,;:.!?")
+    trailing_connector = re.match(
+        r"^(?:and|then|but|after)\b", trailing_text, flags=re.IGNORECASE)
+    multiple_operations = later_command_start or trailing_connector is not None
+    procedure_text = (
+        instruction[procedure_start:].strip(" \t,;:.!?")
+        if multiple_operations else first_phrase)
 
     # A relation phrase explicitly licensed from cited examples may appear
     # between the finite value set and the operation (for example, "Nia can
     # reach"). Recover it from that clause using the same grounded alignment
     # API used for direct relation claims. This does not admit a lexical
     # synonym: an unlicensed phrase still produces no claim and abstains.
-    claim_region = instruction[value_span.end():
-                               command_occurrences[0].start()]
+    claim_region = instruction[value_span.end():procedure_start]
     claim_region = re.sub(
         r"^\s*(?:(?:to|keep|return)\s+)?(?:only\s+)?(?:the\s+)?"
         r"values?\s+(?:(?:that|which)\s+)?", "", claim_region,
@@ -402,7 +391,7 @@ def _generic_request_parts(
     # Keep the observed surface for the normal resolver to attach the
     # alignment's source evidence to the final composition record.
     claim_text = licensed_claim or f"{subject} {relation}"
-    return values_text, claim_text, selected_phrase
+    return values_text, claim_text, procedure_text
 
 
 def _proof_sources(proof: dict[str, Any]) -> set[str]:
