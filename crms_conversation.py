@@ -218,6 +218,11 @@ _ACTION_REQUEST_VERBS = {
     "put", "remind", "reserve", "seat", "send", "set", "take", "translate",
     "try", "write",
 }
+_DIRECT_REQUEST_VERBS = _INFORMATION_REQUEST_VERBS | _ACTION_REQUEST_VERBS
+_DIRECT_IMPERATIVE_REQUEST_RE = re.compile(
+    r"^(?:please\s+)?(?P<verb>"
+    + "|".join(sorted(_DIRECT_REQUEST_VERBS, key=len, reverse=True))
+    + r")\b\s+\S.+$", re.IGNORECASE)
 _EXPLICIT_RESERVATION_REQUEST_RE = re.compile(
     r"^(?:(?:i|we)\s+(?:(?:need|want)\s+(?:to\s+)?|"
     r"(?:would|could)\s+like\s+to\s+)"
@@ -741,6 +746,24 @@ def classify_user_intent(
                 context_predicates=("pending_candidate_choice",),
                 alternatives=tuple(dialogue.pending_result.candidates or ()),
             )
+
+    # A clear new imperative is a new task, even while the assistant is
+    # waiting for a short clarification value. Do not absorb requests such as
+    # “Tell me a joke” as the entity or detail requested by the prior turn.
+    direct_imperative = _DIRECT_IMPERATIVE_REQUEST_RE.fullmatch(text.strip())
+    if (direct_imperative is not None
+            and _session_slot_correction(text) is None):
+        verb = direct_imperative.group("verb").casefold()
+        task_intent = ("seek-information" if verb in _INFORMATION_REQUEST_VERBS
+                       else "other-task")
+        return UserIntentHypothesis(
+            dialogue_act="request-action",
+            task_intent=task_intent,
+            goal_intent=task_intent,
+            decision="selected",
+            matched_frame="direct-imperative-request",
+            context_predicates=("direct-user-request",),
+        )
 
     open_question = dialogue.open_dialogue_question
     if open_question is not None:

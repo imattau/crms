@@ -2085,3 +2085,23 @@ and gendered forms. The existing 12 focused retrieval/dialogue regressions
 `v1_427`, `v1_435`, `v1_438`, `v1_439`, `v1_440`) also passed after the change.
 This does not demonstrate open-domain language transfer or human-label
 accuracy.
+
+## New requests interrupt open dialogue slots (2026-10-20)
+
+The 30-turn transcript uncovered a contextual routing error outside its
+assertions: after CRMS asked which entity “it” referred to, “Tell me a joke”
+was accepted as the missing entity. The same short-answer heuristic could
+consume a new task as a response to an open clarification.
+
+`experiments/v1_444_dialogue_request_interruptions.py` now checks three direct
+requests (“Tell me a joke”, “Write a poem”, “Translate hello into French”) while
+an entity slot is open, plus a valid short entity reply. Explicit imperative
+requests are classified before the generic short-answer rule, clearing the old
+slot; typed corrections such as “Set the location to San Jose” retain their
+existing correction route.
+
+Runtime commands: `v1_444`, `v1_388`, `v1_427`, `v1_442`, `v1_353`, `v1_391`,
+`v1_404`, `v1_419`, and `v1_438`; all nine passed. `git diff --check` passed.
+The request classifier only recognizes the current explicit command vocabulary;
+this does not establish broad intent recognition, nor does it add joke-writing
+capability. The new fixture and existing dialogue scripts are Codex-authored.

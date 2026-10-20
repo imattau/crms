@@ -155,7 +155,10 @@ unsupported cases alongside capability results.
    authored conversations with interruptions, corrections, history questions,
    ordinal references, and unresolved choices. Report wrong referents, wrong
    answer sentences, omissions, clarification, abstention, citation support,
-   and task completion separately. Attribute labels and authoring; do not
+   and task completion separately. A direct request now interrupts an open
+   clarification rather than being consumed as its missing value (`v1_444`);
+   broaden this beyond the current authored command forms and exercise it in
+   complete held-out conversations. Attribute labels and authoring; do not
    present the Codex-authored probe as independent human evaluation.
 2. **Advance source-derived self-learning rules.** Extend beyond current
    teacher-labeled phrase and connective examples using complete-document and
@@ -221,6 +224,15 @@ clauses remain review proposals with exact conditions visible. These cases
 measure regression behavior, not field precision. The next gate remains
 complete-document, source-disjoint transfer with independently authored
 negative passages and a measured proposal precision.
+
+The dialogue packet also exposed a short-answer routing bug: “Tell me a joke”
+was stored as the missing entity after an open pronoun clarification. Direct
+imperative requests are now classified before the open-slot fallback, while
+valid entity replies and explicit slot corrections retain their routes. The
+new transcript regression and eight adjacent intent/dialogue scripts pass
+(9/9 total). This closes only that interrupted-slot failure on the covered
+commands; contextual intent generalization and open-ended creative capability
+remain unproven.
 
 Do not grow the corpus as a substitute for these packets: more documents cannot
 repair relation selection, context updates, or a missing composition learner.
