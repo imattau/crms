@@ -3315,7 +3315,8 @@ def _exact_title_location_evidence(
 
 
 def _explicit_subject_locative_evidence(
-        index: CRMSSQLiteResearchIndex, entity: str, predicate: str
+        index: CRMSSQLiteResearchIndex, entity: str, predicate: str,
+        licensed_predicate_families: dict[str, set[str]] | None = None,
         ) -> dict[str, Any] | None:
     """Find one asserted clause with an exact subject, verb and place phrase."""
     entity_tokens = tuple(normalized_tokens(entity))
@@ -3363,11 +3364,40 @@ def _explicit_subject_locative_evidence(
                 continue
             source_verb = relation.group("verb").casefold()
             requested_verb = predicate.casefold()
-            if (source_verb != requested_verb
-                    and _analyze_predicate_spelling(
-                        requested_verb, source_verb) is None
-                    and _analyze_predicate_spelling(
-                        source_verb, requested_verb) is None):
+            source_preposition = relation.group("preposition").casefold()
+            exact_or_inflected = (
+                source_verb == requested_verb
+                or _analyze_predicate_spelling(
+                    requested_verb, source_verb) is not None
+                or _analyze_predicate_spelling(
+                    source_verb, requested_verb) is not None)
+            aligned_relations = []
+            for canonical, forms in (licensed_predicate_families or {}).items():
+                canonical_tokens = normalized_tokens(canonical)
+                if len(canonical_tokens) < 2:
+                    continue
+                canonical_verb = canonical_tokens[0]
+                canonical_preposition = " ".join(canonical_tokens[1:])
+                source_matches_canonical = (
+                    canonical_preposition == source_preposition
+                    and (source_verb == canonical_verb
+                         or _analyze_predicate_spelling(
+                             canonical_verb, source_verb) is not None
+                         or _analyze_predicate_spelling(
+                             source_verb, canonical_verb) is not None))
+                requested_form_is_licensed = any(
+                    tuple(normalized_tokens(form))
+                        == tuple(normalized_tokens(predicate))
+                    or (len(normalized_tokens(form)) == 1
+                        and _analyze_predicate_spelling(
+                            requested_verb,
+                            normalized_tokens(form)[0]) is not None)
+                    for form in forms)
+                if source_matches_canonical and requested_form_is_licensed:
+                    aligned_relations.append(canonical)
+            learned_alignment = (aligned_relations[0]
+                                 if len(set(aligned_relations)) == 1 else None)
+            if not exact_or_inflected and learned_alignment is None:
                 continue
             place = relation.group("place").strip()
             if (not place or re.search(
@@ -3381,6 +3411,10 @@ def _explicit_subject_locative_evidence(
                 continue
             evidence["locative_phrase"] = (
                 relation.group("preposition") + " " + place)
+            if learned_alignment is not None and not exact_or_inflected:
+                evidence["aligned_relation"] = learned_alignment
+                evidence["source_predicate"] = (
+                    source_verb + " " + source_preposition)
             found.setdefault(tuple(normalized_tokens(place)), evidence)
     if len(found) == 1:
         return next(iter(found.values()))
@@ -11621,17 +11655,57 @@ def main() -> int:
                 where_evidence = _exact_title_location_evidence(
                     index, entity, predicate)
             if where_evidence is None and generic_where_action:
+                licensed_families: dict[str, set[str]] = {}
+                if turn.research is not None:
+                    for expansion in turn.research.query_expansions:
+                        if (expansion.get("kind") == "licensed_predicate"
+                                and expansion.get("evidence")
+                                and expansion.get("text")):
+                            licensed_families.setdefault(
+                                str(expansion["evidence"]), set()).add(
+                                    str(expansion["text"]))
                 where_evidence = _explicit_subject_locative_evidence(
-                    index, entity, predicate)
+                    index, entity, predicate, licensed_families)
                 if (where_evidence is not None
                         and not where_evidence.get("ambiguous")):
+                    alignment_note = ""
+                    aligned_relation = where_evidence.get("aligned_relation")
+                    if aligned_relation:
+                        alignment_examples = []
+                        if turn.research is not None:
+                            for expansion in turn.research.query_expansions:
+                                if (expansion.get("kind")
+                                        != "licensed_predicate"
+                                        or expansion.get("evidence")
+                                            != aligned_relation):
+                                    continue
+                                for source_id in expansion.get("sources", []):
+                                    try:
+                                        document_id = str(source_id).split(
+                                            "#", 1)[0]
+                                        title = index.document(document_id).title
+                                        excerpt = index.resolve_citation(
+                                            str(source_id))
+                                    except (KeyError, ValueError):
+                                        continue
+                                    item = f'“{excerpt}” [Source: {title}]'
+                                    if item not in alignment_examples:
+                                        alignment_examples.append(item)
+                        alignment_note = (
+                            f"; reviewed wording alignment: '{predicate}' "
+                            f"to '{aligned_relation}'"
+                            + ("; alignment examples: "
+                               + "; ".join(alignment_examples)
+                               if alignment_examples else ""))
                     where_evidence["realized_answer"] = {
                         "text": where_evidence["text"],
                         "source_title": where_evidence["title"],
                         "citation": where_evidence["citation"],
                         "method": "explicit-subject locative realization",
                         "stored_as_fact": False,
+                        "language_alignment": aligned_relation,
                     }
+                    where_evidence["alignment_note"] = alignment_note
                     if turn.research is not None:
                         turn.research.source_sentences = [where_evidence]
                         turn.research.realized_answer = dict(
@@ -11659,7 +11733,8 @@ def main() -> int:
                     turn.text = (
                         f"{location_text or 'The source says: ' + where_evidence['text']} "
                         f"[Source: {where_evidence['title']}; quoted evidence, "
-                        "not an accepted fact]")
+                        "not an accepted fact]"
+                        f"{where_evidence.get('alignment_note', '')}")
             else:
                 if turn.status in {"unknown", "sources_found"}:
                     location_labels = {

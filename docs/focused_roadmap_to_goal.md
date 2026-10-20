@@ -1,7 +1,7 @@
 # Focused roadmap from current CRMS to its goal
 
 **Reviewed:** 2026-10-20, against the current checkout and recorded runtime
-evidence through `v1_542`.
+evidence through `v1_543`.
 **Status:** active execution plan. The broad capability goal is not yet
 demonstrated.
 
@@ -52,6 +52,17 @@ new fresh-CLI regression and the 30-turn dialogue, paragraph-grounding, and
 source-topic controls pass. This improves one history operation; history,
 ordinal references, and open-ended continuity still need broader held-out
 conversation evaluation.
+
+The `v1_543` integration applies the existing reviewed relation-learning path
+to a real chat gap from the broad-corpus audit: “Where does the Serein River
+run?” can use a source sentence saying it “flows through” a city after two
+independent source-backed examples explicitly align `runs` with `flow through`.
+One example alone does not license the expansion; the held-out entity/source
+is cited, and alignment sources are shown in fresh chat. A separate unrelated
+verb still abstains. This demonstrates a small learned-language-plus-evidence
+composition through chat and save/reload, but the examples and task are
+controlled, the supervision is manually supplied, and this is not learned
+source-rule discovery or broad paraphrase transfer.
 
 Recombination, self-learning rules, reasoning, and dialogue are the central
 research priorities. Dialogue safety is also a release gate for every
