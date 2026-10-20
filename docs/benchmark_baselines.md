@@ -2467,21 +2467,38 @@ The exploratory read-only scan
 `python3 experiments/v1_337_structured_prose_alignment_probe.py` processed all
 285,478 documents in the local SimpleWiki index. Its explicit field/relation
 map found a repeated `capital city of` candidate for `capital of` across eight
-distinct entity pairs. It also found a likely false `national museum of` /
-`born in` alignment on two pairs, demonstrating that joint title/value mentions and
-parser role compatibility do not establish semantic equivalence.
+distinct entity pairs. The initial probe also produced a false
+`national museum of` / `born in` candidate on two pairs: both mentions came
+from `caption = ...` infobox lines, not article prose. The probe now excludes
+sentence spans that overlap structured key/value lines, with a direct
+caption-versus-prose regression. After that change, the scan counted 4,223
+joint field/prose mentions, 45 role-compatible parses, and 30 canonical
+relation matches. It reported four groups total, of which only
+`capital city of` → `capital of` was a novel predicate group; the museum
+caption proposal disappeared. This remains a narrow candidate-yield measure,
+not proposal precision or recall.
 
 A separate full-corpus call to the integrated
 `CRMSKnowledgeBase._propose_structured_predicate_alignments` path found the
 same capital wording on eleven pairs and did not return the museum alignment.
-This is a scope difference, not evidence of better precision: the probe has a
-five-field map including `birth_place`, while the integrated code currently
-allows only `capital`; additionally, the probe requires the document text to
-start with `Infobox`, while the integrated extractor can locate an infobox
-later. The two paths have not been compared on a matched document set. Both
-use a hand-coded field-to-relation map, and field and prose citations come
-from the same page. The 11-pair figure is page-level repetition, not
-independent publisher evidence.
+After that filter, the paths were compared on an identical probe-eligible set with
+`python3 experiments/v1_458_matched_structured_alignment.py`. The script
+copied 3,284 matching documents into a temporary SQLite index; both paths
+found exactly the same eight `capital city of` pairs (8 overlap, zero
+path-specific pairs). The original eleven-pair integrated result includes
+three pages excluded by the probe's `text.startswith("Infobox")` scope. After
+the caption filter, the exploratory scan reports four groups total, only one
+novel predicate group, and no museum-caption false proposal. This is a useful
+boundary correction, not a real-corpus precision estimate: both paths still
+use hand-coded field-to-relation maps, and field and prose citations come from
+the same page. The eight repeated pairs are not independent publisher
+evidence, and unproposed variants remain unmeasured.
+
+The matched-scope runtime diagnostic passed under the isolated experiment
+runner (`v1_458`, 1/1 in 18.74 seconds); the structured learning/review fixture
+also passed (`v1_338`, 1/1 in 0.34 seconds). The `v1_458` result checks exact
+agreement between the two implementations for the capital candidate on the
+matched documents. It does not evaluate general rule learning.
 
 `python3 experiments/v1_338_structured_field_predicate_learning.py` passed all
 checks: the proposal remained inert before review, six training pages licensed
@@ -2489,6 +2506,5 @@ two held-out question forms, cited evidence survived SQLite reload, stale
 proposals were rejected, and the coordinated “capital and largest city”
 negative was not simplified into an alias. This validates the review/writeback
 mechanics on fixtures, not the correctness or generality of the real-corpus
-alignment. Next, reconcile the two candidate-generation paths and evaluate a
-blinded sample of proposals and non-proposals before widening the allowlist or
-promoting this to a language-learning claim.
+alignment. Next, evaluate a blinded sample of proposals and non-proposals
+before widening the allowlist or promoting this to a language-learning claim.

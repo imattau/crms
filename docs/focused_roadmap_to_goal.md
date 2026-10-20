@@ -12,16 +12,19 @@ derivation keep composed outputs correctable. The most recent corpus probe
 changes the rule-learning tactic: direct exact-pair predicate matching found no
 useful variants in sampled SimpleWiki windows, while structured-field/prose
 alignment found one repeated candidate (`capital city of` → `capital of`) on
-eight distinct entity pairs. A replay through the stricter integrated proposal
-API found the same candidate on eleven pairs. The exploratory probe also
-reported a likely false `born in` / `national museum of` candidate because it
-uses a five-field map; the integrated path currently allows only `capital`.
-The probe also requires the document text to start with `Infobox`, whereas the
-integrated extractor can locate an infobox later in the document. The count
-difference is therefore a scope difference, not evidence that the integrated
-path is more precise. Use this as a report-only lead for a general, reviewable
-discovery path; do not turn the hand-coded field map or this candidate into a
-learned-language claim.
+eight distinct entity pairs. A replay through the integrated proposal API
+found the same candidate on eleven pairs. The exploratory probe also
+reported `national museum of` as a `born in` variant because it treated
+infobox caption lines as prose. After excluding structured key/value lines,
+that candidate disappeared; the `capital city of` candidate remained on eight
+pairs. The matched-scope replay (`v1_458`) copied 3,284 eligible documents and
+found exact agreement on all eight capital pairs. The full probe now reports
+four candidate groups, one novel predicate group, and no caption-derived
+false proposal. The integrated path's other three matches come from its
+broader document scan. This is a useful source boundary correction, not a
+precision estimate: the field-to-relation mapping is hand-coded, evidence
+comes from one corpus, and unproposed variants remain unmeasured. Keep the
+path report-only and review-gated.
 
 | Order | Work packet | Immediate outcome | Do not claim yet |
 |---|---|---|---|
@@ -131,10 +134,9 @@ After the records and learning lifecycle above are stable, complete migration an
    evaluation shows no confident wrong referents and reports omission and
    completion rates.
 2. **One decisive real-corpus discovery study.** Reproduce the structured
-   alignment lead (`capital city of` / `capital of`, eight pairs in the
-   exploratory probe and eleven in the integrated API), reconcile the scope
-   difference, and test whether candidate groups emerge from field labels plus
-   aligned prose across disjoint documents and publishers. The algorithm may
+   alignment lead (`capital city of` / `capital of`, with matched agreement on
+   eight pairs), then test whether candidate groups emerge from field labels
+   plus aligned prose across disjoint documents and publishers. The algorithm may
    use field names to propose hypotheses, but must not treat them as semantic
    truth. Keep every candidate cited and inert pending review. Blindly label a
    sample containing candidate and non-candidate pairs; report proposals,

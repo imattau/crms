@@ -52,6 +52,26 @@ FIELD_RELATIONS = {
 }
 
 
+def prose_sentence_spans(text: str) -> list[tuple[int, int]]:
+    """Exclude sentence spans occurring on structured key/value lines.
+
+    SimpleWiki's text export often has no blank line between the infobox and
+    article prose. Infobox fields can still contain full sentences (notably
+    captions), so excluding the full infobox block would discard valid prose.
+    """
+    assignment = re.compile(r"^[ \t]*[\w -]{1,48}[ \t]*=")
+    structured_lines = []
+    offset = 0
+    for line in text.splitlines(keepends=True):
+        content = line.rstrip("\r\n")
+        if assignment.match(content):
+            structured_lines.append((offset, offset + len(content)))
+        offset += len(line)
+    return [(start, end) for start, end in _sentence_spans(text)
+            if not any(start < line_end and end > line_start
+                       for line_start, line_end in structured_lines)]
+
+
 def field_rows(text: str) -> list[tuple[str, str, int, int]]:
     """Return exact key/value spans from the first normalized infobox."""
     rows = []
@@ -79,11 +99,29 @@ def field_rows(text: str) -> list[tuple[str, str, int, int]]:
     return rows
 
 
+def _check_infobox_is_not_prose() -> None:
+    fixture = (
+        "Infobox person\n"
+        "name = Ada Example\n"
+        "caption = Portrait at the National Museum of Rome.\n"
+        "birth_place = Rome\n\n"
+        "Ada Example was born in Rome.\n"
+    )
+    sentences = [fixture[start:end].strip()
+                 for start, end in prose_sentence_spans(fixture)]
+    if sentences != ["Ada Example was born in Rome."]:
+        raise AssertionError(
+            f"infobox metadata was treated as prose: {sentences}")
+
+
 def token_key(text: str) -> tuple[str, ...]:
     return tuple(re.findall(r"[\w’'-]+", text.casefold()))
 
 
-def run(index_path: Path) -> None:
+def run(index_path: Path) -> dict[
+        tuple[str, str],
+        dict[tuple[tuple[str, ...], tuple[str, ...]], set[str]]]:
+    _check_infobox_is_not_prose()
     if not index_path.is_file():
         raise SystemExit(f"SQLite research index not found: {index_path}")
     index = CRMSSQLiteResearchIndex(index_path, read_only=True)
@@ -93,10 +131,12 @@ def run(index_path: Path) -> None:
         print(f"Index: {index_path}")
         print(f"Documents: {index.document_count()}")
         print("Mode: read-only; proposals are diagnostics only")
-        all_pairs: dict[tuple[str, str], dict[tuple[str, ...], set[str]]] = {}
+        all_pairs: dict[tuple[str, str], dict[
+            tuple[tuple[str, ...], tuple[str, ...]], set[str]]] = {}
         for offset in range(0, index.document_count(), DOCUMENTS_PER_WINDOW):
             counts = defaultdict(int)
-            pairs: dict[tuple[str, str], dict[tuple[str, ...], set[str]]] = {}
+            pairs: dict[tuple[str, str], dict[
+                tuple[tuple[str, ...], tuple[str, ...]], set[str]]] = {}
             examples = []
             for source_row in index.source_list(
                     limit=DOCUMENTS_PER_WINDOW, offset=offset):
@@ -121,7 +161,7 @@ def run(index_path: Path) -> None:
                     obj = title if title_role == "object" else value
                     wanted_subject = token_key(subject)
                     wanted_object = token_key(obj)
-                    for start, end in _sentence_spans(document.text):
+                    for start, end in prose_sentence_spans(document.text):
                         sentence = document.text[start:end].strip()
                         if not sentence.endswith((".", "!", "?")):
                             continue
@@ -201,6 +241,7 @@ def run(index_path: Path) -> None:
             print("  corpus candidate:", item)
         for item in all_novel_candidate_groups[:10]:
             print("  novel predicate:", item)
+        return all_pairs
     finally:
         index.close()
 
