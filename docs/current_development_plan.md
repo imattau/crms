@@ -3,6 +3,10 @@
 **Reviewed:** 2026-10-20
 **Status:** architecture is aligned; the overall capability goal remains unmet.
 
+For the concise, decision-oriented path from the current state to the project
+goal, see the [goal execution plan](goal_execution_plan.md). This document
+retains the fuller implementation history and experiment detail.
+
 ## Destination
 
 Build a lightweight, distributable language system that can understand and
