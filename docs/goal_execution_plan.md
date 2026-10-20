@@ -1,6 +1,6 @@
 # CRMS goal execution plan
 
-**Reviewed:** 2026-10-20
+**Reviewed:** 2026-10-20 (reconciled with the latest dialogue, task-flow, and source-discovery reviews)
 **Status:** execution plan; the capability goal remains unmet.
 
 ## Destination
@@ -42,6 +42,18 @@ dialogue cases does not establish conversational competence; a retrieval hit
 does not establish that the answer addresses the question; and a verified
 proof over an authored graph does not establish autonomous rule learning.
 
+The latest dialogue review adds a concrete reliability risk: a pronoun-led
+source sentence can be attributed to the wrong entity after a topic switch;
+clearing context on any non-`answered` turn can also discard valid source-only
+context. History questions and ordinal references remain uncovered. The
+bounded reservation draft (`v1_467`) demonstrates one request → clarification
+→ correction → draft → reload path, but its parser and task route are narrow.
+The map-free scan (`v1_464`) found repeated relation candidates, but most
+reviewed groups were unsafe, artifacts, or false/composite. Treat this as a
+discovery lead, not a learning result. These findings keep dialogue safety and
+source-rule transfer as the immediate gates; recombination and reasoning stay
+the central capability bet.
+
 ## Operating principles
 
 1. **Evaluate user tasks end to end.** Keep versioned, frozen, source-disjoint
@@ -66,9 +78,11 @@ proof over an authored graph does not establish autonomous rule learning.
 Dialogue and contextual intent are measured throughout. The capability work
 below is sequential: each stage must clear its gate before the next stage
 expands. If a gate fails, repair or redesign that stage instead of adding
-surface area.
+surface area. Dialogue safety is a release gate for every chat-facing
+capability; recombination, source-derived rules, and reasoning remain the
+primary capability work.
 
-### 1. Establish the shared end-to-end baseline and protect dialogue safety
+### 1. Establish the shared end-to-end baseline and close the reported dialogue failures
 
 Build one compact scorecard spanning factual questions, paraphrases,
 multi-part requests, unsupported/conflicting claims, topic changes, source-only
@@ -78,18 +92,32 @@ fixed regressions. Include the reported Eiffel Tower/Colosseum referent case,
 source-only context carryover, unanswered turns, and `why?` after topic
 changes. Test clean-process and save/reload behavior.
 
+Freeze the reported Eiffel/Colosseum pronoun switch, source-only follow-up
+after an unanswered or review-only turn, stale `why?`, “what did I just ask?”
+and “the first one” as full-transcript regressions. A pronoun-led source
+sentence must be linked to its entity by paragraph or explicit relation
+evidence; retrieval match or recency alone cannot choose the referent. Preserve
+typed visible context through recoverable source-only answers and abstentions;
+expire or replace it on explicit reset, topic change, or incompatible context.
+Separate act classification, referent resolution, evidence lookup, answering,
+and context update so a failed turn cannot erase valid context or explain the
+wrong answer. Evaluate with independently authored transcripts and varied
+source layouts, not resolver-only checks.
+
 Model intent as a contextual, revisable hypothesis over the utterance and
 explicit state: task and subgoal, active topic/referents, open question or
 choice, previous move, and the answer under discussion. Keep state bounded and
-inspectable. Resolve only when context and evidence support it; otherwise ask
-a targeted clarification. Dialogue-move induction remains research until it
-beats the explicit baseline on held-out task outcomes.
+inspectable. Intent may route, clarify, or repair; it cannot supply facts or
+authorize unsupported actions. Dialogue-move induction remains research until
+it beats the explicit baseline on held-out task outcomes.
 
-**Gate:** no confident wrong referent on the frozen dialogue set; correct
-follow-ups or focused clarifications; evidence supports each factual answer;
-report completion, omissions, abstentions, clarification, and label
-agreement separately. Do not interpret single-annotator intent agreement as
-accuracy.
+**Gate:** no confident wrong referent on fixed regressions or independent
+transcripts; correct follow-ups or focused clarifications; evidence supports
+each factual answer; no stale explanation after a topic switch. Report
+completion, omissions, abstentions, clarification, and label agreement
+separately. Do not interpret single-annotator intent agreement as accuracy. If
+this gate fails, fix context lifetime and grounding before adding more intent
+classes or dialogue moves.
 
 ### 2. Prove useful source-driven rule discovery
 
@@ -103,16 +131,21 @@ contributions.
 
 Measure proposal precision, useful coverage, false proposals, review burden,
 and labeling effort. Structured fields may suggest hypotheses but cannot be
-treated as semantic truth. If the current alignment lead has negligible yield
-or requires hand-coded field-to-relation truth, change the discovery method
-before expanding extraction machinery.
+treated as semantic truth. Use `v1_464` as a noise baseline: freeze the
+candidate generator before labeling, sample non-proposals, and test documents
+and publishers withheld from discovery. Codex can label examples, but the
+labeler identity and unblinded limits must be explicit; Codex review is not
+independent validation. If useful yield requires hand-coded field-to-relation
+truth or fails on a second publisher, redesign rather than promote the path.
 
 **Gate:** a frozen method finds useful candidates on held-out documents and a
-second publisher with measured precision and review effort; negative controls
-do not become positive rules. Codex review may establish a labeled diagnostic,
-not independent validation.
+second publisher with measured precision and review effort; sampled
+non-proposals and negative controls do not become positive rules. Accepted
+rules preserve exact source provenance and remain review-gated until holdout
+validation. This proves a useful learning input, not broad autonomous
+language understanding.
 
-### 3. Demonstrate recombination through chat
+### 3. Demonstrate recombination through chat and join it to verified reasoning
 
 Compose independently supported rules and procedures into genuinely unseen
 multi-step requests. Vary wording, values, and operation order. Keep the
@@ -123,11 +156,13 @@ chat and a fresh process; check output with an independent oracle.
 
 **Gate:** at least one source-disjoint unseen composition succeeds through
 chat and reload; the independent checker accepts valid outputs and rejects
-invalid ones; unsupported or incomplete requests abstain. Report teacher and
+invalid ones; unsupported or incomplete requests abstain. Include a
+proof-backed reasoning step, a missing-premise or conflict case, and a
+correction that invalidates dependent derived knowledge. Report teacher and
 labeler effort. Supervised phrase alignment must not be described as
 autonomous learning from documents.
 
-### 4. Join recombination to verified reasoning and governed derivation
+### 4. Govern self-learning and derived knowledge
 
 Route the same natural-language task through rule selection, reasoning, and
 the relevant proof or task-specific checker. Cover positive results, missing
@@ -158,6 +193,11 @@ can be evaluated; keep corpus policy, citations, and Codex labeling visible.
 increasing wrong referents, stale context, or inappropriate moves. Learned
 moves remain experimental unless they improve the explicit baseline.
 
+This research runs alongside stages 1–4, but its changes enter the runtime
+only when the dialogue gate passes. Keep the weak Taskmaster transfer results
+as warnings; do not tune against inspected test rows or substitute label
+agreement for task completion.
+
 ### 6. Expand domain breadth through the validated interface
 
 Add math, coding, translation, and creative work one bounded task at a time.
@@ -183,23 +223,33 @@ Report size, runtime, compatibility, migration behavior, and unsupported
 cases. Keep source acquisition and packaging policy explicit, including
 academic-paper sources.
 
-## Immediate work queue
+## Immediate work queue — execute in this order
 
-1. Freeze the latest dialogue and factual controls, then create an independent
-   multi-turn transcript/layout set. Evaluate it once before changing
-   dialogue behavior; prioritize wrong referents, topic-switch context loss,
-   and completion over more intent features.
-2. Run the source-rule discovery study with a frozen method, real
-   relation/wording overlap, disjoint documents/publishers, and blind
-   candidate plus non-candidate labeling. Decide whether the current alignment
-   lead merits promotion or redesign.
-3. Use the discovery result to pick one unseen recombination task, and join it
-   to proof/output verification, correction, and derived-case invalidation.
-   Keep existing synthetic integration cases as regression controls.
+1. **Dialogue safety.** Freeze the reported pronoun/topic-switch,
+   source-only-context, stale-`why?`, history, and ordinal cases. Create a
+   small independently authored transcript set with varied paragraph layouts;
+   score it before changing runtime behavior. Repair the smallest reproduced
+   cause, then replay fixed and new cases in fresh processes.
+2. **Source-rule discovery.** Freeze a candidate generator and use corpora
+   with real relation/wording overlap, complete-document and
+   publisher-disjoint splits, candidate and non-candidate samples, and
+   negation/quotation/contrast/role-reversal controls. Codex may label the
+   examples, but report that supervision separately. Keep the path report-only
+   unless precision, useful yield, provenance, and review effort clear the
+   gate.
+3. **Recombination plus reasoning.** Select a learning signal that passes
+   packet 2, then exercise an unseen multi-step request through normal chat,
+   fresh-process reload, proof/output checking, missing premises, conflict,
+   incomplete search, source correction, and derived-case invalidation. Keep
+   existing `v1_451`/`v1_456` integrations as regression controls, not evidence
+   that source learning is autonomous.
 
 Do not enlarge the corpus, add a new dialogue mechanism, expand domain
 coverage, or migrate the model store unless it clears one of these gates.
-Dialogue measurement runs alongside the learning/reasoning path, not after it.
+Dialogue measurement runs alongside the learning/reasoning path, not after
+them. After these packets pass, choose one bounded math, coding, translation,
+or creative task from measured user-task loss; then verify the copied SQLite
+model against the same scorecard without original source files.
 
 ## Reassessment rule
 
