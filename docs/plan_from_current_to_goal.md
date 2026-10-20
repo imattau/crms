@@ -106,9 +106,9 @@ initially surfaced an unrelated Thames sentence as closest evidence; the
 current runtime omits that sentence after the entity-mismatch fix. Proof-to-
 procedure composition already has controlled demonstrations (`v1_451`,
 `v1_502`, `v1_507`), so the remaining gap is its transfer to broader
-source-backed tasks. Treat the recent
-Colosseum/Eiffel pronoun report as an open dialogue release-gate regression;
-older dialogue controls do not invalidate that counterexample.
+source-backed tasks. The exact Colosseum/Eiffel passive-date case has since
+been repaired and checked in full chat by `v1_527`; the broader dialogue
+transfer gate remains open.
 
 The subsequent live count audit also found and repaired a stopword retrieval
 failure and a post-object quantity boundary (`v1_524`). Three real source claims
@@ -160,16 +160,19 @@ narrow location/date task; it does not close the independently authored
 conversation-transfer gate. Keep improving the transcript set while moving
 the main capability experiment forward in parallel.
 
-A fresh replay of the reported Eiffel Tower/Colosseum case on the current
-runtime does **not** reproduce the confident 1889 misattribution: after the
-named switch, “When was it completed?” abstains because the returned sentence
-does not name Colosseum. That is a safety improvement over a wrong answer, but
-the paragraph-local antecedent is still not used to answer the follow-up.
-Source-only elliptical switches such as “and Italy?” also remain unresolved
-when the target has not been established as an answerable entity. Keep this as
-an open omission/transfer item in the dialogue packet; do not count the safe
+The reported Eiffel Tower/Colosseum sequence now answers “When was it
+completed?” with the Colosseum's “80 CE” sentence after a named topic switch;
+the `why?` citation resolves to that exact sentence. The date route recognizes
+passive “when was” wording and binds “it” only when the immediately preceding
+sentence in the same paragraph has the queried entity as its subject. Separate
+paragraphs and a different entity in the prior sentence remain negative
+controls. The original 1889 misattribution is not reproduced, and the current
+answer no longer abstains on this fixture. This fixes one dialogue seam, not
+general event coreference. Source-only elliptical switches such as “and
+Italy?” remain unresolved when the target has not been established as an
+answerable entity. Keep that as an open transfer item; do not count safe
 abstention as task completion. `why?` must continue to refer to the current
-turn or state clearly that there is no grounded answer to explain.
+turn or say clearly that there is no grounded answer to explain.
 
 The source-backed composition diagnostic (`v1_529`) is a narrow positive
 transfer result: it discovers a two-premise rule from two SimpleWiki training

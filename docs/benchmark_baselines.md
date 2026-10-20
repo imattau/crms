@@ -209,15 +209,23 @@ Museum, while full chat previously lost the referent when its date specialist
 read the raw pronoun. Chat now sends the resolved question to the standard
 date-evidence route. That route can use “The museum opened in 1972” only when
 the immediately preceding sentence in the same paragraph names Meridian
-Museum and the alias matches its entity class. The fresh standard-effort CLI
-answers 1972 and `why?` cites the exact sentence. Four controls reject a
-cross-paragraph antecedent, a mismatched class (“observatory”), a competing
-immediate museum antecedent, and a negated date. The response remains quoted
-source evidence, not an accepted fact.
+Museum and the alias matches its entity class. It also handles a passive
+“When was Colosseum completed?” query when the immediately preceding sentence
+names Colosseum as its subject and the cited sentence begins “It was completed
+in 80 CE.” The Eiffel Tower/Colosseum full-chat replay now returns 80 CE after
+the topic switch, and `why?` cites that exact sentence rather than the
+Eiffel Tower's 1889 date. The fresh standard-effort CLI still answers the
+Meridian Museum case and cites its exact sentence. Controls reject
+cross-paragraph antecedents, a mismatched class (“observatory”), a competing
+immediate museum antecedent, an entity mentioned but not serving as the prior
+sentence's subject, and a negated date. Responses remain quoted source
+evidence, not accepted facts.
 
-This repairs the date omission in full chat for the tested construction; the
-lower-level dialogue API still abstains, and the route's grammar is narrow.
-Other date formats, event paraphrases, and broader coreference remain open.
+This repairs two date omissions in full chat for the tested constructions;
+the lower-level dialogue API still abstains, and the route's grammar is
+narrow. Other date formats, event paraphrases, source-only elliptical topic
+switches, and broader coreference remain open. The separate six-scenario
+dialogue packet (`v1_528`) also passes with no confident wrong-entity dates.
 See the [runner](../experiments/v1_527_paragraph_anchored_event_date.py) and
 [report](../experiments/reports/v1_527_paragraph_anchored_event_date.json).
 

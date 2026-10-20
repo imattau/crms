@@ -1334,12 +1334,18 @@ def _natural_superlative_evidence(
 
 def _natural_when_question(message: str) -> tuple[str, str] | None:
     match = re.fullmatch(
-        r"\s*when\s+did\s+(?P<subject>.+?)\s+"
-        r"(?P<predicate>[a-z][\w’'-]*)\s*[?!.]?\s*",
+        r"\s*when\s+(?:"
+        r"did\s+(?P<active_subject>.+?)\s+"
+        r"(?P<active_predicate>[a-z][\w’'-]*)|"
+        r"was\s+(?P<passive_subject>.+?)\s+"
+        r"(?P<passive_predicate>[a-z][\w’'-]*)"
+        r")\s*[?!.]?\s*",
         message, flags=re.IGNORECASE)
     if match is None:
         return None
-    subject, predicate = match.group("subject", "predicate")
+    subject = match.group("active_subject") or match.group("passive_subject")
+    predicate = (match.group("active_predicate")
+                 or match.group("passive_predicate"))
     return subject.strip(), predicate.casefold()
 
 
@@ -1358,7 +1364,8 @@ def _natural_when_evidence(index: CRMSSQLiteResearchIndex,
     dated = re.compile(
         r"\b(?:in|on|during)\s+(?:(?:January|February|March|April|May|June|"
         r"July|August|September|October|November|December)\s+)?"
-        r"(?:\d{1,2},?\s+)?(?:1[0-9]{3}|20[0-9]{2})\b", re.I)
+        r"(?:\d{1,2},?\s+)?(?:1[0-9]{3}|20[0-9]{2}|"
+        r"\d{1,3}\s*(?:CE|AD|BCE|BC))\b", re.I)
     found: dict[str, list[dict[str, Any]]] = {}
     for hit in index.search(query, limit=100, context_chars=240):
         if not set(subject_terms) <= set(hit.matched_terms) or _is_code_source(hit.location):
@@ -1401,6 +1408,9 @@ def _natural_when_evidence(index: CRMSSQLiteResearchIndex,
                 alias_match = re.match(
                     r"\s*(?:the|this|that)\s+" + re.escape(alias)
                     + r"s?\b", sentence, flags=re.IGNORECASE)
+                pronoun_match = re.match(
+                    r"\s*(?:it|he|she|they)\b", sentence,
+                    flags=re.IGNORECASE)
                 previous_sentences = [
                     span for span in paragraph_sentences
                     if span[1] <= local_start]
@@ -1411,12 +1421,30 @@ def _natural_when_evidence(index: CRMSSQLiteResearchIndex,
                     if previous_span is not None
                     and previous_span[0] <= item.start() < previous_span[1]
                 ])
-                if not alias_match or len(immediate_anchors) != 1:
+                if ((not alias_match and not pronoun_match)
+                        or len(immediate_anchors) != 1):
                     continue
-                alias_tokens = tuple(normalized_tokens(alias_match.group()))
-                subject_start = 1 if alias_tokens[:1] in {
-                    ("the",), ("this",), ("that",)} else 0
-                subj_end = subject_start + 1
+                if pronoun_match:
+                    # A personal pronoun is accepted only when its immediate
+                    # predecessor is a sentence whose subject is the exact
+                    # entity named in the question. A same-paragraph mention
+                    # elsewhere is not enough to bind “it” to that entity.
+                    if previous_span is None:
+                        continue
+                    previous_sentence = paragraph[
+                        previous_span[0]:previous_span[1]].strip()
+                    leading_subject = tuple(normalized_tokens(
+                        re.sub(r"^(?:the|this|that)\s+", "",
+                               previous_sentence, flags=re.IGNORECASE)))
+                    if leading_subject[:len(subject_terms)] != subject_terms:
+                        continue
+                    subject_start = 0
+                    subj_end = 1
+                else:
+                    alias_tokens = tuple(normalized_tokens(alias_match.group()))
+                    subject_start = 1 if alias_tokens[:1] in {
+                        ("the",), ("this",), ("that",)} else 0
+                    subj_end = subject_start + 1
             date_match = dated.search(sentence)
             if date_match is None:
                 continue

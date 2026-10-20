@@ -3,9 +3,11 @@
   "source": "independently authored, two-sentence paragraph",
   "success": {
     "entity_alias_same_paragraph": true,
+    "pronoun_led_passive_date_same_paragraph": true,
     "resolved_followup_through_standard_effort_chat": true,
     "why_citation_resolves_exactly": true,
-    "source_only_label_preserved": true
+    "source_only_label_preserved": true,
+    "eiffel_colosseum_topic_switch_uses_colosseum_date": true
   },
   "negative_controls": [
     {
@@ -23,11 +25,19 @@
     {
       "control": "a negated event date was accepted",
       "rejected": true
+    },
+    {
+      "control": "a pronoun antecedent from another paragraph was accepted",
+      "rejected": true
+    },
+    {
+      "control": "a pronoun was bound to a non-subject entity in the prior sentence",
+      "rejected": true
     }
   ],
   "limitations": [
-    "The date grammar accepts a bounded when-did predicate with year dates.",
-    "Alias resolution requires an immediate preceding sentence in the same paragraph and an entity-class match.",
+    "The date grammar accepts bounded when-did and when-was predicates with year or era-qualified dates.",
+    "Pronoun binding requires the named entity to be the subject of the immediately preceding sentence in the same paragraph.",
     "This does not establish general temporal-question transfer or broad event-coreference coverage."
   ]
 }
