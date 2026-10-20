@@ -1,0 +1,98 @@
+{
+  "experiment": "v1_466_negative_then_request_intent_dev_replay",
+  "code_revision": "379b07e",
+  "dataset": "Taskmaster-1 movie-tickets development slice: movie_dev_first4_codex_primary.csv",
+  "dataset_sha256": "7c496c842c6457514ae0d842f9065ab5254f7ef7b6ad31d0d48c093a5441e0f7",
+  "labeled_user_turns": 37,
+  "label_provenance": "single Codex primary annotations; agreement is not accuracy or independent ground truth",
+  "comparison": {
+    "before_revision": "783512b",
+    "after_revision": "379b07e",
+    "before": {
+      "context_free": {
+        "labeled": 37,
+        "hypothesis": 10,
+        "hypothesis_coverage": 0.2702702702702703,
+        "joint_match": 6,
+        "joint_label_agreement_all_labeled": 0.16216216216216217,
+        "joint_label_agreement_on_hypotheses": 0.6
+      },
+      "transcript_replay": {
+        "labeled": 37,
+        "hypothesis": 21,
+        "hypothesis_coverage": 0.5675675675675675,
+        "joint_match": 18,
+        "joint_label_agreement_all_labeled": 0.4864864864864865,
+        "joint_label_agreement_on_hypotheses": 0.8571428571428571
+      }
+    },
+    "after": {
+      "context_free": {
+        "labeled": 37,
+        "hypothesis": 11,
+        "hypothesis_coverage": 0.2972972972972973,
+        "joint_match": 7,
+        "joint_label_agreement_all_labeled": 0.1891891891891892,
+        "joint_label_agreement_on_hypotheses": 0.6363636363636364
+      },
+      "transcript_replay": {
+        "labeled": 37,
+        "hypothesis": 21,
+        "hypothesis_coverage": 0.5675675675675675,
+        "joint_match": 19,
+        "joint_label_agreement_all_labeled": 0.5135135135135135,
+        "joint_label_agreement_on_hypotheses": 0.9047619047619048
+      }
+    }
+  },
+  "delta": {
+    "context_free_joint_matches": 1,
+    "transcript_replay_joint_matches": 1
+  },
+  "corrected_dev_case": {
+    "utterance": "No. Just get three tickets for the next showing the next open.",
+    "before": {
+      "dialogue_act": "answer-clarification",
+      "task_intent": "resolve-ambiguity"
+    },
+    "after": {
+      "dialogue_act": "request-action",
+      "task_intent": "other-task",
+      "matched_frame": "negative-with-direct-imperative"
+    }
+  },
+  "remaining_transcript_replay_disagreements": [
+    {
+      "utterance": "Looking to see if Cold Pursuit is playing anywhere near Vail, Colorado.",
+      "expected": {
+        "dialogue_act": "question",
+        "task_intent": "check-availability"
+      },
+      "predicted": {
+        "dialogue_act": "request-action",
+        "task_intent": "check-availability",
+        "decision": "selected",
+        "matched_frame": "explicit-availability-search"
+      }
+    },
+    {
+      "utterance": "Great.",
+      "expected": {
+        "dialogue_act": "acknowledgement",
+        "task_intent": "continue-current-task"
+      },
+      "predicted": {
+        "dialogue_act": "reaction",
+        "task_intent": "social-contact",
+        "decision": "selected",
+        "matched_frame": "reaction"
+      }
+    }
+  ],
+  "limitations": [
+    "The 37 turns are a small development slice and were used to select the fix.",
+    "The labels are single-Codex annotations.",
+    "The replay measures act/intent label agreement, not task completion.",
+    "The previously inspected held-out set was not used to select this change."
+  ]
+}

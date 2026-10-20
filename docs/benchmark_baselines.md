@@ -2800,3 +2800,26 @@ pass count is not a common accuracy or task-completion score. It does not show
 independent dialogue transfer, broad language coverage, or parity with a 70B+
 instruction model. See `capability_comparison_70b.md` for the qualitative
 capability reference and limits.
+
+## Rejection followed by new request in contextual intent (`v1_466`, 2026-10-20)
+
+In the four-conversation movie-ticket development slice, after the assistant
+offered to select a different showing or cancel the order, the user said
+“No. Just get three tickets for the next showing the next open.” The previous
+classifier treated the whole turn as an answer to the open choice. The new
+`experiments/v1_466_negative_then_request_intent.py` strips the explicit
+rejection prefix only when the remaining text matches a recognized request;
+it then classifies the turn as `request-action / other-task`. Bare “No” remains
+ambiguous against the open choice, and “No, I would prefer the other showing”
+remains a contextual answer. The ordinary `respond()` path records the new
+request act.
+
+On the same 37-turn development CSV (SHA-256 recorded in the
+[run report](reports/v1_466_negative_then_request_intent_dev.json)), transcript
+replay joint act/task-intent agreement with single-Codex labels changed from
+18/37 (48.6%) to 19/37 (51.4%). Context-free agreement changed from 6/37
+(16.2%) to 7/37 (18.9%). This improves one targeted development case; two
+transcript-replay disagreements remain. Because this slice selected the fix
+and its labels are not independent, these figures are not an accuracy claim.
+The previously inspected held-out set was not used to select the change, and
+end-to-end task completion remains unmeasured.

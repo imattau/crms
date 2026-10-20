@@ -125,6 +125,16 @@ the Taskmaster transfer result remains frozen at its pre-change score.
 clarified or declined; no confident wrong referent appears in the held-out
 conversation set. Record transcript authorship and labeling provenance.
 
+The movie-ticket development replay also exposed an intent precedence error:
+“No. Just get three tickets for the next showing” was consumed as an answer to
+the open choice rather than a new imperative. `v1_466` recognizes this
+rejection-plus-request form while keeping a bare “No” ambiguous and a negative
+preference detail attached to the choice. On the same 37-turn dev slice, joint
+single-Codex act/intent agreement moved from 18/37 to 19/37 with transcript
+context and from 6/37 to 7/37 without it. This is a development-set diagnostic,
+not independent accuracy or task-completion evidence; the transfer gate stays
+open.
+
 ### 2. Learn rules from sources and prove unseen recombination
 
 Make this the main capability experiment. Use complete source documents with
