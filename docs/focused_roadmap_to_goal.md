@@ -432,21 +432,21 @@ recombination with already reviewed components.
 ### Next execution card
 
 This is the order for the next development cycles, reviewed against the current
-checkout (`53ddfa1`, 2026-10-20). Recheck reported behavior before changing
+checkout (`6b7b437`, 2026-10-20). Recheck reported behavior before changing
 code; historical reports describe earlier snapshots and should not trigger
 duplicate fixes. The objective is to improve held-out user task completion,
 not to add more demonstrations of the same finite-list operations.
 
 | Order | Work | Concrete output | Advance when |
 | --- | --- | --- | --- |
-| 1 | **Lock dialogue safety and measure contextual intent.** Turn topic switching, source-only follow-ups, pronoun grounding, failed turns, `why?`, history, and ordinal references into frozen multi-turn transcripts. Add independently authored same-utterance/different-context examples for intent. | Fresh-process transcript scorecard: task completion, wrong referents, unsupported evidence, clarification, abstention, stale context, repair, and intent agreement. | No confident wrong referent or stale explanation; source-only evidence retains usable context; ambiguity gets a focused clarification or abstention. Dialogue remains a release gate for chat-facing work. |
-| 2 | **Widen recombination transfer through ordinary chat.** `v1_516` now transfers the reviewed relation alignment and transitive type proof across three source-disjoint held-out routes. Next, test independently authored task forms beyond the trained question frame and vary evidence layout/order. Add missing premises, contradiction, cycles, unsupported steps, and partial/composite requests; reload a copied model and check independently. | Frozen user-task set with each taught, reviewed, hand-coded, and Codex-labeled step disclosed; report completion, correctness, omissions, abstentions, proof validity, repair, and runtime. | The broader held-out set improves task completion over the explicit baseline with no confident invalid result, and ordinary chat—not the experiment harness—coordinates each successful composition. This remains the main capability gate. |
+| 1 | **Measure dialogue as complete turns.** `v1_518` recognizes “I need to find …” as information seeking, routes it to source presentation, and its runtime fixture now filters out cuisine and location mismatches. Expand that control to varied constraints and partial-match behavior; freeze full transcripts for topic switching, source-only continuity, pronoun grounding, failed turns, `why?`, history, and ordinal references. Add independently authored same-utterance/different-context conversations. | Fresh-process scorecard separating intent-label agreement from task completion, wrong referents, irrelevant evidence, unsupported evidence, clarification, abstention, stale context, repair, and constraint satisfaction. | Search results meet all explicit constraints or clearly disclose partial matches; no confident wrong referent or stale explanation; source-only evidence retains usable context; ambiguity gets focused clarification or abstention. Dialogue remains a release gate for chat-facing work. |
+| 2 | **Widen recombination transfer through ordinary chat.** `v1_516` transfers a reviewed relation alignment and transitive type proof across three source-disjoint held-out routes. Test independently authored task forms beyond trained question frames and vary evidence layout/order. Add missing premises, contradiction, cycles, unsupported steps, and partial/composite requests; reload a copied model and check independently. | Frozen user-task set with each taught, reviewed, hand-coded, and Codex-labeled step disclosed; report completion, correctness, omissions, abstentions, proof validity, repair, constraint satisfaction, and runtime. | The broader held-out set improves task completion over the explicit baseline with no confident invalid result, and ordinary chat—not the experiment harness—coordinates each successful composition. This remains the main capability gate. |
 | 3 | **Keep source-derived rule learning bounded and review-gated.** Redesign role/context/scope preservation using existing frozen diagnostics, then freeze the method and test on new documents and a new publisher. Review proposals and sampled non-proposals; retain separate citations for claim and context. | Transfer report for useful yield, false proposals, missed claims, abstentions, source diversity, and review burden. | Roles, conditions, polarity, and scope survive source-disjoint evaluation without phrase-specific semantic mapping. Failure pauses this lane, not reviewed-component recombination. |
 | 4 | **Close the governed self-learning loop after recombination transfers.** Create derived proposals only from independently verified outputs. Exercise source/rule correction, descendant invalidation, conflicts, duplication, restart, retrieval weighting, and growth. | End-to-end propose → independent verification → review/revalidation → reuse/invalidation in a copied SQLite model. | Every correction disables or revalidates dependents; no derivation validates its generating rule; invalid lineage abstains; reuse and growth have measured limits. Write-back remains review-gated until then. |
 | 5 | **Expand breadth only through validated task slices.** Use the same natural-language interface for coding, math, translation, and creative work. Select the next task from observed failures; define held-out requests, negative cases, an independent checker or rubric, and repair behavior before implementation. Test each domain before cross-domain composition. | Per-task ordinary-chat scorecards for coverage, correctness/quality, unsupported output, provenance, repair, and cost. | Each slice demonstrates useful held-out completion and honest limits. A feature, corpus, or one-off success does not count as domain competence. |
 | 6 | **Validate SQLite as the complete distributable runtime.** Once learning and correction lifecycles stabilize, copy the model where source files are unavailable and replay the shared scorecard, including query, learning, recombination, reasoning, explanation, correction, and reload. | Reproducible copy-only report including searchable source text, accepted knowledge, rules, provenance, correction lineage, licensing metadata, size, and migration behavior. | Tested behavior depends only on the copied model and runtime, and evidence/corrections remain inspectable after reload. |
 
-**Current checkpoint (2026-10-20):** the project has
+**Current checkpoint (2026-10-20, `6b7b437`):** the project has
 well-instrumented controlled paths for proof-checked reasoning, bounded
 recombination, source-backed retrieval, contextual dialogue state, reviewed
 learning, and SQLite portability. The prior multi-turn dialogue failures now
@@ -507,7 +507,13 @@ fact is stored. The dialogue regression replay (`v1_409`, `v1_412`, `v1_426`,
 `v1_427`, `v1_442`, `v1_449`, `v1_517`) passed 7/7 isolated diagnostics.
 These are targeted continuity controls, not representative conversation
 transfer; the dialogue gate still requires independently authored complete
-conversations scored for task completion and wrong or omitted content.
+conversations scored for task completion and wrong or omitted content. The
+current `v1_518` change addresses an information-seeking intent error and
+contrasts it with an explicit build request. Its runtime fixture now shows only
+the source matching both requested cuisine and location, while preserving the
+quoted-evidence label and learning no fact. This is one authored fixture, not
+evidence of broad search constraint handling; do not count the five controls
+as an intent-accuracy or task-completion estimate.
 
 A fresh run of `v1_251_large_corpus_chat_stress.py` on this checkout indexed
 1,200 documents and 7,200 sentences. It found all 30 exact baseline targets,

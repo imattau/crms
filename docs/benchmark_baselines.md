@@ -9,19 +9,26 @@ current classifier reproduced that error. Its information-complement rule
 now treats bounded `find`, `look for`, `search for`, and `locate` requests as
 information seeking, while an explicit `build` request remains an action task.
 
-The focused runtime packet passes four controls: the search/action contrast,
-preferences interpreted under an open restaurant-search slot, and a reservation
-request with an ordinal candidate reference. The latter stays
-`make-reservation` rather than being swallowed as source selection. Existing
-contextual confirmation and task-slot regressions also pass (3/3 including
-`v1_518`).
+The focused packet passes five controls, including a fresh runtime search over
+three indexed sources. For “I need to find a Chinese restaurant in San
+Francisco, California,” chat presents the matching cited sentence and filters
+out a Chinese restaurant in Oakland and an Italian restaurant in San
+Francisco. It labels the excerpts as evidence rather than verified
+recommendations and stores no accepted facts. The packet also checks the
+search/action contrast, preferences under an open restaurant-search slot, and
+a reservation request with an ordinal candidate reference; the reservation
+stays `make-reservation` rather than being swallowed as source selection.
+Existing contextual confirmation and task-slot regressions also pass (3/3
+including `v1_518`).
 
 Report: [v1_518](../experiments/reports/v1_518_contextual_intent_search_request.json).
-Its labels are Codex-authored development labels; the four controls are not an
-intent-accuracy estimate. The raw Taskmaster transcript used by `v1_462` is not
-in this checkout, so its full replay was not rerun. Re-evaluate this change on
-a frozen, source-disjoint conversation set before claiming broader intent
-improvement.
+Its labels are Codex-authored development labels; the five controls are not an
+intent-accuracy or task-completion estimate. The raw Taskmaster transcript
+used by `v1_462` is not in this checkout, so its full replay was not rerun. The
+runtime search check covers one explicit two-constraint request; broader
+constraint combinations, paraphrases, and partial-match handling remain
+untested. Re-evaluate this change on a frozen, source-disjoint conversation set
+before claiming broader intent improvement.
 
 ## History recall and ordinal source selection in one conversation (`v1_517`)
 

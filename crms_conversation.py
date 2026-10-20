@@ -1106,6 +1106,20 @@ def classify_user_intent(
             matched_frame="explicit-availability-search",
             context_predicates=("direct-user-request",))
 
+    # Direct search requests must reach the source-presentation route below.
+    # If the broader first-person request matcher runs first, “I need to find
+    # a restaurant” is labeled as information seeking but never gets the
+    # exact-source search presentation used by that route.
+    if _DIRECT_SEARCH_REQUEST_RE.search(reservation_request):
+        return UserIntentHypothesis(
+            dialogue_act="request-action",
+            task_intent="seek-information",
+            goal_intent="seek-information",
+            decision="selected",
+            matched_frame="explicit-search-request",
+            context_predicates=("direct-user-request",),
+        )
+
     # Treat explicit first-person wants/needs for an action or service as a
     # broad task goal. Information-seeking complements are left to the search
     # and question routes below; the rule does not infer a task from a bare
@@ -1133,19 +1147,6 @@ def classify_user_intent(
                 matched_frame="explicit-generic-task-request",
                 context_predicates=("direct-user-request",
                                     "explicit-action-complement"))
-
-    # A direct search statement establishes an information-seeking goal.
-    # This runs after open-question handling and explicit booking detection so
-    # a cuisine/slot answer or reservation commitment keeps its active intent.
-    if _DIRECT_SEARCH_REQUEST_RE.search(reservation_request):
-        return UserIntentHypothesis(
-            dialogue_act="request-action",
-            task_intent="seek-information",
-            goal_intent="seek-information",
-            decision="selected",
-            matched_frame="explicit-search-request",
-            context_predicates=("direct-user-request",),
-        )
 
     # Portable dialogue frames are additive: built-in content-free and
     # contextual clarification rules above take precedence. Only explicitly
@@ -1273,7 +1274,8 @@ def _present_direct_search_matches(
         target_terms = set(re.findall(r"[a-z0-9]+", target_text)) - {
             "i", "we", "am", "are", "was", "were", "a", "an", "the",
             "to", "for", "me", "us", "some", "any", "please", "just",
-            "looking", "need", "want", "find", "search", "place", "option",
+            "looking", "look", "need", "want", "find", "search", "locate",
+            "place", "option",
         }
         if len(target_parts) == 2:
             location_terms = set(re.findall(r"[a-z0-9]+", target_parts[1])) - {
@@ -1286,9 +1288,9 @@ def _present_direct_search_matches(
             continue
         matched_terms = {str(term).casefold() for term in
                          passage.get("matched_question_terms", [])}
-        if target_terms and not target_terms.intersection(matched_terms):
+        if target_terms and not target_terms.issubset(matched_terms):
             continue
-        if location_terms and not location_terms.intersection(matched_terms):
+        if location_terms and not location_terms.issubset(matched_terms):
             continue
         citation = passage.get("citation")
         if not isinstance(citation, str) or not citation:

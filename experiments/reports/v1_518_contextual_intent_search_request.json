@@ -4,7 +4,7 @@
   "source_report_revision": "70abcd8989e94064a47bd80d4aa1d66982b1a9b6",
   "label_provenance": "Codex-authored development labels from listed Taskmaster disagreement plus contrastive controls",
   "independent_validation": false,
-  "result": "4/4 targeted intent controls passed",
+  "result": "5/5 targeted intent and runtime controls passed",
   "cases": [
     {
       "case": "search goal",
@@ -20,8 +20,27 @@
         "task_intent": "seek-information",
         "goal_intent": "seek-information",
         "decision": "selected",
-        "matched_frame": "explicit-information-request",
+        "matched_frame": "explicit-search-request",
         "selected_value": null
+      }
+    },
+    {
+      "case": "source-backed search route",
+      "utterance": "I need to find a Chinese restaurant in San Francisco, California.",
+      "context": "three indexed sources; one cuisine/location match",
+      "expected": {
+        "status": "sources_found",
+        "visible_match": "Golden Dragon",
+        "mismatches_excluded": true,
+        "no_recommendation_claim": true,
+        "no_fact_learning": true
+      },
+      "actual": {
+        "status": "sources_found",
+        "text": "Matching source excerpts (quoted evidence, not verified recommendations):\n1. Golden Dragon is a Chinese restaurant in San Francisco, California.\n   Source: Golden Dragon\nAsk about the first result to select it.",
+        "matched_frame": "explicit-search-request",
+        "active_task_intent": "seek-information",
+        "accepted_fact_count": 0
       }
     },
     {
@@ -79,7 +98,7 @@
   ],
   "limitations": [
     "The source Taskmaster replay was not rerun because its raw transcript input is not present in this checkout.",
-    "The four controls do not estimate intent accuracy, coverage, or task completion.",
+    "The five controls do not estimate intent accuracy, coverage, or task completion.",
     "Taskmaster labels are not independent gold; this is a development regression only."
   ]
 }
