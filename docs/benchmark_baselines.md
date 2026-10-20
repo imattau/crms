@@ -1,5 +1,25 @@
 # Language and recombination benchmark baselines
 
+## Role-compatible predicate candidate probe (2026-10-20)
+
+Command: `python3 experiments/v1_450_role_compatible_predicate_candidates.py`.
+
+The runtime probe extracts the inflected source relations “created” and
+“made”, then uses accepted, source-cited entity types to surface relation pairs
+whose subject and object roles match. It reports the plausible created/made
+pair, but also surfaces created/praised despite their different meanings. The
+person-to-city “visited” relation is filtered by its mismatched object type.
+Every proposal is explicitly `investigate_only`, carries citations for the
+relation examples and role types, and cannot be accepted through this path.
+The fresh chat command preserves that warning and does not alter facts or
+frames.
+
+This synthetic fixture confirms a useful, higher-recall investigation signal,
+not synonym discovery: type compatibility alone is too weak to license an
+alignment. It gives no estimate of real-corpus precision. Continue only with
+held-out examples and direct semantic validation; do not turn these candidates
+into learned rules automatically.
+
 ## Cross-paragraph source pronoun grounding (2026-10-20)
 
 Command: `python3 experiments/v1_449_cross_paragraph_pronoun_grounding.py`.

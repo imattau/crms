@@ -375,6 +375,9 @@ _IRREGULAR_VERB_PARADIGMS = {
     "win": ("win", "wins", "won", "winning"),
     "write": ("write", "writes", "wrote", "written", "writing"),
 }
+_IRREGULAR_VERB_SURFACES = frozenset(
+    surface for lemma, forms in _IRREGULAR_VERB_PARADIGMS.items()
+    for surface in forms if surface != lemma)
 
 
 class _JSONStreamReader:
@@ -5127,7 +5130,9 @@ class CRMSKnowledgeBase:
                              "to", "under", "with"}
                 if (len(predicate_key) == 1
                         and predicate_key[0] not in copulas
-                        and predicate_key[0].endswith(("ed", "s"))
+                        and (predicate_key[0].endswith(("ed", "s"))
+                             or predicate_key[0]
+                                in _IRREGULAR_VERB_SURFACES)
                         and 1 <= len(object_words) <= 6
                         and not (set(object_words) & forbidden)):
                     relation = " ".join(predicate_key)
@@ -5225,6 +5230,7 @@ class CRMSKnowledgeBase:
             if (passive is None
                     and not any(token in copulas
                                 or token.endswith(("ed", "ing", "s"))
+                                or token in _IRREGULAR_VERB_SURFACES
                                 for token in predicate_tokens)
                     and (not allow_uninflected
                          or set(predicate_tokens) <= {
@@ -6045,6 +6051,192 @@ class CRMSKnowledgeBase:
         return sorted(unique.values(), key=lambda item: (
             item["relation"], item["predicate_phrase"],
             item["proposal_id"]))[:maximum_proposals]
+
+    def propose_role_compatible_predicate_candidates(
+            self, research_index: Any, *, minimum_pairs: int = 2,
+            maximum_documents: int = 1000, maximum_sentences: int = 20_000,
+            maximum_proposals: int = 100, document_offset: int = 0
+            ) -> list[dict[str, Any]]:
+        """Surface report-only predicate candidates with matching cited roles.
+
+        Unlike exact-pair alignment, this can find wording worth reviewing
+        when different people/entities fill the same typed subject/object
+        roles. Role compatibility is only a candidate-generation signal; it
+        never proves two predicates equivalent and cannot be accepted through
+        the exact-pair alignment path.
+        """
+        if (type(minimum_pairs) is not int or not 2 <= minimum_pairs <= 20
+                or type(maximum_documents) is not int
+                or not 1 <= maximum_documents <= 300_000
+                or type(maximum_sentences) is not int
+                or not 1 <= maximum_sentences <= 1_000_000
+                or type(maximum_proposals) is not int
+                or not 1 <= maximum_proposals <= 1000
+                or type(document_offset) is not int
+                or not 0 <= document_offset <= 1_000_000):
+            raise ValueError("role-compatible predicate bounds are outside supported limits")
+
+        # Only accepted, positively supported type claims with citations that
+        # resolve in this exact corpus can supply role compatibility.
+        type_sources: dict[tuple[str, ...], dict[tuple[str, ...], set[str]]] = {}
+        for fact in self.facts():
+            if _tokens(fact.relation) != _tokens("is-a"):
+                continue
+            entity_key = _tokens(fact.subject)
+            type_key = _tokens(fact.object)
+            if not entity_key or not type_key:
+                continue
+            resolved_sources = set()
+            for source in fact.sources:
+                try:
+                    if research_index.resolve_citation(source):
+                        resolved_sources.add(source)
+                except (AttributeError, KeyError, OSError, TypeError, ValueError):
+                    continue
+            if resolved_sources:
+                type_sources.setdefault(entity_key, {}).setdefault(
+                    type_key, set()).update(resolved_sources)
+
+        if not type_sources:
+            return []
+        frames = self.propose_corpus_relation_frames(
+            research_index, minimum_examples=minimum_pairs,
+            maximum_documents=min(maximum_documents, 10_000),
+            maximum_sentences=maximum_sentences,
+            maximum_proposals=1000, document_offset=document_offset)
+        by_relation: dict[tuple[str, ...], dict[
+            tuple[tuple[str, ...], tuple[str, ...]], list[dict[str, Any]]]] = {}
+        for frame in frames:
+            if frame.get("polarity") is not True:
+                continue
+            relation = tuple(_tokens(str(frame.get("relation", ""))))
+            for row in frame.get("support", []):
+                subject_key = _tokens(str(row.get("subject", "")))
+                object_key = _tokens(str(row.get("object", "")))
+                subject_types = type_sources.get(subject_key, {})
+                object_types = type_sources.get(object_key, {})
+                for subject_type, subject_evidence in subject_types.items():
+                    for object_type, object_evidence in object_types.items():
+                        signature = (subject_type, object_type)
+                        record = {
+                            **row,
+                            "role_types": {
+                                "subject": " ".join(subject_type),
+                                "object": " ".join(object_type),
+                            },
+                            "role_type_sources": {
+                                "subject": sorted(subject_evidence),
+                                "object": sorted(object_evidence),
+                            },
+                        }
+                        pair = (subject_key, object_key)
+                        records = by_relation.setdefault(relation, {}).setdefault(
+                            (signature, pair), [])
+                        if all(existing["document_id"] != row["document_id"]
+                               for existing in records):
+                            records.append(record)
+
+        proposals: list[dict[str, Any]] = []
+        relations = sorted(by_relation)
+        for left_index, left_relation in enumerate(relations):
+            for right_relation in relations[left_index + 1:]:
+                shared_signatures = sorted(
+                    {signature for signature, _pair in by_relation[left_relation]}
+                    & {signature for signature, _pair in by_relation[right_relation]})
+                for signature in shared_signatures:
+                    left_by_pair = {
+                        pair: records for (item_signature, pair), records
+                        in by_relation[left_relation].items()
+                        if item_signature == signature
+                    }
+                    right_by_pair = {
+                        pair: records for (item_signature, pair), records
+                        in by_relation[right_relation].items()
+                        if item_signature == signature
+                    }
+                    # Exact shared entities are already handled by the higher
+                    # precision path. This probe is specifically the weaker
+                    # role-type fallback.
+                    left_pairs = set(left_by_pair)
+                    right_pairs = set(right_by_pair)
+                    left_rows = [row for pair, rows in left_by_pair.items()
+                                 if pair not in right_pairs for row in rows]
+                    right_rows = [row for pair, rows in right_by_pair.items()
+                                  if pair not in left_pairs for row in rows]
+                    left_rows.sort(key=lambda row: (row["document_id"], row["source"]))
+                    right_rows.sort(key=lambda row: (row["document_id"], row["source"]))
+                    used_right: set[int] = set()
+                    aligned = []
+                    for left in left_rows:
+                        right_index = next((index for index, right in enumerate(right_rows)
+                                            if index not in used_right
+                                            and right["document_id"]
+                                                != left["document_id"]), None)
+                        if right_index is None:
+                            continue
+                        used_right.add(right_index)
+                        aligned.append((left, right_rows[right_index]))
+                    if (len(aligned) < minimum_pairs
+                            or len({left["document_id"] for left, _ in aligned})
+                                < minimum_pairs
+                            or len({right["document_id"] for _, right in aligned})
+                                < minimum_pairs):
+                        continue
+
+                    left_relation_count = sum(len(rows) for rows in
+                                              by_relation[left_relation].values())
+                    right_relation_count = sum(len(rows) for rows in
+                                               by_relation[right_relation].values())
+                    if (right_relation_count > left_relation_count
+                            or (right_relation_count == left_relation_count
+                                and right_relation < left_relation)):
+                        canonical, candidate = right_relation, left_relation
+                        support = [{"canonical": right, "candidate": left}
+                                   for left, right in aligned]
+                    else:
+                        canonical, candidate = left_relation, right_relation
+                        support = [{"canonical": left, "candidate": right}
+                                   for left, right in aligned]
+                    typed_support = [{
+                        "canonical_sentence": pair["canonical"]["sentence"],
+                        "canonical_source": pair["canonical"]["source"],
+                        "canonical_document_id": pair["canonical"]["document_id"],
+                        "candidate_sentence": pair["candidate"]["sentence"],
+                        "candidate_source": pair["candidate"]["source"],
+                        "candidate_document_id": pair["candidate"]["document_id"],
+                        "subject_type": pair["canonical"]["role_types"]["subject"],
+                        "object_type": pair["canonical"]["role_types"]["object"],
+                        "subject_type_sources": pair["canonical"][
+                            "role_type_sources"]["subject"],
+                        "object_type_sources": pair["canonical"][
+                            "role_type_sources"]["object"],
+                    } for pair in support]
+                    payload = {
+                        "relation": " ".join(canonical),
+                        "candidate_predicate": " ".join(candidate),
+                        "support": typed_support,
+                        "role_signature": {
+                            "subject_type": " ".join(signature[0]),
+                            "object_type": " ".join(signature[1]),
+                        },
+                        "distinct_candidate_pairs": len(typed_support),
+                        "canonical_documents": len({row[
+                            "canonical_document_id"] for row in typed_support}),
+                        "candidate_documents": len({row[
+                            "candidate_document_id"] for row in typed_support}),
+                        "evidence_kind": "role_type_compatibility_only",
+                        "review_required": True,
+                        "status": "investigate_only",
+                        "acceptance_allowed": False,
+                    }
+                    payload["proposal_id"] = hashlib.sha256(json.dumps(
+                        payload, sort_keys=True, ensure_ascii=False,
+                        separators=(",", ":")).encode("utf-8")).hexdigest()[:24]
+                    proposals.append(payload)
+        proposals.sort(key=lambda item: (
+            -item["distinct_candidate_pairs"], item["relation"],
+            item["candidate_predicate"], item["proposal_id"]))
+        return proposals[:maximum_proposals]
 
     def accept_corpus_predicate_alignment(
             self, proposal_id: str, research_index: Any, *,

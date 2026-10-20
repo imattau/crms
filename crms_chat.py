@@ -127,6 +127,9 @@ HELP = """Commands:
                  accept one source-separated frame and its cited example facts
   /suggest-corpus-alignments [DOC_OFFSET|MAX_DOCS]
                  find repeated corpus-only predicate alignments; report-only
+  /suggest-role-compatible-alignments [DOC_OFFSET|MAX_DOCS]
+                 surface cited predicate candidates with matching entity types;
+                 role compatibility is not evidence of synonymy
   /accept-corpus-alignment SELECTOR[|DOC_OFFSET|MAX_DOCS]
                  accept a reviewed corpus predicate alignment from cited pairs
   /suggest-question-role-rules
@@ -6621,6 +6624,51 @@ def main() -> int:
             except (OSError, TypeError, ValueError, AttributeError) as error:
                 print(f"Could not discover corpus predicate alignments: {error}")
                 print("Use: /suggest-corpus-alignments [DOC_OFFSET|MAX_DOCS]")
+            continue
+        if (line == "/suggest-role-compatible-alignments"
+                or line.startswith("/suggest-role-compatible-alignments ")):
+            try:
+                value = line[len("/suggest-role-compatible-alignments"):].strip()
+                bounds = value.split("|") if value else []
+                if len(bounds) > 2:
+                    raise ValueError
+                document_offset = int(bounds[0]) if bounds and bounds[0] else 0
+                maximum_documents = (int(bounds[1])
+                                     if len(bounds) > 1 and bounds[1]
+                                     else 1000)
+                proposals = knowledge.propose_role_compatible_predicate_candidates(
+                    index, document_offset=document_offset,
+                    maximum_documents=maximum_documents)
+                if not proposals:
+                    print("No role-compatible candidate met the source and "
+                          "accepted-type evidence gates.")
+                for number, proposal in enumerate(proposals, 1):
+                    print(f"{number}. Possible wording candidate "
+                          f"'{proposal['candidate_predicate']}' for "
+                          f"'{proposal['relation']}' "
+                          f"(typed pairs={proposal['distinct_candidate_pairs']}, "
+                          f"roles={proposal['role_signature']['subject_type']} → "
+                          f"{proposal['role_signature']['object_type']})")
+                    print(f"   proposal ID: {proposal['proposal_id']}")
+                    for row in proposal["support"]:
+                        print(f"   Canonical: {row['canonical_sentence']} "
+                              f"[{row['canonical_source']}]")
+                        print(f"   Candidate: {row['candidate_sentence']} "
+                              f"[{row['candidate_source']}]")
+                        print("   Role evidence: "
+                              f"subject type {row['subject_type']} "
+                              f"[{', '.join(row['subject_type_sources'])}]; "
+                              f"object type {row['object_type']} "
+                              f"[{', '.join(row['object_type_sources'])}]")
+                if proposals:
+                    print("Review only: shared argument types do not show that "
+                          "the predicates mean the same thing. No facts or "
+                          "language frames changed; validate with direct "
+                          "source pairs before teaching an alignment.")
+            except (OSError, TypeError, ValueError, AttributeError) as error:
+                print(f"Could not find role-compatible predicate candidates: {error}")
+                print("Use: /suggest-role-compatible-alignments "
+                      "[DOC_OFFSET|MAX_DOCS]")
             continue
         if line.startswith("/accept-corpus-alignment"):
             fields = line[len("/accept-corpus-alignment"):].strip().split("|")

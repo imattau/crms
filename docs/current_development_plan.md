@@ -86,6 +86,14 @@ precision, useful coverage, review burden, and labeler effort. Codex may label
 proposals, but Codex labels are not independent validation. Do not describe cue
 matching or teacher-assisted alignment as autonomous learning.
 
+The new role-compatible predicate probe is deliberately a report-only
+discovery aid. Its runtime fixture shows both a plausible created/made
+candidate and a false created/praised candidate from shared entity types.
+That result supports investigating broader candidate generation, while
+confirming that type compatibility must never teach an alignment on its own.
+The probe is not evidence of source-disjoint rule learning; that gate still
+requires complete held-out documents and direct semantic validation.
+
 **Gate:** at least one genuinely unseen, source-disjoint composition succeeds
 through chat and reload; an independent checker accepts valid results and
 rejects invalid ones; unsupported cases abstain; provenance makes supervision

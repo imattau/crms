@@ -96,11 +96,15 @@ offsets 0, 5,000, 20,000, 50,000, 100,000, 150,000, 200,000, and 275,000). Repro
 
 This is a yield result for these windows, not an estimate of corpus-wide precision or recall. It
 shows that exact shared-pair matching does not yet provide useful self-learning coverage on these
-ordinary encyclopedia slices. Keep its evidence threshold intact. A next discovery mechanism
-should propose role-compatible candidate relations from broader evidence (for example, repeated
-subject/object type combinations), then test them on held-out pairs and present them for review;
-it must not treat type compatibility or lexical similarity as proof of synonymy. Track proposal
-yield, held-out precision, and abstentions separately before using that mechanism in chat.
+ordinary encyclopedia slices. Keep its evidence threshold intact. The report-only probe in
+`experiments/v1_450_role_compatible_predicate_candidates.py` now uses accepted, source-cited
+subject/object types to surface role-compatible candidates. Its controlled fixture finds a
+created/made lead and the false created/praised match, confirming that role compatibility can
+improve candidate yield but cannot establish synonymy. The `/suggest-role-compatible-alignments`
+command labels these as investigation-only and cannot accept them. This is not yet corpus-level
+validation or a learning path. Before any candidate can teach an alignment, measure yield and
+precision on complete held-out documents, include hard semantic near-misses, and require direct
+source evidence plus review. Track abstentions separately.
 
 ## 1. Evidence independence and dependency report
 
