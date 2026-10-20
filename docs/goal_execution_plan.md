@@ -1,6 +1,6 @@
 # CRMS goal execution plan
 
-**Reviewed:** 2026-10-20 (reconciled with the latest dialogue, task-flow, and source-discovery reviews)
+**Reviewed:** 2026-10-20 (including the real-source learning and copied-model replay)
 **Status:** execution plan; the capability goal remains unmet.
 
 ## Destination
@@ -29,12 +29,17 @@ ordinary user language to a correct, useful, checkable result. Strong results
 still rely heavily on controlled fixtures, hand-authored rules, or Codex labels.
 The latest dialogue test transfer was materially weaker than development
 (12/46 vs. 64/131 joint act/task-intent label agreement); this is a label
-diagnostic, not task accuracy, but it shows that current intent handling does
-not transfer reliably. Source-derived rule discovery has promising narrow
-signals, but no convincing precision/coverage result across source-disjoint
-documents and publishers. Verified reasoning is ahead of natural-language
-routing and broad rule learning. The single-file SQLite distribution goal is
-not yet validated across the complete learning and correction lifecycle.
+diagnostic, not task accuracy, and still warns that intent handling does not
+transfer reliably. Reported topic-switch and source-only context failures now
+have focused regression coverage, but independently authored conversations
+and varied layouts have not established dialogue reliability. Source-derived
+rule discovery has a narrow positive signal, but no convincing precision and
+coverage result across source-disjoint documents and publishers. Verified
+reasoning is ahead of natural-language routing and broad rule learning.
+The copied SQLite model now carries one reviewed real-source phrase through
+acceptance, held-out checking, fresh-process chat, and removal of original
+source files; this is a useful packaging slice, not validation of the full
+learning and correction lifecycle.
 
 Recent regressions and component passes should be kept as controls, not
 combined into an overall success percentage. In particular, passing scripted
@@ -42,17 +47,27 @@ dialogue cases does not establish conversational competence; a retrieval hit
 does not establish that the answer addresses the question; and a verified
 proof over an authored graph does not establish autonomous rule learning.
 
-The latest dialogue review adds a concrete reliability risk: a pronoun-led
-source sentence can be attributed to the wrong entity after a topic switch;
-clearing context on any non-`answered` turn can also discard valid source-only
-context. History questions and ordinal references remain uncovered. The
-bounded reservation draft (`v1_467`) demonstrates one request → clarification
-→ correction → draft → reload path, but its parser and task route are narrow.
+The dialogue review that reported a pronoun-led source sentence attributed to
+the wrong entity and source-only context loss has since been replayed against
+focused fixes. The selected current-checkout regressions pass, including topic
+switch, source-only context, persisted evidence, and stale `why?` behavior.
+Treat those as repaired controls, not as proof of general dialogue competence:
+history questions, ordinal references, and independently authored multi-turn
+transfer still need a broader held-out evaluation. The bounded reservation draft (`v1_467`) demonstrates one request →
+clarification → correction → draft → reload path, but its parser and task
+route are narrow.
 The map-free scan (`v1_464`) found repeated relation candidates, but most
-reviewed groups were unsafe, artifacts, or false/composite. Treat this as a
-discovery lead, not a learning result. These findings keep dialogue safety and
-source-rule transfer as the immediate gates; recombination and reasoning stay
-the central capability bet.
+reviewed groups were unsafe, artifacts, or false/composite. `v1_468` found no
+exact endpoint-pair overlap between candidate and dominant phrase groups, so
+that filter is not useful as a promotion gate. `v1_469` demonstrates one
+reviewed `capital city of` phrase from SimpleWiki through acceptance, a
+five-page train/one-page holdout, SQLite reload, fresh-process chat, and a
+copied portable model with original files removed. The field mapping remains
+hand-coded, Codex supplies review, and there is no second-publisher transfer
+result. Treat this as an end-to-end integration control, not autonomous rule
+learning. These findings keep independent dialogue transfer and source-rule
+discovery as open gates; recombination and reasoning remain the central
+capability bet.
 
 ## Operating principles
 
@@ -225,24 +240,37 @@ academic-paper sources.
 
 ## Immediate work queue — execute in this order
 
-1. **Dialogue safety.** Freeze the reported pronoun/topic-switch,
-   source-only-context, stale-`why?`, history, and ordinal cases. Create a
-   small independently authored transcript set with varied paragraph layouts;
-   score it before changing runtime behavior. Repair the smallest reproduced
-   cause, then replay fixed and new cases in fresh processes.
-2. **Source-rule discovery.** Freeze a candidate generator and use corpora
-   with real relation/wording overlap, complete-document and
-   publisher-disjoint splits, candidate and non-candidate samples, and
-   negation/quotation/contrast/role-reversal controls. Codex may label the
-   examples, but report that supervision separately. Keep the path report-only
-   unless precision, useful yield, provenance, and review effort clear the
-   gate.
+1. **Dialogue transfer.** Keep the fixed pronoun/topic-switch,
+   source-only-context, stale-`why?`, history, and ordinal regressions locked.
+   Create an independently authored transcript set with varied paragraph
+   layouts and entity switches; score wrong referents, omissions,
+   clarification, and task completion before changing runtime behavior. Fix
+   only reproduced failures, then replay both fixed and held-out cases in fresh
+   processes.
+2. **Source-rule discovery.** Treat `v1_469` as the positive integration
+   control and `v1_464`/`v1_468` as noisy discovery baselines. Freeze one typed
+   candidate generator; sample both proposals and non-proposals from complete
+   documents in corpora with actual relation/wording overlap; reserve a second
+   publisher. Include polarity, quotation, contrast, role-reversal, and
+   boundary negatives. Report precision, useful yield, source independence,
+   and review effort. Keep proposals inert unless this gate is met. Do not
+   spend another cycle on exact endpoint overlap or a larger one-corpus scan.
 3. **Recombination plus reasoning.** Select a learning signal that passes
    packet 2, then exercise an unseen multi-step request through normal chat,
    fresh-process reload, proof/output checking, missing premises, conflict,
    incomplete search, source correction, and derived-case invalidation. Keep
    existing `v1_451`/`v1_456` integrations as regression controls, not evidence
    that source learning is autonomous.
+
+The dialogue packet is a parallel release-quality gate; it must not displace
+the learning experiment. The source-rule result decides whether CRMS advances
+the learner or redesigns the evidence-extraction step. Recombination proceeds
+only after that decision, while reasoning checks are built into its acceptance
+criteria. Math, coding, translation, and creative tasks remain next-stage
+domain slices, not current distractions.
+
+
+
 
 Do not enlarge the corpus, add a new dialogue mechanism, expand domain
 coverage, or migrate the model store unless it clears one of these gates.
