@@ -160,6 +160,17 @@ narrow location/date task; it does not close the independently authored
 conversation-transfer gate. Keep improving the transcript set while moving
 the main capability experiment forward in parallel.
 
+A fresh replay of the reported Eiffel Tower/Colosseum case on the current
+runtime does **not** reproduce the confident 1889 misattribution: after the
+named switch, “When was it completed?” abstains because the returned sentence
+does not name Colosseum. That is a safety improvement over a wrong answer, but
+the paragraph-local antecedent is still not used to answer the follow-up.
+Source-only elliptical switches such as “and Italy?” also remain unresolved
+when the target has not been established as an answerable entity. Keep this as
+an open omission/transfer item in the dialogue packet; do not count the safe
+abstention as task completion. `why?` must continue to refer to the current
+turn or state clearly that there is no grounded answer to explain.
+
 The source-backed composition diagnostic (`v1_529`) is a narrow positive
 transfer result: it discovers a two-premise rule from two SimpleWiki training
 articles, validates against two separate articles, removes the validation
