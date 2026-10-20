@@ -572,9 +572,15 @@ describe behavior or mathematical properties. This is single-rater diagnostic
 evidence, not a quality estimate. It led to a general parser change separating
 leading discourse/setting context from a following explicit subject, with
 existing uncertainty, context, and coordinated-clause controls still passing.
-SymPy is now development material. The source-learning gate remains open until
-the revised method is frozen and checked on a different untouched package and
-sample.
+The revised parser was then frozen and probed on NetworkX 3.6.1. Only 10/20
+sampled proposals were structurally reviewable; two needed context and eight
+had boundary errors. Three of five sampled unhandled spans appeared to state
+behavior. This new-package, single-rater diagnostic does not establish quality
+or recall, but it shows the previous context fix did not close the transfer
+gap. SymPy and NetworkX are now development material. Redesign claim boundaries
+for parameter declarations, relative clauses, multiple predicates, and inline
+code before freezing a further untouched package. Keep source-derived claims
+review-only throughout.
 
 The immediate bottleneck is therefore no longer “can the components compose in
 a fixture?” It is whether a fresh user request can cause CRMS to select and

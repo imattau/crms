@@ -1,0 +1,583 @@
+{
+  "audit": "v1_512",
+  "purpose": "frozen new-package transfer diagnostic; no source claims accepted",
+  "package": "NetworkX",
+  "package_version": "3.6.1",
+  "package_license_metadata": "BSD-3-Clause",
+  "method_revision": "572331eaa6b4acc1fef657da0708c10015e3a8ef",
+  "method": [
+    "propose_procedure_phrase_candidates",
+    "nearest_parameter_heading",
+    "propose_contextual_procedure_phrase_candidates"
+  ],
+  "corpus_scope": "Importable public functions and classes with docstrings in the installed networkx package; repeated Python object identities are counted once. This is not the complete online documentation.",
+  "counts": {
+    "importable_modules": 287,
+    "api_units_with_docstrings": 1158,
+    "sentences": 25332,
+    "sentences_containing_will": 608,
+    "sentences_with_direct_proposal": 593,
+    "sentences_with_parameter_context_proposal": 374,
+    "sentences_with_any_proposal": 602,
+    "unhandled_will_sentences": 6,
+    "candidate_sample_size": 20,
+    "unhandled_sample_size": 5
+  },
+  "sample_selection": "Separately sort candidate and unhandled rows by SHA-256 of API unit, sentence offset, and text; keep the first row per API unit and normalized sentence, up to 20 per group.",
+  "candidate_sample": [
+    {
+      "sample_key": "003636b60eb1dd38ad378df9b7c5a790564bef39839f481c56e5063af3871c47",
+      "api_unit": "networkx.circular_layout",
+      "sentence_start": 445,
+      "sentence_end": 625,
+      "docstring_sha256": "d84b0cf33992eaee91973f424452dfb2a497a52835a2ff031730b5a358de870c",
+      "source_citation": "networkx.circular_layout#sha256=d84b0cf33992eaee91973f424452dfb2a497a52835a2ff031730b5a358de870c&chars=445:625",
+      "sentence": "store_pos_as : str, default None\n    If non-None, the position of each node will be stored on the graph as\n    an attribute with this string as its name, which can be accessed with",
+      "proposals": [
+        {
+          "subject": "store_pos_as : str, default None If non-None, the position of each node",
+          "predicate_phrase": "be stored on the graph as an attribute with this string as its name, which can be accessed with",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "00501b70b6c7d0d45575d861ec5833ff0cef633075ac1929dd23652d13a24029",
+      "api_unit": "networkx.algorithms.connectivity.local_node_connectivity",
+      "sentence_start": 1431,
+      "sentence_end": 1486,
+      "docstring_sha256": "c863a4fe5ae531447a8fc48ad3984613a6529afb8dae2affed9ea43145a3e6af",
+      "source_citation": "networkx.algorithms.connectivity.local_node_connectivity#sha256=c863a4fe5ae531447a8fc48ad3984613a6529afb8dae2affed9ea43145a3e6af&chars=1431:1486",
+      "sentence": "If provided it will be\n    reused instead of recreated.",
+      "proposals": [
+        {
+          "subject": "If provided it",
+          "predicate_phrase": "be reused instead of recreated",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "01038438970d2e65b7b87dd1ac0675b0639b194838123de1a62bab6b9f5b5718",
+      "api_unit": "networkx.drawing.nx_pylab.apply_alpha",
+      "sentence_start": 582,
+      "sentence_end": 733,
+      "docstring_sha256": "5c75ae2e7bed7266cb9088721cb580a45b6dca7b8c4eaa2866c80214d81e3256",
+      "source_citation": "networkx.drawing.nx_pylab.apply_alpha#sha256=5c75ae2e7bed7266cb9088721cb580a45b6dca7b8c4eaa2866c80214d81e3256&chars=582:733",
+      "sentence": "Otherwise,\n    if it is an array, the elements of alpha will be applied to the colors\n    in order (cycling through alpha multiple times if necessary).",
+      "proposals": [
+        {
+          "subject": "the elements of alpha",
+          "predicate_phrase": "be applied to the colors in order (cycling through alpha multiple times if necessary)",
+          "polarity": true,
+          "scope_notes": [
+            "before: Otherwise, if it is an array"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0174b1cfdba610993cbb7ddf06f1a8be79d70c17afc211c37da2b6a8bc86dceb",
+      "api_unit": "networkx.is_isomorphic",
+      "sentence_start": 945,
+      "sentence_end": 1049,
+      "docstring_sha256": "1a9b357d5d0e046c07c04894233b7ed47759c5a5d3baf52db10fcd4bc15712f3",
+      "source_citation": "networkx.is_isomorphic#sha256=1a9b357d5d0e046c07c04894233b7ed47759c5a5d3baf52db10fcd4bc15712f3&chars=945:1049",
+      "sentence": "That is, the function will receive the edge attribute dictionaries\n    of the edges under consideration.",
+      "proposals": [
+        {
+          "subject": "That is, the function",
+          "predicate_phrase": "receive the edge attribute dictionaries of the edges under consideration",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "026742759aad7dc91b437610d824f641d8e08b696ed0135cffa2f774d7b5c985",
+      "api_unit": "networkx.write_network_text",
+      "sentence_start": 602,
+      "sentence_end": 676,
+      "docstring_sha256": "62b79037e64556e19cac4bbbdc99ea682d8705bf53f0b1f6c89c585b4485cb87",
+      "source_citation": "networkx.write_network_text#sha256=62b79037e64556e19cac4bbbdc99ea682d8705bf53f0b1f6c89c585b4485cb87&chars=602:676",
+      "sentence": "if None, this will default to \"sys.stdout.write\"\n\nwith_labels : bool | str",
+      "proposals": [
+        {
+          "subject": "this",
+          "predicate_phrase": "default to \"sys",
+          "polarity": true,
+          "scope_notes": [
+            "before: if None"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "033a3c41ce5080e36c12d921993214816e359dbbbf05e3b63541b1523cdae381",
+      "api_unit": "networkx.spectral_layout",
+      "sentence_start": 1590,
+      "sentence_end": 1673,
+      "docstring_sha256": "f3b93eeec8dc092670db432b28d36b9f28e918bf1958004951c0a6f7e7abbd52",
+      "source_citation": "networkx.spectral_layout#sha256=f3b93eeec8dc092670db432b28d36b9f28e918bf1958004951c0a6f7e7abbd52&chars=1590:1673",
+      "sentence": "Directed graphs will be considered as undirected graphs when\npositioning the nodes.",
+      "proposals": [
+        {
+          "subject": "Directed graphs",
+          "predicate_phrase": "be considered as undirected graphs when positioning the nodes",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "03596cbe423fad71c3d99f4a022d3c9837a4f77894aa2ff93cfb0ed56a9c348c",
+      "api_unit": "networkx.generate_network_text",
+      "sentence_start": 2324,
+      "sentence_end": 2407,
+      "docstring_sha256": "438245e75f762e3ba75d52f86ab0bde48171c797f60ae4ab55022ee7ea7ab3ba",
+      "source_citation": "networkx.generate_network_text#sha256=438245e75f762e3ba75d52f86ab0bde48171c797f60ae4ab55022ee7ea7ab3ba&chars=2324:2407",
+      "sentence": "If given as a\n    string, then that attribute name will be used instead of \"label\".",
+      "proposals": [
+        {
+          "subject": "that attribute name",
+          "predicate_phrase": "be used instead of \"label\"",
+          "polarity": true,
+          "scope_notes": [
+            "before: If given as a string"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "039f9e25e92e74f5d46e44a76cba2c697554c1298499648a9a2d43cb27779c67",
+      "api_unit": "networkx.hits",
+      "sentence_start": 1146,
+      "sentence_end": 1261,
+      "docstring_sha256": "54c67df98a0bdbec7a55fe286606e506ec5215b22786b0011d0b3c1bd6731b66",
+      "source_citation": "networkx.hits#sha256=54c67df98a0bdbec7a55fe286606e506ec5215b22786b0011d0b3c1bd6731b66&chars=1146:1261",
+      "sentence": "The iteration will stop\nafter max_iter iterations or an error tolerance of\nnumber_of_nodes(G)*tol has been reached.",
+      "proposals": [
+        {
+          "subject": "The iteration",
+          "predicate_phrase": "stop after max_iter iterations or an error tolerance of number_of_nodes(G)*tol has been reached",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "05748e0dc2f908cfc78472ab913885dc98fdaae28d03e26084c2d40d71557346",
+      "api_unit": "networkx.google_matrix",
+      "sentence_start": 468,
+      "sentence_end": 529,
+      "docstring_sha256": "af54150ccce9b6d691542c7eb073723e2ef20db97b04436e059af4f5a2a26810",
+      "source_citation": "networkx.google_matrix#sha256=af54150ccce9b6d691542c7eb073723e2ef20db97b04436e059af4f5a2a26810&chars=468:529",
+      "sentence": "If not specified, a nodes personalization value will be zero.",
+      "proposals": [
+        {
+          "subject": "a nodes personalization value",
+          "predicate_phrase": "be zero",
+          "polarity": true,
+          "scope_notes": [
+            "before: If not specified"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0792c144d270b697d073d08f7fe3a66f47f7ef7a1dfeceae86f2fc7dcbe98cab",
+      "api_unit": "networkx.subgraph",
+      "sentence_start": 393,
+      "sentence_end": 464,
+      "docstring_sha256": "ba2479e3844c43c3def497f97f229b72dbc19fd2e362d57b82d442ca6528816f",
+      "source_citation": "networkx.subgraph#sha256=ba2479e3844c43c3def497f97f229b72dbc19fd2e362d57b82d442ca6528816f&chars=393:464",
+      "sentence": "Nodes in nbunch that are not in the graph will be (quietly)\n   ignored.",
+      "proposals": [
+        {
+          "subject": "Nodes in nbunch that are not in the graph",
+          "predicate_phrase": "be (quietly) ignored",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "07c73e15bf2b6d968bce10b3b9e7d5a2436b2aca67a2512f902a8610d693d65e",
+      "api_unit": "networkx.all_shortest_paths",
+      "sentence_start": 1477,
+      "sentence_end": 1688,
+      "docstring_sha256": "dba223ba2380ce8815524bb98abc1049f5738b7e4e9e83228b45311177e46062",
+      "source_citation": "networkx.all_shortest_paths#sha256=dba223ba2380ce8815524bb98abc1049f5738b7e4e9e83228b45311177e46062&chars=1477:1688",
+      "sentence": "If G\ncontains zero-weight cycles, this function will not produce all shortest\npaths because doing so would produce infinitely many paths of unbounded\nlength -- instead, we only produce the shortest simple paths.",
+      "proposals": [
+        {
+          "subject": "this function",
+          "predicate_phrase": "produce all shortest paths",
+          "polarity": false,
+          "scope_notes": [
+            "before: If G contains zero-weight cycles",
+            "after: because doing so would produce infinitely many paths of unbounded length -- instead, we only produce the shortest simple paths"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "081dcbabf0ef691cd917399c3c8d5aadbb8df6f4a925eaab90166a01c7701e28",
+      "api_unit": "networkx.percolation_centrality",
+      "sentence_start": 1077,
+      "sentence_end": 1217,
+      "docstring_sha256": "1433c4a5fdb7f20e81471e9687c06e87846e6b1aac66cd1a4f1f8d0787a0aba5",
+      "source_citation": "networkx.percolation_centrality#sha256=1433c4a5fdb7f20e81471e9687c06e87846e6b1aac66cd1a4f1f8d0787a0aba5&chars=1077:1217",
+      "sentence": "If all nodes do not have the attribute all nodes will be set to\n  1 and the centrality measure will be equivalent to betweenness centrality.",
+      "proposals": [
+        {
+          "subject": "If all nodes do not have the attribute all nodes",
+          "predicate_phrase": "be set to 1 and the centrality measure will be equivalent to betweenness centrality",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0899616821b08ff7796658eeb94cf0e4924a6e8240f806f01a99d6243c03309f",
+      "api_unit": "networkx.display",
+      "sentence_start": 5776,
+      "sentence_end": 5853,
+      "docstring_sha256": "6441cfba786eae24d36c10e18e4bb22d3c6b52ba40ebbd892d28b3084041fa38",
+      "source_citation": "networkx.display#sha256=6441cfba786eae24d36c10e18e4bb22d3c6b52ba40ebbd892d28b3084041fa38&chars=5776:5853",
+      "sentence": "Visible nodes without\n    this attribute will use the assumed default of 1.0.",
+      "proposals": [
+        {
+          "subject": "Visible nodes without this attribute",
+          "predicate_phrase": "use the assumed default of 1.0",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "08a53cb03525068dd761bf4af24699e4a8c84cd844e930f8c09582c1fc06e33f",
+      "api_unit": "networkx.contracted_nodes",
+      "sentence_start": 5458,
+      "sentence_end": 5646,
+      "docstring_sha256": "9dbca68453a03245975030dcaacb014f2974c4fab481286c71ad3c9b03263223",
+      "source_citation": "networkx.contracted_nodes#sha256=9dbca68453a03245975030dcaacb014f2974c4fab481286c71ad3c9b03263223&chars=5458:5646",
+      "sentence": "In a ``MultiDiGraph`` with a self loop, the in and out edges will\nbe treated separately as edges, so while contracting a node which\nhas a self loop the contraction will add multiple edges:",
+      "proposals": [
+        {
+          "subject": "In a ``MultiDiGraph`` with a self loop, the in and out edges",
+          "predicate_phrase": "be treated separately as edges, so while contracting a node which has a self loop the contraction will add multiple edges",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "08d1ce5e43082aeada65a2862650e14b16a1ad0fd8e24bd38f3581d1a06fd450",
+      "api_unit": "networkx.from_numpy_array",
+      "sentence_start": 2479,
+      "sentence_end": 2696,
+      "docstring_sha256": "507a6ab2a715f76a5b2fa7c0d60f6a61c3c8c6872caefb991fa44d541f70560c",
+      "source_citation": "networkx.from_numpy_array#sha256=507a6ab2a715f76a5b2fa7c0d60f6a61c3c8c6872caefb991fa44d541f70560c&chars=2479:2696",
+      "sentence": "If `create_using` indicates a multigraph and the array has only integer\nentries and `parallel_edges` is False, then the entries will be treated\nas weights for edges joining the nodes (without creating parallel edges):",
+      "proposals": [
+        {
+          "subject": "the entries",
+          "predicate_phrase": "be treated as weights for edges joining the nodes (without creating parallel edges)",
+          "polarity": true,
+          "scope_notes": [
+            "before: If `create_using` indicates a multigraph and the array has only integer entries and `parallel_edges` is False"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "08e113b9c4153f29c60d69d7b837bf8fea9fed39375faec32de3889dbefe11d7",
+      "api_unit": "networkx.readwrite.gexf.ElementTree",
+      "sentence_start": 105,
+      "sentence_end": 267,
+      "docstring_sha256": "bcd2daa9e529cf104089a92521ceaba9f57983f9a5e72f2b7a37007963735c17",
+      "source_citation": "networkx.readwrite.gexf.ElementTree#sha256=bcd2daa9e529cf104089a92521ceaba9f57983f9a5e72f2b7a37007963735c17&chars=105:267",
+      "sentence": "*element* is an optional root element node,\n*file* is an optional file handle or file name of an XML file whose\ncontents will be used to initialize the tree with.",
+      "proposals": [
+        {
+          "subject": "file* is an optional file handle or file name of an XML file whose contents",
+          "predicate_phrase": "be used to initialize the tree with",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0919ea22a38cd796d1170ba4f31d2bebc750f21704c986bb4ec6167db7da1d40",
+      "api_unit": "networkx.astar_path_length",
+      "sentence_start": 1646,
+      "sentence_end": 1719,
+      "docstring_sha256": "e021f5c92db56f8c850201cf633b93a96eebf26ac56b84a74cdeb836d6136821",
+      "source_citation": "networkx.astar_path_length#sha256=e021f5c92db56f8c850201cf633b93a96eebf26ac56b84a74cdeb836d6136821&chars=1646:1719",
+      "sentence": "Then,\n   if g(n) + h'(n) > cutoff, the node will not be explored further.",
+      "proposals": [
+        {
+          "subject": "Then, if g(n) + h'(n) > cutoff, the node",
+          "predicate_phrase": "be explored further",
+          "polarity": false,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0aa0a2316eec355d42d843320ea39c568cbbb04aa77662de1d5e20b0d45cc7bd",
+      "api_unit": "networkx.algorithms.connectivity.minimum_st_edge_cut",
+      "sentence_start": 1480,
+      "sentence_end": 1545,
+      "docstring_sha256": "07896347832ca9213d8b935c97dfb8a31b4bcfd719f522c8b1b338b663d2e2cb",
+      "source_citation": "networkx.algorithms.connectivity.minimum_st_edge_cut#sha256=07896347832ca9213d8b935c97dfb8a31b4bcfd719f522c8b1b338b663d2e2cb&chars=1480:1545",
+      "sentence": "Set of edges that, if removed from the graph, will disconnect it.",
+      "proposals": [
+        {
+          "subject": "Set of edges that, if removed from the graph",
+          "predicate_phrase": "disconnect it",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0abba343f6475974d078a2fd118e4db036658f4f3457bd947642b016f77c47b9",
+      "api_unit": "networkx.write_adjlist",
+      "sentence_start": 685,
+      "sentence_end": 791,
+      "docstring_sha256": "ff1b15dc01861cfb27ab8b5d3481f630d9bf89753d1e4acef7e97210001f1324",
+      "source_citation": "networkx.write_adjlist#sha256=ff1b15dc01861cfb27ab8b5d3481f630d9bf89753d1e4acef7e97210001f1324&chars=685:791",
+      "sentence": "The default `delimiter=\" \"` will result in unexpected results if node names contain\nwhitespace characters.",
+      "proposals": [
+        {
+          "subject": "The default `delimiter=\" \"`",
+          "predicate_phrase": "result in unexpected results",
+          "polarity": true,
+          "scope_notes": [
+            "after: if node names contain whitespace characters"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0b08a61897a60189fd70edbf7fc402f3d5e067a41805c14441e261dd8dc3dd48",
+      "api_unit": "networkx.ego_graph",
+      "sentence_start": 481,
+      "sentence_end": 589,
+      "docstring_sha256": "2f82674bc279eac55584c32aa2ac7548babd35d4708fab77b636418506ba78c0",
+      "source_citation": "networkx.ego_graph#sha256=2f82674bc279eac55584c32aa2ac7548babd35d4708fab77b636418506ba78c0&chars=481:589",
+      "sentence": "For example, setting\n  distance='weight' will use the edge weight to measure the\n  distance from the node n.",
+      "proposals": [
+        {
+          "subject": "setting distance='weight'",
+          "predicate_phrase": "use the edge weight to measure the distance from the node n",
+          "polarity": true,
+          "scope_notes": [
+            "before: For example"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    }
+  ],
+  "unhandled_sample": [
+    {
+      "sample_key": "079bf1ee23336bd06359c225a2ee538b706fd0a685b8a17d3e52b55fe1e08736",
+      "api_unit": "networkx.gomory_hu_tree",
+      "sentence_start": 2775,
+      "sentence_end": 2834,
+      "docstring_sha256": "fb14be1246a03ead9ff0b2658c7c8e63f8c21d8d232b19465648041b458f4b9b",
+      "source_citation": "networkx.gomory_hu_tree#sha256=fb14be1246a03ead9ff0b2658c7c8e63f8c21d8d232b19465648041b458f4b9b&chars=2775:2834",
+      "sentence": "# that is, the set of edges that if removed from G will\n..."
+    },
+    {
+      "sample_key": "4248a5087f83914e40ebf1e2486500e73b997c417453c296c1bb449f5bf41fa5",
+      "api_unit": "networkx.is_aperiodic",
+      "sentence_start": 171,
+      "sentence_end": 269,
+      "docstring_sha256": "57d1da319d9fc12f23a8a43e26787080f2ad2c28619dcd131a3b7432b594b262",
+      "source_citation": "networkx.is_aperiodic#sha256=57d1da319d9fc12f23a8a43e26787080f2ad2c28619dcd131a3b7432b594b262&chars=171:269",
+      "sentence": "This function requires the graph `G` to be strongly connected and will raise\nan error if it's not."
+    },
+    {
+      "sample_key": "77ca561f1de435872593c6c24115596eda76d431714edf5aa2971ad608dcf607",
+      "api_unit": "networkx.LFR_benchmark_graph",
+      "sentence_start": 518,
+      "sentence_end": 636,
+      "docstring_sha256": "1a252a218f4a6a7af48f28642e912914cce097fa95174e35956c2d6d2ec2876f",
+      "source_citation": "networkx.LFR_benchmark_graph#sha256=1a252a218f4a6a7af48f28642e912914cce097fa95174e35956c2d6d2ec2876f&chars=518:636",
+      "sentence": "Each node *u* will have $\\mu \\mathrm{deg}(u)$ edges\n   joining it to nodes in communities other than its own and $(1 -"
+    },
+    {
+      "sample_key": "8f54c81f25d1e6a75ddf0be3d5ebffb0460e3543b8445266e8a551b83512cf56",
+      "api_unit": "networkx.algorithms.clique.islice",
+      "sentence_start": 180,
+      "sentence_end": 271,
+      "docstring_sha256": "a96939b176610e3d33c1b7184108d911e0d19a31149f139882b334530308ba52",
+      "source_citation": "networkx.algorithms.clique.islice#sha256=a96939b176610e3d33c1b7184108d911e0d19a31149f139882b334530308ba52&chars=180:271",
+      "sentence": "If start is specified, will skip all preceding elements;\notherwise, start defaults to zero."
+    },
+    {
+      "sample_key": "c84e752ad9773d080ee8edb78ca9acdbc54c687ed7fb1d8bc447e4bb46acb6d4",
+      "api_unit": "networkx.s_metric",
+      "sentence_start": 303,
+      "sentence_end": 413,
+      "docstring_sha256": "3394aa6b206698220141bbc6def71ba9d5c4c4b1b2178615e9ba1e334f548f4c",
+      "source_citation": "networkx.s_metric#sha256=3394aa6b206698220141bbc6def71ba9d5c4c4b1b2178615e9ba1e334f548f4c&chars=303:413",
+      "sentence": "[1] Lun Li, David Alderson, John C. Doyle, and Walter Willinger,\n       Towards a Theory of Scale-Free Graphs:"
+    }
+  ],
+  "manual_review": {
+    "reviewer": "Codex (single reviewer)",
+    "method": "Unblinded field-level review of the pre-frozen hash-selected sample; no source claims accepted.",
+    "candidate_rows_reviewed": 20,
+    "candidate_class_counts": {
+      "structurally_reviewable": 10,
+      "context_required": 2,
+      "boundary_error": 8
+    },
+    "candidate_classifications": [
+      {
+        "api_unit": "networkx.circular_layout",
+        "class": "boundary_error"
+      },
+      {
+        "api_unit": "networkx.algorithms.connectivity.local_node_connectivity",
+        "class": "context_required"
+      },
+      {
+        "api_unit": "networkx.drawing.nx_pylab.apply_alpha",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "networkx.is_isomorphic",
+        "class": "boundary_error"
+      },
+      {
+        "api_unit": "networkx.write_network_text",
+        "class": "boundary_error"
+      },
+      {
+        "api_unit": "networkx.spectral_layout",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "networkx.generate_network_text",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "networkx.hits",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "networkx.google_matrix",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "networkx.subgraph",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "networkx.all_shortest_paths",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "networkx.percolation_centrality",
+        "class": "boundary_error"
+      },
+      {
+        "api_unit": "networkx.display",
+        "class": "context_required"
+      },
+      {
+        "api_unit": "networkx.contracted_nodes",
+        "class": "boundary_error"
+      },
+      {
+        "api_unit": "networkx.from_numpy_array",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "networkx.readwrite.gexf.ElementTree",
+        "class": "boundary_error"
+      },
+      {
+        "api_unit": "networkx.astar_path_length",
+        "class": "boundary_error"
+      },
+      {
+        "api_unit": "networkx.algorithms.connectivity.minimum_st_edge_cut",
+        "class": "boundary_error"
+      },
+      {
+        "api_unit": "networkx.write_adjlist",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "networkx.ego_graph",
+        "class": "structurally_reviewable"
+      }
+    ],
+    "structurally_reviewable_definition": "Subject, predicate, polarity, and relevant local scope are coherent in the cited sentence. This is not a promotion or semantic-correctness decision.",
+    "unhandled_rows_reviewed": 5,
+    "unhandled_rows_with_plausible_behavior_or_property_claim": 3,
+    "unhandled_non_target_or_incomplete": 2,
+    "unhandled_observation": "Three of five spans appeared to describe behavior or properties; the sample is too small and non-probabilistic to estimate recall.",
+    "limitations": [
+      "single-rater",
+      "unblinded",
+      "hash-selected diagnostic sample, not a probability sample",
+      "package API docstrings, not complete online documentation",
+      "proposal and non-proposal observations are not precision or recall estimates"
+    ]
+  },
+  "limitations": [
+    "This is a package-level sample, not a complete documentation-publisher test.",
+    "Only sentence spans containing 'will' are in scope.",
+    "The deterministic sample is diagnostic, not a precision/recall estimate.",
+    "The method was not changed in response to this sample."
+  ]
+}

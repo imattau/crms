@@ -3239,6 +3239,29 @@ rule yield. Freeze a different package and its sample before further tuning.
 Report: [frozen SymPy transfer manifest](reports/v1_511_sympy_procedure_transfer.json),
 [reproduction script](../experiments/audits/v1_511_sympy_procedure_transfer.py).
 
+## Frozen NetworkX package probe (`v1_512`, 2026-10-20)
+
+After the leading-context parser change was committed, a fresh hash-selected
+sample was frozen from NetworkX 3.6.1 public API docstrings. The scan covered
+1,158 API docstrings and 25,332 sentence spans; 608 contained `will`, 602
+received a proposal, and six were unhandled. In the 20-row proposal sample,
+one Codex reviewer marked ten structurally reviewable, two context-dependent,
+and eight with boundary errors. Three of five sampled unhandled spans appeared
+to express a behavior or property. This is a new-package diagnostic, not an
+estimate of precision or recall and not a complete documentation-publisher
+test. The extractor still returns many malformed subjects and clause spans,
+so the source-rule transfer gate remains open. NetworkX is now development
+data and must not be used as an untouched confirmation sample after further
+parser changes.
+
+The next parser revision should address parameter declaration blocks,
+relative clauses, multiple claims in one sentence, and punctuation inside
+inline code. Keep claim and context spans independently cited; preserve
+review-only status and abstain on ambiguous role recovery.
+
+Report: [frozen NetworkX sample and review](reports/v1_512_networkx_procedure_transfer.json),
+[reproduction script](../experiments/audits/v1_512_networkx_procedure_transfer.py).
+
 ## Recombination and derived-learning control replay (`d5ebdb4`, 2026-10-20)
 
 Command: `python3 run_experiments.py --match v1_448_minimal_phrase_role_recombination --match v1_441_source_grounded_rule_recombination --match v1_82_derived_lineage_revalidation --match v1_72_proof_backed_derived_cases --timeout 300`.
