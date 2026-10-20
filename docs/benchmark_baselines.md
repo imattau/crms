@@ -3252,11 +3252,12 @@ request frames over the same proof-checked task: “Filter … to values …; th
 …, then …”. It also varies the procedure connective from `then` to `and then`.
 The procedure learner now learns the primitive operations and two different
 ordered examples (`sort then reverse` and `reverse then sort`); it is not taught
-the target `remove duplicate values then reverse the list` sequence. All four
-requests completed through a fresh chat process and returned the same
-`[9, 4, 12]` result, preserving three verified positive proofs, the primitive
-and connective evidence, and exclusion of the explicit negative value. An
-unknown value also blocks the whole result through chat; unknown and
+the target `remove duplicate values then reverse the list` sequence. Four
+request forms with different input ordering and duplicate placement completed
+through fresh chat, yielding `[9, 4, 12]`, `[4, 12, 9]`, `[9, 12, 4]`, and
+`[4, 9, 12]`. Each preserves three verified positive proofs, primitive and
+connective evidence, and exclusion of the explicit negative value. An unknown
+value also blocks the whole result through chat; unknown and
 positive/negative-conflicting values block it through the direct composition
 API. An unlicensed operation paraphrase (`deduplicate`) and relation wording
 (`Nia can reach`) remain unsupported.

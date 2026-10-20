@@ -96,20 +96,20 @@ def learn_connective_procedures() -> CRMSModel:
 def main() -> None:
     knowledge, _direct_composite_control = build_case()
     procedures = learn_connective_procedures()
-    variants = (
-        "Filter 12, 4, 4, 9, and 7 to values Nia reaches; then remove duplicate "
-        "values then reverse the list.",
-        "Given 12, 4, 4, 9, and 7, keep the values Nia reaches, and then remove "
-        "duplicate values then reverse the list.",
-        "From [12, 4, 4, 9, 7], return the values Nia reaches, then remove "
-        "duplicate values then reverse the list.",
-        "From [12, 4, 4, 9, 7], return the values Nia reaches, then remove "
-        "duplicate values and then reverse the list.",
+    cases = (
+        ("Filter 12, 4, 4, 9, and 7 to values Nia reaches; then remove duplicate "
+         "values then reverse the list.", (9, 4, 12)),
+        ("Given 9, 12, 4, 4, and 7, keep the values Nia reaches, and then remove "
+         "duplicate values then reverse the list.", (4, 12, 9)),
+        ("From [4, 12, 9, 4, 7], return the values Nia reaches, then remove "
+         "duplicate values then reverse the list.", (9, 12, 4)),
+        ("From [12, 9, 4, 12, 7], return the values Nia reaches, then remove "
+         "duplicate values and then reverse the list.", (4, 9, 12)),
     )
-    for request in variants:
+    for request, expected in cases:
         result = compose_verified_filter(request, knowledge, procedures)
         require(result is not None and result.status == "answered"
-                and result.output_values == (9, 4, 12)
+                and result.output_values == expected
                 and result.excluded_negative == (7,)
                 and len(result.inference_proofs) == 3
                 and result.procedure_records
@@ -181,18 +181,19 @@ def main() -> None:
         chat = subprocess.run(
             command,
             input="\n".join((
-                *variants,
+                *(request for request, _expected in cases),
                 "From [12, 4, 8], return the values Nia reaches, then remove "
                 "duplicate values then reverse the list.",
                 "/quit", "")),
             text=True, capture_output=True, cwd=root, timeout=60, check=False)
         output = chat.stdout + chat.stderr
         require(chat.returncode == 0 and "Traceback" not in output
-                and output.count("[9, 4, 12]") == len(variants)
+                and all(str(list(expected)) in output
+                        for _request, expected in cases)
                 and "I can't determine whether 8 satisfy Nia reaches" in output,
                 f"fresh-process chat did not answer all licensed variants:\n{output}")
 
-    print("four request surfaces compose through a learned connective in fresh chat: PASS")
+    print("four request surfaces and varied inputs compose through fresh chat: PASS")
     print("target operation order was not directly taught; component and connective evidence retained: PASS")
     print("verified proof set and explicit-negative handling are preserved: PASS")
     print("unlicensed operation and relation paraphrases remain unsupported: PASS")
