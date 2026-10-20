@@ -2020,6 +2020,27 @@ source-language recall. The next gate is more publishers and sentence forms,
 complete document splits, and independently authored negatives held out from
 cue design.
 
+## Natural request syntax transfer after phrase-role learning (2026-10-20)
+
+Command: `python3 experiments/v1_452_natural_request_frame_transfer.py`.
+
+After learning six labeled action/object/direction combinations, a fresh chat
+process receives five positive requests in syntactic forms not represented by
+the training phrases: “put items in increasing order,” “sort numbers from low
+to high,” “arrange values in ascending order,” “order the numbers
+ascendingly,” and “make the values go from smallest to largest.” It generates
+code for 0/5. The negative “sort items descending” also receives no generated
+code (0 false positives). This establishes a concrete coverage gap in natural
+request transfer; the existing 27-phrase positional grid does not show broad
+language understanding. The expected request interpretations and labels were
+written by Codex, and the procedure examples use Codex labels, so this is a
+controlled diagnostic rather than an independent language benchmark.
+
+The next model change should learn request structure across differing word
+order and function-word patterns, with provenance for each role alignment. It
+must improve the positive held-out coverage without licensing the unsupported
+descending request or other conflicting meanings.
+
 ## Source-grounded procedure phrase recombination (2026-10-20)
 
 Command: `python3 experiments/v1_441_source_grounded_rule_recombination.py`;

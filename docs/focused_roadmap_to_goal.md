@@ -93,7 +93,7 @@ After the records and learning lifecycle above are stable, complete migration an
 
 ### Next packets after those gates
 
-4. Use the shared scorecard's largest user-visible loss to choose between answer-bearing retrieval, relation/paraphrase transfer, or one bounded math/coding/translation/creative task. Each domain gets held-out natural-language requests and an independent checker before scope expands.
+4. Address the demonstrated request-language gap before widening domains: `v1_452` gets 0/5 positive syntactic paraphrases after a six-seed role grid, while safely abstaining on its descending negative. Extend phrase-role learning across word order, morphology, and function-word patterns with explicit alignment provenance, then measure held-out request coverage and conflicting-direction controls. After that, use the shared scorecard's largest remaining user-visible loss to choose between answer-bearing retrieval and one bounded math/coding/translation/creative task. Each domain gets held-out natural-language requests and an independent checker before scope expands.
 5. Continue contextual-intent evaluation in parallel. Defer learned dialogue-move induction until the explicit baseline generalizes across independent transcripts and the pilot beats it on held-out outcomes without raising wrong-referent or inappropriate-move rates.
 6. Finish SQLite distribution after the record model and learning lifecycle stabilize, then verify a copied model with source files unavailable.
 
