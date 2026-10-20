@@ -446,24 +446,29 @@ not to add more demonstrations of the same finite-list operations.
 | 5 | **Expand breadth only through validated task slices.** Use the same natural-language interface for coding, math, translation, and creative work. Select the next task from observed failures; define held-out requests, negative cases, an independent checker or rubric, and repair behavior before implementation. Test each domain before cross-domain composition. | Per-task ordinary-chat scorecards for coverage, correctness/quality, unsupported output, provenance, repair, and cost. | Each slice demonstrates useful held-out completion and honest limits. A feature, corpus, or one-off success does not count as domain competence. |
 | 6 | **Validate SQLite as the complete distributable runtime.** Once learning and correction lifecycles stabilize, copy the model where source files are unavailable and replay the shared scorecard, including query, learning, recombination, reasoning, explanation, correction, and reload. | Reproducible copy-only report including searchable source text, accepted knowledge, rules, provenance, correction lineage, licensing metadata, size, and migration behavior. | Tested behavior depends only on the copied model and runtime, and evidence/corrections remain inspectable after reload. |
 
-**Current checkpoint (`4564ffe`, 2026-10-20):** the project has
+**Current checkpoint (`1372812`, 2026-10-20):** the project has
 well-instrumented controlled paths for proof-checked reasoning, bounded
 recombination, source-backed retrieval, contextual dialogue state, reviewed
-learning, and SQLite portability. The dialogue report now identifies a fresh
-high-severity risk: “when was it completed?” after switching from the Eiffel
-Tower to the Colosseum can select the Eiffel Tower’s 1889 sentence because the
-paragraphs both use “It”. It also reports lost follow-up context after
-source-only answers, stale `why?`, and unsupported history/ordinal references.
-These are reported observations that still need current-checkout reproduction
-and a frozen multi-turn evaluation. The clause-aware source-rule learner has
-passed its selected controls but has not passed transfer: the latest frozen
+learning, and SQLite portability. The prior multi-turn dialogue failures now
+have current passing controls: `v1_427` covers the source-only Eiffel Tower to
+Colosseum switch, `80 CE` follow-up, “and Italy?”, history recall, stale
+explanations, clarification, and save/reload; `v1_435` covers competing
+same-paragraph “It was completed” antecedents and rejects a wrong visible date
+even when an undisplayed matching citation exists; `v1_419` covers failed
+follow-ups and `why?`; and the 2026-10-20 runtime retest passed `v1_412`,
+`v1_419`, and `v1_435` as well. These are curated controls, not a
+representative transfer benchmark. Exact wording like “Who built the Eiffel
+Tower?” now retrieves its directly supported “designed and built” sentence;
+“Who constructed the Eiffel Tower?” still abstains, showing a paraphrase gap
+that more source text alone will not close. The clause-aware source-rule
+learner has passed selected controls but has not passed transfer: frozen
 SymPy and NetworkX diagnostics each found only 10/20 sampled proposals
-structurally reviewable, with the rest context-dependent or boundary errors.
-Those are small, single-rater diagnostics, not precision estimates. The next
-capability milestone is independent held-out recombination through chat; the
-dialogue packet gates all chat changes, while source-rule extraction proceeds
-separately. The project is aligned in architecture, but broad capability and
-reliable self-learning remain unproven.
+structurally reviewable, with the remainder context-dependent or boundary
+errors. These are small, single-rater diagnostics, not precision estimates.
+The next capability milestone is independently authored, paraphrased
+recombination through chat; dialogue remains a release gate, and source-rule
+extraction proceeds separately. Broad capability and reliable self-learning
+remain unproven.
 
 `v1_503` adds one sum-first frame: “Sum every value in … that Mira reaches.”
 Before the operation phrase is taught it abstains; after contrastive examples,
