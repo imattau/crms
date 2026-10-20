@@ -3372,6 +3372,7 @@ def _explicit_subject_locative_evidence(
                 or _analyze_predicate_spelling(
                     source_verb, requested_verb) is not None)
             aligned_relations = []
+            requested_tokens = tuple(normalized_tokens(predicate))
             for canonical, forms in (licensed_predicate_families or {}).items():
                 canonical_tokens = normalized_tokens(canonical)
                 if len(canonical_tokens) < 2:
@@ -3386,9 +3387,14 @@ def _explicit_subject_locative_evidence(
                          or _analyze_predicate_spelling(
                              source_verb, canonical_verb) is not None))
                 requested_form_is_licensed = any(
-                    tuple(normalized_tokens(form))
-                        == tuple(normalized_tokens(predicate))
+                    tuple(normalized_tokens(form)) == requested_tokens
                     or (len(normalized_tokens(form)) == 1
+                        and _analyze_predicate_spelling(
+                            requested_verb,
+                            normalized_tokens(form)[0]) is not None)
+                    or (len(normalized_tokens(form)) > 1
+                        and " ".join(normalized_tokens(form)[1:])
+                            == source_preposition
                         and _analyze_predicate_spelling(
                             requested_verb,
                             normalized_tokens(form)[0]) is not None)

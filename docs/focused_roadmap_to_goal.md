@@ -53,16 +53,17 @@ source-topic controls pass. This improves one history operation; history,
 ordinal references, and open-ended continuity still need broader held-out
 conversation evaluation.
 
-The `v1_543` integration applies the existing reviewed relation-learning path
-to a real chat gap from the broad-corpus audit: “Where does the Serein River
-run?” can use a source sentence saying it “flows through” a city after two
-independent source-backed examples explicitly align `runs` with `flow through`.
-One example alone does not license the expansion; the held-out entity/source
-is cited, and alignment sources are shown in fresh chat. A separate unrelated
-verb still abstains. This demonstrates a small learned-language-plus-evidence
-composition through chat and save/reload, but the examples and task are
-controlled, the supervision is manually supplied, and this is not learned
-source-rule discovery or broad paraphrase transfer.
+The `v1_543` integration applies source-discovered relation learning to a real
+chat gap from the broad-corpus audit: “Where does the Serein River run?” can use
+a held-out source sentence saying it “flows through” a city. Two distinct
+subject/object pairs produce a report-only `runs through` → `flow through`
+proposal; it remains inactive until reviewed. Chat then transfers it to a new
+entity and cites both the answer sentence and exact alignment examples. One
+pair alone does not propose, and an unrelated verb still abstains. This is
+evidence of one reviewed learning/retrieval composition through chat and
+save/reload, not of broad source-rule precision: the sentences are controlled,
+Codex reviews the proposal, and only one phrase family and held-out entity
+were tested.
 
 Recombination, self-learning rules, reasoning, and dialogue are the central
 research priorities. Dialogue safety is also a release gate for every

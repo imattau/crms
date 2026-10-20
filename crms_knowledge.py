@@ -8089,6 +8089,26 @@ class CRMSKnowledgeBase:
                 if any(query_words[index:index + len(phrase)] == phrase
                        for index in range(len(query_words) - len(phrase) + 1)):
                     return True
+                # Locative questions commonly omit the relation's
+                # preposition after do-support ("Where does a river run?"),
+                # while source-backed examples retain it ("runs through").
+                # Use this only for a reviewed multiword predicate family
+                # whose final token is a locative preposition.
+                locative_prepositions = {
+                    "at", "across", "along", "from", "in", "near", "on",
+                    "through", "to", "within",
+                }
+                if (len(query_words) >= 4 and query_words[0] == "where"
+                        and query_words[1] in {"do", "does", "did"}
+                        and len(phrase) > 1
+                        and phrase[-1] in locative_prepositions):
+                    query_verb = query_words[-1]
+                    if (query_verb == phrase[0]
+                            or _analyze_predicate_spelling(
+                                query_verb, phrase[0])
+                            or _analyze_predicate_spelling(
+                                phrase[0], query_verb)):
+                        return True
                 # The question commonly uses a bare verb after do-support
                 # ("What did X investigate?") while examples store past tense
                 # ("X investigated Y"). Treat that regular spelling as a
@@ -9283,7 +9303,10 @@ class CRMSKnowledgeBase:
             if (len(relation_words) > 1 and len(query_words) >= 4
                     and query_words[0] == "where"
                     and query_words[1] in {"do", "does", "did"}
-                    and relation_words[-1] in {"at", "in", "near"}):
+                    and relation_words[-1] in {
+                        "at", "across", "along", "from", "in", "near", "on",
+                        "through", "to", "within",
+                    }):
                 base = query_words[-1]
                 surface = relation_words[0]
                 if (base == surface

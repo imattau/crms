@@ -4389,21 +4389,23 @@ Report: [experiment](../experiments/v1_542_exact_question_recall.py).
 
 Command: `python3 experiments/v1_543_learned_where_predicate_transfer.py`.
 
-Two source-backed examples with distinct subjects and objects teach the
-surface predicate `runs` as the reviewed relation `flow through`. A single
-example does not license query expansion. On a held-out river and cited
-sentence using “flows through,” fresh chat answers “Where does the Serein
-River 0133 run?” and shows both the direct evidence source and the sources
-supporting the wording alignment, including the exact cited example sentences.
+Two canonical source facts plus two separately cited alternate sentences with
+distinct subjects and objects produce a report-only `runs through` proposal
+for the relation `flow through`. One pair alone does not propose; even after
+two pairs, the proposal does not expand a query until explicit review. On a
+held-out river and cited sentence using “flows through,” fresh chat answers
+“Where does the Serein River 0133 run?” and shows both the direct evidence
+source and the exact cited example sentences supporting the wording alignment.
 An unrelated predicate still abstains. The
 `v1_541` direct-wording, wrong-entity, object-role, and multiple-location
 controls plus `v1_513`, `v1_514`, `v1_295`, and `v1_427` pass alongside this
 experiment.
 
-This is a controlled, manually supervised phrase alignment and one held-out
-entity pair. It demonstrates composition of a reviewed language relation with
-source retrieval through chat, not autonomous discovery, general verb
-paraphrase, or broad language transfer. The alignment remains auditable and
-the factual answer stays quoted evidence, not an accepted fact.
+This is a controlled, Codex-reviewed phrase proposal and one held-out entity
+pair. It demonstrates composition of source-derived candidate discovery,
+reviewed language alignment, and source retrieval through chat, not autonomous
+rule acceptance, general verb paraphrase, or broad language transfer. The
+alignment remains auditable and the factual answer stays quoted evidence, not
+an accepted fact.
 
 Report: [experiment](../experiments/v1_543_learned_where_predicate_transfer.py).

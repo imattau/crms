@@ -1,4 +1,4 @@
-"""Transfer a reviewed relation phrase into a source-grounded where answer.
+"""Transfer a reviewed, source-discovered phrase into a where answer.
 
 Run with: python3 experiments/v1_543_learned_where_predicate_transfer.py
 """
@@ -22,10 +22,8 @@ from crms_research import CRMSResearchIndex  # noqa: E402
 
 
 TRAINING = (
-    ("run-phrase-a", "The Indigo River runs through Ochre City.",
-     "Indigo River", "Ochre City"),
-    ("run-phrase-b", "The Mica Stream runs through Silver City.",
-     "Mica Stream", "Silver City"),
+    ("a", "Indigo River", "Ochre City"),
+    ("b", "Mica Stream", "Silver City"),
 )
 HELDOUT_SENTENCE = "The Serein River 0133 flows through Nacre City 0133."
 QUESTION = "Where does the Serein River 0133 run?"
@@ -45,34 +43,64 @@ def chat_options(root: Path) -> list[str]:
     return options
 
 
+def add_document(index: CRMSResearchIndex, document_id: str,
+                 sentence: str) -> None:
+    index.add_document(document_id, document_id, sentence,
+                       f"{document_id}.txt")
+
+
 def main() -> None:
     with tempfile.TemporaryDirectory(prefix="crms-learned-where-",
                                      dir="/tmp") as folder:
         root = Path(folder)
         index = CRMSResearchIndex()
         knowledge = CRMSKnowledgeBase()
-        for document_id, sentence, subject, obj in TRAINING:
-            index.add_document(document_id, document_id, sentence,
-                               f"{document_id}.txt")
-            hit = next(hit for hit in index.search(sentence, limit=10)
-                       if hit.document_id == document_id)
+        for position, (suffix, subject, obj) in enumerate(TRAINING):
+            canonical = f"{subject} flows through {obj}."
+            alternate = f"{subject} runs through {obj}."
+            canonical_id = f"flow-canonical-{suffix}"
+            alternate_id = f"run-alternate-{suffix}"
+            add_document(index, canonical_id, canonical)
+            canonical_hit = next(
+                hit for hit in index.search(canonical, limit=10)
+                if hit.document_id == canonical_id)
             knowledge.add_fact_from_hit(
-                subject, "flow through", obj, index, hit)
-            licensed = knowledge.teach_fact_pattern_from_hit(
-                sentence, subject=subject, relation="flow through", obj=obj,
-                predicate_phrase="runs", research_index=index, hit=hit)
-            if document_id == TRAINING[0][0]:
-                require(not licensed,
-                        "one example prematurely licensed a relation phrase")
-                one_example = knowledge.research(QUESTION, index)
+                subject, "flow through", obj, index, canonical_hit)
+            add_document(index, alternate_id, alternate)
+
+            if position == 0:
+                single_support = knowledge.propose_predicate_form_alignments(index)
+                require(not any(
+                    item["relation"] == "flow through"
+                    and item["predicate_phrase"] == "runs through"
+                    for item in single_support),
+                    "one independent pair prematurely proposed an alignment")
+            else:
+                proposals = knowledge.propose_predicate_form_alignments(index)
+                proposal = next((
+                    item for item in proposals
+                    if item["relation"] == "flow through"
+                    and item["predicate_phrase"] == "runs through"), None)
+                require(proposal is not None
+                        and proposal["distinct_subjects"] == 2
+                        and proposal["distinct_objects"] == 2
+                        and proposal["independent_documents"] == 2
+                        and proposal["review_required"],
+                        f"varied source pairs did not propose the phrase: {proposals!r}")
+                # Discovery is inert; the explicit review step promotes the
+                # relation alignment and preserves the original citations.
+                before_review = knowledge.research(QUESTION, index)
                 require(not any(
                     item.get("kind") == "licensed_predicate"
-                    and item.get("text") == "runs"
-                    for item in one_example.query_expansions),
-                    "one source example prematurely expanded the query")
-            else:
-                require(licensed,
-                        "diverse source-backed examples did not license the phrase")
+                    and item.get("text") == "runs through"
+                    for item in before_review.query_expansions),
+                    "a report-only proposal expanded a question before review")
+                accepted = knowledge.accept_predicate_form_alignment(
+                    proposal["proposal_id"], index)
+                require(accepted["relation"] == "flow through"
+                        and accepted["predicate_phrase"] == "runs through"
+                        and len(accepted["support"]) == 2,
+                        f"review did not accept the source-backed alignment: {accepted!r}")
 
         parsed = _natural_where_action_lookup(QUESTION)
         require(parsed == ("Serein River 0133", "run"),
@@ -84,8 +112,8 @@ def main() -> None:
                 licensed_families.setdefault(
                     str(item["evidence"]), set()).add(str(item["text"]))
         require(licensed_families.get("flow through") == {
-                    "flow through", "runs"},
-                f"query did not recover the reviewed relation family: "
+                    "flow through", "runs through"},
+                f"query did not recover the reviewed phrase family: "
                 f"{licensed_families!r}")
 
         index.add_document("heldout-serein", "Held-out river source",
@@ -110,8 +138,7 @@ def main() -> None:
             command,
             input=(QUESTION + "\nWhere does the Serein River 0133 float?\n"
                    "/quit\n"),
-            text=True,
-            capture_output=True, cwd=root, timeout=120, check=False)
+            text=True, capture_output=True, cwd=root, timeout=120, check=False)
         output = run.stdout + run.stderr
         require(run.returncode == 0 and "Traceback" not in output,
                 f"fresh CLI failed: {output}")
@@ -123,10 +150,10 @@ def main() -> None:
                     in replies[0]
                 and "reviewed wording alignment: 'run' to 'flow through'"
                     in replies[0]
-                and TRAINING[0][1] in replies[0]
-                and TRAINING[1][1] in replies[0]
-                and "[Source: run-phrase-a]" in replies[0]
-                and "[Source: run-phrase-b]" in replies[0],
+                and "Indigo River runs through Ochre City." in replies[0]
+                and "Mica Stream runs through Silver City." in replies[0]
+                and "[Source: run-alternate-a]" in replies[0]
+                and "[Source: run-alternate-b]" in replies[0],
                 f"fresh chat omitted answer or learning lineage: {replies!r}")
         require("flows through" not in replies[1]
                 and "quoted evidence, not an accepted fact" not in replies[1]
@@ -138,9 +165,9 @@ def main() -> None:
         require(unsupported is None,
                 f"an unrelated verb was licensed by the learned phrase: {unsupported!r}")
 
-    print("two source-backed examples license run → flow through; one does not: PASS")
-    print("reviewed relation transfers to a new entity and cited source sentence: PASS")
-    print("fresh chat exposes both answer source and alignment sources: PASS")
+    print("one independent pair does not propose; two varied pairs propose the relation: PASS")
+    print("reviewed phrase transfers to a new entity and cited source sentence: PASS")
+    print("fresh chat exposes direct and exact alignment citations: PASS")
     print("unrelated predicate remains unsupported in helper and chat: PASS")
 
 
