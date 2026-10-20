@@ -310,6 +310,8 @@ def _predicate_end(text: str, start: int) -> int | None:
     """Find a predicate boundary while preserving balanced inline literals."""
     index = start
     paren_depth = 0
+    quote_pairs = {opener: closer for opener, closer in _QUOTES
+                   if opener != "`"}
     while index < len(text):
         if text[index] == "`":
             run_end = index + 1
@@ -322,6 +324,24 @@ def _predicate_end(text: str, start: int) -> int | None:
             index = close + len(marker)
             continue
         character = text[index]
+        if character in quote_pairs:
+            if (character == "'" and index > 0 and index + 1 < len(text)
+                    and text[index - 1].isalnum()
+                    and text[index + 1].isalnum()):
+                # Apostrophes inside contractions or possessives are not
+                # quotation delimiters.
+                index += 1
+                continue
+            closer = quote_pairs[character]
+            close = text.find(closer, index + len(character))
+            if close < 0:
+                # The predicate may begin inside a quote opened earlier in
+                # the sentence. Without the opener in this slice, treat the
+                # unmatched closer as ordinary text and keep scanning.
+                index += len(character)
+                continue
+            index = close + len(closer)
+            continue
         if character == "(":
             # Parenthetical citations, conditions, and side notes belong in
             # scope metadata rather than the main predicate. Keep ordinary
@@ -359,7 +379,7 @@ def _predicate_end(text: str, start: int) -> int | None:
         if re.match(r"\s+(?:and|but)\s+will\b", text[index:], re.IGNORECASE):
             return index
         if re.match(
-                r"\s+(?:if|unless|only\s+if|only\s+when|provided\s+that|"
+                r"\s+(?:if|unless|when|only\s+if|only\s+when|provided\s+that|"
                 r"as\s+long\s+as)\b", text[index:], re.IGNORECASE):
             return index
         if re.match(r"\s+(?:because|since)\b", text[index:], re.IGNORECASE):

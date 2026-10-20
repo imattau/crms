@@ -147,7 +147,7 @@ described below, and confirmation must use untouched API units and a new
 publisher.
 
 The clause-aware redesign is now implemented as a review-only proposal path
-and exercised by `v1_476`. Its 19 cited fixtures cover full subjects,
+and exercised by `v1_476`. Its 25 cited fixtures cover full subjects,
 conditions, contrast, list items, parenthesized values, literals, polarity,
 quotation, denial, uncertainty, one-word predicates, and a fresh chat replay;
 candidates remain review-only. The full-package replay `v1_477` finds 657

@@ -257,7 +257,10 @@ proposals across 250 API units, and 216 pandas candidate sentences yielding
 217 proposals across 60 API units (up from 303/177 and 24/16 in `v1_474`);
 NumPy has 279 normalized candidate patterns. The fixtures
 also cover wrapped clauses, multi-comma conditions, balanced parenthetical
-subjects, coordinated clauses, and one-word predicates. This is
+subjects, coordinated clauses, one-word predicates, and quoted dotted values
+followed by conditions. The parser now skips punctuation inside balanced
+quoted values and records a following `when` clause as scope. Targeted controls
+`v1_470`, `v1_471`, `v1_472`, `v1_476`, and `v1_479` pass. This is
 improved extraction yield, not evidence of improved precision: complex
 parameter descriptions, contrastive clauses, and conditional scope still
 produce malformed boundaries, and the parser was redesigned using the earlier

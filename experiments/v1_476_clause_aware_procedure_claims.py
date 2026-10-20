@@ -210,6 +210,15 @@ PASSAGES = (
                        "and unit scale of ``1``",), True),),
     },
     {
+        "id": "quoted-dotted-code-value",
+        "title": "Synthetic boundary fixture",
+        "url": "https://example.invalid/quoted-dotted-value",
+        "text": 'The callback will default to "sys.stdout.write" when no '
+                'callback is provided.',
+        "expected": (("The callback", 'default to "sys.stdout.write"',
+                      ("after: when no callback is provided",), True),),
+    },
+    {
         "id": "setting-clause-coordinated-subject-ambiguity",
         "title": "Ambiguous subject control",
         "url": "https://example.invalid/ambiguous-subject",

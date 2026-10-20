@@ -3121,11 +3121,16 @@ Report: [labeled sample JSON](reports/v1_475_api_candidate_sample_review.json),
 
 ## Clause-aware technical-reference replay (`v1_476`/`v1_477`, 2026-10-20)
 
-`python3 experiments/v1_476_clause_aware_procedure_claims.py` checks 19 cited
+`python3 experiments/v1_476_clause_aware_procedure_claims.py` checks 25 cited
 source fixtures for complete subjects, conditions, contrast, parenthesized
-values, code literals, polarity, and multi-claim list items. Its fresh-process
+values, code literals (including dotted quoted values followed by a condition),
+polarity, and multi-claim list items. Its fresh-process
 chat check confirms that the review-only `numpy.add` candidate displays `the
 \`out\` array` and its conditional scope, and that no procedure rule is added.
+The clause scanner also skips punctuation inside balanced quoted values and
+keeps a following `when` clause in scope metadata. The focused regression and
+the existing `v1_470`, `v1_471`, `v1_472`, and `v1_479` controls pass on the
+current checkout.
 The targeted source-learning controls (`v1_470` through `v1_472`) and six
 dialogue regressions (`v1_413`, `v1_419`, `v1_426`, `v1_427`, `v1_449`, and
 `v1_465`) passed together, 9/9. The dialogue cases are fixed controls, not
