@@ -319,6 +319,21 @@ parameter heading, and condition spans separately cited, then freeze a new
 package before testing that design. See the [`v1_489 audit`](../experiments/audits/v1_489_pydantic_dependency_transfer.py)
 and [`v1_489 report`](../experiments/reports/v1_489_pydantic_dependency_transfer.json).
 
+The follow-up `v1_490` context-bundle probe attaches the nearest paragraph or
+bounded source windows, adjacent same-paragraph sentences, and API-unit
+identity as separate fields. All source text spans were verified against the
+Pydantic docstring hash and exact character offsets. In a single-Codex review
+of the same 11 rows previously labeled context-needed, three bundles added a
+cited antecedent or condition, three showed the anchor sentence already
+contained enough subject context, three supplied only package-symbol metadata,
+and two remained unresolved. This small, reused development sample does not
+measure transfer or extraction quality; it demonstrates that context can help
+selectively and must not be treated as a blanket repair. The next learner
+checkpoint should keep candidate structure and contextual evidence separate,
+and test whether reviewers can recover a correct claim without relying on
+uncited API identity. See the [`v1_490 audit`](../experiments/audits/v1_490_pydantic_context_bundle.py)
+and [`v1_490 report`](../experiments/reports/v1_490_pydantic_context_bundle.json).
+
 Use the existing excerpt and real-source acceptance experiments as regression
 controls, not as a corpus-level result. If a suitable corpus does not contain
 enough examples, change the learning signal or narrow the claim; do not add

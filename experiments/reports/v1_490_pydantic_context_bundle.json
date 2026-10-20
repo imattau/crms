@@ -1,0 +1,445 @@
+{
+  "audit": "v1_490",
+  "purpose": "review-only source-context bundling probe",
+  "source_audit": "v1_489",
+  "package": "Pydantic",
+  "package_version": "2.13.4",
+  "sample_size": 11,
+  "context_review_counts": {
+    "context_does_not_resolve_it": 1,
+    "context_supplies_failing_antecedent": 1,
+    "context_supplies_operation_and_conditions": 1,
+    "context_supplies_value_antecedent": 1,
+    "does_not_fix_in_sentence_boundary_error": 1,
+    "metadata_only_anchor": 3,
+    "no_external_context_needed_for_subject": 3
+  },
+  "context_reviewer": "Codex, single rater",
+  "context_review_definitions": {
+    "context_supplies_failing_antecedent": "Newly cited adjacent source text identifies what 'failing to do so' refers to.",
+    "context_supplies_operation_and_conditions": "Newly cited paragraph gives the operation description and the nested field conditions.",
+    "context_supplies_value_antecedent": "Newly cited Args text binds 'it' to the value parameter.",
+    "metadata_only_anchor": "Package symbol identity may help orient a reader but does not independently cite the identity-to-claim relation.",
+    "does_not_fix_in_sentence_boundary_error": "The problematic role is already in the anchor sentence; more context does not repair the extraction boundary.",
+    "context_does_not_resolve_it": "The surrounding cited attribute text does not identify the pronoun antecedent.",
+    "no_external_context_needed_for_subject": "The anchor sentence itself supplies the candidate subject; the previous context-needed label appears overcautious for subject resolution."
+  },
+  "bundle_policy": "Attach immediate same-paragraph sentence neighbors, the nearest preceding section heading, and package API-unit metadata. Every text span is separately cited to the original docstring hash and character offsets. No merging, inference, or rule acceptance.",
+  "rows": [
+    {
+      "api_unit": "pydantic.NatsDsn",
+      "anchor_sentence": "A type that will accept any NATS DSN.",
+      "anchor_citation": "pydantic:pydantic.NatsDsn#sha256=43c39c3e6928b04cf7608a8a9369207ad927f8ef66cc6f053e9091da26b00667&chars=0:37",
+      "proposal": [
+        {
+          "subject": "that",
+          "predicate_phrase": "will accept any NATS DSN",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "original_review_label": "context_needed",
+      "context_review": "metadata_only_anchor",
+      "context_bundle": [
+        {
+          "kind": "paragraph_context",
+          "text": "A type that will accept any NATS DSN.",
+          "citation": "pydantic:pydantic.NatsDsn#sha256=43c39c3e6928b04cf7608a8a9369207ad927f8ef66cc6f053e9091da26b00667&chars=0:37"
+        },
+        {
+          "kind": "api_unit_metadata",
+          "text": "pydantic.NatsDsn",
+          "citation": null,
+          "note": "symbol identity from the imported package, not a cited claim"
+        }
+      ]
+    },
+    {
+      "api_unit": "pydantic.Field",
+      "anchor_sentence": "extra: (Deprecated) Extra fields that will be included in the JSON schema.",
+      "anchor_citation": "pydantic:pydantic.Field#sha256=279e8de5b621df66f9379aec53b354594043b7a05c05ce9dba9f5e3bfda00935&chars=4389:4463",
+      "proposal": [
+        {
+          "subject": "that",
+          "predicate_phrase": "will be included in the JSON schema",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "original_review_label": "context_needed",
+      "context_review": "does_not_fix_in_sentence_boundary_error",
+      "context_bundle": [
+        {
+          "kind": "preceding_context_window",
+          "text": "ow digits for strings.\n    decimal_places: Maximum number of decimal places allowed for numbers.\n    union_mode: The strategy to apply when validating a union. Can be `smart` (the default), or `left_to_right`.\n        See [Union Mode](../concepts/unions.md#union-modes) for details.\n    fail_fast: If `True`, validation will stop on the first error. If `False`, all validation errors will be collected.\n        This option can be applied only to iterable types (list, tuple, set, and frozenset).\n    ",
+          "citation": "pydantic:pydantic.Field#sha256=279e8de5b621df66f9379aec53b354594043b7a05c05ce9dba9f5e3bfda00935&chars=3889:4389"
+        },
+        {
+          "kind": "adjacent_sentence",
+          "text": "This option can be applied only to iterable types (list, tuple, set, and frozenset).",
+          "citation": "pydantic:pydantic.Field#sha256=279e8de5b621df66f9379aec53b354594043b7a05c05ce9dba9f5e3bfda00935&chars=4300:4384"
+        },
+        {
+          "kind": "api_unit_metadata",
+          "text": "pydantic.Field",
+          "citation": null,
+          "note": "symbol identity from the imported package, not a cited claim"
+        }
+      ]
+    },
+    {
+      "api_unit": "pydantic.field_serializer",
+      "anchor_sentence": "when_used: Determines the serializer will be used for serialization.",
+      "anchor_citation": "pydantic:pydantic.field_serializer#sha256=a3fc44d48eefcffec28091c150e6ac4a1cafb94ab9e4f288e16031ea487bd1eb&chars=1508:1576",
+      "proposal": [
+        {
+          "subject": "the serializer",
+          "predicate_phrase": "will be used for serialization",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "original_review_label": "context_needed",
+      "context_review": "no_external_context_needed_for_subject",
+      "context_bundle": [
+        {
+          "kind": "paragraph_context",
+          "text": "        - `plain` means the function will be called instead of the default serialization logic,\n        - `wrap` means the function will be called with an argument to optionally call the\n           default serialization logic.\n    return_type: Optional return type for the function, if omitted it will be inferred from the type annotation.\n    when_used: Determines the serializer will be used for serialization.\n    check_fields: Whether to check that the fields actually exist on the model.",
+          "citation": "pydantic:pydantic.field_serializer#sha256=a3fc44d48eefcffec28091c150e6ac4a1cafb94ab9e4f288e16031ea487bd1eb&chars=1164:1656"
+        },
+        {
+          "kind": "adjacent_sentence",
+          "text": "return_type: Optional return type for the function, if omitted it will be inferred from the type annotation.",
+          "citation": "pydantic:pydantic.field_serializer#sha256=a3fc44d48eefcffec28091c150e6ac4a1cafb94ab9e4f288e16031ea487bd1eb&chars=1395:1503"
+        },
+        {
+          "kind": "adjacent_sentence",
+          "text": "check_fields: Whether to check that the fields actually exist on the model.",
+          "citation": "pydantic:pydantic.field_serializer#sha256=a3fc44d48eefcffec28091c150e6ac4a1cafb94ab9e4f288e16031ea487bd1eb&chars=1581:1656"
+        },
+        {
+          "kind": "api_unit_metadata",
+          "text": "pydantic.field_serializer",
+          "citation": null,
+          "note": "symbol identity from the imported package, not a cited claim"
+        }
+      ]
+    },
+    {
+      "api_unit": "pydantic.TypeAdapter",
+      "anchor_sentence": "Defaults to 2, which will result in the frame where the `TypeAdapter` was instantiated.",
+      "anchor_citation": "pydantic:pydantic.TypeAdapter#sha256=804088ab0ceb8636f914540495792199a7bd748a697ddf9e0a49b9cd344256da&chars=1277:1364",
+      "proposal": [
+        {
+          "subject": "which",
+          "predicate_phrase": "will result in the frame where the `TypeAdapter` was instantiated",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "original_review_label": "context_needed",
+      "context_review": "no_external_context_needed_for_subject",
+      "context_bundle": [
+        {
+          "kind": "paragraph_context",
+          "text": "        !!! note\n            You cannot provide a configuration when instantiating a `TypeAdapter` if the type you're using\n            has its own config that cannot be overridden (ex: `BaseModel`, `TypedDict`, and `dataclass`). A\n            [`type-adapter-config-unused`](../errors/usage_errors.md#type-adapter-config-unused) error will\n            be raised in this case.\n    _parent_depth: Depth at which to search for the [parent frame][frame-objects]. This frame is used when\n        resolving forward annotations during schema building, by looking for the globals and locals of this\n        frame. Defaults to 2, which will result in the frame where the `TypeAdapter` was instantiated.",
+          "citation": "pydantic:pydantic.TypeAdapter#sha256=804088ab0ceb8636f914540495792199a7bd748a697ddf9e0a49b9cd344256da&chars=671:1364"
+        },
+        {
+          "kind": "adjacent_sentence",
+          "text": "This frame is used when\n        resolving forward annotations during schema building, by looking for the globals and locals of this\n        frame.",
+          "citation": "pydantic:pydantic.TypeAdapter#sha256=804088ab0ceb8636f914540495792199a7bd748a697ddf9e0a49b9cd344256da&chars=1130:1276"
+        },
+        {
+          "kind": "api_unit_metadata",
+          "text": "pydantic.TypeAdapter",
+          "citation": null,
+          "note": "symbol identity from the imported package, not a cited claim"
+        }
+      ]
+    },
+    {
+      "api_unit": "pydantic.Tag",
+      "anchor_sentence": "Failing to do so will result in a `PydanticUserError` with code\n    [`callable-discriminator-no-tag`](../errors/usage_errors.md#callable-discriminator-no-tag).",
+      "anchor_citation": "pydantic:pydantic.Tag#sha256=8575189ca03f2a15bf2762b9db4e3a4a765d882afffaafe819c2a903ab723e16&chars=2160:2319",
+      "proposal": [
+        {
+          "subject": "Failing to do so",
+          "predicate_phrase": "will result in a `PydanticUserError` with code [`callable-discriminator-no-tag`](../errors/usage_errors.md#callable-discriminator-no-tag).",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "original_review_label": "context_needed",
+      "context_review": "context_supplies_failing_antecedent",
+      "context_bundle": [
+        {
+          "kind": "paragraph_context",
+          "text": "!!! note\n    You must specify a `Tag` for every case in a `Tag` that is associated with a\n    callable `Discriminator`. Failing to do so will result in a `PydanticUserError` with code\n    [`callable-discriminator-no-tag`](../errors/usage_errors.md#callable-discriminator-no-tag).",
+          "citation": "pydantic:pydantic.Tag#sha256=8575189ca03f2a15bf2762b9db4e3a4a765d882afffaafe819c2a903ab723e16&chars=2040:2319"
+        },
+        {
+          "kind": "adjacent_sentence",
+          "text": "note\n    You must specify a `Tag` for every case in a `Tag` that is associated with a\n    callable `Discriminator`.",
+          "citation": "pydantic:pydantic.Tag#sha256=8575189ca03f2a15bf2762b9db4e3a4a765d882afffaafe819c2a903ab723e16&chars=2044:2159"
+        },
+        {
+          "kind": "api_unit_metadata",
+          "text": "pydantic.Tag",
+          "citation": null,
+          "note": "symbol identity from the imported package, not a cited claim"
+        }
+      ]
+    },
+    {
+      "api_unit": "pydantic._internal._discriminated_union.apply_discriminator",
+      "anchor_sentence": "discriminator: The name of the field which will serve as the discriminator.",
+      "anchor_citation": "pydantic:pydantic._internal._discriminated_union.apply_discriminator#sha256=60cc32ae9e27e9385904bddd9b57b968452160b98143adee3bb07dd8988ff8ba&chars=98:173",
+      "proposal": [
+        {
+          "subject": "which",
+          "predicate_phrase": "will serve as the discriminator",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "original_review_label": "context_needed",
+      "context_review": "no_external_context_needed_for_subject",
+      "context_bundle": [
+        {
+          "kind": "paragraph_context",
+          "text": "Args:\n    schema: The input schema.\n    discriminator: The name of the field which will serve as the discriminator.\n    definitions: A mapping of schema ref to schema.",
+          "citation": "pydantic:pydantic._internal._discriminated_union.apply_discriminator#sha256=60cc32ae9e27e9385904bddd9b57b968452160b98143adee3bb07dd8988ff8ba&chars=58:225"
+        },
+        {
+          "kind": "adjacent_sentence",
+          "text": "Args:\n    schema: The input schema.",
+          "citation": "pydantic:pydantic._internal._discriminated_union.apply_discriminator#sha256=60cc32ae9e27e9385904bddd9b57b968452160b98143adee3bb07dd8988ff8ba&chars=58:93"
+        },
+        {
+          "kind": "adjacent_sentence",
+          "text": "definitions: A mapping of schema ref to schema.",
+          "citation": "pydantic:pydantic._internal._discriminated_union.apply_discriminator#sha256=60cc32ae9e27e9385904bddd9b57b968452160b98143adee3bb07dd8988ff8ba&chars=178:225"
+        },
+        {
+          "kind": "api_unit_metadata",
+          "text": "pydantic._internal._discriminated_union.apply_discriminator",
+          "citation": null,
+          "note": "symbol identity from the imported package, not a cited claim"
+        }
+      ]
+    },
+    {
+      "api_unit": "pydantic.WrapSerializer",
+      "anchor_sentence": "If omitted it will be inferred from the type annotation.",
+      "anchor_citation": "pydantic:pydantic.WrapSerializer#sha256=aa87da598f367bbcd7f392b4ac21839c889a92b159509d65f6ba335796b76d3f&chars=1846:1902",
+      "proposal": [
+        {
+          "subject": "it",
+          "predicate_phrase": "will be inferred from the type annotation.",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [
+            "condition: If omitted"
+          ],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "original_review_label": "context_needed",
+      "context_review": "context_does_not_resolve_it",
+      "context_bundle": [
+        {
+          "kind": "paragraph_context",
+          "text": "Attributes:\n    func: The serializer function to be wrapped.\n    return_type: The return type for the function. If omitted it will be inferred from the type annotation.\n    when_used: Determines when this serializer should be used. Accepts a string with values `'always'`,\n        `'unless-none'`, `'json'`, and `'json-unless-none'`. Defaults to 'always'.",
+          "citation": "pydantic:pydantic.WrapSerializer#sha256=aa87da598f367bbcd7f392b4ac21839c889a92b159509d65f6ba335796b76d3f&chars=1734:2089"
+        },
+        {
+          "kind": "adjacent_sentence",
+          "text": "return_type: The return type for the function.",
+          "citation": "pydantic:pydantic.WrapSerializer#sha256=aa87da598f367bbcd7f392b4ac21839c889a92b159509d65f6ba335796b76d3f&chars=1799:1845"
+        },
+        {
+          "kind": "adjacent_sentence",
+          "text": "when_used: Determines when this serializer should be used.",
+          "citation": "pydantic:pydantic.WrapSerializer#sha256=aa87da598f367bbcd7f392b4ac21839c889a92b159509d65f6ba335796b76d3f&chars=1907:1965"
+        },
+        {
+          "kind": "api_unit_metadata",
+          "text": "pydantic.WrapSerializer",
+          "citation": null,
+          "note": "symbol identity from the imported package, not a cited claim"
+        }
+      ]
+    },
+    {
+      "api_unit": "pydantic.v1.schema.get_flat_models_from_field",
+      "anchor_sentence": "if you pass a field that was declared to be of type ``Foo`` (subclass of BaseModel) as ``field``, and that\nmodel ``Foo`` has a field of type ``Bar`` (also subclass of ``BaseModel``) and that model ``Bar`` has a field of\ntype ``Baz`` (also subclass of ``BaseModel``), the return value will be ``set([Foo, Bar, Baz])``.",
+      "anchor_citation": "pydantic:pydantic.v1.schema.get_flat_models_from_field#sha256=dfa9140ecd124f25b799dec311039137249ed43bc9a4335e8902b9e45ac09d55&chars=215:532",
+      "proposal": [
+        {
+          "subject": "and that model ``Foo`` has a field of type ``Bar`` (also subclass of ``BaseModel``) and that model ``Bar`` has a field of type ``Baz`` (also subclass of ``BaseModel``), the return value",
+          "predicate_phrase": "will be ``set([Foo, Bar, Baz])``.",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [
+            "condition: if you pass a field that was declared to be of type ``Foo`` (subclass of BaseModel) as ``field``"
+          ],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "original_review_label": "context_needed",
+      "context_review": "context_supplies_operation_and_conditions",
+      "context_bundle": [
+        {
+          "kind": "paragraph_context",
+          "text": "Take a single Pydantic ``ModelField`` (from a model) that could have been declared as a subclass of BaseModel\n(so, it could be a submodel), and generate a set with its model and all the sub-models in the tree.\nI.e. if you pass a field that was declared to be of type ``Foo`` (subclass of BaseModel) as ``field``, and that\nmodel ``Foo`` has a field of type ``Bar`` (also subclass of ``BaseModel``) and that model ``Bar`` has a field of\ntype ``Baz`` (also subclass of ``BaseModel``), the return value will be ``set([Foo, Bar, Baz])``.",
+          "citation": "pydantic:pydantic.v1.schema.get_flat_models_from_field#sha256=dfa9140ecd124f25b799dec311039137249ed43bc9a4335e8902b9e45ac09d55&chars=0:532"
+        },
+        {
+          "kind": "adjacent_sentence",
+          "text": "I.e.",
+          "citation": "pydantic:pydantic.v1.schema.get_flat_models_from_field#sha256=dfa9140ecd124f25b799dec311039137249ed43bc9a4335e8902b9e45ac09d55&chars=210:214"
+        },
+        {
+          "kind": "api_unit_metadata",
+          "text": "pydantic.v1.schema.get_flat_models_from_field",
+          "citation": null,
+          "note": "symbol identity from the imported package, not a cited claim"
+        }
+      ]
+    },
+    {
+      "api_unit": "pydantic.SnowflakeDsn",
+      "anchor_sentence": "A type that will accept any Snowflake DSN.",
+      "anchor_citation": "pydantic:pydantic.SnowflakeDsn#sha256=7e7376d92ae8ff3767146c717e4e6efc1a67efb834394897d34389c8dc067c69&chars=0:42",
+      "proposal": [
+        {
+          "subject": "that",
+          "predicate_phrase": "will accept any Snowflake DSN",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "original_review_label": "context_needed",
+      "context_review": "metadata_only_anchor",
+      "context_bundle": [
+        {
+          "kind": "paragraph_context",
+          "text": "A type that will accept any Snowflake DSN.",
+          "citation": "pydantic:pydantic.SnowflakeDsn#sha256=7e7376d92ae8ff3767146c717e4e6efc1a67efb834394897d34389c8dc067c69&chars=0:42"
+        },
+        {
+          "kind": "api_unit_metadata",
+          "text": "pydantic.SnowflakeDsn",
+          "citation": null,
+          "note": "symbol identity from the imported package, not a cited claim"
+        }
+      ]
+    },
+    {
+      "api_unit": "pydantic._internal._decorators.is_instance_method_from_sig",
+      "anchor_sentence": "It will consider a function as instance method if the first parameter of\nfunction is `self`.",
+      "anchor_citation": "pydantic:pydantic._internal._decorators.is_instance_method_from_sig#sha256=9f22c9fda16db0ad244e8e87b1dc88acf6edc6286e0e3644111d5f2e331eba39&chars=45:137",
+      "proposal": [
+        {
+          "subject": "It",
+          "predicate_phrase": "will consider a function as instance method",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [
+            "condition: if the first parameter of\nfunction is `self"
+          ],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "original_review_label": "context_needed",
+      "context_review": "metadata_only_anchor",
+      "context_bundle": [
+        {
+          "kind": "paragraph_context",
+          "text": "It will consider a function as instance method if the first parameter of\nfunction is `self`.",
+          "citation": "pydantic:pydantic._internal._decorators.is_instance_method_from_sig#sha256=9f22c9fda16db0ad244e8e87b1dc88acf6edc6286e0e3644111d5f2e331eba39&chars=45:137"
+        },
+        {
+          "kind": "api_unit_metadata",
+          "text": "pydantic._internal._decorators.is_instance_method_from_sig",
+          "citation": null,
+          "note": "symbol identity from the imported package, not a cited claim"
+        }
+      ]
+    },
+    {
+      "api_unit": "pydantic._internal._typing_extra.try_eval_type",
+      "anchor_sentence": "If an instance\n        of `str`, it will be converted to a `ForwardRef`.",
+      "anchor_citation": "pydantic:pydantic._internal._typing_extra.try_eval_type#sha256=90a70bae6b8a386cce904e3bd3a1c78a58070d32d8524d5c8e460f7846f0ec8a&chars=150:222",
+      "proposal": [
+        {
+          "subject": "it",
+          "predicate_phrase": "will be converted to a `ForwardRef`.",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [
+            "condition: If an instance\n        of `str`"
+          ],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "original_review_label": "context_needed",
+      "context_review": "context_supplies_value_antecedent",
+      "context_bundle": [
+        {
+          "kind": "paragraph_context",
+          "text": "Args:\n    value: The value to evaluate. If `None`, it will be replaced by `type[None]`. If an instance\n        of `str`, it will be converted to a `ForwardRef`.\n    localns: The global namespace to use during annotation evaluation.\n    globalns: The local namespace to use during annotation evaluation.",
+          "citation": "pydantic:pydantic._internal._typing_extra.try_eval_type#sha256=90a70bae6b8a386cce904e3bd3a1c78a58070d32d8524d5c8e460f7846f0ec8a&chars=62:364"
+        },
+        {
+          "kind": "adjacent_sentence",
+          "text": "If `None`, it will be replaced by `type[None]`.",
+          "citation": "pydantic:pydantic._internal._typing_extra.try_eval_type#sha256=90a70bae6b8a386cce904e3bd3a1c78a58070d32d8524d5c8e460f7846f0ec8a&chars=102:149"
+        },
+        {
+          "kind": "adjacent_sentence",
+          "text": "localns: The global namespace to use during annotation evaluation.",
+          "citation": "pydantic:pydantic._internal._typing_extra.try_eval_type#sha256=90a70bae6b8a386cce904e3bd3a1c78a58070d32d8524d5c8e460f7846f0ec8a&chars=227:293"
+        },
+        {
+          "kind": "api_unit_metadata",
+          "text": "pydantic._internal._typing_extra.try_eval_type",
+          "citation": null,
+          "note": "symbol identity from the imported package, not a cited claim"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Reuses a small single-rater development sample; not transfer evidence.",
+    "Nearby text may be irrelevant or insufficient to resolve an antecedent.",
+    "API-unit identity is metadata, not sentence-level source evidence.",
+    "Candidate extraction and semantic correctness are unchanged."
+  ]
+}

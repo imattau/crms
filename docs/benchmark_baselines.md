@@ -3176,3 +3176,40 @@ remain review-only or be rejected. No rule was accepted.
 
 Report: [review JSON](reports/v1_478_api_candidate_boundary_review.json),
 [reproduction and citation verifier](audits/v1_478_api_candidate_boundary_review.py).
+
+
+## Separately cited context bundles for source claims (`v1_490`, 2026-10-20)
+
+Command: `python3 experiments/audits/v1_490_pydantic_context_bundle.py`.
+
+The probe reapplies a bounded source-context bundle to the 11 Pydantic rows
+that the frozen `v1_489` sample labeled context-needed. Each source span
+(paragraph or bounded window, neighboring sentence, and applicable section
+heading) carries its own document hash and character-offset citation. The
+script verifies every cited text slice against the exact imported docstring.
+Package symbol identity is included as metadata and explicitly marked as
+uncited context; it cannot by itself license a claim.
+
+A single-Codex reading of those 11 bundles found three with a separately cited
+antecedent or condition that could help resolve the claim, three whose anchor
+sentence already supplied enough subject context, three where only API-symbol
+metadata helped orient the reader, and two where the bundle did not resolve
+the ambiguity. This is not an independent review, transfer result, or estimate
+of parser precision/recall; it reuses the same sample and labels for diagnosis.
+The result argues for selective evidence bundling plus abstention, not for
+promoting candidates from nearby text automatically. No runtime path or rule
+store changed.
+
+Report: [context-bundle report](reports/v1_490_pydantic_context_bundle.json),
+[reproduction and exact-citation check](../experiments/audits/v1_490_pydantic_context_bundle.py).
+
+## Recombination and derived-learning control replay (`d5ebdb4`, 2026-10-20)
+
+Command: `python3 run_experiments.py --match v1_448_minimal_phrase_role_recombination --match v1_441_source_grounded_rule_recombination --match v1_82_derived_lineage_revalidation --match v1_72_proof_backed_derived_cases --timeout 300`.
+
+All four selected controls passed (4/4) in isolated working directories. They
+cover held-out phrase-role composition, source-grounded multi-step composition
+through fresh chat, proof-backed derived cases, and lineage revalidation. This
+replay confirms the controlled capability slices still run together on the
+current checkout. It does not establish independent language transfer,
+general-purpose learning, or robustness beyond their authored cases.
