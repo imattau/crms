@@ -4879,10 +4879,65 @@ class CRMSModel:
             if varying_roles < 2:
                 continue
 
+            # Derive productive affixes only from two distinct word roots
+            # that share this behavior and differ at one role position.
+            # Evidence from other procedure groups cannot license morphology
+            # for the current role frame.
+            affix_roots: dict[
+                tuple[int, str, str, str], set[str]
+            ] = {}
+            affix_sources: dict[
+                tuple[int, str, str, str], set[str]
+            ] = {}
+            phrase_items = sorted(distinct.items())
+            for left_index, (left_phrase, left_words) in enumerate(phrase_items):
+                for right_phrase, right_words in phrase_items[left_index + 1:]:
+                    differences = [
+                        index for index, (left_word, right_word)
+                        in enumerate(zip(left_words, right_words))
+                        if left_word != right_word
+                    ]
+                    if len(differences) != 1:
+                        continue
+                    position = differences[0]
+                    edit = self._word_affix_edit(
+                        left_words[position], right_words[position])
+                    if edit is None:
+                        continue
+                    root, side, old_affix, new_affix = edit
+                    key = (position, side, old_affix, new_affix)
+                    affix_roots.setdefault(key, set()).add(root)
+                    affix_sources.setdefault(key, set()).update(
+                        (left_phrase, right_phrase))
+
             role_options: list[list[tuple[str, set[str], int]]] = []
-            for column in columns:
+            for position, column in enumerate(columns):
+                supported_words = {
+                    word: set(sources)
+                    for word, sources in column.items()
+                    if len(sources) >= 2
+                }
+                for edit_key, roots in affix_roots.items():
+                    edit_position, side, old_affix, new_affix = edit_key
+                    if edit_position != position or len(roots) < 2:
+                        continue
+                    for root in column:
+                        if side == 'suffix':
+                            if old_affix and not root.endswith(old_affix):
+                                continue
+                            derived = (root[:-len(old_affix)] + new_affix
+                                       if old_affix else root + new_affix)
+                        else:
+                            if old_affix and not root.startswith(old_affix):
+                                continue
+                            derived = (new_affix + root[len(old_affix):]
+                                       if old_affix else new_affix + root)
+                        supported_words.setdefault(derived, set()).update(
+                            affix_sources[(edit_position, side, old_affix,
+                                           new_affix)])
+
                 options = []
-                for word, sources in column.items():
+                for word, sources in supported_words.items():
                     if len(sources) < 2:
                         continue
                     options.extend(
