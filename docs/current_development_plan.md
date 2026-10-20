@@ -49,9 +49,9 @@ Run the first three packets as the active program. Dialogue and contextual
 intent evaluation continue alongside them, but do not let isolated UX fixes
 displace the recombination, self-learning, and reasoning gates.
 
-The current procedure engine now has a strict document-disjoint scaffold
-proposal mode (`CRMSModel.propose_procedure_scaffolds` with
-`require_source_disjoint=True`). It can validate structural reuse across
+The current procedure engine and chat now expose a strict document-disjoint
+scaffold proposal mode (`/procedure-scaffolds --source-disjoint`). It resolves
+citations against the active index and can validate structural reuse across
 reviewed phrase rules when example sources, instruction sources, and labeler
 IDs are complete. It does not extract or understand procedure wording from raw
 prose, and distinct document IDs do not establish independent publishers.

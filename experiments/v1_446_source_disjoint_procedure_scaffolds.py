@@ -7,6 +7,7 @@ held-out documents out of training lineage, and remain report-only.
 from __future__ import annotations
 
 import sys
+import subprocess
 import tempfile
 from pathlib import Path
 
@@ -74,7 +75,7 @@ def make_model(*, shared_document: bool = False,
 
 
 def main() -> None:
-    with tempfile.TemporaryDirectory(prefix="crms-source-disjoint-"):
+    with tempfile.TemporaryDirectory(prefix="crms-source-disjoint-") as folder:
         model, index = make_model()
         before = model.list_rules()
         default = model.propose_procedure_scaffolds()
@@ -122,6 +123,29 @@ def main() -> None:
         require(model.list_rules() == before,
                 "report-only proposal changed the active procedure library")
 
+        root = Path(folder)
+        rules_path = root / "rules.json"
+        index_path = root / "index.json"
+        model.save(rules_path)
+        index.save(index_path)
+        cli = subprocess.run(
+            [sys.executable,
+             str(Path(__file__).resolve().parents[1] / "crms_chat.py"),
+             "--knowledge", str(root / "knowledge.json"),
+             "--index", str(index_path),
+             "--dialogue-state", str(root / "dialogue.json"),
+             "--rules", str(rules_path),
+             "--rule-session", str(root / "rule-session.json")],
+            input="/procedure-scaffolds --source-disjoint\n/quit\n",
+            text=True, capture_output=True, check=False, timeout=30)
+        require(cli.returncode == 0
+                and "citations resolved" in cli.stdout
+                and "documents disjoint" in cli.stdout
+                and "Publisher independence is not established" in cli.stdout
+                and "Report only: no rules or grammar changed." in cli.stdout,
+                f"chat did not expose strict source validation honestly:\n"
+                f"{cli.stdout}\n{cli.stderr}")
+
         shared, _ = make_model(shared_document=True)
         require(not shared.propose_procedure_scaffolds(
                     require_source_disjoint=True),
@@ -137,6 +161,7 @@ def main() -> None:
     print("complete citations, distinct train/holdout documents, and labeler lineage: PASS")
     print("overlapping sources and incomplete provenance refused: PASS")
     print("strict retrieval policy and report-only behavior: PASS")
+    print("chat inspection resolves citations and discloses the publisher limit: PASS")
     print("scope: validates a held-out phrase scaffold, not autonomous prose extraction")
 
 

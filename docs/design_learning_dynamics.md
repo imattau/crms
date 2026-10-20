@@ -804,10 +804,12 @@ labeler ID; it chooses a held-out phrase only when the document IDs in its
 lineage do not overlap training documents. The proposal fingerprint includes
 these provenance fields, and retrieval must repeat the same validation policy.
 The model treats source IDs as opaque and cannot establish that citations
-resolve or that distinct documents have independent publishers; the caller
-must validate citations against the active index and measure publisher
-independence separately. `experiments/v1_446_source_disjoint_procedure_scaffolds.py`
-checks exact citation resolution, disjoint train/held-out document sets,
+resolve or that distinct documents have independent publishers. The chat
+command `/procedure-scaffolds --source-disjoint` resolves every citation
+against the active index before displaying a proposal, then reports document
+disjointness while explicitly leaving publisher independence unproven.
+`experiments/v1_446_source_disjoint_procedure_scaffolds.py` checks exact
+citation resolution, disjoint train/held-out document sets,
 missing-provenance and shared-document rejection, report-only behavior, and
 the unchanged default route. Its fixture is controlled; this is a validation
 mechanism, not evidence that prose extraction or independent-source learning

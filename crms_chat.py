@@ -230,8 +230,8 @@ HELP = """Commands:
   /retry-rule I   rerun stored demonstrations under current rule bounds
   Try to learn the rule for INSTRUCTION
                  rerun stored examples in ordinary CRMS language
-  /procedure-scaffolds [MIN_SUPPORT]
-                 inspect successful procedure abstractions and their evidence
+  /procedure-scaffolds [MIN_SUPPORT] [--source-disjoint]
+                 inspect successful abstractions; strict mode checks sourced holdouts
   /primitive-proposals [MIN_SUPPORT]
                  inspect held-out and MDL-gated primitive proposals
   /accept-primitive ID|N
@@ -7757,21 +7757,47 @@ def main() -> int:
         if (line == "/procedure-scaffolds"
                 or line.startswith("/procedure-scaffolds ")):
             fields = line.split()
-            if len(fields) > 2 or (len(fields) == 2
-                                   and not fields[1].isdigit()):
-                print("Use: /procedure-scaffolds [MIN_SUPPORT]")
+            arguments = fields[1:]
+            strict_source_holdout = arguments.count("--source-disjoint") == 1
+            numeric_arguments = [item for item in arguments
+                                 if item != "--source-disjoint"]
+            if (arguments.count("--source-disjoint") > 1
+                    or len(numeric_arguments) > 1
+                    or any(not item.isdigit() for item in numeric_arguments)):
+                print("Use: /procedure-scaffolds [MIN_SUPPORT] [--source-disjoint]")
                 continue
-            minimum_support = int(fields[1]) if len(fields) == 2 else 3
+            minimum_support = (int(numeric_arguments[0])
+                               if numeric_arguments else 3)
             try:
                 proposals = rules.propose_procedure_scaffolds(
-                    minimum_supporting_phrases=minimum_support)
+                    minimum_supporting_phrases=minimum_support,
+                    require_source_disjoint=strict_source_holdout)
             except ValueError as error:
                 print(f"Could not propose procedure scaffolds: {error}")
                 continue
             if not proposals:
-                print("No successful procedure scaffold met the support and "
-                      "reconstruction checks.")
+                if strict_source_holdout:
+                    print("No successful procedure scaffold met the support, "
+                          "reconstruction, complete-provenance, and "
+                          "document-disjoint checks.")
+                else:
+                    print("No successful procedure scaffold met the support and "
+                          "reconstruction checks.")
                 continue
+            if strict_source_holdout:
+                try:
+                    for proposal in proposals:
+                        for item in proposal["lineage"]:
+                            source_provenance = item["source_provenance"]
+                            for citation in (
+                                    source_provenance["example_source_ids"]
+                                    + source_provenance[
+                                        "instruction_source_ids"]):
+                                index.resolve_citation(citation)
+                except (KeyError, TypeError, ValueError) as error:
+                    print("Could not show source-disjoint scaffold: a source "
+                          f"citation does not resolve in the active index ({error}).")
+                    continue
             for number, proposal in enumerate(proposals, 1):
                 print(f"{number}. {proposal['descriptor']}")
                 print(f"   artifact ID: {proposal['artifact_id']}")
@@ -7787,6 +7813,19 @@ def main() -> int:
                 print(f"   procedure MDL: {proposal['description_length_bits_baseline']} → "
                       f"{proposal['description_length_bits_candidate']} bits "
                       f"(gain {proposal['description_length_gain_bits']})")
+                if strict_source_holdout:
+                    training_sources = set().union(*(
+                        set(item["source_provenance"]["source_documents"])
+                        for item in proposal["lineage"]
+                        if item["role"] == "training"))
+                    heldout_sources = set().union(*(
+                        set(item["source_provenance"]["source_documents"])
+                        for item in proposal["lineage"]
+                        if item["role"] == "held_out"))
+                    print("   source holdout: citations resolved; training and "
+                          f"held-out documents disjoint ({len(training_sources)} "
+                          f"train, {len(heldout_sources)} held out). Publisher "
+                          "independence is not established.")
             print("Report only: no rules or grammar changed.")
             continue
         if _NATURAL_PRIMITIVE_PROPOSAL_REQUEST_RE.fullmatch(line):
