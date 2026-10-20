@@ -5972,6 +5972,7 @@ def main() -> int:
     last_research_evidence: dict | None = None
     last_answer_had_inference_proof = False
     last_reasoned_filter = None
+    last_reasoned_filter_practiced = False
     last_feedback_record: dict[str, Any] | None = restored_feedback_context
 
     def remember_feedback(record: dict[str, Any] | None) -> None:
@@ -6015,6 +6016,7 @@ def main() -> int:
         explanation_followup = _natural_research_explanation_request(line)
         if not explanation_followup and line != "/practice-composition":
             last_reasoned_filter = None
+            last_reasoned_filter_practiced = False
         story_revision_tone = _natural_story_revision(line)
         if story_revision_tone is not None and last_story is not None:
             pending_story_tone = None
@@ -7871,6 +7873,10 @@ def main() -> int:
                 print("CRMS> There is no successful proof-backed list composition "
                       "to practice. Run one, then use /practice-composition.")
                 continue
+            if last_reasoned_filter_practiced:
+                print("CRMS> This composition has already been practiced in this "
+                      "session; no additional practice event was recorded.")
+                continue
             retained_values: list[int] = []
             rejected_values: list[int] = []
             for value in dict.fromkeys(result.included_values):
@@ -7896,6 +7902,7 @@ def main() -> int:
                       f"{rejected_values}.")
             if not retained_values and not rejected_values:
                 print("CRMS> The composition had no positive relation cases to practice.")
+            last_reasoned_filter_practiced = True
             continue
         if line.startswith("/auto-practice"):
             fields = line.split()
@@ -9764,6 +9771,7 @@ def main() -> int:
         reasoned_filter = compose_verified_filter(line, knowledge, rules)
         if reasoned_filter is not None:
             last_reasoned_filter = reasoned_filter
+            last_reasoned_filter_practiced = False
             print("CRMS> " + reasoned_filter.text)
             evidence_refs = collect_feedback_refs(response=reasoned_filter)
             evidence_refs.extend(

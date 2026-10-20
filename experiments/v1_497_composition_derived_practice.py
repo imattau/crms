@@ -93,12 +93,13 @@ def main() -> None:
         # response's cached claims or add them to ordinary fact storage.
         output = run_chat(
             root, knowledge_path, procedures_path, index_path,
-            (REQUEST, "/practice-composition", UNKNOWN_REQUEST,
-             "/practice-composition", "/derived-cases"))
+            (REQUEST, "/practice-composition", "/practice-composition",
+             UNKNOWN_REQUEST, "/practice-composition", "/derived-cases"))
         require("Stored separately verified derived relation cases" in output
                 and "[12, 4, 9]" in output
                 and "These remain derived cases, not facts or new procedures."
                     in output
+                and "already been practiced in this session" in output
                 and "There is no successful proof-backed list composition"
                     in output,
                 f"explicit composition practice was not reported accurately:\n{output}")
@@ -107,6 +108,7 @@ def main() -> None:
         by_object = {case["conclusion"]["object"]: case for case in cases}
         require(set(by_object) == {"12", "4", "9"}
                 and all(case["status"] == "verified"
+                        and case["practice_count"] == 1
                         and case["lineage"]["sources"]
                         and case["lineage"]["rule_ids"]
                         for case in by_object.values()),

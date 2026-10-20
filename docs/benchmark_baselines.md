@@ -3365,8 +3365,9 @@ not appear in `facts()`, and survive save/reload. An unresolved composition
 cannot be practiced. Retracting the source premise for `Nia reaches 12` makes
 that derived case unavailable after reload while the unrelated `4` and `9`
 cases remain valid; recomposition abstains on `12` instead of using its cached
-derived case as a proof leaf. The focused experiment and six recombination,
-proof, and invalidation controls passed.
+derived case as a proof leaf. Repeating the practice command in the same
+session does not increment practice counts or create new cases. The focused
+experiment and six recombination, proof, and invalidation controls passed.
 
 This is an explicit bridge from verified output to derived memory, not a learned
 procedure or autonomous write-back loop. It stores the proof-backed relation

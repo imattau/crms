@@ -31,6 +31,8 @@ accepted-rule store also rechecks saved negative evidence and suspends rules tha
 The opt-in `/practice-composition` command now connects a successful proof-filter composition to
 this derived-case path: it re-derives and verifies each distinct positive membership result before
 storing it. Ordinary composition remains read-only, and the stored cases stay out of the fact store.
+The action is one-shot per successful composition in a session, so repeating the command does not
+inflate practice counts without new evidence.
 The composed list and procedure lineage are not yet stored as one derived artifact, and the command
 does not learn or modify the procedure that produced the list; a later design must capture that
 cross-store lineage before claiming complete derivation learning. See
