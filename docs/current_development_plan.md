@@ -32,16 +32,18 @@ than in natural-language coverage; and dialogue/intent evidence remains narrow.
 The project has not shown that a copied SQLite model can support its full
 learning and correction lifecycle without the original source files.
 
-The current code snapshot (`69158a4`) passed a 17-diagnostic cross-domain
-regression replay covering language, recombination, reasoning, dialogue,
-translation, math/code, and creative revision. These diagnostics use separate
-fixtures and scoring, so 17/17 is a regression result, not a unified capability
-score. The role-compatible candidate probe (`v1_450`) also surfaced a false
-created/praised match, reinforcing that candidate yield is not learned-rule
-precision. These results preserve tested paths but do not close the generality
-precision. It now excludes role types contradicted by explicit negatives and
-types carrying qualifiers. These results preserve tested paths but do not
-close the generality gap.
+The code snapshot at `69158a4` passed a 17-diagnostic cross-domain regression
+replay covering language, recombination, reasoning, dialogue, translation,
+math/code, and creative revision. The replay used separate fixtures and
+scoring, so 17/17 is a regression result, not a unified capability score. The
+`v1_450` role-compatible candidate probe surfaced a false created/praised match;
+the later evidence-gate fix excludes role types contradicted by explicit
+negatives and types carrying qualifiers. This improves a named safety gate but
+does not establish source-derived rule precision. The latest integration probe,
+committed as `63fbd4a`, joins held-out rule validation, verified chat reasoning,
+procedure execution, and premise-correction invalidation for one controlled
+synthetic task. It still relies on an authored graph and Codex-labeled procedure
+examples, so it does not close the generalization gap.
 
 The overall direction is sound, but CRMS is not yet on track to claim its
 capability destination. Progress now depends on integrated, held-out outcomes,
