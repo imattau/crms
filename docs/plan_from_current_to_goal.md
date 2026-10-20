@@ -144,11 +144,16 @@ gaps, not to claim parity.
 
 ## Immediate next action
 
-Freeze and run the current dialogue packet in a clean process, including the
-reported topic switch and source-only continuity cases, then begin the
-held-out recombination packet through ordinary chat. Repair only reproduced
-failures. Keep source-rule quality work moving in parallel, and do not promote
-derived write-back until the recombination and correction gates pass.
+The clean-process dialogue and reasoning regressions pass, and the current
+recombination packet again transfers across its three synthetic routes. Build
+the next frozen packet from independently authored ordinary-chat tasks over
+source-backed material. Vary request structure, evidence layout, and entity
+disambiguation; include partial, unsupported, conflicting, and multi-source
+comparison cases, with an independent answer checker. Start with composed
+reasoning/procedure tasks through the CLI and copied model. Keep the current
+dialogue, cycle, and integrity controls as release gates. Continue source-rule
+quality work in parallel, and keep derived write-back review-gated until
+recombination and correction pass on held-out tasks.
 
 For detailed implementation history and experiment evidence, see
 [`focused_roadmap_to_goal.md`](focused_roadmap_to_goal.md) and

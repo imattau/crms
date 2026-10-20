@@ -1073,12 +1073,13 @@ def _natural_type_field_evidence(
     match = re.fullmatch(
         r"\s*(?:what\s+(?:type|kind)(?:\s+of\s+[\w’'-]+)?\s+is\s+"
         r"(?P<entity_a>.+?)|what\s+is\s+the\s+(?:type|kind)\s+of\s+"
-        r"(?P<entity_b>.+?))\s*[?!.]?\s*",
+        r"(?P<entity_b>.+?)|what\s+(?:is|are)\s+(?P<entity_c>.+?))\s*[?!.]?\s*",
         question, flags=re.IGNORECASE)
     if match is None:
         return None
     entity = re.sub(r"^(?:a|an|the)\s+", "",
-                    (match.group("entity_a") or match.group("entity_b")).strip(),
+                    (match.group("entity_a") or match.group("entity_b")
+                     or match.group("entity_c")).strip(),
                     flags=re.IGNORECASE)
     entity_tokens = tuple(normalized_tokens(entity))
     if not entity_tokens:
@@ -1090,6 +1091,43 @@ def _natural_type_field_evidence(
         return None
     hit = next(iter(documents.values()))
     document = index.document(hit.document_id)
+    if match.group("entity_c") is not None:
+        # Some source pages have an exact-title infobox but a malformed or
+        # non-definitional prose lead. Its template type is still useful
+        # structured evidence for a broad "What is X?" request. Keep the
+        # exact source line visible and label the realization as metadata;
+        # never turn the field into an accepted fact here.
+        header = re.compile(
+            r"^[ \t]*Infobox\s+(?P<value>[A-Za-z][A-Za-z -]{0,48})\s*$",
+            flags=re.IGNORECASE)
+        offset = 0
+        for line in document.text.splitlines(keepends=True):
+            content = line.rstrip("\r\n")
+            found = header.fullmatch(content)
+            if found is not None:
+                value = found.group("value").strip()
+                value_tokens = tuple(normalized_tokens(value))
+                if not value_tokens or len(value_tokens) > 6:
+                    return None
+                end = offset + len(content)
+                evidence = _cited_sentence_evidence(
+                    index, hit, offset, end,
+                    tuple(dict.fromkeys((*entity_tokens, *value_tokens))))
+                if evidence is None:
+                    return None
+                evidence["structured_metadata"] = True
+                evidence["realized_answer"] = {
+                    "text": f"The source classifies {entity} as a {value}.",
+                    "source_title": hit.title or "source",
+                    "citation": evidence["citation"],
+                    "method": "exact-title infobox-type realization",
+                    "field_text": content,
+                    "field_name": "infobox template type",
+                    "field_value": value,
+                    "stored_as_fact": False,
+                }
+                return evidence
+            offset += len(line)
     fields = ("type", "class", "kind", "entity type",
               "settlement_type", "settlement type")
     field_rows = [(field, value, start, end)
@@ -11196,6 +11234,8 @@ def main() -> int:
         type_field_evidence = None
         population_field_evidence = None
         if (turn.status in {"unknown", "sources_found"}
+                and not (definition_topic is not None
+                         and definition_evidence is not None)
                 and not (turn.response is not None
                          and (turn.response.status in {"answered", "ambiguous"}
                               or turn.response.candidates))):
@@ -11209,6 +11249,8 @@ def main() -> int:
                 if turn.research is not None:
                     turn.research.source_sentences = [capital_field_evidence]
         if (turn.status in {"unknown", "sources_found"}
+                and not (definition_topic is not None
+                         and definition_evidence is not None)
                 and not (turn.response is not None
                          and (turn.response.status in {"answered", "ambiguous"}
                               or turn.response.candidates))):
@@ -11228,7 +11270,8 @@ def main() -> int:
                     type_candidate = FactCandidate(
                         subject=str(type_field_evidence["title"]),
                         relation="is-a",
-                        object=str(realized["field_text"]).split("=", 1)[1].strip(),
+                        object=str(realized.get("field_value") or
+                                   str(realized["field_text"]).split("=", 1)[-1].strip()),
                         source=str(type_field_evidence["citation"]),
                         template="exact-title structured type field",
                         sentence=str(realized["field_text"]))

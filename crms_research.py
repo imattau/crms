@@ -1738,7 +1738,9 @@ class CRMSResearchIndex:
         matches = []
         for document_id in sorted(candidates):
             document = self._documents[document_id]
-            if document.title.casefold() == title.casefold():
+            actual = tuple(token.group().casefold()
+                           for token in word_matches(document.title))
+            if actual == wanted:
                 matches.append(ExactTitleMatch(
                     document.document_id, document.title, document.location))
         return matches
@@ -2894,7 +2896,8 @@ class CRMSSQLiteResearchIndex(CRMSResearchIndex):
             (f"title : {phrase}",))
         return [ExactTitleMatch(document_id, actual_title, location)
                 for document_id, actual_title, location in rows
-                if actual_title.casefold() == title.casefold()]
+                if tuple(token.group().casefold()
+                         for token in word_matches(actual_title)) == wanted]
 
     def documents(self) -> list[SourceDocument]:
         rows = self._db.execute(

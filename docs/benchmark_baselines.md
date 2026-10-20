@@ -179,6 +179,62 @@ varied evidence layouts, natural request forms, and adversarial reasoning
 controls, checked by an independent oracle. The runtime work does not establish
 independent dialogue transfer or autonomous source-rule learning.
 
+## Exact-title definition fallback from structured source metadata (`v1_522`)
+
+The read-only SimpleWiki drive exposed a multiword-definition failure:
+`What is Mount Everest?` initially selected an avalanche report in the direct
+research route and the standard chat abstained because its exact-title
+definition and sentence evidence did not resolve the infobox class. The
+exact-title matcher also required punctuation-identical titles, so the
+structured-field control could not resolve `Python programming language` to
+the indexed title `Python (programming language)`.
+
+The definition path now uses the exact-title infobox template type only when
+the title has no usable prose definition. For the current Mount Everest page,
+the standard chat says the source classifies it as a mountain, cites the exact
+`Infobox mountain` line, labels it structured evidence, and leaves it in the
+review queue rather than promoting a fact. A clean Photosynthesis lead
+definition remains preferred over its infobox. A title mention without an
+exact-title infobox still abstains. Exact-title matching compares normalized
+token sequences while retaining order, so parenthetical title punctuation is
+handled but a shorter title remains distinct.
+
+`experiments/v1_522_definition_type_from_infobox.py` checks the structured
+fallback and non-promotion in a fresh CLI process. The pre-existing
+`v1_318_infobox_field_evidence.py` and `v1_332_title_count_superlative_grounding.py`
+also pass. A read-only lookup from the installed SimpleWiki index copied only
+the exact Mount Everest and avalanche source documents into a temporary test
+index; the normal chat then returned the quoted infobox type. No accepted fact
+or source corpus was changed.
+
+This closes one source-grounded definition fallback and punctuation seam; it
+does not add general comparison, definition generation, or semantic ranking.
+In the same corpus drive, `Compare Paris and Rome.` correctly declined to
+infer a comparison from a sentence about the Prix de Rome and students in
+Paris, but it did not perform the requested comparison. Keep that case as a
+held-out task: entity disambiguation and multi-source comparison remain an
+open capability gap.
+
+## Integrated replay after the definition and title-normalization fix
+
+Commands: `v1_318`, `v1_332`, `v1_427`, `v1_435`, `v1_360`, `v1_376`,
+`v1_379`, `v1_516`, and `v1_522` under `experiments/`.
+
+All nine selected diagnostics pass on the updated working tree. In addition
+to the new definition fallback, the replay confirms parenthetical exact-title
+matching, the 30-turn dialogue grounding controls, source-visible citation
+checks, relation integrity denials, cycle detection, bounded proof search,
+portable correction/invalidation, and the three-route recombination control.
+The diamond benchmark lists only 64 proofs and explicitly reports its proof
+cap; it does not mistake a truncated proof list for complete enumeration.
+
+These are selected regression and integration results, not a transfer score.
+The core recombination packet still uses synthetic entities and pre-reviewed
+components. The immediate next gate is a wider, source-backed, independently
+authored task set through ordinary chat, with varied evidence layouts and
+request forms plus an independent checker. Include multi-source comparisons;
+the Paris/Rome probe remains an explicit uncovered task.
+
 ## Regular agent-noun question over a large corpus (2026-10-20)
 
 `experiments/v1_515_regular_agent_noun_evidence.py` covers the natural-language
