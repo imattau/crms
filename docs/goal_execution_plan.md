@@ -165,9 +165,13 @@ truth or fails on a second publisher, redesign rather than promote the path.
 for a bounded “function/array/result will predicate” construction. It does not
 name the operation; citations, polarity, quotation, and conditions stay
 visible, embedded denial/uncertainty is distinguished, and no rule is
-installed. This is a controlled syntactic prototype, not a precision result.
-Freeze it for the next complete-document, publisher-held-out study rather than
-adding more phrase-specific extractors.
+installed. The first publisher-disjoint excerpt check (`v1_471`) exposed a
+boundary bug: decimal versions such as `SemVer 2.0.0` were truncated. The
+candidate grammar now preserves that qualifier and source capitalization;
+`v1_470` and `v1_471` plus four adjacent learning/recombination controls pass.
+This remains one selected positive excerpt, not a precision or transfer result.
+Freeze this revised grammar for the next complete-document, publisher-held-out
+study. Do not add phrase-specific extractors before that study.
 
 **Gate:** a frozen method finds useful candidates on held-out documents and a
 second publisher with measured precision and review effort; sampled
@@ -256,27 +260,47 @@ academic-paper sources.
 
 ## Immediate work queue — execute in this order
 
-1. **Dialogue transfer.** Keep the fixed pronoun/topic-switch,
+1. **Freeze the evaluation before tuning.** Preserve current dialogue and
+   learning regressions, including fixed topic-switch/source-only-context cases
+   and `v1_470`/`v1_471`. Record commit, corpus, splits, and scoring rubric.
+   Do not use inspected holdout rows to change the implementation.
+2. **Run the decisive source-learning transfer study.** Treat
+   `v1_469`/`v1_436` as integration controls and `v1_464`/`v1_468` as noisy
+   baselines. Apply the frozen revised candidate generator to complete
+   documents from a discovery publisher and a held-out publisher, with actual
+   relation/wording overlap. Sample proposals and non-proposals; include
+   polarity, quotation, contrast, role-reversal, boundary, and unrelated
+   negatives. Report precision, useful yield, missed opportunities, source
+   independence, and review effort. Keep proposals inert. If useful precision
+   and coverage transfer, proceed to rule induction; otherwise identify the
+   failing boundary, revise the method, and reserve a new publisher for
+   confirmation. Do not substitute a larger scan of one corpus.
+3. **Evaluate dialogue transfer in parallel.** Keep fixed pronoun/topic-switch,
    source-only-context, stale-`why?`, history, and ordinal regressions locked.
-   Create an independently authored transcript set with varied paragraph
-   layouts and entity switches; score wrong referents, omissions,
-   clarification, and task completion before changing runtime behavior. Fix
-   only reproduced failures, then replay both fixed and held-out cases in fresh
-   processes.
-2. **Source-rule discovery.** Treat `v1_469`/`v1_436` as integration controls
-   and `v1_464`/`v1_468` as noisy baselines. Freeze the `v1_470` candidate
-   generator; sample both proposals and non-proposals from complete documents
-   in corpora with actual relation/wording overlap; reserve a second publisher.
-   Include polarity, quotation, contrast, role-reversal, and boundary
-   negatives. Report precision, useful yield, source independence, and review
-   effort. Keep proposals inert unless this gate is met. Do not spend another
-   cycle on exact endpoint overlap or a larger one-corpus scan.
-3. **Recombination plus reasoning.** Select a learning signal that passes
-   packet 2, then exercise an unseen multi-step request through normal chat,
-   fresh-process reload, proof/output checking, missing premises, conflict,
-   incomplete search, source correction, and derived-case invalidation. Keep
-   existing `v1_451`/`v1_456` integrations as regression controls, not evidence
-   that source learning is autonomous.
+   Add independently authored transcripts and varied source layouts; score
+   wrong referents, irrelevant evidence, omissions, clarification, repair, and
+   task completion before changing runtime behavior. Fix reproduced failures,
+   then replay fixed and held-out cases in fresh processes. This is a release
+   gate for chat-facing work, not a reason to defer the source-learning study.
+4. **Prove recombination with reasoning on real evidence.** After the
+   source-learning gate, take separately reviewed evidence, rules, and
+   procedures through an unseen multi-step request in ordinary chat and a fresh
+   process. Independently verify proof and output. Include missing premises,
+   explicit negatives, conflicts, cycles/integrity failures, incomplete search,
+   unsupported operations, source correction, and derived-case invalidation.
+   Keep `v1_451`/`v1_456` as controls, not evidence that learning is autonomous.
+5. **Close the self-learning loop under governance.** Only after the composed
+   path is reliable, propose verified derived cases with lineage. Test
+   correction propagation, invalidation, duplicate suppression, trust weighting,
+   and storage limits before allowing automatic retrieval or reuse. Derived
+   cases must never validate their generating rules or evidence.
+6. **Expand breadth and distribution from measured losses.** Choose one
+   bounded math, coding, translation, or creative task based on the scorecard;
+   validate it through the same language interface before composing domains.
+   Once learning and correction records stabilize, verify a copied SQLite
+   model with searchable source text and accepted knowledge/rules, with original
+   documents unavailable. Measure portability, size, compatibility, and task
+   outcomes.
 
 The dialogue packet is a parallel release-quality gate; it must not displace
 the learning experiment. The source-rule result decides whether CRMS advances
@@ -284,6 +308,12 @@ the learner or redesigns the evidence-extraction step. Recombination proceeds
 only after that decision, while reasoning checks are built into its acceptance
 criteria. Math, coding, translation, and creative tasks remain next-stage
 domain slices, not current distractions.
+
+Self-learning write-back comes later because error amplification cannot be
+evaluated until independently checked recombination works. This ordering keeps
+the central capability bet explicit: learn from attributable evidence, combine
+what was learned through reasoning and procedures, and only then let verified
+outputs become reviewable new knowledge.
 
 
 

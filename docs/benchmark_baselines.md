@@ -1,5 +1,28 @@
 # Language and recombination benchmark baselines
 
+## Publisher-disjoint procedure phrase excerpt (2026-10-20)
+
+Command: `python3 run_experiments.py --match v1_470 --match v1_471
+--match v1_436 --match v1_437 --match v1_433 --match v1_469 --timeout 300`.
+
+All six selected diagnostics passed in 4.09 seconds. `v1_471` applies the
+frozen report-only procedure phrase grammar to a short Microsoft Learn excerpt
+about the `tools.json` format. The candidate retains the comma-delimited
+qualifier `SemVer 2.0.0 order`, exact local sentence citation, and asserted
+polarity; an unrelated sentence does not produce a candidate. Fresh-process
+chat exposes the candidate while `/rules` remains empty. The check exposed and
+fixed decimal-period truncation in the candidate boundary and also preserves
+source capitalization.
+
+Source: [Microsoft Learn: tools.json for discovering nuget.exe
+versions](https://learn.microsoft.com/en-us/nuget/api/tools-json).
+
+This is one selected positive excerpt and one unrelated negative sentence. It
+does not measure full-document transfer, proposal precision, useful coverage,
+or rule learning. Keep the extractor frozen for the complete-document,
+publisher-held-out evaluation; do not interpret 6/6 component regressions as a
+cross-corpus score.
+
 ## Proof-guided procedure composition (2026-10-20)
 
 Command: `python3 run_experiments.py --match v1_451 --timeout 300`.

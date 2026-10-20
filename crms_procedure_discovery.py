@@ -14,7 +14,10 @@ import re
 _PREDICATE_CLAUSE = re.compile(
     r"\b(?P<subject>(?:the\s+)?(?:following\s+)?"
     r"(?:function|method|program|code|returned\s+array|array|output|result))"
-    r"\s+will\s+(?P<polarity>not\s+)?(?P<predicate>[a-z][^,.!?;()]{1,140})",
+    r"\s+will\s+(?P<polarity>not\s+)?"
+    r"(?P<predicate>[a-z](?:\.(?=\d)|[^.!?;()]){1,180}?)"
+    r"(?=(?:,?\s+(?:but|if|unless|when|provided\s+that|assuming)\b)"
+    r"|[!?;()]|(?<!\d)\.(?!\d)|$)",
     re.IGNORECASE,
 )
 _QUOTES = (("\"", "\""), ("'", "'"), ("“", "”"), ("‘", "’"),
@@ -129,12 +132,13 @@ def propose_procedure_phrase_candidates(
     match = _PREDICATE_CLAUSE.search(sentence)
     if match is None:
         return ()
-    predicate = " ".join(match.group("predicate").split()).strip(" ,:")
+    predicate = " ".join(match.group("predicate").split()).strip(
+        " \t\r\n,;:'\"“”‘’«»`")
     if len(predicate.split()) < 2:
         return ()
     return (ProcedurePhraseCandidate(
-        subject=" ".join(match.group("subject").split()).casefold(),
-        predicate_phrase=predicate.casefold(),
+        subject=" ".join(match.group("subject").split()),
+        predicate_phrase=predicate,
         polarity=not bool(match.group("polarity")),
         quoted=_is_quoted(sentence, match.start("predicate")),
         source_citation=source_citation,
