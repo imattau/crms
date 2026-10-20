@@ -1351,6 +1351,84 @@ def _natural_when_evidence(index: CRMSSQLiteResearchIndex,
     return next(iter(found.values()))[0]
 
 
+def _locally_anchored_pronoun_paragraphs(
+        question: str, displayed_text: str, rows: list[dict[str, Any]],
+        dialogue: CRMSDialogue, index: CRMSSQLiteResearchIndex
+        ) -> list[dict[str, Any]]:
+    """Retain a cited paragraph when a following pronoun uses its named subject.
+
+    A single pronoun sentence is not enough to establish its referent. Allow a
+    two-sentence paragraph only when the first sentence names the current
+    dialogue topic as its subject and the next sentence begins with a pronoun
+    and states the requested relation and year. The citation must resolve to
+    exactly that same paragraph, which is what jointly supports the answer.
+    """
+    entity = (dialogue.topic_entity or "").strip()
+    entity_terms = normalized_tokens(entity)
+    question_terms = normalized_tokens(question)
+    if (not entity_terms
+            or not all(term in question_terms for term in entity_terms)):
+        return []
+    entity_pattern = r"\s+".join(re.escape(term) for term in entity_terms)
+    pronoun_start = re.compile(r"^\s*(?:it|he|she|they|this|that|these|those)\b",
+                               re.IGNORECASE)
+    year_pattern = re.compile(r"\b(?:1[0-9]{3}|20[0-9]{2})\b")
+    candidate_rows: list[dict[str, Any]] = []
+    for row in rows:
+        text = str(row.get("text", "")).strip()
+        citation = row.get("citation")
+        if (not text or text not in displayed_text
+                or not isinstance(citation, str)):
+            continue
+        try:
+            if index.resolve_citation(citation) != text:
+                continue
+            document_id = citation.split("#sha256=", 1)[0]
+            char_span = citation.split("&chars=", 1)[1].split("&", 1)[0]
+            start, end = (int(value) for value in char_span.split(":", 1))
+            document = index.document(document_id)
+        except (AttributeError, IndexError, KeyError, TypeError, ValueError):
+            continue
+        if (start < 0 or end < start or end > len(document.text)
+                or document.text[start:end] != text):
+            continue
+        previous_break = document.text.rfind("\n\n", 0, start)
+        paragraph_start = previous_break + 2 if previous_break >= 0 else 0
+        next_break = document.text.find("\n\n", end)
+        paragraph_end = next_break if next_break >= 0 else len(document.text)
+        paragraph = document.text[paragraph_start:paragraph_end].strip()
+        if " ".join(paragraph.split()) != " ".join(text.split()):
+            continue
+        spans = _sentence_spans(text)
+        if len(spans) != 2:
+            continue
+        first = text[spans[0][0]:spans[0][1]].strip()
+        second = text[spans[1][0]:spans[1][1]].strip()
+        if not re.match(r"^(?:the\s+)?" + entity_pattern + r"\b",
+                        first, flags=re.IGNORECASE):
+            continue
+        if not pronoun_start.match(second) or year_pattern.search(second) is None:
+            continue
+        relation_terms = [term for term in question_terms
+                          if term not in set(entity_terms)
+                          and term not in _RESEARCH_STOPWORDS]
+        second_terms = set(normalized_tokens(second))
+        if not relation_terms or not second_terms.intersection(relation_terms):
+            continue
+        # Do not bind a sentence that names a different entity itself; that
+        # would make the first sentence's topic an unsafe antecedent.
+        capitalized = re.findall(r"\b[A-Z][a-z]+\b", second[1:])
+        non_name_capitals = {"ce", "ad", "bc", "bce", "january",
+                             "february", "march", "april", "may", "june",
+                             "july", "august", "september", "october",
+                             "november", "december"}
+        if any(term.casefold() not in non_name_capitals
+               for term in capitalized):
+            continue
+        candidate_rows.append({**row, "context_kind": "local-pronoun-paragraph"})
+    return candidate_rows
+
+
 def _natural_where_lookup(message: str) -> tuple[str, str] | None:
     """Parse a bounded where-question that asks for a person/place relation."""
     match = re.fullmatch(
@@ -10692,6 +10770,14 @@ def main() -> int:
                     text = str(row.get("text", "")).strip()
                     if len(_sentence_spans(text)) == 1:
                         gate_rows.append(row)
+                # A pronoun-led source sentence can answer only when the
+                # exact cited paragraph names the current topic immediately
+                # before it. Keep that paragraph as joint evidence so the
+                # named antecedent is not lost when the gate sees sentence
+                # rows separately.
+                gate_rows.extend(_locally_anchored_pronoun_paragraphs(
+                    gate_question, turn.text,
+                    turn.research.source_sentences or [], dialogue, index))
             licensed_predicates = (
                 turn.research.query_expansions
                 if turn.research is not None else [])

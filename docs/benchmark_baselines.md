@@ -1,5 +1,17 @@
 # Language and recombination benchmark baselines
 
+## Cross-paragraph source pronoun grounding (2026-10-20)
+
+Command: `python3 experiments/v1_449_cross_paragraph_pronoun_grounding.py`.
+
+The fresh-process chat path switches from an Eiffel Tower paragraph to a
+Colosseum paragraph, then answers “When was it completed?” with the Colosseum's
+1980 date instead of reusing the Eiffel Tower's 1889 date. The exact cited
+paragraph supplies both the named antecedent and pronoun-led date. A pronoun-
+only paragraph without a local named antecedent remains an abstention. Both
+cases pass in separate CLI processes. This is one targeted regression, not a
+broad dialogue evaluation.
+
 ## Grounded language recombination grid
 
 Command: `python3 experiments/v1_242_grounded_recombination_benchmark.py`

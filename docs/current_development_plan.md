@@ -59,7 +59,10 @@ reliability. Add independently authored conversations with varied paragraph
 layouts and more entities. Context changes should not silently bind an
 ambiguous pronoun to whichever entity happens to have a matching fact. Intent
 may route, clarify, or repair; it cannot establish facts or authorize
-unsupported actions.
+unsupported actions. The fresh-process `v1_449` regression covers a subtle
+integration boundary: the dialogue layer retains the correct topic, but the
+final quoted-evidence gate must receive the exact paragraph that binds a
+pronoun to its named antecedent. A pronoun-only paragraph remains an abstention.
 
 **Gate:** fixed regressions pass in a clean process; unresolved referents are
 clarified or declined; no confident wrong referent appears in the held-out
