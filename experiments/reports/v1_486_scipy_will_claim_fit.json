@@ -1,0 +1,618 @@
+{
+  "audit": "v1_486",
+  "purpose": "frozen grammar corpus-fit check only",
+  "package": "SciPy",
+  "package_version": "1.18.0",
+  "package_license_metadata": "Copyright (c) 2001-2002 Enthought, Inc. 2003, SciPy Developers.\n All rights reserved.\n\n Redistribution and use in source and binary forms, with or without\n modification, are permitted provided that the following conditions\n are met:\n\n 1. Redistributions of source code must retain the above copyright\n    notice, this list of conditions and the following disclaimer.\n\n 2. Redistributions in binary form must reproduce the above\n    copyright notice, this list of conditions and the following\n    disclaimer in the documentation and/or other materials provided\n    with the distribution.\n\n 3. Neither the name of the copyright holder nor the names of its\n    contributors may be used to endorse or promote products derived\n    from this software without specific prior written permission.\n\n THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\n A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT\n OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\n SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT\n LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,\n DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY\n THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\n ----\n\n\n ----\n\n This binary distribution of SciPy can also bundle the following software\n (depending on the build):\n\n\n Name: OpenBLAS\n Files: scipy.libs/libscipy_openblas*.so\n Description: bundled as a dynamically linked library\n Availability: https://github.com/OpenMathLib/OpenBLAS/\n License: BSD-3-Clause\n   Copyright (c) 2011-2014, The OpenBLAS Project\n   All rights reserved.\n\n   Redistribution and use in source and binary forms, with or without\n   modification, are permitted provided that the following conditions are\n   met:\n\n      1. Redistributions of source code must retain the above copyright\n         notice, this list of conditions and the following disclaimer.\n\n      2. Redistributions in binary form must reproduce the above copyright\n         notice, this list of conditions and the following disclaimer in\n         the documentation and/or other materials provided with the\n         distribution.\n      3. Neither the name of the OpenBLAS project nor the names of \n         its contributors may be used to endorse or promote products \n         derived from this software without specific prior written \n         permission.\n\n   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\n   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\n   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE\n   USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\n\n Name: LAPACK\n Files: scipy.libs/libscipy_openblas*.so\n Description: bundled in OpenBLAS\n Availability: https://github.com/OpenMathLib/OpenBLAS/\n License: BSD-3-Clause-Open-MPI\n   Copyright (c) 1992-2013 The University of Tennessee and The University\n                           of Tennessee Research Foundation.  All rights\n                           reserved.\n   Copyright (c) 2000-2013 The University of California Berkeley. All\n                           rights reserved.\n   Copyright (c) 2006-2013 The University of Colorado Denver.  All rights\n                           reserved.\n\n   $COPYRIGHT$\n\n   Additional copyrights may follow\n\n   $HEADER$\n\n   Redistribution and use in source and binary forms, with or without\n   modification, are permitted provided that the following conditions are\n   met:\n\n   - Redistributions of source code must retain the above copyright\n     notice, this list of conditions and the following disclaimer.\n\n   - Redistributions in binary form must reproduce the above copyright\n     notice, this list of conditions and the following disclaimer listed\n     in this license in the documentation and/or other materials\n     provided with the distribution.\n\n   - Neither the name of the copyright holders nor the names of its\n     contributors may be used to endorse or promote products derived from\n     this software without specific prior written permission.\n\n   The copyright holders provide no reassurances that the source code\n   provided does not infringe any patent, copyright, or any other\n   intellectual property rights of third parties.  The copyright holders\n   disclaim any liability to any recipient for claims brought against\n   recipient by any third party for infringement of that parties\n   intellectual property rights.\n\n   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n   \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\n   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT\n   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\n   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT\n   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,\n   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY\n   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\n\n Name: GCC runtime library\n Files: scipy.libs/libgfortran*.so\n Description: dynamically linked to files compiled with gcc\n Availability: https://gcc.gnu.org/git/?p=gcc.git;a=tree;f=libgfortran\n License: GPL-3.0-or-later WITH GCC-exception-3.1\n   Copyright (C) 2002-2017 Free Software Foundation, Inc.\n\n   Libgfortran is free software; you can redistribute it and/or modify\n   it under the terms of the GNU General Public License as published by\n   the Free Software Foundation; either version 3, or (at your option)\n   any later version.\n\n   Libgfortran is distributed in the hope that it will be useful,\n   but WITHOUT ANY WARRANTY; without even the implied warranty of\n   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n   GNU General Public License for more details.\n\n   Under Section 7 of GPL version 3, you are granted additional\n   permissions described in the GCC Runtime Library Exception, version\n   3.1, as published by the Free Software Foundation.\n\n   You should have received a copy of the GNU General Public License and\n   a copy of the GCC Runtime Library Exception along with this program;\n   see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see\n   <http://www.gnu.org/licenses/>.\n\n ----\n\n Full text of license texts referred to above follows (that they are\n listed below does not necessarily imply the conditions apply to the\n present binary release):\n\n ----\n\n GCC RUNTIME LIBRARY EXCEPTION\n\n Version 3.1, 31 March 2009\n\n Copyright (C) 2009 Free Software Foundation, Inc. <http://fsf.org/>\n\n Everyone is permitted to copy and distribute verbatim copies of this\n license document, but changing it is not allowed.\n\n This GCC Runtime Library Exception (\"Exception\") is an additional\n permission under section 7 of the GNU General Public License, version\n 3 (\"GPLv3\"). It applies to a given file (the \"Runtime Library\") that\n bears a notice placed by the copyright holder of the file stating that\n the file is governed by GPLv3 along with this Exception.\n\n When you use GCC to compile a program, GCC may combine portions of\n certain GCC header files and runtime libraries with the compiled\n program. The purpose of this Exception is to allow compilation of\n non-GPL (including proprietary) programs to use, in this way, the\n header files and runtime libraries covered by this Exception.\n\n 0. Definitions.\n\n A file is an \"Independent Module\" if it either requires the Runtime\n Library for execution after a Compilation Process, or makes use of an\n interface provided by the Runtime Library, but is not otherwise based\n on the Runtime Library.\n\n \"GCC\" means a version of the GNU Compiler Collection, with or without\n modifications, governed by version 3 (or a specified later version) of\n the GNU General Public License (GPL) with the option of using any\n subsequent versions published by the FSF.\n\n \"GPL-compatible Software\" is software whose conditions of propagation,\n modification and use would permit combination with GCC in accord with\n the license of GCC.\n\n \"Target Code\" refers to output from any compiler for a real or virtual\n target processor architecture, in executable form or suitable for\n input to an assembler, loader, linker and/or execution\n phase. Notwithstanding that, Target Code does not include data in any\n format that is used as a compiler intermediate representation, or used\n for producing a compiler intermediate representation.\n\n The \"Compilation Process\" transforms code entirely represented in\n non-intermediate languages designed for human-written code, and/or in\n Java Virtual Machine byte code, into Target Code. Thus, for example,\n use of source code generators and preprocessors need not be considered\n part of the Compilation Process, since the Compilation Process can be\n understood as starting with the output of the generators or\n preprocessors.\n\n A Compilation Process is \"Eligible\" if it is done using GCC, alone or\n with other GPL-compatible software, or if it is done without using any\n work based on GCC. For example, using non-GPL-compatible Software to\n optimize any GCC intermediate representations would not qualify as an\n Eligible Compilation Process.\n\n 1. Grant of Additional Permission.\n\n You have permission to propagate a work of Target Code formed by\n combining the Runtime Library with Independent Modules, even if such\n propagation would otherwise violate the terms of GPLv3, provided that\n all Target Code was generated by Eligible Compilation Processes. You\n may then convey such a combination under terms of your choice,\n consistent with the licensing of the Independent Modules.\n\n 2. No Weakening of GCC Copyleft.\n\n The availability of this Exception does not imply any general\n presumption that third-party software is unaffected by the copyleft\n requirements of the license of GCC.\n\n ----\n\n                     GNU GENERAL PUBLIC LICENSE\n                        Version 3, 29 June 2007\n\n  Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>\n  Everyone is permitted to copy and distribute verbatim copies\n  of this license document, but changing it is not allowed.\n\n                             Preamble\n\n   The GNU General Public License is a free, copyleft license for\n software and other kinds of works.\n\n   The licenses for most software and other practical works are designed\n to take away your freedom to share and change the works.  By contrast,\n the GNU General Public License is intended to guarantee your freedom to\n share and change all versions of a program--to make sure it remains free\n software for all its users.  We, the Free Software Foundation, use the\n GNU General Public License for most of our software; it applies also to\n any other work released this way by its authors.  You can apply it to\n your programs, too.\n\n   When we speak of free software, we are referring to freedom, not\n price.  Our General Public Licenses are designed to make sure that you\n have the freedom to distribute copies of free software (and charge for\n them if you wish), that you receive source code or can get it if you\n want it, that you can change the software or use pieces of it in new\n free programs, and that you know you can do these things.\n\n   To protect your rights, we need to prevent others from denying you\n these rights or asking you to surrender the rights.  Therefore, you have\n certain responsibilities if you distribute copies of the software, or if\n you modify it: responsibilities to respect the freedom of others.\n\n   For example, if you distribute copies of such a program, whether\n gratis or for a fee, you must pass on to the recipients the same\n freedoms that you received.  You must make sure that they, too, receive\n or can get the source code.  And you must show them these terms so they\n know their rights.\n\n   Developers that use the GNU GPL protect your rights with two steps:\n (1) assert copyright on the software, and (2) offer you this License\n giving you legal permission to copy, distribute and/or modify it.\n\n   For the developers' and authors' protection, the GPL clearly explains\n that there is no warranty for this free software.  For both users' and\n authors' sake, the GPL requires that modified versions be marked as\n changed, so that their problems will not be attributed erroneously to\n authors of previous versions.\n\n   Some devices are designed to deny users access to install or run\n modified versions of the software inside them, although the manufacturer\n can do so.  This is fundamentally incompatible with the aim of\n protecting users' freedom to change the software.  The systematic\n pattern of such abuse occurs in the area of products for individuals to\n use, which is precisely where it is most unacceptable.  Therefore, we\n have designed this version of the GPL to prohibit the practice for those\n products.  If such problems arise substantially in other domains, we\n stand ready to extend this provision to those domains in future versions\n of the GPL, as needed to protect the freedom of users.\n\n   Finally, every program is threatened constantly by software patents.\n States should not allow patents to restrict development and use of\n software on general-purpose computers, but in those that do, we wish to\n avoid the special danger that patents applied to a free program could\n make it effectively proprietary.  To prevent this, the GPL assures that\n patents cannot be used to render the program non-free.\n\n   The precise terms and conditions for copying, distribution and\n modification follow.\n\n                        TERMS AND CONDITIONS\n\n   0. Definitions.\n\n   \"This License\" refers to version 3 of the GNU General Public License.\n\n   \"Copyright\" also means copyright-like laws that apply to other kinds of\n works, such as semiconductor masks.\n\n   \"The Program\" refers to any copyrightable work licensed under this\n License.  Each licensee is addressed as \"you\".  \"Licensees\" and\n \"recipients\" may be individuals or organizations.\n\n   To \"modify\" a work means to copy from or adapt all or part of the work\n in a fashion requiring copyright permission, other than the making of an\n exact copy.  The resulting work is called a \"modified version\" of the\n earlier work or a work \"based on\" the earlier work.\n\n   A \"covered work\" means either the unmodified Program or a work based\n on the Program.\n\n   To \"propagate\" a work means to do anything with it that, without\n permission, would make you directly or secondarily liable for\n infringement under applicable copyright law, except executing it on a\n computer or modifying a private copy.  Propagation includes copying,\n distribution (with or without modification), making available to the\n public, and in some countries other activities as well.\n\n   To \"convey\" a work means any kind of propagation that enables other\n parties to make or receive copies.  Mere interaction with a user through\n a computer network, with no transfer of a copy, is not conveying.\n\n   An interactive user interface displays \"Appropriate Legal Notices\"\n to the extent that it includes a convenient and prominently visible\n feature that (1) displays an appropriate copyright notice, and (2)\n tells the user that there is no warranty for the work (except to the\n extent that warranties are provided), that licensees may convey the\n work under this License, and how to view a copy of this License.  If\n the interface presents a list of user commands or options, such as a\n menu, a prominent item in the list meets this criterion.\n\n   1. Source Code.\n\n   The \"source code\" for a work means the preferred form of the work\n for making modifications to it.  \"Object code\" means any non-source\n form of a work.\n\n   A \"Standard Interface\" means an interface that either is an official\n standard defined by a recognized standards body, or, in the case of\n interfaces specified for a particular programming language, one that\n is widely used among developers working in that language.\n\n   The \"System Libraries\" of an executable work include anything, other\n than the work as a whole, that (a) is included in the normal form of\n packaging a Major Component, but which is not part of that Major\n Component, and (b) serves only to enable use of the work with that\n Major Component, or to implement a Standard Interface for which an\n implementation is available to the public in source code form.  A\n \"Major Component\", in this context, means a major essential component\n (kernel, window system, and so on) of the specific operating system\n (if any) on which the executable work runs, or a compiler used to\n produce the work, or an object code interpreter used to run it.\n\n   The \"Corresponding Source\" for a work in object code form means all\n the source code needed to generate, install, and (for an executable\n work) run the object code and to modify the work, including scripts to\n control those activities.  However, it does not include the work's\n System Libraries, or general-purpose tools or generally available free\n programs which are used unmodified in performing those activities but\n which are not part of the work.  For example, Corresponding Source\n includes interface definition files associated with source files for\n the work, and the source code for shared libraries and dynamically\n linked subprograms that the work is specifically designed to require,\n such as by intimate data communication or control flow between those\n subprograms and other parts of the work.\n\n   The Corresponding Source need not include anything that users\n can regenerate automatically from other parts of the Corresponding\n Source.\n\n   The Corresponding Source for a work in source code form is that\n same work.\n\n   2. Basic Permissions.\n\n   All rights granted under this License are granted for the term of\n copyright on the Program, and are irrevocable provided the stated\n conditions are met.  This License explicitly affirms your unlimited\n permission to run the unmodified Program.  The output from running a\n covered work is covered by this License only if the output, given its\n content, constitutes a covered work.  This License acknowledges your\n rights of fair use or other equivalent, as provided by copyright law.\n\n   You may make, run and propagate covered works that you do not\n convey, without conditions so long as your license otherwise remains\n in force.  You may convey covered works to others for the sole purpose\n of having them make modifications exclusively for you, or provide you\n with facilities for running those works, provided that you comply with\n the terms of this License in conveying all material for which you do\n not control copyright.  Those thus making or running the covered works\n for you must do so exclusively on your behalf, under your direction\n and control, on terms that prohibit them from making any copies of\n your copyrighted material outside their relationship with you.\n\n   Conveying under any other circumstances is permitted solely under\n the conditions stated below.  Sublicensing is not allowed; section 10\n makes it unnecessary.\n\n   3. Protecting Users' Legal Rights From Anti-Circumvention Law.\n\n   No covered work shall be deemed part of an effective technological\n measure under any applicable law fulfilling obligations under article\n 11 of the WIPO copyright treaty adopted on 20 December 1996, or\n similar laws prohibiting or restricting circumvention of such\n measures.\n\n   When you convey a covered work, you waive any legal power to forbid\n circumvention of technological measures to the extent such circumvention\n is effected by exercising rights under this License with respect to\n the covered work, and you disclaim any intention to limit operation or\n modification of the work as a means of enforcing, against the work's\n users, your or third parties' legal rights to forbid circumvention of\n technological measures.\n\n   4. Conveying Verbatim Copies.\n\n   You may convey verbatim copies of the Program's source code as you\n receive it, in any medium, provided that you conspicuously and\n appropriately publish on each copy an appropriate copyright notice;\n keep intact all notices stating that this License and any\n non-permissive terms added in accord with section 7 apply to the code;\n keep intact all notices of the absence of any warranty; and give all\n recipients a copy of this License along with the Program.\n\n   You may charge any price or no price for each copy that you convey,\n and you may offer support or warranty protection for a fee.\n\n   5. Conveying Modified Source Versions.\n\n   You may convey a work based on the Program, or the modifications to\n produce it from the Program, in the form of source code under the\n terms of section 4, provided that you also meet all of these conditions:\n\n     a) The work must carry prominent notices stating that you modified\n     it, and giving a relevant date.\n\n     b) The work must carry prominent notices stating that it is\n     released under this License and any conditions added under section\n     7.  This requirement modifies the requirement in section 4 to\n     \"keep intact all notices\".\n\n     c) You must license the entire work, as a whole, under this\n     License to anyone who comes into possession of a copy.  This\n     License will therefore apply, along with any applicable section 7\n     additional terms, to the whole of the work, and all its parts,\n     regardless of how they are packaged.  This License gives no\n     permission to license the work in any other way, but it does not\n     invalidate such permission if you have separately received it.\n\n     d) If the work has interactive user interfaces, each must display\n     Appropriate Legal Notices; however, if the Program has interactive\n     interfaces that do not display Appropriate Legal Notices, your\n     work need not make them do so.\n\n   A compilation of a covered work with other separate and independent\n works, which are not by their nature extensions of the covered work,\n and which are not combined with it such as to form a larger program,\n in or on a volume of a storage or distribution medium, is called an\n \"aggregate\" if the compilation and its resulting copyright are not\n used to limit the access or legal rights of the compilation's users\n beyond what the individual works permit.  Inclusion of a covered work\n in an aggregate does not cause this License to apply to the other\n parts of the aggregate.\n\n   6. Conveying Non-Source Forms.\n\n   You may convey a covered work in object code form under the terms\n of sections 4 and 5, provided that you also convey the\n machine-readable Corresponding Source under the terms of this License,\n in one of these ways:\n\n     a) Convey the object code in, or embodied in, a physical product\n     (including a physical distribution medium), accompanied by the\n     Corresponding Source fixed on a durable physical medium\n     customarily used for software interchange.\n\n     b) Convey the object code in, or embodied in, a physical product\n     (including a physical distribution medium), accompanied by a\n     written offer, valid for at least three years and valid for as\n     long as you offer spare parts or customer support for that product\n     model, to give anyone who possesses the object code either (1) a\n     copy of the Corresponding Source for all the software in the\n     product that is covered by this License, on a durable physical\n     medium customarily used for software interchange, for a price no\n     more than your reasonable cost of physically performing this\n     conveying of source, or (2) access to copy the\n     Corresponding Source from a network server at no charge.\n\n     c) Convey individual copies of the object code with a copy of the\n     written offer to provide the Corresponding Source.  This\n     alternative is allowed only occasionally and noncommercially, and\n     only if you received the object code with such an offer, in accord\n     with subsection 6b.\n\n     d) Convey the object code by offering access from a designated\n     place (gratis or for a charge), and offer equivalent access to the\n     Corresponding Source in the same way through the same place at no\n     further charge.  You need not require recipients to copy the\n     Corresponding Source along with the object code.  If the place to\n     copy the object code is a network server, the Corresponding Source\n     may be on a different server (operated by you or a third party)\n     that supports equivalent copying facilities, provided you maintain\n     clear directions next to the object code saying where to find the\n     Corresponding Source.  Regardless of what server hosts the\n     Corresponding Source, you remain obligated to ensure that it is\n     available for as long as needed to satisfy these requirements.\n\n     e) Convey the object code using peer-to-peer transmission, provided\n     you inform other peers where the object code and Corresponding\n     Source of the work are being offered to the general public at no\n     charge under subsection 6d.\n\n   A separable portion of the object code, whose source code is excluded\n from the Corresponding Source as a System Library, need not be\n included in conveying the object code work.\n\n   A \"User Product\" is either (1) a \"consumer product\", which means any\n tangible personal property which is normally used for personal, family,\n or household purposes, or (2) anything designed or sold for incorporation\n into a dwelling.  In determining whether a product is a consumer product,\n doubtful cases shall be resolved in favor of coverage.  For a particular\n product received by a particular user, \"normally used\" refers to a\n typical or common use of that class of product, regardless of the status\n of the particular user or of the way in which the particular user\n actually uses, or expects or is expected to use, the product.  A product\n is a consumer product regardless of whether the product has substantial\n commercial, industrial or non-consumer uses, unless such uses represent\n the only significant mode of use of the product.\n\n   \"Installation Information\" for a User Product means any methods,\n procedures, authorization keys, or other information required to install\n and execute modified versions of a covered work in that User Product from\n a modified version of its Corresponding Source.  The information must\n suffice to ensure that the continued functioning of the modified object\n code is in no case prevented or interfered with solely because\n modification has been made.\n\n   If you convey an object code work under this section in, or with, or\n specifically for use in, a User Product, and the conveying occurs as\n part of a transaction in which the right of possession and use of the\n User Product is transferred to the recipient in perpetuity or for a\n fixed term (regardless of how the transaction is characterized), the\n Corresponding Source conveyed under this section must be accompanied\n by the Installation Information.  But this requirement does not apply\n if neither you nor any third party retains the ability to install\n modified object code on the User Product (for example, the work has\n been installed in ROM).\n\n   The requirement to provide Installation Information does not include a\n requirement to continue to provide support service, warranty, or updates\n for a work that has been modified or installed by the recipient, or for\n the User Product in which it has been modified or installed.  Access to a\n network may be denied when the modification itself materially and\n adversely affects the operation of the network or violates the rules and\n protocols for communication across the network.\n\n   Corresponding Source conveyed, and Installation Information provided,\n in accord with this section must be in a format that is publicly\n documented (and with an implementation available to the public in\n source code form), and must require no special password or key for\n unpacking, reading or copying.\n\n   7. Additional Terms.\n\n   \"Additional permissions\" are terms that supplement the terms of this\n License by making exceptions from one or more of its conditions.\n Additional permissions that are applicable to the entire Program shall\n be treated as though they were included in this License, to the extent\n that they are valid under applicable law.  If additional permissions\n apply only to part of the Program, that part may be used separately\n under those permissions, but the entire Program remains governed by\n this License without regard to the additional permissions.\n\n   When you convey a copy of a covered work, you may at your option\n remove any additional permissions from that copy, or from any part of\n it.  (Additional permissions may be written to require their own\n removal in certain cases when you modify the work.)  You may place\n additional permissions on material, added by you to a covered work,\n for which you have or can give appropriate copyright permission.\n\n   Notwithstanding any other provision of this License, for material you\n add to a covered work, you may (if authorized by the copyright holders of\n that material) supplement the terms of this License with terms:\n\n     a) Disclaiming warranty or limiting liability differently from the\n     terms of sections 15 and 16 of this License; or\n\n     b) Requiring preservation of specified reasonable legal notices or\n     author attributions in that material or in the Appropriate Legal\n     Notices displayed by works containing it; or\n\n     c) Prohibiting misrepresentation of the origin of that material, or\n     requiring that modified versions of such material be marked in\n     reasonable ways as different from the original version; or\n\n     d) Limiting the use for publicity purposes of names of licensors or\n     authors of the material; or\n\n     e) Declining to grant rights under trademark law for use of some\n     trade names, trademarks, or service marks; or\n\n     f) Requiring indemnification of licensors and authors of that\n     material by anyone who conveys the material (or modified versions of\n     it) with contractual assumptions of liability to the recipient, for\n     any liability that these contractual assumptions directly impose on\n     those licensors and authors.\n\n   All other non-permissive additional terms are considered \"further\n restrictions\" within the meaning of section 10.  If the Program as you\n received it, or any part of it, contains a notice stating that it is\n governed by this License along with a term that is a further\n restriction, you may remove that term.  If a license document contains\n a further restriction but permits relicensing or conveying under this\n License, you may add to a covered work material governed by the terms\n of that license document, provided that the further restriction does\n not survive such relicensing or conveying.\n\n   If you add terms to a covered work in accord with this section, you\n must place, in the relevant source files, a statement of the\n additional terms that apply to those files, or a notice indicating\n where to find the applicable terms.\n\n   Additional terms, permissive or non-permissive, may be stated in the\n form of a separately written license, or stated as exceptions;\n the above requirements apply either way.\n\n   8. Termination.\n\n   You may not propagate or modify a covered work except as expressly\n provided under this License.  Any attempt otherwise to propagate or\n modify it is void, and will automatically terminate your rights under\n this License (including any patent licenses granted under the third\n paragraph of section 11).\n\n   However, if you cease all violation of this License, then your\n license from a particular copyright holder is reinstated (a)\n provisionally, unless and until the copyright holder explicitly and\n finally terminates your license, and (b) permanently, if the copyright\n holder fails to notify you of the violation by some reasonable means\n prior to 60 days after the cessation.\n\n   Moreover, your license from a particular copyright holder is\n reinstated permanently if the copyright holder notifies you of the\n violation by some reasonable means, this is the first time you have\n received notice of violation of this License (for any work) from that\n copyright holder, and you cure the violation prior to 30 days after\n your receipt of the notice.\n\n   Termination of your rights under this section does not terminate the\n licenses of parties who have received copies or rights from you under\n this License.  If your rights have been terminated and not permanently\n reinstated, you do not qualify to receive new licenses for the same\n material under section 10.\n\n   9. Acceptance Not Required for Having Copies.\n\n   You are not required to accept this License in order to receive or\n run a copy of the Program.  Ancillary propagation of a covered work\n occurring solely as a consequence of using peer-to-peer transmission\n to receive a copy likewise does not require acceptance.  However,\n nothing other than this License grants you permission to propagate or\n modify any covered work.  These actions infringe copyright if you do\n not accept this License.  Therefore, by modifying or propagating a\n covered work, you indicate your acceptance of this License to do so.\n\n   10. Automatic Licensing of Downstream Recipients.\n\n   Each time you convey a covered work, the recipient automatically\n receives a license from the original licensors, to run, modify and\n propagate that work, subject to this License.  You are not responsible\n for enforcing compliance by third parties with this License.\n\n   An \"entity transaction\" is a transaction transferring control of an\n organization, or substantially all assets of one, or subdividing an\n organization, or merging organizations.  If propagation of a covered\n work results from an entity transaction, each party to that\n transaction who receives a copy of the work also receives whatever\n licenses to the work the party's predecessor in interest had or could\n give under the previous paragraph, plus a right to possession of the\n Corresponding Source of the work from the predecessor in interest, if\n the predecessor has it or can get it with reasonable efforts.\n\n   You may not impose any further restrictions on the exercise of the\n rights granted or affirmed under this License.  For example, you may\n not impose a license fee, royalty, or other charge for exercise of\n rights granted under this License, and you may not initiate litigation\n (including a cross-claim or counterclaim in a lawsuit) alleging that\n any patent claim is infringed by making, using, selling, offering for\n sale, or importing the Program or any portion of it.\n\n   11. Patents.\n\n   A \"contributor\" is a copyright holder who authorizes use under this\n License of the Program or a work on which the Program is based.  The\n work thus licensed is called the contributor's \"contributor version\".\n\n   A contributor's \"essential patent claims\" are all patent claims\n owned or controlled by the contributor, whether already acquired or\n hereafter acquired, that would be infringed by some manner, permitted\n by this License, of making, using, or selling its contributor version,\n but do not include claims that would be infringed only as a\n consequence of further modification of the contributor version.  For\n purposes of this definition, \"control\" includes the right to grant\n patent sublicenses in a manner consistent with the requirements of\n this License.\n\n   Each contributor grants you a non-exclusive, worldwide, royalty-free\n patent license under the contributor's essential patent claims, to\n make, use, sell, offer for sale, import and otherwise run, modify and\n propagate the contents of its contributor version.\n\n   In the following three paragraphs, a \"patent license\" is any express\n agreement or commitment, however denominated, not to enforce a patent\n (such as an express permission to practice a patent or covenant not to\n sue for patent infringement).  To \"grant\" such a patent license to a\n party means to make such an agreement or commitment not to enforce a\n patent against the party.\n\n   If you convey a covered work, knowingly relying on a patent license,\n and the Corresponding Source of the work is not available for anyone\n to copy, free of charge and under the terms of this License, through a\n publicly available network server or other readily accessible means,\n then you must either (1) cause the Corresponding Source to be so\n available, or (2) arrange to deprive yourself of the benefit of the\n patent license for this particular work, or (3) arrange, in a manner\n consistent with the requirements of this License, to extend the patent\n license to downstream recipients.  \"Knowingly relying\" means you have\n actual knowledge that, but for the patent license, your conveying the\n covered work in a country, or your recipient's use of the covered work\n in a country, would infringe one or more identifiable patents in that\n country that you have reason to believe are valid.\n\n   If, pursuant to or in connection with a single transaction or\n arrangement, you convey, or propagate by procuring conveyance of, a\n covered work, and grant a patent license to some of the parties\n receiving the covered work authorizing them to use, propagate, modify\n or convey a specific copy of the covered work, then the patent license\n you grant is automatically extended to all recipients of the covered\n work and works based on it.\n\n   A patent license is \"discriminatory\" if it does not include within\n the scope of its coverage, prohibits the exercise of, or is\n conditioned on the non-exercise of one or more of the rights that are\n specifically granted under this License.  You may not convey a covered\n work if you are a party to an arrangement with a third party that is\n in the business of distributing software, under which you make payment\n to the third party based on the extent of your activity of conveying\n the work, and under which the third party grants, to any of the\n parties who would receive the covered work from you, a discriminatory\n patent license (a) in connection with copies of the covered work\n conveyed by you (or copies made from those copies), or (b) primarily\n for and in connection with specific products or compilations that\n contain the covered work, unless you entered into that arrangement,\n or that patent license was granted, prior to 28 March 2007.\n\n   Nothing in this License shall be construed as excluding or limiting\n any implied license or other defenses to infringement that may\n otherwise be available to you under applicable patent law.\n\n   12. No Surrender of Others' Freedom.\n\n   If conditions are imposed on you (whether by court order, agreement or\n otherwise) that contradict the conditions of this License, they do not\n excuse you from the conditions of this License.  If you cannot convey a\n covered work so as to satisfy simultaneously your obligations under this\n License and any other pertinent obligations, then as a consequence you may\n not convey it at all.  For example, if you agree to terms that obligate you\n to collect a royalty for further conveying from those to whom you convey\n the Program, the only way you could satisfy both those terms and this\n License would be to refrain entirely from conveying the Program.\n\n   13. Use with the GNU Affero General Public License.\n\n   Notwithstanding any other provision of this License, you have\n permission to link or combine any covered work with a work licensed\n under version 3 of the GNU Affero General Public License into a single\n combined work, and to convey the resulting work.  The terms of this\n License will continue to apply to the part which is the covered work,\n but the special requirements of the GNU Affero General Public License,\n section 13, concerning interaction through a network will apply to the\n combination as such.\n\n   14. Revised Versions of this License.\n\n   The Free Software Foundation may publish revised and/or new versions of\n the GNU General Public License from time to time.  Such new versions will\n be similar in spirit to the present version, but may differ in detail to\n address new problems or concerns.\n\n   Each version is given a distinguishing version number.  If the\n Program specifies that a certain numbered version of the GNU General\n Public License \"or any later version\" applies to it, you have the\n option of following the terms and conditions either of that numbered\n version or of any later version published by the Free Software\n Foundation.  If the Program does not specify a version number of the\n GNU General Public License, you may choose any version ever published\n by the Free Software Foundation.\n\n   If the Program specifies that a proxy can decide which future\n versions of the GNU General Public License can be used, that proxy's\n public statement of acceptance of a version permanently authorizes you\n to choose that version for the Program.\n\n   Later license versions may give you additional or different\n permissions.  However, no additional obligations are imposed on any\n author or copyright holder as a result of your choosing to follow a\n later version.\n\n   15. Disclaimer of Warranty.\n\n   THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY\n APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT\n HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY\n OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,\n THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR\n PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM\n IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF\n ALL NECESSARY SERVICING, REPAIR OR CORRECTION.\n\n   16. Limitation of Liability.\n\n   IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING\n WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS\n THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY\n GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE\n USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF\n DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD\n PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS),\n EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF\n SUCH DAMAGES.\n\n   17. Interpretation of Sections 15 and 16.\n\n   If the disclaimer of warranty and limitation of liability provided\n above cannot be given local legal effect according to their terms,\n reviewing courts shall apply local law that most closely approximates\n an absolute waiver of all civil liability in connection with the\n Program, unless a warranty or assumption of liability accompanies a\n copy of the Program in return for a fee.\n\n                      END OF TERMS AND CONDITIONS\n\n             How to Apply These Terms to Your New Programs\n\n   If you develop a new program, and you want it to be of the greatest\n possible use to the public, the best way to achieve this is to make it\n free software which everyone can redistribute and change under these terms.\n\n   To do so, attach the following notices to the program.  It is safest\n to attach them to the start of each source file to most effectively\n state the exclusion of warranty; and each file should have at least\n the \"copyright\" line and a pointer to where the full notice is found.\n\n     <one line to give the program's name and a brief idea of what it does.>\n     Copyright (C) <year>  <name of author>\n\n     This program is free software: you can redistribute it and/or modify\n     it under the terms of the GNU General Public License as published by\n     the Free Software Foundation, either version 3 of the License, or\n     (at your option) any later version.\n\n     This program is distributed in the hope that it will be useful,\n     but WITHOUT ANY WARRANTY; without even the implied warranty of\n     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n     GNU General Public License for more details.\n\n     You should have received a copy of the GNU General Public License\n     along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n Also add information on how to contact you by electronic and paper mail.\n\n   If the program does terminal interaction, make it output a short\n notice like this when it starts in an interactive mode:\n\n     <program>  Copyright (C) <year>  <name of author>\n     This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.\n     This is free software, and you are welcome to redistribute it\n     under certain conditions; type `show c' for details.\n\n The hypothetical commands `show w' and `show c' should show the appropriate\n parts of the General Public License.  Of course, your program's commands\n might be different; for a GUI interface, you would use an \"about box\".\n\n   You should also get your employer (if you work as a programmer) or school,\n if any, to sign a \"copyright disclaimer\" for the program, if necessary.\n For more information on this, and how to apply and follow the GNU GPL, see\n <http://www.gnu.org/licenses/>.\n\n   The GNU General Public License does not permit incorporating your program\n into proprietary programs.  If your program is a subroutine library, you\n may consider it more useful to permit linking proprietary applications with\n the library.  If this is what you want to do, use the GNU Lesser General\n Public License instead of this License.  But first, please read\n <http://www.gnu.org/philosophy/why-not-lgpl.html>.\n\n\n Name: libquadmath\n Files: scipy.libs/libquadmath*.so\n Description: dynamically linked to files compiled with gcc\n Availability: https://gcc.gnu.org/git/?p=gcc.git;a=tree;f=libquadmath\n License: LGPL-2.1-or-later\n\n     GCC Quad-Precision Math Library\n     Copyright (C) 2010-2019 Free Software Foundation, Inc.\n     Written by Francois-Xavier Coudert  <fxcoudert@gcc.gnu.org>\n\n     This file is part of the libquadmath library.\n     Libquadmath is free software; you can redistribute it and/or\n     modify it under the terms of the GNU Library General Public\n     License as published by the Free Software Foundation; either\n     version 2.1 of the License, or (at your option) any later version.\n\n     Libquadmath is distributed in the hope that it will be useful,\n     but WITHOUT ANY WARRANTY; without even the implied warranty of\n     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n     Lesser General Public License for more details.\n     https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html\n",
+  "method_revision": "584e6af929813b5e93ab7f5e6e239bee99066015",
+  "method": [
+    "propose_procedure_phrase_candidates",
+    "nearest_parameter_heading",
+    "propose_contextual_procedure_phrase_candidates"
+  ],
+  "corpus_scope": "Importable public functions and classes with docstrings in the installed scipy package; repeated Python object identities are counted once. Not the complete online documentation corpus.",
+  "counts": {
+    "importable_modules": 622,
+    "api_units_with_docstrings": 2038,
+    "sentences": 65660,
+    "sentences_containing_will": 1805,
+    "sentences_with_direct_proposal": 1645,
+    "sentences_with_parameter_context_proposal": 1143,
+    "sentences_with_any_proposal": 1665,
+    "unhandled_will_sentences": 140,
+    "candidate_sample_size": 20,
+    "unhandled_sample_size": 20
+  },
+  "sample_selection": "For proposals and non-proposals separately, sort rows by SHA-256(api_unit, sentence offset, text); keep the first row per API unit and exact normalized sentence until 20 rows are selected.",
+  "candidate_sample": [
+    {
+      "sample_key": "0026b6d75218650827f40fff2943b490c63fb9d343789d9f430e83bcf991df34",
+      "api_unit": "scipy.stats.weightedtau",
+      "sentence_start": 3510,
+      "sentence_end": 3576,
+      "docstring_sha256": "330d77c5c07a73475e9f12504360205c5da4f553ac9892dfec079169ed35e6d8",
+      "source_citation": "scipy.stats.weightedtau#sha256=330d77c5c07a73475e9f12504360205c5da4f553ac9892dfec079169ed35e6d8&chars=3510:3576",
+      "sentence": "- ``raise``: if a NaN is present, a ``ValueError`` will be raised.",
+      "proposals": [
+        {
+          "subject": "``raise``: if a NaN is present, a ``ValueError``",
+          "predicate_phrase": "be raised",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "002d7adeb1c2d2828740b05d03fea3eec2591b84b8346e78162cbfa6f172f246",
+      "api_unit": "scipy.ndimage.spline_filter",
+      "sentence_start": 2142,
+      "sentence_end": 2246,
+      "docstring_sha256": "cc9e30051b635613f9b0c30b206d8b6d8ffbd4468bac9726908bce2d1fc937d3",
+      "source_citation": "scipy.ndimage.spline_filter#sha256=cc9e30051b635613f9b0c30b206d8b6d8ffbd4468bac9726908bce2d1fc937d3&chars=2142:2246",
+      "sentence": "In this\n        case it is not well defined which sample will be chosen at the point of\n        overlap.",
+      "proposals": [
+        {
+          "subject": "In this case it is not well defined which sample",
+          "predicate_phrase": "be chosen at the point of overlap",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "004dc870560f2c0069d6b59c5c6148c92d845ab3c2de201b7fabf1ae9e43e30b",
+      "api_unit": "scipy.stats._qmc.QMCEngine",
+      "sentence_start": 392,
+      "sentence_end": 513,
+      "docstring_sha256": "f09f915843eb8ae96988bdba541a7878c5a1109f6972aecde47b25e8976c2b44",
+      "source_citation": "scipy.stats._qmc.QMCEngine#sha256=f09f915843eb8ae96988bdba541a7878c5a1109f6972aecde47b25e8976c2b44&chars=392:513",
+      "sentence": "Note that this is a post-processing step that does not\n    guarantee that all properties of the sample will be conserved.",
+      "proposals": [
+        {
+          "subject": "Note that this is a post-processing step that does not guarantee that all properties of the sample",
+          "predicate_phrase": "be conserved",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0074a99a7f531aefc33efb7e7db9c2fbb678e308b36217d42d70ec7a232b8ed3",
+      "api_unit": "scipy.stats.kurtosis",
+      "sentence_start": 660,
+      "sentence_end": 735,
+      "docstring_sha256": "2cab12ccf360f0bab0cafbb63f8616e0b5dac253ab80ec01c3f1b09d8754ea9a",
+      "source_citation": "scipy.stats.kurtosis#sha256=2cab12ccf360f0bab0cafbb63f8616e0b5dac253ab80ec01c3f1b09d8754ea9a&chars=660:735",
+      "sentence": "row) of the input will appear in a\n    corresponding element of the output.",
+      "proposals": [
+        {
+          "subject": "row) of the input",
+          "predicate_phrase": "appear in a corresponding element of the output",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "00a8a9f8d4931c35f5ca37fa46e3a9352261789ffe1008a96ff41991850baec4",
+      "api_unit": "scipy.sparse.linalg.lsqr",
+      "sentence_start": 1615,
+      "sentence_end": 1725,
+      "docstring_sha256": "b9705f81c537ed026575442aac573ce3f46c56287882e165deea3bcdcd2a36f2",
+      "source_citation": "scipy.sparse.linalg.lsqr#sha256=b9705f81c537ed026575442aac573ce3f46c56287882e165deea3bcdcd2a36f2&chars=1615:1725",
+      "sentence": "(The final ``x`` will usually have fewer correct digits,\n    depending on ``cond(A)`` and the size of LAMBDA.)",
+      "proposals": [
+        {
+          "subject": "The final ``x``",
+          "predicate_phrase": "usually have fewer correct digits, depending on ``cond(A)`` and the size of LAMBDA",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "00eb493eef8f70d6636b95d5709061ab61da9e0c7f11b7389cddcd0f81a151dd",
+      "api_unit": "scipy.stats.quantile",
+      "sentence_start": 8727,
+      "sentence_end": 8914,
+      "docstring_sha256": "0769430d6af48569e5125c5b49b63c37ac233a66ef046e6923719ae4a445c6b2",
+      "source_citation": "scipy.stats.quantile#sha256=0769430d6af48569e5125c5b49b63c37ac233a66ef046e6923719ae4a445c6b2&chars=8727:8914",
+      "sentence": "`quantile` also accepts `MArrays <https://mdhaber.github.io/marray/tutorial.html>`__ backed by the backends indicated above; masked values will be treated as though they were not present.",
+      "proposals": [
+        {
+          "subject": "`quantile` also accepts `MArrays <https://mdhaber.github.io/marray/tutorial.html>`__ backed by the backends indicated above; masked values",
+          "predicate_phrase": "be treated as though they were not present",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "00ec66c7428fd48a555b2e62fb82c6dc4be4dc4973c33bdd69d963355a18b895",
+      "api_unit": "scipy.interpolate.approximate_taylor_polynomial",
+      "sentence_start": 68,
+      "sentence_end": 156,
+      "docstring_sha256": "62769dc235cc582400fcd59f49d07d4f22b3619914d572617019ba483c1fd533",
+      "source_citation": "scipy.interpolate.approximate_taylor_polynomial#sha256=62769dc235cc582400fcd59f49d07d4f22b3619914d572617019ba483c1fd533&chars=68:156",
+      "sentence": "deprecated:: 1.18.0\n    This function is deprecated and will be removed in SciPy 1.20.0.",
+      "proposals": [
+        {
+          "subject": "deprecated:: 1.18.0 This function",
+          "predicate_phrase": "be removed in SciPy 1.20.0",
+          "polarity": true,
+          "scope_notes": [
+            "before: shared subject clause: deprecated"
+          ],
+          "context_basis": "shared_subject",
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "00f0a49ecac556ca7c4c5f1cd0c6d1ae3a6f96fc97811ddfc412a31439830dd3",
+      "api_unit": "scipy.signal.oaconvolve",
+      "sentence_start": 177,
+      "sentence_end": 532,
+      "docstring_sha256": "e089ad08c2ee464ea9c8e70ddb17ad9a165966571d442215c3e9fa125ae9f0dc",
+      "source_citation": "scipy.signal.oaconvolve#sha256=e089ad08c2ee464ea9c8e70ddb17ad9a165966571d442215c3e9fa125ae9f0dc&chars=177:532",
+      "sentence": "This is generally much faster than `convolve` for large arrays (n > ~500),\nand generally much faster than `fftconvolve` when one array is much\nlarger than the other, but can be slower when only a few output values are\nneeded or when the arrays are very similar in shape, and can only\noutput float arrays (int or object array inputs will be cast to float).",
+      "proposals": [
+        {
+          "subject": "can be slower when only a few output values are needed or when the arrays are very similar in shape, and can only output float arrays (int or object array inputs",
+          "predicate_phrase": "be cast to float)",
+          "polarity": true,
+          "scope_notes": [
+            "before: contrast (but): This is generally much faster than `convolve` for large arrays (n > ~500), and generally much faster than `fftconvolve` when one array is much larger than the other"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0123c475e93085a4e4e22ebcc0bd6001b15e70a04d2abeca876930bcb2dc0402",
+      "api_unit": "scipy.signal.bode",
+      "sentence_start": 489,
+      "sentence_end": 542,
+      "docstring_sha256": "a66c5a691873c7c61e99eb491a42e3d96ea54d638ae513359c1cd85d36b9e8ad",
+      "source_citation": "scipy.signal.bode#sha256=a66c5a691873c7c61e99eb491a42e3d96ea54d638ae513359c1cd85d36b9e8ad&chars=489:542",
+      "sentence": "If not given a reasonable set will be\n    calculated.",
+      "proposals": [
+        {
+          "subject": "If not given a reasonable set",
+          "predicate_phrase": "be calculated",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "01490275179cfcc976e8037cfa1a928efe359fc902b5ddd18fee8360c78b786d",
+      "api_unit": "scipy.optimize._elementwise.find_minimum",
+      "sentence_start": 3343,
+      "sentence_end": 3497,
+      "docstring_sha256": "79dace48a43a5f523f3199e01949ecf533b483c79be7f5e3cff247985377732f",
+      "source_citation": "scipy.optimize._elementwise.find_minimum#sha256=79dace48a43a5f523f3199e01949ecf533b483c79be7f5e3cff247985377732f&chars=3343:3497",
+      "sentence": "The descriptions are written as though the values will\n    be scalars; however, if `f` returns an array, the outputs will be\n    arrays of the same shape.",
+      "proposals": [
+        {
+          "subject": "The descriptions are written as though the values",
+          "predicate_phrase": "be scalars",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0185af57f53fdf74d1ef0837e55f3506f6d791b63f036890a52f40d0d8cb69c8",
+      "api_unit": "scipy.stats.wilcoxon",
+      "sentence_start": 3581,
+      "sentence_end": 3646,
+      "docstring_sha256": "77bd2ecf248c35b5dcf786c7e038b12c3342dacada295513007ec747f6f02f37",
+      "source_citation": "scipy.stats.wilcoxon#sha256=77bd2ecf248c35b5dcf786c7e038b12c3342dacada295513007ec747f6f02f37&chars=3581:3646",
+      "sentence": "- ``omit``: NaNs will be omitted when performing the calculation.",
+      "proposals": [
+        {
+          "subject": "``omit``: NaNs",
+          "predicate_phrase": "be omitted when performing the calculation",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "022e58ed7a24cba5c669447cc5fc3959efe9c82e6d2f5fb388f2b5aa2d787c53",
+      "api_unit": "scipy.stats.pointbiserialr",
+      "sentence_start": 785,
+      "sentence_end": 855,
+      "docstring_sha256": "9332a232c784fb9b0ca171b5d761a09b57c349feb9e24c1a2c1e4c3b521ae39d",
+      "source_citation": "scipy.stats.pointbiserialr#sha256=9332a232c784fb9b0ca171b5d761a09b57c349feb9e24c1a2c1e4c3b521ae39d&chars=785:855",
+      "sentence": "If ``None``, the input will be raveled before computing the statistic.",
+      "proposals": [
+        {
+          "subject": "the input",
+          "predicate_phrase": "be raveled before computing the statistic",
+          "polarity": true,
+          "scope_notes": [
+            "before: If ``None``"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0234ba0564b71ef477f0167f76373c23fa633057da4605c57adcdd0c17cd1abf",
+      "api_unit": "scipy.stats.moment",
+      "sentence_start": 2690,
+      "sentence_end": 2802,
+      "docstring_sha256": "576913ef4858cf86f7d2e539837a67a8696efe4a285f154db2e920cb031f648c",
+      "source_citation": "scipy.stats.moment#sha256=576913ef4858cf86f7d2e539837a67a8696efe4a285f154db2e920cb031f648c&chars=2690:2802",
+      "sentence": "In\nthis case, the output will be a scalar or ``np.ndarray`` of appropriate shape\nrather than a 2D ``np.matrix``.",
+      "proposals": [
+        {
+          "subject": "In this case, the output",
+          "predicate_phrase": "be a scalar or ``np.ndarray`` of appropriate shape rather than a 2D ``np.matrix``",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "02a1497bfa2a1c1e4bbfbdfaad2d50c80145ecd62b296b3fa1d52cc00a700411",
+      "api_unit": "scipy.stats._distn_infrastructure.vectorize",
+      "sentence_start": 1161,
+      "sentence_end": 1316,
+      "docstring_sha256": "78a129854016f84000572296fe73d10329d9b813d46a602fb20ac3e675042450",
+      "source_citation": "scipy.stats._distn_infrastructure.vectorize#sha256=78a129854016f84000572296fe73d10329d9b813d46a602fb20ac3e675042450&chars=1161:1316",
+      "sentence": "excluded : set, optional\n    Set of strings or integers representing the positional or keyword\n    arguments for which the function will not be vectorized.",
+      "proposals": [
+        {
+          "subject": "excluded : set, optional Set of strings or integers representing the positional or keyword arguments for which the function",
+          "predicate_phrase": "be vectorized",
+          "polarity": false,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "03329fb81220632fbaf53f19f379b245185d1f7c96813b0c841f82bb1be08557",
+      "api_unit": "scipy.optimize.NonlinearConstraint",
+      "sentence_start": 2740,
+      "sentence_end": 2856,
+      "docstring_sha256": "14f90face7ff3ddda25b92c70268d935ef3c1aff56198340e236fe6cc4bbe5d6",
+      "source_citation": "scipy.optimize.NonlinearConstraint#sha256=14f90face7ff3ddda25b92c70268d935ef3c1aff56198340e236fe6cc4bbe5d6&chars=2740:2856",
+      "sentence": "Default is\n    None, which will select a reasonable value automatically depending\n    on a finite difference scheme.",
+      "proposals": [
+        {
+          "subject": "Default is None, which",
+          "predicate_phrase": "select a reasonable value automatically depending on a finite difference scheme",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "03b39351c95535931a3e574fe054208295f352f9a1544a21acebf95fdb370b83",
+      "api_unit": "scipy.stats.gmean",
+      "sentence_start": 2678,
+      "sentence_end": 2834,
+      "docstring_sha256": "8633b0010b8478d75cbfba3214f85e400cdd67d825f5fbc0534bdb9c355f1525",
+      "source_citation": "scipy.stats.gmean#sha256=8633b0010b8478d75cbfba3214f85e400cdd67d825f5fbc0534bdb9c355f1525&chars=2678:2834",
+      "sentence": "Similarly, while masked elements of masked\narrays are ignored, the output will be a scalar or ``np.ndarray`` rather than a\nmasked array with ``mask=False``.",
+      "proposals": [
+        {
+          "subject": "masked elements of masked arrays are ignored, the output",
+          "predicate_phrase": "be a scalar or ``np.ndarray`` rather than a masked array with ``mask=False``",
+          "polarity": true,
+          "scope_notes": [
+            "before: contrast (while): Similarly"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "03b8623c0ca542ebce0f43609a3c0f1afc94c8b8a8ac169b2e6ce8cbbf3c30c1",
+      "api_unit": "scipy.stats.kstest",
+      "sentence_start": 6889,
+      "sentence_end": 7031,
+      "docstring_sha256": "f53f5d515d4e715dc2f117efd78cb4342d51372873931abb59b43e45d754cc52",
+      "source_citation": "scipy.stats.kstest#sha256=f53f5d515d4e715dc2f117efd78cb4342d51372873931abb59b43e45d754cc52&chars=6889:7031",
+      "sentence": "We choose a confidence level of 95%; that is, we will reject the null\nhypothesis in favor of the alternative if the p-value is less than 0.05.",
+      "proposals": [
+        {
+          "subject": "We choose a confidence level of 95%; that is, we",
+          "predicate_phrase": "reject the null hypothesis in favor of the alternative",
+          "polarity": true,
+          "scope_notes": [
+            "after: if the p-value is less than 0"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "03babcb8aa24cc19489c5a36cd34026f32567e2cf462745b2582092e439c1640",
+      "api_unit": "scipy.ndimage.zoom",
+      "sentence_start": 441,
+      "sentence_end": 508,
+      "docstring_sha256": "7f1e6147912f9e918a17344b37229e2bcaa585ca40962482b0b67c4e3680fdd8",
+      "source_citation": "scipy.ndimage.zoom#sha256=7f1e6147912f9e918a17344b37229e2bcaa585ca40962482b0b67c4e3680fdd8&chars=441:508",
+      "sentence": "By default an array of the same dtype as input\n    will be created.",
+      "proposals": [
+        {
+          "subject": "By default an array of the same dtype as input",
+          "predicate_phrase": "be created",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "03db9491b79adbe70a135f356cd81b758ca1813f0795da573d638f6619b51410",
+      "api_unit": "scipy.stats.epps_singleton_2samp",
+      "sentence_start": 1633,
+      "sentence_end": 1715,
+      "docstring_sha256": "9ec277cc275d2a6ad467811c7b679e562cbf228c334a369428d34db2a8240933",
+      "source_citation": "scipy.stats.epps_singleton_2samp#sha256=9ec277cc275d2a6ad467811c7b679e562cbf228c334a369428d34db2a8240933&chars=1633:1715",
+      "sentence": "With this option,\n    the result will broadcast correctly against the input array.",
+      "proposals": [
+        {
+          "subject": "With this option, the result",
+          "predicate_phrase": "broadcast correctly against the input array",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "044f039974db794f7bd4517af4e239db5e1899705908ec70185255eab656476b",
+      "api_unit": "scipy.stats.yeojohnson_normmax",
+      "sentence_start": 587,
+      "sentence_end": 661,
+      "docstring_sha256": "a17e174f195e56ca690793ce64fc9362fe6592f154939ddd5a277595a5331509",
+      "source_citation": "scipy.stats.yeojohnson_normmax#sha256=a17e174f195e56ca690793ce64fc9362fe6592f154939ddd5a277595a5331509&chars=587:661",
+      "sentence": "- ``propagate``: if a NaN is present in the input, the output will be NaN.",
+      "proposals": [
+        {
+          "subject": "``propagate``: if a NaN is present in the input, the output",
+          "predicate_phrase": "be NaN",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    }
+  ],
+  "unhandled_sample": [
+    {
+      "sample_key": "01835ba591ddca4fac7782193a4720376468ecf4275b6a684b1f2cea4a9b2f5e",
+      "api_unit": "scipy.linalg.eigvals_banded",
+      "sentence_start": 1022,
+      "sentence_end": 1109,
+      "docstring_sha256": "595c1bbfca9ce6b2d115c10c2b6626279853dfdf71abc9c7caac419919741044",
+      "source_citation": "scipy.linalg.eigvals_banded#sha256=595c1bbfca9ce6b2d115c10c2b6626279853dfdf71abc9c7caac419919741044&chars=1022:1109",
+      "sentence": "Note that calls with zero-size batches are unsupported and will raise a ``ValueError``."
+    },
+    {
+      "sample_key": "0776a1d919f281ecaee1ee9f7d205b66a866ff784799baa771ed1d134cf9d959",
+      "api_unit": "scipy.stats.variation",
+      "sentence_start": 1224,
+      "sentence_end": 1361,
+      "docstring_sha256": "090e75b2feb9a4e10b44eda5315dcf6f6161d868aa8dc201817e06a00fc6e633",
+      "source_citation": "scipy.stats.variation#sha256=090e75b2feb9a4e10b44eda5315dcf6f6161d868aa8dc201817e06a00fc6e633&chars=1224:1361",
+      "sentence": "If insufficient data remains in the axis slice along which the\n      statistic is computed, the corresponding entry of the output will be"
+    },
+    {
+      "sample_key": "190b7c9fd441b17124d569b66cfa95ba32e664fcba1a1fc7cc16ac0aded830e6",
+      "api_unit": "scipy.stats.bartlett",
+      "sentence_start": 3832,
+      "sentence_end": 3855,
+      "docstring_sha256": "f6e9038d8dcbcb345fbbfd32bca8a8b238b2a7d1772fee8dc1e5c70f88115880",
+      "source_citation": "scipy.stats.bartlett#sha256=f6e9038d8dcbcb345fbbfd32bca8a8b238b2a7d1772fee8dc1e5c70f88115880&chars=3832:3855",
+      "sentence": "and Cochran, William G."
+    },
+    {
+      "sample_key": "25bb623bb204090a0560f098ed806e1398c2460fb61c063dffe1b887f65dd1cb",
+      "api_unit": "scipy.spatial.procrustes",
+      "sentence_start": 1889,
+      "sentence_end": 2085,
+      "docstring_sha256": "badc59eb8437109be0ab2a205246fb0a2cd30cfc6874a66a5d7279ba3239a04c",
+      "source_citation": "scipy.spatial.procrustes#sha256=badc59eb8437109be0ab2a205246fb0a2cd30cfc6874a66a5d7279ba3239a04c&chars=1889:2085",
+      "sentence": "- The disparity should not depend on the order of the input matrices, but\n  the output matrices will, as only the first output matrix is guaranteed\n  to be scaled such that :math:`tr(AA^{T}) = 1`."
+    },
+    {
+      "sample_key": "2ba49a8ea1cdcf8f6792a8d4fec3af7671984df3aadf5f67d8e522c17d8142dd",
+      "api_unit": "scipy.signal.lombscargle",
+      "sentence_start": 3703,
+      "sentence_end": 3861,
+      "docstring_sha256": "46a310c1755abdacc7c3d7f22103c0c4d8236a7340bfa66d4c4c932ed69a305a",
+      "source_citation": "scipy.signal.lombscargle#sha256=46a310c1755abdacc7c3d7f22103c0c4d8236a7340bfa66d4c4c932ed69a305a&chars=3703:3861",
+      "sentence": "Furthermore, `floating_mean` accounts for sample weights, and will also correct for\nany bias due to consistently missing observations at peaks and/or troughs."
+    },
+    {
+      "sample_key": "302236bf9087f9b10e8bf4b8e6f1715cd24ff9671a1096e295eac4ffc273e91f",
+      "api_unit": "scipy.interpolate.Akima1DInterpolator",
+      "sentence_start": 229,
+      "sentence_end": 321,
+      "docstring_sha256": "307ae6edc397211ac35643005dd44c0e831e23a5f784ee0b6bce2a9a49f0e44b",
+      "source_citation": "scipy.interpolate.Akima1DInterpolator#sha256=307ae6edc397211ac35643005dd44c0e831e23a5f784ee0b6bce2a9a49f0e44b&chars=229:321",
+      "sentence": "The resultant curve passes through the given\ndata points and will appear smooth and natural."
+    },
+    {
+      "sample_key": "35337e4b538a429dce6e4d5d949bcb9e5455078651616a54c514b0620844377c",
+      "api_unit": "scipy.stats.ecdf",
+      "sentence_start": 2324,
+      "sentence_end": 2349,
+      "docstring_sha256": "9a9097e797f2933edfd38890d58526b285f32624c33fa056e4c2a2418d73f591",
+      "source_citation": "scipy.stats.ecdf#sha256=9a9097e797f2933edfd38890d58526b285f32624c33fa056e4c2a2418d73f591&chars=2324:2349",
+      "sentence": "[1] Conover, William Jay."
+    },
+    {
+      "sample_key": "3f6ab96a32377f25a546f75674c8a8742844305ed458a130fa8368f29c72be8e",
+      "api_unit": "scipy.io.arff._arffread.tokenize_attribute",
+      "sentence_start": 589,
+      "sentence_end": 697,
+      "docstring_sha256": "2e1c0f92c9180464333af577365b84b8574a9fd7380548d6de2699b135a19c4e",
+      "source_citation": "scipy.io.arff._arffread.tokenize_attribute#sha256=2e1c0f92c9180464333af577365b84b8574a9fd7380548d6de2699b135a19c4e&chars=589:697",
+      "sentence": "If attribute is a string defined in python as r\"floupi real\", will\nreturn floupi as name, and real as value."
+    },
+    {
+      "sample_key": "5d69f380636ea328869c7b4f3b2d008cc0ba342dafb1de4be3d54f74c577a4c3",
+      "api_unit": "scipy.stats._continuous_distns.dpareto_lognorm_gen",
+      "sentence_start": 1333,
+      "sentence_end": 1386,
+      "docstring_sha256": "1132bafe5e915552e01fd54ffa11522b5a7595c711109b12dea5eea2e3a6fc7a",
+      "source_citation": "scipy.stats._continuous_distns.dpareto_lognorm_gen#sha256=1132bafe5e915552e01fd54ffa11522b5a7595c711109b12dea5eea2e3a6fc7a&chars=1333:1386",
+      "sentence": "[1] Hajargasht, Gholamreza, and William E. Griffiths."
+    },
+    {
+      "sample_key": "68199d90fa0334b279cfdc01827006f8f60eea4d460f72f5648985ce2dc98948",
+      "api_unit": "scipy.optimize.least_squares",
+      "sentence_start": 18575,
+      "sentence_end": 18600,
+      "docstring_sha256": "f34b84eb7920d6632558f07b5930f7e8926dab5c1fede180ed87632dfd801a55",
+      "source_citation": "scipy.optimize.least_squares#sha256=f34b84eb7920d6632558f07b5930f7e8926dab5c1fede180ed87632dfd801a55&chars=18575:18600",
+      "sentence": "[NR] William H. Press et."
+    },
+    {
+      "sample_key": "7493b489dd2e40d479eaeaf7dad78afc03e07817414ed9cf5dd52a5cdb40314f",
+      "api_unit": "scipy.stats.spearmanrho",
+      "sentence_start": 5584,
+      "sentence_end": 5602,
+      "docstring_sha256": "e5ab1be054621cdb3a3a0b439fb96abfe32026157a5fe09b4ec0f9d86e1cf54c",
+      "source_citation": "scipy.stats.spearmanrho#sha256=e5ab1be054621cdb3a3a0b439fb96abfe32026157a5fe09b4ec0f9d86e1cf54c&chars=5584:5602",
+      "sentence": "[1] Zwillinger, D."
+    },
+    {
+      "sample_key": "7a6ee8112b15e01c4293f03458ce30eccc273aa004c576eaaf07c46163ff6a1f",
+      "api_unit": "scipy.odr._add_newdocs.add_newdoc",
+      "sentence_start": 962,
+      "sentence_end": 1102,
+      "docstring_sha256": "97252a7abeaa79848be7f2649855efe2b74f4d5eb20c3f3fcc259ca31eaf4bcb",
+      "source_citation": "scipy.odr._add_newdocs.add_newdoc#sha256=97252a7abeaa79848be7f2649855efe2b74f4d5eb20c3f3fcc259ca31eaf4bcb&chars=962:1102",
+      "sentence": "This routine never raises an error if the docstring can't be written, but\nwill raise an error if the object being documented does not exist."
+    },
+    {
+      "sample_key": "8d4e3c143bb2cdccc04ce57134c66bec2eaf426a347de14fc20dbb462fc987bc",
+      "api_unit": "scipy.optimize.basinhopping",
+      "sentence_start": 8719,
+      "sentence_end": 8830,
+      "docstring_sha256": "d81f3570cecc5453ad209c0ad6862c77eeab276086a47209efccb8eff20a6b19",
+      "source_citation": "scipy.optimize.basinhopping#sha256=d81f3570cecc5453ad209c0ad6862c77eeab276086a47209efccb8eff20a6b19&chars=8719:8830",
+      "sentence": "`basinhopping` will, by\ndefault, adjust `stepsize` to find an optimal value, but this may take\nmany iterations."
+    },
+    {
+      "sample_key": "940a50d3f11eeea14a7e630ac29dbe6057f10c97cacad4db31b892530336ddce",
+      "api_unit": "scipy.stats._discrete_distns.poisson_binom_gen",
+      "sentence_start": 995,
+      "sentence_end": 1057,
+      "docstring_sha256": "a78bee3154ea2536593ec7fcce60eefbb9c33df586a776efb874f3b8930fbca6",
+      "source_citation": "scipy.stats._discrete_distns.poisson_binom_gen#sha256=a78bee3154ea2536593ec7fcce60eefbb9c33df586a776efb874f3b8930fbca6&chars=995:1057",
+      "sentence": "[2] Biscarri, William, Sihai Dave Zhao, and Robert J. Brunner."
+    },
+    {
+      "sample_key": "a538f45596bbcd0adccd5b6b6f3189f3905f2d242ceecb45ddf56ab5d91bbf66",
+      "api_unit": "scipy.linalg.issymmetric",
+      "sentence_start": 1272,
+      "sentence_end": 1349,
+      "docstring_sha256": "0f9d9a42dac6ffa9e456fd845129f9fb9785e756cb2080900f2fff80f1740276",
+      "source_citation": "scipy.linalg.issymmetric#sha256=0f9d9a42dac6ffa9e456fd845129f9fb9785e756cb2080900f2fff80f1740276&chars=1272:1349",
+      "sentence": "However,\n`numpy.inf` will be treated as a number, that is to say ``[[1, inf],"
+    },
+    {
+      "sample_key": "b2d793842a2ca29ba56f8f9f59258763850b2078793d9bdb6a451054cd867a9c",
+      "api_unit": "scipy.optimize.brute",
+      "sentence_start": 3970,
+      "sentence_end": 4170,
+      "docstring_sha256": "be3690c4841067d70e3672d7a16e76eaa957dcd9fa56b536dc8966fd56daf627",
+      "source_citation": "scipy.optimize.brute#sha256=be3690c4841067d70e3672d7a16e76eaa957dcd9fa56b536dc8966fd56daf627&chars=3970:4170",
+      "sentence": "Any polishing program used must take `brute's` output as its\ninitial guess as a positional argument, and take `brute's` input values\nfor `args` as keyword arguments, otherwise an error will be raised."
+    },
+    {
+      "sample_key": "b8daba70ac7c249c96903b075ff87f7f2456cf6878c491af15561f99bef71a46",
+      "api_unit": "scipy.optimize.minimize",
+      "sentence_start": 17571,
+      "sentence_end": 17799,
+      "docstring_sha256": "825a80337635c26659bacc1a9e43b3e177e3d65bf0928e6034d47c1300e9810a",
+      "source_citation": "scipy.optimize.minimize#sha256=825a80337635c26659bacc1a9e43b3e177e3d65bf0928e6034d47c1300e9810a&chars=17571:17799",
+      "sentence": "The provided `method` callable must be able to accept (and possibly ignore)\narbitrary parameters; the set of parameters accepted by `minimize` may\nexpand in future versions and then these parameters will be passed to\nthe method."
+    },
+    {
+      "sample_key": "c773378cf8d16fb96b39198094b03b2ceb37da45d7ad9dfc37942a0640e08dd8",
+      "api_unit": "scipy.stats._continuous_distns.erlang_gen",
+      "sentence_start": 261,
+      "sentence_end": 365,
+      "docstring_sha256": "54b5614b68ac1f8a3322ba65688f818e6fec6815e53189d932560ea72f7bffe9",
+      "source_citation": "scipy.stats._continuous_distns.erlang_gen#sha256=54b5614b68ac1f8a3322ba65688f818e6fec6815e53189d932560ea72f7bffe9&chars=261:365",
+      "sentence": "It will, however, generate a warning the first time\na non-integer value is used for the shape parameter."
+    },
+    {
+      "sample_key": "e0d7a14681cd8614238858ff32f894de742ddaa3895efc6995c1eb878daf7046",
+      "api_unit": "scipy.stats.tukey_hsd",
+      "sentence_start": 2948,
+      "sentence_end": 2982,
+      "docstring_sha256": "c6969ebc24a7d5fc1bb41c59af0d27c617f04c1c9d17bab0d038349f0ef17264",
+      "source_citation": "scipy.stats.tukey_hsd#sha256=c6969ebc24a7d5fc1bb41c59af0d27c617f04c1c9d17bab0d038349f0ef17264&chars=2948:2982",
+      "sentence": "[2] Abdi, Herve & Williams, Lynne."
+    },
+    {
+      "sample_key": "e9e2ac1e71a12baba51672585a0427b229df6ea946089e96375d34695dc07f13",
+      "api_unit": "scipy.sparse.linalg.lsqr",
+      "sentence_start": 6659,
+      "sentence_end": 6712,
+      "docstring_sha256": "b9705f81c537ed026575442aac573ce3f46c56287882e165deea3bcdcd2a36f2",
+      "source_citation": "scipy.sparse.linalg.lsqr#sha256=b9705f81c537ed026575442aac573ce3f46c56287882e165deea3bcdcd2a36f2&chars=6659:6712",
+      "sentence": "SYMMLQ (but will take the same number of iterations)."
+    }
+  ],
+  "manual_review": {
+    "reviewer": "Codex",
+    "candidate_rows_promotion_ready": 0,
+    "candidate_rows_reviewed": 20,
+    "candidate_observation": "Every sampled field set needs human review before promotion; the sample contains malformed or overlong subjects, lost conditions/qualifiers, clause-boundary errors, or claims about documentation rather than API behavior.",
+    "unhandled_rows_plausible_behavior_or_property": 13,
+    "unhandled_rows_reviewed": 20,
+    "unhandled_observation": "The frozen grammar missed several ordinary API claims, including zero-size-batch errors, output behavior, option conditions, warning behavior, and parameter forwarding.",
+    "method": "single-rater, unblinded review of hash-selected rows",
+    "interpretation": "These are diagnostic sample counts, not estimates of precision or recall."
+  },
+  "limitations": [
+    "SciPy docstrings are an adjacent technical corpus, not an independent publisher-level test of complete documentation pages.",
+    "The sample covers only sentences containing the token 'will'; it does not measure other constructions.",
+    "The sample is a single-rater diagnostic and not a precision or recall estimate.",
+    "No source claims are accepted or learned by this audit."
+  ]
+}

@@ -265,6 +265,21 @@ coverage gap; it does not show general source-subject resolution or publisher
 transfer. Keep the matcher narrow and review-only until independent subject
 binding and source-conflict behavior are measured.
 
+The SciPy 1.18.0 installed API docstrings provide an adjacent corpus-fit check
+in `v1_486`. The frozen method scanned 2,038 public callable/class docstrings
+(65,660 sentence spans) and found 1,805 sentences containing `will`; it
+proposed on 1,665 of those, while a hash-selected sample of 20 proposed field
+sets had 0 promotion-ready without review. A separate, text-deduplicated
+sample of 20 unhandled sentences contained 13 plausible behavior/property
+claims. These are one-rater sample observations, not precision/recall or a
+publisher-level transfer result. They show the current grammar is both too
+permissive and misses common claims; candidate count is not useful yield. Keep
+SciPy as a development corpus and redesign claim boundaries, role binding,
+conditions, and clause scope against the frozen diagnostics before testing a
+new publisher. The script and cited sample are
+[`v1_486 audit`](../experiments/audits/v1_486_scipy_will_claim_fit.py) and
+[`v1_486 report`](../experiments/reports/v1_486_scipy_will_claim_fit.json).
+
 Use the existing excerpt and real-source acceptance experiments as regression
 controls, not as a corpus-level result. If a suitable corpus does not contain
 enough examples, change the learning signal or narrow the claim; do not add
@@ -373,15 +388,16 @@ recombination and verified reasoning. Work proceeds in this order:
    controls; distinguish source-only evidence, accepted facts, inferred
    conclusions, unknowns, and conflicts in both labels and scoring. Use these
    results as the baseline for every chat-facing change.
-3. **Resolve the current source-learning question with a valid transfer
-   study.** The API-source work has demonstrated candidate yield and several
-   useful local boundary fixes, but the PyTorch review exposed substantial
-   boundary errors and missed conditional/shared-subject claims. Freeze the
-   current method, review proposals and non-proposals on untouched API units,
-   then test a publisher not used for design. Measure useful proposals,
-   boundary errors, missed claims, abstention, and review effort. If it fails,
-   redesign the general clause/context representation and reserve a new
-   holdout; do not tune on the confirmation set.
+3. **Redesign and then test source-derived rule transfer.** API scans have
+   shown high candidate yield, while the PyTorch and SciPy reviews show severe
+   boundary errors and missed claims. The frozen method is now a baseline, not
+   a candidate for promotion. Use the reviewed NumPy/pandas/PyTorch/SciPy rows
+   as development controls to redesign general clause boundaries, role
+   binding, conditions, and markup handling. Then freeze that method and
+   confirm on untouched API units and a publisher not used for design, with
+   proposals and non-proposals sampled and labeled before inspection. Measure
+   useful claims, false proposals, missed claims, abstention, and review
+   effort; if it fails, redesign and reserve a fresh holdout.
 4. **Demonstrate recombination through ordinary chat and verified
    reasoning.** Once the learning gate clears, compose an unseen multi-step
    request from separately supported components, with changed wording,
