@@ -56,8 +56,10 @@ def main() -> None:
             command,
             input=("Is Sydney the capital of Australia?\n"
                    "accept candidate 1\n"
+                   "Is Sydney the capital of Australia?\n"
                    "Is Paris the capital of France?\n"
                    "accept candidate 1\n"
+                   "Is Paris the capital of France?\n"
                    "Did Guido van Rossum create Linux?\n"
                    "Did Guido van Rossum create Python?\n/quit\n"),
             text=True, capture_output=True, timeout=60, check=False)

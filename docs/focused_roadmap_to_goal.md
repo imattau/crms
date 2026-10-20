@@ -249,6 +249,22 @@ one structural source-learning improvement, not resolution of “the algorithm�
 to Adam in a user yes/no question. That source-only polarity route still needs
 an independently checked subject/context binding and conflict behavior.
 
+`v1_485_conditioned_api_polar_evidence.py` adds a narrow source-only yes/no
+route for this API case. It binds a generic source subject such as “the
+algorithm” to a uniquely named API title only when the user states the same
+explicit true/enabled parameter condition. The reply quotes the exact cited
+sentence and remains review-only; missing or mismatched conditions and
+duplicate matching API titles abstain. Its fresh-process replay initially
+exposed a crash when this route created candidates while `turn.research` was
+absent; that path now initializes the review result before attaching them.
+The chat regression, source-grounded positive/negative flow, open-world polar
+questions, and six selected dialogue controls pass. The older polar tests
+needed alignment with current reply wording and a repeated query after review
+acceptance. This closes one state-dependent crash and one explicit-condition
+coverage gap; it does not show general source-subject resolution or publisher
+transfer. Keep the matcher narrow and review-only until independent subject
+binding and source-conflict behavior are measured.
+
 Use the existing excerpt and real-source acceptance experiments as regression
 controls, not as a corpus-level result. If a suitable corpus does not contain
 enough examples, change the learning signal or narrow the claim; do not add

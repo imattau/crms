@@ -85,9 +85,9 @@ def main() -> None:
             raise SystemExit(f"chat exited {run.returncode}:\n{run.stdout}\n{run.stderr}")
         for expected in (
                 "CRMS> Yes.", "CRMS> No.",
-                "The question matches a stored relation, but there is no explicit "
-                "positive or negative evidence for this proposition.",
-                "CRMS> I don't know this from the sources and facts I have."):
+                "I don't have a direct source statement for this exact "
+                "proposition",
+                "I can't answer yes or no from the sources I have."):
             if expected not in run.stdout:
                 raise SystemExit(
                     f"chat output omitted {expected!r}:\n{run.stdout}")

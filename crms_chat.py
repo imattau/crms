@@ -2082,7 +2082,7 @@ def _natural_polar_claim(message: str) -> tuple[str, str, str, str] | None:
 
 def _natural_polar_evidence(
         knowledge: CRMSKnowledgeBase, index: CRMSSQLiteResearchIndex,
-        claim: tuple[str, str, str, str]
+        claim: tuple[str, str, str, str], *, question: str | None = None
         ) -> list[FactCandidate]:
     """Find exact source candidates for a parsed polar proposition."""
     subject, relation, object_, _mode = claim
@@ -2320,7 +2320,138 @@ def _natural_polar_evidence(
                                     "the same relation before accepting."),
                     },))
     
+    if not candidates and question:
+        candidates.update(_conditioned_api_polar_evidence(
+            index, claim, question))
     return [candidates[key] for key in sorted(candidates)]
+
+
+def _conditioned_api_polar_evidence(
+        index: CRMSSQLiteResearchIndex,
+        claim: tuple[str, str, str, str], question: str
+        ) -> dict[tuple[Any, ...], FactCandidate]:
+    """Match a yes/no query to a cited, explicitly conditioned API claim.
+
+    This only handles an explicit true/enabled parameter condition and a
+    generic local subject (for example, ``the algorithm``) on a uniquely
+    named API page. It returns review-only source candidates; it does not add
+    facts, infer the condition, or assert the claim outside that condition.
+    """
+    subject, relation, object_, _mode = claim
+    condition = re.search(
+        r"\b(?:with|when|if)\s+(?P<parameter>[\w-]+(?:\s+[\w-]+){0,4}?)"
+        r"\s+(?:is\s+)?(?P<state>enabled|true|on)\b",
+        question, re.IGNORECASE)
+    if condition is None:
+        return {}
+    parameter_text = condition.group("parameter")
+    parameter_tokens = tuple(normalized_tokens(
+        parameter_text.replace("_", " ")))
+    object_tokens = tuple(normalized_tokens(object_.replace("_", " ")))
+    connector = next((position for position in range(len(object_tokens) - 1, -1, -1)
+                      if object_tokens[position] in {"with", "when", "if"}
+                      and object_tokens[position + 1:
+                          position + 1 + len(parameter_tokens)] == parameter_tokens),
+                     None)
+    if connector is None:
+        return {}
+    tail = object_tokens[connector + 1 + len(parameter_tokens):]
+    if tail[:1] == ("is",):
+        tail = tail[1:]
+    if tail not in {("enabled",), ("true",), ("on",)}:
+        return {}
+    object_core = object_tokens[:connector]
+    while object_core and object_core[0] in {"a", "an", "the"}:
+        object_core = object_core[1:]
+    if not parameter_tokens or not object_core:
+        return {}
+
+    parameter_name = r"[_\s]+".join(
+        re.escape(token) for token in parameter_tokens)
+    parameter_condition = re.compile(
+        r"(?im)^[ \t]*" + parameter_name
+        + r"[^:\n]{0,100}:[ \t]*if[ \t]+true\b")
+    generic_subject = re.compile(
+        r"^(?:the|this|that)\s+(?:algorithm|optimizer|model|estimator|"
+        r"function|method|system|implementation)\b", re.IGNORECASE)
+    wanted_subject = tuple(normalized_tokens(subject))
+    wanted_relation = tuple(normalized_tokens(relation))
+    if not wanted_subject or not wanted_relation:
+        return {}
+    query = " ".join((subject, relation, " ".join(object_core)))
+    found: dict[tuple[Any, ...], FactCandidate] = {}
+    title_hits = [
+        hit for hit in index.search(query, limit=100, context_chars=240)
+        if set(wanted_subject) <= set(normalized_tokens(hit.title))]
+    if len({hit.document_id for hit in title_hits}) != 1:
+        return {}
+    for hit in title_hits:
+        if not set(wanted_subject) <= set(hit.matched_terms):
+            continue
+        if _is_code_source(hit.location):
+            continue
+        document = index.document(hit.document_id)
+        for start, end in _sentence_spans(document.text):
+            if not (start <= (hit.match_start or start) < end):
+                continue
+            sentence = document.text[start:end]
+            if not parameter_condition.search(sentence):
+                continue
+            source_citation = (
+                f"{hit.document_id}#sha256="
+                f"{hashlib.sha256(document.text.encode('utf-8')).hexdigest()}"
+                f"&chars={start}:{end}")
+            proposals = propose_procedure_phrase_candidates(
+                sentence, source_citation=source_citation)
+            for proposal in proposals:
+                if not generic_subject.fullmatch(proposal.subject.strip()):
+                    continue
+                if not any(re.search(r"\bif\s+true\b", note, re.IGNORECASE)
+                           for note in proposal.scope_notes):
+                    continue
+                predicate_tokens = tuple(normalized_tokens(
+                    proposal.predicate_phrase.replace("_", " ")))
+                if not predicate_tokens:
+                    continue
+                relation_matches = (
+                    predicate_tokens[:len(wanted_relation)] == wanted_relation
+                    or (len(wanted_relation) == 1
+                        and _analyze_predicate_spelling(
+                            wanted_relation[0], predicate_tokens[0]) is not None))
+                if not relation_matches:
+                    continue
+                object_position = len(wanted_relation)
+                remaining = list(object_core)
+                for token in predicate_tokens[object_position:]:
+                    if remaining and token == remaining[0]:
+                        remaining.pop(0)
+                if remaining:
+                    continue
+                evidence = _cited_sentence_evidence(
+                    index, hit, start, end,
+                    tuple(sorted(set(wanted_relation) | set(object_core))))
+                if evidence is None:
+                    continue
+                candidate = FactCandidate(
+                    subject, relation, object_, evidence["citation"],
+                    f"<subject> {relation} <object>", sentence,
+                    proposal.polarity,
+                    language_evidence=({
+                        "kind": "conditioned_api_source_claim",
+                        "source_subject": proposal.subject,
+                        "source_title": hit.title,
+                        "parameter_condition": parameter_text,
+                        "asserted_condition": proposal.scope_notes,
+                        "review_required": True,
+                        "warning": (
+                            "This is a source-only subject binding to the "
+                            "uniquely named API page. It is not an accepted "
+                            "fact and applies only under the cited condition."),
+                    },))
+                key = (hit.document_id, tuple(wanted_relation),
+                       tuple(object_core), proposal.polarity)
+                found.setdefault(key, candidate)
+    return found
 
 
 def _missing_premise_source_candidates(
@@ -10345,10 +10476,12 @@ def main() -> int:
                                  == "missing_premise"))):
             polar_route_used = True
             polar_evidence = _natural_polar_evidence(
-                knowledge, index, polar_claim)
+                knowledge, index, polar_claim, question=line)
             if polar_evidence:
                 polar_truths = {candidate.polarity
                                 for candidate in polar_evidence}
+                if turn.research is None:
+                    turn.research = ResearchResult(status="needs_review")
                 turn.research.candidates = polar_evidence
                 turn.research.status = "needs_review"
                 if len(polar_truths) > 1:
@@ -10937,7 +11070,7 @@ def main() -> int:
             else:
                 if not polar_evidence:
                     polar_evidence = _natural_polar_evidence(
-                        knowledge, index, polar_claim)
+                        knowledge, index, polar_claim, question=line)
                 polar_truths = {candidate.polarity
                                 for candidate in polar_evidence}
                 polar_route_used = True
