@@ -4060,6 +4060,64 @@ def _paper_ordinal_followup(message: str) -> int | None:
             "third": 2, "3rd": 2}[match.group(1).casefold()]
 
 
+def _recent_papers_topic_followup(message: str) -> bool:
+    """Recognize a topic question about the immediately preceding paper list."""
+    return bool(re.fullmatch(
+        r"\s*(?:what|which)\s+"
+        r"(?:(?:topics?|subjects?|areas?)\s+)?"
+        r"(?:do|are)\s+(?:these|those|the)\s+papers\s+"
+        r"(?:cover|address|study|examine|investigate|focus\s+on)"
+        r"[.!?]?\s*", message, flags=re.IGNORECASE))
+
+
+def _render_recent_papers_topic_followup(
+        index: CRMSSQLiteResearchIndex, papers: list[dict]) -> str:
+    """Show cited opening abstract sentences for the visible recent paper list."""
+    if not papers:
+        return ("I don't have a recent paper list to resolve that reference. "
+                "Ask for papers on a topic first, or name the papers.")
+
+    lines = [
+        "To keep this grounded, here are the opening abstract sentences "
+        "from the recent papers I listed:"
+    ]
+    for paper in papers[:3]:
+        document_id = paper.get("document_id")
+        title = paper.get("title")
+        if not isinstance(document_id, str) or not isinstance(title, str):
+            continue
+        try:
+            document = index.document(document_id)
+        except KeyError:
+            continue
+        abstract = re.search(r"(?im)^Abstract:\s*(.+)$", document.text)
+        if abstract is None:
+            lines.append(f"- {title}: no abstract is indexed.")
+            continue
+        sentences = [part.strip() for part in
+                     re.split(r"(?<=[.!?])\s+", abstract.group(1).strip())
+                     if part.strip()]
+        if not sentences:
+            lines.append(f"- {title}: no abstract sentence is indexed.")
+            continue
+        sentence = sentences[0]
+        start = document.text.find(sentence, abstract.start(1))
+        if start < 0:
+            lines.append(f"- {title}: the abstract sentence could not be cited.")
+            continue
+        hit = SearchHit(
+            document.document_id, document.title, document.location, 0.0,
+            sentence, start, start + len(sentence),
+            tuple(normalized_tokens(sentence)))
+        try:
+            citation = index.citation(hit)
+        except (KeyError, ValueError):
+            lines.append(f"- {title}: the abstract sentence could not be cited.")
+            continue
+        lines.append(f"- {title}: “{sentence}” [Source: {title}; {citation}]")
+    return "\n".join(lines)
+
+
 def _is_paper_comparison_followup(message: str) -> bool:
     return bool(re.search(
         r"\b(?:these|those|the)\s+papers\b.*"
@@ -9393,6 +9451,13 @@ def main() -> int:
             latest_text, last_research_evidence, latest_research_documents = (
                 _render_latest_research(index, latest_topic))
             print(f"CRMS> {latest_text}")
+            continue
+        if _recent_papers_topic_followup(line):
+            print("CRMS> " + _render_recent_papers_topic_followup(
+                index, previous_latest_documents))
+            # Keep the visible list available for another grounded follow-up,
+            # such as an ordinal request, until a new search replaces it.
+            latest_research_documents = previous_latest_documents
             continue
         paper_ordinal = _paper_ordinal_followup(line)
         if paper_ordinal is not None:

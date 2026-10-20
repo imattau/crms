@@ -1584,3 +1584,23 @@ I also ran the read-only corpus alignment sampler against four 1,000-document wi
 across separate documents are scarce in those windows, so the current learner cannot yet provide
 broad real-corpus paraphrase transfer. The remaining stream/waterway probes stay unresolved; this
 test does not infer those terms from topic similarity.
+
+### Recent-paper topic follow-up recheck (2026-10-20)
+
+I replayed the earlier academic-model sequence through a fresh CLI process using a temporary copy
+of `data/crms_project_model_academic.sqlite`; the original model and its source indexes were not
+modified. “What research topics are represented in this model?” now returns a rough title-term
+overview, and the exact toroidal-graph paper is found. “Can you explain the result in simpler
+terms?” still returns the exact cited result sentence, but does not simplify it. More seriously,
+after “What is the latest research in machine learning in this corpus?” the follow-up “What topics
+do these papers cover?” returned an unrelated sentence from a CRMS project source.
+
+The current CLI now binds that plural follow-up to the most recent visible paper list. It returns
+the opening abstract sentence for each listed paper with an exact citation, retains the list for a
+subsequent ordinal summary, and asks for a list when no paper context is open. The same current
+runtime replay returned the three listed machine-learning paper abstracts instead of the unrelated
+project-source sentence. `experiments/v1_453_recent_papers_topic_followup.py` reproduces the fresh
+process behavior and independently resolves each citation. This is an extractive, bounded repair;
+it does not synthesize a shared topic taxonomy or explain research results in simpler language.
+The prior pending-review interruption was not exercised by this replay and remains a separate
+regression target.

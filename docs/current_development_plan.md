@@ -50,6 +50,15 @@ execution, and premise-correction invalidation for one controlled synthetic
 task. It still relies on an authored graph and Codex-labeled procedure
 examples, so it does not close the generalization gap.
 
+On 2026-10-20, a fresh CLI replay against a temporary copy of the academic
+portable model reproduced a wrong-source answer to “What topics do these papers
+cover?” after a recent-paper list. The new `v1_453` path answers from the
+visible paper list with cited abstract sentences and asks for context if no
+list is open. The expanded 19-diagnostic cross-domain replay passed in 14.46
+seconds. This closes one extractive follow-up failure; it does not solve
+cross-paper synthesis, plain-language explanation, or pending-review
+interference in long conversations.
+
 The overall direction is sound, but CRMS is not yet on track to claim its
 capability destination. Progress now depends on integrated, held-out outcomes,
 not more isolated demonstrations or a larger corpus.
@@ -192,13 +201,14 @@ Report size, runtime, compatibility requirements, and unsupported cases.
 
 ## Immediate work queue
 
-1. **Replay the latest chat failure report against the current checkout.**
-   Use fresh scratch model databases and the same multi-entity/topic-switch
-   transcript, including source-only answers, skipped or composite questions,
-   unsupported turns, `why?`, “what did I just ask?”, ordinal references, and
-   save/reload. Treat reported failures as unresolved until reproduced or
-   covered by an explicit current regression. Fix confident wrong referents
-   first; preserve context only when its evidence and lifetime are explicit.
+1. **Generalize dialogue behavior beyond the passing fixtures.** Add
+   independently authored multi-turn conversations over real source text with
+   topic switches, pending review, unsupported turns, corrections, “why?”,
+   history, plural/ordinal references, and save/reload. Include requests to
+   explain a result more simply and distinguish a grounded extract from an
+   actual explanation. Measure wrong referents, irrelevant evidence, omissions,
+   clarification, and completion separately. The recent-paper topic repair is
+   one regression control, not a conversation benchmark.
 2. **Prove source-derived rules and recombination beyond hand-labeled phrases.**
    Use complete documents with document- and publisher-held-out splits. Freeze
    positive, quoted, negated, contrastive, conditional, metalinguistic, and

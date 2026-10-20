@@ -239,6 +239,28 @@ to evaluate multi-turn dialogue across topic switches and restarts, and measure
 creative quality separately from scripted route and template correctness.
 No overall capability or parity claim follows from this run.
 
+## Recent-paper topic follow-up (2026-10-20)
+
+The older academic-model chat audit found that “What topics do these papers
+cover?” could retrieve an unrelated project-source sentence after a recent
+paper list. A fresh CLI replay reproduced that failure. CRMS now routes this
+plural follow-up to the immediately visible list and returns each listed
+paper's opening abstract sentence with a citation verified against the indexed
+source. It retains the list for the next ordinal follow-up and asks which papers
+the user means when no list is open. The response is explicitly extractive; it
+does not claim to synthesize a shared taxonomy or explain the result in simpler
+terms. The current runtime replay against a temporary copy of
+`data/crms_project_model_academic.sqlite` returned the three listed abstracts
+instead of the unrelated project-source sentence, while leaving the original
+model untouched.
+
+`v1_453_recent_papers_topic_followup.py` passes fresh-process checks for all
+three paper entries, exact citation resolution, follow-up persistence to an
+ordinal summary, and clarification when the list context is absent. The broader
+cross-domain replay including `v1_453` passed 19/19 in 14.46 seconds. This is a
+specific contextual-retrieval repair, not evidence of general multi-document
+reasoning or broad dialogue reliability.
+
 ## Post-grounding cross-domain rerun (2026-10-20)
 
 Code snapshot: commit `57c7892` (`Bind pronoun evidence to the nearest topic`).
