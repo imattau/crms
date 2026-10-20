@@ -107,6 +107,78 @@ def _phrase_is_quoted(text: str, position: int) -> bool:
     return closing is not None
 
 
+def _claim_scope_is_supported(text: str, phrase_start: int,
+                              phrase_end: int) -> bool:
+    """Reject source clauses that deny or doubt the operation.
+
+    Conditions remain eligible only as review-gated proposals; their exact
+    scope is returned separately by ``_extract_scope_notes``.
+    """
+    left_boundaries = [text.rfind(mark, 0, phrase_start)
+                       for mark in ".!?"]
+    right_boundaries = [position for mark in ".!?"
+                        if (position := text.find(mark, phrase_end)) >= 0]
+    sentence_start = max(left_boundaries, default=-1) + 1
+    sentence_end = min(right_boundaries, default=len(text))
+    sentence = text[sentence_start:sentence_end]
+    target = (r"(?:function|method|program|code|"
+              r"(?:returned\s+)?array|output|result|values?)")
+    denied_claim = re.search(
+        r"\b(?:does\s+not|doesn't|did\s+not|didn't|cannot|can't|never)\s+"
+        r"(?:guarantee|claim|assert|promise|state|establish|prove)\b"
+        r"[^.!?]{0,120}\b" + target + r"\s+will\b",
+        sentence, flags=re.IGNORECASE)
+    no_evidence_claim = re.search(
+        r"\b(?:there\s+is|there's|there\s+was)\s+no\s+"
+        r"(?:guarantee|claim|evidence|indication|proof)\s+that\b"
+        r"[^.!?]{0,120}\b" + target + r"\s+will\b",
+        sentence, flags=re.IGNORECASE)
+    unverified_claim = re.search(
+        r"\b(?:has|have|had)\s+not\s+"
+        r"(?:verified|validated|proven|shown|established|confirmed)\s+"
+        r"that\b[^.!?]{0,120}\b" + target + r"\s+will\b",
+        sentence, flags=re.IGNORECASE)
+    uncertain_claim = re.search(
+        r"\b(?:unclear|uncertain|unknown)\s+whether\b"
+        r"[^.!?]{0,120}\b" + target + r"\s+will\b",
+        sentence, flags=re.IGNORECASE)
+    return not (denied_claim or no_evidence_claim or unverified_claim
+                or uncertain_claim)
+
+
+def _extract_scope_notes(text: str, phrase_start: int,
+                         phrase_end: int) -> list[str]:
+    """Retain explicit applicability clauses on a review candidate."""
+    notes: list[str] = []
+    prefix = re.split(r"[.!?]\s+", text[:phrase_start])[-1]
+    leading_condition = re.search(
+        r"^\s*(?P<condition>(?:if|unless|assuming|provided\s+that)\b"
+        r"[^,]{1,160}),\s*(?:the\s+)?(?:following\s+)?"
+        r"(?:function|method|program|code|(?:returned\s+)?array|"
+        r"output|result|values?)\s+will\s+$",
+        prefix, flags=re.IGNORECASE)
+    if leading_condition is not None:
+        notes.append("condition: " + " ".join(
+            leading_condition.group("condition").split()))
+    else:
+        leading_subject_condition = re.search(
+            r"^\s*(?P<condition>(?:if|unless|assuming|provided\s+that)\b"
+            r"[^,]{1,160}),\s*(?:the\s+)?$",
+            prefix, flags=re.IGNORECASE)
+        if leading_subject_condition is not None:
+            notes.append("condition: " + " ".join(
+                leading_subject_condition.group("condition").split()))
+    suffix = text[phrase_end:]
+    for match in re.finditer(
+            r"(?P<condition>\b(?:only\s+if|only\s+when|unless|provided\s+that|"
+            r"as\s+long\s+as|if|when)\b[^.!?;)]{0,160})",
+            suffix, flags=re.IGNORECASE):
+        note = "condition: " + " ".join(match.group("condition").split())
+        if note not in notes:
+            notes.append(note)
+    return notes
+
+
 def extract_review_candidate(index: CRMSResearchIndex,
                              prose_source_id: str = MDN_SOURCE[0]):
     prose_hit = exact_hit(index, prose_source_id,
@@ -125,6 +197,8 @@ def extract_review_candidate(index: CRMSResearchIndex,
         r"\bwill\s+(?P<phrase>sort\s+the\s+array\s+in\s+ascending\s+order)\b",
         prose, flags=re.IGNORECASE)
     if (match is None or _phrase_is_quoted(prose, match.start("phrase"))
+            or not _claim_scope_is_supported(
+                prose, match.start("phrase"), match.end("phrase"))
             or re.search(
                     r"\bwill\s+not\s+sort\b", prose,
                     flags=re.IGNORECASE)):
@@ -140,6 +214,8 @@ def extract_review_candidate(index: CRMSResearchIndex,
     return {
         "phrase": match.group("phrase").casefold(),
         "operation": "sort_ascending",
+        "scope_notes": _extract_scope_notes(
+            prose, match.start("phrase"), match.end("phrase")),
         "prose_citation": prose_citation,
         "code_citation": code_citation,
         "prose": prose,
@@ -162,9 +238,13 @@ def extract_passive_review_candidate(
     code_citation = index.citation(code_hit)
     prose = index.resolve_citation(prose_citation)
     code = index.resolve_citation(code_citation)
-    if not re.search(
+    match = re.search(
             r"\breturned array will be sorted in ascending order\b",
-            prose, flags=re.IGNORECASE):
+            prose, flags=re.IGNORECASE)
+    if (match is None
+            or _phrase_is_quoted(prose, match.start())
+            or not _claim_scope_is_supported(
+                prose, match.start(), match.end())):
         return None
     if not _citation_contains_integer_pair(code, *PAIR):
         return None
@@ -177,6 +257,8 @@ def extract_passive_review_candidate(
     return {
         "phrase": "sort in ascending order",
         "operation": "sort_ascending",
+        "scope_notes": _extract_scope_notes(
+            prose, match.start(), match.end()),
         "prose_citation": prose_citation,
         "code_citation": code_citation,
         "prose": prose,
@@ -223,11 +305,15 @@ def main() -> None:
                 "passive publisher wording did not produce a review candidate")
         require(candidate["phrase"] == "sort the array in ascending order"
                 and candidate["operation"] == "sort_ascending"
+                and candidate["scope_notes"]
+                and "NaN" in candidate["scope_notes"][0]
                 and candidate["origins"] == {
                     "developer.mozilla.org", "docs.python.org"},
                 f"unexpected phrase transfer or source origins: {candidate!r}")
         require(passive_candidate["phrase"] == "sort in ascending order"
                 and passive_candidate["operation"] == "sort_ascending"
+                and passive_candidate["scope_notes"]
+                and "False or None" in passive_candidate["scope_notes"][0]
                 and passive_candidate["origins"] == {
                     "numpy.org", "docs.python.org"},
                 f"unexpected passive phrase transfer: {passive_candidate!r}")

@@ -213,8 +213,14 @@ It passes an independent output oracle, fresh-process generation, model reload,
 and a descending near-miss abstention. The phrase extraction and connective
 labels remain Codex-authored; this is teacher-attributed recombination, not
 autonomous prose learning. Adjacent source-learning/composition regressions pass
-6/6. The next gate remains complete-document, source-disjoint transfer with
-independently authored negative passages and a measured proposal precision.
+7/7 (`v1_355`, `v1_431`, `v1_433`, `v1_436_source_derived_rule_phrase_review`,
+`v1_437_heldout_publisher_phrase_review`, `v1_441`, `v1_443`). The new scope
+controls exposed and then closed ten authored denial, uncertainty, quotation,
+metalinguistic, and direction negatives; five asserted or conditional source
+clauses remain review proposals with exact conditions visible. These cases
+measure regression behavior, not field precision. The next gate remains
+complete-document, source-disjoint transfer with independently authored
+negative passages and a measured proposal precision.
 
 Do not grow the corpus as a substitute for these packets: more documents cannot
 repair relation selection, context updates, or a missing composition learner.

@@ -95,6 +95,8 @@ def main() -> None:
                 and reverse_candidate.phrase == "reverse the order of elements",
                 f"unexpected reviewed source phrases: {sort_candidate!r}; "
                 f"{reverse_candidate!r}")
+        require(any("NaN" in note for note in sort_candidate["scope_notes"]),
+                "the accepted sort candidate dropped its source applicability note")
 
         sort_prose = sort_candidate["prose_citation"]
         sort_code = sort_candidate["code_citation"]

@@ -1946,6 +1946,29 @@ in a new chat composition while preserving checks and lineage. It does not
 establish general language induction, broad coding capability, or source-only
 learning.
 
+## Source-rule assertion and scope controls (2026-10-20)
+
+Command: `python3 experiments/v1_443_source_rule_scope_controls.py`;
+adjacent source-rule and recombination regressions: seven scripts, 7/7 passed
+(`v1_355`, `v1_431`, `v1_433`, `v1_436_source_derived_rule_phrase_review`,
+`v1_437_heldout_publisher_phrase_review`, `v1_441`, `v1_443`).
+
+An initial probe found that a positive-looking `will sort` clause was proposed
+inside claims such as “There is no guarantee that the function will sort” and
+“It is unclear whether the function will sort.” The review-only extractor now
+rejects denial, uncertainty, unverified-claim, quotation, metalinguistic, and
+opposite-direction controls. It retains explicit applicability clauses on
+conditional candidates as review notes; these candidates remain inert until
+review. The probe passed five asserted or scope-qualified proposal cases and
+rejected ten negative or non-instructional cases. Exact cited source text is
+preserved.
+
+These 15 authored snippets are regression controls, not a proposal-precision
+estimate. The extraction patterns remain hand coded for two sorting forms and
+are still isolated under `experiments/`, not a general source-rule review
+feature. Full-document, cross-publisher data and genuinely held-out negatives
+are still required before discussing production use or autonomous learning.
+
 ## Procedure evidence and labeler provenance (2026-10-20)
 
 Commands:
