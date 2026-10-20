@@ -153,12 +153,15 @@ and interruption patterns.
 The full-CLI diagnostic (`v1_528`) now checks a named topic switch and
 pronoun/`why?`, return to an earlier entity after two switches, an unrelated
 interruption followed by an explicit re-anchor, a correction, source-only
-context across a process restart, and a pronoun with no antecedent. All six
-targeted checks pass on a new three-entity corpus with scratch stores. This is
-useful integration evidence, but remains one Codex-authored fixture and a
-narrow location/date task; it does not close the independently authored
-conversation-transfer gate. Keep improving the transcript set while moving
-the main capability experiment forward in parallel.
+context across a process restart, source-only elliptical entity switches, an
+unsupported elliptical target, and a pronoun with no antecedent. All seven
+targeted checks pass across small Codex-authored source fixtures and scratch
+stores. The specific “And Italy?” and “And the Colosseum?” sequence now
+returns relevant citations, `why?` stays on the latest answer, and an
+unsupported “And Atlantis?” does not reuse an earlier location. This remains
+narrow integration evidence, not a dialogue-transfer estimate or a pass of
+the independent conversation gate. Keep expanding the transcript set while
+moving the main capability experiment forward in parallel.
 
 The reported Eiffel Tower/Colosseum sequence now answers “When was it
 completed?” with the Colosseum's “80 CE” sentence after a named topic switch;
@@ -168,11 +171,12 @@ sentence in the same paragraph has the queried entity as its subject. Separate
 paragraphs and a different entity in the prior sentence remain negative
 controls. The original 1889 misattribution is not reproduced, and the current
 answer no longer abstains on this fixture. This fixes one dialogue seam, not
-general event coreference. Source-only elliptical switches such as “and
-Italy?” remain unresolved when the target has not been established as an
-answerable entity. Keep that as an open transfer item; do not count safe
-abstention as task completion. `why?` must continue to refer to the current
-turn or say clearly that there is no grounded answer to explain.
+general event coreference. Source-only elliptical switches now pass the
+specific `v1_528` sequence, including an unsupported-target abstention, but
+broader target types and varied question frames remain untested. Keep that as
+an open transfer item; do not count safe abstention as task completion.
+`why?` must continue to refer to the current turn or say clearly that there is
+no grounded answer to explain.
 
 The source-backed composition diagnostic (`v1_529`) is a narrow positive
 transfer result: it discovers a two-premise rule from two SimpleWiki training

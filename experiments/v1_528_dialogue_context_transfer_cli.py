@@ -155,6 +155,35 @@ def main() -> None:
                 and "1984" not in restart_second and "1972" not in restart_second,
                 "save/reload: source-only topic was lost or rebound after restart")
 
+        elliptical_root = root / "source-only-elliptical-switch"
+        elliptical_source = elliptical_root / "sources"
+        elliptical_source.mkdir(parents=True)
+        (elliptical_source / "places.txt").write_text(
+            "The Eiffel Tower stands in Paris.\n\n"
+            "Italy is a country in Europe.\n\n"
+            "The Colosseum is located in Rome, Italy.\n",
+            encoding="utf-8")
+        elliptical = run(elliptical_root, [
+            f"/source-dir {elliptical_source}",
+            "Where is the Eiffel Tower?",
+            "And Italy?",
+            "And the Colosseum?",
+            "why?",
+            "And Atlantis?",
+        ], "source-only elliptical switches")
+        elliptical_lines = answer_lines(elliptical)
+        require(len(elliptical_lines) >= 5
+                and "Eiffel Tower stands in Paris" in elliptical_lines[0]
+                and "Italy is a country in Europe" in elliptical_lines[1]
+                and "Colosseum is located in Rome" in elliptical_lines[2],
+                f"elliptical switch did not carry the source-backed question: {elliptical}")
+        require("Colosseum is located in Rome" in elliptical_lines[3]
+                and "Paris" not in elliptical_lines[3],
+                f"why? explained stale source-only context: {elliptical}")
+        require(not any(term in elliptical_lines[4]
+                        for term in ("Paris", "Rome", "Europe")),
+                f"unsupported elliptical switch inherited a prior answer: {elliptical}")
+
         blank_root = root / "blank-context"
         blank_source = prepare(blank_root)
         no_antecedent = run(blank_root, [
@@ -169,12 +198,13 @@ def main() -> None:
         {"scenario": "unrelated interruption then historical entity switch", "outcome": "pass"},
         {"scenario": "explicit correction then pronoun", "outcome": "pass"},
         {"scenario": "source-only context across process restart", "outcome": "pass"},
+        {"scenario": "source-only elliptical entity switches and unsupported target", "outcome": "pass"},
         {"scenario": "pronoun with no antecedent", "outcome": "abstained_without_wrong_date"},
     ]
     report = {
         "experiment": "v1_528_dialogue_context_transfer_cli",
         "date": "2026-10-20",
-        "source": "independently authored, three-entity source fixture",
+        "source": "Codex-authored, small multi-entity source fixtures",
         "method": "fresh full CLI processes with scratch knowledge, research index, and dialogue state",
         "metrics": {
             "scenarios": len(scenarios),
@@ -185,7 +215,7 @@ def main() -> None:
         },
         "scenarios": scenarios,
         "limitations": [
-            "One authored corpus and six targeted scenarios are a diagnostic, not a general transfer estimate.",
+            "Small authored corpora and seven targeted scenarios are a diagnostic, not a general transfer estimate.",
             "Expected answers and labels were authored by Codex and are not independent human evaluation.",
             "This tests source-only dialogue transfer, not broad conversational intent, source-rule induction, or reasoning-to-procedure recombination.",
             "No external 70B-class model was run; expected interaction behavior is a qualitative rubric only.",
@@ -198,6 +228,7 @@ def main() -> None:
     print("unrelated interruption and explicit re-anchor: PASS")
     print("explicit correction and follow-up: PASS")
     print("source-only context across process restart: PASS")
+    print("source-only elliptical switches, latest why?, unsupported target: PASS")
     print("pronoun without antecedent does not select a corpus date: PASS")
     print(f"scenarios: {len(scenarios)}/{len(scenarios)}; "
           "confident wrong-entity answers: 0")

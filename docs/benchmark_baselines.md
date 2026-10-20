@@ -60,19 +60,22 @@ the [runner](../experiments/v1_529_source_reasoned_procedure_transfer.py) and
 
 Command: `python3 experiments/v1_528_dialogue_context_transfer_cli.py`.
 
-Six fresh full-CLI scenarios use a new three-entity corpus with separate
-paragraphs and independent scratch stores. They check a named entity switch
-followed by pronoun and `why?`, returning to an earlier entity after two topic
-switches, an unrelated interruption followed by an explicit historical topic,
-explicit correction, source-only context across a CLI restart, and a pronoun
-with no antecedent. All six targeted checks pass; no answer contains a date
-from the wrong entity, and the no-antecedent query does not select a corpus
-date. This confirms those behaviors on the tested construction in integrated
+Seven fresh full-CLI scenarios use small multi-entity source fixtures and
+independent scratch stores. They check a named entity switch followed by
+pronoun and `why?`, returning to an earlier entity after two topic switches,
+an unrelated interruption followed by an explicit historical topic, explicit
+correction, source-only context across a CLI restart, source-only elliptical
+switches (“And Italy?” then “And the Colosseum?”), an unsupported elliptical
+target, and a pronoun with no antecedent. All seven targeted checks pass; no
+answer contains a date from the wrong entity, the unsupported target does not
+inherit a previous answer, and the no-antecedent query does not select a corpus
+date. This confirms those behaviors on the tested constructions in integrated
 chat; it does not estimate dialogue transfer across natural conversations.
 
-The test uses Codex-authored prompts and expected outcomes, one corpus, and a
-narrow class of location/opening-date questions. It does not test source-rule
-induction, recombination, broad conversational intent, or creative dialogue.
+The test uses Codex-authored prompts and expected outcomes, small authored
+corpora, and a narrow class of location/date questions. It does not test
+source-rule induction, recombination, broad conversational intent, or
+creative dialogue.
 The lower-level `CRMSDialogue` route still differs from full chat for the
 paragraph-anchored event-date follow-up documented in `v1_527`. No external
 70B-class model was run; interaction expectations are a qualitative rubric.
