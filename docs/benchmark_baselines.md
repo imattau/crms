@@ -1,5 +1,32 @@
 # Language and recombination benchmark baselines
 
+## arXiv category/year reasoning-to-sort (`v1_530`, 2026-10-20)
+
+Command: `python3 experiments/v1_530_arxiv_reasoned_sort_transfer.py`.
+
+This second source collection uses six source-disjoint arXiv metadata records:
+two train, two holdout, and two evaluation papers. CRMS discovers
+`has primary category paper + published in → has primary category papers from`,
+validates the rule on the two holdout documents, removes their direct
+conclusions, then derives publication years for held-out category `cs.CL`.
+A separately learned `sort the list` procedure returns `[2019, 2020]` from
+the candidate order `[2020, 2019]`. Independent proof verification and a
+separate sort over the raw evaluation metadata agree. An unknown 2018 value
+and an injected negative conflict both prevent an output. A clean copied
+model answers and explains in fresh CLI, and its source citations resolve
+without the original index. All targeted checks pass.
+
+This advances one relation-pattern and procedure transfer beyond the
+SimpleWiki count slice, on a separate source collection and ordinary chat.
+The collection contains CC0 bibliographic metadata, not full paper text; the
+article license is not included or checked. Codex manually mapped the
+metadata fields, procedure examples are Codex-labeled, and rule validation
+contains only two documents from the same platform. This does not demonstrate
+automatic extraction from papers, new-publisher transfer, or broad reasoning.
+The injected conflict is a safety control, not a source claim. See the
+[runner](../experiments/v1_530_arxiv_reasoned_sort_transfer.py) and
+[report](../experiments/reports/v1_530_arxiv_reasoned_sort_transfer.json).
+
 ## Source-backed rule-to-count composition (`v1_529`, 2026-10-20)
 
 Command: `python3 experiments/v1_529_source_reasoned_procedure_transfer.py`.

@@ -1,6 +1,6 @@
 # Focused plan from current CRMS to its goal
 
-**Reviewed:** 2026-10-20 (runtime probes through `v1_528`)
+**Reviewed:** 2026-10-20 (runtime probes through `v1_530`)
 **Status:** active; the capability goal is not yet demonstrated.
 
 ## Direction review and priority
@@ -176,6 +176,20 @@ Codex-labeled. The next composition work should vary both the relation pattern
 and the operation using a second corpus or publisher, with source-disjoint
 validation and independent output checking.
 
+That next cross-collection slice is now present in `v1_530`: the rule connects
+arXiv primary-category, paper, and publication-year metadata, and a separately
+learned sorting procedure orders the years for held-out `cs.CL` records. Two
+disjoint holdout records validate the rule; two evaluation records provide
+proof-checked premises; an unknown year and an injected contradiction block
+the operation; and a clean copied model answers and explains from its selected
+metadata records. This changes the evidence from a single SimpleWiki pattern
+to two distinct source collections, relation patterns, and procedures. It
+still does not establish external-publisher transfer or broad capability:
+arXiv records are CC0 metadata rather than full paper text, field mapping is
+manual, each rule review uses only two holdout documents, and procedures are
+separately Codex-taught. Preserve this as a new transfer control, not a
+generalization rate.
+
 ## Execution order
 
 Dialogue safety is a release gate for every chat-facing change. Source-rule
@@ -290,13 +304,14 @@ gaps, not to claim parity.
 Extend work packet 1 with independently authored, complete conversations that
 vary entity class, discourse distance, and the same utterance under different
 contexts; score correct outcomes and wrong bindings separately. In parallel,
-extend `v1_529` to a second relation pattern and a second operation, preferably
-using a new corpus or publisher, with held-out source documents, evidence-order
-and wording variation, an independent checker, and unknown, negative, and
-conflicting controls. Run this through chat using reviewed components. Keep
-the Eiffel/Colosseum and Marie/Einstein failures as permanent controls, and
-keep derived write-back review-gated until recombination, correction, and
-invalidation pass on held-out tasks.
+extend the `v1_529`/`v1_530` composition packet to an external publisher or
+source type, with multiple held-out relation and procedure examples, wording
+and evidence-order variation, an independent checker, and unknown, negative,
+and conflicting controls. Measure proposal precision and missed cases if
+source-derived rules are involved. Keep the Eiffel/Colosseum and
+Marie/Einstein failures as permanent dialogue controls, and keep derived
+write-back review-gated until recombination, correction, and invalidation pass
+on held-out tasks.
 
 For detailed implementation history and experiment evidence, see
 [`focused_roadmap_to_goal.md`](focused_roadmap_to_goal.md) and
