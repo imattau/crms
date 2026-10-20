@@ -272,12 +272,14 @@ Report size, runtime, compatibility requirements, and unsupported cases.
    stale-`why?` sequence: an unsupported Colosseum switch after an Eiffel source
    answer must not explain the Eiffel answer, while a supported switch must
    explain only the Colosseum evidence. `v1_467` adds one task-oriented
-   vertical slice: gather a restaurant, date/time, and party size through
-   ordinary chat; preserve them as session-only values; regenerate a draft
-   after correction; and state clearly that no booking was submitted. This
-   shows a bounded multi-turn task flow, not independent dialogue transfer or
-   booking capability. Continue the broader transcript and task-completion
-   evaluation; these fixtures are controls, not a conversation benchmark.
+   vertical slice: retain plainly stated restaurant/date-time/party-size
+   details from a small set of opening-request forms, ask for missing details
+   through ordinary chat, preserve values as session-only context, regenerate
+   the draft after correction, and state clearly that no booking was submitted.
+   This shows bounded task handling, not broad natural-language parsing,
+   independent dialogue transfer, or booking capability. Continue the broader
+   transcript and task-completion evaluation; these fixtures are controls, not
+   a conversation benchmark.
 2. **Prove source-derived rules and recombination beyond hand-labeled phrases.**
    The map-free `v1_464` full SimpleWiki scan surfaced useful relation wording
    alongside substantial parser and role noise; keep all candidates

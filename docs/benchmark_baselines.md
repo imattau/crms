@@ -2827,27 +2827,28 @@ end-to-end task completion remains unmeasured.
 ## Reservation request draft as a multi-turn task (`v1_467`, 2026-10-20)
 
 `experiments/v1_467_reservation_request_draft_flow.py` exercises an ordinary
-chat request through a small task lifecycle. CRMS explains that it cannot check
-availability or submit a booking, asks for restaurant, date/time, and party
-size one at a time, retains each answer as session-only state, renders a
-copyable draft, regenerates that draft after a date/time correction, and
-preserves the corrected value through save/reload. The draft says explicitly
-that no reservation has been made; the test checks that no action is issued and
-no user-supplied detail becomes a factual claim. The flow passed, along with
-existing open-question, booking-name, and contextual-intent regressions.
+chat request through a small task lifecycle. For a bounded set of explicit
+opening forms, CRMS extracts restaurant, date/time, and party-size values,
+retains them as session-only user input, and asks for missing values one at a
+time. Ambiguous text such as “at 7 pm” is not mistaken for a restaurant name.
+CRMS renders a copyable draft, regenerates it after a date/time correction,
+and preserves the corrected value through save/reload. The draft says
+explicitly that no reservation has been made; tests check that no action is
+issued and no user-supplied detail becomes a factual claim. The flow passed,
+along with existing open-question, booking-name, and contextual-intent
+regressions.
 
 This closes one bounded chat-level task flow from intent recognition through
-clarification, correction, and a usable artifact. It does not make a booking,
-parse all possible details from the initial request, or establish broad task
-completion. The values in the test are controlled and the flow is explicitly
-hand-routed; general task planning remains open.
+clarification, correction, and a usable artifact. It does not make a booking
+or parse unrestricted wording. The values in the test are controlled and the
+flow is explicitly hand-routed; general task planning remains open.
 
-## Current cross-domain replay at `7dcc99c` (2026-10-20)
+## Current cross-domain replay at `e2f0671` (2026-10-20)
 
-After the reservation-draft path was added, the selected cross-domain replay
-was rerun with `v1_467` and all prior selections, including the `v1_465`
-topic-switch and `v1_466` contextual-intent regressions. All 20 diagnostics
-passed in 13.92 seconds. The suite covers language transfer/retrieval,
+After explicit initial-detail extraction was added, the selected cross-domain
+replay was rerun with `v1_467` and all prior selections, including the
+`v1_465` topic-switch and `v1_466` contextual-intent regressions. All 20
+diagnostics passed in 14.12 seconds. The suite covers language transfer/retrieval,
 source-derived rules and recombination, verified reasoning, math/code,
 translation, creative revision, and dialogue. Each experiment used an isolated
 working directory.
