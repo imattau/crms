@@ -1,21 +1,26 @@
 # Focused roadmap from the current CRMS to its goal
 
-**Reviewed:** 2026-10-20
+**Reviewed:** 2026-10-20 (after real-corpus and dialogue review)
 **Status:** aligned in direction; the overall capability goal remains unmet.
 
 ## Focus for the next development cycle
 
 The next cycle should close three integration gaps before adding more surface
-area. Dialogue safety is a prerequisite for evaluating the rest of the system;
-source-derived rule learning and recombination are the main capability bet;
-verified reasoning and governed derivation must ensure composed outputs remain
-correctable.
+area. Dialogue safety is the reliability gate; evidence-backed rule discovery
+and recombination are the main capability bet; verified reasoning and governed
+derivation keep composed outputs correctable. The most recent corpus probe
+changes the rule-learning tactic: direct exact-pair predicate matching found no
+useful variants in sampled SimpleWiki windows, while structured-field/prose
+alignment found one repeated candidate (`capital city of` → `capital of`) on
+eight distinct entity pairs. Use that as a report-only lead for a general,
+reviewable discovery path; do not turn the hand-coded field map or that one
+candidate into a learned-language claim.
 
 | Order | Work packet | Immediate outcome | Do not claim yet |
 |---|---|---|---|
-| 1 | Reproduce and close the current dialogue failures | Replay the reported topic-switch, source-only follow-up, reset, and `why?` sequence against a fresh process; fix any confident wrong referent or lost visible context; add varied-layout controls. | Robust conversation from a handful of passing fixtures. |
-| 2 | Learn and recombine rules from source material | Extend beyond hand-coded sentence forms to source-disjoint proposals, review, held-out phrase transfer, and unseen multi-step compositions through ordinary chat. Report teacher effort and proposal precision. | Autonomous rule learning from cue matching or teacher-labeled alignments. |
-| 3 | Couple recombination to verified reasoning and governed learning | Run source-grounded tasks through rule selection, proof/checking, composition, correction, and derived-case invalidation. Preserve distinct negative, conflict, missing-premise, and incomplete-search outcomes. | General planning or safe self-improvement from synthetic fixtures. |
+| 1 | Validate dialogue transfer and safety | Preserve current clean-process regressions; test independently authored transcripts, varied layouts, visible-context carryover, topic switching, repairs, and history questions. Measure wrong referents, omissions, clarifications, and task completion separately. | Robust open-domain conversation from authored fixtures. |
+| 2 | Turn source alignment into a useful discovery experiment | Generalize structured-field/prose alignment without hard-coded field→relation truth; emit cited, report-only candidates with entity-role checks, source-disjoint splits, and negative controls. Measure yield and precision on a larger, blinded corpus sample before building more extraction machinery. | Autonomous rule learning or reliable paraphrase discovery from one repeated field. |
+| 3 | Recombine learned components through reasoning | Route accepted, source-backed rules through natural-language chat, held-out composition, proof/checking, and an independent output validator. Include correction and derived-case invalidation; distinguish negative, conflict, missing premise, and incomplete search. | General planning or safe self-improvement from synthetic fixtures. |
 
 Run the contextual-intent/dialogue track alongside these packets, but let intent
 route, clarify, or repair only; it cannot supply evidence. Expand math, coding,
@@ -110,13 +115,43 @@ After the records and learning lifecycle above are stable, complete migration an
 
 ### Immediate packets
 
-1. **Dialogue generalization gate:** preserve the passing Rome/Paris and Eiffel/Colosseum cases, then add independently authored transcripts with different paragraph layouts, more than two entities, source-only answers, topic changes, interruptions, and corrections. Measure wrong referents, omissions, clarification, and task completion separately. Fix any confident wrong answer before broadening contextual intent; keep history and ordinal answers tied to visible state.
-2. **Source-derived rule-learning gate:** expand beyond the two hand-coded MDN/NumPy sentence forms in `v1_437` to more publishers, complete source documents, and independently authored unrelated, metalinguistic, quoted, contrastive, and negated passages. `v1_437` now rejects a positive-looking operation phrase when it is quoted; its four controlled negatives still do not estimate real-corpus precision. The current 0/7 (`v1_436`) and 0/4 (`v1_437`) controlled false-proposal results are regression checks, not precision estimates. Keep proposal, source evidence, teacher/labeler decision, accepted rule, and validation as separate records. Promote it to a reusable chat review path only if held-out precision remains high, rejection controls stay safe, and labeler effort is reported. Do not call cue matching autonomous learning.
-3. **Recombination and governed reasoning gate:** `v1_456` now demonstrates reviewed source-frame extraction feeding a held-out validated rule and proof-backed procedure input. Replace authored source fixtures with complete natural-corpus documents and independently authored holdout cases; reduce experiment-orchestrated steps; and measure false proposals alongside useful coverage. Keep Codex-labeled procedure supervision visible. Retain missing-premise, negative/conflict, invalid-output, cycle, and search-limit controls; exercise derived-case lineage and correction through ordinary chat.
+1. **Dialogue transfer, not another resolver special case.** Keep the current
+   topic-switch, paragraph-grounding, source-only, interruption, and `why?`
+   regressions locked. Add independent transcripts and varied layouts with
+   topic switches, competing entities, source-only answers, corrections, and
+   history/ordinal references. Require either context-grounded resolution or
+   a targeted clarification. Do not broaden learned intent routing until this
+   evaluation shows no confident wrong referents and reports omission and
+   completion rates.
+2. **One decisive real-corpus discovery study.** Reproduce the structured
+   alignment lead (`capital city of` / `capital of`, eight pairs), then test
+   whether candidate groups emerge from field labels plus aligned prose across
+   disjoint documents and publishers. The algorithm may use field names to
+   propose hypotheses, but must not treat them as semantic truth. Keep every
+   candidate cited and inert pending review. Blindly label a sample containing
+   candidate and non-candidate pairs; report proposals, confirmed alignments,
+   false proposals, coverage, and labeler time. Include role reversals,
+   ambiguous fields, quotations, negation, contrast, and accidental title/value
+   overlap. Stop or redesign if yield remains negligible or precision depends
+   on hand-coded relation mappings.
+3. **Promote only a proven path into recombination.** If packet 2 clears its
+   precision and coverage gate, connect the reviewed alignments to source-held-
+   out rule learning and a genuinely unseen multi-step task through ordinary
+   chat and fresh-process reload. Verify proofs and outputs independently;
+   test unsupported operations, missing steps, conflicts, cycles, incomplete
+   search, source correction, and derived-case invalidation. Keep teacher and
+   labeler input explicit. If packet 2 fails, spend this packet improving
+   evidence extraction rather than adding dialogue or domain surface area.
+
+These are sequential gates with parallel measurement, not three feature
+projects. Contextual intent research may continue on frozen data, but may only
+route, clarify, and repair; it cannot supply facts or evidence. Reasoning
+improvements should be driven by failures in packet 3, not by engine depth in
+isolation.
 
 ### Next packets after those gates
 
-4. Address the demonstrated request-language gap before widening domains: `v1_452` now answers 8/11 positive forms (up from 4/8 with grammar-only transfer) after learning the `-ly` edit from two roots in one behavior group and a repeated multiword direction span. It applies morphology to a held-out third root and composes “from low to high” with a held-out action/object pair. Three positive requests still abstain; all three negative-direction controls abstain. The 18-diagnostic cross-domain replay passed after a false positive from overbroad function-word filtering led to removing “please” from the removable token set, then passed again after morphology and multiword span integration. Extend role learning to additional forms; add reordered-role transfer only after labels for roles across different word orders can be learned and provenance-gated. Preserve explicit phrase provenance and measure held-out request coverage and conflicts. After that, use the shared scorecard's largest remaining user-visible loss to choose between answer-bearing retrieval and one bounded math/coding/translation/creative task. Each domain gets held-out natural-language requests and an independent checker before scope expands.
+4. **Broaden request language only when the source/rule gate is stable.** `v1_452` answers 8/11 positive forms with zero wrong outputs and abstains on three; all three negative-direction controls abstain. This is a bounded morphology and phrase-span result. Extend role learning only against held-out wording and conflicts, then choose the next domain slice (math, coding, translation, creative work) from the measured scorecard loss. Each slice needs natural-language holdouts and an independent checker before scope expands.
 5. Continue contextual-intent evaluation in parallel. Defer learned dialogue-move induction until the explicit baseline generalizes across independent transcripts and the pilot beats it on held-out outcomes without raising wrong-referent or inappropriate-move rates.
 6. Finish SQLite distribution after the record model and learning lifecycle stabilize, then verify a copied model with source files unavailable.
 
