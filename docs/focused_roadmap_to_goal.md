@@ -459,13 +459,15 @@ operations, and search limits. Run through ordinary chat, a new process, and
 the copied model once its serialization path is exercised.
 
 The first integrated transfer step is now measured in `v1_492`: four request
-surfaces complete through fresh-process chat, and the target operation order
-is recombined from separately learned primitives and two other ordered
-examples rather than taught directly. Proof gates and evidence lineage remain
-intact. Relations and primitive operation phrases remain exact, and connective
-labels and fixtures are Codex-supplied, so this is not independent semantic
-transfer. Continue with frozen, independently reviewed tasks rather than
-treating these controls as a completed recombination milestone.
+frames across five cases complete through fresh-process chat. An additional interleaved-
+duplicate case confirms `reverse then deduplicate` differs from
+`deduplicate then reverse`, while its target sequence is recombined from
+separately learned primitives and other ordered examples rather than taught
+directly. Proof gates and evidence lineage remain intact. Relations and
+primitive operation phrases remain exact, and connective labels and fixtures
+are Codex-supplied, so this is not independent semantic transfer. Continue
+with frozen, independently reviewed tasks rather than treating these controls
+as a completed recombination milestone.
 
 **Gate:** frozen held-out requests complete through chat; an independent
 checker accepts valid outputs and rejects tampered or invalid ones; unknown,

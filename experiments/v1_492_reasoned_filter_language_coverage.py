@@ -105,6 +105,11 @@ def main() -> None:
          "duplicate values then reverse the list.", (9, 12, 4)),
         ("From [12, 9, 4, 12, 7], return the values Nia reaches, then remove "
          "duplicate values and then reverse the list.", (4, 9, 12)),
+        # This input distinguishes operation order: reversing first yields
+        # [9, 12, 4, 12], then first-occurrence deduplication yields
+        # [9, 12, 4]. Deduplicating first would instead yield [9, 4, 12].
+        ("Filter 12, 4, 12, 9, and 7 to values Nia reaches; then reverse the "
+         "list then remove duplicate values.", (9, 12, 4)),
     )
     for request, expected in cases:
         result = compose_verified_filter(request, knowledge, procedures)
@@ -193,8 +198,8 @@ def main() -> None:
                 and "I can't determine whether 8 satisfy Nia reaches" in output,
                 f"fresh-process chat did not answer all licensed variants:\n{output}")
 
-    print("four request surfaces and varied inputs compose through fresh chat: PASS")
-    print("target operation order was not directly taught; component and connective evidence retained: PASS")
+    print("four request frames across five cases, including an order-sensitive duplicate case, compose through fresh chat: PASS")
+    print("target operation orders were not directly taught; component and connective evidence retained: PASS")
     print("verified proof set and explicit-negative handling are preserved: PASS")
     print("unlicensed operation and relation paraphrases remain unsupported: PASS")
     print("scope: controlled operation recombination over exact primitives; no broad paraphrase or planning claim")
