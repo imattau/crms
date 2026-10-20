@@ -2629,6 +2629,18 @@ rate than the ten-conversation development diagnostic (64/131, 48.9%) means
 the transfer gate is not met. The four conversations are too few to support a
 generalization claim.
 
+The separate four-conversation movie-ticket development slice
+(`movie_dev_first4_codex_primary.csv`, 37 turns) is a safe place to analyze
+context behavior. Its 37 citations also verified. There, transcript replay
+produced 23 hypotheses (62.2% coverage), selected 22, marked one ambiguous,
+and matched both labels on 17/37 turns (45.9%; 17/23 hypotheses). Context-free
+classification produced 10 hypotheses (27.0%) and six joint matches (16.2%).
+These results support keeping turn context in the model, while the misses on
+short confirmations, response-to-prompt distinctions, and reactions show that
+the current representation still loses useful discourse structure. The dev
+slice can guide the next model change; retain the test slice for the next
+frozen replay.
+
 Observed disagreements include answers to assistant prompts being assigned
 the wrong move/intent, “Yes” answers needing an active confirmation or choice,
 availability questions collapsing into generic information seeking, and
