@@ -276,6 +276,19 @@ the pending-rule usability control, passed 21/21 in 15.35 seconds. The
 diagnostics have different fixtures and scores; their aggregate is a regression
 count, not an overall capability rate.
 
+## Plain-language result follow-up (2026-10-20)
+
+When a user asks for a simpler explanation and no rewrite frame is learned,
+CRMS now says that it cannot yet provide a verified rewrite, quotes the cited
+source statement, and describes the two aligned examples needed to teach one.
+The existing `v1_265_grounded_plain_rewrite.py` confirms that a learned
+same-language rewrite still answers with the source attached;
+`v1_455_plain_explanation_without_frame.py` covers both the unlicensed and
+learned cases. The 23-diagnostic replay, including these checks, passed in
+17.07 seconds. The test rewrite is Codex-authored and demonstrates supervised
+frame use, not autonomous simplification or semantic validation of arbitrary
+rewrites.
+
 ## Post-grounding cross-domain rerun (2026-10-20)
 
 Code snapshot: commit `57c7892` (`Bind pronoun evidence to the nearest topic`).

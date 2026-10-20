@@ -3942,8 +3942,10 @@ def _render_research_explanation(index: CRMSSQLiteResearchIndex,
             and rewrite.request and "aligned target values" in rewrite.request):
         return (rewrite.request + " The cited source states: “" + statement
                 + "”\nSource: " + source)
-    return ("I used this quoted source sentence as evidence; it has not been "
-            "accepted as a fact: “" + statement + "”\nSource: " + source)
+    return ("I don't have a verified plain-language rewrite for this result "
+            "yet. The source says: “" + statement + "”\nSource: " + source
+            + "\nYou can teach a rewrite by providing two aligned source and "
+            "simpler-sentence examples.")
 
 
 def _render_latest_research(index: CRMSSQLiteResearchIndex,

@@ -1591,9 +1591,9 @@ I replayed the earlier academic-model sequence through a fresh CLI process using
 of `data/crms_project_model_academic.sqlite`; the original model and its source indexes were not
 modified. “What research topics are represented in this model?” now returns a rough title-term
 overview, and the exact toroidal-graph paper is found. “Can you explain the result in simpler
-terms?” still returns the exact cited result sentence, but does not simplify it. More seriously,
-after “What is the latest research in machine learning in this corpus?” the follow-up “What topics
-do these papers cover?” returned an unrelated sentence from a CRMS project source.
+terms?” returned the exact cited result sentence without simplifying it. More seriously, after
+“What is the latest research in machine learning in this corpus?” the follow-up “What topics do
+these papers cover?” returned an unrelated sentence from a CRMS project source.
 
 The current CLI now binds that plural follow-up to the most recent visible paper list. It returns
 the opening abstract sentence for each listed paper with an exact citation, retains the list for a
@@ -1601,10 +1601,19 @@ subsequent ordinal summary, and asks for a list when no paper context is open. T
 runtime replay returned the three listed machine-learning paper abstracts instead of the unrelated
 project-source sentence. `experiments/v1_453_recent_papers_topic_followup.py` reproduces the fresh
 process behavior and independently resolves each citation. This is an extractive, bounded repair;
-it does not synthesize a shared topic taxonomy or explain research results in simpler language.
-The prior pending-review interruption was not exercised by this replay and remains a separate
-regression target. A separate fresh-session check now covers the direct-answer case: it creates
+it does not synthesize a shared topic taxonomy. The prior pending-review interruption was not
+exercised by this replay. A separate fresh-session check now covers the direct-answer case: it creates
 two review-only Seine claims, asks an unrelated question with an accepted answer, and confirms
 that the answer is not interrupted while both candidates remain available through explicit review
 and after restart. `experiments/v1_454_pending_review_does_not_interrupt_answer.py` passes these
 checks. This does not yet test every review-state interaction in a long multi-topic transcript.
+
+### Plain-language result follow-up (2026-10-20)
+
+The source-only result follow-up is now explicit about its limit. When no aligned plain-language
+rewrite is licensed, CRMS says it cannot yet rewrite the result, quotes the source sentence, and
+describes the two aligned examples needed to teach one. When a rewrite frame has been taught, the
+same follow-up applies it and retains the paper source. `experiments/v1_455_plain_explanation_without_frame.py`
+checks both cases through fresh CLI processes. This improves uncertainty and repair guidance; it
+does not make explanation autonomous or prove that a taught rewrite is semantically correct on
+unseen domains. The accepted rewrite examples remain Codex-authored.
