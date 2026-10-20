@@ -16,12 +16,43 @@ from crms_model import CRMSModel
 from crms_rule_proof import verify_inference_proof
 
 
-_REQUEST = re.compile(
-    r"^\s*From\s+(?:the\s+)?(?:values?\s+)?"
-    r"(?P<values>-?\d+(?:\s*,\s*-?\d+)*(?:\s*,?\s+and\s+-?\d+)?)"
-    r",\s*keep\s+(?:only\s+)?(?:the\s+)?values\s+(?:that\s+|which\s+)?"
-    r"(?P<claim>.+?),\s*then\s+(?P<procedure>.+?)\s*[.!?]*\s*$",
-    re.IGNORECASE)
+_INTEGER_LIST = (
+    r"-?\d+(?:\s*,\s*-?\d+)*(?:\s*,?\s+and\s+-?\d+)?")
+_REQUESTS = (
+    re.compile(
+        r"^\s*From\s+(?:the\s+)?(?:values?\s+)?"
+        rf"(?P<values>{_INTEGER_LIST})"
+        r",\s*keep\s+(?:only\s+)?(?:the\s+)?values\s+"
+        r"(?:that\s+|which\s+)?(?P<claim>.+?),\s*then\s+"
+        r"(?P<procedure>.+?)\s*[.!?]*\s*$", re.IGNORECASE),
+    re.compile(
+        rf"^\s*Filter\s+(?P<values>{_INTEGER_LIST})\s+to\s+"
+        r"(?:the\s+)?values\s+(?:that\s+|which\s+)?"
+        r"(?P<claim>.+?)[,;]\s*(?:and\s+)?then\s+"
+        r"(?P<procedure>.+?)\s*[.!?]*\s*$", re.IGNORECASE),
+    re.compile(
+        rf"^\s*Given\s+(?P<values>{_INTEGER_LIST}),\s*keep\s+"
+        r"(?:only\s+)?(?:the\s+)?values\s+(?:that\s+|which\s+)?"
+        r"(?P<claim>.+?),\s*and\s+then\s+"
+        r"(?P<procedure>.+?)\s*[.!?]*\s*$", re.IGNORECASE),
+    re.compile(
+        rf"^\s*From\s+\[(?P<values>{_INTEGER_LIST})\],\s*return\s+"
+        r"(?:the\s+)?values\s+(?:that\s+|which\s+)?"
+        r"(?P<claim>.+?),\s*then\s+"
+        r"(?P<procedure>.+?)\s*[.!?]*\s*$", re.IGNORECASE),
+)
+
+
+def _normalize_procedure_sequence(instruction: str) -> str:
+    """Normalize explicit sequence connectives without inventing operations."""
+    text = " ".join(instruction.strip().rstrip(".!?").split())
+    text = re.sub(r"\s+and\s+then\s+", " then ", text, flags=re.IGNORECASE)
+    after = re.fullmatch(r"(.+?)\s+after\s+(.+)", text,
+                         flags=re.IGNORECASE)
+    if after is not None:
+        # 'A after B' explicitly orders B before A.
+        text = f"{after.group(2).strip()} then {after.group(1).strip()}"
+    return text
 
 
 @dataclass(frozen=True)
@@ -92,7 +123,11 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
     Unknown, contradictory, incomplete, or unverifiable members cause an
     abstention rather than silently filtering away a possible value.
     """
-    match = _REQUEST.fullmatch(instruction)
+    match = None
+    for candidate in _REQUESTS:
+        match = candidate.fullmatch(instruction)
+        if match is not None:
+            break
     if match is None:
         return None
     values = tuple(int(value) for value in
@@ -105,7 +140,7 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
         return ReasonedListComposition(
             "unsupported", "I couldn't identify one unambiguous stored relation and subject.")
     subject, relation = parsed
-    procedure = match.group("procedure").strip()
+    procedure = _normalize_procedure_sequence(match.group("procedure"))
     positive_facts = knowledge.facts()
     negative_facts = knowledge.negative_facts()
     fact_records = [asdict(fact) for fact in positive_facts]
