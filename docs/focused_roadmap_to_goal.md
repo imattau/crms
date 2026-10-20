@@ -429,6 +429,34 @@ task completion, while keeping dialogue safety in the release path. Source
 rule discovery proceeds as a separate research lane; it must not block
 recombination with already reviewed components.
 
+### Next execution card
+
+This is the order for the next development cycle, based on the current checkout
+(`68b3214`) and the latest dialogue and recombination findings. It deliberately
+starts by checking current behavior: reports describe earlier commits, and a
+regression already fixed in the current tree should not trigger duplicate code.
+
+| Order | Work | Concrete output | Advance when |
+| --- | --- | --- | --- |
+| 1 | Re-run the reported conversation failures on current code, in a fresh process. Include Eiffel Tower/Colosseum topic switching, “and Italy?” after source-only evidence, failed-turn context retention, `why?`, “what did I just ask?”, and “the first one”. Preserve the existing uncommitted dialogue artifacts. | A frozen end-to-end transcript packet and a result report separating wrong referents, completion, clarification, abstention, omissions, and evidence support. | No confident wrong referents or stale explanations on controls; unresolved context clarifies or abstains. Any failure becomes the next small fix. |
+| 2 | Broaden the proof-backed recombination slice through ordinary chat. Vary wording, entities, values, order of operations, and source layout; include at least two compositions where one inferred result feeds a later operation. Use independently authored held-out requests and an independent output/proof checker. | A frozen transfer set, task-level scorecard, and clean-process replay using separately reviewed knowledge and procedures. | More held-out tasks complete than the explicit baseline, with no increase in confident unsupported answers; invalid, conflicting, incomplete, or tampered results are rejected. |
+| 3 | Add governed derivation as a proposal path on top of verified recombination. Record full proof, rule, procedure, and source lineage; test correction, retraction, stale dependencies, duplicate filtering, and an intentionally bad derivation. | A derived-case lifecycle report covering proposal, review/revalidation, write-back, reload, and invalidation. | Correcting any dependency disables or revalidates every dependent result; derived outputs cannot validate their own producing rules; growth follows a measured policy. |
+| 4 | Run the source-rule learner as a separate transfer study, frozen before review on untouched units from a new publisher. Review both proposals and sampled non-proposals; retain claim and context citations. | A labeled transfer report with useful yield, false proposals, missed claims, abstentions, and teacher/review effort. | Evidence supports useful transfer without hand-coded semantic mappings. Otherwise redesign the representation or record a no-go for that learner. |
+| 5 | Use the common scorecard to select one bounded task each in coding, math, translation, and creative work, after steps 1–3 establish a stable chat and recombination baseline. | For each selected task: held-out prompts, a validator independent of generation, ordinary-chat and repair results, and a portability check. | Each task shows useful completion, valid outputs, honest limits, and repair on unseen examples before scope expands. |
+| 6 | Exercise the SQLite model as the complete distributable runtime after the preceding learning paths stabilize. | A clean copied model with source files unavailable, replaying query, learn, compose, reason, explain, correct, save/reload, and the shared scorecard. | Behavior, provenance, searchable source text, and correction lineage survive from the copy alone; size and compatibility are documented. |
+
+Dialogue intent and multi-turn safety are evaluated in every chat-facing step,
+not deferred to step 5. Research into induced dialogue moves may proceed
+alongside the baseline, but it advances only if it improves held-out task
+outcomes over the explicit dialogue baseline without increasing wrong
+referents or unsupported claims. The source-rule study can also proceed in
+parallel; it is not a prerequisite for recombination from reviewed components.
+
+The highest-priority implementation loop is therefore **step 1, then step 2**.
+Do not add more parser branches, domains, or self-write behavior until the
+corresponding failure set and gate are fixed. Preserve experiment outputs and
+user-owned working files; commit only authored plan or code paths.
+
 ### Milestone 1 — Freeze one end-to-end scorecard and verify current failures
 
 Build a small, versioned packet of ordinary chat tasks covering (a) the
