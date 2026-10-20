@@ -1262,9 +1262,25 @@ def _present_direct_search_matches(
     conversation context.
     """
     research = turn.research
-    if research_index is None or research is None:
+    if research_index is None:
+        return turn
+
+    def clear_visible_search_context() -> None:
+        dialogue.presented_sources = []
+        dialogue.source_mentions = []
+        dialogue.topic_entity = None
+        dialogue.last_question = None
+        dialogue.last_answered = None
+        dialogue.last_selected_answer = None
+
+    if research is None:
+        clear_visible_search_context()
+        turn.text = ("I couldn't find a source excerpt that matched what "
+                     "you're looking for, so I can't recommend an option "
+                     "from the indexed material.")
         return turn
     if research.status != "sources_found":
+        clear_visible_search_context()
         if research.status == "unknown":
             turn.text = ("I couldn't find a matching source for what you're "
                          "looking for, so I can't recommend an option from "
@@ -1368,6 +1384,7 @@ def _present_direct_search_matches(
         if len(visible) == 3:
             break
     if not visible:
+        clear_visible_search_context()
         turn.text = ("I couldn't find a source excerpt that matched what "
                      "you're looking for, so I can't recommend an option "
                      "from the indexed material.")
@@ -1395,6 +1412,46 @@ def _present_direct_search_matches(
                              if len(dialogue.source_mentions) == 1 else None)
     dialogue.last_question = turn.resolved_question
     return turn
+
+
+def _contextual_search_continuation(
+        dialogue: CRMSDialogue, text: str) -> tuple[str, str, str] | None:
+    """Carry a visible direct search forward when the user changes locality.
+
+    This only handles short locality substitutions after a displayed search
+    result. It does not resolve general entity mentions or infer a new search
+    category.
+    """
+    previous_intent = dialogue.last_intent_hypothesis
+    previous_query = dialogue.last_question
+    if (previous_intent is None
+            or previous_intent.matched_frame != "explicit-search-request"
+            or not dialogue.presented_sources
+            or not isinstance(previous_query, str)):
+        return None
+    followup = re.fullmatch(
+        r"(?:(?:what|how)\s+about|and(?:\s+in)?)\s+"
+        r"(?P<location>[a-z][a-z0-9 .,'’-]{0,79})[?.!]*",
+        text.strip(), re.IGNORECASE)
+    if followup is None:
+        return None
+    location = followup.group("location").strip(" .,!?'’\"")
+    if (not location or re.match(r"^(?:a|an|the|one|it|they|this|that)\b",
+                                 location, re.IGNORECASE)):
+        return None
+    target_match = re.search(
+        r"(?:looking for|need to find|want to find|search for|look for|"
+        r"find(?:\s+me)?|locate|need|want)\s+"
+        r"(?P<target>.+?)(?:[.!?]|$)", previous_query.casefold())
+    if target_match is None:
+        return None
+    target_parts = re.split(
+        r"\b(?:in|near|around|at|within)\b",
+        target_match.group("target"), maxsplit=1)
+    if len(target_parts) != 2 or not target_parts[0].strip():
+        return None
+    target = target_parts[0].strip()
+    return f"Find {target} in {location}.", target, location
 
 
 def _compound_wh_parts(text: str) -> list[str] | None:
@@ -1557,6 +1614,9 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         # Treat "and when ...?" as a continuation of the current grounded
         # topic, while keeping the user's original wording in turn history.
         text = _COORDINATED_QUESTION_PREFIX_RE.sub("", text, count=1).lstrip()
+    search_continuation = _contextual_search_continuation(dialogue, text)
+    if search_continuation is not None:
+        text = search_continuation[0]
     embedded_request = _EMBEDDED_WH_REQUEST_RE.fullmatch(text.strip())
     if embedded_request is not None:
         question = embedded_request.group("question").strip().rstrip(" .?!")
@@ -2048,6 +2108,10 @@ def respond(dialogue: CRMSDialogue, text: str, *,
                 and intent.matched_frame == "explicit-search-request"):
             turn = _present_direct_search_matches(
                 dialogue, turn, research_index)
+            if search_continuation is not None:
+                _, target, location = search_continuation
+                turn.text = (f"Continuing your search for {target} in "
+                             f"{location}:\n{turn.text}")
         if dialogue.pending_binding is not None:
             intent = UserIntentHypothesis(
                 dialogue_act="question",

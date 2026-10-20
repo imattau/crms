@@ -58,6 +58,27 @@ synonyms, broader location formats, and independently authored requests remain
 untested. See the [runner](../experiments/v1_519_direct_search_wording_transfer.py)
 and [report](../experiments/reports/v1_519_direct_search_wording_transfer.json).
 
+## Contextual search follow-up (`v1_520`, 2026-10-20)
+
+Command: `python3 experiments/v1_520_contextual_search_location_followup.py`.
+
+After listing a cited Chinese restaurant in San Francisco, the dialogue is
+saved and reloaded. “What about Oakland?” keeps the cuisine constraint,
+changes the locality, and presents only the Oakland source. A following
+“why?” explains the new result. When “What about Miami?” finds no source, the
+visible list is cleared; “why?” does not replay the San Francisco result, and
+“the first one” cannot select it. All nine packet assertions and the selected
+seven-script search/dialogue replay pass.
+
+This closes one bounded search-state transition and its stale-context controls.
+The rewrite applies only to short locality follow-ups after a visible direct
+search. It does not yet handle changes to cuisine, price, time, or other
+constraints, nor does it establish general entity/topic continuity. The corpus
+and labels are Codex-authored, so this is a development regression, not
+independent dialogue-transfer evidence. See the
+[runner](../experiments/v1_520_contextual_search_location_followup.py) and
+[report](../experiments/reports/v1_520_contextual_search_location_followup.json).
+
 ## History recall and ordinal source selection in one conversation (`v1_517`)
 
 Command: `python3 experiments/v1_517_dialogue_history_and_ordinal_flow.py`.
