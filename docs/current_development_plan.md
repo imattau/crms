@@ -55,6 +55,10 @@ citations against the active index and can validate structural reuse across
 reviewed phrase rules when example sources, instruction sources, and labeler
 IDs are complete. It does not extract or understand procedure wording from raw
 prose, and distinct document IDs do not establish independent publishers.
+Separately, `v1_447` demonstrates single-step phrase-role transfer: all 27
+action/object/direction combinations pass leave-one-out composition through
+code generation and fresh chat. Its phrases and labels are Codex-authored, so
+it is a transfer diagnostic rather than source-derived rule learning.
 
 ### 1. Lock the evaluation contract and dialogue safety baseline
 

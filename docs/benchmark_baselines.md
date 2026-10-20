@@ -1969,6 +1969,27 @@ are still isolated under `experiments/`, not a general source-rule review
 feature. Full-document, cross-publisher data and genuinely held-out negatives
 are still required before discussing production use or autonomous learning.
 
+## Single-step phrase-role recombination (2026-10-20)
+
+Command: `python3 experiments/v1_447_single_step_phrase_role_recombination.py`.
+
+Twenty-six Codex-authored phrases cover all but one combination in a
+3-action × 3-object × 3-direction grid. Three input/output demonstrations
+teach each phrase as ascending sort. Leave-one-combination-out evaluation
+composes all 27 held-out requests. For “arrange numbers upward,” CRMS produces
+the correct transform for four lists and generates Python in a fresh chat
+process. Four controls with an unseen role, unseen direction, wrong order, or
+unrelated action abstain. Labeler provenance survives reload.
+
+This establishes a useful one-step role-recombination path in addition to the
+multi-step parameterized examples. The phrases and labels are all authored by
+one Codex labeler; there is no raw-source extraction or source-disjoint
+validation here. The grid uses three-token phrases and does not establish
+general paraphrase understanding, novel syntax, or representative user
+coverage. Keep the result separate from source-derived learning and measure
+wording, order, and role transfer on independently sourced and held-out
+language before widening the runtime behavior.
+
 ## Procedure evidence and labeler provenance (2026-10-20)
 
 Commands:
