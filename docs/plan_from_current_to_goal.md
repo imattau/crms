@@ -209,13 +209,15 @@ separately Codex-taught. Preserve this as a new transfer control, not a
 generalization rate.
 
 The math-language diagnostic (`v1_531`) adds fixed, inspectable meanings for
-conventional arithmetic words and numeric higher/lower comparisons. Exact
-decimal math, precedence, save/reload, the chat route with the read-only PMC
-index, and the existing learned-operator path pass their targeted diagnostics.
-The operands came from one CC BY scientific article but were supplied in the
-math query: automatic extraction, evidence linkage, and a user-facing
-percentage-point answer are still missing. This closes a small language gap;
-it is not evidence of broad mathematical reasoning.
+conventional arithmetic words and numeric higher/lower comparisons. The
+follow-up `v1_532` extracts `0.644` and `0.605` from one exact CC BY article
+sentence, retains a verifiable citation on each operand, and answers the
+natural-language request with the exact result “3.9 percentage points higher.”
+Fresh chat also abstains on an unsupported measure and conflicting source
+values, and corrects a query whose requested direction disagrees with the
+evidence. This closes one source-to-number-to-calculation path. It remains one
+question frame and one source layout; table extraction, broader source transfer,
+and general mathematical reasoning remain unproven.
 
 ## Execution order
 
@@ -335,12 +337,12 @@ extend the `v1_529`/`v1_530` composition packet to an external publisher or
 source type, with multiple held-out relation and procedure examples, wording
 and evidence-order variation, an independent checker, and unknown, negative,
 and conflicting controls. Measure proposal precision and missed cases if
-source-derived rules are involved. For math, test the next composition step:
-retrieve source-backed numeric premises, calculate a requested difference,
-preserve citations for both operands, and state units such as percentage
-points accurately. Keep the Eiffel/Colosseum and Marie/Einstein failures as
-permanent dialogue controls, and keep derived write-back review-gated until
-recombination, correction, and invalidation pass on held-out tasks.
+source-derived rules are involved. For math, extend `v1_532` with a frozen set
+of source-disjoint numeric comparisons and alternate source layouts, including
+tables, while preserving operand citations and unit semantics. Keep the
+Eiffel/Colosseum and Marie/Einstein failures as permanent dialogue controls,
+and keep derived write-back review-gated until recombination, correction, and
+invalidation pass on held-out tasks.
 
 For detailed implementation history and experiment evidence, see
 [`focused_roadmap_to_goal.md`](focused_roadmap_to_goal.md) and

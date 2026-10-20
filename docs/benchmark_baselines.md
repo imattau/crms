@@ -26,6 +26,30 @@ improvement, not evidence of broad mathematical reasoning or theorem proving.
 See the [runner](../experiments/v1_531_standard_math_operator_phrases.py) and
 [report](../experiments/reports/v1_531_standard_math_operator_phrases.json).
 
+## Source-grounded percentage-point comparison (`v1_532`, 2026-10-20)
+
+Command: `python3 experiments/v1_532_source_grounded_percentage_points.py`.
+
+Given “How many percentage points higher was the fraction of non-reference
+chrX genotypes that were heterozygous in women on T2T than on GRCh38?”, CRMS
+finds the exact PMC sentence with both labelled values, retains `0.644` and
+`0.605` as separate operands with the same exact sentence citation, and answers
+“3.9 percentage points higher” using exact decimal arithmetic. A fresh chat
+process reports the calculation and source. A query whose requested direction
+contradicts the values reports the observed direction; an unsupported measure
+abstains. Two scratch source records with different T2T values produce a
+conflict response instead of a selected result. All runtime controls pass.
+
+This closes one source-to-number-to-calculation path. It uses one explicitly
+framed question, one CC BY PMC article, decimal values expressed with named
+conditions in the same assertion sentence, and a bounded extraction pattern.
+It does not establish extraction from tables or across sentences, general
+scientific numeric reasoning, or publisher transfer. Keep broader math and
+numeric-source evaluation open.
+
+Report: [experiment](../experiments/v1_532_source_grounded_percentage_points.py),
+[results](../experiments/reports/v1_532_source_grounded_percentage_points.json).
+
 ## arXiv category/year reasoning-to-sort (`v1_530`, 2026-10-20)
 
 Command: `python3 experiments/v1_530_arxiv_reasoned_sort_transfer.py`.

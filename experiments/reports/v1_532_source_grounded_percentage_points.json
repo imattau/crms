@@ -1,0 +1,50 @@
+{
+  "experiment": "v1_532_source_grounded_percentage_points",
+  "date": "2026-10-20",
+  "method": "A fixed natural-language percentage-point frame locates one assertion sentence containing the complete measure and both condition labels, extracts exact decimal strings, verifies the citation, and calculates with rational arithmetic.",
+  "source": {
+    "index": "data/crms_project_model_academic_expanded_pmc.sqlite.memories/research.sqlite",
+    "document_id": "pmc:PMC13675955.v1.rb496c301cb6ab27e",
+    "title": "The reference shapes the signal: chrX genotype summaries and classifier sex disparity between GRCh38 and T2T-CHM13 callsets",
+    "license": "CC BY, recorded in the local PMC document metadata",
+    "sentence": "In women, the fraction of non-reference chrX genotypes that were heterozygous was 0.605 on GRCh38 and 0.644 on T2T.",
+    "citation": "pmc:PMC13675955.v1.rb496c301cb6ab27e#sha256=b256b497d28dadf4e1b74a5bcce8e51f9c32c4033151f401bd45541cdb086839&chars=1935:2050"
+  },
+  "calculation": {
+    "operands": [
+      {
+        "label": "T2T",
+        "value": "0.644",
+        "citation": "pmc:PMC13675955.v1.rb496c301cb6ab27e#sha256=b256b497d28dadf4e1b74a5bcce8e51f9c32c4033151f401bd45541cdb086839&chars=1935:2050"
+      },
+      {
+        "label": "GRCh38",
+        "value": "0.605",
+        "citation": "pmc:PMC13675955.v1.rb496c301cb6ab27e#sha256=b256b497d28dadf4e1b74a5bcce8e51f9c32c4033151f401bd45541cdb086839&chars=1935:2050"
+      }
+    ],
+    "formula": "(0.644 - 0.605) * 100",
+    "exact_percentage_point_difference": "3.9",
+    "formatted_result": "3.9 percentage points higher",
+    "both_operand_citations_resolve_to_the_same_exact_sentence": true
+  },
+  "chat": {
+    "source_backed_query": "3.9 percentage points higher on T2T than on GRCh38. Calculation: (0.644 − 0.605) × 100 = 3.9. [Source: The reference shapes the signal: chrX genotype summaries and classifier sex disparity between GRCh38 and T2T-CHM13 callsets; inputs are quoted evidence, not accepted facts]",
+    "query_direction_contradicted_by_source": "The comparison is 3.9 percentage points higher on T2T than on GRCh38. Calculation: (0.644 − 0.605) × 100 = 3.9. [Source: The reference shapes the signal: chrX genotype summaries and classifier sex disparity between GRCh38 and T2T-CHM13 callsets; inputs are quoted evidence, not accepted facts]",
+    "unsupported_measure_abstention": "I couldn't find one source sentence that states the measure, both named conditions, and both numeric values together, so I can't calculate the percentage-point difference.",
+    "conflicting_source_abstention": "Matching source sentences disagree on the numeric comparison (0.644 vs 0.605; 0.650 vs 0.605) across Study A, Study B. I can't choose one without review."
+  },
+  "controls": {
+    "independent_decimal_oracle": "0.644 - 0.605 = 0.039; * 100 = 3.9",
+    "unsupported_measure": "abstained",
+    "unscaled_unitless_fraction": "abstained",
+    "opposite_requested_direction": "reported observed direction (higher)",
+    "two_source_conflict": "abstained pending review"
+  },
+  "limitations": [
+    "One explicitly framed percentage-point question and one CC BY article were evaluated.",
+    "The measure and both labels must occur in one assertion sentence; table extraction and multi-sentence linkage are not covered.",
+    "This does not establish general numeric extraction, scientific reasoning, or transfer across publishers.",
+    "The domain route uses a bounded source pattern and is not an induced general-purpose math language model."
+  ]
+}

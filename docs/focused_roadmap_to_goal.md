@@ -1,6 +1,6 @@
 # Focused roadmap from the current CRMS to its goal
 
-**Reviewed:** 2026-10-20 against `e350425`
+**Reviewed:** 2026-10-20, including the `v1_532` runtime result
 **Status:** execution plan; the capability goal remains unmet.
 
 ## Destination
@@ -63,6 +63,9 @@ stale `why?`, history recall, and ordinal references. Some of these behaviors
 have since received focused fixes and controls. Replay the complete reported
 sequence against the current checkout before classifying each observation as
 open or fixed; preserve every reproduced failure as an end-to-end control.
+The current `v1_427` 30-turn transcript also passes on this checkout, with no
+cross-topic leak in its Colosseum follow-ups. It is a curated regression, not a
+replacement for replaying the user's exact transcript and corpus.
 
 The next development cycles should follow this order:
 
@@ -483,11 +486,12 @@ recombination with already reviewed components.
 
 ### Next execution card
 
-This is the order for the next development cycles, reviewed against the latest
-committed snapshot (`e350425`, 2026-10-20). Recheck reported behavior before
-changing code; historical reports describe earlier snapshots and should not
-trigger duplicate fixes. The objective is to improve held-out user task
-completion, not to add more demonstrations of the same finite-list operations.
+This is the order for the next development cycles, reviewed against core code
+snapshot `e350425`, with the source-grounded math increment `v1_532` validated
+and recorded below. Recheck reported behavior before changing code; historical
+reports describe earlier snapshots and should not trigger duplicate fixes. The
+objective is to improve held-out user task completion, not to add more
+demonstrations of the same finite-list operations.
 
 | Order | Work | Concrete output | Advance when |
 | --- | --- | --- | --- |
@@ -498,7 +502,7 @@ completion, not to add more demonstrations of the same finite-list operations.
 | 5 | **Expand breadth only through validated task slices.** Use the same natural-language interface for coding, math, translation, and creative work. Select the next task from observed failures; define held-out requests, negative cases, an independent checker or rubric, and repair behavior before implementation. Test each domain before cross-domain composition. | Per-task ordinary-chat scorecards for coverage, correctness/quality, unsupported output, provenance, repair, and cost. | Each slice demonstrates useful held-out completion and honest limits. A feature, corpus, or one-off success does not count as domain competence. |
 | 6 | **Validate SQLite as the complete distributable runtime.** Once learning and correction lifecycles stabilize, copy the model where source files are unavailable and replay the shared scorecard, including query, learning, recombination, reasoning, explanation, correction, and reload. | Reproducible copy-only report including searchable source text, accepted knowledge, rules, provenance, correction lineage, licensing metadata, size, and migration behavior. | Tested behavior depends only on the copied model and runtime, and evidence/corrections remain inspectable after reload. |
 
-**Latest committed checkpoint (2026-10-20, `e350425`):** the project has
+**Core capability checkpoint (2026-10-20, `e350425`):** the project has
 well-instrumented controlled paths for proof-checked reasoning, bounded
 recombination, source-backed retrieval, contextual dialogue state, reviewed
 learning, and SQLite portability. The prior multi-turn dialogue failures now
@@ -528,10 +532,14 @@ with varied request forms and adversarial reasoning cases. Dialogue remains a
 release gate, and source-rule extraction proceeds separately. Broad capability
 and reliable self-learning remain unproven.
 
-The latest math control adds ordinary arithmetic operator phrases and
-higher/lower comparisons while preserving exact results. It evaluates supplied
-numeric operands; broad source-grounded numeric extraction and calculation
-remain a separate task slice.
+The math controls now cover conventional arithmetic language and one
+source-grounded percentage-point calculation: `v1_532` extracts two decimal
+values from a cited assertion sentence, retains a citation for each operand,
+and reports the exact `3.9 percentage points` result through fresh-process
+chat. It also abstains on an unsupported measure and conflicting source
+values. The result is limited to one question frame and one article layout;
+table extraction, publisher transfer, and broad mathematical reasoning remain
+open.
 
 The new `v1_514` composition control combines an accepted source-backed
 predicate alignment with an accepted, proof-checked type hierarchy in ordinary

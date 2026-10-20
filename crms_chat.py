@@ -6,6 +6,8 @@ import argparse
 import ast
 from dataclasses import asdict, replace
 import copy
+from decimal import Decimal
+from fractions import Fraction
 import hashlib
 import json
 import re
@@ -1976,6 +1978,158 @@ def _natural_object_wh_source_evidence(
         evidence["candidate"] = candidate
         return evidence
     return None
+
+
+def _natural_percentage_point_question(
+        message: str) -> tuple[str, str, str, str] | None:
+    """Parse a named-measure comparison asking for percentage points."""
+    match = re.fullmatch(
+        r"\s*how\s+many\s+percentage\s+points\s+"
+        r"(?P<direction>higher|lower)\s+(?:is|was|are|were)\s+"
+        r"(?P<measure>.+?)\s+on\s+(?P<target>[^?!.]+?)\s+"
+        r"than\s+on\s+(?P<baseline>[^?!.]+?)\s*[?!.]*\s*",
+        message, flags=re.IGNORECASE)
+    if match is None:
+        return None
+    values = tuple(match.group(name).strip()
+                   for name in ("measure", "target", "baseline", "direction"))
+    return values if all(values) else None
+
+
+def _format_exact_decimal(value: Fraction) -> str:
+    """Render a finite decimal fraction without rounding or trailing zeroes."""
+    numerator = value.numerator
+    denominator = value.denominator
+    twos = fives = 0
+    while denominator % 2 == 0:
+        denominator //= 2
+        twos += 1
+    while denominator % 5 == 0:
+        denominator //= 5
+        fives += 1
+    if denominator != 1:
+        return f"{value.numerator}/{value.denominator}"
+    places = max(twos, fives)
+    scaled = abs(numerator) * (2 ** (places - twos)) * (5 ** (places - fives))
+    digits = str(scaled).rjust(places + 1, "0")
+    if places:
+        whole, decimal = digits[:-places], digits[-places:]
+        rendered = f"{whole}.{decimal}".rstrip("0").rstrip(".")
+    else:
+        rendered = digits
+    return f"-{rendered}" if numerator < 0 else rendered
+
+
+def _natural_percentage_point_evidence(
+        index: CRMSSQLiteResearchIndex, message: str
+        ) -> dict[str, Any] | None:
+    """Find a same-sentence, labelled numeric pair and cite both operands."""
+    parsed = _natural_percentage_point_question(message)
+    if parsed is None:
+        return None
+    measure, target, baseline, direction = parsed
+    measure_terms = set(normalized_tokens(measure)) - _RESEARCH_STOPWORDS
+    target_terms = set(normalized_tokens(target)) - _RESEARCH_STOPWORDS - {
+        "callset", "assembly", "reference", "dataset"}
+    baseline_terms = set(normalized_tokens(baseline)) - _RESEARCH_STOPWORDS - {
+        "callset", "assembly", "reference", "dataset"}
+    if not measure_terms or not target_terms or not baseline_terms:
+        return None
+    required_terms = measure_terms | target_terms | baseline_terms
+    query = " ".join(sorted(required_terms))
+    hits = index.search(query, limit=100, context_chars=240)
+    document_hits: dict[str, SearchHit] = {}
+    for hit in hits:
+        if _is_code_source(hit.location):
+            continue
+        document_hits.setdefault(hit.document_id, hit)
+
+    label_pattern = re.compile(
+        r"(?P<value>[+-]?(?:\d+(?:\.\d+)?|\.\d+))\s+"
+        r"(?:on|under|for)\s+(?P<label>[A-Za-z0-9][A-Za-z0-9.-]*)",
+        re.IGNORECASE)
+    matches: dict[
+        tuple[Fraction, Fraction],
+        list[tuple[dict[str, Any], str, str]],
+    ] = {}
+    matched_terms = tuple(sorted(required_terms))
+    for hit in document_hits.values():
+        document = index.document(hit.document_id)
+        doc_terms = set(normalized_tokens(document.text))
+        if not required_terms <= doc_terms:
+            continue
+        for start, end in _sentence_spans(document.text):
+            sentence = document.text[start:end]
+            if _sentence_context_kind(sentence, document.text, start) != "assertion":
+                continue
+            sentence_terms = set(normalized_tokens(sentence))
+            if not required_terms <= sentence_terms:
+                continue
+            values_by_label: dict[str, list[Fraction]] = {}
+            literals_by_label: dict[str, list[str]] = {}
+            for numeric in label_pattern.finditer(sentence):
+                labels = normalized_tokens(numeric.group("label"))
+                if len(labels) != 1:
+                    continue
+                label = labels[0]
+                literal = numeric.group("value")
+                values_by_label.setdefault(label, []).append(
+                    Fraction(Decimal(literal)))
+                literals_by_label.setdefault(label, []).append(literal)
+            target_label = next(iter(target_terms)) if len(target_terms) == 1 else None
+            baseline_label = (next(iter(baseline_terms))
+                              if len(baseline_terms) == 1 else None)
+            if not target_label or not baseline_label or target_label == baseline_label:
+                continue
+            target_values = values_by_label.get(target_label, [])
+            baseline_values = values_by_label.get(baseline_label, [])
+            if len(target_values) != 1 or len(baseline_values) != 1:
+                continue
+            fractional_values = all(
+                Fraction(0) <= value <= Fraction(1)
+                for value in (target_values[0], baseline_values[0]))
+            if (fractional_values
+                    and not sentence_terms.intersection(
+                        {"fraction", "proportion", "probability"})):
+                continue
+            evidence = _cited_sentence_evidence(
+                index, hit, start, end, matched_terms)
+            if evidence is None:
+                continue
+            pair = (target_values[0], baseline_values[0])
+            matches.setdefault(pair, []).append((
+                evidence, literals_by_label[target_label][0],
+                literals_by_label[baseline_label][0]))
+    if not matches:
+        return None
+    if len(matches) > 1:
+        return {"conflicts": [
+            {"target_value": rows[0][1], "baseline_value": rows[0][2],
+             "evidence": [item[0] for item in rows]}
+            for pair, rows in sorted(matches.items())]}
+    (target_value, baseline_value), matched_rows = next(iter(matches.items()))
+    # A fraction difference such as 0.644 - 0.605 is 0.039, or 3.9
+    # percentage points. Values already expressed on a percentage scale are
+    # differenced directly.
+    scale = (100 if all(Fraction(0) <= value <= Fraction(1)
+                        for value in (target_value, baseline_value)) else 1)
+    delta = (target_value - baseline_value) * scale
+    matched_rows.sort(key=lambda item: (
+        len(item[0]["text"]), item[0]["document_id"], item[0]["citation"]))
+    selected, target_literal, baseline_literal = dict(matched_rows[0][0]), \
+        matched_rows[0][1], matched_rows[0][2]
+    selected["operands"] = [
+        {"label": target, "value": target_literal,
+         "citation": selected["citation"]},
+        {"label": baseline, "value": baseline_literal,
+         "citation": selected["citation"]},
+    ]
+    selected["difference"] = delta
+    selected["scale"] = scale
+    selected["observed_direction"] = (
+        "higher" if target_value > baseline_value
+        else "lower" if target_value < baseline_value else "equal")
+    return selected
 
 
 def _natural_count_question(message: str) -> tuple[str, str, str] | None:
@@ -10384,6 +10538,69 @@ def main() -> int:
         retrieved_source_sentences = (
             list(turn.research.source_sentences or [])
             if turn.research is not None else [])
+        percentage_point_question = _natural_percentage_point_question(line)
+        percentage_point_evidence = None
+        percentage_point_route_used = False
+        if (current_effort in {"standard", "thorough"}
+                and percentage_point_question is not None
+                and turn.status in {"unknown", "sources_found", "needs_review"}
+                and not (turn.response is not None
+                         and turn.response.status in {"answered", "ambiguous"})):
+            percentage_point_route_used = True
+            percentage_point_evidence = _natural_percentage_point_evidence(
+                index, line)
+            if turn.research is None:
+                turn.research = ResearchResult(status="unknown")
+            if percentage_point_evidence is None:
+                turn.text = (
+                    "I couldn't find one source sentence that states the "
+                    "measure, both named conditions, and both numeric values "
+                    "together, so I can't calculate the percentage-point "
+                    "difference.")
+                turn.research.source_sentences = []
+            elif percentage_point_evidence.get("conflicts"):
+                conflicts = percentage_point_evidence["conflicts"]
+                values = "; ".join(
+                    f"{item['target_value']} vs {item['baseline_value']}"
+                    for item in conflicts)
+                rows = [row for item in conflicts for row in item["evidence"]]
+                titles = sorted({row.get("title", "source") for row in rows})
+                turn.text = (
+                    "Matching source sentences disagree on the numeric "
+                    f"comparison ({values}) across {', '.join(titles)}. "
+                    "I can't choose one without review.")
+                turn.research.source_sentences = rows
+            else:
+                operands = percentage_point_evidence["operands"]
+                target_operand, baseline_operand = operands
+                scale = percentage_point_evidence["scale"]
+                difference = percentage_point_evidence["difference"]
+                amount = abs(difference)
+                observed = percentage_point_evidence["observed_direction"]
+                title = percentage_point_evidence.get("title") or "source"
+                if observed == "equal":
+                    claim = (f"The values are equal on {target_operand['label']} "
+                             f"and {baseline_operand['label']}: 0 percentage points")
+                else:
+                    claim = (
+                        f"{_format_exact_decimal(amount)} percentage points "
+                        f"{observed} on {target_operand['label']} than on "
+                        f"{baseline_operand['label']}")
+                    if observed != percentage_point_question[3]:
+                        claim = "The comparison is " + claim
+                calculation = (
+                    f"({target_operand['value']} − {baseline_operand['value']})"
+                    f"{' × 100' if scale == 100 else ''} = "
+                    f"{_format_exact_decimal(difference)}")
+                turn.text = (
+                    f"{claim}. Calculation: {calculation}. [Source: {title}; "
+                    "inputs are quoted evidence, not accepted facts]")
+                if current_effort == "thorough":
+                    turn.text += (
+                        "\nPlausibility check: both labelled values occur in "
+                        "the same cited assertion sentence.")
+                turn.research.status = "sources_found"
+                turn.research.source_sentences = [percentage_point_evidence]
         count_question = _natural_count_question(line)
         count_evidence = None
         count_route_used = False
@@ -11457,7 +11674,8 @@ def main() -> int:
                 and not typed_relation_route_used and not polar_route_used
                 and not where_route_used and not why_route_used
                 and not object_wh_route_used
-                and not count_route_used and not superlative_route_used
+                and not count_route_used and not percentage_point_route_used
+                and not superlative_route_used
                 and definition_topic is None):
             turn.text = (
                 f"{source_realization['text']} [Source: "
@@ -11553,7 +11771,8 @@ def main() -> int:
             who_route_used, typed_relation_route_used, polar_route_used,
             where_route_used, when_route_used, why_route_used, object_wh_route_used,
             irregular_form_route_used,
-            count_route_used, superlative_route_used,
+            count_route_used, percentage_point_route_used,
+            superlative_route_used,
             definition_evidence is not None,
             superlative_evidence is not None,
             capital_field_evidence is not None,
@@ -11562,7 +11781,10 @@ def main() -> int:
         ))
         specialist_route_abstained = (
             (where_route_used and where_evidence is None)
-            or (when_route_used and when_evidence is None))
+            or (when_route_used and when_evidence is None)
+            or (percentage_point_route_used
+                and (percentage_point_evidence is None
+                     or bool(percentage_point_evidence.get("conflicts")))))
         # Judge evidence against the question the dialogue actually answered.
         # A follow-up such as "when was it completed?" is resolved to a named
         # entity first; gating the raw wording would accept any sentence with
@@ -11571,6 +11793,7 @@ def main() -> int:
                          if turn.resolved_question else line)
         fallback_gate_eligible = (
             turn.status in {"unknown", "sources_found"}
+            and not percentage_point_route_used
             and supports_question_type(gate_question)
             and not has_structured_response
             and not has_review_candidates
@@ -11729,6 +11952,8 @@ def main() -> int:
             last_research_evidence = type_field_evidence
         elif population_field_evidence is not None:
             last_research_evidence = population_field_evidence
+        elif percentage_point_route_used and percentage_point_evidence is not None:
+            last_research_evidence = percentage_point_evidence
         elif irregular_form_route_used and irregular_form_candidate is not None:
             last_research_evidence = {
                 "document_id": irregular_form_candidate.source.split("#", 1)[0],
