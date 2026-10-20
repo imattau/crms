@@ -149,6 +149,8 @@ _SESSION_SLOT_QUESTIONS = {
     "cuisine": "What cuisine should I use?",
     "restaurant_choice": "Which restaurant should I use?",
 }
+_RESERVATION_DRAFT_SLOT_ORDER = (
+    "restaurant_choice", "date_time", "party_size")
 _ELABORATION_TOPIC_REPLY_RE = re.compile(
     r"^(?:about\s+)?(?P<topic>[\w][\w '&’.-]{0,118})[.! ]*$",
     re.IGNORECASE)
@@ -1347,6 +1349,33 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         _offer(dialogue, turn)
         return turn
 
+    def reservation_draft_prompt(utterance: str) -> DialogueTurn:
+        missing_slot = next((slot for slot in _RESERVATION_DRAFT_SLOT_ORDER
+                             if slot not in dialogue.session_slots), None)
+        if missing_slot is not None:
+            return DialogueTurn(
+                "clarify", utterance, utterance,
+                text=_SESSION_SLOT_QUESTIONS[missing_slot])
+        restaurant = dialogue.session_slots["restaurant_choice"]["value"]
+        date_time = dialogue.session_slots["date_time"]["value"]
+        party_size = dialogue.session_slots["party_size"]["value"]
+        return DialogueTurn(
+            "prepared", utterance, utterance,
+            text=("Reservation request draft (not submitted):\n"
+                  f"- Restaurant: {restaurant}\n"
+                  f"- Date/time: {date_time}\n"
+                  f"- Party size: {party_size}\n"
+                  "No reservation has been made."))
+
+    if (intent is not None and intent.decision == "selected"
+            and intent.task_intent == "make-reservation"
+            and intent.matched_frame == "explicit-reservation-request"):
+        return with_intent(DialogueTurn(
+            "clarify", text, text,
+            text=("I can prepare a reservation request draft, but I can't "
+                  "check availability or submit it from this chat. "
+                  "Which restaurant should I use?")))
+
     offers = dialogue.offers
     answers_offer = bool(
         offers and dialogue.pending_result is None
@@ -1449,6 +1478,14 @@ def respond(dialogue: CRMSDialogue, text: str, *,
                                         "provide-information"}
             and dialogue.open_dialogue_question is not None
             and _session_slot_correction(text) is None):
+        if (dialogue.active_task_intent == "make-reservation"
+                and intent.dialogue_act == "answer-clarification"
+                and dialogue.open_dialogue_question.get("expected_slot")
+                    in _RESERVATION_DRAFT_SLOT_ORDER):
+            dialogue.remember_session_slot(
+                intent.selected_value or text.strip(), user_turn=text)
+            dialogue.open_dialogue_question = None
+            return with_intent(reservation_draft_prompt(text))
         prompt = (dialogue.open_dialogue_question or {}).get("prompt", "")
         value = (intent.selected_value or text.strip()).rstrip(" .!?")
         if intent.dialogue_act == "provide-information":
@@ -1611,6 +1648,11 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             selected_value=value if decision == "selected" else None,
         )
         act = "correction"
+        if (decision == "selected"
+                and dialogue.active_task_intent == "make-reservation"
+                and all(required in dialogue.session_slots
+                        for required in _RESERVATION_DRAFT_SLOT_ORDER)):
+            return with_intent(reservation_draft_prompt(text))
         return with_intent(DialogueTurn(
             "social" if decision == "selected" else "clarify",
             text, text, text=reply))
