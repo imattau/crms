@@ -89,6 +89,25 @@ or abstention; every factual answer is supported by the evidence shown. If the
 gate fails, fix context lifetime and source/entity grounding before adding
 intent classes or learned dialogue moves.
 
+The latest roughly 30-turn Rome/Paris drive is a small diagnostic, not a
+transfer benchmark. It confirmed useful follow-ups, named topic changes,
+source citations, and abstention, but found a high-severity wrong answer:
+after switching from the Eiffel Tower to the Colosseum, “when was it
+completed?” selected the Eiffel Tower's 1889 sentence because both paragraphs
+used “It”. It also found that source-only answers lose usable context, failed
+turns clear all referents, and a later “why?” can explain an older answer.
+“What did I just ask?” and “the first one” remain unsupported. The immediate
+dialogue task is therefore a full-turn regression packet for topic changes,
+paragraph/entity grounding, source-only continuity, failed turns, explanation
+anchoring, history, and ordinal references. Require a unique paragraph or
+explicit entity link before resolving a pronoun-led sentence; if none exists,
+ask which entity the user means. Preserve typed visible context through
+recoverable source-only answers and abstentions, and make each explanation
+refer to the answer from the immediately relevant turn. Treat the submitted
+code-review observations (large `turn()` and `_resolve_pronoun`, duplicated
+candidate gathering, brittle persisted referents) as simplification targets
+only after these behaviors are locked by end-to-end tests.
+
 ### 2. Establish whether source-derived rules transfer
 
 Use complete technical references or another corpus that contains enough
@@ -317,54 +336,61 @@ academic-paper sources.
 
 ## Immediate sequence
 
-The next checkpoint is deliberately narrow. `v1_479` now passes its focused
-runtime checks, the earlier clause-aware source fixtures, and nine selected
-source/dialogue regressions. Treat that as bounded implementation evidence,
-not a transfer result. Do not count implementation or candidate yield as
-evidence of transfer.
+The next checkpoint is to remove a known confident dialogue error and
+establish a trustworthy end-to-end evaluation packet. Dialogue is a release
+gate; the primary capability path remains source-derived learning followed by
+recombination and verified reasoning. Work proceeds in this order:
 
-1. **Freeze and run the source-learning transfer gate.** Treat `v1_479` as the
-   frozen candidate method, then test untouched API units and a publisher not
-   used for design. Sample both
-   proposals and non-proposals, with document-level splits and exact cited
-   spans. Report useful proposals, boundary errors, missed claims, abstention,
-   and review effort. Keep `v1_473` as a negative corpus-fit control. If the
-   method fails, revise the general boundary/context model and reserve a new
-   holdout; do not patch individual phrases until the old set passes.
-2. **Close dialogue safety alongside every chat change.** Replay fixed
-   topic-switch, source-only-context, stale-`why?`, history, ordinal, repair,
-   and save/reload transcripts. Specifically retain the reported
-   Eiffel-Tower/Colosseum pronoun switch and “and Italy?” after source-only
-   evidence. Add independently authored multi-turn transcripts with competing
-   entities and varied paragraph layouts. Fix reproduced failures, and report
-   wrong referents, completion, clarification, omissions, and abstention
-   separately. Dialogue is a release gate, not a reason to widen intent or
-   move classes yet.
-3. **Prove recombination through ordinary chat.** Once source-derived
-   components transfer, compose one genuinely unseen multi-step request with
-   changed wording, values, and operation order. Run after fresh-process
-   reload; independently check output and proof. Include missing steps,
-   unsupported operations, explicit negatives, conflicts, integrity failures,
-   and search limits. Keep learned components, connective supervision,
-   hand-coded mappings, and orchestration visible. If only a scripted
-   experiment can assemble the task, the gate remains open.
-4. **Then govern self-learning.** After recombination passes, allow derived
-   outputs only as lineage-bearing proposals. Test correction propagation,
-   invalidation, duplicate suppression, trust weighting, abstention on stale
-   lineage, and storage growth. Derived results must not validate the rules
-   that generated them; write-back stays review-gated until all controls pass.
-5. **Advance dialogue research and breadth by measured need.** Evaluate
-   contextual intent against held-out task completion, then dialogue moves
-   against the explicit baseline. Only after these core gates, select one
-   bounded coding, math, translation, or creative task based on observed
-   failures. Finish by replaying the scorecard from a copied SQLite model with
-   original source files unavailable.
+1. **Lock and close the dialogue failures from the latest drive.** Turn the
+   Rome/Paris conversation into a clean-process transcript regression,
+   including the Eiffel Tower → Colosseum → “when was it completed?” switch,
+   “and Italy?” after source-only evidence, failed-turn context retention,
+   “why?” anchoring, “what did I just ask?”, and “the first one”. Fix referent
+   grounding and context lifetime before adding dialogue moves. Add varied
+   paragraph layouts and competing entities, then report confident wrong
+   answers, correct follow-ups, clarification, omission, and abstention
+   separately. A confident wrong referent is a release blocker.
+2. **Freeze a compact shared scorecard and keep it clean.** Replay all fixed
+   natural-language, retrieval, reasoning, recombination, and dialogue
+   regressions in fresh state. Add previously unseen, independently authored
+   multi-turn conversations and source layouts. Preserve incorrect cases as
+   controls; distinguish source-only evidence, accepted facts, inferred
+   conclusions, unknowns, and conflicts in both labels and scoring. Use these
+   results as the baseline for every chat-facing change.
+3. **Resolve the current source-learning question with a valid transfer
+   study.** The API-source work has demonstrated candidate yield and several
+   useful local boundary fixes, but the PyTorch review exposed substantial
+   boundary errors and missed conditional/shared-subject claims. Freeze the
+   current method, review proposals and non-proposals on untouched API units,
+   then test a publisher not used for design. Measure useful proposals,
+   boundary errors, missed claims, abstention, and review effort. If it fails,
+   redesign the general clause/context representation and reserve a new
+   holdout; do not tune on the confirmation set.
+4. **Demonstrate recombination through ordinary chat and verified
+   reasoning.** Once the learning gate clears, compose an unseen multi-step
+   request from separately supported components, with changed wording,
+   values, and operation order. Exercise the natural-language route, fresh
+   process, proof verifier, and independent task checker. Include missing
+   premises, negatives, conflicts, cycles/integrity failures, unsupported
+   operations, and incomplete search. Keep hand-coded mapping, supervision,
+   and orchestration visible. If only an experiment script can assemble it,
+   the gate remains open.
+5. **Then govern derived learning and widen scope.** Make verified outputs
+   reviewable proposals with lineage; test correction propagation,
+   invalidation, duplicate suppression, trust weighting, stale-lineage
+   abstention, and storage growth before automatic reuse. Evaluate contextual
+   intent and dialogue moves against held-out task completion separately.
+   Choose one bounded coding, math, translation, or creative task from
+   measured user-facing failures. Finally, replay the full scorecard from a
+   copied SQLite model with original source files unavailable.
 
 Do not expand the corpus, add a dialogue mechanism, widen domains, or migrate
-the runtime store merely to show activity. After each gate, ask whether
-held-out useful task completion improved without added confident errors. If
-not, retain the failure, state what it falsifies, and redesign the smallest
-part of the path that caused it.
+the runtime store merely to show activity. Continue to include recombination,
+self-learning rules, and reasoning in the main capability path; dialogue
+research protects the user-facing route and does not replace that work. After
+each gate, ask whether held-out useful task completion improved without added
+confident errors. If not, retain the failure, state what it falsifies, and
+redesign the smallest part of the path that caused it.
 
 ## Detailed references
 
