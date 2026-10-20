@@ -261,6 +261,21 @@ cross-domain replay including `v1_453` passed 19/19 in 14.46 seconds. This is a
 specific contextual-retrieval repair, not evidence of general multi-document
 reasoning or broad dialogue reliability.
 
+## Pending-review interruption control (2026-10-20)
+
+`v1_454_pending_review_does_not_interrupt_answer.py` creates two cited,
+review-only claims, then asks an unrelated question with an already accepted
+answer. The accepted answer is returned without a candidate reminder; both
+claims remain available through `/pending-candidates` in the same session and
+after restart. The adjacent rule-pending usability diagnostic also passes.
+These controls verify queue isolation for this sequence, not every possible
+pending-state interaction during long conversations.
+
+The combined cross-domain regression replay, including `v1_453`, `v1_454`, and
+the pending-rule usability control, passed 21/21 in 15.35 seconds. The
+diagnostics have different fixtures and scores; their aggregate is a regression
+count, not an overall capability rate.
+
 ## Post-grounding cross-domain rerun (2026-10-20)
 
 Code snapshot: commit `57c7892` (`Bind pronoun evidence to the nearest topic`).

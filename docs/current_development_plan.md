@@ -57,7 +57,11 @@ visible paper list with cited abstract sentences and asks for context if no
 list is open. The expanded 19-diagnostic cross-domain replay passed in 14.46
 seconds. This closes one extractive follow-up failure; it does not solve
 cross-paper synthesis, plain-language explanation, or pending-review
-interference in long conversations.
+interference in every long-conversation pattern. `v1_454` now confirms that
+two pending source candidates do not interrupt an unrelated accepted answer,
+remain explicitly reviewable, and survive restart. The combined 21-diagnostic
+replay passed in 15.35 seconds; those passes remain separate regression checks,
+not a representative user-task score.
 
 The overall direction is sound, but CRMS is not yet on track to claim its
 capability destination. Progress now depends on integrated, held-out outcomes,

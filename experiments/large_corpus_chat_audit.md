@@ -1603,4 +1603,8 @@ project-source sentence. `experiments/v1_453_recent_papers_topic_followup.py` re
 process behavior and independently resolves each citation. This is an extractive, bounded repair;
 it does not synthesize a shared topic taxonomy or explain research results in simpler language.
 The prior pending-review interruption was not exercised by this replay and remains a separate
-regression target.
+regression target. A separate fresh-session check now covers the direct-answer case: it creates
+two review-only Seine claims, asks an unrelated question with an accepted answer, and confirms
+that the answer is not interrupted while both candidates remain available through explicit review
+and after restart. `experiments/v1_454_pending_review_does_not_interrupt_answer.py` passes these
+checks. This does not yet test every review-state interaction in a long multi-topic transcript.
