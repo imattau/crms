@@ -88,6 +88,23 @@ python3 run_experiments.py --stop-on-failure
 Before opening a pull request, run the experiments related to what you changed
 and, where practical, the full set.
 
+### Running the scorecard
+
+The end-to-end scorecard drives the real chat CLI in clean processes and checks
+complete user tasks:
+
+```sh
+python3 run_scorecard.py --suite smoke
+python3 run_scorecard.py --suite smoke --list
+```
+
+Reports are written under `experiments/reports/scorecard/`. The scorecard is the
+instrument of record for capability claims; the `experiments/` diagnostics
+remain the unit regression layer. See
+[`experiments/scorecard/README.md`](experiments/scorecard/README.md) for the task
+schema, oracles, and freezing policy. Run the smoke suite before merging any
+chat-facing change.
+
 ## Adding or changing behaviour
 
 - **Add an experiment** for new behaviour under `experiments/`, named like the

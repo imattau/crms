@@ -1,0 +1,220 @@
+{
+  "generated_at": "2026-10-20T10:55:54+00:00",
+  "metadata": {
+    "platform": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39",
+    "project": "/home/lostcause/workspace/crms",
+    "python": "3.12.3"
+  },
+  "suite": "smoke",
+  "summary": {
+    "by_category": {
+      "abstention": {
+        "errors": 0,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 1,
+        "total": 1
+      },
+      "dialogue": {
+        "errors": 0,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 1,
+        "total": 1
+      },
+      "math": {
+        "errors": 0,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 2,
+        "total": 2
+      },
+      "procedures": {
+        "errors": 0,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 2,
+        "total": 2
+      },
+      "reload": {
+        "errors": 0,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 1,
+        "total": 1
+      },
+      "research": {
+        "errors": 0,
+        "failed": 0,
+        "pass_rate": 1.0,
+        "passed": 5,
+        "total": 5
+      }
+    },
+    "duration_s": {
+      "max": 0.431,
+      "median": 0.215,
+      "p95": 0.233
+    },
+    "errors": 0,
+    "failed": 0,
+    "gated_total": 12,
+    "known_failures": 0,
+    "known_failures_passed": 0,
+    "observed": {
+      "abstained": 1,
+      "answered": 9,
+      "clarified": 2
+    },
+    "pass_rate": 1.0,
+    "passed": 12,
+    "total": 12,
+    "unsafe_answers": 0
+  },
+  "tasks": [
+    {
+      "category": "research",
+      "duration_s": 0.22953471500659361,
+      "failures": [],
+      "id": "research-who-created-python",
+      "known_failure": false,
+      "notes": "Direct source-backed who question with an exact citation.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.21336033398984,
+      "failures": [],
+      "id": "research-where-colosseum",
+      "known_failure": false,
+      "notes": "Direct source-backed location question.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.22126833599759266,
+      "failures": [],
+      "id": "research-compound",
+      "known_failure": false,
+      "notes": "Two explicit questions handled separately, both cited.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "abstention",
+      "duration_s": 0.20048072299687192,
+      "failures": [],
+      "id": "research-abstain-unknown",
+      "known_failure": false,
+      "notes": "Unknown entity must abstain rather than invent a capital.",
+      "observed": "abstained",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "reload",
+      "duration_s": 0.43136012996546924,
+      "failures": [],
+      "id": "research-reload",
+      "known_failure": false,
+      "notes": "The same cited answer is available after a fresh process restart.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.2172169069526717,
+      "failures": [],
+      "id": "research-sqlite",
+      "known_failure": false,
+      "notes": "The same direct question through the SQLite index backend.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "math",
+      "duration_s": 0.19262207596329972,
+      "failures": [],
+      "id": "math-add",
+      "known_failure": false,
+      "notes": "Teach two examples, apply to an unseen operand pair.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "math",
+      "duration_s": 0.19962658098665997,
+      "failures": [],
+      "id": "math-clarify-unknown",
+      "known_failure": false,
+      "notes": "An unlicensed math phrase asks for examples instead of guessing.",
+      "observed": "clarified",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "procedures",
+      "duration_s": 0.2096129489946179,
+      "failures": [],
+      "id": "rules-reverse",
+      "known_failure": false,
+      "notes": "Two demonstrations license reverse; apply to a taught and an untaught list.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "procedures",
+      "duration_s": 0.19744264095788822,
+      "failures": [],
+      "id": "rules-clarify-unteaching",
+      "known_failure": false,
+      "notes": "An untaught instruction asks for an example rather than guessing.",
+      "observed": "clarified",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "dialogue",
+      "duration_s": 0.22459936002269387,
+      "failures": [],
+      "id": "dialogue-history",
+      "known_failure": false,
+      "notes": "History recall returns the user's exact prior question.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.23335016501368955,
+      "failures": [],
+      "id": "research-date-anchored-pronoun",
+      "known_failure": false,
+      "notes": "A pronoun-led date sentence anchors to the immediately preceding named subject.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    }
+  ]
+}

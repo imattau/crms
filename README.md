@@ -162,6 +162,7 @@ rechecks the original question against the remaining accepted facts.
 
 - [CRMS_README.md](CRMS_README.md) - the detailed technical documentation.
 - [docs/focused_roadmap_to_goal.md](docs/focused_roadmap_to_goal.md) - the staged plan from current capabilities toward CRMS's broader goal.
+- [docs/master_plan_to_final_state.md](docs/master_plan_to_final_state.md) - the canonical plan to the 70B-class target, including the self-learning workstream.
 - [docs/design_domain_expansion.md](docs/design_domain_expansion.md) - the staged roadmap for natural-language math, coding, translation, cross-domain tasks, and capability comparisons.
 - [CONTRIBUTING.md](CONTRIBUTING.md) - how to help.
 

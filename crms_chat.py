@@ -1362,7 +1362,12 @@ def _natural_when_evidence(index: CRMSSQLiteResearchIndex,
     predicate_terms = tuple(normalized_tokens(predicate))
     if not subject_terms or len(predicate_terms) != 1:
         return None
-    query = " ".join(subject_terms)
+    determiners = {"the", "a", "an", "this", "that"}
+    subject_core = (subject_terms[1:]
+                    if subject_terms[0] in determiners else subject_terms)
+    if not subject_core:
+        return None
+    query = " ".join(subject_core)
     dated = re.compile(
         r"\b(?:in|on|during)\s+(?:(?:January|February|March|April|May|June|"
         r"July|August|September|October|November|December)\s+)?"
@@ -1370,7 +1375,7 @@ def _natural_when_evidence(index: CRMSSQLiteResearchIndex,
         r"\d{1,3}\s*(?:CE|AD|BCE|BC))\b", re.I)
     found: dict[str, list[dict[str, Any]]] = {}
     for hit in index.search(query, limit=100, context_chars=240):
-        if not set(subject_terms) <= set(hit.matched_terms) or _is_code_source(hit.location):
+        if not set(subject_core) <= set(hit.matched_terms) or _is_code_source(hit.location):
             continue
         document = index.document(hit.document_id)
         source = document.text
@@ -1394,6 +1399,7 @@ def _natural_when_evidence(index: CRMSSQLiteResearchIndex,
         for local_start, local_end in paragraph_sentences:
             sentence = paragraph[local_start:local_end]
             start, end = paragraph_start + local_start, paragraph_start + local_end
+            evidence_start = start
             if _sentence_context_kind(sentence, source, start) != "assertion":
                 continue
             words = tuple(normalized_tokens(sentence))
@@ -1436,17 +1442,20 @@ def _natural_when_evidence(index: CRMSSQLiteResearchIndex,
                     previous_sentence = paragraph[
                         previous_span[0]:previous_span[1]].strip()
                     leading_subject = tuple(normalized_tokens(
-                        re.sub(r"^(?:the|this|that)\s+", "",
+                        re.sub(r"^(?:the|a|an|this|that)\s+", "",
                                previous_sentence, flags=re.IGNORECASE)))
-                    if leading_subject[:len(subject_terms)] != subject_terms:
+                    if leading_subject[:len(subject_core)] != subject_core:
                         continue
                     subject_start = 0
                     subj_end = 1
+                    evidence_start = paragraph_start + previous_span[0]
                 else:
                     alias_tokens = tuple(normalized_tokens(alias_match.group()))
                     subject_start = 1 if alias_tokens[:1] in {
                         ("the",), ("this",), ("that",)} else 0
                     subj_end = subject_start + 1
+                    if previous_span is not None:
+                        evidence_start = paragraph_start + previous_span[0]
             date_match = dated.search(sentence)
             if date_match is None:
                 continue
@@ -1469,7 +1478,7 @@ def _natural_when_evidence(index: CRMSSQLiteResearchIndex,
                    for token in between):
                 continue
             evidence = _cited_sentence_evidence(
-                index, hit, start, end, tuple(hit.matched_terms))
+                index, hit, evidence_start, end, tuple(hit.matched_terms))
             if evidence is not None:
                 found.setdefault(date_match.group(), []).append(evidence)
     if len(found) != 1:
