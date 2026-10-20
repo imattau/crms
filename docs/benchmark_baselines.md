@@ -2751,3 +2751,18 @@ noise to learn safely.” Next work should improve relation/role typing and
 test transfer across publishers before adding automatic rule learning. This
 supports the roadmap’s emphasis on recombination and self-learning rules while
 keeping those capabilities unclaimed until their evidence gates pass.
+
+## Unsupported dialogue topic switch and `why?` (`v1_465`, 2026-10-20)
+
+`experiments/v1_465_dialogue_unsupported_topic_switch.py` freezes the reported
+stale-explanation failure with source-only evidence. After CRMS quotes the
+Eiffel Tower's completion date, an unsupported switch to the Colosseum must
+replace the question under discussion; `why?` then reports that there is no
+grounded answer to explain, without repeating the Eiffel date. A paired
+supported-topic case confirms that the Colosseum completion source is returned
+and explained without leaking the Eiffel sentence. Both cases pass in the
+current runtime.
+
+This confirms the two specific context-safety behaviors on a small authored
+corpus. It does not estimate multi-turn dialogue accuracy or transfer; the
+independent-transcript and task-completion gate remains open.

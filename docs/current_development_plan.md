@@ -258,8 +258,11 @@ Report size, runtime, compatibility requirements, and unsupported cases.
    history, plural/ordinal references, and save/reload. Include requests to
    explain a result more simply and distinguish a grounded extract from an
    actual explanation. Measure wrong referents, irrelevant evidence, omissions,
-   clarification, and completion separately. The recent-paper topic repair is
-   one regression control, not a conversation benchmark.
+   clarification, and completion separately. `v1_465` now freezes the reported
+   stale-`why?` sequence: an unsupported Colosseum switch after an Eiffel source
+   answer must not explain the Eiffel answer, while a supported switch must
+   explain only the Colosseum evidence. This is a regression control, not a
+   conversation benchmark.
 2. **Prove source-derived rules and recombination beyond hand-labeled phrases.**
    The map-free `v1_464` full SimpleWiki scan surfaced useful relation wording
    alongside substantial parser and role noise; keep all candidates
