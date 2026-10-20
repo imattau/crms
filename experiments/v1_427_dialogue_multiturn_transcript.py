@@ -98,6 +98,12 @@ def main() -> None:
             f"history recall did not report the preceding question: {turns[12]!r}")
     require("And Italy?" in turns[14].text,
             f"history recall was not updated after an unanswered turn: {turns[14]!r}")
+    unbound_ordinal = turns[15]
+    require(unbound_ordinal.status == "clarify"
+            and "numbered source list" in unbound_ordinal.text.casefold()
+            and "Which result or entity" in unbound_ordinal.text,
+            "an ordinal with no open list should ask what the user means, "
+            f"not fall through to a generic unknown answer: {unbound_ordinal!r}")
     clarification = turns[17]
     require(clarification.status == "unknown"
             and "Please name the entity" in clarification.text,

@@ -52,8 +52,9 @@ the wrong entity and source-only context loss has since been replayed against
 focused fixes. The selected current-checkout regressions pass, including topic
 switch, source-only context, persisted evidence, and stale `why?` behavior.
 Treat those as repaired controls, not as proof of general dialogue competence:
-history questions, ordinal references, and independently authored multi-turn
-transfer still need a broader held-out evaluation. The bounded reservation draft (`v1_467`) demonstrates one request →
+history recall and numbered-result selection have targeted regression checks,
+but independently authored multi-turn transfer still needs a broader held-out
+evaluation. The bounded reservation draft (`v1_467`) demonstrates one request →
 clarification → correction → draft → reload path, but its parser and task
 route are narrow.
 The map-free scan (`v1_464`) found repeated relation candidates, but most

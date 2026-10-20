@@ -56,6 +56,21 @@ def main() -> None:
                 and selected.research.source_sentences[0]["citation"]
                 == selected_citation,
                 "selected source citation did not match the displayed option")
+
+        # The common ordinal "the first one" selects the exact first visible
+        # result too, including after restoring the saved list context.
+        first_dialogue = CRMSDialogue.load(
+            CRMSKnowledgeBase(), str(state_path), research_index=index)
+        first_selected = first_dialogue.turn(
+            "What about the first one?", research_index=index)
+        require(first_selected.status == "sources_found"
+                and "Cafe Birch is a French restaurant" in first_selected.text
+                and "Bistro Alder" not in first_selected.text
+                and first_selected.research is not None
+                and first_selected.research.source_sentences[0]["citation"]
+                == dialogue.presented_sources[0]["citation"],
+                "ordinal did not select the exact displayed first source: "
+                f"{first_selected!r}")
         require(not restored.knowledge.facts(),
                 "quoting a selected source must not create an accepted fact")
 
@@ -72,6 +87,7 @@ def main() -> None:
 
     print("explicit source lists expose only numbered, cited results: PASS")
     print("ordinal selection survives save/load and returns the exact citation: PASS")
+    print("first-item wording selects the exact displayed first result: PASS")
     print("selecting quoted evidence does not teach or accept a fact: PASS")
     print("source selections are discarded when citations fail revalidation: PASS")
 
