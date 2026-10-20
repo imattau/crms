@@ -14,10 +14,11 @@ eligibility, allows a regular plural in the requested object to match the
 singular source form, and recognizes a post-object count only when followed by
 `time` or `times`.
 
-Two cited claims from one SimpleWiki page now answer through fresh CLI using a
-copied source index: Curie family, 5 Nobel Prizes; International Committee of
-the Red Cross, 3 Nobel Peace Prizes. Nearby count/aggregation and quoted
-evidence controls pass (`v1_329`, `v1_502`, `v1_507`). This does not establish
+Three cited claims from two SimpleWiki pages now answer through fresh CLI using
+a copied source index: Marie Curie, 2 Nobel Prizes (one sentence mentions both
+an individual prize and the total); Curie family, 5 Nobel Prizes; International
+Committee of the Red Cross, 3 Nobel Peace Prizes. Nearby count/aggregation and
+quoted evidence controls pass (`v1_329`, `v1_502`, `v1_507`). This does not establish
 general count understanding: the examples share one page, the route still
 quotes source wording, and other count constructions, paraphrases, and verb
 alternations remain untested. See the

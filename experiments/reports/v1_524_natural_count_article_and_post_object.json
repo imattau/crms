@@ -6,11 +6,19 @@
     "article_led_subjects_retrieved": true,
     "count_before_object_extracted": true,
     "count_after_object_with_times_extracted": true,
+    "repeated_object_mentions_select_explicit_count": true,
     "fresh_cli_answers_from_source_copy": true,
     "citations_resolve_from_source_copy": true,
     "no_accepted_facts_written": true
   },
   "cases": [
+    {
+      "question": "How many Nobel Prizes did Marie Curie win?",
+      "quantity": "two",
+      "citation": "wiki:simplewiki:9924#sha256=65a96e4b2b8a9482280ad5cbf0f9c14c21f746a52360de2584b12e19613bc7a7&chars=1191:1295",
+      "source_title": "November 7",
+      "source_text": "1911 – Marie Curie wins the Nobel Prize in Chemistry, becoming the first person to win two Nobel Prizes."
+    },
     {
       "question": "How many Nobel Prizes did the Curie family receive?",
       "quantity": "5",
@@ -26,9 +34,9 @@
       "source_text": "As a group, the International Committee of the Red Cross (ICRC) has received the Nobel Peace Prize three times: in 1917, 1944, and 1963."
     }
   ],
-  "cli_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> CRMS> The source states: “The Curie family received 5 Nobel Prizes.” [Source: Nobel Prize; quoted evidence, not an accepted fact]\nyou> CRMS> The source states: “As a group, the International Committee of the Red Cross (ICRC) has received the Nobel Peace Prize three times: in 1917, 1944, and 1963.” [Source: Nobel Prize; quoted evidence, not an accepted fact]\nyou> CRMS state saved. Goodbye.\n",
+  "cli_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> CRMS> The source states: “1911 – Marie Curie wins the Nobel Prize in Chemistry, becoming the first person to win two Nobel Prizes.” [Source: November 7; quoted evidence, not an accepted fact]\nyou> CRMS> The source states: “The Curie family received 5 Nobel Prizes.” [Source: Nobel Prize; quoted evidence, not an accepted fact]\nyou> CRMS> The source states: “As a group, the International Committee of the Red Cross (ICRC) has received the Nobel Peace Prize three times: in 1917, 1944, and 1963.” [Source: Nobel Prize; quoted evidence, not an accepted fact]\nyou> CRMS state saved. Goodbye.\n",
   "limits": [
-    "Two count patterns from one encyclopedia page do not establish broad count understanding.",
+    "Three count claims from two encyclopedia pages do not establish broad count understanding.",
     "The count route returns cited source wording rather than a general learned numeric procedure.",
     "Compound counts, paraphrases, and semantically equivalent verbs remain untested."
   ]

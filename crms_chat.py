@@ -2051,61 +2051,63 @@ def _natural_count_evidence(index: CRMSSQLiteResearchIndex,
 
             subjects = occurrences(subject_terms)
             objects = occurrences(object_terms, regular_plural=True)
-            if len(subjects) != 1 or len(objects) != 1:
+            if len(subjects) != 1 or not objects:
                 continue
             subject_end = subjects[0] + len(subject_terms)
-            object_start = objects[0]
-            if subject_end >= object_start:
-                continue
-            relation_positions = []
-            for position in range(subject_end, object_start):
-                surface = words[position]
-                base = _base_verb_for_surface((surface,))
-                if (surface == predicate_terms[0]
-                        or base == predicate_terms
-                        or _analyze_predicate_spelling(
-                            predicate_terms[0], surface) is not None):
-                    relation_positions.append(position)
-            if not relation_positions:
-                continue
-            between = words[subject_end:object_start]
-            if any(token in {
-                    "not", "never", "no", "without", "n't", "didn't",
-                    "doesn't", "don't", "hasn't", "haven't", "isn't",
-                    "aren't", "wasn't", "weren't", "can't", "cannot",
-            } for token in between):
-                continue
-            quantity = None
-            quantity_start = max(subject_end, object_start - 4)
-            quantity_candidates = [
-                token for token in words[quantity_start:object_start]
-                if (token.isdigit() or token.replace(",", "").isdigit()
-                    or token in quantity_words)
-            ]
-            if quantity_candidates:
-                quantity = quantity_candidates[-1]
-            else:
-                # Some sources place the count after the counted item:
-                # "received the Nobel Peace Prize three times". Accept this
-                # post-object form only when the quantity is explicitly
-                # attached to a time-unit, avoiding nearby years or unrelated
-                # numbers as counts.
-                object_end = objects[0] + len(object_terms)
-                following = words[object_end:object_end + 3]
-                for following_index, token in enumerate(following):
+            for object_start in objects:
+                if subject_end >= object_start:
+                    continue
+                relation_positions = []
+                for position in range(subject_end, object_start):
+                    surface = words[position]
+                    base = _base_verb_for_surface((surface,))
+                    if (surface == predicate_terms[0]
+                            or base == predicate_terms
+                            or _analyze_predicate_spelling(
+                                predicate_terms[0], surface) is not None):
+                        relation_positions.append(position)
+                if not relation_positions:
+                    continue
+                between = words[subject_end:object_start]
+                if any(token in {
+                        "not", "never", "no", "without", "n't", "didn't",
+                        "doesn't", "don't", "hasn't", "haven't", "isn't",
+                        "aren't", "wasn't", "weren't", "can't", "cannot",
+                } for token in between):
+                    continue
+                quantity = None
+                quantity_start = max(subject_end, object_start - 4)
+                quantity_candidates = [
+                    token for token in words[quantity_start:object_start]
                     if (token.isdigit() or token.replace(",", "").isdigit()
-                            or token in quantity_words):
-                        if (following_index + 1 < len(following)
-                                and following[following_index + 1]
-                                in {"time", "times"}):
-                            quantity = token
-                            break
-            matched = tuple(sorted(
-                required_terms | {words[position] for position in relation_positions}))
-            evidence = _cited_sentence_evidence(index, hit, start, end, matched)
-            if evidence is None:
-                continue
-            evidence_by_count.setdefault(quantity, []).append(evidence)
+                        or token in quantity_words)
+                ]
+                if quantity_candidates:
+                    quantity = quantity_candidates[-1]
+                else:
+                    # Some sources place the count after the counted item:
+                    # "received the Nobel Peace Prize three times". Accept
+                    # this post-object form only when the quantity is
+                    # explicitly attached to a time-unit, avoiding nearby
+                    # years or unrelated numbers as counts.
+                    object_end = object_start + len(object_terms)
+                    following = words[object_end:object_end + 3]
+                    for following_index, token in enumerate(following):
+                        if (token.isdigit() or token.replace(",", "").isdigit()
+                                or token in quantity_words):
+                            if (following_index + 1 < len(following)
+                                    and following[following_index + 1]
+                                    in {"time", "times"}):
+                                quantity = token
+                                break
+                matched = tuple(sorted(
+                    required_terms
+                    | {words[position] for position in relation_positions}))
+                evidence = _cited_sentence_evidence(
+                    index, hit, start, end, matched)
+                if evidence is None:
+                    continue
+                evidence_by_count.setdefault(quantity, []).append(evidence)
     if not evidence_by_count:
         return None
     explicit_counts = {
