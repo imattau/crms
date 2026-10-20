@@ -243,32 +243,53 @@ academic-paper sources.
 
 ## Immediate sequence
 
-1. Freeze the shared scorecard and independently authored dialogue holdout.
-   Replay all fixed topic-switch, source-only-context, stale-`why?`, history,
-   ordinal, repair, and save/reload transcripts. Fix only reproduced safety
-   failures, then report task completion, wrong referents, clarification,
-   omissions, and abstention separately. Dialogue is a parallel research and
-   release gate for every chat-facing change.
-2. Redesign claim assembly to use cited source-unit context based on the
-   `v1_478` findings: explicit/shared subjects, anaphora, parameter headings,
-   and long conditional scope. Keep the two supporting spans independently
-   cited and abstain on ambiguous bindings. Use the reviewed cases as
-   development controls, then freeze the method and test untouched API units
-   plus a publisher held out from design. Measure useful proposals, boundary
-   errors, missed claims, abstention, and review effort. `v1_473` remains a
-   negative corpus-fit control for this grammar.
-3. If source learning transfers, use reviewed components to build one unseen
-   natural-language recombination task through chat and fresh-process reload.
-   Independently check the result and its proof; include missing-premise,
-   conflict, negative, unsupported, and incomplete-search cases. Keep the
-   connective supervision and any hand-coded mappings visible.
-4. After that composition passes, test derived-case proposals, correction
-   propagation, invalidation, duplicate control, trust weighting, and growth
-   limits. Keep write-back review-gated until those controls pass.
-5. Continue dialogue-intent and move research against held-out task outcomes.
-   Only then select a bounded math, coding, translation, or creative task by
-   measured loss; finish with the copied SQLite-model scorecard using no source
-   files. Do not expand corpus or domain breadth just to increase activity.
+The next checkpoint is deliberately narrow. The working tree contains an
+uncommitted `v1_479` prototype for two of the source-context failures found in
+`v1_478` (parameter-heading context and shared subjects). Treat it as
+unverified until its experiment, prior source controls, and chat regressions
+run cleanly. Do not count implementation or candidate yield as evidence of
+transfer.
+
+1. **Finish the current source-context prototype.** Check exact citations for
+   both claim and context, ambiguity abstention, conditional/negative scope,
+   and review-only behavior in a fresh chat process. Run the previous source
+   and dialogue regressions. Record what the narrow cases establish and what
+   they do not; commit only the relevant source, experiment, and roadmap files.
+2. **Run the frozen source-learning gate.** Freeze the resulting method, then
+   test untouched API units and a publisher not used for design. Sample both
+   proposals and non-proposals, with document-level splits and exact cited
+   spans. Report useful proposals, boundary errors, missed claims, abstention,
+   and review effort. Keep `v1_473` as a negative corpus-fit control. If the
+   method fails, revise the general boundary/context model and reserve a new
+   holdout; do not patch individual phrases until the old set passes.
+3. **Close dialogue safety alongside every chat change.** Replay fixed
+   topic-switch, source-only-context, stale-`why?`, history, ordinal, repair,
+   and save/reload transcripts. Specifically retain the reported
+   Eiffel-Tower/Colosseum pronoun switch and “and Italy?” after source-only
+   evidence. Add independently authored multi-turn transcripts with competing
+   entities and varied paragraph layouts. Fix reproduced failures, and report
+   wrong referents, completion, clarification, omissions, and abstention
+   separately. Dialogue is a release gate, not a reason to widen intent or
+   move classes yet.
+4. **Prove recombination through ordinary chat.** Once source-derived
+   components transfer, compose one genuinely unseen multi-step request with
+   changed wording, values, and operation order. Run after fresh-process
+   reload; independently check output and proof. Include missing steps,
+   unsupported operations, explicit negatives, conflicts, integrity failures,
+   and search limits. Keep learned components, connective supervision,
+   hand-coded mappings, and orchestration visible. If only a scripted
+   experiment can assemble the task, the gate remains open.
+5. **Then govern self-learning.** After recombination passes, allow derived
+   outputs only as lineage-bearing proposals. Test correction propagation,
+   invalidation, duplicate suppression, trust weighting, abstention on stale
+   lineage, and storage growth. Derived results must not validate the rules
+   that generated them; write-back stays review-gated until all controls pass.
+6. **Advance dialogue research and breadth by measured need.** Evaluate
+   contextual intent against held-out task completion, then dialogue moves
+   against the explicit baseline. Only after these core gates, select one
+   bounded coding, math, translation, or creative task based on observed
+   failures. Finish by replaying the scorecard from a copied SQLite model with
+   original source files unavailable.
 
 Do not expand the corpus, add a dialogue mechanism, widen domains, or migrate
 the runtime store merely to show activity. After each gate, ask whether
