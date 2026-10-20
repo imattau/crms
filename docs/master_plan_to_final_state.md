@@ -497,6 +497,11 @@ provenance present, repair demonstrated, cost reported.
 **Goal:** exposure breadth comparable in *kind* to a general assistant's
 training mix, sized for a workstation.
 
+**Inventory:** the v0 source, licence, and domain inventory is
+`corpus/manifest_v0.json` (documented in `docs/corpus_manifest.md`). It is a
+planning inventory; per-document manifests and licence audits precede
+ingestion.
+
 Tiered corpora:
 - **Core packaged corpus (target 50–100M words, 1–2 GB compressed SQLite):**
   SimpleWiki/Wikipedia subset, public-domain books, project docs, reference
@@ -642,7 +647,10 @@ redesigned or dropped.
    (`experiments/scorecard/family_a_spec.md`); the suite now has 12 tasks,
    including wording variants and negative controls.
 8. **Corpus manifest v0** — inventory of candidate sources, licences, sizes,
-   and domain targets. — next.
+   and domain targets. — done
+   (`corpus/manifest_v0.json`, `docs/corpus_manifest.md`,
+   `experiments/v1_557_corpus_manifest.py`); 20 candidate groups, 4 documented
+   exclusions, and a 94.5M-word core planning estimate.
 9. **Consolidate plan docs** — this file is canonical; link the others as
    history. — canonical status recorded; remaining docs still need pruning.
 
@@ -678,3 +686,4 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Learned request frames replace the regex compiler in chat: exact literal templates, typed slots, two-varied-example licensing, procedure-vocabulary disambiguation, ambiguity/no-match abstention, persistence, `/teach-frame` and `/frames`; 40 seed demonstrations license 20 Family A frames; Family A scorecard grows to 5/5 with a taught-frame reload | `crms_request_frames.py`, `crms_request_frames_seed.json`, `crms_task_composition.py`, `crms_chat.py`, `docs/design_request_frames.md`, `experiments/v1_553_request_frames.py`, `experiments/v1_554_request_frame_composition.py`, `experiments/v1_555_request_frame_chat.py`, `experiments/scorecard/family_a.jsonl` |
 | 2026-10-21 | Request frames join the governed rule registry: `request-frame` family, stored-template replay validation, active-rule matching gate, use counts, contest/retire/rollback, stale retirement, and versioned successors on explicit re-teaching | `crms_frame_registry.py`, `crms_rule_registry.py`, `crms_request_frames.py`, `crms_task_composition.py`, `crms_chat.py`, `experiments/v1_556_request_frame_registry.py` |
 | 2026-10-21 | Family A scorecard grows to 12/12: explicit negative exclusion, conflict, missing output, and four licensed wording variants; conflict replies count as abstentions | `experiments/scorecard/family_a.jsonl`, `crms_eval/oracles.py`, `experiments/scorecard/family_a_spec.md` |
+| 2026-10-21 | Corpus manifest v0: 20 candidate source groups across core/extended/research, licence classes, domain targets, 4 documented exclusions, and a validated 94.5M-word core planning estimate | `corpus/manifest_v0.json`, `crms_corpus_manifest.py`, `docs/corpus_manifest.md`, `experiments/v1_557_corpus_manifest.py` |
