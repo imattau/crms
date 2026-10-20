@@ -31,6 +31,9 @@ REQUESTS = (
 LINKED_FILTER_SUM = (
     "Which values in 23, 5, 23, and 8 does Mira reach, and what do they sum to?"
 )
+WH_TOTAL = (
+    "What is the total of the values Mira reaches among 23, 5, 23, and 8?"
+)
 UNKNOWN_LINKED_FILTER_SUM = (
     "Which values in 23, 5, 11, and 8 does Mira reach, and what do they sum to?"
 )
@@ -65,6 +68,11 @@ def main() -> None:
             and linked.included_values == (23, 5, 23)
             and linked.output_values == (51,),
             f"the linked WH filter-and-sum question failed: {linked}")
+    wh_total = compose_verified_filter(WH_TOTAL, knowledge, procedures)
+    require(wh_total is not None and wh_total.status == "answered"
+            and wh_total.included_values == (23, 5, 23)
+            and wh_total.output_values == (51,),
+            f"the WH-total request failed: {wh_total}")
     unknown_linked = compose_verified_filter(
         UNKNOWN_LINKED_FILTER_SUM, knowledge, procedures)
     require(unknown_linked is not None and unknown_linked.status == "unknown"
@@ -115,7 +123,7 @@ def main() -> None:
         output = run_chat(
             session, session / knowledge_path.name,
             session / procedure_path.name, session / index_path.name,
-            (REQUESTS[0], LINKED_FILTER_SUM, "why?"))
+            (REQUESTS[0], LINKED_FILTER_SUM, WH_TOTAL, "why?"))
         require("Their total is 51." in output
                 and "Verified values satisfying the relation 'Mira reaches': "
                     "[23, 5, 23]" in output
@@ -129,6 +137,7 @@ def main() -> None:
 
     print("compositional parsing handles three reordered forms: PASS")
     print("linked WH filter-and-sum stays one task and rejects unresolved values: PASS")
+    print("WH-total request selects values by proof before aggregation: PASS")
     print("positive, negative, learned-procedure and proof gates remain active: PASS")
     print("unknown values, competing claims, multiple lists, and unlicensed aliases abstain: PASS")
     print("copy-only fresh chat answers and explains the reordered request: PASS")

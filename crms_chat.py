@@ -72,7 +72,7 @@ from crms_translation import (
 )
 from crms_task_composition import (
     compose_verified_filter, create_derived_composition_record,
-    is_explicit_filter_and_sum_question, revalidate_derived_composition,
+    is_explicit_aggregate_question, revalidate_derived_composition,
 )
 
 
@@ -1919,7 +1919,7 @@ def _natural_coordinated_who(
 
 def _split_explicit_compound_questions(message: str) -> tuple[str, ...]:
     """Split only independently phrased question clauses, never shared-verb lists."""
-    if is_explicit_filter_and_sum_question(message):
+    if is_explicit_aggregate_question(message):
         return ()
     starts_question = (r"(?:also\s*,?\s+)?(?:who|whom|what|which|where|when|why|how|"
                        r"is|are|was|were|do|does|did|can|could|has|have|had)\b")

@@ -26,6 +26,10 @@ _FILTER_AND_SUM_QUESTION = re.compile(
     rf"^\s*Which\s+values?\s+in\s+(?P<values>{_INTEGER_LIST})\s+"
     r"does\s+(?P<claim>.+?),\s*and\s+what\s+do\s+they\s+"
     r"sum\s+to\s*[.!?]*\s*$", re.IGNORECASE)
+_WH_TOTAL_QUESTION = re.compile(
+    rf"^\s*What\s+is\s+the\s+total\s+of\s+(?:the\s+)?values?\s+"
+    r"(?:that\s+|which\s+)?(?P<claim>.+?)\s+among\s+"
+    rf"(?P<values>{_INTEGER_LIST})\s*[.!?]*\s*$", re.IGNORECASE)
 _REQUESTS = (
     re.compile(
         rf"^\s*(?P<procedure>sum\s+every\s+value)\s+in\s+"
@@ -60,9 +64,10 @@ _REQUESTS = (
 )
 
 
-def is_explicit_filter_and_sum_question(message: str) -> bool:
-    """Identify one linked filter-and-sum question that should stay intact."""
-    return _FILTER_AND_SUM_QUESTION.fullmatch(message) is not None
+def is_explicit_aggregate_question(message: str) -> bool:
+    """Identify a linked natural-language aggregate request kept as one task."""
+    return any(pattern.fullmatch(message) is not None for pattern in (
+        _FILTER_AND_SUM_QUESTION, _WH_TOTAL_QUESTION))
 
 
 def _normalize_procedure_sequence(instruction: str) -> str:
@@ -381,7 +386,11 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
     Unknown, contradictory, incomplete, or unverifiable members cause an
     abstention rather than silently filtering away a possible value.
     """
-    linked_aggregate = _FILTER_AND_SUM_QUESTION.fullmatch(instruction)
+    linked_aggregate = next((pattern.fullmatch(instruction)
+                             for pattern in (_FILTER_AND_SUM_QUESTION,
+                                             _WH_TOTAL_QUESTION)
+                             if pattern.fullmatch(instruction) is not None),
+                            None)
     if linked_aggregate is not None:
         values_text = linked_aggregate.group("values")
         claim_text = linked_aggregate.group("claim")

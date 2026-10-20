@@ -491,6 +491,8 @@ which values satisfy the relation and what those values sum to. CRMS keeps the
 clauses together, grounds the inflected “does Mira reach” form to the stored
 “Mira reaches” relation, and returns the selected values and checked total
 through copied-model chat. An unknown list member still blocks the result.
+It also covers the frozen “What is the total of the values Mira reaches among
+…” WH-total frame and routes it through the same proof-selected aggregation.
 This is one explicit filter-and-sum question shape in the Codex-authored
 development packet; it does not establish general compound-question
 understanding or broad relation inflection coverage.
