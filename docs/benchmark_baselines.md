@@ -2460,3 +2460,32 @@ transcripts and labels are Codex-authored, so the result does not show broad
 dialogue reliability or independent generalization. Keep the dialogue packet
 open for varied, independently authored conversations and measure wrong
 referents, omissions, clarifications, and task completion separately.
+
+## Structured-field predicate alignment on SimpleWiki (2026-10-20)
+
+The exploratory read-only scan
+`python3 experiments/v1_337_structured_prose_alignment_probe.py` processed all
+285,478 documents in the local SimpleWiki index. Its explicit field/relation
+map found a repeated `capital city of` candidate for `capital of` across eight
+distinct entity pairs. It also found a likely false `national museum of` /
+`born in` alignment on two pairs, demonstrating that joint title/value mentions and
+parser role compatibility do not establish semantic equivalence.
+
+A separate full-corpus call to the stricter integrated
+`CRMSKnowledgeBase._propose_structured_predicate_alignments` path found the
+same capital wording on eleven pairs and did not return the museum alignment.
+The two paths therefore disagree on candidate support and false-proposal
+filtering; the exploratory probe and runtime path are not yet a calibrated
+precision/recall comparison. Both use hand-coded field-to-relation mappings,
+and the field and prose citations come from the same page. The 11-pair figure
+is page-level repetition, not independent publisher evidence.
+
+`python3 experiments/v1_338_structured_field_predicate_learning.py` passed all
+checks: the proposal remained inert before review, six training pages licensed
+two held-out question forms, cited evidence survived SQLite reload, stale
+proposals were rejected, and the coordinated “capital and largest city”
+negative was not simplified into an alias. This validates the review/writeback
+mechanics on fixtures, not the correctness or generality of the real-corpus
+alignment. Next, reconcile the two candidate-generation paths and evaluate a
+blinded sample of proposals and non-proposals before widening the allowlist or
+promoting this to a language-learning claim.
