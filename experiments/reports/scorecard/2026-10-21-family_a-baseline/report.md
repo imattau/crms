@@ -1,6 +1,6 @@
 # CRMS scorecard: family_a
 
-Generated: 2026-10-20T19:51:19+00:00
+Generated: 2026-10-20T20:05:45+00:00
 
 ## Summary
 
@@ -14,8 +14,8 @@ Generated: 2026-10-20T19:51:19+00:00
 | Pass rate | 100.0% |
 | Unsafe answers | 0 |
 | Known failures | 0 (0 now passing) |
-| Median task duration | 0.228 s |
-| p95 task duration | 0.45 s |
+| Median task duration | 0.244 s |
+| p95 task duration | 0.464 s |
 
 ## By category
 
@@ -28,7 +28,7 @@ Generated: 2026-10-20T19:51:19+00:00
 | Task | Category | Result | Observed | Time |
 |---|---|---|---|---|
 | family-a-filter-sum | composition | pass | answered | 0.23s |
-| family-a-filter-sum-reload | composition | pass | answered | 0.42s |
-| family-a-unknown-value | composition | pass | abstained | 0.22s |
-| family-a-untaught-procedure | composition | pass | clarified | 0.22s |
-| family-a-taught-frame-reload | composition | pass | answered | 0.45s |
+| family-a-filter-sum-reload | composition | pass | answered | 0.44s |
+| family-a-unknown-value | composition | pass | abstained | 0.23s |
+| family-a-untaught-procedure | composition | pass | clarified | 0.24s |
+| family-a-taught-frame-reload | composition | pass | answered | 0.46s |

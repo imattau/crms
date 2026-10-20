@@ -1,8 +1,9 @@
 # Design: learned request frames
 
-**Status:** implemented for the `select-then-procedure` goal. Chat uses request
-frames as its only natural-language composition router; the regex compiler in
-`crms_task_composition.py` remains as a reference path for parity tests.
+**Status:** implemented for the `select-then-procedure` goal and governed by the
+rule registry. Chat uses request frames as its only natural-language composition
+router; the regex compiler in `crms_task_composition.py` remains as a reference
+path for parity tests.
 **Date:** 2026-10-21
 
 ## Why
@@ -98,7 +99,28 @@ the same plan actions as the reference path.
 - the store defaults to `--rules` with a `_frames.json` suffix; pass
   `--request-frames PATH` to choose another file.
 
-`/frames` lists licensed frames, templates, examples, and fixed procedures.
+`/frames` lists licensed frames, templates, examples, fixed procedures, and each
+frame's registry state and use counts.
+
+## Governance
+
+`crms_frame_registry.py` mirrors each licensed frame into the governed rule
+registry as family `request-frame`. A rule records the frame id, template,
+parts, examples, goal, and fixed procedure. Validation replays every marked
+example against the stored template (`stored-template-replay`) and requires two
+distinct utterances, a varied slot, and valid fillers. Passing rules activate in
+review mode; the family is not eligible for scoped auto-acceptance.
+
+- `governed_frame_ids` intersects licensed frames with active registry rules.
+  Chat passes that set to matching, so contested, proposed, retired, or invalid
+  frames cannot execute even if their examples still license them.
+- Successful answers increment the frame rule's use count. Unknown values,
+  conflicts, and untaught procedures do not count as frame corrections.
+- Dropping the evidence that licenses a frame retires its rule. Startup never
+  silently revives a retired frame; an explicit `/teach-frame` creates a
+  versioned successor.
+- Registry rollback restores the prior lifecycle state, and `/rule-health` and
+  `/rule-detail` expose frame rules alongside procedure rules.
 
 ## Migration and limits
 
@@ -106,8 +128,8 @@ the same plan actions as the reference path.
   route only.
 - `compose_verified_filter` and `compose_verified_filter_via_plan` remain as
   reference paths for `v1_552` and direct diagnostics.
-- Frames are not yet in the governed rule registry. The next integration should
-  record frame lifecycle, validation, use counts, and retirement there.
+- Frames share registry lifecycle, validation, use counts, retirement, and
+  rollback. Inference schemas and fact frames still need the same integration.
 - Only `select-then-procedure` is implemented. Other goals need their own typed
   actions and slot contracts.
 - The seed file is a starting curriculum, not a claim of general paraphrase

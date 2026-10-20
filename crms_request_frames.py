@@ -543,13 +543,20 @@ def _has_adjacent_procedure_slots(frame: RequestFrame) -> bool:
 
 
 def match_frames(frames: Iterable[RequestFrame], text: str, *,
-                 procedure_phrases: Iterable[str] = ()) -> FrameMatchResult:
+                 procedure_phrases: Iterable[str] = (),
+                 allowed_frame_ids: Iterable[str] | None = None
+                 ) -> FrameMatchResult:
     procedure_phrases = tuple(procedure_phrases)
+    frame_list = list(frames)
+    if allowed_frame_ids is not None:
+        allowed = set(allowed_frame_ids)
+        frame_list = [frame for frame in frame_list
+                      if frame.frame_id in allowed]
     tokens = tokenize(text)
     if not tokens:
         return FrameMatchResult("no_match", reason="empty request")
     candidates: list[FrameMatch] = []
-    for frame in frames:
+    for frame in frame_list:
         requires_anchor = _has_adjacent_procedure_slots(frame)
         for raw in _match_parts(frame.parts, text, tokens):
             slots = _bind_slots(frame, raw)
@@ -647,9 +654,12 @@ class RequestFrameStore:
         return derived_frames(self.examples)
 
     def match(self, text: str, *,
-              procedure_phrases: Iterable[str] = ()) -> FrameMatchResult:
+              procedure_phrases: Iterable[str] = (),
+              allowed_frame_ids: Iterable[str] | None = None
+              ) -> FrameMatchResult:
         return match_frames(self.frames(), text,
-                            procedure_phrases=procedure_phrases)
+                            procedure_phrases=procedure_phrases,
+                            allowed_frame_ids=allowed_frame_ids)
 
     def add_example(self, text: str, goal: str, source_id: str,
                     fixed_procedure: str | None = None

@@ -460,6 +460,14 @@ retained as a reference path for parity diagnostics. Request-frame stores are
 local sidecars in this integration; packaging them inside portable model files
 is later work.
 
+Licensed frames are mirrored into the governed rule registry as family
+`request-frame`. Validation replays the marked examples against the stored
+template; successful answers increment the rule's use count. Contesting,
+retiring, or rolling back a frame rule changes whether matching may use it:
+chat matches only frames whose registry rule is active. `/frames` shows each
+frame's rule id, lifecycle state, uses, successes, and corrections; the usual
+`/rule-health` and `/rule-detail` commands include frame rules.
+
 The parameterized rule family can also discover multipliers beyond doubling:
 
 ```python

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-20T19:51:19+00:00",
+  "generated_at": "2026-10-20T20:05:45+00:00",
   "metadata": {
     "platform": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39",
     "project": "/home/lostcause/workspace/crms",
@@ -17,9 +17,9 @@
       }
     },
     "duration_s": {
-      "max": 0.45,
-      "median": 0.228,
-      "p95": 0.45
+      "max": 0.464,
+      "median": 0.244,
+      "p95": 0.464
     },
     "errors": 0,
     "failed": 0,
@@ -39,7 +39,7 @@
   "tasks": [
     {
       "category": "composition",
-      "duration_s": 0.2277488399995491,
+      "duration_s": 0.2333869049907662,
       "failures": [],
       "id": "family-a-filter-sum",
       "known_failure": false,
@@ -51,7 +51,7 @@
     },
     {
       "category": "composition",
-      "duration_s": 0.41519731003791094,
+      "duration_s": 0.44196853903122246,
       "failures": [],
       "id": "family-a-filter-sum-reload",
       "known_failure": false,
@@ -63,7 +63,7 @@
     },
     {
       "category": "composition",
-      "duration_s": 0.21892999298870564,
+      "duration_s": 0.23490363702876493,
       "failures": [],
       "id": "family-a-unknown-value",
       "known_failure": false,
@@ -75,7 +75,7 @@
     },
     {
       "category": "composition",
-      "duration_s": 0.21955315495142713,
+      "duration_s": 0.2437440839712508,
       "failures": [],
       "id": "family-a-untaught-procedure",
       "known_failure": false,
@@ -87,7 +87,7 @@
     },
     {
       "category": "composition",
-      "duration_s": 0.4502010259893723,
+      "duration_s": 0.46435295999981463,
       "failures": [],
       "id": "family-a-taught-frame-reload",
       "known_failure": false,

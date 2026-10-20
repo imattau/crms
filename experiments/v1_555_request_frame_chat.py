@@ -105,6 +105,12 @@ def main() -> None:
                 f"taught frame did not answer:\n{taught}")
         require("send {values:integer-list} to {claim:claim}" in taught,
                 f"taught frame is not inspectable:\n{taught}")
+        require("Registry rule request-frame-" in taught
+                and "Governed frames:" in taught
+                and "state=active" in taught
+                and "uses=1" in taught
+                and "successes=1" in taught,
+                f"taught frame did not enter the governed registry:\n{taught}")
 
         reloaded = run_chat(
             root, knowledge_path, procedures_path, index_path, frames_path,

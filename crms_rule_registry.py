@@ -25,6 +25,7 @@ FAMILIES = frozenset({
     "lexical",
     "morphology",
     "procedure",
+    "request-frame",
     "fact-frame",
     "inference-schema",
     "relation-type",

@@ -44,6 +44,10 @@ from crms_knowledge import (CRMSKnowledgeBase, FactCandidate, ResearchResult,
 from crms_math import CRMSMath, render as render_math
 from crms_model import CRMSModel, Prediction
 from crms_rule_registry import RuleRegistry
+from crms_frame_registry import (
+    frame_rule_for, governed_frame_ids, record_request_frame_use,
+    register_request_frame_rule, sync_request_frame_registry,
+)
 from crms_nl_gate import gate_quoted_evidence, supports_question_type
 from crms_procedure_discovery import (
     nearest_parameter_heading,
@@ -6808,6 +6812,10 @@ def main() -> int:
             request_frames.save(args.request_frames)
         except OSError as error:
             print(f"Could not save seeded request frames: {error}")
+    try:
+        sync_request_frame_registry(request_frames, rule_registry)
+    except (KeyError, ValueError) as error:
+        print(f"Ignoring request-frame registry sync ({error}).")
     pending_rule = _load_pending_rule(args.rule_session, args.rules)
     if pending_rule and pending_rule[0] in rules._procedures:
         pending_rule = None
@@ -8780,7 +8788,9 @@ def main() -> int:
                       "session; no additional practice event was recorded.")
                 continue
             current = compose_verified_filter_via_frames(
-                request, knowledge, rules, request_frames)
+                request, knowledge, rules, request_frames,
+                allowed_frame_ids=governed_frame_ids(
+                    request_frames, rule_registry))
             if (current is None or current.status != "answered"
                     or current.output_values != result.output_values
                     or current.inference_proofs != result.inference_proofs
@@ -8799,7 +8809,9 @@ def main() -> int:
                 if item.get("artifact_id") == artifact["artifact_id"]), None)
             if existing_artifact is not None:
                 validity, _reason = revalidate_derived_composition(
-                    existing_artifact, knowledge, rules, request_frames)
+                    existing_artifact, knowledge, rules, request_frames,
+                    allowed_frame_ids=governed_frame_ids(
+                        request_frames, rule_registry))
                 if validity == "current":
                     print("CRMS> This exact composition is already stored with "
                           "current evidence; no new practice count was recorded.")
@@ -8875,7 +8887,9 @@ def main() -> int:
                 continue
             for record in records:
                 validity, reason = revalidate_derived_composition(
-                    record, knowledge, rules, request_frames)
+                    record, knowledge, rules, request_frames,
+                    allowed_frame_ids=governed_frame_ids(
+                        request_frames, rule_registry))
                 conclusion = (f"{record['subject']} — {record['relation']} → "
                               f"{record['output_values']}")
                 print(f"Derived composition [{validity}]: {conclusion}")
@@ -9159,6 +9173,15 @@ def main() -> int:
                 print(f"Frame {learned.frame.frame_id} "
                       f"({learned.frame.goal}): "
                       f"{learned.frame.template_text()}")
+                try:
+                    record = register_request_frame_rule(
+                        learned.frame, rule_registry, allow_successor=True)
+                except (KeyError, ValueError) as error:
+                    print(f"Could not register request-frame rule: {error}")
+                else:
+                    print(f"Registry rule {record.id}: state={record.state}, "
+                          f"validation="
+                          f"{(record.validation or {}).get('passed', False)}.")
             else:
                 print("Teach another example with the same literal wording "
                       "and a different slot filler.")
@@ -9166,11 +9189,29 @@ def main() -> int:
                 request_frames.save(args.request_frames)
             except OSError as error:
                 print(f"Could not save request frames: {error}")
+            try:
+                rule_registry.save(args.rule_registry)
+            except (OSError, sqlite3.Error) as error:
+                print(f"Could not save rule registry: {error}")
             continue
         if line == "/frames":
             lines = request_frames.describe()
             print("\n".join(lines) if lines
                   else "No request frames are licensed yet.")
+            frames = request_frames.frames()
+            if frames:
+                governed = governed_frame_ids(request_frames, rule_registry)
+                print(f"Governed frames: {len(governed)}/{len(frames)} active.")
+                for frame in frames:
+                    record = frame_rule_for(rule_registry, frame.frame_id)
+                    if record is None:
+                        print(f"{frame.frame_id}: no registry rule")
+                        continue
+                    utility = record.utility or {}
+                    print(f"{frame.frame_id}: {record.id} state={record.state} "
+                          f"uses={utility.get('applications', 0)} "
+                          f"successes={utility.get('successes', 0)} "
+                          f"corrections={utility.get('corrections', 0)}")
             continue
         if line.startswith("/teach-rule "):
             fields = [value.strip() for value in line[len("/teach-rule "):].split("|")]
@@ -10828,14 +10869,26 @@ def main() -> int:
             last_research_evidence = None
             latest_research_documents = []
             continue
+        governed_frames = governed_frame_ids(request_frames, rule_registry)
         reasoned_filter = compose_verified_filter_via_frames(
-            line, knowledge, rules, request_frames)
+            line, knowledge, rules, request_frames,
+            allowed_frame_ids=governed_frames)
         if reasoned_filter is not None:
+            if (reasoned_filter.status == "answered"
+                    and reasoned_filter.request_frame_id):
+                record_request_frame_use(
+                    rule_registry, reasoned_filter.request_frame_id,
+                    success=True)
             last_reasoned_filter = reasoned_filter
             last_reasoned_filter_request = line
             last_reasoned_filter_practiced = False
             print("CRMS> " + reasoned_filter.text)
             evidence_refs = collect_feedback_refs(response=reasoned_filter)
+            if reasoned_filter.request_frame_id:
+                evidence_refs.append({
+                    "kind": "request-frame",
+                    "id": reasoned_filter.request_frame_id,
+                })
             evidence_refs.extend(
                 {"kind": "source", "id": source}
                 for row in reasoned_filter.language_evidence

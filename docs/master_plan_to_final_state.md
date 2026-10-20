@@ -632,12 +632,11 @@ redesigned or dropped.
    (`docs/design_task_ir.md`).
 5. **RFC for `crms_rule_registry.py`** — record schema, lifecycle, validation
    ladder, rollback, and how existing procedure/frame/rule stores migrate. —
-   done for procedures; request frames have their own learned store and are
-   next to migrate; inference rules follow.
+   done for procedures and request frames; inference schemas and fact frames
+   follow.
 6. **Learning baseline** — instrument current rules/procedures with use counts
    and outcomes; measure today's compounding curve before changing it. —
-   procedure use counts are live; frame use counts and the compounding
-   benchmark are not.
+   procedure and frame use counts are live; the compounding benchmark is not.
 7. **Family A specification** — 10 tasks + independent oracle, frozen before
    planner code. — done
    (`experiments/scorecard/family_a_spec.md`); chat coverage now includes
@@ -677,3 +676,4 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Legacy/plan parity for explicit verified-filter requests (status, evidence, procedure lineage, and rendered text); chat switched to the plan path, regex retained only as request compiler | `crms_task_composition.py`, `crms_chat.py`, `crms_tasks.py`, `crms_planner.py`, `experiments/v1_552_family_a_plan_parity.py` |
 | 2026-10-21 | Family A scorecard suite (4/4): filter+sum with citations, fresh reload, unknown-value abstention, untaught-procedure clarification; scorecard oracle recognizes “can’t determine” as abstention | `experiments/scorecard/family_a.jsonl`, `crms_eval/oracles.py`, `experiments/reports/scorecard/2026-10-21-family_a-baseline/` |
 | 2026-10-21 | Learned request frames replace the regex compiler in chat: exact literal templates, typed slots, two-varied-example licensing, procedure-vocabulary disambiguation, ambiguity/no-match abstention, persistence, `/teach-frame` and `/frames`; 40 seed demonstrations license 20 Family A frames; Family A scorecard grows to 5/5 with a taught-frame reload | `crms_request_frames.py`, `crms_request_frames_seed.json`, `crms_task_composition.py`, `crms_chat.py`, `docs/design_request_frames.md`, `experiments/v1_553_request_frames.py`, `experiments/v1_554_request_frame_composition.py`, `experiments/v1_555_request_frame_chat.py`, `experiments/scorecard/family_a.jsonl` |
+| 2026-10-21 | Request frames join the governed rule registry: `request-frame` family, stored-template replay validation, active-rule matching gate, use counts, contest/retire/rollback, stale retirement, and versioned successors on explicit re-teaching | `crms_frame_registry.py`, `crms_rule_registry.py`, `crms_request_frames.py`, `crms_task_composition.py`, `crms_chat.py`, `experiments/v1_556_request_frame_registry.py` |

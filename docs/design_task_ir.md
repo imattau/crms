@@ -5,8 +5,9 @@
 `crms_actions.py` implements the first two Family A adapters
 (`select-verified-positive`, `apply-learned-procedure`). Request goals now come
 from learned request frames (`docs/design_request_frames.md`); chat no longer
-uses the regex compiler for composition. The regex path remains as a reference
-for parity tests.
+uses the regex compiler for composition. Licensed frames are mirrored into the
+governed rule registry as family `request-frame`, and only active rules may
+match. The regex path remains as a reference for parity tests.
 **Date:** 2026-10-21
 
 ## Why

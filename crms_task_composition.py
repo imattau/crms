@@ -318,13 +318,16 @@ def create_derived_composition_record(
 def revalidate_derived_composition(
         record: dict[str, Any], knowledge: CRMSKnowledgeBase,
         procedures: CRMSModel,
-        frames: RequestFrameStore | None = None) -> tuple[str, str]:
+        frames: RequestFrameStore | None = None,
+        *, allowed_frame_ids: set[str] | None = None
+        ) -> tuple[str, str]:
     """Re-run the exact request before presenting a stored composition as current."""
     request = record.get("request", "")
     frame_id = record.get("request_frame_id")
     if frames is not None and frame_id:
         current = compose_verified_filter_via_frames(
-            request, knowledge, procedures, frames)
+            request, knowledge, procedures, frames,
+            allowed_frame_ids=allowed_frame_ids)
         if current is None or current.request_frame_id != frame_id:
             return ("stale",
                     "the licensed request frame no longer matches this request")
@@ -959,15 +962,19 @@ def compose_verified_filter_via_plan(
 def compose_verified_filter_via_frames(
         instruction: str, knowledge: CRMSKnowledgeBase,
         procedures: CRMSModel, frames: RequestFrameStore,
+        *, allowed_frame_ids: set[str] | None = None,
         ) -> ReasonedListComposition | None:
     """Execute a request only when a licensed frame binds typed slots.
 
     Unknown wording returns ``None`` so the caller can abstain or use another
-    route. Ambiguous frames never execute.
+    route. Ambiguous frames never execute. ``allowed_frame_ids`` is the
+    governed view from the rule registry; when provided, only those frames may
+    match.
     """
     match_result = frames.match(
         instruction,
-        procedure_phrases=procedures.learned_procedure_phrases())
+        procedure_phrases=procedures.learned_procedure_phrases(),
+        allowed_frame_ids=allowed_frame_ids)
     if match_result.status == "no_match":
         return None
     if match_result.status == "ambiguous":
