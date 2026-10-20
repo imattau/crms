@@ -2129,10 +2129,16 @@ replay confirmed cited candidates are visible and `/rules` remains empty. The
 experiment passed.
 
 This is a narrow syntactic retrieval aid, not an operation mapper or learner.
-The fixtures and expected labels are Codex-authored, so the result is not a
-field precision estimate. Next freeze this generator and evaluate candidates
-and non-candidates on complete documents from a source/publisher held out from
-design; preserve scope, negation, quotation, role, and alignment controls.
+The synthetic controls and expected labels are Codex-authored, so the result is
+not a field precision estimate. A source audit found that the original NumPy
+positive fixture was an inaccurate paraphrase of its cited page: it conflated
+stable relative ordering with ascending sort order. The fixture now uses the
+page's actual statement that `stable=True` preserves relative order among
+equal values, with its `If True` condition. The extractor test passes against
+that corrected sentence. This correction narrows the claim; it does not
+validate the generator generally. Next freeze it and evaluate candidates and
+non-candidates on complete documents from source/publisher families held out
+from design; preserve scope, negation, quotation, role, and alignment controls.
 
 ## Natural request syntax transfer after phrase-role learning (2026-10-20)
 

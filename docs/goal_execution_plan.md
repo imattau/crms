@@ -173,6 +173,12 @@ This remains one selected positive excerpt, not a precision or transfer result.
 Freeze this revised grammar for the next complete-document, publisher-held-out
 study. Do not add phrase-specific extractors before that study.
 
+The current code audit also corrected an inaccurate NumPy fixture: its earlier
+wording combined stable ordering with ascending sort, which the cited source
+does not claim. Keep the corrected source sentence and its condition locked as
+a regression; provenance review must check that the cited source entails the
+claim, not only that a local offset resolves to the supplied text.
+
 An initial corpus-fitness probe against the locally installed indexes found
 that they are not suitable positive corpora for this construction: a bounded
 full-document scan of 2,339 SimpleWiki documents and 40 arXiv documents

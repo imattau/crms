@@ -1,9 +1,11 @@
 """Check a generic, review-only procedure phrase extraction construction.
 
 The extractor recognizes a source sentence's ``will`` predicate without
-knowing whether the operation is sort, reverse, or another action. Labels in
-this controlled, Codex-authored set are development expectations only. No
-candidate is accepted as a rule and no rule is learned.
+knowing whether the operation is sort, reverse, or another action. The positive
+sentences are attributed to documentation excerpts; negative and assertion
+status controls are synthetic. Expected labels are development expectations,
+not independent judgments. No candidate is accepted as a rule and no rule is
+learned.
 """
 from __future__ import annotations
 
@@ -29,10 +31,10 @@ SOURCES = {
         "The following function will sort the array in ascending order "
         "(if it doesn't contain NaN)."),
     "numpy-passive": (
-        "NumPy passive operation",
+        "NumPy stable sort return-order statement",
         "https://numpy.org/doc/stable/reference/generated/numpy.sort.html",
-        "If the sort kind is stable, the returned array will be sorted in "
-        "ascending order."),
+        "If True, the returned array will maintain the relative order of "
+        "a values which compare as equal."),
     "negated": (
         "Negated operation control",
         "https://example.invalid/negated",
@@ -90,12 +92,14 @@ def main() -> None:
     require(active[0].scope_notes == ("after: if it doesn't contain NaN",),
             f"active applicability condition was lost: {active[0]!r}")
 
-    passive = find_candidate(index, "numpy-passive", "returned array sorted")
+    passive = find_candidate(
+        index, "numpy-passive", "returned array relative order equal")
     require(len(passive) == 1
-            and passive[0].predicate_phrase == "be sorted in ascending order"
+            and passive[0].predicate_phrase
+                == "maintain the relative order of a values which compare as equal"
             and passive[0].polarity and not passive[0].quoted,
-            f"passive publisher example was not extracted: {passive!r}")
-    require(passive[0].scope_notes == ("before: If the sort kind is stable",),
+            f"passive source example was not extracted: {passive!r}")
+    require(passive[0].scope_notes == ("before: If True",),
             f"leading applicability condition was lost: {passive[0]!r}")
 
     negated = find_candidate(index, "negated", "function will not sort")
