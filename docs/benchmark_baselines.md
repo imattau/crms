@@ -144,6 +144,41 @@ Result: 5/5 held-out question forms compose across 3 unseen routes, and 2/2
 unsupported-type controls pass. See the [frozen report](../experiments/reports/v1_516_recombination_transfer_packet.json)
 and [runner](../experiments/v1_516_recombination_transfer_packet.py).
 
+## Current focused runtime replay (`31950d5`, 2026-10-20)
+
+Commands:
+
+```sh
+python3 experiments/v1_427_dialogue_multiturn_transcript.py
+python3 experiments/v1_435_dialogue_visible_evidence_anchor.py
+python3 experiments/v1_360_constraint_denials.py
+python3 experiments/v1_376_reasoning_graph_benchmark.py
+python3 experiments/v1_379_portable_validated_rule_learning.py
+python3 experiments/v1_516_recombination_transfer_packet.py
+```
+
+All six focused diagnostics completed successfully in fresh or isolated test
+state. The 30-turn dialogue transcript kept the Eiffel Tower/Colosseum topic
+switch grounded, survived a save/reload during clarification, and kept `why?`
+anchored to the latest answer. The visible-evidence control rejected an
+undisplayed citation as support for the wrong date. Reasoning checks detected
+cycle-backed self-relations, applied declared irreflexive/asymmetric
+constraints, independently verified returned proofs, and kept conflict,
+incomplete-search, and correction cases non-positive. The recombination
+packet again transferred across three held-out synthetic routes through fresh
+chat processes, preserved source/proof lineage, and abstained on two unsupported
+type claims.
+
+This replay confirms that these named regressions are not current blockers.
+It does not pass the broader capability gates: dialogue cases and relation
+examples remain curated, recombination uses synthetic entities and
+pre-reviewed components, and no representative user-task comparison or
+70B-class parity result follows from these passes. The next evidence should
+come from broader, independently authored ordinary-chat compositions with
+varied evidence layouts, natural request forms, and adversarial reasoning
+controls, checked by an independent oracle. The runtime work does not establish
+independent dialogue transfer or autonomous source-rule learning.
+
 ## Regular agent-noun question over a large corpus (2026-10-20)
 
 `experiments/v1_515_regular_agent_noun_evidence.py` covers the natural-language
