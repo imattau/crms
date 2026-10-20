@@ -24,7 +24,14 @@ false proposal. The integrated path's other three matches come from its
 broader document scan. This is a useful source boundary correction, not a
 precision estimate: the field-to-relation mapping is hand-coded, evidence
 comes from one corpus, and unproposed variants remain unmeasured. Keep the
-path report-only and review-gated.
+path report-only and review-gated. The arXiv index has zero exact attestations
+of `capital city of` among 1,697 papers, and only one `capital of` sentence;
+the latter supports canonical wording but does not validate this variant.
+Use a corpus with actual relation and wording overlap for cross-source
+generalization, and do not count missing phrase occurrences as false claims.
+Codex's unblinded review found all eight cited capital sentences directly
+express the relation; this does not estimate proposal precision or recall. See
+the [review record](../experiments/reports/structured_predicate_alignment_review.json).
 
 | Order | Work packet | Immediate outcome | Do not claim yet |
 |---|---|---|---|
@@ -139,8 +146,9 @@ After the records and learning lifecycle above are stable, complete migration an
    plus aligned prose across disjoint documents and publishers. The algorithm may
    use field names to propose hypotheses, but must not treat them as semantic
    truth. Keep every candidate cited and inert pending review. Blindly label a
-   sample containing candidate and non-candidate pairs; report proposals,
-   confirmed alignments, false proposals, coverage, and labeler time. Include
+   sample containing candidate and non-candidate pairs from corpora with
+   relation and wording overlap; report proposals, confirmed alignments, false
+   proposals, coverage, and labeler time. Include
    role reversals, ambiguous fields, quotations, negation, contrast, and
    accidental title/value overlap. Stop or redesign if yield remains
    negligible or precision depends on hand-coded relation mappings.

@@ -2500,6 +2500,33 @@ also passed (`v1_338`, 1/1 in 0.34 seconds). The `v1_458` result checks exact
 agreement between the two implementations for the capital candidate on the
 matched documents. It does not evaluate general rule learning.
 
+Codex manually reviewed the eight cited capital examples: all eight directly
+express the capital relation, including the inverted “capital city of England
+is London” frame. It also reviewed both metadata artifacts and labeled them
+non-prose evidence. The citation-backed labels and explicit limitations are in
+[`structured_predicate_alignment_review.json`](../experiments/reports/structured_predicate_alignment_review.json).
+This was an unblinded review of generator-selected candidates by the same
+system that built the probe; it is not independent precision evidence. No
+random non-proposal sample was labeled, so recall is unknown.
+
+## Academic-corpus phrase attestation (2026-10-20)
+
+`python3 experiments/v1_459_academic_phrase_attestation.py` scanned all 1,697
+documents in the local arXiv CC0/CC-BY research index, read-only. It found zero
+sentences with the exact phrase `capital city of`; it found one sentence with
+`capital of`, describing Stockholm as the largest city and a capital of
+Sweden. The example citation resolved to the exact sentence. This gives one
+independent-source attestation of canonical wording but no evidence for
+cross-source transfer of the candidate variant. The arXiv sample is small and
+domain-mismatched for country-capital wording, so zero hits are not a negative
+semantic judgment and provide no estimate of general phrase coverage.
+
+The script is a lexical attestation check, not a synonym test. A useful next
+test needs a second source corpus with overlap in the candidate relation and
+surface wording, or a broader independently sourced corpus where such overlap
+can be measured. Do not count same-page field/prose repetitions as independent
+publisher support.
+
 `python3 experiments/v1_338_structured_field_predicate_learning.py` passed all
 checks: the proposal remained inert before review, six training pages licensed
 two held-out question forms, cited evidence survived SQLite reload, stale

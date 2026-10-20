@@ -1,0 +1,117 @@
+{
+  "review_id": "structured-predicate-alignment-2026-10-20",
+  "reviewer": "Codex",
+  "review_mode": "manual evidence review",
+  "blinded": false,
+  "independent_of_candidate_generation": false,
+  "labeler_effort_minutes": null,
+  "candidate_group": {
+    "canonical_relation": "capital of",
+    "candidate_phrase": "capital city of",
+    "corpus": "SimpleWiki research index",
+    "matched_document_count": 3284,
+    "candidate_pair_count": 8,
+    "reviewed_support": [
+      {
+        "subject": "Astana",
+        "object": "Kazakhstan",
+        "judgment": "supports_capital_relation",
+        "field_evidence": "capital = Astana",
+        "field_citation": "wiki:simplewiki:11232#sha256=81d4844d8cb5ecd46bafbfe15f43047d098dc828252bb621a9f61649e04e7fb2&chars=678:694",
+        "sentence": "Astana is the capital city of Kazakhstan.",
+        "sentence_citation": "wiki:simplewiki:11232#sha256=81d4844d8cb5ecd46bafbfe15f43047d098dc828252bb621a9f61649e04e7fb2&chars=4096:4137"
+      },
+      {
+        "subject": "Havana",
+        "object": "Cuba",
+        "judgment": "supports_capital_relation",
+        "field_evidence": "capital = Havana",
+        "field_citation": "wiki:simplewiki:178#sha256=442a6fba0e7a32c8cec048bc858fbb6e6cdba09413f597a5aecad06ada9ca9bc&chars=688:704",
+        "sentence": "Havana is the capital city of Cuba.",
+        "sentence_citation": "wiki:simplewiki:178#sha256=442a6fba0e7a32c8cec048bc858fbb6e6cdba09413f597a5aecad06ada9ca9bc&chars=3529:3564"
+      },
+      {
+        "subject": "London",
+        "object": "England",
+        "judgment": "supports_capital_relation",
+        "field_evidence": "capital = London",
+        "field_citation": "wiki:simplewiki:3047#sha256=7ba51feac4b8644aece2dcadd07dc1e7cf15d1e93a80e73a4e8ca49fd8e8f8a5&chars=327:343",
+        "sentence": "The capital city of England is London.",
+        "sentence_citation": "wiki:simplewiki:3047#sha256=7ba51feac4b8644aece2dcadd07dc1e7cf15d1e93a80e73a4e8ca49fd8e8f8a5&chars=2354:2392"
+      },
+      {
+        "subject": "Monrovia",
+        "object": "Liberia",
+        "judgment": "supports_capital_relation",
+        "field_evidence": "capital = Monrovia",
+        "field_citation": "wiki:simplewiki:12333#sha256=b8ff05a4817fe50afed5677bfbda77c4a1c4a73da56231324fc784e4f75cc4ad&chars=1001:1019",
+        "sentence": "The capital city of Liberia is Monrovia.",
+        "sentence_citation": "wiki:simplewiki:12333#sha256=b8ff05a4817fe50afed5677bfbda77c4a1c4a73da56231324fc784e4f75cc4ad&chars=3216:3256"
+      },
+      {
+        "subject": "Nassau",
+        "object": "The Bahamas",
+        "judgment": "supports_capital_relation",
+        "field_evidence": "capital = Nassau",
+        "field_citation": "wiki:simplewiki:10487#sha256=3b9191057c312c118f95f8fcb9f2051d99ab7e5b58fb511941a9ce2e2e8172d9&chars=448:464",
+        "sentence": "Nassau, capital city of The Bahamas, is on the island of New Providence.",
+        "sentence_citation": "wiki:simplewiki:10487#sha256=3b9191057c312c118f95f8fcb9f2051d99ab7e5b58fb511941a9ce2e2e8172d9&chars=5730:5802"
+      },
+      {
+        "subject": "Palermo",
+        "object": "Sicily",
+        "judgment": "supports_capital_relation",
+        "field_evidence": "capital = Palermo",
+        "field_citation": "wiki:simplewiki:15605#sha256=e10b60165328682ec16605f1ea9f287edc56e8671b829f80b7a2dbb0abaebd31&chars=173:190",
+        "sentence": "The capital city of Sicily is Palermo.",
+        "sentence_citation": "wiki:simplewiki:15605#sha256=e10b60165328682ec16605f1ea9f287edc56e8671b829f80b7a2dbb0abaebd31&chars=591:629"
+      },
+      {
+        "subject": "Port Moresby",
+        "object": "Papua New Guinea",
+        "judgment": "supports_capital_relation",
+        "field_evidence": "capital = Port Moresby",
+        "field_citation": "wiki:simplewiki:26947#sha256=669b1dbca636671fbac4010ef566aa8e4b5cdd1154a1101374bc1be5972bf252&chars=562:584",
+        "sentence": "The capital city of Papua New Guinea is Port Moresby.",
+        "sentence_citation": "wiki:simplewiki:26947#sha256=669b1dbca636671fbac4010ef566aa8e4b5cdd1154a1101374bc1be5972bf252&chars=2189:2242"
+      },
+      {
+        "subject": "Reykjavík",
+        "object": "Iceland",
+        "judgment": "supports_capital_relation",
+        "field_evidence": "capital = Reykjavík",
+        "field_citation": "wiki:simplewiki:2979#sha256=8153fec7543251f5a399f2b6533b523b8742abb2e592b5e8940b4ea820d60cdc&chars=365:384",
+        "sentence": "Reykjavík is the capital city of Iceland.",
+        "sentence_citation": "wiki:simplewiki:2979#sha256=8153fec7543251f5a399f2b6533b523b8742abb2e592b5e8940b4ea820d60cdc&chars=10463:10504"
+      }
+    ]
+  },
+  "false_candidate_regression": {
+    "canonical_relation": "born in",
+    "candidate_phrase": "national museum of",
+    "judgment": "not_prose_evidence",
+    "count": 2,
+    "reason": "Both matches were infobox caption lines. They mention the birth-place value in a museum name but do not state a birthplace relation.",
+    "citations": [
+      "wiki:simplewiki:266591#sha256=a68cf76267ee9c9c6c529ba2e7ccfe13b4e498d3c1816c6fd55b64e5ce82da9a&chars=85:142",
+      "wiki:simplewiki:941677#sha256=4c0c454a4f74bf58eaf5363f6d307ec7d92fc11075dcce454c5545d83d9e51ac&chars=113:178"
+    ],
+    "effect_of_filter": "Both matches are now excluded from predicate-alignment evidence."
+  },
+  "external_attestation": {
+    "corpus": "local arXiv CC0/CC-BY index",
+    "documents_scanned": 1697,
+    "candidate_phrase_sentence_count": 0,
+    "canonical_phrase_sentence_count": 1,
+    "canonical_example": "The first city is Stockholm, which is the largest city and capital of Sweden.",
+    "citation": "arxiv:1904.13196v1#sha256=6852e710814d458cbd0473a899f7773843fe403cf0b25cf9e92107b7dce18d93&chars=22586:22929",
+    "judgment": "canonical_relation_only; does_not_attest_candidate_variant"
+  },
+  "limitations": [
+    "The positive examples were selected by the candidate generator and then reviewed without blinding.",
+    "Codex labels are not an independent human review or validation set.",
+    "The negative metadata examples arose from a known boundary bug and do not estimate general false-positive rate.",
+    "No random sample of non-proposals was semantically labeled, so recall and missed-variant coverage are unknown.",
+    "The academic index is domain-mismatched and contains no exact candidate-phrase attestation."
+  ]
+}
