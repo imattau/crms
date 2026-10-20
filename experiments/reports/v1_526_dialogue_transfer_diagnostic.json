@@ -7,7 +7,11 @@
     "turns": 6,
     "safe_entity_switches": 2,
     "supported_omissions": 1,
-    "unfocused_abstentions": 1,
+    "unfocused_abstentions": 0,
+    "focused_clarifications": 1,
+    "visible_entity_followup_after_reload": true,
+    "history_does_not_bind_pronoun_after_unrelated_turn": true,
+    "changed_source_invalidates_old_visible_entity": true,
     "citation_rows_checked": 2,
     "all_checked_citations_resolve": true,
     "confident_wrong_entity_or_date": false
@@ -34,7 +38,7 @@
     {
       "turn": 4,
       "task": "switch to previously visible entity after abstention",
-      "outcome": "unfocused_abstention",
+      "outcome": "focused_clarification",
       "expected_content": "Northport"
     },
     {
@@ -71,9 +75,9 @@
     },
     {
       "user": "And Northport?",
-      "status": "unknown",
+      "status": "clarify",
       "resolved_question": "And Northport?",
-      "reply": "Please name an entity already present in the knowledge base."
+      "reply": "I recognize Northport from a source shown earlier. What would you like to know about Northport?"
     },
     {
       "user": "What did I just ask?",

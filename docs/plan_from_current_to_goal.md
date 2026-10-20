@@ -74,14 +74,17 @@ borrowing the Aurora Observatory's 1984 date, but misses “The museum opened in
 paragraph-local entity-class alias with the date specialist; four negative
 controls reject cross-paragraph, wrong-class, competing-antecedent, and
 negated cases, and `why?` resolves the exact cited sentence. The lower-level
-dialogue API remains less capable than the integrated chat route. The other
-`v1_526` failure remains: after an abstention, “And Northport?” receives a
-generic knowledge-base response even though Northport was surfaced earlier.
-History recall and honest `why?` abstention work. These are small fixtures,
-not a transfer estimate. Next dialogue work should retain a bounded history of
-visible entities across topic changes and failed turns while requiring the
-source or knowledge layer to support any answer; when the intended relation is
-unclear, ask a focused question rather than dropping the user's entity.
+dialogue API remains less capable than the integrated chat route for the dated
+event. The post-abstention topic switch now recognizes Northport from
+citation-verified visible entity history, asks a focused clarification,
+survives save/reload, and uses the name only as dialogue context. An unrelated
+turn clears active pronoun binding while the explicit name remains available;
+final chat rendering retains only entities whose evidence was actually shown.
+A changed source invalidates the citation and removes the old name. History
+recall and honest `why?` abstention work. These are small fixtures, not a
+transfer estimate. The next dialogue task is broader held-out evaluation of
+this bounded state across more entity types, topic distances, corrections,
+and interruption patterns.
 
 ## Execution order
 
@@ -194,11 +197,10 @@ gaps, not to claim parity.
 
 ## Immediate next action
 
-The immediate dialogue task is to preserve earlier user-visible entity
-mentions across topic switches and abstentions, then either resolve the
-explicitly named entity through current source evidence or ask a focused
-clarifying question. Expand the independent conversation set to include this
-path, event/date paraphrases, pronouns with and without antecedents, “why?”,
+The immediate dialogue task is to expand the frozen independent conversation
+set and evaluate the citation-verified visible-entity state across entity
+types, longer topic distances, corrections, interruptions, and save/reload.
+Include event/date paraphrases, pronouns with and without antecedents, “why?”,
 history, and repair. Keep the Eiffel/Colosseum and Marie/Einstein cases as
 fixed controls. Measure task completion, omissions, clarification, abstention,
 and confident misbindings separately; do not rely on intent-label agreement

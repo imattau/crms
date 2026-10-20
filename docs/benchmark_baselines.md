@@ -101,17 +101,20 @@ Command: `python3 experiments/v1_526_dialogue_transfer_diagnostic.py`.
 A six-turn conversation over a separately authored three-paragraph corpus
 tests visible source-only topics, a named topic switch, an elliptical pronoun,
 an unsupported-but-present event date, a second entity switch after abstention,
-history recall, and `why?`. The named topic switch, location answers, history
-recall, and honest explanation abstention behave as expected. The pronoun
-resolves to Meridian Museum and does not leak Aurora Observatory's 1984 date,
-but CRMS misses the explicit 1972 opening sentence. After that abstention,
-“And Northport?” gets a generic knowledge-base response rather than using the
-previously surfaced entity or asking a focused clarification. Both are task
-failures; no confident wrong entity/date appears, and both displayed source
-citations resolve exactly.
+history recall, and `why?`. The pronoun resolves to Meridian Museum without
+leaking Aurora Observatory's 1984 date. “And Northport?” now produces a
+focused clarification from the earlier displayed source. The citation-backed
+visible-entity record survives save/reload, and a subsequent “What is it?”
+resolves to Northport and retrieves its own source sentence. An unrelated
+“Tell me a joke” turn clears active pronoun binding but leaves Northport
+available when named explicitly. Editing the source invalidates the old
+citation and removes the entity from verified dialogue context. The history
+and honest `why?` abstention controls pass. The lower-level
+`CRMSDialogue` path still omits the 1972 date; standard-effort full chat handles
+that construction in `v1_527`.
 
 Counts are diagnostic only: two source answers, one supported omission, one
-unfocused abstention, one history answer, and one honest `why?` abstention in
+focused clarification, one history answer, and one honest `why?` abstention in
 this six-turn fixture. This is not an independent transfer-rate estimate. No
 external 70B-class model was run; ideal responses are rubric criteria rather
 than comparator measurements. See the

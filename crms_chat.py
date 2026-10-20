@@ -10335,6 +10335,7 @@ def main() -> int:
             else:
                 dialogue.clear()
             continue
+        visible_entities_before_turn = list(dialogue.visible_entities)
         turn = respond_conversation(
             dialogue, line, research_index=index,
             pending_claims=len(pending_candidates))
@@ -11628,6 +11629,11 @@ def main() -> int:
                 turn.research.source_sentences = []
                 turn.research.passages = []
                 turn.research.status = "unknown"
+        if turn.research is not None:
+            dialogue.refresh_visible_entities_from_reply(
+                turn.resolved_question or line, turn.text or "",
+                turn.research.source_sentences or [], index,
+                visible_entities_before_turn)
         if compound_part is None:
             print(f"CRMS> {turn.text}")
         else:

@@ -229,6 +229,7 @@ class UserIntentHypothesis:
 _HISTORY_LIMIT = 12
 _HISTORY_FIELD_LIMIT = 200
 _HISTORY_QUESTION_LIMIT = 500
+_VISIBLE_ENTITY_LIMIT = 100
 _INTENT_TRACE_LIMIT = 12
 _INTENT_TASKS = {
     "check-availability", "make-reservation", "change-reservation",
@@ -314,6 +315,11 @@ class CRMSDialogue:
         # Names extracted from the most recently quoted source passage are
         # discourse candidates only; they never become facts or answer evidence.
         self.source_mentions: list[dict[str, str]] = []
+        # Citation-verified entities that have appeared in user-visible source
+        # text anywhere in this conversation. This enables explicit named
+        # follow-ups after an abstention; it never licenses pronoun binding or
+        # factual answers by itself.
+        self.visible_entities: list[dict[str, str]] = []
         # The one entity the user named and the shown source confirmed; it
         # is the preferred referent for a bare pronoun. Not persisted.
         self.topic_entity: str | None = None
@@ -493,6 +499,7 @@ class CRMSDialogue:
 
     def reset_history(self) -> None:
         self.history = []
+        self.visible_entities = []
         self.intent_trace = []
         self.active_task_intent = None
         self.active_task_subgoal = None
@@ -1262,6 +1269,50 @@ class CRMSDialogue:
                     merged.setdefault(key, item)
         return list(merged.values())[:100]
 
+    def _remember_visible_entities(self,
+                                   mentions: list[dict[str, str]]) -> None:
+        """Retain only source entities extracted from text shown to the user."""
+        self.visible_entities = self._merge_mentions(
+            mentions, self.visible_entities)[:_VISIBLE_ENTITY_LIMIT]
+
+    def refresh_visible_entities_from_reply(
+            self, question: str, reply: str,
+            source_sentences: list[dict[str, Any]], research_index: Any,
+            previous: list[dict[str, str]]) -> None:
+        """Commit only source entities present in the final rendered reply.
+
+        The chat may replace the initial retrieval brief with a specialized
+        realization. Rebuild this turn's additions after that rendering so an
+        undisplayed retrieval candidate cannot become later dialogue context.
+        """
+        self.visible_entities = list(previous)
+        directly_shown = []
+        title_anchored = []
+        for item in source_sentences:
+            sentence = item.get("text")
+            if isinstance(sentence, str) and sentence.strip() in reply:
+                directly_shown.append(item)
+                continue
+            title = item.get("title")
+            if (isinstance(title, str) and title.strip()
+                    and title.strip() in reply):
+                # A structured field may be realized as a sentence instead
+                # of quoted verbatim. Require an explicit user-named entity
+                # and verify that entity against the citation's paragraph.
+                named = self._question_entity_mentions(
+                    question, [item], research_index)
+                if any(re.search(
+                        r"(?<!\w)" + re.escape(mention["entity"])
+                        + r"(?!\w)", reply, flags=re.IGNORECASE)
+                       for mention in named):
+                    title_anchored.append(item)
+        mentions = self._merge_mentions(
+            self._question_entity_mentions(
+                question, directly_shown + title_anchored, research_index),
+            self._source_entity_mentions(directly_shown))
+        self.source_mentions = mentions
+        self._remember_visible_entities(mentions)
+
     def _remember_evidence(self, response: QuestionResult) -> None:
         self.source_mentions = []
         facts = response.evidence or []
@@ -1661,6 +1712,7 @@ class CRMSDialogue:
             carried.question = message
             return carried
         target_is_pronoun = target_phrase.strip().casefold() in _REFERENTIAL_PRONOUNS
+        historical_match = None
         if target_is_pronoun:
             if (self.last_question is None and self.last_writing_subject is not None):
                 target_candidates = [self.last_writing_subject]
@@ -1680,7 +1732,21 @@ class CRMSDialogue:
                                  == tuple(word.casefold() for word in
                                           _WORD_RE.findall(target_phrase.strip()))),
                                 None)
-            target = (source_match or
+            active_entity_keys = {
+                tuple(word.casefold() for word in
+                      _WORD_RE.findall(item.get("entity", "")))
+                for item in self.source_mentions
+            }
+            historical_match = next((item.get("entity")
+                                     for item in self.visible_entities
+                                     if tuple(word.casefold() for word in
+                                              _WORD_RE.findall(item.get("entity", "")))
+                                     == tuple(word.casefold() for word in
+                                              _WORD_RE.findall(target_phrase.strip()))
+                                     and tuple(word.casefold() for word in
+                                               _WORD_RE.findall(item.get("entity", "")))
+                                     not in active_entity_keys), None)
+            target = (source_match or historical_match or
                       self._canonical_entity(target_phrase.strip()))
             target_candidates = []
         if target is None and not target_candidates:
@@ -1701,6 +1767,14 @@ class CRMSDialogue:
             target_candidates = [target] if target is not None else []
         if not target_candidates and target is not None:
             target_candidates = [target]
+        if (historical_match is not None and not target_is_pronoun
+                and self.last_question is None):
+            self.topic_entity = target
+            self.last_selected_answer = None
+            return DialogueTurn(
+                "clarify", message, message,
+                text=(f"I recognize {target} from a source shown earlier. "
+                      f"What would you like to know about {target}?"))
         if not target_candidates and not target_is_pronoun:
             swapped = self._swap_named_question_entity(target_phrase)
             if swapped is not None:
@@ -2495,6 +2569,7 @@ class CRMSDialogue:
                 self.source_mentions = self._merge_mentions(
                     named,
                     self._source_entity_mentions(visible_source_sentences))
+                self._remember_visible_entities(self.source_mentions)
                 self.topic_entity = (named[0]["entity"]
                                      if len(named) == 1 else None)
                 if (_SOURCE_LIST_REQUEST_RE.search(question)
@@ -2533,7 +2608,7 @@ class CRMSDialogue:
         destination.parent.mkdir(parents=True, exist_ok=True)
         topic_reference = next((
             {"entity": item["entity"], "citation": item["citation"]}
-            for item in self.source_mentions
+            for item in (*self.source_mentions, *self.visible_entities)
             if self.topic_entity
             and isinstance(item.get("entity"), str)
             and item["entity"].casefold()
@@ -2541,11 +2616,12 @@ class CRMSDialogue:
             and item.get("citation")
         ), None)
         destination.write_text(
-            json.dumps({"format_version": 21, "last_entity": self.last_entity,
+            json.dumps({"format_version": 22, "last_entity": self.last_entity,
                         "subject_entity": self.subject_entity,
                         "object_entity": self.object_entity,
                         "last_question": self.last_question,
                         "source_mentions": self.source_mentions,
+                        "visible_entities": self.visible_entities,
                         "topic_reference": topic_reference,
                         "presented_sources": self.presented_sources,
                         "last_selected_answer": self.last_selected_answer,
@@ -2577,8 +2653,9 @@ class CRMSDialogue:
              intent_model: CRMSDialogueIntentModel | None = None
              ) -> "CRMSDialogue":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
-        if payload.get("format_version") not in (
-                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21):
+        if payload.get("format_version") not in {
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+                17, 18, 19, 20, 21, 22}:
             raise ValueError("unsupported dialogue-state format version")
         dialogue = cls(knowledge, intent_model=intent_model)
         pending_dialogue_slot = payload.get("pending_dialogue_slot")
@@ -2697,40 +2774,48 @@ class CRMSDialogue:
                 raise ValueError("stored previous question is malformed")
             dialogue.last_question = last_question
         source_mentions = payload.get("source_mentions", [])
-        if not isinstance(source_mentions, list) or len(source_mentions) > 100:
-            raise ValueError("stored source referents are malformed")
+        visible_entities = payload.get("visible_entities", source_mentions)
+        for field_name, rows in (("source referents", source_mentions),
+                                 ("visible entities", visible_entities)):
+            if (not isinstance(rows, list)
+                    or len(rows) > _VISIBLE_ENTITY_LIMIT):
+                raise ValueError(f"stored {field_name} are malformed")
         if research_index is not None:
-            verified_mentions = []
-            for item in source_mentions:
-                if not isinstance(item, dict):
-                    raise ValueError("stored source referent is malformed")
-                entity, citation = item.get("entity"), item.get("citation")
-                if (not isinstance(entity, str) or not entity.strip()
-                        or not isinstance(citation, str) or not citation.strip()):
-                    raise ValueError("stored source referent is malformed")
-                title = item.get("title", "source")
-                if not isinstance(title, str):
-                    raise ValueError("stored source title is malformed")
-                try:
-                    cited_text = research_index.resolve_citation(citation)
-                    document_id = citation.partition("#sha256=")[0]
-                    indexed_title = research_index.document(document_id).title
-                except (AttributeError, KeyError, TypeError, ValueError):
-                    # A source may have been removed or revised since the
-                    # dialogue was saved. Its names must not remain usable as
-                    # referents unless the current index still verifies it.
-                    continue
-                recovered = dialogue._source_entity_mentions([{
-                    "text": cited_text, "citation": citation,
-                    "title": indexed_title,
-                }])
-                if any(candidate["entity"].casefold() == entity.casefold()
-                       for candidate in recovered):
-                    verified_mentions.append({
-                        "entity": entity, "citation": citation,
-                        "title": indexed_title or title,
-                    })
+            def verify_mentions(rows: list[Any]) -> list[dict[str, str]]:
+                verified = []
+                for item in rows:
+                    if not isinstance(item, dict):
+                        raise ValueError("stored source referent is malformed")
+                    entity, citation = item.get("entity"), item.get("citation")
+                    if (not isinstance(entity, str) or not entity.strip()
+                            or not isinstance(citation, str) or not citation.strip()):
+                        raise ValueError("stored source referent is malformed")
+                    title = item.get("title", "source")
+                    if not isinstance(title, str):
+                        raise ValueError("stored source title is malformed")
+                    try:
+                        cited_text = research_index.resolve_citation(citation)
+                        document_id = citation.partition("#sha256=")[0]
+                        indexed_title = research_index.document(document_id).title
+                    except (AttributeError, KeyError, TypeError, ValueError):
+                        # Removed or revised citations cannot keep a name
+                        # available as a dialogue referent after reload.
+                        continue
+                    recovered = dialogue._source_entity_mentions([{
+                        "text": cited_text, "citation": citation,
+                        "title": indexed_title,
+                    }])
+                    if any(candidate["entity"].casefold() == entity.casefold()
+                           for candidate in recovered):
+                        verified.append({
+                            "entity": entity, "citation": citation,
+                            "title": indexed_title or title,
+                        })
+                return verified
+
+            verified_mentions = verify_mentions(source_mentions)
             dialogue.source_mentions = verified_mentions
+            dialogue.visible_entities = verify_mentions(visible_entities)
             topic_reference = payload.get("topic_reference")
             if topic_reference is not None:
                 if (not isinstance(topic_reference, dict)
@@ -2742,7 +2827,8 @@ class CRMSDialogue:
                 if any(item["entity"].casefold()
                        == topic_reference["entity"].casefold()
                        and item["citation"] == topic_reference["citation"]
-                       for item in verified_mentions):
+                       for item in (*verified_mentions,
+                                    *dialogue.visible_entities)):
                     dialogue.topic_entity = topic_reference["entity"]
             presented_sources = payload.get("presented_sources", [])
             if not isinstance(presented_sources, list) or len(presented_sources) > 3:

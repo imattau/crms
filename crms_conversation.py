@@ -1729,6 +1729,11 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         act = intent.runtime_route
 
     def with_intent(turn: DialogueTurn) -> DialogueTurn:
+        if turn.status == "out_of_scope":
+            # An unrelated task ends the active pronoun/topic binding, while
+            # citation-verified visible entities remain available if the user
+            # explicitly names one again. History is context, not evidence.
+            dialogue.clear()
         if (intent is not None and intent.decision == "selected"
                 and intent.dialogue_act == "answer-clarification"
                 and dialogue.open_dialogue_question is not None):
