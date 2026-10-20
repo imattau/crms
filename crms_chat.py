@@ -9607,6 +9607,11 @@ def main() -> int:
                         knowledge, proof, short_answer=short_answer)
                     if rendered_proof is not None:
                         explanation_parts.append(rendered_proof)
+                for row in last_reasoned_filter.language_evidence:
+                    explanation_parts.append(
+                        f"The relation wording '{row['surface_phrase']}' was "
+                        f"matched to '{row['relation']}' using taught source "
+                        f"examples: {', '.join(row.get('sources', ())) }.")
                 if last_reasoned_filter.procedure_records:
                     labels = sorted({str(record.get("labeler_id"))
                                      for record in last_reasoned_filter.procedure_records
@@ -9621,6 +9626,10 @@ def main() -> int:
                 print("CRMS> " + rendered)
                 explanation_refs = collect_feedback_refs(
                     response=last_reasoned_filter)
+                explanation_refs.extend(
+                    {"kind": "source", "id": source}
+                    for row in last_reasoned_filter.language_evidence
+                    for source in row.get("sources", ()))
                 remember_feedback(
                     {"question": "why?", "answer": rendered,
                      "evidence": explanation_refs}
@@ -9722,6 +9731,10 @@ def main() -> int:
             last_reasoned_filter = reasoned_filter
             print("CRMS> " + reasoned_filter.text)
             evidence_refs = collect_feedback_refs(response=reasoned_filter)
+            evidence_refs.extend(
+                {"kind": "source", "id": source}
+                for row in reasoned_filter.language_evidence
+                for source in row.get("sources", ()))
             evidence_refs.extend(
                 {"kind": "procedure", "id": str(record.get("phrase", "")),
                  "sources": [value for value in (

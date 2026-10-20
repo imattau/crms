@@ -93,9 +93,61 @@ def learn_connective_procedures() -> CRMSModel:
     return model
 
 
+def teach_relation_surface(knowledge: CRMSKnowledgeBase,
+                           research_index: CRMSResearchIndex) -> list[str]:
+    """Teach a source-grounded predicate form without hard-coding its alias."""
+    citations = []
+    for document_id, subject, obj in (
+            ("surface-ada", "Ada", "21"),
+            ("surface-bea", "Bea", "34"),
+            ("surface-cy", "Cy", "55")):
+        sentence = f"{subject} can reach {obj}."
+        research_index.add_document(
+            document_id, "Reviewed reach wording", sentence,
+            f"{document_id}.txt")
+        hit = next(item for item in research_index.search(sentence, limit=10)
+                   if item.document_id == document_id)
+        citation = research_index.citation(hit)
+        knowledge.add_fact_from_hit(
+            subject, "reaches", obj, research_index, hit)
+        licensed = knowledge.teach_fact_pattern_from_hit(
+            sentence, subject=subject, relation="reaches", obj=obj,
+            predicate_phrase="can reach", research_index=research_index,
+            hit=hit)
+        citations.append(citation)
+    require(licensed,
+            "varied cited predicate examples did not license the surface form")
+    return citations
+
+
+def check_relation_surface_source_independence() -> None:
+    index = CRMSResearchIndex()
+    index.add_document(
+        "single-source", "Single source", "Dee can reach 8. Eli can reach 9.",
+        "single-source.txt")
+    knowledge = CRMSKnowledgeBase()
+    licensed = False
+    for subject, obj, sentence in (
+            ("Dee", "8", "Dee can reach 8."),
+            ("Eli", "9", "Eli can reach 9.")):
+        hit = next(item for item in index.search(sentence, limit=10)
+                   if item.document_id == "single-source")
+        knowledge.add_fact_from_hit(subject, "reaches", obj, index, hit)
+        licensed = knowledge.teach_fact_pattern_from_hit(
+            sentence, subject=subject, relation="reaches", obj=obj,
+            predicate_phrase="can reach", research_index=index, hit=hit)
+    require(licensed
+            and knowledge.match_fact_pattern_relation_claim("Nia can reach")
+                is None,
+            "one source document licensed a reusable relation wording")
+
+
 def main() -> None:
     knowledge, _direct_composite_control = build_case()
     procedures = learn_connective_procedures()
+    alias_index = CRMSResearchIndex()
+    alias_sources = teach_relation_surface(knowledge, alias_index)
+    check_relation_surface_source_independence()
     cases = (
         ("Filter 12, 4, 4, 9, and 7 to values Nia reaches; then remove duplicate "
          "values then reverse the list.", (9, 4, 12)),
@@ -110,6 +162,8 @@ def main() -> None:
         # [9, 12, 4]. Deduplicating first would instead yield [9, 4, 12].
         ("Filter 12, 4, 12, 9, and 7 to values Nia reaches; then reverse the "
          "list then remove duplicate values.", (9, 12, 4)),
+        ("Filter 12, 4, 4, 9, and 7 to values Nia can reach; then remove "
+         "duplicate values then reverse the list.", (9, 4, 12)),
     )
     for request, expected in cases:
         result = compose_verified_filter(request, knowledge, procedures)
@@ -127,6 +181,18 @@ def main() -> None:
                             for record in result.procedure_records},
                 f"ordinary request frame did not preserve verified composition: "
                 f"{request!r}: {result}")
+        if "can reach" in request:
+            require(result.subject == "Nia"
+                    and len(result.language_evidence) == 1
+                    and result.language_evidence[0]["document_count"] >= 2
+                    and result.language_evidence[0]["surface_phrase"] == "can reach"
+                    and result.language_evidence[0]["relation"] == "reaches"
+                    and set(result.language_evidence[0]["sources"]) == set(alias_sources)
+                    and all(alias_index.resolve_citation(source)
+                            for source in alias_sources)
+                    and "Taught relation wording: 'can reach' → 'reaches'"
+                        in result.text,
+                    f"learned relation wording lost its evidence: {result}")
 
     # The parser may normalize an explicit connective, but it must not invent
     # operation synonyms or broaden relation vocabulary without supervision.
@@ -138,7 +204,7 @@ def main() -> None:
             and not unlicensed_operation.output_values,
             f"unlicensed operation paraphrase was executed: {unlicensed_operation}")
     unlicensed_relation = compose_verified_filter(
-        "From [12, 4, 4, 9, 7], return the values Nia can reach, then remove "
+        "From [12, 4, 4, 9, 7], return the values Nia can get to, then remove "
         "duplicate values then reverse the list.", knowledge, procedures)
     require(unlicensed_relation is not None
             and unlicensed_relation.status == "unsupported"
@@ -171,7 +237,7 @@ def main() -> None:
         procedures.save(root / "rules.json")
         CRMSMath().save(root / "math.json")
         CRMSTranslation().save(root / "translations.json")
-        CRMSResearchIndex().save(root / "index.json")
+        alias_index.save(root / "index.json")
         command = [
             sys.executable, str(PROJECT / "crms_chat.py"),
             "--knowledge", str(root / "knowledge.json"),
@@ -187,6 +253,7 @@ def main() -> None:
             command,
             input="\n".join((
                 *(request for request, _expected in cases),
+                "why?",
                 "From [12, 4, 8], return the values Nia reaches, then remove "
                 "duplicate values then reverse the list.",
                 "/quit", "")),
@@ -195,14 +262,21 @@ def main() -> None:
         require(chat.returncode == 0 and "Traceback" not in output
                 and all(str(list(expected)) in output
                         for _request, expected in cases)
+                and "Taught relation wording: 'can reach' → 'reaches'" in output
+                and "The relation wording 'can reach' was matched to 'reaches'" in output
+                and all(source in output for source in alias_sources)
                 and "I can't determine whether 8 satisfy Nia reaches" in output,
                 f"fresh-process chat did not answer all licensed variants:\n{output}")
 
-    print("four request frames across five cases, including an order-sensitive duplicate case, compose through fresh chat: PASS")
-    print("target operation orders were not directly taught; component and connective evidence retained: PASS")
+    print("four request frames across six cases, including learned relation")
+    print("wording and an order-sensitive duplicate case: PASS")
+    print("target operation orders were not directly taught; component and")
+    print("connective evidence retained: PASS")
     print("verified proof set and explicit-negative handling are preserved: PASS")
     print("unlicensed operation and relation paraphrases remain unsupported: PASS")
-    print("scope: controlled operation recombination over exact primitives; no broad paraphrase or planning claim")
+    print("relation wording from one source document does not transfer: PASS")
+    print("scope: controlled operation recombination over exact primitives;")
+    print("no broad paraphrase or planning claim")
 
 
 if __name__ == "__main__":

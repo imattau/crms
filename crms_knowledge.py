@@ -3842,6 +3842,68 @@ class CRMSKnowledgeBase:
                 return True
         return False
 
+    def match_fact_pattern_relation_claim(
+            self, claim: str) -> dict[str, Any] | None:
+        """Match a subject plus an explicitly taught predicate to a relation.
+
+        This is an exact suffix match over positive, licensed fact-pattern
+        alignments supported by at least two source documents. It does not
+        infer synonyms or use unreviewed candidates. Ambiguous matches
+        abstain. The returned support records identify the source examples
+        that licensed the observed predicate phrase.
+        """
+        claim = _display(claim, "claim")
+        words = _tokens(claim)
+        surface_matches = word_matches(claim)
+        if len(surface_matches) != len(words):
+            return None
+        if len(words) < 2:
+            return None
+        matches: dict[tuple[tuple[str, ...], tuple[str, ...]], dict[str, Any]] = {}
+        for key, examples in self._fact_pattern_examples.items():
+            _template, relation = key
+            if (self._fact_pattern_polarities.get(key, True) is not True
+                    or not self._fact_pattern_is_licensed(key, examples)):
+                continue
+            for phrase in self._fact_pattern_predicates.get(key, set()):
+                if not phrase or phrase == relation or len(phrase) >= len(words):
+                    continue
+                if words[-len(phrase):] != phrase:
+                    continue
+                subject_words = words[:-len(phrase)]
+                if (len(subject_words) >= 2
+                        and subject_words[-2:] in {("is", "a"), ("is", "an")}):
+                    subject_words = subject_words[:-2]
+                if not subject_words:
+                    continue
+                subject_text = claim[:surface_matches[len(subject_words) - 1].end()].strip()
+                subject = self._canonicalize_query_entity(subject_text)
+                source_pairs = self._fact_pattern_predicate_sources.get(
+                    key, {}).get(phrase, {})
+                support = [
+                    {"subject": " ".join(pair[0]),
+                     "object": " ".join(pair[1]),
+                     "sources": sorted(sources)}
+                    for pair, sources in sorted(source_pairs.items()) if sources
+                ]
+                documents = sorted({str(source).split("#", 1)[0]
+                                    for row in support
+                                    for source in row["sources"]})
+                if not support or len(documents) < 2:
+                    continue
+                candidate_key = (_tokens(subject), relation)
+                matches[candidate_key] = {
+                    "subject": subject,
+                    "relation": " ".join(relation),
+                    "surface_phrase": " ".join(phrase),
+                    "kind": "taught_fact_pattern_predicate",
+                    "support": support,
+                    "document_count": len(documents),
+                    "sources": sorted({source for row in support
+                                       for source in row["sources"]}),
+                }
+        return next(iter(matches.values())) if len(matches) == 1 else None
+
     def fact_pattern_diagnostics(
             self, sentence: str, *, subject: str, relation: str, obj: str,
             polarity: bool = True, predicate_phrase: str | None = None,

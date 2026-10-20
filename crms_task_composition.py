@@ -72,6 +72,7 @@ class ReasonedListComposition:
     evidence: tuple[dict[str, Any], ...] = ()
     inference_proofs: tuple[dict[str, Any], ...] = ()
     procedure_records: tuple[dict[str, Any], ...] = ()
+    language_evidence: tuple[dict[str, Any], ...] = ()
 
 
 def _relation_and_subject(claim: str, knowledge: CRMSKnowledgeBase
@@ -136,6 +137,13 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
         return ReasonedListComposition(
             "unsupported", "I can check a finite list of 1 to 32 integer values.")
     parsed = _relation_and_subject(match.group("claim"), knowledge)
+    language_evidence: tuple[dict[str, Any], ...] = ()
+    if parsed is None:
+        learned_match = knowledge.match_fact_pattern_relation_claim(
+            match.group("claim"))
+        if learned_match is not None:
+            parsed = (learned_match["subject"], learned_match["relation"])
+            language_evidence = (learned_match,)
     if parsed is None:
         return ReasonedListComposition(
             "unsupported", "I couldn't identify one unambiguous stored relation and subject.")
@@ -151,6 +159,8 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
     negative: list[int] = []
     unresolved: list[int] = []
     sources: set[str] = set()
+    for row in language_evidence:
+        sources.update(str(source) for source in row.get("sources", ()) if source)
     verified_proofs: list[dict[str, Any]] = []
     negative_evidence: list[dict[str, Any]] = []
     checks = 0
@@ -199,7 +209,8 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
                 subject, relation, values, unresolved_values=(value,),
                 procedure=procedure, evidence_sources=tuple(sorted(sources)),
                 proof_checks=checks, evidence=tuple(negative_evidence),
-                inference_proofs=tuple(verified_proofs))
+                inference_proofs=tuple(verified_proofs),
+                language_evidence=language_evidence)
         if explicit_negative:
             negative.append(value)
         elif inference.status == "answered" and verified_proof is not None:
@@ -218,7 +229,8 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
             tuple(unresolved), procedure=procedure,
             evidence_sources=tuple(sorted(sources)), proof_checks=checks,
             evidence=tuple(negative_evidence),
-            inference_proofs=tuple(verified_proofs))
+            inference_proofs=tuple(verified_proofs),
+            language_evidence=language_evidence)
 
     prediction = procedures.predict(procedure, included)
     if prediction.status != "ok" or prediction.output is None:
@@ -228,7 +240,8 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
             subject, relation, values, tuple(included), tuple(negative),
             procedure=procedure, evidence_sources=tuple(sorted(sources)),
             proof_checks=checks, evidence=tuple(negative_evidence),
-            inference_proofs=tuple(verified_proofs))
+            inference_proofs=tuple(verified_proofs),
+            language_evidence=language_evidence)
     output = tuple(prediction.output)
     procedure_phrases = set(prediction.evidence_phrases or ())
     procedure_records = tuple(
@@ -248,11 +261,21 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
     support_note = (f" Procedure examples: {len(procedure_records)}"
                     + (f" (labeler: {', '.join(labelers)})" if labelers else "")
                     + ".")
+    language_note = ""
+    if language_evidence:
+        alignments = "; ".join(
+            f"'{row['surface_phrase']}' → '{row['relation']}'"
+            for row in language_evidence)
+        language_note = (f" Taught relation wording: {alignments}; sources: "
+                         + ", ".join(sorted({source
+                                              for row in language_evidence
+                                              for source in row.get("sources", ())}))
+                         + ".")
     text = (f"Verified values satisfying {subject} {relation}: {included}"
             f"{exclusions}. After '{procedure}': {list(output)}. "
-            f"Evidence sources: {evidence}.{support_note}")
+            f"Evidence sources: {evidence}.{support_note}{language_note}")
     return ReasonedListComposition(
         "answered", text, subject, relation, values, tuple(included),
         tuple(negative), (), output, procedure, tuple(sorted(sources)), checks,
         tuple(negative_evidence), tuple(verified_proofs),
-        procedure_records)
+        procedure_records, language_evidence)
