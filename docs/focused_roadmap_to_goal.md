@@ -130,18 +130,31 @@ and exercised by `v1_476`. Its 19 cited fixtures cover full subjects,
 conditions, contrast, list items, parenthesized values, literals, polarity,
 quotation, denial, uncertainty, one-word predicates, and a fresh chat replay;
 candidates remain review-only. The full-package replay `v1_477` finds 657
-sentences across 250 NumPy API units and 217 across 60 pandas units, compared
-with 303/177 and 24/16 in `v1_474`; NumPy has 279 normalized candidate
-patterns. A re-run of six topic-switch, source-only,
+candidate sentences across 250 NumPy API units and 216 candidate sentences /
+217 proposals across 60 pandas units, compared with 303/177 and 24/16 in
+`v1_474`; NumPy has 279 normalized candidate patterns. A re-run of six
+topic-switch, source-only,
 paragraph-grounding, multi-turn, cross-paragraph, and unsupported-switch
 dialogue controls passed 6/6; this is regression coverage, not dialogue
 transfer evidence. The source counts are yield only: the replay
 still exposes malformed boundaries in complex parameter and conditional
 prose, and the frozen sample was used during redesign. Do not call the yield
-increase improved precision or transfer. The next gate is a predeclared
-review of a frozen sample from `v1_477`, followed by a publisher- and
-API-unit-held-out confirmation that was not used to revise the parser. Codex
-labels are supervision, not independent validation.
+increase improved precision or transfer. The current `v1_478` review selected
+ten candidates and ten non-candidates per package, with exact citations and
+sentence hashes. Codex marked 10/20 candidate field sets structurally
+reviewable, 5/20 context-dependent, and 5/20 boundary errors. Of 20 sampled
+non-candidates, 14 appeared to state behavior that needs context, shared-
+subject recovery, or broader clause structure; six were fragments or not
+behavior claims. This is an unblinded, single-rater diagnostic from the same
+corpora used during parser development, not a precision/recall estimate or
+independent validation. See [`v1_478 report`](../experiments/reports/v1_478_api_candidate_boundary_review.json).
+
+The next learner task is context-aware claim assembly: use complete source-unit
+structure to resolve omitted or shared subjects and antecedents, retain
+separate citations for each supporting span, and abstain when the source does
+not determine a unique claim. Develop against the frozen sample, then freeze
+the method and measure proposal quality and missed claims on untouched API
+units and a new publisher. Keep candidates review-only throughout.
 
 Use the existing excerpt and real-source acceptance experiments as regression
 controls, not as a corpus-level result. If a suitable corpus does not contain
@@ -236,14 +249,14 @@ academic-paper sources.
    failures, then report task completion, wrong referents, clarification,
    omissions, and abstention separately. Dialogue is a parallel research and
    release gate for every chat-facing change.
-2. Freeze the `v1_477` clause-aware parser and review a predeclared sample of
-   candidate and non-candidate sentences. Use Codex labels as explicitly
-   identified supervision; preserve the exact source sentence and boundary
-   errors. Do not tune on confirmation data. Confirm on untouched API units
-   and a new publisher, measuring useful proposal precision, missed useful
-   claims, review effort, and source coverage. If this gate fails, revise the
-   boundary representation and reserve a new confirmation set. The `v1_473`
-   arXiv result remains a negative control for this specific grammar.
+2. Redesign claim assembly to use cited source-unit context based on the
+   `v1_478` findings: explicit/shared subjects, anaphora, parameter headings,
+   and long conditional scope. Keep the two supporting spans independently
+   cited and abstain on ambiguous bindings. Use the reviewed cases as
+   development controls, then freeze the method and test untouched API units
+   plus a publisher held out from design. Measure useful proposals, boundary
+   errors, missed claims, abstention, and review effort. `v1_473` remains a
+   negative corpus-fit control for this grammar.
 3. If source learning transfers, use reviewed components to build one unseen
    natural-language recombination task through chat and fresh-process reload.
    Independently check the result and its proof; include missing-premise,

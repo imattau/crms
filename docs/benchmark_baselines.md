@@ -3124,13 +3124,14 @@ transfer evidence.
 `python3 experiments/audits/v1_477_clause_aware_api_reference_fit.py` replayed
 the complete locally installed API-docstring corpora:
 
-| Package | API docstrings | Sentences | Candidate sentences | API units with candidates | Unique normalized candidates |
-|---|---:|---:|---:|---:|---:|
-| NumPy 2.5.1 | 415 | 13,391 | 657 | 250 | 279 |
-| pandas 3.0.5 | 100 | 5,384 | 217 | 60 | 185 |
+| Package | API docstrings | Source sentences | Candidate sentences | Candidate proposals | API units with candidates | Unique normalized proposals |
+|---|---:|---:|---:|---:|---:|---:|
+| NumPy 2.5.1 | 415 | 13,391 | 657 | 657 | 250 | 279 |
+| pandas 3.0.5 | 100 | 5,384 | 216 | 217 | 60 | 185 |
 
-Compared with `v1_474`, the candidate counts rose from 303 to 657 for NumPy
-and from 24 to 217 for pandas. The replay also found malformed subjects in
+Compared with `v1_474`, the proposal counts rose from 303 to 657 for NumPy
+and from 24 to 217 for pandas. One pandas sentence yields two proposals, so
+the number of candidate sentences is 216. The replay also found malformed subjects in
 complex parameter descriptions and nested conditions. It is a corpus-fit and
 implementation diagnostic only: it does not measure semantic precision,
 missed-claim rate, transfer, or rule-learning quality. The same package
@@ -3143,3 +3144,35 @@ Reports: [clause-aware corpus-fit JSON](reports/v1_477_clause_aware_api_referenc
 [frozen review sample](reports/v1_475_api_candidate_sample_review.json),
 [source-claim fixtures](../experiments/v1_476_clause_aware_procedure_claims.py), and
 [replay script](audits/v1_477_clause_aware_api_reference_fit.py).
+
+## Current proposal and non-proposal review (`v1_478`, 2026-10-20)
+
+Command: `python3 experiments/audits/v1_478_api_candidate_boundary_review.py`.
+
+For each exact package corpus in `v1_477`, a deterministic SHA-256 key selected
+ten candidate and ten non-candidate sentences containing `will` from each
+package. API docstrings were deduplicated by module, qualified name, and text;
+all labels are tied to exact document hashes, offsets, and sentence hashes.
+No source sentence text is copied into the report.
+
+| Review class | Label | Count |
+|---|---|---:|
+| Candidate | Structurally reviewable | 10/20 |
+| Candidate | Needs antecedent/context | 5/20 |
+| Candidate | Boundary error | 5/20 |
+| No candidate | Context-dependent behavior | 8/20 |
+| No candidate | Shared-subject clause | 5/20 |
+| No candidate | Complex-scope behavior | 1/20 |
+| No candidate | Incomplete source fragment | 5/20 |
+| No candidate | Not a behavior claim | 1/20 |
+
+These are Codex's unblinded single-rater development labels. The set is
+deterministic but not a probability sample, the same two corpora were used for
+parser development, and “structurally reviewable” does not mean a semantic
+rule is correct. This is not an estimate of precision or recall. It shows the
+next learner should use source-unit context to recover omitted/shared subjects
+while citing antecedent and claim spans separately; ambiguous bindings must
+remain review-only or be rejected. No rule was accepted.
+
+Report: [review JSON](reports/v1_478_api_candidate_boundary_review.json),
+[reproduction and citation verifier](audits/v1_478_api_candidate_boundary_review.py).

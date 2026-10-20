@@ -24,6 +24,7 @@
   "packages": [
     {
       "candidate_api_units": 250,
+      "candidate_proposals": 657,
       "candidate_sentences": 657,
       "corpus_sha256": "e0de3744dad3b18a02a455b04bcb31ec59c7d51543b21674cea6496b930f6567",
       "license_label": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
@@ -133,7 +134,8 @@
     },
     {
       "candidate_api_units": 60,
-      "candidate_sentences": 217,
+      "candidate_proposals": 217,
+      "candidate_sentences": 216,
       "corpus_sha256": "77c2241d955527380a76b6a493e2341e52e3db1b06c37255f730aa1ae6f2cbc1",
       "license_label": "BSD 3-Clause License",
       "package": "pandas",

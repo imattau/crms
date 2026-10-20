@@ -1,0 +1,679 @@
+{
+  "audit": "v1_478_api_candidate_boundary_review",
+  "date": "2026-10-20",
+  "label_counts": {
+    "candidate": {
+      "boundary_error": 5,
+      "context_needed": 5,
+      "reviewable": 10
+    },
+    "no_candidate": {
+      "complex_scope": 1,
+      "context_dependent": 8,
+      "incomplete_source_fragment": 5,
+      "not_a_behavior_claim": 1,
+      "shared_subject": 5
+    }
+  },
+  "label_protocol": "Codex reviewed the exact cited sentence and extracted fields in one unblinded pass. Labels are single-rater development feedback, not independent validation and not a probability-sample estimate.",
+  "limits": [
+    "The two pinned package corpora are development data, not held-out publishers.",
+    "The sample is deterministic but not a probability sample.",
+    "A source sentence can contain relevant context outside its cited span.",
+    "Review labels diagnose extraction boundaries; they do not validate a learned rule.",
+    "No source candidate was accepted or installed as a rule."
+  ],
+  "method": "For each pinned package and each candidate/no-candidate class, select the ten lowest SHA-256 keys of deduplicated public API docstring sentences containing 'will'. Keys bind package, document identity, and exact sentence. Sample generation and citations are checked against the complete v1_477 corpus hashes.",
+  "packages": [
+    {
+      "candidate_proposal_count": 657,
+      "candidate_sentence_count": 657,
+      "corpus_sha256": "e0de3744dad3b18a02a455b04bcb31ec59c7d51543b21674cea6496b930f6567",
+      "no_candidate_count": 24,
+      "package": "numpy",
+      "version": "2.5.1"
+    },
+    {
+      "candidate_proposal_count": 217,
+      "candidate_sentence_count": 216,
+      "corpus_sha256": "77c2241d955527380a76b6a493e2341e52e3db1b06c37255f730aa1ae6f2cbc1",
+      "no_candidate_count": 16,
+      "package": "pandas",
+      "version": "3.0.5"
+    }
+  ],
+  "rows": [
+    {
+      "api_export": "fmin",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "remain uninitialized",
+          "quoted": false,
+          "scope": [
+            "before: Note that if an uninitialized `out` array is created via the default ``out=None``"
+          ],
+          "subject": "locations within it where the condition is False"
+        }
+      ],
+      "codex_review_label": "context_needed",
+      "package": "numpy",
+      "review_note": "The local subject contains 'it'; the condition supplies its antecedent.",
+      "sample_class": "candidate",
+      "sample_key": "0092c48634638d86b6a17769e19f31a7dbd0da135df17a108484399c400b921a",
+      "sentence_sha256": "db7ac0bb6c05b330d233a2dc0ca4e9fce2f309f2675d6892abf4faaf852356b4",
+      "source_citation": "numpy:numpy.fmin:3f8ec9856f2c#sha256=3f8ec9856f2c3dd671c7277988bd348b9000dad2c68f6af8ee4e7cdcee6ed9f9&chars=1358:1524"
+    },
+    {
+      "api_export": "reciprocal",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "retain its original value",
+          "quoted": false,
+          "scope": [
+            "before: Elsewhere"
+          ],
+          "subject": "the `out` array"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "package": "numpy",
+      "review_note": "The out-array role and Elsewhere scope are explicit.",
+      "sample_class": "candidate",
+      "sample_key": "00a2a9cd453328b928a8ee0d30958d6c0acd064ad216fafd5ec2153e47e80201",
+      "sentence_sha256": "4a24da07eb152b0f6e609b4db6a8baeceab63c500dc7f0105e20befefa8bccdc",
+      "source_citation": "numpy:numpy.reciprocal:5a7972e9be64#sha256=5a7972e9be64be9f22a77b5b7c71eafd1a0f9e1e78bcbe9363c629d99ae63170&chars=760:818"
+    },
+    {
+      "api_export": "heaviside",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "remain uninitialized",
+          "quoted": false,
+          "scope": [
+            "before: Note that if an uninitialized `out` array is created via the default ``out=None``"
+          ],
+          "subject": "locations within it where the condition is False"
+        }
+      ],
+      "codex_review_label": "context_needed",
+      "package": "numpy",
+      "review_note": "'Within it' refers to the out array in the condition.",
+      "sample_class": "candidate",
+      "sample_key": "00a55ee875ac39e48332544df1c23623f855586661f28d1f3f2be05042d414f8",
+      "sentence_sha256": "db7ac0bb6c05b330d233a2dc0ca4e9fce2f309f2675d6892abf4faaf852356b4",
+      "source_citation": "numpy:numpy.heaviside:3a7eac52b0bb#sha256=3a7eac52b0bb07e31cd0a5bc48c2028339fb2a2ff6c21917dc2df8c36db5a3f9&chars=1222:1388"
+    },
+    {
+      "api_export": "diagonal",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "return a read/write view and writing to the returned array will alter your original array",
+          "quoted": false,
+          "scope": [],
+          "subject": "In some future release, it"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "package": "numpy",
+      "review_note": "A time qualifier was absorbed into the subject and a second clause into the predicate.",
+      "sample_class": "candidate",
+      "sample_key": "01c525eb5bb1676ad0bb54b110656b75abf0bdfc6ec3d5f09954a0af3f20d31f",
+      "sentence_sha256": "f9ab04142cceeeb2308464f71ccb8dad7c2c0bcd0955bf0580119bfdab960d60",
+      "source_citation": "numpy:numpy.diagonal:0be7c482ae26#sha256=0be7c482ae26697b451185e1b3874c127ca0c05f2ceb040aa219f2f4c6285c86&chars=967:1089"
+    },
+    {
+      "api_export": "tanh",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "remain uninitialized",
+          "quoted": false,
+          "scope": [
+            "before: Note that if an uninitialized `out` array is created via the default ``out=None``"
+          ],
+          "subject": "locations within it where the condition is False"
+        }
+      ],
+      "codex_review_label": "context_needed",
+      "package": "numpy",
+      "review_note": "The subject contains 'it'; its referent is in the condition.",
+      "sample_class": "candidate",
+      "sample_key": "02d83245e0ff9f536be25a609af2308f5686ba9efb00d45cdf9ab37f2a3f9314",
+      "sentence_sha256": "db7ac0bb6c05b330d233a2dc0ca4e9fce2f309f2675d6892abf4faaf852356b4",
+      "source_citation": "numpy:numpy.tanh:05ac0c6d479a#sha256=05ac0c6d479a7bbb0f1ed0d3010449ba997bd32e0b7dadf976637390d5977ce7&chars=845:1011"
+    },
+    {
+      "api_export": "nextafter",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "retain its original value",
+          "quoted": false,
+          "scope": [
+            "before: Elsewhere"
+          ],
+          "subject": "the `out` array"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "package": "numpy",
+      "review_note": "The out-array role and Elsewhere scope are explicit.",
+      "sample_class": "candidate",
+      "sample_key": "03732e94f67bffd828049c94b9f088ba82c1335559ebccee755cb4cfe021bf18",
+      "sentence_sha256": "4a24da07eb152b0f6e609b4db6a8baeceab63c500dc7f0105e20befefa8bccdc",
+      "source_citation": "numpy:numpy.nextafter:2f4b34dc1d8d#sha256=2f4b34dc1d8d547d7b4d03aa888653f2c80baee6f955f6c9bae8beac01c639a2&chars=1011:1069"
+    },
+    {
+      "api_export": "bitwise_or",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "retain its original value",
+          "quoted": false,
+          "scope": [
+            "before: Elsewhere"
+          ],
+          "subject": "the `out` array"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "package": "numpy",
+      "review_note": "The out-array role and Elsewhere scope are explicit.",
+      "sample_class": "candidate",
+      "sample_key": "0376c7d146868a8b250f3cd6cec0d8b07a8d3e5fee3501485fc3806c03e7376a",
+      "sentence_sha256": "4a24da07eb152b0f6e609b4db6a8baeceab63c500dc7f0105e20befefa8bccdc",
+      "source_citation": "numpy:numpy.bitwise_or:ee3f98fc12b6#sha256=ee3f98fc12b6e00c8f0918be5155f45793bec8d97250ce3fb753ea3988ab198f&chars=1056:1114"
+    },
+    {
+      "api_export": "arccos",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "remain uninitialized",
+          "quoted": false,
+          "scope": [
+            "before: Note that if an uninitialized `out` array is created via the default ``out=None``"
+          ],
+          "subject": "locations within it where the condition is False"
+        }
+      ],
+      "codex_review_label": "context_needed",
+      "package": "numpy",
+      "review_note": "'Within it' refers to the out array in the condition.",
+      "sample_class": "candidate",
+      "sample_key": "03c2cc2b68540b493dfaf0f9482d861e573c6e863cd39a8f69efb610855d7f5b",
+      "sentence_sha256": "db7ac0bb6c05b330d233a2dc0ca4e9fce2f309f2675d6892abf4faaf852356b4",
+      "source_citation": "numpy:numpy.arccos:a9e92c88ec58#sha256=a9e92c88ec584f74b5dbed53fdfc2fedfa03a3458782c33998fe3b90e550ccbc&chars=932:1098"
+    },
+    {
+      "api_export": "unwrap",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "operate, default is the last axis",
+          "quoted": false,
+          "scope": [
+            "before: parameter type/option: int, optional"
+          ],
+          "subject": "the axis parameter"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "package": "numpy",
+      "review_note": "The parameter axis was selected as subject although unwrap is the actor of 'operate'.",
+      "sample_class": "candidate",
+      "sample_key": "04e2c8a774952447a8114d980899651e3cd3aeb85912b68e6ed386b0849e0d26",
+      "sentence_sha256": "2ccf8d1c5c788e9f3f491813616f9c063be1b15a75b0065e0d89f2f784ddd68f",
+      "source_citation": "numpy:numpy.unwrap:fd25b9e7deda#sha256=fd25b9e7dedac251a75eac5d415f9c1335c3683998f03a1256e0d3ab01715d64&chars=814:902"
+    },
+    {
+      "api_export": "average",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "be that of `a` , or ``float64``",
+          "quoted": false,
+          "scope": [
+            "before: If `weights` is None",
+            "after: if `a` is integral"
+          ],
+          "subject": "the result dtype"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "package": "numpy",
+      "review_note": "The result-dtype subject and both conditions are preserved.",
+      "sample_class": "candidate",
+      "sample_key": "053a500be6597cead6dd149fa41a414c7ac845b2e8e4d8e7ac0a2f7904f4f821",
+      "sentence_sha256": "03eb2f0c28da5696eca2148cbe818d042a9c31cab490143b5798cf72562553e4",
+      "source_citation": "numpy:numpy.average:f0216c7d5316#sha256=f0216c7d5316933831587a67a66378b3b2a2e479b897b3d2d3d0ae225c5c746f&chars=2274:2373"
+    },
+    {
+      "api_export": "zeros_like",
+      "codex_review_label": "context_dependent",
+      "package": "numpy",
+      "review_note": "A conditional behavior is stated, but its subject is omitted.",
+      "sample_class": "no_candidate",
+      "sample_key": "017788c489577db6635dff203ca18f2f5501c6cd75825d9d5c6b85c6f95617e3",
+      "sentence_sha256": "591bb575417e45e7624236b6beeb3f7a4a83a90556a970f1d075aaf1c316885c",
+      "source_citation": "numpy:numpy.zeros_like:11b7c64e2150#sha256=11b7c64e2150d1ac053a2621083848c2a17675d8e2ee2ea4d5fd7dfeb42ed4c4&chars=779:899"
+    },
+    {
+      "api_export": "round",
+      "codex_review_label": "not_a_behavior_claim",
+      "package": "numpy",
+      "review_note": "The span is a bibliographic citation, not an API behavior claim.",
+      "sample_class": "no_candidate",
+      "sample_key": "049c0649ef04df94187634b69eecb993334789a21c91c56c50e7d4539fbe5dcd",
+      "sentence_sha256": "faa35cf21ca6b797bd4d2d83dc9a0956ae74dc87008f46e8278d782bfaa99969",
+      "source_citation": "numpy:numpy.round:85ab21b5dd08#sha256=85ab21b5dd0807d4b416725edf668d9cdf0eb30adb811ba8b1261de240c56924&chars=2361:2496"
+    },
+    {
+      "api_export": "full_like",
+      "codex_review_label": "context_dependent",
+      "package": "numpy",
+      "review_note": "A conditional behavior is stated, but its subject is omitted.",
+      "sample_class": "no_candidate",
+      "sample_key": "062c21b37a1c29de8deb39d2a9ff91daafb9a0238335af9f812fbd8497a4a876",
+      "sentence_sha256": "591bb575417e45e7624236b6beeb3f7a4a83a90556a970f1d075aaf1c316885c",
+      "source_citation": "numpy:numpy.full_like:6828f8fc4bf3#sha256=6828f8fc4bf3c1bbb8537a14149fe50035fb7c5dc74133068b95ea6a4e04aa11&chars=814:934"
+    },
+    {
+      "api_export": "sum",
+      "codex_review_label": "incomplete_source_fragment",
+      "package": "numpy",
+      "review_note": "The docstring span ends with an incomplete 'will be' clause.",
+      "sample_class": "no_candidate",
+      "sample_key": "0d413ce7dd03ae03a442ae13a4575007b0a115a9df131ef8d4103960770fb0f7",
+      "sentence_sha256": "2310582bbc5de7b5f8aa9b62ac557a3647742f238ee60e4df49afd4c22b64e68",
+      "source_citation": "numpy:numpy.sum:359a6efed81f#sha256=359a6efed81f7c35acaa6d403e4aeb6c367398c3cfcdc9fec889f494fa9094e8&chars=1473:1522"
+    },
+    {
+      "api_export": "var",
+      "codex_review_label": "incomplete_source_fragment",
+      "package": "numpy",
+      "review_note": "The docstring span ends with an incomplete 'will be' clause.",
+      "sample_class": "no_candidate",
+      "sample_key": "11da4c23b75d49d3e9e6c8e6a3285467c7c3473fe3591f91ec409a53f359923e",
+      "sentence_sha256": "2310582bbc5de7b5f8aa9b62ac557a3647742f238ee60e4df49afd4c22b64e68",
+      "source_citation": "numpy:numpy.var:e94ce8de35b2#sha256=e94ce8de35b22b5b7a7957690d373b27f08a0e2556db03dafa3b00e5eafd76c8&chars=1639:1688"
+    },
+    {
+      "api_export": "ediff1d",
+      "codex_review_label": "context_dependent",
+      "package": "numpy",
+      "review_note": "The future passive clause has no local subject.",
+      "sample_class": "no_candidate",
+      "sample_key": "1a3a635b37a44964935e214046c4a4ec557947fdb940ec3c5561482c7b008a2c",
+      "sentence_sha256": "1d84a58aa307f09ad583ea044106ddbcd06b4c4701375046b1720ac1b1dbd3a6",
+      "source_citation": "numpy:numpy.ediff1d:cab8dd252e70#sha256=cab8dd252e708cee470986e4b855fce842a912cb3e2c099c6aa3f1357d9866da&chars=102:167"
+    },
+    {
+      "api_export": "prod",
+      "codex_review_label": "incomplete_source_fragment",
+      "package": "numpy",
+      "review_note": "The docstring span ends with an incomplete 'will be' clause.",
+      "sample_class": "no_candidate",
+      "sample_key": "362788a8e98ce32d61b4fd07e8f1f500cef144135b5d7d4e21ee04d96dd5e823",
+      "sentence_sha256": "2310582bbc5de7b5f8aa9b62ac557a3647742f238ee60e4df49afd4c22b64e68",
+      "source_citation": "numpy:numpy.prod:ffd2c38bdd68#sha256=ffd2c38bdd68862f55c48db4c8bf73cba7e424ea6b5ea7ce1cea0cbae576035f&chars=1526:1575"
+    },
+    {
+      "api_export": "min",
+      "codex_review_label": "incomplete_source_fragment",
+      "package": "numpy",
+      "review_note": "The docstring span ends with an incomplete 'will be' clause.",
+      "sample_class": "no_candidate",
+      "sample_key": "3caaa16cf4005346f3046c8fc9fee7987b32e1b80f8e748556ffb22ddd346f10",
+      "sentence_sha256": "2310582bbc5de7b5f8aa9b62ac557a3647742f238ee60e4df49afd4c22b64e68",
+      "source_citation": "numpy:numpy.min:b338c2a18ff0#sha256=b338c2a18ff0ec758eb3b9a0a0844fbd47b8d9466bca2014d416528dda3ee791&chars=930:979"
+    },
+    {
+      "api_export": "all",
+      "codex_review_label": "incomplete_source_fragment",
+      "package": "numpy",
+      "review_note": "The docstring span ends with an incomplete 'will be' clause.",
+      "sample_class": "no_candidate",
+      "sample_key": "40973aa3dd25d90dcd488ea6cf43626b5c5e476b1a6a8267816f62d452f67a98",
+      "sentence_sha256": "2310582bbc5de7b5f8aa9b62ac557a3647742f238ee60e4df49afd4c22b64e68",
+      "source_citation": "numpy:numpy.all:a7dec3bace86#sha256=a7dec3bace864b48dc979b2bca7e6a67ff98a5eff681019da6a59290da5db6c0&chars=1254:1303"
+    },
+    {
+      "api_export": "isin",
+      "codex_review_label": "context_dependent",
+      "package": "numpy",
+      "review_note": "The later 'will use' clause omits the subject supplied by its surrounding description.",
+      "sample_class": "no_candidate",
+      "sample_key": "4a82b3610c3ca9383f20b948afe93b1119d26b325f7a2062c53791eaee2b691b",
+      "sentence_sha256": "362d722129f1065457fc9ec96c685489fa0fd0e77d61e426cd760434007534b0",
+      "source_citation": "numpy:numpy.isin:62e32b4e68f1#sha256=62e32b4e68f1e925c9a92ce868758c38097722016bd0831d129d02c968c8d843&chars=1778:1873"
+    },
+    {
+      "api_export": "cut",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "be ordered",
+          "quoted": false,
+          "scope": [
+            "before: If True"
+          ],
+          "subject": "the resulting categorical"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "package": "pandas",
+      "review_note": "The resulting categorical subject and If True condition are preserved.",
+      "sample_class": "candidate",
+      "sample_key": "00bc8ce084d69a342baf9c3a34e6ee1a773be7fa29059a8c8ceb8160dcc26db4",
+      "sentence_sha256": "2fc3e506b2baf1bc19c461f716357f021411abade763a2c94e2c264896488b58",
+      "source_citation": "pandas:pandas.cut:ee622f373126#sha256=ee622f373126383e21c02b9d4aa4c4fda10dd4d8dd381def4b04d174e2438229&chars=2195:2250"
+    },
+    {
+      "api_export": "interval_range",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "have ``periods`` linearly spaced elements between",
+          "quoted": false,
+          "scope": [
+            "before: If ``freq`` is omitted"
+          ],
+          "subject": "the resulting ``IntervalIndex``"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "package": "pandas",
+      "review_note": "The IntervalIndex subject and omitted-frequency condition are preserved.",
+      "sample_class": "candidate",
+      "sample_key": "00fc3767fad2133cccd7d6e2166e0f049b55adf1bde0bc98e7ba6fbe035cdfd9",
+      "sentence_sha256": "08e379394ff65742611f6ab91e1517c91f05cb4a39007905e8ed9f280d821ab4",
+      "source_citation": "pandas:pandas.interval_range:4fffcb9b3a65#sha256=4fffcb9b3a65e8bb7c3649147444becebd33adc754f9633cd221215a783012bf&chars=1067:1177"
+    },
+    {
+      "api_export": "get_dummies",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "be added even",
+          "quoted": false,
+          "scope": [
+            "after: if no NaN values are present"
+          ],
+          "subject": "dummy_na : bool, default False If True, a NaN indicator column"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "package": "pandas",
+      "review_note": "Parameter metadata and the If True condition are absorbed into the subject.",
+      "sample_class": "candidate",
+      "sample_key": "01cf2e423b48aa5c6f91188b5339ac155aec3b862156d60f37b64b032033ae20",
+      "sentence_sha256": "564a7a6bdc2f5644297c10ebb2a55ba6e1f71312ebdfbe49a1c165a8e9486e59",
+      "source_citation": "pandas:pandas.get_dummies:9d2cc8f61e6f#sha256=9d2cc8f61e6f00e947dc9eb091c810f111cc0efb78ed6f92eb9c56509ae05c05&chars=1027:1142"
+    },
+    {
+      "api_export": "to_datetime",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "render the cache unusable and may slow down parsing",
+          "quoted": false,
+          "scope": [],
+          "subject": "The presence of out-of-bounds values"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "package": "pandas",
+      "review_note": "The presence of out-of-bounds values is the explicit subject.",
+      "sample_class": "candidate",
+      "sample_key": "035c7cb00cbaace3f7b8da9f69436885e3f8fc42328c0fd5e0bd9f0fe09dfb8e",
+      "sentence_sha256": "4574af22f542b86241949006f2faa11ec9df685b1275360999d8a5693ab146a5",
+      "source_citation": "pandas:pandas.to_datetime:640eeb022893#sha256=640eeb02289372917f62a9748f663b19387b4cc34ff574196e032ff979ec4063&chars=4686:4788"
+    },
+    {
+      "api_export": "json_normalize",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "raise KeyError",
+          "quoted": false,
+          "scope": [
+            "after: if keys listed in meta are not always present"
+          ],
+          "subject": "'raise'"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "package": "pandas",
+      "review_note": "The quoted option label and KeyError behavior are recoverable from the cited bullet.",
+      "sample_class": "candidate",
+      "sample_key": "04da80eeb27d224d79bde1671a083f0a8c2782d6b9e715ef971b7c7c5d4dfd1a",
+      "sentence_sha256": "09f5aad37192f063b0a41adfc85092d3c98e16ac9c574504da03bd43c6d88e70",
+      "source_citation": "pandas:pandas.json_normalize:ee445752480f#sha256=ee445752480f91777ddd7a9270039e53c374815d3b8dd4eaf8488a7af6a43480&chars=1105:1189"
+    },
+    {
+      "api_export": "crosstab",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "normalize over each column",
+          "quoted": false,
+          "scope": [],
+          "subject": "If passed 'columns'"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "package": "pandas",
+      "review_note": "The condition 'If passed columns' is presented as the subject; the action subject is omitted.",
+      "sample_class": "candidate",
+      "sample_key": "052baca6d38def352076b46aa0037ebfb89e5b576bf4e32c10634a93f1abffdd",
+      "sentence_sha256": "0035303c33e8b15f29810c541c7b6774c55bcb03c769dd3593ea65d598b1e518",
+      "source_citation": "pandas:pandas.crosstab:e8efd99f4484#sha256=e8efd99f4484e12b63056eb126f4e95f16d3aeca59ee9619d816a036652dc6bc&chars=1303:1357"
+    },
+    {
+      "api_export": "get_dummies",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "be prepended, unaltered, to the result",
+          "quoted": false,
+          "scope": [
+            "before: If `data` contains other columns than the dummy-coded one(s)"
+          ],
+          "subject": "these"
+        }
+      ],
+      "codex_review_label": "context_needed",
+      "package": "pandas",
+      "review_note": "'These' refers to other columns named in the preceding condition.",
+      "sample_class": "candidate",
+      "sample_key": "06951433e97dae51e28cb478471b80215686b707bad4e1d28c4038e2f58b1444",
+      "sentence_sha256": "5bb356e29e644dc9bbaa91c871db41ca80e869dc4f0d7c624e92a3392bbedacb",
+      "source_citation": "pandas:pandas.get_dummies:9d2cc8f61e6f#sha256=9d2cc8f61e6f00e947dc9eb091c810f111cc0efb78ed6f92eb9c56509ae05c05&chars=1809:1925"
+    },
+    {
+      "api_export": "read_sql_query",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "be converted to UTC",
+          "quoted": false,
+          "scope": [],
+          "subject": "Any datetime values with time zone information parsed via the `parse_dates` parameter"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "package": "pandas",
+      "review_note": "The datetime-values subject and conversion result are explicit.",
+      "sample_class": "candidate",
+      "sample_key": "06dd758e89bb9ea4709c54d404aa3d9ccbd232d19d0972c570626a5d3d527105",
+      "sentence_sha256": "b7afb56002c98d1f4b30a4241706e5cf4fdc87de9dfc0f41534f0d9de7e1d9de",
+      "source_citation": "pandas:pandas.read_sql_query:090ea12e3d0b#sha256=090ea12e3d0b9ea41b62463a349eb780304ad0641aacded358e005d6395aabdd&chars=2815:2926"
+    },
+    {
+      "api_export": "Grouper",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "also be treated as the key in groups",
+          "quoted": false,
+          "scope": [
+            "before: If False"
+          ],
+          "subject": "NA values"
+        }
+      ],
+      "codex_review_label": "reviewable",
+      "package": "pandas",
+      "review_note": "The NA-values subject and If False condition are preserved.",
+      "sample_class": "candidate",
+      "sample_key": "092e974098a98a68bf9f7d5201f9b05cf6191410d6031e786e3320eef611ec37",
+      "sentence_sha256": "b3ec310c14bde8038369766aa288066bf659448f774b1061852a307c15d6f775",
+      "source_citation": "pandas:pandas.Grouper:84aa7bdde45f#sha256=84aa7bdde45fc768f578e4546db5079f529cfe22bcc9e0d570b5470e21c5c41a&chars=2058:2124"
+    },
+    {
+      "api_export": "read_xml",
+      "candidate_fields": [
+        {
+          "assertion_status": "asserted",
+          "positive": true,
+          "predicate": "replace ``xpath`` parsing and unlike ``xpath``, descendants do not need to relate to each other but can exist any where in document under the repeating element",
+          "quoted": false,
+          "scope": [],
+          "subject": "Note: If this option is used, it"
+        }
+      ],
+      "codex_review_label": "boundary_error",
+      "package": "pandas",
+      "review_note": "The leading If condition and 'it' were combined into the subject.",
+      "sample_class": "candidate",
+      "sample_key": "093dc5d6df911cfbdb467de42e8cad505123c34a5f6def97d2aefd52217df6c9",
+      "sentence_sha256": "517590e7833ff35219b3f0028185fd4450197159c7be6d716aa8650f0e5d7cfc",
+      "source_citation": "pandas:pandas.read_xml:192f028c2157#sha256=192f028c21575408698b099fb036e650f3b6a50f37e5550be40eff2c685b77e9&chars=3850:4056"
+    },
+    {
+      "api_export": "crosstab",
+      "codex_review_label": "context_dependent",
+      "package": "pandas",
+      "review_note": "A bullet states behavior but omits the object that will normalize.",
+      "sample_class": "no_candidate",
+      "sample_key": "284f749214a77e91e16ba3b0431d3de689df8315e59bdc71c5ab563741de9265",
+      "sentence_sha256": "14d3b5ca8c3f9b957b53455dc1152a48e3e6aea6e362b31dbf1060eba001e964",
+      "source_citation": "pandas:pandas.crosstab:e8efd99f4484#sha256=e8efd99f4484e12b63056eb126f4e95f16d3aeca59ee9619d816a036652dc6bc&chars=1362:1420"
+    },
+    {
+      "api_export": "read_excel",
+      "codex_review_label": "context_dependent",
+      "package": "pandas",
+      "review_note": "The condition is explicit but the returning subject is omitted.",
+      "sample_class": "no_candidate",
+      "sample_key": "2a53566ba8e729812c987c1cd722fb948054a985c43122adb527a5c77294c1ee",
+      "sentence_sha256": "e1bf73a748a034eb13d05ee4bbd5ca713ad630c541d5ac50b11f80c806214e8c",
+      "source_citation": "pandas:pandas.read_excel:185c644d0cae#sha256=185c644d0caec9bd5ba1f3fdc5365cf5fb48ef67c9784f7b51ad7a5109527a52&chars=1031:1108"
+    },
+    {
+      "api_export": "concat",
+      "codex_review_label": "shared_subject",
+      "package": "pandas",
+      "review_note": "The coordinated 'will be removed' clause inherits 'This keyword'.",
+      "sample_class": "no_candidate",
+      "sample_key": "49d68912323a709094c8184f2e024ad807e0734d08316b081b31387d495fad44",
+      "sentence_sha256": "c732d2989f62cd2aa0172fe7f4f1dfaa88dd99504e96998fc14f75eafa908cb2",
+      "source_citation": "pandas:pandas.concat:dc5d1c8720af#sha256=dc5d1c8720af34a0031b6e5aeec954f6ebf7f6822fa4cb6223aef47f0ea19f5d&chars=2192:2250"
+    },
+    {
+      "api_export": "merge",
+      "codex_review_label": "shared_subject",
+      "package": "pandas",
+      "review_note": "The coordinated 'will be removed' clause inherits 'This keyword'.",
+      "sample_class": "no_candidate",
+      "sample_key": "6223478278f712a6ac988c0d0b578e0214df7942340ba667d3cc1423645c5729",
+      "sentence_sha256": "c732d2989f62cd2aa0172fe7f4f1dfaa88dd99504e96998fc14f75eafa908cb2",
+      "source_citation": "pandas:pandas.merge:05c105230cda#sha256=05c105230cda7d5900f0cf6c093e87894098eda90dd1943259c8b4cc0ec39211&chars=3672:3730"
+    },
+    {
+      "api_export": "to_datetime",
+      "codex_review_label": "shared_subject",
+      "package": "pandas",
+      "review_note": "The 'will prefer' clause inherits the dayfirst argument from the preceding clause.",
+      "sample_class": "no_candidate",
+      "sample_key": "623de14c34c067d04f55933e8e9a92337f6e9f14d103fdb66ec934bf82429cb6",
+      "sentence_sha256": "f9b1c7984d257f149ce344a026fcaec8fcd72c54dd688dafa4338de8a80da3cc",
+      "source_citation": "pandas:pandas.to_datetime:640eeb022893#sha256=640eeb02289372917f62a9748f663b19387b4cc34ff574196e032ff979ec4063&chars=946:1027"
+    },
+    {
+      "api_export": "DataFrame",
+      "codex_review_label": "context_dependent",
+      "package": "pandas",
+      "review_note": "The selection action is stated, but its subject is omitted.",
+      "sample_class": "no_candidate",
+      "sample_key": "75e650cd9dda14b0b706b7e4d086ed73d46be77f56e87d48d3abf544bd8127ca",
+      "sentence_sha256": "334371e807df2a0c30a3632edc77f62bfdcc360965087fe7d2039d98e24b62cf",
+      "source_citation": "pandas:pandas.DataFrame:b326ba933d59#sha256=b326ba933d59358eae27c498c3bc37c9595c312c4ac2798438fbed694920b41e&chars=1129:1203"
+    },
+    {
+      "api_export": "crosstab",
+      "codex_review_label": "shared_subject",
+      "package": "pandas",
+      "review_note": "The 'will not be shown' clause inherits the c/f subject from the preceding clause.",
+      "sample_class": "no_candidate",
+      "sample_key": "79d7eb7ec6f06904fd808415e2afe96a476f76dc7128e8f15922df594d749916",
+      "sentence_sha256": "46cea70b1ac3081a832a6b4a2752fd9650cd7b7fd65f827d3785a4e37950a053",
+      "source_citation": "pandas:pandas.crosstab:e8efd99f4484#sha256=e8efd99f4484e12b63056eb126f4e95f16d3aeca59ee9619d816a036652dc6bc&chars=3137:3256"
+    },
+    {
+      "api_export": "read_html",
+      "codex_review_label": "context_dependent",
+      "package": "pandas",
+      "review_note": "A conditional behavior is stated but the subject is omitted.",
+      "sample_class": "no_candidate",
+      "sample_key": "83b389e0822fe99c3d3a348aea011b84fcc69bfe71478a0c163aa59566e3c305",
+      "sentence_sha256": "9f68b3df5a7329371c28e0fbe40e740eab8988441d2aea5f9be770d390abc0a4",
+      "source_citation": "pandas:pandas.read_html:0ccf2252fb93#sha256=0ccf2252fb93103cee84e974486c833c46eb63a4e78fc0db3128bd1fd4b52d37&chars=1640:1739"
+    },
+    {
+      "api_export": "to_numeric",
+      "codex_review_label": "complex_scope",
+      "package": "pandas",
+      "review_note": "The claim is present but nested conditions and a long lead-in exceed this sentence-local boundary method.",
+      "sample_class": "no_candidate",
+      "sample_key": "93850b1c4011b28b3ec431710a3110c06d372af40c32d11d3d96d6ff730f49f7",
+      "sentence_sha256": "fefa629f1b56dc239d4099fd119bae74e6659a2e70eb289d3a7001d38e3efe7a",
+      "source_citation": "pandas:pandas.to_numeric:755ac7cb0cab#sha256=755ac7cb0cab2cd6514982ada69ae7b92b217f9d6f310f18d29eedc546828060&chars=350:640"
+    },
+    {
+      "api_export": "to_datetime",
+      "codex_review_label": "shared_subject",
+      "package": "pandas",
+      "review_note": "The 'will prefer' clause inherits the yearfirst argument from the preceding clause.",
+      "sample_class": "no_candidate",
+      "sample_key": "a05decf08a77bb01256a9e657ce7cf74736055fe5f7b0211ee5179b88026b4e3",
+      "sentence_sha256": "0524b07054a9cbdc29bdbc1ac1ad8d8f139ef09b352e50eef7d44208fc849e75",
+      "source_citation": "pandas:pandas.to_datetime:640eeb022893#sha256=640eeb02289372917f62a9748f663b19387b4cc34ff574196e032ff979ec4063&chars=1392:1475"
+    }
+  ],
+  "selected_rows": 40
+}

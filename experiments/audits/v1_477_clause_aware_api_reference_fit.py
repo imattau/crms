@@ -109,6 +109,8 @@ def scan_package(package: str, url_template: str) -> dict[str, object]:
          proposal.polarity, proposal.quoted, proposal.assertion_status)
         for _, _, proposal in candidates)
     candidate_exports = {export for export, _, _ in candidates}
+    candidate_citations = {proposal.source_citation
+                           for _, _, proposal in candidates}
     top_patterns = [
         {
             "count": count,
@@ -128,7 +130,8 @@ def scan_package(package: str, url_template: str) -> dict[str, object]:
         "license_label": license_label,
         "public_callable_docstrings": len(prepared),
         "source_sentences": sentence_total,
-        "candidate_sentences": len(candidates),
+        "candidate_sentences": len(candidate_citations),
+        "candidate_proposals": len(candidates),
         "candidate_api_units": len(candidate_exports),
         "unique_normalized_candidates": len(normalized),
         "corpus_sha256": corpus_digest.hexdigest(),

@@ -248,26 +248,43 @@ The clause-aware proposal path is exercised by `v1_476` and replayed
 against the same complete installed-package docstrings by `v1_477`. The
 `numpy.add` fresh-process chat replay now displays the subject ``the `out`
 array`` and the condition while keeping the proposal cited, review-only, and
-out of the rule store. The full scan yields 657 candidate sentences across
-250 NumPy API units and 217 across 60 pandas API units (up from 303/177 and
-24/16 in `v1_474`); NumPy has 279 normalized candidate patterns. The fixtures
+out of the rule store. The full scan yields 657 NumPy candidate sentences and
+proposals across 250 API units, and 216 pandas candidate sentences yielding
+217 proposals across 60 API units (up from 303/177 and 24/16 in `v1_474`);
+NumPy has 279 normalized candidate patterns. The fixtures
 also cover wrapped clauses, multi-comma conditions, balanced parenthetical
 subjects, coordinated clauses, and one-word predicates. This is
 improved extraction yield, not evidence of improved precision: complex
 parameter descriptions, contrastive clauses, and conditional scope still
 produce malformed boundaries, and the parser was redesigned using the earlier
 same-corpus sample. Freeze the current parser for confirmation. Review a fixed
-sample of current proposals and non-proposals,
-then evaluate untouched API units and at least one new publisher without
-tuning on those results. Keep all candidates review-only. See
+sample of current proposals and non-proposals, then evaluate untouched API
+units and at least one new publisher without tuning on those results. Keep all
+candidates review-only. See
 [`v1_476_clause_aware_procedure_claims.py`](../experiments/v1_476_clause_aware_procedure_claims.py),
 [`v1_477_clause_aware_api_reference_fit.py`](../experiments/audits/v1_477_clause_aware_api_reference_fit.py),
 and [`v1_477 report`](../experiments/reports/v1_477_clause_aware_api_reference_fit.json).
 
-**Gate:** a frozen method finds useful candidates on held-out documents and a
-second publisher with measured precision and review effort; sampled
-non-proposals and negative controls do not become positive rules. Accepted
-rules preserve exact source provenance and remain review-gated until holdout
+`v1_478` completed a deterministic, source-hashed review of ten proposals and
+ten non-proposals per package. Codex marked 10/20 proposals as structurally
+reviewable, 5/20 as requiring antecedent context, and 5/20 as boundary errors.
+Among the 20 non-proposals, 14 appear to express behavior recoverable from
+context or more complete clause structure (8 context-dependent, 5 shared
+subject, 1 complex-scope); 6 were fragments or not behavior claims. This is
+single-rater, unblinded development feedback from the same corpora used to
+revise the parser, not precision/recall or independent validation. It changes
+the next learner step: add a context-aware claim-boundary stage that can cite
+the subject/antecedent separately, keep unclear cases review-only or abstain,
+then freeze it and confirm on untouched API units and a new publisher. Do not
+continue tuning the sentence-local grammar against these same rows. See
+[`v1_478 review script`](../experiments/audits/v1_478_api_candidate_boundary_review.py)
+and [`v1_478 report`](../experiments/reports/v1_478_api_candidate_boundary_review.json).
+
+**Gate:** a frozen context-aware method finds useful candidates on held-out
+documents and a second publisher with measured precision and review effort;
+sampled non-proposals and negative controls do not become positive rules.
+Antecedent and claim citations remain separately traceable. Accepted rules
+preserve exact source provenance and remain review-gated until holdout
 validation. This proves a useful learning input, not broad autonomous
 language understanding.
 
