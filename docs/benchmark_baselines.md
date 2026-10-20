@@ -3271,3 +3271,27 @@ user-written task forms and independently reviewed components, then test
 varied operation order and more than one composition shape through chat.
 
 Report: [experiment](../experiments/v1_492_reasoned_filter_language_coverage.py).
+
+## Coordinated source-only question follow-ups (`v1_493`, 2026-10-20)
+
+`experiments/v1_493_dialogue_coordinated_followup.py` exposed that an initial
+source-only answer such as “Where is the Eiffel Tower?” retained a grounded
+topic, but a natural continuation beginning “and when …?” was not routed as
+a follow-up. `respond()` now removes the leading coordinator only when a
+previous question and grounded topic are present and the next token starts a
+question. The original user wording remains in the turn history. “and when was
+it completed?” and “and how tall is it?” now resolve to the Eiffel Tower and
+return the cited source sentence; the same wording without prior topic state
+still asks the user to name an entity. Exact citations are re-resolved through
+the index.
+
+The new probe and eight selected dialogue regressions passed, including the
+Eiffel Tower/Colosseum topic switch, paragraph grounding, source-only context,
+reload, unsupported switches, and stale-`why?` controls. This is one bounded
+coordination-pattern repair on an authored corpus, not general discourse or
+compound-question coverage. The exploratory paraphrase probe still found
+unsupported wording such as “Who constructed the Eiffel Tower?”, and a single
+turn asking two questions currently abstains when its second clause uses “it”;
+both remain open natural-language dialogue gaps.
+
+Report: [experiment](../experiments/v1_493_dialogue_coordinated_followup.py).

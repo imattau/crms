@@ -499,6 +499,13 @@ context-licensed dialogue moves against the scripted baseline; retain them only
 if they improve appropriate task completion without increasing wrong
 referents, unsupported claims, or inappropriate actions.
 
+The latest `v1_493` runtime probe fixes one reported natural turn form:
+“and when …?” / “and how …?” now continues a visible source-only topic, while
+the same wording without an established topic still abstains. Compound WH
+questions with a pronoun in their second clause and lexical paraphrases such as
+“constructed” for “built” remain known gaps; do not count the narrow fix as
+dialogue transfer.
+
 **Gate:** unseen conversations complete more tasks than the baseline without
 more confident errors; ambiguous or unsupported turns recover through a
 focused question or honest abstention. If learned moves do not improve the

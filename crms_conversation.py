@@ -50,6 +50,9 @@ _ACTS: tuple[tuple[str, re.Pattern[str]], ...] = (
 _MIXED_GREETING_RE = re.compile(
     r"^(?:hi|hello|hey)(?:\s+there)?[,]\s*(?P<question>\S.+)$",
     re.IGNORECASE)
+_COORDINATED_QUESTION_PREFIX_RE = re.compile(
+    r"^\s*and\s+(?=(?:who|what|where|when|why|how|is|are|was|were|"
+    r"do|does|did|has|have|can|could|will|would)\b)", re.IGNORECASE)
 _BARE_YES_NO_RE = re.compile(
     r"^(?:yes|yeah|yep|yup|sure|certainly|absolutely|no|nope|nah|not really)"
     r"(?:[, ]+(?:please|thanks|thank you))?[.!? ]*$",
@@ -1332,6 +1335,11 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             pending_claims: int = 0) -> DialogueTurn:
     """Handle dialogue acts and route embedded WH requests to question handling."""
     original_text = text
+    if (dialogue.last_question and dialogue.topic_entity
+            and _COORDINATED_QUESTION_PREFIX_RE.match(text)):
+        # Treat "and when ...?" as a continuation of the current grounded
+        # topic, while keeping the user's original wording in turn history.
+        text = _COORDINATED_QUESTION_PREFIX_RE.sub("", text, count=1).lstrip()
     embedded_request = _EMBEDDED_WH_REQUEST_RE.fullmatch(text.strip())
     if embedded_request is not None:
         question = embedded_request.group("question").strip().rstrip(" .?!")
@@ -1406,7 +1414,7 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         dialogue.last_intent_hypothesis = intent
         history_act = (act or (intent.dialogue_act if intent is not None else None)
                        or "question")
-        if embedded_request is not None:
+        if embedded_request is not None or text != original_text:
             turn.question = original_text
         dialogue.record_turn(original_text, history_act, turn, intent)
         _offer(dialogue, turn)
