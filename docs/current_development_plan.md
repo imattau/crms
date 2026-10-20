@@ -158,6 +158,27 @@ integration seam for one synthetic task. The procedure mapping is
 Codex-labeled, the graph is authored, and the experiment orchestrates the
 stages; source-derived rule learning and user-level task planning remain open.
 
+`v1_456_source_frames_to_reasoned_procedure.py` advances the seam: repeated
+parent/ancestor facts are extracted from exact source sentences and reviewed
+separately on training and document-held-out corpora; a parent-chain rule is
+then validated on the held-out facts, accepted, independently proof-checked on
+new runtime premises, and routed through a fresh chat process. Only proof-backed
+record IDs feed a separately learned unique-then-reverse procedure, checked by
+an independent output oracle. The probe also covers an explicit-negative
+conflict, an open-world unknown, and invalidation after premise correction.
+All source passages are Codex-authored fixtures and frame review is explicit;
+the procedure examples and instruction alignment are Codex-labeled. This
+demonstrates the mechanics of source-frame → rule → verified reasoning →
+procedure composition, not learning from natural corpora or broad planning.
+
+While building this probe, the passive-role regression in `v1_245` became
+visible: a learned active frame could misparse “Archive was created by Cal” as
+“Archive was → create → by Cal.” Active-frame matching now rejects explicit
+be-verb/by-phrase passive clauses. The exact cited question route still returns
+the correctly role-reversed claim for review, while corpus-frame discovery does
+not generalize from the passive-only pattern. `v1_243` and the updated
+`v1_245` check these boundaries.
+
 **Gate:** chat and engine agree; every positive has a verified proof or
 task-specific check; incomplete search cannot produce a positive; correcting a
 source makes dependent derivations unavailable until revalidated.

@@ -7053,6 +7053,24 @@ class CRMSKnowledgeBase:
                  object_start, object_end) = matches[0]
                 predicate_start = predicate_positions[0]
                 predicate_end = predicate_start + len(predicate_words)
+                # An active fact frame must not treat an explicit passive
+                # clause as if its surface subject were the agent. The
+                # sentence-level candidate path can still offer a cited,
+                # review-only passive parse with the by-phrase roles reversed.
+                be_auxiliaries = {"am", "is", "are", "was", "were",
+                                  "be", "been", "being"}
+                passive_modifiers = {"not", "never", "also", "previously",
+                                     "recently", "already"}
+                prefix_start = max(0, predicate_start - 3)
+                passive_auxiliary_positions = [
+                    position for position in range(prefix_start, predicate_start)
+                    if words[position] in be_auxiliaries
+                    and all(token in passive_modifiers
+                            for token in words[position + 1:predicate_start])]
+                if (passive_auxiliary_positions
+                        and _is_past_participle((predicate_words[-1],))
+                        and "by" in words[predicate_end:]):
+                    continue
                 # A productive prefix joined to a verb with a hyphen is part
                 # of that surface predicate, not the preceding subject. If
                 # this compound has no grounded alignment, leave it to the

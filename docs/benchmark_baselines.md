@@ -2393,6 +2393,44 @@ phrase coreference. The positive and negative fixtures were authored together;
 they do not estimate accuracy on natural corpora. Unstated aliases and
 description chains still require abstention or clarification.
 
+## Source frames through reasoning and procedure composition (2026-10-20)
+
+Command:
+
+```sh
+python3 run_experiments.py \
+  --match v1_456_source_frames_to_reasoned_procedure --timeout 300
+```
+
+One diagnostic passed in 0.32 seconds. The experiment begins with four
+Codex-authored documents. CRMS proposes parent and ancestor frames from two
+training documents and two separately indexed holdout documents; the test
+explicitly accepts these source frames, induces the parent-chain rule, validates
+it on the held-out documents, then applies it to new runtime premises. Every
+positive proof is checked by the independent proof verifier. Only the
+proof-backed IDs `[12, 4, 4, 9]` feed a separately learned stable-unique then
+reverse procedure; its `[9, 4, 12]` output is checked by an independent oracle.
+The probe also verifies ambiguous proof-plus-negative evidence, an unknown
+without a complete premise chain, correction invalidation, a proof explanation,
+and code generation in a fresh chat process.
+
+This closes a small but real integration seam between citation-backed sentence
+frames, source-held-out rule induction, reasoning, and recombination. It does
+not show autonomous frame acceptance: the experiment reviews every source
+frame. The sentences are authored fixtures, source origins are synthetic, and
+the procedure examples and instruction-to-operation mapping are Codex-labeled.
+It does not establish broad corpus precision, publisher transfer, or open-ended
+task planning.
+
+During this work, the existing `v1_245` suite revealed a false parse after an
+active “created” frame had been taught: “Archive was created by Cal” could be
+read as “Archive was → create → by Cal.” `crms_knowledge.py` now rejects that
+passive construction from active-frame matching. When the exact source is
+queried, the separate review path still proposes `Cal — create → Archive`
+with cited passive-role evidence. Corpus mining does not generalize from a
+passive-only pattern without licensed morphology support. The focused
+`v1_243`, `v1_245`, and `v1_456` diagnostics all pass after the guard.
+
 ## Current dialogue regression replay (2026-10-20)
 
 On checkout `c229e3d`, the following targeted dialogue suite passed 5/5:

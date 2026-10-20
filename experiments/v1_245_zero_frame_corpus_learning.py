@@ -111,24 +111,33 @@ def check_morphology_aware_discovery() -> None:
     proposal = next((item for item in proposals
                      if item["relation"] == "create"
                      and {row["document_id"] for row in item["support"]}
-                     >= {"target-created", "target-creates", "target-passive"}), None)
+                     >= {"target-created", "target-creates"}), None)
     if proposal is None:
         raise SystemExit(
             f"licensed inflections were not grouped under the relation: {proposals}")
     if not all(row.get("morphology_support") for row in proposal["support"]
                if row["document_id"] in {
-                   "target-created", "target-creates", "target-passive"}):
+                   "target-created", "target-creates"}):
         raise SystemExit("inflection merge omitted its independent morphology evidence")
-    passive_row = next(row for row in proposal["support"]
-                       if row["document_id"] == "target-passive")
-    if ((passive_row["subject"], passive_row["relation"],
-         passive_row["object"]) != ("Cal", "create", "Archive")):
-        raise SystemExit(f"passive by-phrase roles were not normalized: {passive_row}")
-    if not any(item.get("method") == "passive by-phrase role normalization"
-               for item in kb._discover_surface_relation_candidates(
-                   "Archive was created by Cal.", source="test",
-                   research_index=index)[0].language_evidence):
-        raise SystemExit("passive parse did not retain its role-analysis evidence")
+    if any(row["document_id"] == "target-passive"
+           for row in proposal["support"]):
+        raise SystemExit(
+            "unlicensed passive shape was generalized into a reusable frame")
+    if kb.propose_facts("Archive was created by Cal.",
+                        source="review-only:passive"):
+        raise SystemExit(
+            "active learned frame misparsed passive agent and patient roles")
+    passive_review = kb.research("Who created Archive?", index)
+    if (passive_review.status != "needs_review"
+            or len(passive_review.candidates or []) != 1
+            or (passive_review.candidates[0].subject,
+                passive_review.candidates[0].relation,
+                passive_review.candidates[0].object,
+                passive_review.candidates[0].polarity)
+                != ("Cal", "create", "Archive", True)):
+        raise SystemExit(
+            f"passive source did not retain a correctly scoped review candidate: "
+            f"{passive_review}")
     with tempfile.TemporaryDirectory(prefix="crms-morph-frame-cli-") as folder:
         root = Path(folder)
         knowledge_path, index_path = root / "knowledge.json", root / "index.json"
@@ -154,11 +163,10 @@ def check_morphology_aware_discovery() -> None:
     accepted = kb.accept_corpus_relation_frame(proposal["proposal_id"], index)
     if (not accepted or kb._facts.get(kb._fact_key("Ava", "create", "Quill")) is None
             or kb._facts.get(kb._fact_key("Bea", "create", "Loom")) is None
-            or kb._facts.get(kb._fact_key("Cal", "create", "Archive")) is None):
+            or kb._facts.get(kb._fact_key("Cal", "create", "Archive")) is not None):
         raise SystemExit("reviewed inflected proposals did not store canonical facts")
     for question, expected in (("Who created Quill?", "Ava"),
-                               ("Who creates Loom?", "Bea"),
-                               ("What was created by Cal?", "Archive")):
+                               ("Who creates Loom?", "Bea")):
         answer = kb.ask(question)
         if answer.status != "answered" or answer.answer != expected:
             raise SystemExit(
@@ -320,27 +328,26 @@ def check_repeated_passive_negative_discovery() -> None:
     matching = [proposal for proposal in proposals
                 if proposal["relation"] == "created"
                 and proposal["polarity"] is False]
-    if len(matching) != 1:
+    if matching:
         raise SystemExit(
-            f"repeated passive negatives did not form one review proposal: "
-            f"{proposals}")
-    proposal = matching[0]
-    if (proposal["distinct_subjects"] != 2
-            or proposal["distinct_objects"] != 2
-            or proposal["independent_documents"] != 2
-            or kb.facts() or kb.negative_facts()):
-        raise SystemExit(
-            "negative corpus discovery lacked source diversity or wrote early")
-    accepted = kb.accept_corpus_relation_frame(
-        proposal["proposal_id"], index)
-    if (len(accepted["support"]) != 2 or kb.facts()
-            or len(kb.negative_facts()) != 2
+            "unlicensed passive-only shape became a reusable corpus frame")
+    # These exact sentences remain available to the cited, per-claim review
+    # path. Do not generalize the unsafe passive pattern across the corpus.
+    for question in ("Who created Python?", "Who created Unix?"):
+        reviewed = kb.research(question, index)
+        if (reviewed.status != "needs_review"
+                or len(reviewed.candidates or []) != 1
+                or reviewed.candidates[0].polarity):
+            raise SystemExit(
+                f"passive negative did not enter exact fact review: {reviewed}")
+        kb.accept_fact_candidate(reviewed.candidates[0], index)
+    if (kb.facts() or len(kb.negative_facts()) != 2
             or {(fact.subject, fact.relation, fact.object)
                 for fact in kb.negative_facts()}
-            != {("Guido van Rossum", "created", "Python"),
-                ("Ken Thompson", "created", "Unix")}):
+                != {("Guido van Rossum", "created", "Python"),
+                    ("Ken Thompson", "created", "Unix")}):
         raise SystemExit(
-            "reviewed passive negative frame lost polarity or participant roles")
+            "reviewed passive negative facts lost polarity or participant roles")
     kb.add_fact("Guido van Rossum", "created", "Python",
                 "independent-positive-source")
     conflict = kb.infer_relation("Guido van Rossum", "created", "Python")
@@ -565,8 +572,8 @@ def main() -> None:
 
     print("zero-frame corpus learning diagnostic: PASS")
     print("source-separated discovery, review gate, transactional acceptance, "
-          "lowercase objects, inflection/passive grouping, paging, provenance, "
-          "passive negative relation grouping, source-learned type "
+          "lowercase objects, licensed inflection grouping, passive fact review, "
+          "paging, provenance, passive-negative review boundary, source-learned type "
           "guards/conflicts, typed question answer gating, "
           "terminal typed/untyped QA, in-memory/SQLite parity, "
           "CLI path: PASS")
