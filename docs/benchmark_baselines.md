@@ -3450,3 +3450,27 @@ language-transfer benchmark or autonomous self-learning. Keep the single-pair
 negative and order-sensitive cases in the regression set.
 
 Report: [experiment](../experiments/v1_500_learned_and_reasoned_composition.py).
+
+## Entity/value transfer of learned reasoning and sequence composition (`v1_501`, 2026-10-20)
+
+Command: `python3 experiments/v1_501_reasoned_sequence_entity_transfer.py`.
+
+The three-premise rule was learned and checked on its existing training and
+held-out sources. The `and` sequence was learned from the two compound
+demonstrations in `v1_500`. This probe then adds a previously unseen entity
+(`Mira`), new relation evidence and values, and asks two different finite-list
+request frames. Both answers pass through fresh-process chat with `why?`;
+positive proof sources, the explicit negative source, and the learned
+sequence-teacher provenance remain visible. An unknown value blocks the full
+result. Interleaved duplicates distinguish the two operation orders: CRMS
+returns `[5, 23]` for deduplicate-then-reverse and `[23, 5]` for
+reverse-then-deduplicate.
+
+This is task-level entity/value transfer across a learned reasoning rule and
+learned procedure connective, but its data and requests are authored controls.
+It is not independent language transfer. The next benchmark must separate
+request authorship and validation from the procedure-building fixtures, and
+must add a second task family rather than increase examples in this finite-list
+task alone.
+
+Report: [experiment](../experiments/v1_501_reasoned_sequence_entity_transfer.py).
