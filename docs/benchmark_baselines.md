@@ -94,6 +94,30 @@ pronoun grounding, generic source-only context transfer, or contextual intent
 accuracy. Keep the independent conversation transfer gate open. See the
 [runner](../experiments/v1_525_dialogue_topic_switch_entity_transfer.py).
 
+## Independently authored dialogue transfer diagnostic (`v1_526`, 2026-10-20)
+
+Command: `python3 experiments/v1_526_dialogue_transfer_diagnostic.py`.
+
+A six-turn conversation over a separately authored three-paragraph corpus
+tests visible source-only topics, a named topic switch, an elliptical pronoun,
+an unsupported-but-present event date, a second entity switch after abstention,
+history recall, and `why?`. The named topic switch, location answers, history
+recall, and honest explanation abstention behave as expected. The pronoun
+resolves to Meridian Museum and does not leak Aurora Observatory's 1984 date,
+but CRMS misses the explicit 1972 opening sentence. After that abstention,
+“And Northport?” gets a generic knowledge-base response rather than using the
+previously surfaced entity or asking a focused clarification. Both are task
+failures; no confident wrong entity/date appears, and both displayed source
+citations resolve exactly.
+
+Counts are diagnostic only: two source answers, one supported omission, one
+unfocused abstention, one history answer, and one honest `why?` abstention in
+this six-turn fixture. This is not an independent transfer-rate estimate. No
+external 70B-class model was run; ideal responses are rubric criteria rather
+than comparator measurements. See the
+[runner](../experiments/v1_526_dialogue_transfer_diagnostic.py) and
+[machine-readable report](../experiments/reports/v1_526_dialogue_transfer_diagnostic.json).
+
 ## Contextual task-intent contrast (`v1_518`, 2026-10-20)
 
 The prior Taskmaster diagnostic (`v1_462`, code revision

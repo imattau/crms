@@ -1,0 +1,96 @@
+{
+  "experiment": "v1_526_dialogue_transfer_diagnostic",
+  "date": "2026-10-20",
+  "source": "independently authored three-paragraph fixture",
+  "method": "CRMSDialogue and respond() in a fresh process; exact source citations resolved in memory",
+  "metrics": {
+    "turns": 6,
+    "safe_entity_switches": 2,
+    "supported_omissions": 1,
+    "unfocused_abstentions": 1,
+    "citation_rows_checked": 2,
+    "all_checked_citations_resolve": true,
+    "confident_wrong_entity_or_date": false
+  },
+  "outcomes": [
+    {
+      "turn": 1,
+      "task": "answer location after explicit topic",
+      "outcome": "answered",
+      "expected_content": "Northport"
+    },
+    {
+      "turn": 2,
+      "task": "switch entity using elliptical follow-up",
+      "outcome": "answered",
+      "expected_content": "Vale City"
+    },
+    {
+      "turn": 3,
+      "task": "resolve pronoun and find opening year",
+      "outcome": "supported_omission",
+      "expected_content": "1972"
+    },
+    {
+      "turn": 4,
+      "task": "switch to previously visible entity after abstention",
+      "outcome": "unfocused_abstention",
+      "expected_content": "Northport"
+    },
+    {
+      "turn": 5,
+      "task": "recall the immediately preceding user request",
+      "outcome": "answered",
+      "expected_content": "And Northport?"
+    },
+    {
+      "turn": 6,
+      "task": "explain after an unanswered request",
+      "outcome": "honest_abstention",
+      "expected_content": "no previous grounded answer"
+    }
+  ],
+  "turns": [
+    {
+      "user": "Where is the Aurora Observatory?",
+      "status": "sources_found",
+      "resolved_question": "Where is the Aurora Observatory?",
+      "reply": "Source text: The Aurora Observatory stands in Northport.\nSource: guide.txt. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation."
+    },
+    {
+      "user": "And the Meridian Museum?",
+      "status": "sources_found",
+      "resolved_question": "Where is the Meridian Museum?",
+      "reply": "Source text: The Meridian Museum is in Vale City.\nSource: guide.txt. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation."
+    },
+    {
+      "user": "When did it open?",
+      "status": "unknown",
+      "resolved_question": "When did Meridian Museum open?",
+      "reply": "I don't know this from the sources and facts I have. Add a source or teach the fact."
+    },
+    {
+      "user": "And Northport?",
+      "status": "unknown",
+      "resolved_question": "And Northport?",
+      "reply": "Please name an entity already present in the knowledge base."
+    },
+    {
+      "user": "What did I just ask?",
+      "status": "smalltalk",
+      "resolved_question": "What did I just ask?",
+      "reply": "Your last question was: And Northport?"
+    },
+    {
+      "user": "Why?",
+      "status": "unknown",
+      "resolved_question": "Why?",
+      "reply": "There is no previous grounded answer to explain yet."
+    }
+  ],
+  "limitations": [
+    "One authored fixture is a diagnostic, not a transfer-rate estimate.",
+    "No external 70B-class model was run; expected behaviors are task criteria, not comparator measurements.",
+    "The corpus is intentionally small and does not test source-rule induction or recombination."
+  ]
+}
