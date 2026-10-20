@@ -432,29 +432,36 @@ recombination with already reviewed components.
 ### Next execution card
 
 This is the order for the next development cycle, based on the current checkout
-(`3559b21`) and the latest dialogue and recombination findings. It deliberately
-starts by checking current behavior: reports describe earlier commits, and a
-regression already fixed in the current tree should not trigger duplicate code.
+(`e82ed10`, 2026-10-20). Recheck reported behavior before changing code;
+historical reports describe earlier snapshots and should not trigger duplicate
+fixes.
 
 | Order | Work | Concrete output | Advance when |
 | --- | --- | --- | --- |
-| 1 | Re-run the reported conversation failures on current code, in a fresh process. Include Eiffel Tower/Colosseum topic switching, “and Italy?” after source-only evidence, failed-turn context retention, `why?`, “what did I just ask?”, and “the first one”. Preserve the existing uncommitted dialogue artifacts. | A frozen end-to-end transcript packet and a result report separating wrong referents, completion, clarification, abstention, omissions, and evidence support. | No confident wrong referents or stale explanations on controls; unresolved context clarifies or abstains. Any failure becomes the next small fix. |
-| 2 | Broaden the proof-backed recombination slice through ordinary chat. Vary wording, entities, values, order of operations, and source layout; include at least two compositions where one inferred result feeds a later operation. Use independently authored held-out requests and an independent output/proof checker. | A frozen transfer set, task-level scorecard, and clean-process replay using separately reviewed knowledge and procedures. | More held-out tasks complete than the explicit baseline, with no increase in confident unsupported answers; invalid, conflicting, incomplete, or tampered results are rejected. |
-| 3 | Add governed derivation as a proposal path on top of verified recombination. Record full proof, rule, procedure, and source lineage; test correction, retraction, stale dependencies, duplicate filtering, and an intentionally bad derivation. | A derived-case lifecycle report covering proposal, review/revalidation, write-back, reload, and invalidation. | Correcting any dependency disables or revalidates every dependent result; derived outputs cannot validate their own producing rules; growth follows a measured policy. |
-| 4 | Run the source-rule learner as a separate transfer study, frozen before review on untouched units from a new publisher. Review both proposals and sampled non-proposals; retain claim and context citations. | A labeled transfer report with useful yield, false proposals, missed claims, abstentions, and teacher/review effort. | Evidence supports useful transfer without hand-coded semantic mappings. Otherwise redesign the representation or record a no-go for that learner. |
-| 5 | Use the common scorecard to select one bounded task each in coding, math, translation, and creative work, after steps 1–3 establish a stable chat and recombination baseline. | For each selected task: held-out prompts, a validator independent of generation, ordinary-chat and repair results, and a portability check. | Each task shows useful completion, valid outputs, honest limits, and repair on unseen examples before scope expands. |
-| 6 | Exercise the SQLite model as the complete distributable runtime after the preceding learning paths stabilize. | A clean copied model with source files unavailable, replaying query, learn, compose, reason, explain, correct, save/reload, and the shared scorecard. | Behavior, provenance, searchable source text, and correction lineage survive from the copy alone; size and compatibility are documented. |
+| 1 | **Freeze chat safety and task evaluation.** Replay the reported Eiffel/Colosseum pronoun switch, source-only follow-ups, failed-turn context, stale `why?`, history and ordinal references in clean processes. Add independently authored complete dialogues with varied paragraph layouts. Preserve existing user-owned working files. | Versioned transcript packet and scorecard separating completion, wrong referents, omissions, clarification, abstention and evidence support. | No confident wrong referent or stale explanation on fixed controls; ambiguous turns clarify or abstain; independent transcripts establish a baseline. Failures become focused fixes with nearby negative cases. |
+| 2 | **Prove recombination transfer through ordinary chat.** Start with proof-selected values plus learned sum. Freeze independently authored tasks before tuning; vary wording, entities/value types, operation order and source layout. Include a second composition shape where an inferred result feeds a later operation. Keep learned, hand-coded and labeled steps explicit. | Held-out task set, clean-process replay, task scorecard, independent proof verifier and output checker. | Held-out completion improves over the explicit baseline without more confident errors; incomplete, negative, conflicting, cyclic, unsupported and tampered cases are rejected. Harness-only composition does not pass. |
+| 3 | **Keep dialogue and contextual-intent research active in parallel.** Compare explicit state/intent handling with contextual intent on held-out conversations, including the same utterance under different goals, topics and open questions. Keep move induction experimental; separate label agreement from task success. | Frozen dialogue comparison reporting task completion, wrong referents, clarification, repair, inappropriate action and abstention. | Contextual intent improves task outcomes without increasing wrong referents or inappropriate actions. Otherwise keep the explicit baseline and redesign state/resolution. Dialogue safety gates every chat-facing change. |
+| 4 | **Run source-derived rule transfer as a separate research lane.** Freeze the clause/context method and proposal plus non-proposal samples from untouched units at a new publisher. Preserve role, condition, polarity, scope and separate claim/context citations; keep proposals review-only. | Transfer report with useful yield, false proposals, missed claims, abstentions and review effort. | Held-out proposals are useful without hand-coded semantic mapping. Otherwise redesign or record a no-go; this lane does not block recombination from reviewed components. |
+| 5 | **Gate derived learning on recombination transfer.** Then expose verified outputs as lineage-bearing proposals. Test correction, retraction, invalid ancestors, duplicate suppression, trust ordering, stale lineage and bounded growth, including a deliberately bad derivation. | Derived-case lifecycle report across verification, review, SQLite reload and invalidation. | Corrections disable or revalidate every dependent result; derived results never validate their own generating rules; reuse and growth are bounded. Until then write-back stays review-gated. |
+| 6 | **Widen task breadth one validated slice at a time.** Use the same natural-language path for distinct math, coding, translation and creative tasks. Define held-out prompts, an independent checker or quality rubric, negative cases and repair behavior before implementation. | Per-domain ordinary-chat results for coverage, correctness/quality, unsupported outputs, provenance, repair and runtime. | Each domain shows useful held-out completion and honest limits before cross-domain composition or broader claims. Strong 70B-class systems remain a qualitative reference for breadth, paraphrase, completeness and interaction, not a parity target. |
+| 7 | **Validate SQLite as the distributable runtime.** Once learning and correction stabilize, copy the model to a clean location without source files and replay the shared scorecard using the copy alone. | Reproducible copy-only query, search, learning, composition, reasoning, explanation, correction and reload report, with size and compatibility notes. | Tested behavior, searchable source text, rules, provenance and correction lineage survive without the original files. |
 
-**Current checkpoint (2026-10-20):** the fixed multi-turn
-regression packet passes 8/8, including the reported topic switch, source-only
-continuity, history, ordinal selection, and follow-ups after abstention. These
-are targeted controls, not independently authored transfer evidence. The
-latest recombination slice passes seven requests across four bounded frames,
-including an “after removing” construction. It converts that gerund only when
-the existing procedure learner accepts the resulting taught operation
-sequence, and shows the mapping in the answer. The main remaining recombination
-gap is transfer to independently authored requests with changed wording,
-entities, values, and operation order.
+**Current checkpoint (`e82ed10`, 2026-10-20):** the focused multi-turn
+regression packet was reported passing 8/8, including topic switching,
+source-only continuity, history, ordinal selection and follow-ups after
+abstention. These are targeted controls, not independent dialogue-transfer
+evidence. Recombination now reaches a proof-selected set, applies a contrastively
+learned sum procedure, checks the scalar independently with `CRMSMath`, and
+answers through chat; unknown or conflicting inputs are blocked. The recent
+`v1_497`–`v1_502` sequence also covers governed practice artifacts, learned
+operation/connective transfer and entity/value changes. These remain controlled,
+mostly authored demonstrations, not independent task-transfer evidence.
+
+The immediate bottleneck is therefore no longer “can the components compose in
+a fixture?” It is whether a fresh user request can cause CRMS to select and
+compose the right components, complete the whole task, and survive independent
+checking on requests withheld from development. The next implementation cycle
+should freeze that evaluation and dialogue baseline before extending mechanisms.
 
 The new `v1_498` fresh-chat diagnostic completed 3/6 authored request forms.
 Exact licensed wording, “after removing”, and source-backed “can reach” worked;
@@ -517,15 +524,13 @@ outcomes over the explicit dialogue baseline without increasing wrong
 referents or unsupported claims. The source-rule study can also proceed in
 parallel; it is not a prerequisite for recombination from reviewed components.
 
-The highest-priority implementation loop is therefore **step 1, then step 2**:
-first recheck and lock dialogue safety on current code, then test recombination
-transfer through ordinary chat with frozen held-out requests and an independent
-checker. Keep dialogue evaluation active in every chat-facing change. The
-source-rule transfer study is a parallel research lane; derived-artifact work
-must wait for broader recombination evidence before expanding write-back. Do
-not add more parser branches, domains, or self-write behavior until the
-corresponding failure set and gate are fixed. Preserve experiment outputs and
-user-owned working files; commit only authored plan or code paths.
+The critical loop is **scorecard → held-out recombination through chat →
+independent check → repair the observed seam → rerun the packet**. Dialogue
+evaluation runs alongside every chat-facing change. Source-rule transfer may
+proceed in parallel but must remain review-only. Governed derived learning is
+gated on recombination transfer. Domain breadth and full distribution follow
+those gates. Do not count more fixtures, corpus volume, or isolated component
+passes as progress; preserve experiment outputs and user-owned working files.
 
 ### Milestone 1 — Freeze one end-to-end scorecard and verify current failures
 
