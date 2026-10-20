@@ -61,6 +61,9 @@ _AFFIRMATIVE_DETAIL_RE = re.compile(
 _NEGATIVE_DETAIL_RE = re.compile(
     r"^(?:no|nope|nah|not really)\b(?:[, ]+(?P<detail>.+))?[.!? ]*$",
     re.IGNORECASE)
+_NEGATIVE_REQUEST_PREFIX_RE = re.compile(
+    r"^(?:no|nope|nah)[,.!]\s+(?:just\s+)?(?P<request>.+)$",
+    re.IGNORECASE)
 _CORRECTION_RE = re.compile(
     r"^(?:(?:no|nope|sorry)[,.!]?\s+)?(?:i\s+meant|i\s+mean)\s+"
     r"(?P<entity>\S.*?)[?!. ]*$", re.IGNORECASE)
@@ -788,11 +791,25 @@ def classify_user_intent(
 
     open_question = dialogue.open_dialogue_question
 
+    # A rejection followed by a recognizable request is still a new request,
+    # not merely an answer to the assistant's open choice. Keep bare "No" and
+    # non-imperative negative details in the open-question path below.
+    request_text = text.strip()
+    negative_request = _NEGATIVE_REQUEST_PREFIX_RE.fullmatch(request_text)
+    if negative_request is not None:
+        proposed_request = negative_request.group("request").strip()
+        is_new_request = bool(
+            _DIRECT_IMPERATIVE_REQUEST_RE.fullmatch(proposed_request)
+            or _EXPLICIT_RESERVATION_REQUEST_RE.fullmatch(proposed_request)
+            or _RESERVATION_COMMITMENT_RE.search(proposed_request))
+        if is_new_request:
+            request_text = proposed_request
+
     # A clear new imperative is a new task, even while the assistant is
     # waiting for a short clarification value. Do not absorb requests such as
     # “Tell me a joke” as the entity or detail requested by the prior turn.
-    direct_imperative = _DIRECT_IMPERATIVE_REQUEST_RE.fullmatch(text.strip())
-    reservation_request_text = text.strip()
+    direct_imperative = _DIRECT_IMPERATIVE_REQUEST_RE.fullmatch(request_text)
+    reservation_request_text = request_text
     reservation_commitment = bool(_RESERVATION_COMMITMENT_RE.search(
         reservation_request_text))
     trailing_clause = re.split(
@@ -818,7 +835,9 @@ def classify_user_intent(
             task_intent="make-reservation",
             goal_intent="make-reservation",
             decision="selected",
-            matched_frame="explicit-reservation-request",
+            matched_frame=("negative-with-explicit-reservation-request"
+                           if request_text != text.strip()
+                           else "explicit-reservation-request"),
             context_predicates=("direct-user-request",),
         )
     name_slot_reply = bool(
@@ -838,7 +857,9 @@ def classify_user_intent(
             task_intent=task_intent,
             goal_intent=task_intent,
             decision="selected",
-            matched_frame="direct-imperative-request",
+            matched_frame=("negative-with-direct-imperative"
+                           if request_text != text.strip()
+                           else "direct-imperative-request"),
             context_predicates=("direct-user-request",),
         )
 
