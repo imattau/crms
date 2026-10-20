@@ -18,6 +18,46 @@ def require(condition: bool, message: str) -> None:
 
 
 def main() -> None:
+    # Common explicit details in the opening request should not be discarded
+    # and re-asked. The parsed values remain attributed to that user turn.
+    upfront_knowledge = CRMSKnowledgeBase()
+    upfront = CRMSDialogue(upfront_knowledge)
+    complete_request = respond(
+        upfront,
+        "I want to book a table at Nopa for 4 on Friday at 7 pm.")
+    require(complete_request.status == "prepared"
+            and "Restaurant: Nopa" in complete_request.text
+            and "Date/time: Friday at 7 pm" in complete_request.text
+            and "Party size: 4" in complete_request.text
+            and "No reservation has been made." in complete_request.text
+            and upfront.open_dialogue_question is None
+            and upfront.session_slots["restaurant_choice"]["updated_by"]
+                == "I want to book a table at Nopa for 4 on Friday at 7 pm."
+            and not upfront_knowledge._facts,
+            f"explicit opening details were dropped or promoted to facts: "
+            f"{complete_request!r}")
+
+    partial = CRMSDialogue(CRMSKnowledgeBase())
+    partial_start = respond(
+        partial, "I want a reservation at Nopa for four people.")
+    require(partial_start.status == "clarify"
+            and partial.session_slots["restaurant_choice"]["value"] == "Nopa"
+            and partial.session_slots["party_size"]["value"] == "four"
+            and partial.open_dialogue_question is not None
+            and partial.open_dialogue_question["expected_slot"] == "date_time",
+            f"partial opening details were not retained with the correct slot: "
+            f"{partial_start!r}")
+
+    time_only = CRMSDialogue(CRMSKnowledgeBase())
+    time_only_start = respond(time_only, "I want to book a table at 7 pm.")
+    require(time_only_start.status == "clarify"
+            and time_only.session_slots["date_time"]["value"] == "7 pm"
+            and "restaurant_choice" not in time_only.session_slots
+            and time_only.open_dialogue_question is not None
+            and time_only.open_dialogue_question["expected_slot"]
+                == "restaurant_choice",
+            f"a time was mistaken for a restaurant name: {time_only_start!r}")
+
     knowledge = CRMSKnowledgeBase()
     dialogue = CRMSDialogue(knowledge)
 
@@ -78,6 +118,7 @@ def main() -> None:
                 f"corrected draft value did not survive save/reload: {recalled!r}")
 
     print("reservation request collects typed session-only details: PASS")
+    print("explicit opening details are retained without being re-asked: PASS")
     print("draft remains explicit that no booking was submitted: PASS")
     print("correction regenerates the draft and survives reload: PASS")
 

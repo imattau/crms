@@ -151,6 +151,69 @@ _SESSION_SLOT_QUESTIONS = {
 }
 _RESERVATION_DRAFT_SLOT_ORDER = (
     "restaurant_choice", "date_time", "party_size")
+_WEEKDAY_WORD = r"(?:mon|tues|wednes|thurs|fri|satur|sun)day"
+_RESERVATION_DATE_TIME_RE = re.compile(
+    r"\b(?P<when>(?:(?:(?:next|this)\s+)?" + _WEEKDAY_WORD
+    + r"|today|tomorrow|tonight|this\s+(?:morning|afternoon|evening))"
+    r"(?:\s+at\s+(?:\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)?"
+    r"|noon|midnight))?)\b", re.IGNORECASE)
+_RESERVATION_TIME_ONLY_RE = re.compile(
+    r"\bat\s+(?P<time>\d{1,2}(?::\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)?"
+    r"|noon|midnight)\b", re.IGNORECASE)
+_RESERVATION_PARTY_SIZE_RE = re.compile(
+    r"\b(?:party\s+of|table\s+for|for)\s+"
+    r"(?P<count>\d{1,2}|one|two|three|four|five|six|seven|eight|nine|"
+    r"ten|eleven|twelve)(?=\s*(?:people|persons|guests|of\s+us)?\b)",
+    re.IGNORECASE)
+_RESERVATION_NAME_STOP = (
+    r"for|on|at|today|tomorrow|tonight|this\s+(?:morning|afternoon|evening)|"
+    + _WEEKDAY_WORD)
+_RESERVATION_NAME_RE = re.compile(
+    r"\bat\s+(?P<name>[\w][\w&'’.-]*(?:\s+[\w][\w&'’.-]*){0,4}?)"
+    r"(?=\s+(?:" + _RESERVATION_NAME_STOP + r")\b|[,;.!?]|$)",
+    re.IGNORECASE)
+_NON_RESTAURANT_NAMES = {
+    "a restaurant", "the restaurant", "a table", "the table",
+    "a place", "somewhere", "home",
+}
+
+
+def _extract_reservation_request_details(text: str) -> dict[str, str]:
+    """Extract only explicit, bounded values from a reservation request.
+
+    These are user-provided session details, never facts. Unrecognized or
+    ambiguous wording remains unfilled and is requested conversationally.
+    """
+    details: dict[str, str] = {}
+    party = _RESERVATION_PARTY_SIZE_RE.search(text)
+    if party is not None:
+        details["party_size"] = party.group("count").strip()
+
+    when = _RESERVATION_DATE_TIME_RE.search(text)
+    if when is not None:
+        details["date_time"] = " ".join(when.group("when").split())
+        time_match = re.search(
+            r"\s+at\s+(?:\d{1,2}(?::\d{2})?\s*"
+            r"(?:a\.?m\.?|p\.?m\.?)?|noon|midnight)$",
+            when.group("when"), flags=re.IGNORECASE)
+        if time_match is None:
+            time = _RESERVATION_TIME_ONLY_RE.search(text)
+            if time is not None:
+                details["date_time"] += " " + time.group("time").strip()
+    else:
+        time = _RESERVATION_TIME_ONLY_RE.search(text)
+        if time is not None:
+            details["date_time"] = time.group("time").strip()
+
+    for name in _RESERVATION_NAME_RE.finditer(text):
+        candidate = " ".join(name.group("name").split()).strip(" ,")
+        if (candidate.casefold() not in _NON_RESTAURANT_NAMES
+                and not re.search(r"\d", candidate)):
+            details["restaurant_choice"] = candidate
+            break
+    return details
+
+
 _ELABORATION_TOPIC_REPLY_RE = re.compile(
     r"^(?:about\s+)?(?P<topic>[\w][\w '&’.-]{0,118})[.! ]*$",
     re.IGNORECASE)
@@ -1370,11 +1433,31 @@ def respond(dialogue: CRMSDialogue, text: str, *,
     if (intent is not None and intent.decision == "selected"
             and intent.task_intent == "make-reservation"
             and intent.matched_frame == "explicit-reservation-request"):
-        return with_intent(DialogueTurn(
-            "clarify", text, text,
-            text=("I can prepare a reservation request draft, but I can't "
-                  "check availability or submit it from this chat. "
-                  "Which restaurant should I use?")))
+        extracted = _extract_reservation_request_details(text)
+        for slot, value in extracted.items():
+            dialogue.session_slots[slot] = {
+                "value": value,
+                "question": "Initial reservation request: " + text[:400],
+                "updated_by": text[:512],
+            }
+        progress = reservation_draft_prompt(text)
+        if progress.status == "prepared":
+            intro = ("I used the details stated in your request to prepare "
+                     "this draft. I can't check availability or submit it.\n"
+                     + progress.text)
+            return with_intent(DialogueTurn(
+                progress.status, text, text, text=intro))
+        turn = with_intent(DialogueTurn(
+            progress.status, text, text, text=progress.text))
+        noted = "; ".join(
+            f"{_SESSION_SLOT_LABELS[slot]}: {value}"
+            for slot, value in extracted.items())
+        intro = ("I can prepare a reservation request draft, but I can't "
+                 "check availability or submit it.")
+        if noted:
+            intro += f" I noted {noted} from your request."
+        turn.text = intro + "\n" + turn.text
+        return turn
 
     offers = dialogue.offers
     answers_offer = bool(
