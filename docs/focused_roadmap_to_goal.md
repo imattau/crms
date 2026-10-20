@@ -455,6 +455,13 @@ procedure learner accepts the resulting taught operation sequence, and shows
 the mapping in the answer. This improves one compositional language seam; broad
 paraphrase, task planning, and transfer remain unproven.
 
+An opt-in `/practice-composition` command now re-runs and verifies each distinct
+positive relation result from the last successful composition and stores it as
+a separate derived case. SQLite reload and source correction invalidate the
+dependent case without promoting it to a fact. This establishes a narrow
+write-back bridge; the composite output and its procedure lineage are not yet
+stored together, so the governed self-learning gate remains open.
+
 Dialogue intent and multi-turn safety are evaluated in every chat-facing step,
 not deferred to step 5. Research into induced dialogue moves may proceed
 alongside the baseline, but it advances only if it improves held-out task

@@ -28,6 +28,13 @@ the exact contradicted conclusion remains ambiguous with its supporting proof. T
 rules remain active and report the conflict at the affected conclusion. `/inference-rules` exposes
 rule status and the cited counterexample so a user can inspect and correct it. Loading an older
 accepted-rule store also rechecks saved negative evidence and suspends rules that it contradicts.
+The opt-in `/practice-composition` command now connects a successful proof-filter composition to
+this derived-case path: it re-derives and verifies each distinct positive membership result before
+storing it. Ordinary composition remains read-only, and the stored cases stay out of the fact store.
+The composed list and procedure lineage are not yet stored as one derived artifact, and the command
+does not learn or modify the procedure that produced the list; a later design must capture that
+cross-store lineage before claiming complete derivation learning. See
+`experiments/v1_497_composition_derived_practice.py` for the SQLite reload and correction check.
 The ledger experiment checks deterministic registration and event updates, protected items, a
 preference margin, dependency-safe dormancy, stale-item listing, outer-transaction savepoints, and
 noisy revision. Across 200 synthetic 20%-noise seeds, the margin 0.30 policy averaged 1.27

@@ -220,6 +220,9 @@ HELP = """Commands:
                  store a verified inference separately as a derived case
   /practice-question QUESTION
                  answer and retain one unique proof-backed inference
+  /practice-composition
+                 reverify and retain the positive relation cases from the last
+                 successful proof-backed list composition
   Natural-language composition: "From values 12, 4, and 7, keep only the
                  values that Nia reaches, then remove duplicates and reverse"
                  every value must be proved positive/negative without a conflict
@@ -6010,7 +6013,7 @@ def main() -> int:
         if not line:
             continue
         explanation_followup = _natural_research_explanation_request(line)
-        if not explanation_followup:
+        if not explanation_followup and line != "/practice-composition":
             last_reasoned_filter = None
         story_revision_tone = _natural_story_revision(line)
         if story_revision_tone is not None and last_story is not None:
@@ -7861,6 +7864,38 @@ def main() -> int:
                       "proof-backed inferred answers can be retained.")
             else:
                 print("Auto-practice disabled for this chat session.")
+            continue
+        if line == "/practice-composition":
+            result = last_reasoned_filter
+            if result is None or result.status != "answered":
+                print("CRMS> There is no successful proof-backed list composition "
+                      "to practice. Run one, then use /practice-composition.")
+                continue
+            retained_values: list[int] = []
+            rejected_values: list[int] = []
+            for value in dict.fromkeys(result.included_values):
+                practiced = knowledge.practice_relation(
+                    result.subject or "", result.relation or "", str(value))
+                retained = knowledge.retrieve_derived_case(
+                    result.subject or "", result.relation or "", str(value),
+                    record_use=False)
+                if (practiced.status == "answered" and practiced.complete
+                        and retained is not None
+                        and retained.get("status") == "verified"):
+                    retained_values.append(value)
+                else:
+                    rejected_values.append(value)
+            if retained_values:
+                knowledge.save(args.knowledge)
+                print("CRMS> Stored separately verified derived relation cases for "
+                      f"{result.subject} {result.relation}: {retained_values}. "
+                      "These remain derived cases, not facts or new procedures.")
+            if rejected_values:
+                print("CRMS> Did not retain these as derived cases because they "
+                      "were direct, incomplete, conflicted, or could not be stored: "
+                      f"{rejected_values}.")
+            if not retained_values and not rejected_values:
+                print("CRMS> The composition had no positive relation cases to practice.")
             continue
         if line.startswith("/auto-practice"):
             fields = line.split()
