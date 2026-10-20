@@ -1,5 +1,32 @@
 # Language and recombination benchmark baselines
 
+## Proof-guided procedure composition (2026-10-20)
+
+Command: `python3 run_experiments.py --match v1_451 --timeout 300`.
+
+The experiment discovers a typed three-premise rule (`employs + owns +
+located in → reaches`) from two training examples and validates it against two
+held-out examples. Ordinary-language chat asks which runtime record IDs are
+reachable. Every positive used in the next stage has a proof accepted by the
+independent proof verifier. Two distinct proofs for record 4 intentionally
+produce a duplicate in the intermediate list: `[12, 4, 4, 9]`.
+
+A separately learned procedure, “remove duplicate values then reverse the
+list,” transforms those proof-derived IDs into `[9, 4, 12]`. The generated
+Python artifact passes its recorded parity checks and an independent output
+oracle. Explicit negative record 7, conflicting record 6, and unsupported
+record 8 are excluded. A fresh chat process answers positive, negative, and
+unknown questions, explains the positive proof, and generates the artifact. A
+practiced conclusion is stored separately and becomes unavailable when its
+supporting source premise is corrected.
+
+This closes one controlled integration gap among reasoning, procedure
+recombination, chat, and correction. The graph examples are synthetic; the
+list-operation mapping and demonstrations are Codex-labeled; and the final
+composition is orchestrated by the experiment rather than planned from a broad
+request. It does not show autonomous rule learning from source documents or
+general task planning.
+
 ## Role-compatible predicate candidate probe (2026-10-20)
 
 Command: `python3 experiments/v1_450_role_compatible_predicate_candidates.py`.

@@ -125,6 +125,16 @@ that produced them. Test source correction, dependency invalidation, duplicate
 control, and store-growth policy before derived cases affect ordinary
 retrieval.
 
+The first cross-component integration now has a controlled end-to-end probe:
+`v1_451` learns and source-holdout-validates a typed three-premise rule, asks
+runtime questions through natural-language chat, independently verifies the
+positive proofs, passes only proof-backed result IDs into a separately learned
+list procedure, checks the generated code against an independent oracle, and
+invalidates a practiced conclusion after premise correction. This closes the
+integration seam for one synthetic task. The procedure mapping is
+Codex-labeled, the graph is authored, and the experiment orchestrates the
+stages; source-derived rule learning and user-level task planning remain open.
+
 **Gate:** chat and engine agree; every positive has a verified proof or
 task-specific check; incomplete search cannot produce a positive; correcting a
 source makes dependent derivations unavailable until revalidated.
