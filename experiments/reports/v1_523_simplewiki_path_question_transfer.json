@@ -1,0 +1,78 @@
+{
+  "experiment": "v1_523_simplewiki_path_question_transfer",
+  "source_index": "data/crms_simplewiki_research.sqlite",
+  "input_index_opened_read_only": true,
+  "training_entities": [
+    "River Thames",
+    "Seine"
+  ],
+  "heldout_entity": "Tiber River",
+  "heldout_answer": "Italy",
+  "path": [
+    "flows through",
+    "capital city of"
+  ],
+  "training_frame": "Through the capital of which country does the {river} flow?",
+  "source_citations": [
+    {
+      "document_id": "wiki:simplewiki:3308",
+      "title": "River Thames",
+      "claim": "River Thames — flows through → London",
+      "citation": "wiki:simplewiki:3308#sha256=dfa8bb76ce9060cb04fdd227e16bb41792f8dd2abbc8904fd562165f5d5d49fb&chars=24:133",
+      "span": "The River Thames is a large river in England. It goes through London, the capital city of the United Kingdom."
+    },
+    {
+      "document_id": "wiki:simplewiki:3308",
+      "title": "River Thames",
+      "claim": "London — capital city of → United Kingdom",
+      "citation": "wiki:simplewiki:3308#sha256=dfa8bb76ce9060cb04fdd227e16bb41792f8dd2abbc8904fd562165f5d5d49fb&chars=24:133",
+      "span": "The River Thames is a large river in England. It goes through London, the capital city of the United Kingdom."
+    },
+    {
+      "document_id": "wiki:simplewiki:4467",
+      "title": "Paris",
+      "claim": "Paris — capital city of → France",
+      "citation": "wiki:simplewiki:4467#sha256=de6b8841fd739bcb10843e3c780fa54ff49a0ff5db46a7e992be588c67c0758c&chars=1722:1822",
+      "span": "Paris (nicknamed the \"City of light\") is the capital city of France, and the largest city in France."
+    },
+    {
+      "document_id": "wiki:simplewiki:347271",
+      "title": "Seine",
+      "claim": "Seine — flows through → Paris",
+      "citation": "wiki:simplewiki:347271#sha256=623bb9eb41433695ea96247512c5750569c34198b17180c93c94ccb3b6f559a2&chars=1101:1208",
+      "span": "The Seine rises near Dijon in eastern central France, and flows through Paris and into the English Channel."
+    },
+    {
+      "document_id": "wiki:simplewiki:29790",
+      "title": "Rhea Silvia",
+      "claim": "Tiber River — flows through → Rome",
+      "citation": "wiki:simplewiki:29790#sha256=13eb3b9a88c534d5c6e21e8c7a01846a8e0aa86e0786ae8d449b5de7f71402d4&chars=1275:1344",
+      "span": "The Tiber River that flows through Rome gets its name from Tiberinus."
+    },
+    {
+      "document_id": "wiki:simplewiki:2875",
+      "title": "Rome",
+      "claim": "Rome — capital city of → Italy",
+      "citation": "wiki:simplewiki:2875#sha256=fae67906ca5d6c4746f80948ce21155497a9d9f0667f192f2902f72279742ac8&chars=2805:2939",
+      "span": ") is the capital city of Italy. It is also the capital and largest city in the region of Lazio, and the geographical region of Latium."
+    }
+  ],
+  "checks": {
+    "two_examples_licensed_frame": true,
+    "heldout_path_answered_by_engine": true,
+    "heldout_path_answered_in_fresh_cli_from_copied_model": true,
+    "heldout_sources_shown": true,
+    "unknown_route_abstained_in_engine": true,
+    "unknown_route_did_not_guess_in_fresh_cli": true,
+    "source_citations_resolved_in_copy": true
+  },
+  "responses": {
+    "heldout": "CRMS> Italy.\nSource: Rhea Silvia, Rome",
+    "unsupported": "CRMS> I found source text, but it does not support a grounded answer (named entity missing: Through; named entity missing: Danube; no location-bearing predicate in sentence; named entity appears as a location, not as the located subject). I won't guess.\nClosest source sentence: “The building of a new London Bridge in 1825 may have helped stop it from freezing: the new bridge had fewer pillars than the old, allowing the river to flow more easily, and stopping it from flowing slowly enough to freeze in cold winters.” [Source: River Thames; may not answer your question]"
+  },
+  "limits": [
+    "Codex manually labeled claims from cited SimpleWiki text; this does not test automatic extraction or rule induction.",
+    "One question frame and one held-out route do not establish broad natural-language or reasoning transfer.",
+    "The composed result is a two-edge path lookup; no downstream numeric/list procedure was tested."
+  ]
+}

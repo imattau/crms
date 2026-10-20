@@ -1,6 +1,6 @@
 # Focused plan from current CRMS to its goal
 
-**Reviewed:** 2026-10-20 (HEAD `578f3b0`)  
+**Reviewed:** 2026-10-20 (HEAD `663ace0`; runtime probe `v1_523`)  
 **Status:** active; the capability goal is not yet demonstrated.
 
 ## Goal
@@ -32,6 +32,15 @@ ordinary-chat task gate; and safe self-learning at scale remains unproven.
 The system is architecturally aligned, but not yet on track to claim broad
 capability. Progress means held-out task completion with controlled errors,
 not more features, data volume, or isolated passing scripts.
+
+The latest real-corpus probe adds one narrow positive result: two manually
+labeled SimpleWiki paths licensed a question frame that answered a held-out
+Tiber → Rome → Italy path in a copied-model CLI process, with citations
+resolvable from the copy. It does not change the overall assessment: there was
+one held-out entity, no downstream procedure, and the unsupported Danube query
+surfaced an unrelated Thames sentence as closest evidence. Treat the recent
+Colosseum/Eiffel pronoun report as an open dialogue release-gate regression;
+older dialogue controls do not invalidate that counterexample.
 
 ## Execution order
 
@@ -144,16 +153,17 @@ gaps, not to claim parity.
 
 ## Immediate next action
 
-The clean-process dialogue and reasoning regressions pass, and the current
-recombination packet again transfers across its three synthetic routes. Build
-the next frozen packet from independently authored ordinary-chat tasks over
-source-backed material. Vary request structure, evidence layout, and entity
-disambiguation; include partial, unsupported, conflicting, and multi-source
-comparison cases, with an independent answer checker. Start with composed
-reasoning/procedure tasks through the CLI and copied model. Keep the current
-dialogue, cycle, and integrity controls as release gates. Continue source-rule
-quality work in parallel, and keep derived write-back review-gated until
-recombination and correction pass on held-out tasks.
+The next capability packet must cross two boundaries not yet demonstrated:
+reasoning should drive a separate procedure, and the composed task should
+transfer across more than one held-out entity and request form. Freeze an
+independently authored packet over source-backed material; vary evidence order,
+layout, and entity disambiguation; include partial, unsupported, conflicting,
+and multi-source cases; and use an independent checker. Run it through fresh
+CLI processes and a copied model. Keep the Danube irrelevant-evidence result
+and the reported Colosseum/Eiffel pronoun failure as explicit quality gates.
+Continue source-rule quality work in parallel, but keep derived write-back
+review-gated until recombination, correction, and invalidation pass on held-out
+tasks.
 
 For detailed implementation history and experiment evidence, see
 [`focused_roadmap_to_goal.md`](focused_roadmap_to_goal.md) and

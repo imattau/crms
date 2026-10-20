@@ -1,5 +1,49 @@
 # Language and recombination benchmark baselines
 
+## Source-backed multi-hop question-frame transfer (`v1_523`, 2026-10-20)
+
+Command: `python3 experiments/v1_523_simplewiki_path_question_transfer.py`.
+
+Using the installed SimpleWiki SQLite index read-only, the experiment manually
+labels two training paths from River Thames and Seine sources, then tests a
+held-out Tiber → Rome → Italy path. The learned request frame transfers to
+the unseen river, the fresh CLI answers from a copied model, and the cited
+passages resolve from that copy. An unsupported Danube path does not inherit
+Italy or produce a guessed answer. All seven focused checks pass.
+
+The abstention does surface a retrieval defect: the CLI appends an unrelated
+River Thames sentence as its “closest” evidence for Danube. The answer remains
+non-committal, but the evidence ranking and abstention presentation are weak.
+The positive reply lists the two source names but does not expose the two-step
+proof by default. The result demonstrates a source-backed two-edge path lookup
+and frame transfer, not broad natural-language transfer, automatic extraction,
+source-rule induction, or reasoning consumed by a separate procedure. Claims
+were labeled by Codex and training/test routes are a small curated set. See the
+[runner](../experiments/v1_523_simplewiki_path_question_transfer.py) and
+[report](../experiments/reports/v1_523_simplewiki_path_question_transfer.json).
+
+## Overall direction check (`2026-10-20`)
+
+The project remains aligned with its stated aim, but capability breadth is
+still unproven. Verified inference, correction, and small recombination
+transfers are credible foundations; most successful composition results still
+depend on curated examples and reviewed components. Keep the scorecard ordered
+by user-visible gates: (1) dialogue must not confidently bind a pronoun to a
+stale topic; preserve valid context across source-only answers and anchor
+“why?” to the latest result; (2) ordinary chat must compose independently
+supported facts and rules into a result, then feed that result into a distinct
+procedure; (3) unknown, conflicting, incomplete, or cyclic inputs must be
+rejected with relevant evidence; (4) broaden to source-rule learning and
+governed self-learning only after transfer and correction checks pass. The
+latest topic-switch report is a fresh dialogue release-gate input and is not
+closed by the older curated dialogue regressions.
+
+The next capability packet should extend `v1_523` into a downstream operation
+and add multiple held-out entities, evidence layouts, and request forms, with
+an independent checker. Keep the Danube unrelated-evidence result as a retrieval
+quality failure even though the answer abstains. Do not count curated passes as
+a broad task-completion estimate.
+
 ## Contextual task-intent contrast (`v1_518`, 2026-10-20)
 
 The prior Taskmaster diagnostic (`v1_462`, code revision
