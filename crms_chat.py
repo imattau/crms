@@ -41,6 +41,7 @@ from crms_knowledge import (CRMSKnowledgeBase, FactCandidate, ResearchResult,
 from crms_math import CRMSMath, render as render_math
 from crms_model import CRMSModel, Prediction
 from crms_nl_gate import gate_quoted_evidence, supports_question_type
+from crms_procedure_discovery import propose_procedure_phrase_candidates
 from crms_package import (
     export_model_database, install_model_database, inspect_model_database,
     model_database_has_research, model_database_rule_settings,
@@ -130,6 +131,8 @@ HELP = """Commands:
   /suggest-role-compatible-alignments [DOC_OFFSET|MAX_DOCS]
                  surface cited predicate candidates with matching entity types;
                  role compatibility is not evidence of synonymy
+  /suggest-procedure-phrases QUERY
+                 extract cited, review-only procedure wording from retrieved sources
   /accept-corpus-alignment SELECTOR[|DOC_OFFSET|MAX_DOCS]
                  accept a reviewed corpus predicate alignment from cited pairs
   /suggest-question-role-rules
@@ -2524,6 +2527,73 @@ def _cited_sentence_evidence(
     return {"document_id": hit.document_id, "title": hit.title,
             "location": hit.location, "text": sentence,
             "citation": citation}
+
+
+def _render_procedure_phrase_candidates(index: CRMSSQLiteResearchIndex,
+                                        query: str) -> str:
+    """Show cited procedure phrase candidates without accepting a rule."""
+    query = query.strip()
+    if not query:
+        return "Use: /suggest-procedure-phrases QUERY"
+    candidates = []
+    seen = set()
+    sentence_spans_by_document = {}
+    for hit in index.search(query, limit=20, context_chars=0):
+        if hit.match_start is None or hit.match_end is None:
+            continue
+        document = index.document(hit.document_id)
+        spans = sentence_spans_by_document.get(hit.document_id)
+        if spans is None:
+            spans = _sentence_spans(document.text)
+            sentence_spans_by_document[hit.document_id] = spans
+        span = next(((start, end) for start, end in
+                     spans
+                     if start <= hit.match_start < end
+                     and hit.match_end <= end), None)
+        if span is None:
+            continue
+        evidence = _cited_sentence_evidence(
+            index, hit, span[0], span[1], hit.matched_terms)
+        if evidence is None:
+            continue
+        for candidate in propose_procedure_phrase_candidates(
+                evidence["text"], source_citation=evidence["citation"]):
+            key = (evidence["citation"], candidate.predicate_phrase)
+            if key in seen:
+                continue
+            seen.add(key)
+            candidates.append((evidence, candidate))
+            if len(candidates) == 8:
+                break
+        if len(candidates) == 8:
+            break
+    if not candidates:
+        return ("No cited procedure phrase candidates were found in the top 20 "
+                "retrieved source hits. No rule was changed.")
+    lines = ["Source-backed procedure phrase candidates (review required):"]
+    for number, (evidence, candidate) in enumerate(candidates, 1):
+        if not candidate.polarity:
+            evidence_type = "negative claim; not positive rule evidence"
+        elif candidate.quoted:
+            evidence_type = "quoted claim; not positive rule evidence"
+        elif candidate.assertion_status == "denied":
+            evidence_type = "embedding claim denied; not positive rule evidence"
+        elif candidate.assertion_status == "uncertain":
+            evidence_type = "embedding claim uncertain; not positive rule evidence"
+        else:
+            evidence_type = "positive-polarity claim; operation meaning unverified"
+        lines.append(
+            f"{number}. {candidate.predicate_phrase!r} — {evidence_type}")
+        if candidate.scope_notes:
+            lines.append("   Scope: " + "; ".join(candidate.scope_notes))
+        lines.append(f"   Source: {evidence['title']}")
+        lines.append(f"   Evidence: {evidence['text']}")
+        lines.append(f"   Citation: {evidence['citation']}")
+    lines.append(
+        "These are wording candidates, not learned rules. Verify the operation "
+        "against independent examples before teaching it; no knowledge or "
+        "procedure was changed.")
+    return "\n".join(lines)
 
 
 def _top_retrieved_sentence_evidence(
@@ -7289,6 +7359,11 @@ def main() -> int:
                     print("  User feedback: an answer using this rule was marked wrong "
                           f"for {report.get('question', 'an unspecified question')} "
                           f"(feedback {report.get('answer_id', 'unknown')}).")
+            continue
+        if (line == "/suggest-procedure-phrases"
+                or line.startswith("/suggest-procedure-phrases ")):
+            query = line[len("/suggest-procedure-phrases"):].strip()
+            print("CRMS> " + _render_procedure_phrase_candidates(index, query))
             continue
         if line == "/suggest-inference-rules" or line.startswith("/suggest-inference-rules "):
             fields = [value.strip() for value in

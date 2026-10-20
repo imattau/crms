@@ -161,6 +161,14 @@ labeler identity and unblinded limits must be explicit; Codex review is not
 independent validation. If useful yield requires hand-coded field-to-relation
 truth or fails on a second publisher, redesign rather than promote the path.
 
+`v1_470` adds a chat-accessible, report-only procedure candidate extractor
+for a bounded “function/array/result will predicate” construction. It does not
+name the operation; citations, polarity, quotation, and conditions stay
+visible, embedded denial/uncertainty is distinguished, and no rule is
+installed. This is a controlled syntactic prototype, not a precision result.
+Freeze it for the next complete-document, publisher-held-out study rather than
+adding more phrase-specific extractors.
+
 **Gate:** a frozen method finds useful candidates on held-out documents and a
 second publisher with measured precision and review effort; sampled
 non-proposals and negative controls do not become positive rules. Accepted
@@ -255,14 +263,14 @@ academic-paper sources.
    clarification, and task completion before changing runtime behavior. Fix
    only reproduced failures, then replay both fixed and held-out cases in fresh
    processes.
-2. **Source-rule discovery.** Treat `v1_469` as the positive integration
-   control and `v1_464`/`v1_468` as noisy discovery baselines. Freeze one typed
-   candidate generator; sample both proposals and non-proposals from complete
-   documents in corpora with actual relation/wording overlap; reserve a second
-   publisher. Include polarity, quotation, contrast, role-reversal, and
-   boundary negatives. Report precision, useful yield, source independence,
-   and review effort. Keep proposals inert unless this gate is met. Do not
-   spend another cycle on exact endpoint overlap or a larger one-corpus scan.
+2. **Source-rule discovery.** Treat `v1_469`/`v1_436` as integration controls
+   and `v1_464`/`v1_468` as noisy baselines. Freeze the `v1_470` candidate
+   generator; sample both proposals and non-proposals from complete documents
+   in corpora with actual relation/wording overlap; reserve a second publisher.
+   Include polarity, quotation, contrast, role-reversal, and boundary
+   negatives. Report precision, useful yield, source independence, and review
+   effort. Keep proposals inert unless this gate is met. Do not spend another
+   cycle on exact endpoint overlap or a larger one-corpus scan.
 3. **Recombination plus reasoning.** Select a learning signal that passes
    packet 2, then exercise an unseen multi-step request through normal chat,
    fresh-process reload, proof/output checking, missing premises, conflict,

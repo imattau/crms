@@ -2089,6 +2089,28 @@ source-language recall. The next gate is more publishers and sentence forms,
 complete document splits, and independently authored negatives held out from
 cue design.
 
+## Review-only procedure phrase extraction (2026-10-20)
+
+Command: `python3 experiments/v1_470_review_only_procedure_candidates.py`.
+
+The first chat-accessible discovery step, `/suggest-procedure-phrases QUERY`,
+retrieves source sentences and extracts a bounded “function/array/result will
+predicate” construction without naming `sort` or `reverse`. It retains exact
+hashed sentence citations, subject form, polarity, quotation status, and
+nearby conditions. The command labels output as unverified and review-required;
+it does not create a rule. On seven Codex-authored controlled sentences,
+active and passive positive forms were extracted, direct negation and an
+embedding denial were marked non-positive, a quoted assertion remained
+marked quoted, and metalinguistic/uncertain wording abstained. The fresh chat
+replay confirmed cited candidates are visible and `/rules` remains empty. The
+experiment passed.
+
+This is a narrow syntactic retrieval aid, not an operation mapper or learner.
+The fixtures and expected labels are Codex-authored, so the result is not a
+field precision estimate. Next freeze this generator and evaluate candidates
+and non-candidates on complete documents from a source/publisher held out from
+design; preserve scope, negation, quotation, role, and alignment controls.
+
 ## Natural request syntax transfer after phrase-role learning (2026-10-20)
 
 Command: `python3 experiments/v1_452_natural_request_frame_transfer.py`.
