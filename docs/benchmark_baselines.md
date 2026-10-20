@@ -1990,6 +1990,23 @@ coverage. Keep the result separate from source-derived learning and measure
 wording, order, and role transfer on independently sourced and held-out
 language before widening the runtime behavior.
 
+## Minimal support for single-step phrase-role transfer (2026-10-20)
+
+Command: `python3 experiments/v1_448_minimal_phrase_role_recombination.py`.
+
+The same 3×3×3 role grid can be covered by six carefully chosen phrase seeds,
+each with three input/output demonstrations. All six seed phrases work exactly,
+and the other 21 combinations are composed through a positional analogy frame:
+27/27 correct. Four unsupported role/order controls abstain. The selected
+held-out phrase generates code that passes four independently computed sort
+outputs through a fresh chat process; all labeler records survive reload.
+
+This reduces the controlled support requirement from 26 phrase mappings to 6,
+but the inputs remain synthetic and all labels come from one Codex annotator.
+It does not estimate a human review burden or source-text learning. Natural
+syntax variation, independent wording labels, and proposition/source citations
+remain necessary before this can be treated as broad natural-language transfer.
+
 ## Procedure evidence and labeler provenance (2026-10-20)
 
 Commands:
