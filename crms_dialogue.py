@@ -816,12 +816,25 @@ class CRMSDialogue:
                 options.setdefault(binding[0], resolved)
             self._pronoun_options = list(options.items())
 
-        # A named query topic is not enough to resolve a gendered pronoun
-        # when the quoted evidence introduced multiple people. The system has
-        # no licensed gender model, and answering from whichever name is the
-        # current topic silently rewrites the user's reference. Keep the
-        # candidate bindings available so the caller can offer an explicit
-        # clarification instead.
+        # The current topic is the discourse anchor for a single referential
+        # follow-up. Do this before probing which bindings happen to have
+        # stored answers: evidence availability must not pull a pronoun back
+        # to an older entity that is easier to answer about. This also applies
+        # to gendered pronouns after the user explicitly switched to a named
+        # topic: other names in the quoted sentence do not erase that local
+        # discourse choice. The answer path still checks that the resulting
+        # claim is supported for this entity.
+        if (self.topic_entity and self.topic_entity in entities
+                and len(pronouns) == 1):
+            resolved = question
+            for match in reversed(pronouns):
+                resolved = (resolved[:match.start()] + self.topic_entity
+                            + resolved[match.end():])
+            return resolved, None
+
+        # Without a single explicit current topic, gendered pronouns must not
+        # be assigned by guessing which entity in the cited sentence is a
+        # person. Leave the alternatives available for clarification.
         gendered = {match.group(0).casefold() for match in pronouns} & {
             "he", "she", "him", "her"}
         source_entities = list(dict.fromkeys(
@@ -838,19 +851,6 @@ class CRMSDialogue:
                 f"The last quoted source mentions {choices}. I can't infer "
                 f"which person '{pronoun}' refers to. Which entity do you "
                 "mean? Please restate the question with that name.")
-
-        # The current topic is the discourse anchor for a single referential
-        # follow-up. Do this before probing which bindings happen to have
-        # stored answers: evidence availability must not pull a pronoun back
-        # to an older entity that is easier to answer about. The answer path
-        # still checks that the resulting claim is supported for this entity.
-        if (self.topic_entity and self.topic_entity in entities
-                and len(pronouns) == 1):
-            resolved = question
-            for match in reversed(pronouns):
-                resolved = (resolved[:match.start()] + self.topic_entity
-                            + resolved[match.end():])
-            return resolved, None
 
         supported: dict[tuple[str, ...], list[tuple[str, tuple[Any, ...]]]] = {}
         seen: set[tuple[str, tuple[str, ...]]] = set()

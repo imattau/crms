@@ -484,6 +484,16 @@ clarification, and the source sentence must independently support the answer.
 `v1_438` plus the established topic, persistence, citation, and transcript
 regressions passed 10/10 in the focused runtime suite.
 
+A fresh rerun on the current checkout exposed an ordering regression in this
+path: the gendered-pronoun ambiguity guard ran before the current-topic anchor,
+so “Where did he work?” asked for clarification after “What about Alan
+Turing?” when the cited sentence also mentioned Bletchley Park and the Second
+World War. Moving the explicit current-topic binding ahead of that guard fixes
+the failure while leaving unsupported named topics evidence-free. On this
+checkout `v1_438`, the 30-turn `v1_427` transcript, paragraph-grounding
+`v1_426`, and topic-anchor `v1_412` all pass. These are targeted runtime
+regressions, not independent dialogue-transfer evidence.
+
 ## Explicit topic-switch clause followed by a question
 
 Command: `python3 experiments/v1_439_explicit_topic_clause.py`.
