@@ -3470,6 +3470,10 @@ class CRMSModel:
             for index, (inputs, outputs) in enumerate(examples)
         ]
 
+    def learned_procedure_phrases(self) -> list[str]:
+        """Return instruction phrases with an accepted procedure."""
+        return sorted(self._procedures)
+
     def example_instruction_sources(self, instruction: str) -> list[str]:
         """Return distinct prose citations associated with an instruction."""
         key = self._canonical_instruction_storage_key(

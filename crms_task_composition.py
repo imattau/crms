@@ -246,6 +246,86 @@ def _relation_and_subject(claim: str, knowledge: CRMSKnowledgeBase
     return next(iter(matches))
 
 
+def _generic_request_parts(
+        instruction: str, knowledge: CRMSKnowledgeBase,
+        procedures: CRMSModel) -> tuple[str, str, str] | None:
+    """Resolve a bounded composition from explicit, independently licensed parts.
+
+    This does not infer operation synonyms or relation paraphrases. It accepts
+    a request only when the text contains one unambiguous integer set, one
+    subject/relation pair already represented in the knowledge base, and one
+    learned procedure phrase.
+    """
+    learned_phrases = procedures.learned_procedure_phrases()
+    if not any(re.search(
+            rf"(?<!\w){re.escape(phrase).replace(r'\ ', r'\s+')}(?!\w)",
+            instruction, flags=re.IGNORECASE)
+            for phrase in learned_phrases):
+        return None
+
+    value_spans = list(re.finditer(_INTEGER_LIST, instruction,
+                                   flags=re.IGNORECASE))
+    if len(value_spans) != 1:
+        return None
+    value_span = value_spans[0]
+    values_text = value_span.group(0)
+    values = re.findall(r"-?\d+", values_text)
+    all_numbers = re.findall(r"-?\d+", instruction)
+    if not values or len(values) > 32 or len(values) != len(all_numbers):
+        return None
+
+    claims: set[tuple[str, str]] = set()
+    facts = (*knowledge.facts(), *knowledge.negative_facts())
+    folded_instruction = instruction.casefold()
+    mentioned_subjects = {
+        fact.subject for fact in facts
+        if fact.subject.casefold() in folded_instruction
+    }
+    claims.update((fact.subject, fact.relation) for fact in facts
+                  if fact.subject in mentioned_subjects)
+    for rule in knowledge._inference_rules.values():
+        claims.update((subject, rule.conclusion_relation)
+                      for subject in mentioned_subjects)
+    claims = {
+        (subject, relation) for subject, relation in claims
+        if re.search(
+            rf"(?<!\w){re.escape(f'{subject} {relation}').replace(r'\ ', r'\s+')}(?!\w)",
+            instruction, flags=re.IGNORECASE)
+    }
+    if len(claims) != 1:
+        return None
+
+    matched_phrases: set[str] = set()
+    for phrase in learned_phrases:
+        words = re.escape(phrase).replace(r"\ ", r"\s+")
+        if re.search(rf"(?<!\w){words}(?!\w)", instruction,
+                     flags=re.IGNORECASE):
+            matched_phrases.add(phrase)
+    if not matched_phrases:
+        return None
+    longest = max(len(phrase) for phrase in matched_phrases)
+    selected = sorted(phrase for phrase in matched_phrases
+                      if len(phrase) == longest)
+    if len(selected) != 1:
+        return None
+    selected_phrase = selected[0]
+    words = re.escape(selected_phrase).replace(r"\ ", r"\s+")
+    command_occurrences = []
+    for phrase_match in re.finditer(rf"(?<!\w){words}(?!\w)", instruction,
+                                    flags=re.IGNORECASE):
+        prefix = instruction[:phrase_match.start()].rstrip()
+        if (not prefix
+                or re.search(r"[,;:.!?]\s*$", prefix)
+                or re.search(r"\b(?:please|then|and|now|can you|could you|"
+                             r"i need to|i want to)\s*$", prefix,
+                             flags=re.IGNORECASE)):
+            command_occurrences.append(phrase_match)
+    if not command_occurrences:
+        return None
+    subject, relation = next(iter(claims))
+    return values_text, f"{subject} {relation}", selected_phrase
+
+
 def _proof_sources(proof: dict[str, Any]) -> set[str]:
     sources: set[str] = set()
 
@@ -279,18 +359,26 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
         match = candidate.fullmatch(instruction)
         if match is not None:
             break
-    if match is None:
-        return None
+    if match is not None:
+        values_text = match.group("values")
+        claim_text = match.group("claim")
+        procedure_text = match.group("procedure")
+    else:
+        generic_parts = _generic_request_parts(
+            instruction, knowledge, procedures)
+        if generic_parts is None:
+            return None
+        values_text, claim_text, procedure_text = generic_parts
     values = tuple(int(value) for value in
-                   re.findall(r"-?\d+", match.group("values")))
+                   re.findall(r"-?\d+", values_text))
     if not values or len(values) > 32:
         return ReasonedListComposition(
             "unsupported", "I can check a finite list of 1 to 32 integer values.")
-    parsed = _relation_and_subject(match.group("claim"), knowledge)
+    parsed = _relation_and_subject(claim_text, knowledge)
     language_evidence: tuple[dict[str, Any], ...] = ()
     if parsed is None:
         learned_match = knowledge.match_fact_pattern_relation_claim(
-            match.group("claim"))
+            claim_text)
         if learned_match is not None:
             parsed = (learned_match["subject"], learned_match["relation"])
             language_evidence = (learned_match,)
@@ -298,7 +386,7 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
         return ReasonedListComposition(
             "unsupported", "I couldn't identify one unambiguous stored relation and subject.")
     subject, relation = parsed
-    procedure = _normalize_procedure_sequence(match.group("procedure"))
+    procedure = _normalize_procedure_sequence(procedure_text)
     positive_facts = knowledge.facts()
     negative_facts = knowledge.negative_facts()
     fact_records = [asdict(fact) for fact in positive_facts]
