@@ -2226,6 +2226,16 @@ and gendered forms. The existing 12 focused retrieval/dialogue regressions
 This does not demonstrate open-domain language transfer or human-label
 accuracy.
 
+An added interruption sequence now tests each fixture after the initial
+`why?`: an unsupported closing-date question must abstain, the next pronoun
+follow-up must still resolve to the current named topic, and a subsequent
+`why?` must explain that follow-up rather than the abstention. Current runtime
+result: 32/32 supported evidence steps, 0 wrong answers, and 8/8 abstentions
+across the existing four fixtures. Each fixture's pronoun check after the
+interruption also remains correct after state reload. These are still
+Codex-authored, fixed regression fixtures, not an independent dialogue
+benchmark.
+
 ## New requests interrupt open dialogue slots (2026-10-20)
 
 The 30-turn transcript uncovered a contextual routing error outside its

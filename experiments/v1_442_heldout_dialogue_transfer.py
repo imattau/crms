@@ -120,6 +120,30 @@ def run_case(case: dict[str, str]) -> None:
                 and case["first_date"] not in explanation.text,
                 f"{case['name']}: why? drifted to an earlier topic: {explanation!r}")
 
+        # A recoverable abstention should not discard a still-grounded topic.
+        # The next pronoun must continue to refer to the named target, and
+        # "why?" must explain that follow-up rather than the failed request.
+        unsupported = respond(
+            dialogue, "When did it close?", research_index=index)
+        require(unsupported.status not in {"answered", "sources_found"}
+                and case["target_date"] not in unsupported.text,
+                f"{case['name']}: unsupported closing date was answered: "
+                f"{unsupported!r}")
+        after_abstention = respond(
+            dialogue, case.get("pronoun_question", "When did it open?"),
+            research_index=index)
+        require(after_abstention.status == "sources_found"
+                and case["target_date"] in after_abstention.text
+                and case["first_date"] not in after_abstention.text,
+                f"{case['name']}: recoverable abstention lost current topic: "
+                f"{after_abstention!r}")
+        after_abstention_why = respond(
+            dialogue, "why?", research_index=index)
+        require(case["target_date"] in after_abstention_why.text
+                and case["first_date"] not in after_abstention_why.text,
+                f"{case['name']}: why? explained the wrong turn after abstention: "
+                f"{after_abstention_why!r}")
+
         state = Path(folder) / "dialogue.json"
         dialogue.save(str(state))
         restored = CRMSDialogue.load(CRMSKnowledgeBase(), str(state),
@@ -142,9 +166,10 @@ def run_case(case: dict[str, str]) -> None:
 def main() -> None:
     for case in CASES:
         run_case(case)
-        print(f"{case['name']}: topic switch, pronoun, citation, why?, reload: PASS")
-    supported_steps = 5 * len(CASES)
-    expected_abstentions = len(CASES)
+        print(f"{case['name']}: topic switch, pronoun, citation, interrupted "
+              "follow-up, why?, reload: PASS")
+    supported_steps = 8 * len(CASES)
+    expected_abstentions = 2 * len(CASES)
     print(f"held-out-style authored fixtures: {len(CASES)}; target-evidence "
           f"steps: {supported_steps}/{supported_steps}; wrong answers: 0; "
           f"negative-control abstentions: {expected_abstentions}/"
