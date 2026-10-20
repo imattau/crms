@@ -1997,18 +1997,32 @@ def _natural_percentage_point_question(
         r"\s*(?:by\s+)?how\s+many\s+percentage\s+points\s+did\s+"
         r"(?P<measure>.+?)\s+(?P<trend>increase|increased|rise|rose|"
         r"grow|grew|decrease|decreased|fall|fell|decline|declined)\s+"
-        r"(?:from\s+(?P<baseline>20\d{2})\s+to\s+(?P<target>20\d{2})|"
-        r"between\s+(?P<baseline_between>20\d{2})\s+and\s+"
-        r"(?P<target_between>20\d{2}))\s*[?!.]*\s*",
+        r"(?:from\s+(?P<baseline>[A-Za-z0-9][A-Za-z0-9.-]*)\s+to\s+"
+        r"(?P<target>[A-Za-z0-9][A-Za-z0-9.-]*)|"
+        r"between\s+(?P<baseline_between>[A-Za-z0-9][A-Za-z0-9.-]*)\s+and\s+"
+        r"(?P<target_between>[A-Za-z0-9][A-Za-z0-9.-]*))\s*[?!.]*\s*",
         message, flags=re.IGNORECASE)
-    if match is None:
-        return None
-    baseline = (match.group("baseline") or match.group("baseline_between"))
-    target = match.group("target") or match.group("target_between")
-    increasing = match.group("trend").casefold() in {
-        "increase", "increased", "rise", "rose", "grow", "grew"}
-    return (match.group("measure").strip(), target, baseline,
-            "higher" if increasing else "lower", "in")
+    if match is not None:
+        baseline = (match.group("baseline") or match.group("baseline_between"))
+        target = match.group("target") or match.group("target_between")
+        increasing = match.group("trend").casefold() in {
+            "increase", "increased", "rise", "rose", "grow", "grew"}
+        return (match.group("measure").strip(), target, baseline,
+                "higher" if increasing else "lower", "in")
+
+    # A direction-neutral change request still has an explicit baseline and
+    # target order. State the direction observed in the cited values rather
+    # than treating the requested wording as evidence.
+    match = re.fullmatch(
+        r"\s*what\s+(?:was|is)\s+the\s+percentage[- ]point\s+change\s+"
+        r"in\s+(?P<measure>.+?)\s+from\s+"
+        r"(?P<baseline>[A-Za-z0-9][A-Za-z0-9.-]*)\s+to\s+"
+        r"(?P<target>[A-Za-z0-9][A-Za-z0-9.-]*)\s*[?!.]*\s*",
+        message, flags=re.IGNORECASE)
+    if match is not None:
+        return (match.group("measure").strip(), match.group("target"),
+                match.group("baseline"), "either", "on")
+    return None
 
 
 def _format_exact_decimal(value: Fraction) -> str:
@@ -10620,7 +10634,8 @@ def main() -> int:
                         f"{_format_exact_decimal(amount)} percentage points "
                         f"{observed} {prep} {target_operand['label']} than {prep} "
                         f"{baseline_operand['label']}")
-                    if observed != percentage_point_question[3]:
+                    if (percentage_point_question[3] != "either"
+                            and observed != percentage_point_question[3]):
                         claim = "The comparison is " + claim
                 value_suffix = ("%" if percentage_point_evidence["input_unit"]
                                 == "percent" else "")
@@ -10642,6 +10657,7 @@ def main() -> int:
         count_evidence = None
         count_route_used = False
         if (current_effort in {"standard", "thorough"}
+                and not percentage_point_route_used
                 and count_question is not None
                 and turn.status in {"unknown", "sources_found", "needs_review"}
                 and not (turn.response is not None

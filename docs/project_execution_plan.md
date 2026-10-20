@@ -84,6 +84,11 @@ On the current checkout, the following runtime controls passed:
   held-out routes, including unsupported-type abstention.
 - `v1_533`: cited dated percentage-point comparison, independent decimal
   check, and direction, unsupported-measure, and conflicting-source controls.
+- `v1_534`: new operation phrases compose in both orders after explicit
+  supervision; unknown and unlicensed operations still abstain.
+- `v1_535`: four new question frames retrieve and calculate one
+  source-backed percentage-point comparison; unsupported measures/labels and
+  a contradictory requested direction are controlled.
 
 These are component/regression passes, not an independent user-task score.
 Most use authored controls; `v1_533` uses two documents from one PMC
@@ -97,9 +102,14 @@ orders in fresh chat. Operation order changes the output; evidence, operation
 labels, and connective provenance remain visible. Unknown values and
 unlicensed operations/connectives abstain, and the copied SQLite model
 reproduces the result. This is controlled transfer over supervised phrases
-and a synthetic proof graph, not broad language transfer. The next step is a
-frozen task set with newly written wording and a second, non-list task family;
-measure useful transfer and teacher burden before adding more phrase examples.
+and a synthetic proof graph, not broad language transfer. `v1_535` adds a
+second, non-list task family using real indexed article text and expands one
+source-grounded math route from one question frame to four. It still tests one
+sentence and one condition pair from one PMC collection; independent
+publisher and user-task transfer remain unproven. The next gate is a frozen
+multi-source packet with independently authored tasks spanning recombination,
+reasoning, and source-grounded math. Measure useful transfer, wrong answers,
+abstention, and teacher burden before widening phrase coverage.
 
 The current experiments already demonstrate controlled reasoning-to-math,
 typed relation/paraphrase recombination, learned sequence operations, and

@@ -4230,3 +4230,29 @@ competence. Preserve the before-teaching abstention and all negative controls.
 
 Report: [experiment](../experiments/v1_534_taught_operation_phrase_recombination.py),
 [results](../experiments/reports/v1_534_taught_operation_phrase_recombination.json).
+
+## Percentage-point question-frame transfer (`v1_535`, 2026-10-20)
+
+Command: `python3 experiments/v1_535_percentage_point_language_transfer.py`.
+
+The held-out requests ask for the same source-backed comparison in four
+frames: higher on one condition than another; increase from one named
+condition to another; growth between named conditions; and a direction-neutral
+percentage-point change from baseline to target. All four parse through fresh
+chat, retrieve the same PMC assertion, cite the same two labeled operands, and
+calculate 3.9 percentage points. An independently computed `Decimal` check
+confirms the result. A contradictory requested direction is reported against
+the source-observed direction. An unsupported measure and an unsupported
+condition label produce a percentage-specific abstention rather than falling
+through to the generic “how many” count handler.
+
+Before the parser change, only the canonical higher/lower form returned the
+intended calculation. Some alternate forms were incorrectly intercepted by
+the count route; others asked an irrelevant entity clarification. The count
+route now yields when the percentage-point route has claimed the request.
+
+This is one source sentence and one measure/condition pair, with questions
+authored during development. It expands one non-list, source-grounded math
+slice; it is not a representative benchmark, independent participant study,
+publisher transfer, or broad math result. See the [runner](../experiments/v1_535_percentage_point_language_transfer.py)
+and [results](../experiments/reports/v1_535_percentage_point_language_transfer.json).

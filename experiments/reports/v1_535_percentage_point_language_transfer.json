@@ -1,0 +1,81 @@
+{
+  "experiment": "v1_535_percentage_point_language_transfer",
+  "date": "2026-10-20",
+  "status": "pass",
+  "source": {
+    "document_id": "pmc:PMC13675955.v1.rb496c301cb6ab27e",
+    "title": "The reference shapes the signal: chrX genotype summaries and classifier sex disparity between GRCh38 and T2T-CHM13 callsets",
+    "license": "CC BY, as recorded in the local PMC snapshot",
+    "sentence": "In women, the fraction of non-reference chrX genotypes that were heterozygous was 0.605 on GRCh38 and 0.644 on T2T."
+  },
+  "held_out_question_frames": [
+    {
+      "question": "How many percentage points higher was the fraction of non-reference chrX genotypes that were heterozygous in women on T2T than on GRCh38?",
+      "parsed": [
+        "the fraction of non-reference chrX genotypes that were heterozygous in women",
+        "T2T",
+        "GRCh38",
+        "higher",
+        "on"
+      ],
+      "difference_percentage_points": "39/10",
+      "citation_resolves_to_exact_sentence": true
+    },
+    {
+      "question": "By how many percentage points did the fraction of non-reference chrX genotypes that were heterozygous in women increase from GRCh38 to T2T?",
+      "parsed": [
+        "the fraction of non-reference chrX genotypes that were heterozygous in women",
+        "T2T",
+        "GRCh38",
+        "higher",
+        "in"
+      ],
+      "difference_percentage_points": "39/10",
+      "citation_resolves_to_exact_sentence": true
+    },
+    {
+      "question": "How many percentage points did the fraction of non-reference chrX genotypes that were heterozygous in women grow between GRCh38 and T2T?",
+      "parsed": [
+        "the fraction of non-reference chrX genotypes that were heterozygous in women",
+        "T2T",
+        "GRCh38",
+        "higher",
+        "in"
+      ],
+      "difference_percentage_points": "39/10",
+      "citation_resolves_to_exact_sentence": true
+    },
+    {
+      "question": "What was the percentage-point change in the fraction of non-reference chrX genotypes that were heterozygous in women from GRCh38 to T2T?",
+      "parsed": [
+        "the fraction of non-reference chrX genotypes that were heterozygous in women",
+        "T2T",
+        "GRCh38",
+        "either",
+        "on"
+      ],
+      "difference_percentage_points": "39/10",
+      "citation_resolves_to_exact_sentence": true
+    }
+  ],
+  "controls": {
+    "contradictory_direction": "How many percentage points did the fraction of non-reference chrX genotypes that were heterozygous in women decrease from GRCh38 to T2T?",
+    "unsupported_measure": "By how many percentage points did the fraction of unicorn genotypes increase from GRCh38 to T2T?",
+    "unsupported_label": "How many percentage points did the fraction of non-reference chrX genotypes that were heterozygous in women increase from GRCh3 to T2T?",
+    "fresh_chat_replies": [
+      "3.9 percentage points higher on T2T than on GRCh38. Calculation: (0.644 − 0.605) × 100 = 3.9. [Source: The reference shapes the signal: chrX genotype summaries and classifier sex disparity between GRCh38 and T2T-CHM13 callsets; inputs are quoted evidence, not accepted facts]",
+      "3.9 percentage points higher in T2T than in GRCh38. Calculation: (0.644 − 0.605) × 100 = 3.9. [Source: The reference shapes the signal: chrX genotype summaries and classifier sex disparity between GRCh38 and T2T-CHM13 callsets; inputs are quoted evidence, not accepted facts]",
+      "3.9 percentage points higher in T2T than in GRCh38. Calculation: (0.644 − 0.605) × 100 = 3.9. [Source: The reference shapes the signal: chrX genotype summaries and classifier sex disparity between GRCh38 and T2T-CHM13 callsets; inputs are quoted evidence, not accepted facts]",
+      "3.9 percentage points higher on T2T than on GRCh38. Calculation: (0.644 − 0.605) × 100 = 3.9. [Source: The reference shapes the signal: chrX genotype summaries and classifier sex disparity between GRCh38 and T2T-CHM13 callsets; inputs are quoted evidence, not accepted facts]",
+      "The comparison is 3.9 percentage points higher in T2T than in GRCh38. Calculation: (0.644 − 0.605) × 100 = 3.9. [Source: The reference shapes the signal: chrX genotype summaries and classifier sex disparity between GRCh38 and T2T-CHM13 callsets; inputs are quoted evidence, not accepted facts]",
+      "I couldn't find one source sentence that states the measure, both named conditions, and both numeric values together, so I can't calculate the percentage-point difference.",
+      "I couldn't find one source sentence that states the measure, both named conditions, and both numeric values together, so I can't calculate the percentage-point difference."
+    ]
+  },
+  "limitations": [
+    "One source sentence and one measure/condition pair were used.",
+    "The new wording varies syntax but not the domain or underlying evidence.",
+    "The questions were authored during development, not by independent participants.",
+    "This does not establish broad scientific number understanding or publisher transfer."
+  ]
+}
