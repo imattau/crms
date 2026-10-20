@@ -11,6 +11,7 @@ from fractions import Fraction
 import hashlib
 import json
 import re
+import sqlite3
 from pathlib import Path
 from typing import Any
 
@@ -42,6 +43,7 @@ from crms_knowledge import (CRMSKnowledgeBase, FactCandidate, ResearchResult,
                             _base_verb_for_surface)
 from crms_math import CRMSMath, render as render_math
 from crms_model import CRMSModel, Prediction
+from crms_rule_registry import RuleRegistry
 from crms_nl_gate import gate_quoted_evidence, supports_question_type
 from crms_procedure_discovery import (
     nearest_parameter_heading,
@@ -274,6 +276,9 @@ HELP = """Commands:
   /explain-rule I|INPUT CSV
                  inspect the procedure and examples grounding a prediction
   /rules         inspect learned list-transformation rules
+  /rule-health   inspect rule-registry lifecycle, validation, and conflicts
+  /rule-detail ID
+                 inspect one rule's statement, scope, validation, and utility
   /write-fact S|R|O|positive/negative
                  write a stored fact with a learned sentence frame
   /write-about ENTITY[|KEY=VALUE...]
@@ -1399,7 +1404,7 @@ def _natural_when_evidence(index: CRMSSQLiteResearchIndex,
         for local_start, local_end in paragraph_sentences:
             sentence = paragraph[local_start:local_end]
             start, end = paragraph_start + local_start, paragraph_start + local_end
-            evidence_start = start
+            anchor_text: str | None = None
             if _sentence_context_kind(sentence, source, start) != "assertion":
                 continue
             words = tuple(normalized_tokens(sentence))
@@ -1448,14 +1453,15 @@ def _natural_when_evidence(index: CRMSSQLiteResearchIndex,
                         continue
                     subject_start = 0
                     subj_end = 1
-                    evidence_start = paragraph_start + previous_span[0]
+                    anchor_text = previous_sentence
                 else:
                     alias_tokens = tuple(normalized_tokens(alias_match.group()))
                     subject_start = 1 if alias_tokens[:1] in {
                         ("the",), ("this",), ("that",)} else 0
                     subj_end = subject_start + 1
                     if previous_span is not None:
-                        evidence_start = paragraph_start + previous_span[0]
+                        anchor_text = paragraph[
+                            previous_span[0]:previous_span[1]].strip()
             date_match = dated.search(sentence)
             if date_match is None:
                 continue
@@ -1478,8 +1484,10 @@ def _natural_when_evidence(index: CRMSSQLiteResearchIndex,
                    for token in between):
                 continue
             evidence = _cited_sentence_evidence(
-                index, hit, evidence_start, end, tuple(hit.matched_terms))
+                index, hit, start, end, tuple(hit.matched_terms))
             if evidence is not None:
+                if anchor_text is not None:
+                    evidence["anchor_text"] = anchor_text
                 found.setdefault(date_match.group(), []).append(evidence)
     if len(found) != 1:
         return {"conflicts": found} if found else None
@@ -6147,6 +6155,8 @@ def build_parser() -> argparse.ArgumentParser:
                         help="SQLite log for evidence-attributed /right and /wrong feedback")
     parser.add_argument("--rules", type=Path, default=Path("crms_rules.json"),
                         help="learned transformation-rule memory; .sqlite paths use indexed SQLite storage (default: %(default)s)")
+    parser.add_argument("--rule-registry", type=Path, default=None,
+                        help="governed rule-registry SQLite path (default: next to --rules)")
     parser.add_argument("--rule-depth", type=int, choices=(1, 2, 3, 4), default=2,
                         help="maximum rule-composition depth (default: %(default)s)")
     parser.add_argument("--rule-max-add", type=int, default=10,
@@ -6732,6 +6742,22 @@ def main() -> int:
             except OSError:
                 kept = "left in place"
             print(f"Ignoring saved dialogue state ({error}); {kept}.")
+    if args.rule_registry is None:
+        args.rule_registry = args.rules.with_name(
+            args.rules.stem + "_registry.sqlite")
+    try:
+        rule_registry = (RuleRegistry.load(args.rule_registry)
+                         if args.rule_registry.is_file() else RuleRegistry())
+    except (ValueError, sqlite3.DatabaseError) as error:
+        stale = args.rule_registry.with_name(
+            args.rule_registry.name + ".stale")
+        try:
+            args.rule_registry.replace(stale)
+            kept = f"saved as {stale}"
+        except OSError:
+            kept = "left in place"
+        print(f"Ignoring saved rule registry ({error}); {kept}.")
+        rule_registry = RuleRegistry()
     rules = CRMSModel(
         args.rules, max_composition_depth=args.rule_depth,
         max_add=args.rule_max_add, max_scale=args.rule_max_scale,
@@ -6743,7 +6769,8 @@ def main() -> int:
         vsa_alpha=args.rule_vsa_alpha,
         vsa_min_similarity=args.rule_vsa_min_similarity,
         vsa_min_margin=args.rule_vsa_min_margin,
-        enable_position_arithmetic=args.rule_enable_position_arithmetic)
+        enable_position_arithmetic=args.rule_enable_position_arithmetic,
+        rule_registry=rule_registry)
     pending_rule = _load_pending_rule(args.rule_session, args.rules)
     if pending_rule and pending_rule[0] in rules._procedures:
         pending_rule = None
@@ -7157,6 +7184,7 @@ def main() -> int:
             _save_pending_candidates(args.candidate_session, args.knowledge,
                                      args.index, pending_candidates, pending_question,
                                      invalidated_candidates)
+            rule_registry.save(args.rule_registry)
             if args.model_db is not None:
                 current_model_memory_state = {
                     path: _memory_file_state(path) for path in model_memory_paths
@@ -9437,6 +9465,62 @@ def main() -> int:
                     for step in procedure)
                 print(f"{instruction}: {steps}")
             continue
+        if line == "/rule-health":
+            health = rule_registry.health()
+            states = ", ".join(
+                f"{state} {count}" for state, count in health["by_state"].items())
+            families = ", ".join(
+                f"{family} {count}" for family, count in health["by_family"].items())
+            print(f"Rule registry: {health['total']} rule(s)")
+            print(f"  states: {states or 'none'}")
+            print(f"  families: {families or 'none'}")
+            print(f"  active without validation: "
+                  f"{health['active_without_validation']}")
+            print(f"  active with no recorded use: "
+                  f"{health['active_zero_utility']}")
+            print(f"  duplicate groups: {len(health['duplicate_groups'])}")
+            print(f"  orphan dependencies: "
+                  f"{len(health['orphan_dependencies'])}")
+            print(f"  scoped auto-accept: "
+                  f"{'on' if health['allow_scoped_auto'] else 'off'}")
+            continue
+        if line.startswith("/rule-detail "):
+            rule_id = line[len("/rule-detail "):].strip()
+            if not rule_id:
+                print("Use: /rule-detail RULE ID")
+                continue
+            if rule_id not in rule_registry:
+                print(f"No rule is registered with ID {rule_id}.")
+                continue
+            record = rule_registry.get(rule_id)
+            print(f"{record.id}: {record.statement}")
+            print(f"  family: {record.family}; state: {record.state}; "
+                  f"trust: {record.trust}; acceptance: {record.acceptance_mode}")
+            if record.scope:
+                print(f"  scope: {record.scope}")
+            validation = record.validation or {}
+            if validation:
+                print(f"  validation: {validation.get('oracle')} "
+                      f"passed={validation.get('passed')} "
+                      f"cases={validation.get('cases')} "
+                      f"independent_sources={validation.get('independent_sources')} "
+                      f"at {validation.get('validated_at')}")
+                if validation.get("detail"):
+                    print(f"  detail: {validation['detail']}")
+            else:
+                print("  validation: none")
+            utility = record.utility
+            print(f"  uses: {utility['applications']} "
+                  f"(successes {utility['successes']}, "
+                  f"corrections {utility['corrections']}); "
+                  f"last used: {utility['last_used'] or 'never'}")
+            if record.dependencies:
+                print(f"  dependencies: {', '.join(record.dependencies)}")
+            recent = record.history[-5:]
+            if recent:
+                print("  history: " + " -> ".join(
+                    str(item.get("action")) for item in recent))
+            continue
         if line.startswith("/accept"):
             parts = line.split()
             if not pending_candidates:
@@ -11187,8 +11271,11 @@ def main() -> int:
                     turn.text += ("\nPlausibility check: entity and action "
                                   "matched, but date evidence conflicts.")
             else:
+                anchor = when_evidence.get("anchor_text")
+                prefix = f"Context: {anchor} " if anchor else ""
                 turn.text = (
-                    f"{when_evidence['text']} [Source: {when_evidence['title']}; "
+                    f"{prefix}{when_evidence['text']} "
+                    f"[Source: {when_evidence['title']}; "
                     "quoted evidence, not an accepted fact]")
                 if current_effort == "thorough":
                     turn.text += ("\nPlausibility check: the named entity, "

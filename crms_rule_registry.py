@@ -205,7 +205,8 @@ class RuleRegistry:
             "validated_at": _now(),
         }
         if passed:
-            record.state = "validated"
+            if record.state != "active":
+                record.state = "validated"
         elif record.state == "active":
             record.state = "contested"
         record.updated_at = _now()
@@ -215,6 +216,40 @@ class RuleRegistry:
             "action": "validate" if passed else "validation-failed",
             "before": before,
             "detail": record.validation,
+        })
+        return record
+
+    def revise(self, rule_id: str, *, statement: str | None = None,
+               payload: Mapping[str, Any] | None = None,
+               provenance: Iterable[Mapping[str, Any]] | None = None,
+               dependencies: Iterable[str] | None = None) -> RuleRecord:
+        """Update a rule's evidence while preserving its lifecycle state."""
+
+        record = self.get(rule_id)
+        if record.state == "retired":
+            raise ValueError(f"cannot revise retired rule: {rule_id!r}")
+        before = self._snapshot(record)
+        if statement is not None:
+            if not statement.strip():
+                raise ValueError("rule statement cannot be empty")
+            record.statement = statement.strip()
+        if payload is not None:
+            record.payload = dict(payload)
+        if provenance is not None:
+            record.provenance = [dict(item) for item in provenance]
+        if dependencies is not None:
+            dependencies = list(dict.fromkeys(str(item) for item in dependencies))
+            unknown = [item for item in dependencies if item not in self._records]
+            if unknown:
+                raise ValueError(f"unknown dependencies: {unknown}")
+            record.dependencies = dependencies
+        record.updated_at = _now()
+        record.version += 1
+        record.history.append({
+            "at": record.updated_at,
+            "action": "revise",
+            "before": before,
+            "detail": {"version": record.version},
         })
         return record
 
@@ -316,7 +351,6 @@ class RuleRegistry:
     def record_use(self, rule_id: str, *, success: bool,
                    saved_work: int = 0) -> RuleRecord:
         record = self.get(rule_id)
-        before = self._snapshot(record)
         record.utility["applications"] += 1
         if success:
             record.utility["successes"] += 1
@@ -325,13 +359,6 @@ class RuleRegistry:
         record.utility["saved_work"] += max(0, int(saved_work))
         record.utility["last_used"] = _now()
         record.updated_at = record.utility["last_used"]
-        record.version += 1
-        record.history.append({
-            "at": record.updated_at,
-            "action": "use",
-            "before": before,
-            "detail": {"success": bool(success), "saved_work": saved_work},
-        })
         return record
 
     def rollback(self, rule_id: str) -> RuleRecord:
@@ -524,7 +551,6 @@ class RuleRegistry:
             "trust": record.trust,
             "acceptance_mode": record.acceptance_mode,
             "validation": json.loads(json.dumps(record.validation)),
-            "utility": json.loads(json.dumps(record.utility)),
             "version": record.version,
         }
 
@@ -535,5 +561,4 @@ class RuleRegistry:
         record.acceptance_mode = str(
             snapshot.get("acceptance_mode", record.acceptance_mode))
         record.validation = snapshot.get("validation")
-        record.utility = dict(snapshot.get("utility", record.utility))
         record.version = int(snapshot.get("version", record.version))

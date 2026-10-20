@@ -31,8 +31,9 @@ def main() -> None:
     evidence = _natural_when_evidence(
         index_with(text), "When was the Eiffel Tower completed?")
     require(evidence is not None
-            and evidence["text"] == ("The Eiffel Tower is a landmark in Paris. "
-                                     "It was completed in 1889.")
+            and evidence["text"] == "It was completed in 1889."
+            and evidence.get("anchor_text") == ("The Eiffel Tower is a landmark "
+                                                "in Paris.")
             and evidence["location"] == "date.txt",
             f"a locally anchored pronoun date was not found: {evidence!r}")
 

@@ -293,12 +293,16 @@ A rising rule count with flat held-out performance is a failure, not progress.
 
 Existing: procedure learning with contrastive probes; frame and morphology
 alignment; rule discovery with held-out validation; primitive proposals; a
-derived-case cache with revalidation; feedback and retraction.
+derived-case cache with revalidation; feedback and retraction; and a governed
+rule registry with lifecycle, validation, scoped auto-accept gates, correction
+propagation, rollback, and SQLite persistence. Learned procedures are mirrored
+into the registry at commit time, use is counted, and forgetting retires the
+rule.
 
-Missing: a unified registry, lifecycle states, scoped auto-accept, utility
-accounting, cross-mechanism conflict detection, drift measurement, and a
-compounding benchmark. Those are the deliverables of §5.9, integrated from
-Phase 2 onward.
+Missing: registry integration for fact frames, inference schemas, domain rules,
+and task plans; cross-mechanism conflict detection; drift measurement; and a
+compounding benchmark over those families. Those are the deliverables of
+§5.9, integrated from Phase 2 onward.
 
 ---
 
@@ -655,3 +659,5 @@ corpus size, it has not advanced the goal.
 | 2026-10-20 | Harness self-check: pass/fail/unsafe detection, duplicate-id rejection | `experiments/v1_545_scorecard_harness.py` |
 | 2026-10-20 | Rule registry v0: lifecycle, validation, scoped auto-accept gates, correction propagation, rollback, SQLite persistence | `crms_rule_registry.py`, `experiments/v1_546_rule_registry_lifecycle.py` |
 | 2026-10-20 | Fixed pronoun date anchoring (determiner normalization, hit filtering, anchor citation); smoke suite now 12/12 with zero known failures | `crms_chat.py`, `experiments/v1_547_pronoun_date_anchor.py`, `experiments/v1_449_cross_paragraph_pronoun_grounding.py`, `experiments/reports/scorecard/2026-10-20-smoke-baseline/report.md` |
+| 2026-10-21 | Procedure learner mirrors learned rules into the registry: validation by demonstration replay, activation, use counts, retirement on forget, reload reconstruction, versioned successors | `crms_model.py`, `experiments/v1_548_rule_registry_integration.py` |
+| 2026-10-21 | Chat loads/saves the registry (default `_registry.sqlite` next to `--rules`) and exposes `/rule-health` and `/rule-detail`; anchor context preserved without widening exact citations | `crms_chat.py`, `CRMS_README.md`, `experiments/v1_527_paragraph_anchored_event_date.py`, `experiments/reports/scorecard/2026-10-21-smoke-baseline/report.md` |

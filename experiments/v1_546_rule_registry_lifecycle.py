@@ -56,13 +56,11 @@ def main() -> None:
             and utility["corrections"] == 1 and utility["saved_work"] == 2,
             f"utility accounting is wrong: {utility}")
 
-    # Rollback restores the prior transition each time: the two uses, then the
-    # activation itself.
-    for _ in range(3):
-        registry.rollback("reverse-phrase")
+    # Rollback undoes the activation; usage telemetry stays independent.
+    registry.rollback("reverse-phrase")
     restored = registry.get("reverse-phrase")
     require(restored.state == "validated"
-            and restored.utility["applications"] == 0,
+            and restored.utility["applications"] == 2,
             "rollback did not restore the pre-activation state")
 
     # A failing revalidation of an active rule contests it, not silently keeps it.
@@ -188,8 +186,8 @@ def main() -> None:
                 "persistence lost rules")
         restored_reverse = restored.get("reverse-phrase")
         require(restored_reverse.state == "contested"
-                and restored_reverse.utility["applications"] == 1
-                and restored_reverse.utility["saved_work"] == 3,
+                and restored_reverse.utility["applications"] == 3
+                and restored_reverse.utility["saved_work"] == 5,
                 "persistence lost lifecycle or utility state")
         require(restored.get("auto-lexical").acceptance_mode == "scoped-auto"
                 and restored.allow_scoped_auto,

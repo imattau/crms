@@ -420,6 +420,18 @@ knowledge and rule tables, verify them against compatibility payloads, and
 install writable SQLite sidecars for chat. Existing v1 and v2 model files
 remain readable.
 
+Learned procedures are also mirrored into a governed rule registry. Each
+committed instruction-to-procedure rule records its scope, provenance,
+demonstrations, validation, lifecycle state, and use count. A rule is
+validated by replaying its stored demonstrations against the committed
+procedure before it becomes active; forgetting the instruction retires it.
+The registry defaults to a `_registry.sqlite` file next to `--rules`; pass
+`--rule-registry PATH` to choose another path. `/rule-health` summarizes rule
+states, validation gaps, duplicates, and orphan dependencies, and
+`/rule-detail ID` shows one rule's evidence and history. The registry is a
+local sidecar in this first integration; packaging it inside portable model
+files is later work.
+
 The parameterized rule family can also discover multipliers beyond doubling:
 
 ```python

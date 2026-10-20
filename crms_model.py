@@ -33,6 +33,7 @@ from itertools import combinations, product
 from pathlib import Path
 from typing import Any, Iterable
 from crms_text import casefold_nfc, tokens as normalized_tokens
+from crms_rule_registry import RuleRecord, RuleRegistry
 
 
 _RULE_DB_APPLICATION_ID = int.from_bytes(b"CRUL", "big")
@@ -3361,7 +3362,8 @@ class CRMSModel:
                  max_repeat: int = 4,
                  max_position_stride: int = 6,
                  max_search_expansions: int = 250_000,
-                 enable_position_arithmetic: bool = False):
+                 enable_position_arithmetic: bool = False,
+                 rule_registry: RuleRegistry | None = None):
         if max_composition_depth not in (1, 2, 3, 4):
             raise ValueError('max_composition_depth must be 1, 2, 3, or 4')
         if max_add < 1:
@@ -3469,8 +3471,13 @@ class CRMSModel:
             tuple[str, ...], tuple[int, set[str]]
         ] | None = None
         self._ordinal_number_phrase_cache: set[tuple[str, ...]] | None = None
+        if rule_registry is not None and not isinstance(rule_registry, RuleRegistry):
+            raise ValueError('rule_registry must be a RuleRegistry or None')
+        self.rule_registry = rule_registry
         if self.memory_path and self.memory_path.exists():
             self.load()
+        if self.rule_registry is not None:
+            self.sync_rule_registry()
 
     @staticmethod
     def _clean_instruction(instruction: str) -> str:
@@ -5830,6 +5837,171 @@ class CRMSModel:
                 candidates[_semantic_key(procedure)] = procedure
         return [candidates[key] for key in sorted(candidates)]
 
+    @staticmethod
+    def _procedure_rule_id(phrase: str) -> str:
+        digest = hashlib.sha256(
+            f"procedure:{phrase}".encode("utf-8")).hexdigest()[:16]
+        return f"procedure-{digest}"
+
+    def _procedure_rule_payload(
+            self, phrase: str, procedure: tuple[Step, ...]
+            ) -> tuple[dict[str, Any], list[dict[str, Any]], int, int]:
+        """Build a bounded, serializable rule record for a learned procedure."""
+        examples = self._examples.get(phrase, [])
+        sources = self._example_sources.get(phrase, [])
+        labelers = self._example_labelers.get(phrase, [])
+        instruction_sources = self._instruction_sources.get(phrase, [])
+        demonstrations: list[dict[str, Any]] = []
+        provenance: list[dict[str, Any]] = []
+        for index, (inputs, outputs) in enumerate(examples[:20]):
+            source = sources[index] if index < len(sources) else None
+            labeler = labelers[index] if index < len(labelers) else None
+            instruction_source = (instruction_sources[index]
+                                  if index < len(instruction_sources) else None)
+            demonstrations.append({
+                "input": list(inputs),
+                "output": list(outputs),
+            })
+            provenance.append({
+                "kind": "demonstration",
+                "index": index,
+                "source_id": source,
+                "labeler_id": labeler,
+                "instruction_source_id": instruction_source,
+            })
+        distinct_sources = len({
+            source for source in sources if isinstance(source, str) and source})
+        payload = {
+            "origin": "crms_model",
+            "instruction": phrase,
+            "procedure": _procedure_dict(procedure),
+            "demonstrations": demonstrations,
+            "example_count": len(examples),
+            "max_composition_depth": self.max_composition_depth,
+        }
+        return payload, provenance, len(examples), distinct_sources
+
+    def register_procedure_rule(self, phrase: str) -> RuleRecord | None:
+        """Register or refresh the rule record for a learned procedure."""
+        registry = self.rule_registry
+        if registry is None:
+            return None
+        procedure = self._procedures.get(phrase)
+        if procedure is None:
+            return None
+        payload, provenance, cases, independent_sources = (
+            self._procedure_rule_payload(phrase, procedure))
+        examples = self._examples.get(phrase, [])
+        passed = bool(examples) and all(
+            _apply_procedure(procedure, list(inputs)) == list(outputs)
+            for inputs, outputs in examples)
+        statement = f"procedure rule for instruction: {phrase}"
+        scope = f"integer lists; composition depth <= {self.max_composition_depth}"
+
+        rule_id = self._procedure_rule_id(phrase)
+        existing = registry.get(rule_id) if rule_id in registry else None
+        if existing is not None and existing.state == "retired":
+            version = 2
+            while f"{rule_id}-v{version}" in registry:
+                version += 1
+            rule_id = f"{rule_id}-v{version}"
+            existing = None
+        if existing is None:
+            registry.propose(
+                rule_id=rule_id,
+                family="procedure",
+                statement=statement,
+                scope=scope,
+                payload=payload,
+                provenance=provenance,
+                trust="taught",
+            )
+        else:
+            current_validation = existing.validation or {}
+            unchanged = (
+                existing.payload == payload
+                and existing.provenance == provenance
+                and bool(current_validation.get("passed")) == passed
+                and int(current_validation.get("cases", -1)) == cases
+                and int(current_validation.get("independent_sources", -1))
+                == independent_sources
+            )
+            if unchanged and existing.state == "active":
+                return existing
+            registry.revise(
+                rule_id,
+                statement=statement,
+                payload=payload,
+                provenance=provenance,
+            )
+        registry.validate(
+            rule_id,
+            oracle="stored-demonstration-parity",
+            passed=passed,
+            cases=cases,
+            independent_sources=independent_sources,
+            detail=("all stored demonstrations replayed against the committed "
+                    "procedure" if passed else
+                    "the committed procedure did not replay a stored demonstration"),
+        )
+        record = registry.get(rule_id)
+        if passed and record.state in {"proposed", "validated"}:
+            registry.activate(rule_id, mode="review", authoriser="teacher")
+        return registry.get(rule_id)
+
+    def sync_rule_registry(self) -> None:
+        """Mirror learned procedures into the registry and retire stale ones."""
+        registry = self.rule_registry
+        if registry is None:
+            return
+        for phrase in sorted(self._procedures):
+            base_id = self._procedure_rule_id(phrase)
+            if base_id in registry and registry.get(base_id).state == "retired":
+                # A retired rule is not silently revived on startup. Explicit
+                # re-teaching goes through teach() and creates a successor.
+                continue
+            self.register_procedure_rule(phrase)
+        for record in registry.records(family="procedure"):
+            if record.state == "retired":
+                continue
+            if record.payload.get("origin") != "crms_model":
+                continue
+            phrase = record.payload.get("instruction")
+            if phrase not in self._procedures:
+                registry.retire(
+                    record.id, reason="procedure is no longer learned")
+
+    def _retire_procedure_rule(self, phrase: str, reason: str) -> None:
+        registry = self.rule_registry
+        if registry is None:
+            return
+        for record in registry.records(family="procedure"):
+            if record.state == "retired":
+                continue
+            if record.payload.get("instruction") == phrase:
+                registry.retire(record.id, reason=reason)
+
+    def _record_procedure_use(self, instruction: str,
+                              result: Prediction) -> None:
+        registry = self.rule_registry
+        if registry is None or result.status != "ok":
+            return
+        key = self._canonical_instruction_storage_key(
+            self._clean_instruction(instruction))
+        if key not in self._procedures:
+            return
+        rule_id = self._procedure_rule_id(key)
+        if rule_id in registry:
+            registry.record_use(rule_id, success=True)
+            return
+        for record in registry.records(family="procedure", state="active"):
+            if record.payload.get("instruction") == key:
+                registry.record_use(record.id, success=True)
+                return
+
+    def rule_health(self) -> dict[str, Any] | None:
+        return None if self.rule_registry is None else self.rule_registry.health()
+
     def teach(self, instruction: str,
               examples: Iterable[tuple[Iterable[int], Iterable[int]]],
               *, replace: bool = False,
@@ -5951,6 +6123,7 @@ class CRMSModel:
             self._no_fit_records.pop(key, None)
             self._ambiguity_probe_cache.pop(key, None)
             self._invalidate_language_indexes()
+            self.register_procedure_rule(key)
             self._save_if_configured()
             return LearnResult('learned', key, len(evidence), 1,
                                procedure=_procedure_dict(candidates[0]),
@@ -6053,6 +6226,11 @@ class CRMSModel:
                           instruction_source_ids=instruction_sources)
 
     def predict(self, instruction: str, values: Iterable[int]) -> Prediction:
+        result = self._predict(instruction, values)
+        self._record_procedure_use(instruction, result)
+        return result
+
+    def _predict(self, instruction: str, values: Iterable[int]) -> Prediction:
         key = self._clean_instruction(instruction)
         requested_key = key
         xs = self._clean_values(values)
@@ -6558,6 +6736,7 @@ class CRMSModel:
         self._ambiguity_probe_cache.pop(key, None)
         self._candidate_space_cache.pop(key, None)
         self._invalidate_language_indexes()
+        self._retire_procedure_rule(key, "procedure forgotten")
         self._save_if_configured()
         return existed
 
