@@ -1,6 +1,6 @@
 # Focused plan from current CRMS to its goal
 
-**Reviewed:** 2026-10-20 (runtime probes through `v1_524`)
+**Reviewed:** 2026-10-20 (runtime probes through `v1_524`; dialogue topic-switch failure under repair)
 **Status:** active; the capability goal is not yet demonstrated.
 
 ## Goal
@@ -52,6 +52,19 @@ now answer in a copied-index CLI replay, including a sentence with both an
 individual object mention and its total. This advances a named language seam;
 three claims from two pages do not establish broad count comprehension or
 change the overall transfer assessment.
+
+A fresh dialogue drive has exposed another release-gate failure: after
+switching from Marie Curie to Albert Einstein, the follow-up “Where was he
+born?” can return a confidently cited birthplace for Luke Baldwin. The switch
+turn may be source-only or review-only, and a specialized WHERE route was
+reading the raw pronoun rather than the dialogue-resolved question. A focused
+repair is in progress: preserve an explicitly named topic across source-only
+and review-only turns, and run the WHERE specialization on the resolved
+question while refusing a raw pronoun as an entity. This is not yet verified
+and does not close the independent dialogue-transfer gate. Keep the original
+Eiffel Tower/Colosseum example and this Marie Curie/Einstein example as separate
+permanent controls; also check a fresh conversation with no antecedent so
+pronouns cannot bind opportunistically to unrelated corpus sentences.
 
 ## Execution order
 
@@ -164,16 +177,18 @@ gaps, not to claim parity.
 
 ## Immediate next action
 
-The next capability packet must transfer the existing reasoning-to-procedure
-composition beyond curated demonstrations. Freeze an independently authored
-packet over real source-backed material; vary held-out entities, evidence
-order, layout, and request forms; include partial, unsupported, conflicting,
-and multi-source cases; and use an independent checker. Run it through fresh
-CLI processes and a copied model. Keep the original Danube irrelevant-evidence
-case and the reported Colosseum/Eiffel pronoun failure as explicit quality gates.
-Continue source-rule quality work in parallel, but keep derived write-back
-review-gated until recombination, correction, and invalidation pass on held-out
-tasks.
+The immediate task is to finish and verify the in-progress dialogue repair
+against both reported topic-switch cases, source-only/review-only context
+carryover, “why?” anchoring, and a no-antecedent pronoun control. Then freeze a
+small independent multi-entity conversation set and establish task-level
+outcomes, not only intent-label agreement. If this gate passes, the next
+capability packet transfers reasoning-to-procedure composition beyond curated
+demonstrations: use real source-backed material; vary held-out entities,
+evidence order, layout, and request forms; include partial, unsupported,
+conflicting, and multi-source cases; and check results independently in fresh
+CLI processes and a copied model. Keep source-rule quality research moving in
+parallel. Keep derived write-back review-gated until recombination, correction,
+and invalidation pass on held-out tasks.
 
 For detailed implementation history and experiment evidence, see
 [`focused_roadmap_to_goal.md`](focused_roadmap_to_goal.md) and
