@@ -12,7 +12,9 @@ person-to-city “visited” relation is filtered by its mismatched object type.
 Every proposal is explicitly `investigate_only`, carries citations for the
 relation examples and role types, and cannot be accepted through this path.
 The fresh chat command preserves that warning and does not alter facts or
-frames.
+frames. The follow-up trust-boundary check confirms that a role type with an
+explicit negative conflict or contextual qualifier does not participate in
+candidate generation.
 
 This synthetic fixture confirms a useful, higher-recall investigation signal,
 not synonym discovery: type compatibility alone is too weak to license an
@@ -22,10 +24,11 @@ into learned rules automatically.
 
 ## Current cross-domain regression replay (2026-10-20)
 
-Code snapshot: commit `1531b26` (`Probe role-compatible source relation
-candidates`). The checkout also contained user-owned dialogue artifacts and an
-edited corpus-audit report; the runner gave each experiment an isolated
-temporary working directory, and none of those files was used as a fixture.
+Code snapshot: commit `69158a4` (`Exclude conflicted types from candidate
+discovery`), including the role-type trust-boundary fix. The checkout also
+contained user-owned dialogue artifacts and an edited corpus-audit report; the
+runner gave each experiment an isolated temporary working directory, and none
+of those files was used as a fixture.
 
 Command:
 
