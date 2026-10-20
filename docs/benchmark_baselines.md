@@ -20,6 +20,46 @@ alignment. It gives no estimate of real-corpus precision. Continue only with
 held-out examples and direct semantic validation; do not turn these candidates
 into learned rules automatically.
 
+## Current cross-domain regression replay (2026-10-20)
+
+Code snapshot: commit `1531b26` (`Probe role-compatible source relation
+candidates`). The checkout also contained user-owned dialogue artifacts and an
+edited corpus-audit report; the runner gave each experiment an isolated
+temporary working directory, and none of those files was used as a fixture.
+
+Command:
+
+```sh
+python3 run_experiments.py --match 327 --match v1_242 --match v1_376 \
+  --match v1_357 --match v1_207 --match v1_389 --match v1_413_source \
+  --match v1_414_persisted_source --match v1_427 --match v1_449 \
+  --match v1_436_source_derived --match v1_437_heldout_publisher \
+  --match v1_448 --match v1_250 --match v1_192 --match v1_379 --timeout 300
+```
+
+All 17 selected diagnostics passed in 13.93 seconds:
+
+| Capability slice | Diagnostics | Result |
+| --- | --- | ---: |
+| Paraphrase transfer and retrieval | `v1_327`, `v1_242` (2 diagnostics) | 2/2 passed |
+| Source-derived rules and procedure recombination | `v1_250`, `v1_436`, `v1_437`, `v1_448` | 4/4 passed |
+| Verified reasoning and governed learning | `v1_192`, `v1_376`, `v1_379` | 3/3 passed |
+| Math/code and translation | `v1_357`, `v1_207` | 2/2 passed |
+| Creative revision | `v1_389` | 1/1 passed |
+| Dialogue continuity and evidence grounding | `v1_413`, `v1_414`, `v1_427`, `v1_449` | 4/4 passed |
+| **Total** | **17 diagnostics** | **17/17 passed** |
+
+This is a regression sweep across separately designed experiments. Their
+fixtures, difficulty, and scoring differ, so the pass count is not a shared
+accuracy score, a representative user-task distribution, or a comparison with
+a 70B-class model. It confirms that these specific paths still satisfy their
+assertions on the current code snapshot. Broad conversation quality, independent
+human assessment of creative work, and reliable autonomous rule discovery from
+raw source documents remain unmeasured. The separate `v1_450` role-compatibility
+probe also shows a false created/praised candidate; it must not be folded into
+the passing source-learning evidence as if candidate recall proved rule
+learning.
+
 ## Cross-paragraph source pronoun grounding (2026-10-20)
 
 Command: `python3 experiments/v1_449_cross_paragraph_pronoun_grounding.py`.

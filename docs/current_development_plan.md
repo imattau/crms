@@ -32,6 +32,15 @@ than in natural-language coverage; and dialogue/intent evidence remains narrow.
 The project has not shown that a copied SQLite model can support its full
 learning and correction lifecycle without the original source files.
 
+The current code snapshot (`1531b26`) passed a 17-diagnostic cross-domain
+regression replay covering language, recombination, reasoning, dialogue,
+translation, math/code, and creative revision. These diagnostics use separate
+fixtures and scoring, so 17/17 is a regression result, not a unified capability
+score. The role-compatible candidate probe (`v1_450`) also surfaced a false
+created/praised match, reinforcing that candidate yield is not learned-rule
+precision. These results preserve tested paths but do not close the generality
+gap.
+
 The overall direction is sound, but CRMS is not yet on track to claim its
 capability destination. Progress now depends on integrated, held-out outcomes,
 not more isolated demonstrations or a larger corpus.
