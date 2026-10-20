@@ -432,7 +432,7 @@ recombination with already reviewed components.
 ### Next execution card
 
 This is the order for the next development cycle, based on the current checkout
-(`e82ed10`, 2026-10-20). Recheck reported behavior before changing code;
+(`9058c6c`, 2026-10-20). Recheck reported behavior before changing code;
 historical reports describe earlier snapshots and should not trigger duplicate
 fixes.
 
@@ -446,7 +446,7 @@ fixes.
 | 6 | **Widen task breadth one validated slice at a time.** Use the same natural-language path for distinct math, coding, translation and creative tasks. Define held-out prompts, an independent checker or quality rubric, negative cases and repair behavior before implementation. | Per-domain ordinary-chat results for coverage, correctness/quality, unsupported outputs, provenance, repair and runtime. | Each domain shows useful held-out completion and honest limits before cross-domain composition or broader claims. Strong 70B-class systems remain a qualitative reference for breadth, paraphrase, completeness and interaction, not a parity target. |
 | 7 | **Validate SQLite as the distributable runtime.** Once learning and correction stabilize, copy the model to a clean location without source files and replay the shared scorecard using the copy alone. | Reproducible copy-only query, search, learning, composition, reasoning, explanation, correction and reload report, with size and compatibility notes. | Tested behavior, searchable source text, rules, provenance and correction lineage survive without the original files. |
 
-**Current checkpoint (`e82ed10`, 2026-10-20):** the focused multi-turn
+**Current checkpoint (`9058c6c`, 2026-10-20):** the focused multi-turn
 regression packet was reported passing 8/8, including topic switching,
 source-only continuity, history, ordinal selection and follow-ups after
 abstention. These are targeted controls, not independent dialogue-transfer
@@ -456,6 +456,16 @@ answers through chat; unknown or conflicting inputs are blocked. The recent
 `v1_497`–`v1_502` sequence also covers governed practice artifacts, learned
 operation/connective transfer and entity/value changes. These remain controlled,
 mostly authored demonstrations, not independent task-transfer evidence.
+
+`v1_503` adds one sum-first frame: “Sum every value in … that Mira reaches.”
+Before the operation phrase is taught it abstains; after contrastive examples,
+the learned operation composes with proof-selected values, explicit negative
+evidence and a checked sum through copied-model fresh chat. Unknown values still
+block output. This validates one new language frame and phrase-learning path,
+not open-ended paraphrase. The most useful next probe is a frozen set of
+independently written formulations of the same request, including varied
+clause order, aggregate wording, and non-list task types, with baseline coverage
+recorded before changing the parser or teaching aliases.
 
 The immediate bottleneck is therefore no longer “can the components compose in
 a fixture?” It is whether a fresh user request can cause CRMS to select and
