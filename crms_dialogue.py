@@ -816,6 +816,29 @@ class CRMSDialogue:
                 options.setdefault(binding[0], resolved)
             self._pronoun_options = list(options.items())
 
+        # A named query topic is not enough to resolve a gendered pronoun
+        # when the quoted evidence introduced multiple people. The system has
+        # no licensed gender model, and answering from whichever name is the
+        # current topic silently rewrites the user's reference. Keep the
+        # candidate bindings available so the caller can offer an explicit
+        # clarification instead.
+        gendered = {match.group(0).casefold() for match in pronouns} & {
+            "he", "she", "him", "her"}
+        source_entities = list(dict.fromkeys(
+            item.get("entity", "") for item in self.source_mentions
+            if item.get("entity")))
+        if (not local_entities and gendered and len(source_entities) > 1):
+            choices = "; ".join(
+                f"{item['entity']} [Source: {item.get('title') or 'source'}]"
+                for item in self.source_mentions
+                if item.get("entity"))
+            pronoun = next(match.group(0) for match in pronouns
+                           if match.group(0).casefold() in gendered)
+            return None, (
+                f"The last quoted source mentions {choices}. I can't infer "
+                f"which person '{pronoun}' refers to. Which entity do you "
+                "mean? Please restate the question with that name.")
+
         # The current topic is the discourse anchor for a single referential
         # follow-up. Do this before probing which bindings happen to have
         # stored answers: evidence availability must not pull a pronoun back
