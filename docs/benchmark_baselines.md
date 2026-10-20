@@ -2752,6 +2752,26 @@ test transfer across publishers before adding automatic rule learning. This
 supports the roadmap’s emphasis on recombination and self-learning rules while
 keeping those capabilities unclaimed until their evidence gates pass.
 
+## Reviewed real-corpus phrase learning through chat (`v1_469`, 2026-10-20)
+
+`experiments/v1_469_real_corpus_predicate_learning.py` takes the candidate
+previously reviewed as `capital city of` → `capital of` and copies six cited
+pages from the local SimpleWiki research index into an isolated temporary
+index. The candidate remains inert before acceptance. CRMS revalidates the
+field and prose citations, learns the question frame from five pages, validates
+it on one held-out page, saves the accepted facts and frame to SQLite, reloads
+them, and answers through a fresh `crms_chat.py` process with a resolvable
+source. The unsupported “largest city of” wording remains unknown. The
+experiment passed in 0.49 seconds under the isolated runner.
+
+This closes one real-source integration seam from candidate review through
+ordinary chat and persistence. It does not clear the source-learning gate:
+the field-to-relation mapping and question construction are hand-coded, the
+Codex review is unblinded, and all pages come from SimpleWiki. It also does not
+demonstrate publisher transfer or autonomous rule induction. Keep the
+existing synthetic `v1_338` path as a regression; use `v1_469` as the real-page
+vertical slice, not as a precision estimate.
+
 ## Unsupported dialogue topic switch and `why?` (`v1_465`, 2026-10-20)
 
 `experiments/v1_465_dialogue_unsupported_topic_switch.py` freezes the reported

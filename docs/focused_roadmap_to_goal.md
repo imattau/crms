@@ -60,6 +60,15 @@ precision result. Keep candidate generation report-only; next freeze a
 typed-feature proposal method and evaluate candidates plus non-proposals
 blindly on publisher-disjoint sources. See the [follow-up report](../experiments/reports/v1_468_pair_overlap_discovery.json).
 
+`v1_469` now carries the reviewed `capital city of` candidate from actual
+SimpleWiki pages through explicit acceptance, a five-page training/one-page
+holdout check, SQLite reload, and fresh-process cited chat; an unsupported
+relation wording remains unknown. This is stronger end-to-end source evidence
+than the synthetic `v1_338` fixture, but it still uses the hand-coded capital
+field map, Codex review, and one encyclopedia. It does not clear the
+publisher-transfer or autonomous-learning gate. Keep it as an integration
+control while developing and measuring a frozen candidate method.
+
 | Order | Work packet | Immediate outcome | Do not claim yet |
 |---|---|---|---|
 | 1 | Validate dialogue transfer and safety | Preserve current clean-process regressions; test independently authored transcripts, varied layouts, visible-context carryover, topic switching, repairs, and history questions. Measure wrong referents, omissions, clarifications, and task completion separately. | Robust open-domain conversation from authored fixtures. |
