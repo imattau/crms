@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import subprocess
 import re
+import shutil
 import sys
 import tempfile
 from dataclasses import dataclass
@@ -23,6 +24,8 @@ from crms_codegen import generate_python
 from crms_knowledge import CRMSKnowledgeBase
 from crms_math import CRMSMath
 from crms_model import CRMSModel
+from crms_package import (export_model_database, inspect_model_database,
+                          model_database_research_stats)
 from crms_research import CRMSResearchIndex
 from crms_translation import CRMSTranslation
 
@@ -410,6 +413,67 @@ def main() -> None:
         require(all(namespace["transform"](values) == expected
                     for values, expected in HELD_OUT),
                 "generated artifact failed the held-out lists")
+
+        # Reintegrate the reviewed operation rule, its label/source lineage,
+        # and the searchable source text into a portable SQLite model. The
+        # clean-process check must start with that single file only.
+        portable_knowledge = root / "portable-knowledge.sqlite"
+        portable_rules = root / "portable-rules.sqlite"
+        CRMSKnowledgeBase().save(portable_knowledge)
+        restored.save(portable_rules)
+        portable = root / "portable-model.sqlite"
+        export_model_database(
+            portable, knowledge=portable_knowledge, rules=portable_rules,
+            research_index=root / "index.json")
+        require({"knowledge", "rules"} <= inspect_model_database(portable).keys(),
+                "portable model omitted its knowledge or accepted procedure rules")
+        portable_sources = model_database_research_stats(portable)
+        require(portable_sources is not None
+                and portable_sources["documents"] == 4,
+                f"portable model omitted source text: {portable_sources}")
+        clean_dir = root / "clean-portable"
+        clean_dir.mkdir()
+        clean_model = clean_dir / "model.sqlite"
+        shutil.copy2(portable, clean_model)
+        for source_path in (portable_knowledge, portable_rules,
+                            root / "index.json", root / "rules.json",
+                            root / "knowledge.json", root / "math.json",
+                            root / "translations.json"):
+            source_path.unlink(missing_ok=True)
+        require(list(clean_dir.iterdir()) == [clean_model],
+                "clean chat did not start with only the copied model file")
+        portable_chat = subprocess.run(
+            [sys.executable, str(PROJECT / "crms_chat.py"),
+             "--model-db", str(clean_model),
+             "--dialogue-state", str(clean_dir / "dialogue.json"),
+             "--candidate-session", str(clean_dir / "candidates.json"),
+             "--rule-session", str(clean_dir / "rule-session.json"),
+             "--math-session", str(clean_dir / "math-session.json"),
+             "--translation-session", str(clean_dir / "translation-session.json")],
+            input=(f"Write Python code to {candidate.phrase}\n/quit\n"),
+            text=True, capture_output=True, cwd=clean_dir, timeout=120,
+            check=False)
+        require(portable_chat.returncode == 0,
+                "copied model failed to start fresh chat: "
+                f"{portable_chat.stderr}\n{portable_chat.stdout}")
+        code_blocks = re.findall(
+            r"```python\n(.*?)```", portable_chat.stdout, re.DOTALL)
+        require(len(code_blocks) == 1
+                and f"Generated Python for '{candidate.phrase}'"
+                    in portable_chat.stdout,
+                "copied model did not generate the learned operation in chat: "
+                f"{portable_chat.stdout[-1200:]}")
+        portable_namespace: dict[str, object] = {}
+        exec(compile(code_blocks[0], "<portable-reviewed-sort>", "exec"),
+             portable_namespace)
+        require(all(portable_namespace["transform"](values) == expected
+                    for values, expected in HELD_OUT),
+                "code generated from the copied model failed held-out inputs")
+        require(prose_citation in code_blocks[0]
+                and candidate.phrase in code_blocks[0]
+                and PYTHON_SOURCE[0] in code_blocks[0],
+                "portable artifact lost phrase/source/example provenance")
+
         reverse_artifact = generate_python(restored, reverse_candidate.phrase)
         require(reverse_artifact is not None,
                 "reviewed reverse proposal generated no artifact")
@@ -509,6 +573,7 @@ def main() -> None:
     print("two-origin prose/code evidence proposed a phrase mapping: PASS")
     print("proposal remained review-only and preserved exact citations: PASS")
     print("reviewed rule learned, persisted, and passed three held-out lists: PASS")
+    print("copied SQLite model generated an independently checked artifact: PASS")
     print("descending, negated, mentioned-phrase, unrelated, tampered, and "
           "single-origin controls rejected: PASS")
     print("controlled source-text controls: 0 false candidates in 7 cases")

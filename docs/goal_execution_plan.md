@@ -39,7 +39,11 @@ reasoning is ahead of natural-language routing and broad rule learning.
 The copied SQLite model now carries one reviewed real-source phrase through
 acceptance, held-out checking, fresh-process chat, and removal of original
 source files; this is a useful packaging slice, not validation of the full
-learning and correction lifecycle.
+learning and correction lifecycle. The extended `v1_436` additionally exports
+a reviewed procedure rule with its source text, then generates and executes
+held-out code from a clean copied model. This closes the operation-rule
+packaging seam, while candidate extraction and mapping remain cue-based and
+Codex-reviewed.
 
 Recent regressions and component passes should be kept as controls, not
 combined into an overall success percentage. In particular, passing scripted
@@ -66,9 +70,12 @@ five-page train/one-page holdout, SQLite reload, fresh-process chat, and a
 copied portable model with original files removed. The field mapping remains
 hand-coded, Codex supplies review, and there is no second-publisher transfer
 result. Treat this as an end-to-end integration control, not autonomous rule
-learning. These findings keep independent dialogue transfer and source-rule
-discovery as open gates; recombination and reasoning remain the central
-capability bet.
+learning. The `v1_436` portable procedure check likewise demonstrates a
+learned rule can be distributed and used, but it does not demonstrate the
+multi-step recombination, reasoning, correction, and derived-case lifecycle
+in the copied model. These findings keep independent dialogue transfer and
+source-rule discovery as open gates; recombination and reasoning remain the
+central capability bet.
 
 ## Operating principles
 

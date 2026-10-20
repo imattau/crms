@@ -2041,6 +2041,18 @@ experiment with explicit human review and substantial labeler effort for
 reverse. It does not establish autonomous phrase induction, general language
 learning, or a production review feature.
 
+The 2026-10-20 follow-up extends `v1_436` through model distribution. It saves
+the accepted procedure and knowledge into SQLite, embeds the four cited
+source documents in a single portable model, copies only that model into a
+clean directory, and starts a fresh chat process with no source or memory
+files. CRMS generates Python for the reviewed sort phrase; the exact emitted
+artifact is parsed and executed against three held-out lists, and its embedded
+provenance retains the source phrase and Python example identifiers. The
+runtime experiment passed. This closes a packaging and execution seam for one
+Codex-reviewed, cue-extracted operation rule; the candidate extractor and
+review remain hand-guided, and recombination, correction, or general learning
+from the copied model are not established by this result.
+
 ## Publisher- and sentence-form source phrase transfer (2026-10-20)
 
 Command: `python3 experiments/v1_437_heldout_publisher_phrase_review.py`.
