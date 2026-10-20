@@ -28,6 +28,12 @@ REQUESTS = (
     "From 23, 5, 23, and 8, sum every value Mira reaches.",
     "For 23, 5, 23, and 8, sum every value Mira reaches.",
 )
+LINKED_FILTER_SUM = (
+    "Which values in 23, 5, 23, and 8 does Mira reach, and what do they sum to?"
+)
+UNKNOWN_LINKED_FILTER_SUM = (
+    "Which values in 23, 5, 11, and 8 does Mira reach, and what do they sum to?"
+)
 UNKNOWN_REQUEST = "Mira reaches some of 23, 5, 11, and 8. Sum every value."
 UNLICENSED_ALIAS = "Mira reaches some of 23, 5, 23, and 8. Add up every value."
 MULTIPLE_LISTS = (
@@ -53,6 +59,18 @@ def main() -> None:
                 and result.output_values == (51,)
                 for result in answers),
             f"the same licensed parts did not compose across clause order: {answers}")
+
+    linked = compose_verified_filter(LINKED_FILTER_SUM, knowledge, procedures)
+    require(linked is not None and linked.status == "answered"
+            and linked.included_values == (23, 5, 23)
+            and linked.output_values == (51,),
+            f"the linked WH filter-and-sum question failed: {linked}")
+    unknown_linked = compose_verified_filter(
+        UNKNOWN_LINKED_FILTER_SUM, knowledge, procedures)
+    require(unknown_linked is not None and unknown_linked.status == "unknown"
+            and unknown_linked.unresolved_values == (11,)
+            and not unknown_linked.output_values,
+            f"linked WH composition used an unknown value: {unknown_linked}")
 
     unknown = compose_verified_filter(UNKNOWN_REQUEST, knowledge, procedures)
     require(unknown is not None and unknown.status == "unknown"
@@ -97,16 +115,20 @@ def main() -> None:
         output = run_chat(
             session, session / knowledge_path.name,
             session / procedure_path.name, session / index_path.name,
-            (REQUESTS[0], "why?"))
+            (REQUESTS[0], LINKED_FILTER_SUM, "why?"))
         require("Their total is 51." in output
+                and "Verified values satisfying the relation 'Mira reaches': "
+                    "[23, 5, 23]" in output
                 and "mira:record-23" in output
                 and "mira:record-5" in output
                 and "mira:record-8-negative" in output
                 and "Because Mira" in output
+                and "Handling 2 explicit questions separately." not in output
                 and "Traceback" not in output,
                 f"fresh chat failed to retain proof-grounded composition:\n{output}")
 
     print("compositional parsing handles three reordered forms: PASS")
+    print("linked WH filter-and-sum stays one task and rejects unresolved values: PASS")
     print("positive, negative, learned-procedure and proof gates remain active: PASS")
     print("unknown values, competing claims, multiple lists, and unlicensed aliases abstain: PASS")
     print("copy-only fresh chat answers and explains the reordered request: PASS")

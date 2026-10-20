@@ -13,13 +13,19 @@ import json
 import re
 from typing import Any
 
-from crms_knowledge import CRMSKnowledgeBase
+from crms_knowledge import (
+    CRMSKnowledgeBase, _analyze_predicate_spelling,
+)
 from crms_model import CRMSModel
 from crms_rule_proof import verify_inference_proof
 
 
 _INTEGER_LIST = (
     r"-?\d+(?:\s*,\s*-?\d+)*(?:\s*,?\s+and\s+-?\d+)?")
+_FILTER_AND_SUM_QUESTION = re.compile(
+    rf"^\s*Which\s+values?\s+in\s+(?P<values>{_INTEGER_LIST})\s+"
+    r"does\s+(?P<claim>.+?),\s*and\s+what\s+do\s+they\s+"
+    r"sum\s+to\s*[.!?]*\s*$", re.IGNORECASE)
 _REQUESTS = (
     re.compile(
         rf"^\s*(?P<procedure>sum\s+every\s+value)\s+in\s+"
@@ -52,6 +58,11 @@ _REQUESTS = (
         r"(?P<claim>.+?),\s*(?:and\s+)?then\s+"
         r"(?P<procedure>.+?)\s*[.!?]*\s*$", re.IGNORECASE),
 )
+
+
+def is_explicit_filter_and_sum_question(message: str) -> bool:
+    """Identify one linked filter-and-sum question that should stay intact."""
+    return _FILTER_AND_SUM_QUESTION.fullmatch(message) is not None
 
 
 def _normalize_procedure_sequence(instruction: str) -> str:
@@ -232,13 +243,29 @@ def _relation_and_subject(claim: str, knowledge: CRMSKnowledgeBase
     relations.update(rule.conclusion_relation
                      for rule in knowledge._inference_rules.values())
     matches: set[tuple[str, str]] = set()
-    folded = " ".join(claim.casefold().split())
     for relation in relations:
-        suffix = " ".join(relation.casefold().split())
-        if folded.endswith(" " + suffix):
-            subject = claim[:len(claim) - len(relation)].strip()
+        relation_words = tuple(re.findall(r"\w+", relation.casefold()))
+        suffix = r"\s+".join(re.escape(word) for word in relation_words)
+        match = re.search(r"(?<!\w)" + suffix + r"\s*$", claim,
+                          flags=re.IGNORECASE)
+        if match is not None:
+            subject = claim[:match.start()].strip()
             subject = re.sub(r"\s+is\s+(?:a|an)\s*$", "", subject,
                              flags=re.IGNORECASE).strip()
+            if subject:
+                matches.add((subject, relation))
+            continue
+        if len(relation_words) == 1:
+            predicate = re.search(r"(?P<word>\w+)\s*$", claim)
+            if predicate is None:
+                continue
+            surface = predicate.group("word").casefold()
+            canonical = relation_words[0]
+            inflected = (_analyze_predicate_spelling(surface, canonical)
+                         or _analyze_predicate_spelling(canonical, surface))
+            if inflected is None:
+                continue
+            subject = claim[:predicate.start()].strip()
             if subject:
                 matches.add((subject, relation))
     if len(matches) != 1:
@@ -354,21 +381,27 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
     Unknown, contradictory, incomplete, or unverifiable members cause an
     abstention rather than silently filtering away a possible value.
     """
-    match = None
-    for candidate in _REQUESTS:
-        match = candidate.fullmatch(instruction)
-        if match is not None:
-            break
-    if match is not None:
-        values_text = match.group("values")
-        claim_text = match.group("claim")
-        procedure_text = match.group("procedure")
+    linked_aggregate = _FILTER_AND_SUM_QUESTION.fullmatch(instruction)
+    if linked_aggregate is not None:
+        values_text = linked_aggregate.group("values")
+        claim_text = linked_aggregate.group("claim")
+        procedure_text = "sum every value"
     else:
-        generic_parts = _generic_request_parts(
-            instruction, knowledge, procedures)
-        if generic_parts is None:
-            return None
-        values_text, claim_text, procedure_text = generic_parts
+        match = None
+        for candidate in _REQUESTS:
+            match = candidate.fullmatch(instruction)
+            if match is not None:
+                break
+        if match is not None:
+            values_text = match.group("values")
+            claim_text = match.group("claim")
+            procedure_text = match.group("procedure")
+        else:
+            generic_parts = _generic_request_parts(
+                instruction, knowledge, procedures)
+            if generic_parts is None:
+                return None
+            values_text, claim_text, procedure_text = generic_parts
     values = tuple(int(value) for value in
                    re.findall(r"-?\d+", values_text))
     if not values or len(values) > 32:

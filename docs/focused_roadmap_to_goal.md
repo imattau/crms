@@ -486,6 +486,15 @@ and the learned sum; one passes copied-model fresh chat and `why?`. The test
 also confirms abstention for an unknown value, competing claims, multiple
 numeric sets, a mere phrase mention, and an unlicensed operation alias.
 
+The `v1_505` runtime packet now also covers a linked WH request asking both
+which values satisfy the relation and what those values sum to. CRMS keeps the
+clauses together, grounds the inflected “does Mira reach” form to the stored
+“Mira reaches” relation, and returns the selected values and checked total
+through copied-model chat. An unknown list member still blocks the result.
+This is one explicit filter-and-sum question shape in the Codex-authored
+development packet; it does not establish general compound-question
+understanding or broad relation inflection coverage.
+
 The frozen `v1_504` packet remains the before-change baseline; its six language
 gaps remain open for the baseline model. `v1_506` demonstrates a supervised
 resolution for the operation-synonym case: after “add up every value” is taught
