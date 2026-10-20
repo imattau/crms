@@ -1345,7 +1345,7 @@ def _natural_when_question(message: str) -> tuple[str, str] | None:
 
 def _natural_when_evidence(index: CRMSSQLiteResearchIndex,
                            message: str) -> dict[str, Any] | None:
-    """Find a sentence that states the named subject, action, and a date."""
+    """Find a dated action, allowing a locally anchored entity-class alias."""
     parsed = _natural_when_question(message)
     if parsed is None:
         return None
@@ -1364,22 +1364,59 @@ def _natural_when_evidence(index: CRMSSQLiteResearchIndex,
         if not set(subject_terms) <= set(hit.matched_terms) or _is_code_source(hit.location):
             continue
         document = index.document(hit.document_id)
-        spans = (_sentence_spans(hit.snippet)
-                 if 0 <= hit.start < hit.end
-                 and document.text[hit.start:hit.end] == hit.snippet
-                 else _sentence_spans(document.text))
-        base_offset = hit.start if spans and document.text[hit.start:hit.end] == hit.snippet else 0
-        for local_start, local_end in spans:
-            start, end = base_offset + local_start, base_offset + local_end
-            sentence = document.text[start:end]
-            if _sentence_context_kind(sentence, document.text, start) != "assertion":
+        source = document.text
+        if not (0 <= hit.start <= hit.end <= len(source)):
+            continue
+        previous_paragraph_break = source.rfind("\n\n", 0, hit.start)
+        paragraph_start = (previous_paragraph_break + 2
+                           if previous_paragraph_break >= 0 else 0)
+        paragraph_end = source.find("\n\n", hit.end)
+        if paragraph_end < 0:
+            paragraph_end = len(source)
+        # The relation check is intentionally paragraph-bounded. A title
+        # elsewhere in a large document cannot license a generic alias.
+        if paragraph_end - paragraph_start > 8000:
+            continue
+        paragraph = source[paragraph_start:paragraph_end]
+        exact_anchor_pattern = re.compile(
+            r"(?<!\w)" + re.escape(subject) + r"(?!\w)", re.IGNORECASE)
+        anchors = list(exact_anchor_pattern.finditer(paragraph))
+        paragraph_sentences = _sentence_spans(paragraph)
+        for local_start, local_end in paragraph_sentences:
+            sentence = paragraph[local_start:local_end]
+            start, end = paragraph_start + local_start, paragraph_start + local_end
+            if _sentence_context_kind(sentence, source, start) != "assertion":
                 continue
             words = tuple(normalized_tokens(sentence))
             positions = [i for i in range(len(words) - len(subject_terms) + 1)
                          if words[i:i + len(subject_terms)] == subject_terms]
-            if len(positions) != 1:
-                continue
-            subj_end = positions[0] + len(subject_terms)
+            if len(positions) == 1:
+                subject_start = positions[0]
+                subj_end = subject_start + len(subject_terms)
+            else:
+                # Permit a bounded alias such as “The museum” only when the
+                # exact entity was named earlier in this same paragraph and
+                # the alias head matches the named entity's final noun.
+                alias = subject_terms[-1]
+                alias_match = re.match(
+                    r"\s*(?:the|this|that)\s+" + re.escape(alias)
+                    + r"s?\b", sentence, flags=re.IGNORECASE)
+                previous_sentences = [
+                    span for span in paragraph_sentences
+                    if span[1] <= local_start]
+                previous_span = (previous_sentences[-1]
+                                 if previous_sentences else None)
+                immediate_anchors = ([
+                    item for item in anchors
+                    if previous_span is not None
+                    and previous_span[0] <= item.start() < previous_span[1]
+                ])
+                if not alias_match or len(immediate_anchors) != 1:
+                    continue
+                alias_tokens = tuple(normalized_tokens(alias_match.group()))
+                subject_start = 1 if alias_tokens[:1] in {
+                    ("the",), ("this",), ("that",)} else 0
+                subj_end = subject_start + 1
             date_match = dated.search(sentence)
             if date_match is None:
                 continue
@@ -10312,6 +10349,7 @@ def main() -> int:
             # Dialogue resolution returns a grounded expanded question. Use it
             # for the chat's source routes as well as the knowledge response.
             line = turn.resolved_question
+        resolved_line = turn.resolved_question or line
         last_answer_had_inference_proof = bool(
             turn.response is not None and turn.response.inference_proofs)
         retrieved_source_sentences = (
@@ -10383,12 +10421,15 @@ def main() -> int:
                     "not an accepted fact]")
                 if turn.research is not None:
                     turn.research.source_sentences = [superlative_evidence]
-        when_question = _natural_when_question(line)
-        if (current_effort == "thorough" and when_question is not None
+        when_question = _natural_when_question(resolved_line)
+        when_route_used = False
+        if (current_effort in {"standard", "thorough"}
+                and when_question is not None
                 and turn.status in {"unknown", "sources_found", "needs_review"}
                 and not (turn.response is not None
                          and turn.response.status in {"answered", "ambiguous"})):
-            when_evidence = _natural_when_evidence(index, line)
+            when_route_used = True
+            when_evidence = _natural_when_evidence(index, resolved_line)
             if when_evidence is None:
                 turn.text = (
                     "I couldn't find one source sentence that states the named "
@@ -10398,15 +10439,23 @@ def main() -> int:
             elif "conflicts" in when_evidence:
                 turn.text = (
                     "Matching source sentences give different dates, so I can't "
-                    "choose one without review.\nPlausibility check: entity and "
-                    "action matched, but date evidence conflicts.")
+                    "choose one without review.")
+                if current_effort == "thorough":
+                    turn.text += ("\nPlausibility check: entity and action "
+                                  "matched, but date evidence conflicts.")
             else:
                 turn.text = (
                     f"{when_evidence['text']} [Source: {when_evidence['title']}; "
-                    "quoted evidence, not an accepted fact]\nPlausibility check: "
-                    "the named entity, action, and date align.")
+                    "quoted evidence, not an accepted fact]")
+                if current_effort == "thorough":
+                    turn.text += ("\nPlausibility check: the named entity, "
+                                  "action, and date align.")
                 if turn.research is not None:
                     turn.research.source_sentences = [when_evidence]
+                    turn.research.status = "sources_found"
+                else:
+                    turn.research = ResearchResult(
+                        "sources_found", source_sentences=[when_evidence])
         irregular_form_candidate = None
         irregular_form_route_used = False
         if (turn.status in {"unknown", "sources_found"}
@@ -10855,7 +10904,6 @@ def main() -> int:
                 if turn.research is not None:
                     turn.research.candidates = []
                     turn.research.status = "unknown"
-        resolved_line = turn.resolved_question or line
         where_query = _natural_where_lookup(resolved_line)
         where_evidence = None
         where_route_used = False
@@ -11474,7 +11522,7 @@ def main() -> int:
             and turn.research.realized_answer is not None)
         specialist_route_used = any((
             who_route_used, typed_relation_route_used, polar_route_used,
-            where_route_used, why_route_used, object_wh_route_used,
+            where_route_used, when_route_used, why_route_used, object_wh_route_used,
             irregular_form_route_used,
             count_route_used, superlative_route_used,
             definition_evidence is not None,
@@ -11484,7 +11532,8 @@ def main() -> int:
             population_field_evidence is not None,
         ))
         specialist_route_abstained = (
-            where_route_used and where_evidence is None)
+            (where_route_used and where_evidence is None)
+            or (when_route_used and when_evidence is None))
         # Judge evidence against the question the dialogue actually answered.
         # A follow-up such as "when was it completed?" is resolved to a named
         # entity first; gating the raw wording would accept any sentence with

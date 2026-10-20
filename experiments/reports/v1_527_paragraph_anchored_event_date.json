@@ -1,0 +1,33 @@
+{
+  "experiment": "v1_527_paragraph_anchored_event_date",
+  "source": "independently authored, two-sentence paragraph",
+  "success": {
+    "entity_alias_same_paragraph": true,
+    "resolved_followup_through_standard_effort_chat": true,
+    "why_citation_resolves_exactly": true,
+    "source_only_label_preserved": true
+  },
+  "negative_controls": [
+    {
+      "control": "an alias from a different paragraph was accepted",
+      "rejected": true
+    },
+    {
+      "control": "an entity-class mismatch was accepted",
+      "rejected": true
+    },
+    {
+      "control": "an alias with a competing immediate antecedent was accepted",
+      "rejected": true
+    },
+    {
+      "control": "a negated event date was accepted",
+      "rejected": true
+    }
+  ],
+  "limitations": [
+    "The date grammar accepts a bounded when-did predicate with year dates.",
+    "Alias resolution requires an immediate preceding sentence in the same paragraph and an entity-class match.",
+    "This does not establish general temporal-question transfer or broad event-coreference coverage."
+  ]
+}

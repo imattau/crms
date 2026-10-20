@@ -118,6 +118,27 @@ than comparator measurements. See the
 [runner](../experiments/v1_526_dialogue_transfer_diagnostic.py) and
 [machine-readable report](../experiments/reports/v1_526_dialogue_transfer_diagnostic.json).
 
+## Paragraph-anchored event-date follow-up (`v1_527`, 2026-10-20)
+
+Command: `python3 experiments/v1_527_paragraph_anchored_event_date.py`.
+
+The lower-level dialogue route resolves “When did it open?” to Meridian
+Museum, while full chat previously lost the referent when its date specialist
+read the raw pronoun. Chat now sends the resolved question to the standard
+date-evidence route. That route can use “The museum opened in 1972” only when
+the immediately preceding sentence in the same paragraph names Meridian
+Museum and the alias matches its entity class. The fresh standard-effort CLI
+answers 1972 and `why?` cites the exact sentence. Four controls reject a
+cross-paragraph antecedent, a mismatched class (“observatory”), a competing
+immediate museum antecedent, and a negated date. The response remains quoted
+source evidence, not an accepted fact.
+
+This repairs the date omission in full chat for the tested construction; the
+lower-level dialogue API still abstains, and the route's grammar is narrow.
+Other date formats, event paraphrases, and broader coreference remain open.
+See the [runner](../experiments/v1_527_paragraph_anchored_event_date.py) and
+[report](../experiments/reports/v1_527_paragraph_anchored_event_date.json).
+
 ## Contextual task-intent contrast (`v1_518`, 2026-10-20)
 
 The prior Taskmaster diagnostic (`v1_462`, code revision

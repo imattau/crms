@@ -67,17 +67,21 @@ antecedent. This repairs one example but does not close independent dialogue
 transfer. Keep the Eiffel Tower/Colosseum and Marie Curie/Einstein cases as
 separate permanent controls.
 
-The first independently authored dialogue diagnostic (`v1_526`) confirms two
-additional gaps. The resolver correctly expands “When did it open?” to the
-Meridian Museum and avoids borrowing the Aurora Observatory's 1984 date, but it
-misses “The museum opened in 1972” in the same paragraph. After that abstention,
-“And Northport?” receives a generic knowledge-base response even though
-Northport was surfaced in the conversation. History recall works, `why?`
-honestly reports that there is no grounded answer, and both citations resolve.
-This is one six-turn fixture, not a transfer estimate. The next dialogue work
-should improve locally anchored event/date realization and retain a bounded,
-visible entity history for explicit topic switches after abstentions, with
-focused clarification when the requested relation cannot be inferred safely.
+The independently authored dialogue diagnostic (`v1_526`) found that the
+dialogue API resolves “When did it open?” to the Meridian Museum and avoids
+borrowing the Aurora Observatory's 1984 date, but misses “The museum opened in
+1972.” `v1_527` closes that omission in standard-effort full chat by using a
+paragraph-local entity-class alias with the date specialist; four negative
+controls reject cross-paragraph, wrong-class, competing-antecedent, and
+negated cases, and `why?` resolves the exact cited sentence. The lower-level
+dialogue API remains less capable than the integrated chat route. The other
+`v1_526` failure remains: after an abstention, “And Northport?” receives a
+generic knowledge-base response even though Northport was surfaced earlier.
+History recall and honest `why?` abstention work. These are small fixtures,
+not a transfer estimate. Next dialogue work should retain a bounded history of
+visible entities across topic changes and failed turns while requiring the
+source or knowledge layer to support any answer; when the intended relation is
+unclear, ask a focused question rather than dropping the user's entity.
 
 ## Execution order
 
@@ -190,15 +194,17 @@ gaps, not to claim parity.
 
 ## Immediate next action
 
-The immediate task is to expand the dialogue diagnostic into a frozen,
-independently authored multi-entity set spanning topic changes,
-source-only/review-only answers, pronouns with and without antecedents,
-event/date paraphrases, “why?”, history, clarification, and repair. Keep the
-Eiffel/Colosseum and Marie/Einstein cases as fixed controls. Repair the two
-`v1_526` failures, then measure task completion, omissions, clarification,
-abstention, and confident misbindings separately; do not rely on intent-label
-agreement alone. In parallel, prepare the next capability packet to transfer
-reasoning-to-procedure composition beyond curated demonstrations: use real source-backed material; vary held-out entities,
+The immediate dialogue task is to preserve earlier user-visible entity
+mentions across topic switches and abstentions, then either resolve the
+explicitly named entity through current source evidence or ask a focused
+clarifying question. Expand the independent conversation set to include this
+path, event/date paraphrases, pronouns with and without antecedents, “why?”,
+history, and repair. Keep the Eiffel/Colosseum and Marie/Einstein cases as
+fixed controls. Measure task completion, omissions, clarification, abstention,
+and confident misbindings separately; do not rely on intent-label agreement
+alone. In parallel, prepare the next capability packet to transfer
+reasoning-to-procedure composition beyond curated demonstrations using real
+source-backed material; vary held-out entities,
 evidence order, layout, and request forms; include partial, unsupported,
 conflicting, and multi-source cases; and check results independently in fresh
 CLI processes and a copied model. Keep source-rule quality research moving in
