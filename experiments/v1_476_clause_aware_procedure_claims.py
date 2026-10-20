@@ -120,6 +120,36 @@ PASSAGES = (
                        "value or a mixture of timezones",), True),),
     },
     {
+        "id": "numpy-balanced-parenthetical-subject",
+        "title": "numpy.nanquantile API reference",
+        "url": "https://numpy.org/doc/stable/reference/generated/numpy.nanquantile.html",
+        "text": "It must have the same shape and buffer length as the expected "
+                "output, but the type (of the output) will be cast if necessary.",
+        "expected": (("the type (of the output)", "be cast",
+                      ("before: contrast (but): It must have the same shape and "
+                       "buffer length as the expected output",
+                       "after: if necessary"), True),),
+    },
+    {
+        "id": "pandas-coordinated-instruction",
+        "title": "pandas.date_range API reference",
+        "url": "https://pandas.pydata.org/docs/reference/api/pandas.date_range.html",
+        "text": "Use ``inclusive='right'`` to exclude `start` if it falls on "
+                "the boundary, and similarly ``inclusive='neither'`` will "
+                "exclude both `start` and `end`.",
+        "expected": (("``inclusive='neither'``", "exclude both `start` and `end`",
+                      ("before: contrast (and similarly): Use "
+                       "``inclusive='right'`` to exclude `start` if it falls "
+                       "on the boundary",), True),),
+    },
+    {
+        "id": "numpy-single-verb-predicate",
+        "title": "numpy.load API reference",
+        "url": "https://numpy.org/doc/stable/reference/generated/numpy.load.html",
+        "text": "Loading object arrays will fail.",
+        "expected": (("Loading object arrays", "fail", (), True),),
+    },
+    {
         "id": "pandas-bullet-list",
         "title": "pandas.pivot_table API reference",
         "url": "https://pandas.pydata.org/docs/reference/api/pandas.pivot_table.html",
@@ -288,7 +318,7 @@ def main() -> None:
     print("PASS: negative, quoted, denied, and uncertain controls retain their status")
     print("PASS: fresh chat shows subject, predicate, scope, and exact evidence")
     print("PASS: candidates remain review-only and do not change rules")
-    print("LIMIT: 16 cited sentence fixtures; publisher-held-out transfer remains open")
+    print("LIMIT: 19 cited sentence fixtures; publisher-held-out transfer remains open")
 
 
 if __name__ == "__main__":

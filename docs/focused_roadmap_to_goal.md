@@ -126,12 +126,12 @@ described below, and confirmation must use untouched API units and a new
 publisher.
 
 The clause-aware redesign is now implemented as a review-only proposal path
-and exercised by `v1_476`. Its 16 cited fixtures cover full subjects,
+and exercised by `v1_476`. Its 19 cited fixtures cover full subjects,
 conditions, contrast, list items, parenthesized values, literals, polarity,
-quotation, denial, uncertainty, and a fresh chat replay; candidates remain
-review-only. The full-package replay `v1_477` finds 649
-sentences across 249 NumPy API units and 214 across 60 pandas units, compared
-with 303/177 and 24/16 in `v1_474`; NumPy has 274 normalized candidate
+quotation, denial, uncertainty, one-word predicates, and a fresh chat replay;
+candidates remain review-only. The full-package replay `v1_477` finds 657
+sentences across 250 NumPy API units and 217 across 60 pandas units, compared
+with 303/177 and 24/16 in `v1_474`; NumPy has 279 normalized candidate
 patterns. A re-run of six topic-switch, source-only,
 paragraph-grounding, multi-turn, cross-paragraph, and unsupported-switch
 dialogue controls passed 6/6; this is regression coverage, not dialogue

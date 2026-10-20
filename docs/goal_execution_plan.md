@@ -248,9 +248,11 @@ The clause-aware proposal path is exercised by `v1_476` and replayed
 against the same complete installed-package docstrings by `v1_477`. The
 `numpy.add` fresh-process chat replay now displays the subject ``the `out`
 array`` and the condition while keeping the proposal cited, review-only, and
-out of the rule store. The full scan yields 649 candidate sentences across
-249 NumPy API units and 214 across 60 pandas API units (up from 303/177 and
-24/16 in `v1_474`); NumPy has 274 normalized candidate patterns. This is
+out of the rule store. The full scan yields 657 candidate sentences across
+250 NumPy API units and 217 across 60 pandas API units (up from 303/177 and
+24/16 in `v1_474`); NumPy has 279 normalized candidate patterns. The fixtures
+also cover wrapped clauses, multi-comma conditions, balanced parenthetical
+subjects, coordinated clauses, and one-word predicates. This is
 improved extraction yield, not evidence of improved precision: complex
 parameter descriptions, contrastive clauses, and conditional scope still
 produce malformed boundaries, and the parser was redesigned using the earlier

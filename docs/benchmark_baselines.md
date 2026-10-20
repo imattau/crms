@@ -3111,25 +3111,26 @@ Report: [labeled sample JSON](reports/v1_475_api_candidate_sample_review.json),
 
 ## Clause-aware technical-reference replay (`v1_476`/`v1_477`, 2026-10-20)
 
-`python3 experiments/v1_476_clause_aware_procedure_claims.py` checks 16 cited
+`python3 experiments/v1_476_clause_aware_procedure_claims.py` checks 19 cited
 source fixtures for complete subjects, conditions, contrast, parenthesized
 values, code literals, polarity, and multi-claim list items. Its fresh-process
 chat check confirms that the review-only `numpy.add` candidate displays `the
 \`out\` array` and its conditional scope, and that no procedure rule is added.
-The targeted source-learning controls (`v1_470` through `v1_472`) passed 3/3.
-Six dialogue regressions (`v1_413`, `v1_419`, `v1_426`, `v1_427`, `v1_449`,
-and `v1_465`) passed 6/6; these are fixed controls, not transfer evidence.
+The targeted source-learning controls (`v1_470` through `v1_472`) and six
+dialogue regressions (`v1_413`, `v1_419`, `v1_426`, `v1_427`, `v1_449`, and
+`v1_465`) passed together, 9/9. The dialogue cases are fixed controls, not
+transfer evidence.
 
 `python3 experiments/audits/v1_477_clause_aware_api_reference_fit.py` replayed
 the complete locally installed API-docstring corpora:
 
 | Package | API docstrings | Sentences | Candidate sentences | API units with candidates | Unique normalized candidates |
 |---|---:|---:|---:|---:|---:|
-| NumPy 2.5.1 | 415 | 13,391 | 649 | 249 | 274 |
-| pandas 3.0.5 | 100 | 5,384 | 214 | 60 | 182 |
+| NumPy 2.5.1 | 415 | 13,391 | 657 | 250 | 279 |
+| pandas 3.0.5 | 100 | 5,384 | 217 | 60 | 185 |
 
-Compared with `v1_474`, the candidate counts rose from 303 to 649 for NumPy
-and from 24 to 214 for pandas. The replay also found malformed subjects in
+Compared with `v1_474`, the candidate counts rose from 303 to 657 for NumPy
+and from 24 to 217 for pandas. The replay also found malformed subjects in
 complex parameter descriptions and nested conditions. It is a corpus-fit and
 implementation diagnostic only: it does not measure semantic precision,
 missed-claim rate, transfer, or rule-learning quality. The same package

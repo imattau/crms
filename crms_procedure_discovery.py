@@ -110,8 +110,9 @@ def _subject_start(text: str, will_start: int
     context: list[str] = []
     # A contrastive finite clause has its own subject. Keep its antecedent as
     # scope and bind the claim only to the clause after the coordinator.
-    contrasts = list(re.finditer(r",\s*(?P<marker>but|however)\s+",
-                                 prefix, re.IGNORECASE))
+    contrasts = list(re.finditer(
+        r",\s*(?P<marker>(?:and\s+)?(?:but|however|whereas|while|"
+        r"similarly|likewise))\s+", prefix, re.IGNORECASE))
     if contrasts:
         contrast = contrasts[-1]
         antecedent = " ".join(prefix[:contrast.start()].split())
@@ -176,7 +177,7 @@ def _subject_start(text: str, will_start: int
                 subject = prefix.strip()
                 subject_start = prefix_start + len(prefix) - len(prefix.lstrip())
 
-    subject = subject.strip(" \t\r\n,;:()")
+    subject = subject.strip(" \t\r\n,;:")
     if not subject or len(subject) > 180:
         return None
     if not re.search(r"[A-Za-z\u0080-\uffff]", subject):
@@ -231,7 +232,7 @@ def _predicate_end(text: str, start: int) -> int | None:
         if character == "," and re.match(r",\s*\*\s+", text[index:]):
             return index
         if character == "," and re.match(
-                r",\s*(?:but|otherwise|if|unless|when|provided\s+that|"
+                r",\s*(?:and\s+)?(?:but|otherwise|if|unless|when|provided\s+that|"
                 r"assuming)\b", text[index:], re.IGNORECASE):
             return index
         if re.match(r"\s+(?:and|but)\s+will\b", text[index:], re.IGNORECASE):
@@ -307,7 +308,7 @@ def propose_procedure_phrase_candidates(
         predicate = " ".join(
             sentence[predicate_start:predicate_end].split()).strip(
                 " \t\r\n,;:")
-        if len(predicate.split()) < 2:
+        if not predicate or (predicate.casefold() == "be"):
             continue
         candidates.append(ProcedurePhraseCandidate(
             subject=" ".join(subject_phrase.split()),
