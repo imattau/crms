@@ -199,6 +199,13 @@ isolation.
    locked set; report coverage, abstentions, clarifications, omissions, task
    completion, and layout/source diversity. If it fails, fix context lifetime
    and referent grounding before adding more intent or move machinery.
+   The first small Taskmaster test replay underperforms dev (12/46 vs. 64/131
+   joint label matches) and shows that the current context representation
+   misses the assistant's last move and typed choice/confirmation state. Use
+   disjoint dev conversations to test a bounded discourse state that explicitly
+   records the assistant move, open question/choice, active goal, and subgoal;
+   do not tune against the revealed test rows. Keep short confirmations
+   ambiguous when that state is absent.
 2. **Blinded source-rule discovery study.** Use corpora with actual overlap in
    relation and wording. Freeze the candidate generator before labeling; sample
    proposals and non-proposals, and label cited evidence for relation match,
