@@ -29,6 +29,37 @@ class ProcedurePhraseCandidate:
     scope_notes: tuple[str, ...] = ()
     assertion_status: str = "asserted"
     status: str = "needs_review"
+    context_text: str | None = None
+    context_citation: str | None = None
+    context_basis: str | None = None
+
+
+def nearest_parameter_heading(document_text: str, before_offset: int
+                              ) -> tuple[str, int, int] | None:
+    """Find the closest API-style ``name : type`` heading before a span.
+
+    The heading is only context for review; it does not independently license
+    a rule. A nearby section boundary or a distant heading makes the result
+    ambiguous, so the function abstains.
+    """
+    if (not isinstance(document_text, str) or type(before_offset) is not int
+            or before_offset < 0 or before_offset > len(document_text)):
+        return None
+    matches = list(re.finditer(
+        r"(?m)^[ \t]*(?P<name>[A-Za-z_][\w]*)[ \t]*:[ \t]*"
+        r"(?P<description>[^\n]{1,180})[ \t]*$", document_text[:before_offset]))
+    if not matches:
+        return None
+    match = matches[-1]
+    if before_offset - match.end() > 1600:
+        return None
+    between = document_text[match.end():before_offset]
+    if re.search(
+            r"(?m)^(?:Parameters|Returns|Yields|Raises|Attributes|"
+            r"Examples|Notes|See Also)\s*\n[-=~]{3,}\s*$",
+            between, re.IGNORECASE):
+        return None
+    return match.group("name"), match.start(), match.end()
 
 
 def _is_quoted(text: str, offset: int) -> bool:
@@ -82,7 +113,7 @@ def _scope_notes(text: str, start: int, end: int,
         trailing = re.match(
             r"\s*,?\s*(?P<condition>(?:if|unless|only\s+if|only\s+when|"
             r"when|provided\s+that|as\s+long\s+as|but|otherwise|"
-            r"and\s+will(?:\s+not)?)"
+            r"because|since|and\s+will(?:\s+not)?)"
             r"\b[^.!?;]{1,180})",
             suffix, re.IGNORECASE)
         if trailing:
@@ -185,6 +216,34 @@ def _subject_start(text: str, will_start: int
     return subject_start, subject, tuple(context)
 
 
+def _shared_subject_start(text: str, will_start: int
+                          ) -> tuple[int, str, tuple[str, ...]] | None:
+    """Resolve a repeated subject in a simple coordinated predicate clause."""
+    prefix = text[:will_start]
+    if re.match(r"\s*(?:if|unless|when|whenever|assuming|provided\s+that)\b",
+                prefix, re.IGNORECASE):
+        return None
+    connector = re.search(r"(?:,\s*)?(?P<connector>and|but)\s*$",
+                          prefix, re.IGNORECASE)
+    if not connector:
+        return None
+    prior_clause = prefix[:connector.start()].rstrip(" ,;:")
+    auxiliary = re.search(
+        r"\b(?:is|are|was|were|has|have|does|do|did)\b",
+        prior_clause, re.IGNORECASE)
+    if not auxiliary:
+        return None
+    subject = prior_clause[:auxiliary.start()].strip(" \t\r\n,;:")
+    prior_predicate = prior_clause[auxiliary.end():].strip(" \t\r\n,;:")
+    if (not subject or not prior_predicate or len(subject) > 120
+            or re.search(r"\b(?:that|which|who|if|when|unless)\b",
+                         subject, re.IGNORECASE)):
+        return None
+    subject_start = len(prefix[:auxiliary.start()])
+    note = f"shared subject clause: {prior_predicate}"
+    return subject_start, subject, (note,)
+
+
 def _predicate_end(text: str, start: int) -> int | None:
     """Find a predicate boundary while preserving balanced inline literals."""
     index = start
@@ -240,6 +299,8 @@ def _predicate_end(text: str, start: int) -> int | None:
         if re.match(
                 r"\s+(?:if|unless|only\s+if|only\s+when|provided\s+that|"
                 r"as\s+long\s+as)\b", text[index:], re.IGNORECASE):
+            return index
+        if re.match(r"\s+(?:because|since)\b", text[index:], re.IGNORECASE):
             return index
         index += 1
     return len(text) if paren_depth == 0 else None
@@ -298,6 +359,10 @@ def propose_procedure_phrase_candidates(
                 # the first claim until their implicit subject is resolved.
                 continue
         subject = _subject_start(sentence, match.start())
+        shared_subject = False
+        if subject is None:
+            subject = _shared_subject_start(sentence, match.start())
+            shared_subject = subject is not None
         if subject is None:
             continue
         subject_start, subject_phrase, leading_context = subject
@@ -320,5 +385,64 @@ def propose_procedure_phrase_candidates(
             scope_notes=_scope_notes(sentence, subject_start, predicate_end,
                                      leading_context),
             assertion_status=_assertion_status(sentence, match.start()),
+            context_text=(leading_context[0]
+                          if shared_subject and leading_context else None),
+            context_basis=("shared_subject" if shared_subject else None),
+        ))
+    return tuple(candidates)
+
+
+def propose_contextual_procedure_phrase_candidates(
+        sentence: str, *, source_citation: str,
+        context_text: str, context_citation: str
+        ) -> tuple[ProcedurePhraseCandidate, ...]:
+    """Recover a missing local subject from a cited API parameter heading.
+
+    This path is intentionally narrow: it only runs when the sentence-local
+    extractor abstains and a nearby parameter heading is supplied. The
+    inferred subject and context citation stay explicit and review-only.
+    """
+    direct = propose_procedure_phrase_candidates(
+        sentence, source_citation=source_citation)
+    if direct or not isinstance(context_text, str) or not context_text.strip():
+        return direct
+    if (not isinstance(context_citation, str)
+            or "#sha256=" not in context_citation
+            or "&chars=" not in context_citation):
+        return ()
+    header = re.match(
+        r"\s*(?P<name>[A-Za-z_][\w]*)\s*:\s*(?P<description>.+?)\s*$",
+        context_text)
+    if not header:
+        return ()
+    parameter = header.group("name")
+    candidates = []
+    for match in _WILL_CLAUSE.finditer(sentence):
+        if _subject_start(sentence, match.start()) is not None:
+            continue
+        predicate_end = _predicate_end(sentence, match.end())
+        if predicate_end is None:
+            continue
+        predicate = " ".join(sentence[match.end():predicate_end].split()).strip(
+            " \t\r\n,;:")
+        if not predicate or predicate.casefold() == "be":
+            continue
+        prefix = " ".join(sentence[:match.start()].split()).strip(" ,;:")
+        scope = []
+        if prefix:
+            scope.append("before: " + prefix)
+        scope.append("parameter context: " + " ".join(context_text.split()))
+        candidates.append(ProcedurePhraseCandidate(
+            subject=f"the {parameter} parameter",
+            predicate_phrase=predicate,
+            polarity=not bool(match.group("negative")),
+            quoted=_is_quoted(sentence, match.start()),
+            source_citation=source_citation,
+            source_sentence=sentence,
+            scope_notes=tuple(scope),
+            assertion_status=_assertion_status(sentence, match.start()),
+            context_text=context_text,
+            context_citation=context_citation,
+            context_basis="nearest_parameter_heading",
         ))
     return tuple(candidates)

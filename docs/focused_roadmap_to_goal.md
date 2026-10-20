@@ -156,6 +156,19 @@ not determine a unique claim. Develop against the frozen sample, then freeze
 the method and measure proposal quality and missed claims on untouched API
 units and a new publisher. Keep candidates review-only throughout.
 
+The first narrow runtime slice is now exercised by
+`experiments/v1_479_contextual_procedure_candidates.py`. It covers two omitted
+subjects recovered from nearby parameter headings and two simple coordinated
+predicates with shared subjects. Source and context citations are checked
+separately; stale section context and context-free missing subjects abstain;
+the fresh chat path keeps the proposals review-only. The 19-fixture
+`v1_476` source controls and nine selected source/dialogue regressions also
+pass on this checkout. This only validates the named cases and compatibility
+controls: four hand-selected contextual examples do not establish proposal
+precision, recall, or transfer. The next step is to freeze this implementation
+and measure it on untouched API units and a new publisher, reviewing both
+proposals and non-proposals.
+
 Use the existing excerpt and real-source acceptance experiments as regression
 controls, not as a corpus-level result. If a suitable corpus does not contain
 enough examples, change the learning signal or narrow the claim; do not add
@@ -243,26 +256,21 @@ academic-paper sources.
 
 ## Immediate sequence
 
-The next checkpoint is deliberately narrow. The working tree contains an
-uncommitted `v1_479` prototype for two of the source-context failures found in
-`v1_478` (parameter-heading context and shared subjects). Treat it as
-unverified until its experiment, prior source controls, and chat regressions
-run cleanly. Do not count implementation or candidate yield as evidence of
-transfer.
+The next checkpoint is deliberately narrow. `v1_479` now passes its focused
+runtime checks, the earlier clause-aware source fixtures, and nine selected
+source/dialogue regressions. Treat that as bounded implementation evidence,
+not a transfer result. Do not count implementation or candidate yield as
+evidence of transfer.
 
-1. **Finish the current source-context prototype.** Check exact citations for
-   both claim and context, ambiguity abstention, conditional/negative scope,
-   and review-only behavior in a fresh chat process. Run the previous source
-   and dialogue regressions. Record what the narrow cases establish and what
-   they do not; commit only the relevant source, experiment, and roadmap files.
-2. **Run the frozen source-learning gate.** Freeze the resulting method, then
-   test untouched API units and a publisher not used for design. Sample both
+1. **Freeze and run the source-learning transfer gate.** Treat `v1_479` as the
+   frozen candidate method, then test untouched API units and a publisher not
+   used for design. Sample both
    proposals and non-proposals, with document-level splits and exact cited
    spans. Report useful proposals, boundary errors, missed claims, abstention,
    and review effort. Keep `v1_473` as a negative corpus-fit control. If the
    method fails, revise the general boundary/context model and reserve a new
    holdout; do not patch individual phrases until the old set passes.
-3. **Close dialogue safety alongside every chat change.** Replay fixed
+2. **Close dialogue safety alongside every chat change.** Replay fixed
    topic-switch, source-only-context, stale-`why?`, history, ordinal, repair,
    and save/reload transcripts. Specifically retain the reported
    Eiffel-Tower/Colosseum pronoun switch and “and Italy?” after source-only
@@ -271,7 +279,7 @@ transfer.
    wrong referents, completion, clarification, omissions, and abstention
    separately. Dialogue is a release gate, not a reason to widen intent or
    move classes yet.
-4. **Prove recombination through ordinary chat.** Once source-derived
+3. **Prove recombination through ordinary chat.** Once source-derived
    components transfer, compose one genuinely unseen multi-step request with
    changed wording, values, and operation order. Run after fresh-process
    reload; independently check output and proof. Include missing steps,
@@ -279,12 +287,12 @@ transfer.
    and search limits. Keep learned components, connective supervision,
    hand-coded mappings, and orchestration visible. If only a scripted
    experiment can assemble the task, the gate remains open.
-5. **Then govern self-learning.** After recombination passes, allow derived
+4. **Then govern self-learning.** After recombination passes, allow derived
    outputs only as lineage-bearing proposals. Test correction propagation,
    invalidation, duplicate suppression, trust weighting, abstention on stale
    lineage, and storage growth. Derived results must not validate the rules
    that generated them; write-back stays review-gated until all controls pass.
-6. **Advance dialogue research and breadth by measured need.** Evaluate
+5. **Advance dialogue research and breadth by measured need.** Evaluate
    contextual intent against held-out task completion, then dialogue moves
    against the explicit baseline. Only after these core gates, select one
    bounded coding, math, translation, or creative task based on observed

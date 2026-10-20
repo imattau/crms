@@ -41,7 +41,11 @@ from crms_knowledge import (CRMSKnowledgeBase, FactCandidate, ResearchResult,
 from crms_math import CRMSMath, render as render_math
 from crms_model import CRMSModel, Prediction
 from crms_nl_gate import gate_quoted_evidence, supports_question_type
-from crms_procedure_discovery import propose_procedure_phrase_candidates
+from crms_procedure_discovery import (
+    nearest_parameter_heading,
+    propose_contextual_procedure_phrase_candidates,
+    propose_procedure_phrase_candidates,
+)
 from crms_package import (
     export_model_database, install_model_database, inspect_model_database,
     model_database_has_research, model_database_rule_settings,
@@ -2529,6 +2533,38 @@ def _cited_sentence_evidence(
             "citation": citation}
 
 
+def _cited_source_span(index: CRMSSQLiteResearchIndex,
+                       hit: SearchHit, start: int, end: int
+                       ) -> dict[str, Any] | None:
+    """Build an exact citation for a context span such as an API heading."""
+    document = index.document(hit.document_id)
+    if (start < 0 or end <= start or end > len(document.text)):
+        return None
+    page_number = None
+    if document.pages:
+        page_offset = 0
+        for page_index, page in enumerate(document.pages, start=1):
+            page_end = page_offset + len(page)
+            if page_offset <= start < page_end and end <= page_end:
+                page_number = page_index
+                break
+            page_offset = page_end + len("\n\f\n")
+        if page_number is None:
+            return None
+    span_hit = SearchHit(
+        hit.document_id, hit.title, hit.location, hit.score,
+        document.text[start:end], start, end, (), page_number,
+        start if page_number is not None else None,
+        end if page_number is not None else None)
+    try:
+        citation = index.citation(span_hit)
+    except (KeyError, ValueError):
+        return None
+    return {"document_id": hit.document_id, "title": hit.title,
+            "location": hit.location, "text": document.text[start:end],
+            "citation": citation}
+
+
 def _render_procedure_phrase_candidates(index: CRMSSQLiteResearchIndex,
                                         query: str) -> str:
     """Show cited procedure phrase candidates without accepting a rule."""
@@ -2556,8 +2592,24 @@ def _render_procedure_phrase_candidates(index: CRMSSQLiteResearchIndex,
             index, hit, span[0], span[1], hit.matched_terms)
         if evidence is None:
             continue
-        for candidate in propose_procedure_phrase_candidates(
-                evidence["text"], source_citation=evidence["citation"]):
+        parameter_heading = nearest_parameter_heading(
+            document.text, span[0])
+        context_evidence = None
+        candidates_for_sentence = propose_procedure_phrase_candidates(
+            evidence["text"], source_citation=evidence["citation"])
+        if not candidates_for_sentence and parameter_heading:
+            _, context_start, context_end = parameter_heading
+            context_evidence = _cited_source_span(
+                index, hit, context_start, context_end)
+            if context_evidence:
+                candidates_for_sentence = (
+                    propose_contextual_procedure_phrase_candidates(
+                        evidence["text"],
+                        source_citation=evidence["citation"],
+                        context_text=context_evidence["text"],
+                        context_citation=context_evidence["citation"],
+                    ))
+        for candidate in candidates_for_sentence:
             key = (evidence["citation"], candidate.predicate_phrase)
             if key in seen:
                 continue
@@ -2590,6 +2642,18 @@ def _render_procedure_phrase_candidates(index: CRMSSQLiteResearchIndex,
         lines.append(f"   Source: {evidence['title']}")
         lines.append(f"   Evidence: {evidence['text']}")
         lines.append(f"   Citation: {evidence['citation']}")
+        if candidate.context_text and candidate.context_citation:
+            lines.append(f"   Subject context: {candidate.context_text}")
+            lines.append(f"   Context citation: {candidate.context_citation}")
+            lines.append(
+                "   Subject was suggested from the nearest parameter heading; "
+                "review it before teaching.")
+        elif (candidate.context_basis == "shared_subject"
+              and candidate.context_text):
+            lines.append(f"   Shared-subject context: {candidate.context_text}")
+            lines.append(
+                "   The sentence citation covers both clauses; review the "
+                "shared subject before teaching.")
     lines.append(
         "These are wording candidates, not learned rules. Verify the operation "
         "against independent examples before teaching it; no knowledge or "
