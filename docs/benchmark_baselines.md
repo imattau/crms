@@ -3603,3 +3603,30 @@ publisher-held-out evaluation was run. The existing `v1_244` and `v1_296`
 predicate-alignment controls also pass on this checkout.
 
 Report: [experiment](../experiments/v1_513_reviewed_predicate_paraphrase_chat.py).
+
+## Typed relation and paraphrase recombination (`v1_514`, 2026-10-20)
+
+Command: `python3 experiments/v1_514_typed_relation_recombination_chat.py`.
+
+This combines two separately reviewed components in fresh CLI chat: a
+two-source `runs through → flows through` predicate alignment and a cited
+`Serein River is-a river → river is-a waterway` hierarchy with an explicit
+transitive `is-a` schema. The wording alignment stays inactive before review.
+After acceptance, a third route with only canonical `flows through` wording
+answers “Which waterway runs through Nacre City 0133?” The rendered result
+retains distinct route, entity-type, and taxonomy sources, plus the type proof
+and language-alignment provenance. “Which stream runs through …?” does not
+inherit the broader waterway type; it returns source-only evidence and says
+the requested type is unverified. All four controls pass.
+
+This is an integrated recombination result: natural-language relation
+alignment and typed reasoning compose over a held-out entity pair without
+assuming that `river` means `stream`. The source, relation pairs, and query
+forms remain a small synthetic fixture, and component acceptance was prepared
+before chat; this is not evidence of broad open-domain language transfer.
+The adjacent `v1_285`, `v1_286`, and `v1_296` controls also pass. `v1_285` now
+runs its CLI in an isolated temporary working directory with a temporary
+feedback database so unrelated user-local correction history cannot affect
+the result.
+
+Report: [experiment](../experiments/v1_514_typed_relation_recombination_chat.py).

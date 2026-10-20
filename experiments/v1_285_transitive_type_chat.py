@@ -57,10 +57,11 @@ def main() -> None:
                 "--translation-session",
                 str(root / f"{suffix}-translation-session.json"),
                 "--dialogue-state", str(root / f"{suffix}-dialogue.json"),
+                "--feedback-db", str(root / f"{suffix}-feedback.sqlite3"),
             ]
             result = subprocess.run(
                 command, input=question + "\n/quit\n", text=True,
-                capture_output=True, check=False, timeout=45)
+                capture_output=True, check=False, cwd=root, timeout=45)
             require(result.returncode == 0,
                     f"{suffix} chat failed: {result.stderr}\n{result.stdout}")
             return result.stdout

@@ -475,6 +475,16 @@ recombination through chat; dialogue remains a release gate, and source-rule
 extraction proceeds separately. Broad capability and reliable self-learning
 remain unproven.
 
+The new `v1_514` composition control combines an accepted source-backed
+predicate alignment with an accepted, proof-checked type hierarchy in ordinary
+chat. On a third route, “Which waterway runs through …?” returns the sourced
+answer with separate relation and type provenance; “Which stream runs through
+…?” does not inherit an unsupported narrower type. This advances the tested
+composition path, but its small synthetic fixture and pre-accepted components
+do not establish independent transfer. The next gate remains a frozen,
+independently authored request set with varied source layouts and an
+independent checker.
+
 `v1_503` adds one sum-first frame: “Sum every value in … that Mira reaches.”
 Before the operation phrase is taught it abstains; after contrastive examples,
 the learned operation composes with proof-selected values, explicit negative
