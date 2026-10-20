@@ -2110,3 +2110,25 @@ and a narrow embedded-WH form; this does not establish broad intent recognition,
 nor does it add joke-writing capability. The embedded question test uses an
 accepted fact, not a source-only retrieval case. The new fixture and existing
 dialogue scripts are Codex-authored.
+
+## Grounded descriptive anaphora in source follow-ups (2026-10-20)
+
+`experiments/v1_445_grounded_definite_description_followup.py` covers a source
+paragraph that states “Python is a programming language” and later says “The
+language was first released in 1991.” After the user names Python, CRMS now
+normalizes “Tell me when it was first released” to direct-question word order,
+resolves *it* to Python, and returns a citation spanning both the explicit type
+link and the release-date sentence. The companion negative places Java as the
+nearest explicit subject before “The language”; CRMS does not attribute 1991 to
+Python.
+
+The local anaphora check also now treats a copular phrase such as “It was
+created” as a pronoun subject, not as a multiword entity name. The seven focused
+scripts (`v1_445`, `v1_442`, `v1_426`, `v1_427`, `v1_423`, `v1_425`, `v1_438`)
+passed, including cross-topic, source-only, exact-citation, and save/reload
+controls. Compilation and `git diff --check` passed.
+
+This is a narrow, source-explicit type-to-description link, not general noun
+phrase coreference. The positive and negative fixtures were authored together;
+they do not estimate accuracy on natural corpora. Unstated aliases and
+description chains still require abstention or clarification.

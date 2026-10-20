@@ -7697,7 +7697,8 @@ class CRMSKnowledgeBase:
                 if match is None:
                     continue
                 subject = match.group("subject")
-                if subject.casefold() in {
+                first_subject_word = subject.split()[0].casefold()
+                if first_subject_word in {
                         "it", "he", "she", "they", "this", "that"}:
                     continue
                 return named_anchor_tokens.issubset(set(_tokens(subject)))
@@ -7827,13 +7828,69 @@ class CRMSKnowledgeBase:
             return local_entity_antecedent_matches(
                 document_id, int(span.group(1)))
 
+        def definite_description_sentence_is_anchored(
+                sentence: Mapping[str, Any]) -> bool:
+            """Link ``the language`` only to an explicit, nearest type claim.
+
+            The cited sentence is usable for a named query entity only when
+            the paragraph's nearest explicit subject is that entity and an
+            earlier copular assertion gives it the same head noun. This keeps
+            a later ``The language ...`` from drifting across two languages.
+            """
+            text = str(sentence.get("text", ""))
+            description = re.match(
+                r"\s*(?:the|this|that)\s+(?P<head>[a-z][\w’'-]*)\b",
+                text, flags=re.IGNORECASE)
+            if description is None or not named_anchor_tokens:
+                return False
+            citation = str(sentence.get("citation", ""))
+            span = re.search(r"&chars=(\d+):(\d+)", citation)
+            document_id = sentence.get("document_id")
+            if span is None or not isinstance(document_id, str):
+                return False
+            try:
+                document = research_index.document(document_id)
+            except (AttributeError, KeyError, TypeError, ValueError):
+                return False
+            start = int(span.group(1))
+            if not 0 <= start <= len(document.text):
+                return False
+            previous_break = document.text.rfind("\n\n", 0, start)
+            paragraph_start = previous_break + 2 if previous_break >= 0 else 0
+            prefix = document.text[paragraph_start:start]
+            if not local_entity_antecedent_matches(document_id, start):
+                return False
+            type_assertion = re.compile(
+                r"^\s*(?P<subject>[A-Z][\w’'-]*(?:\s+[A-Z][\w’'-]*){0,5})"
+                r"\s+(?:is|was|are|were|became)\s+(?:a|an|the)\s+"
+                r"(?P<predicate>[a-z][\w’'-]*(?:\s+[a-z][\w’'-]*){0,5})"
+                r"[^.!?]*[.!?]?\s*$", flags=re.IGNORECASE)
+            for prior_sentence in reversed(re.split(
+                    r"(?<=[.!?])\s+", prefix)):
+                match = type_assertion.match(prior_sentence)
+                if match is None:
+                    continue
+                subject = match.group("subject")
+                first_subject_word = subject.split()[0].casefold()
+                if first_subject_word in {
+                        "it", "he", "she", "they", "this", "that"}:
+                    continue
+                predicate_words = _tokens(match.group("predicate"))
+                if (named_anchor_tokens.issubset(set(_tokens(subject)))
+                        and predicate_words
+                        and predicate_words[-1]
+                            == description.group("head").casefold()):
+                    return True
+            return False
+
         if named_anchor_tokens:
             source_sentences = [
                 sentence for sentence in source_sentences
                 if (named_anchor_tokens.issubset(set(_tokens(
                         sentence.get("text", ""))))
                     or pronoun_sentence_is_anchored(sentence)
-                    or object_pronoun_sentence_is_anchored(sentence))
+                    or object_pronoun_sentence_is_anchored(sentence)
+                    or definite_description_sentence_is_anchored(sentence))
             ]
         if who_action is not None:
             requested_predicate = who_action.group("predicate").casefold()
@@ -8011,7 +8068,9 @@ class CRMSKnowledgeBase:
                                   str(source_sentences[0].get("text", "")),
                                   flags=re.IGNORECASE)
                          or object_pronoun_sentence_is_anchored(
-                             source_sentences[0]))):
+                             source_sentences[0])
+                    or definite_description_sentence_is_anchored(
+                        source_sentences[0]))):
                 # The answer sentence may use an anaphor. Cite the local
                 # antecedent with it so the user can see why the pronoun is
                 # bound to the named entity, and so dialogue can safely retain

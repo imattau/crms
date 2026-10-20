@@ -228,6 +228,12 @@ _EMBEDDED_WH_REQUEST_RE = re.compile(
     r"(?:tell|show|explain|describe)\s+me\s+"
     r"(?P<question>(?:who|whom|whose|what|which|when|where|why|how)"
     r"\b.+?)[?.! ]*$", re.IGNORECASE)
+_INDIRECT_PRONOUN_AUX_RE = re.compile(
+    r"^(?P<wh>when|where|what|which|why|how)\s+"
+    r"(?P<subject>it|they|he|she|this|that)\s+"
+    r"(?P<aux>is|are|was|were|does|do|did|has|have|had|"
+    r"can|could|will|would|should|might|must)\s+"
+    r"(?P<rest>.+)$", re.IGNORECASE)
 _EXPLICIT_RESERVATION_REQUEST_RE = re.compile(
     r"^(?:(?:i|we)\s+(?:(?:need|want)\s+(?:to\s+)?|"
     r"(?:would|could)\s+like\s+to\s+)"
@@ -1208,7 +1214,14 @@ def respond(dialogue: CRMSDialogue, text: str, *,
     original_text = text
     embedded_request = _EMBEDDED_WH_REQUEST_RE.fullmatch(text.strip())
     if embedded_request is not None:
-        text = embedded_request.group("question").strip().rstrip(" .?!")
+        question = embedded_request.group("question").strip().rstrip(" .?!")
+        indirect = _INDIRECT_PRONOUN_AUX_RE.fullmatch(question)
+        if indirect is not None:
+            question = " ".join((indirect.group("wh"),
+                                 indirect.group("aux"),
+                                 indirect.group("subject"),
+                                 indirect.group("rest")))
+        text = question
         text = text[:1].upper() + text[1:] + "?"
     intent = classify_user_intent(dialogue, text)
     act = classify_act(text)

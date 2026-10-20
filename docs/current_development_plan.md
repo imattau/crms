@@ -237,6 +237,17 @@ new transcript regression and eight adjacent intent/dialogue scripts pass
 forms; contextual intent generalization and open-ended creative capability
 remain unproven.
 
+A further source-only probe found that a question about Python's release date
+was lost when the source called Python “a programming language” and then used
+“The language.” Retrieval now licenses that description only when the source
+explicitly supplies the same type and its nearest named subject matches the
+query. The cited answer includes both the type link and date. A Java-nearest
+control abstains. The indirect “Tell me when it was...” form is also normalized
+to direct WH word order before pronoun resolution. Seven focused dialogue and
+retrieval experiments pass (`v1_445`, `v1_442`, `v1_426`, `v1_427`, `v1_423`,
+`v1_425`, `v1_438`). This is one bounded definite-description pattern, not
+general noun phrase coreference or independent natural-corpus validation.
+
 Do not grow the corpus as a substitute for these packets: more documents cannot
 repair relation selection, context updates, or a missing composition learner.
 Use a larger corpus only when a defined held-out evaluation needs it and record
