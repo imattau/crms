@@ -93,7 +93,22 @@ def main() -> None:
     respond(no_match_dialogue,
             "Can you find a Chinese restaurant in San Francisco, California?",
             research_index=index)
-    no_match = respond(no_match_dialogue, "What about Miami?",
+    ambiguous = respond(no_match_dialogue, "What about French?",
+                         research_index=index)
+    require(ambiguous.status == "help"
+            and "can't tell whether that changes the location" in
+                ambiguous.text.casefold()
+            and [item["title"] for item in no_match_dialogue.presented_sources]
+                == ["Golden Dragon"],
+            f"an untyped cuisine/location term was guessed or cleared context: "
+            f"{ambiguous.text!r}")
+    ambiguous_why = respond(no_match_dialogue, "why?", research_index=index)
+    require("Golden Dragon" in ambiguous_why.text
+            and "not verified recommendations" in ambiguous_why.text,
+            f"why? after the clarification did not stay on visible evidence: "
+            f"{ambiguous_why.text!r}")
+
+    no_match = respond(no_match_dialogue, "What about in Miami?",
                        research_index=index)
     require(no_match.status == "unknown"
             and "couldn't find a source excerpt" in no_match.text.casefold()
@@ -115,7 +130,7 @@ def main() -> None:
         "experiment": "v1_520_contextual_search_location_followup",
         "label_provenance": "Codex-authored development controls",
         "independent_validation": False,
-        "result": "9/9 contextual search and stale-context assertions passed",
+        "result": "11/11 contextual search and stale-context assertions passed",
         "cases": [
             {"case": "retain cuisine and replace locality",
              "turns": [first.text, followup.text],
@@ -127,6 +142,11 @@ def main() -> None:
             {"case": "miss clears old displayed results",
              "response": no_match.text,
              "remaining_visible_sources": len(no_match_dialogue.presented_sources)},
+            {"case": "untyped term asks for disambiguation",
+             "response": ambiguous.text,
+             "visible_source_preserved": True},
+            {"case": "why after disambiguation stays with visible evidence",
+             "response": ambiguous_why.text},
             {"case": "why after miss does not replay stale answer",
              "response": no_match_why.text},
             {"case": "stale ordinal selection is refused",
@@ -146,7 +166,8 @@ def main() -> None:
     print("PASS: why? explains the latest search only")
     print("PASS: a search miss clears stale results and prevents stale why?/selection")
     print("PASS: search context survives save/reload before the follow-up")
-    print("PASS: all 9 contextual search and stale-context assertions")
+    print("PASS: unknown cuisine/location terms prompt clarification")
+    print("PASS: all 11 contextual search and stale-context assertions")
     print("LIMIT: narrow, Codex-authored dialogue controls")
     print(f"REPORT: {REPORT}")
 

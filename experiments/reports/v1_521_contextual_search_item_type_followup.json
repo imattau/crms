@@ -1,0 +1,29 @@
+{
+  "experiment": "v1_521_contextual_search_item_type_followup",
+  "label_provenance": "Codex-authored development controls",
+  "independent_validation": false,
+  "result": "12/12 source-grounded item-type and locality assertions passed",
+  "item_type_cases": [
+    {
+      "phrase": "What about Italian?",
+      "result": "Continuing your search for an Italian restaurant in San Francisco, California:\nMatching source excerpts (quoted evidence, not verified recommendations):\n1. Little Napoli is an Italian restaurant in San Francisco, California.\n   Source: Little Napoli\nAsk about the first result to select it.",
+      "why": "I showed those excerpts because they matched terms in your search. Sources: Little Napoli. They are quoted source matches, not verified recommendations.",
+      "accepted_fact_count": 0
+    },
+    {
+      "phrase": "And the Italian one?",
+      "result": "Continuing your search for an Italian restaurant in San Francisco, California:\nMatching source excerpts (quoted evidence, not verified recommendations):\n1. Little Napoli is an Italian restaurant in San Francisco, California.\n   Source: Little Napoli\nAsk about the first result to select it.",
+      "why": "I showed those excerpts because they matched terms in your search. Sources: Little Napoli. They are quoted source matches, not verified recommendations.",
+      "accepted_fact_count": 0
+    }
+  ],
+  "location_case": {
+    "phrase": "And Italy?",
+    "result": "Continuing your search for a Chinese restaurant in Italy:\nMatching source excerpts (quoted evidence, not verified recommendations):\n1. Roma Table is a Chinese restaurant in Rome, Italy.\n   Source: Roma Table\nAsk about the first result to select it."
+  },
+  "limitations": [
+    "One synthetic restaurant index; source grammar is used to distinguish a type modifier from a location.",
+    "Only one-word item modifiers before restaurant/place/option are supported; arbitrary preferences and multi-slot changes remain open.",
+    "Labels and expected outputs are Codex-authored; this is not independent dialogue-transfer evidence."
+  ]
+}

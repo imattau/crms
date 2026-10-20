@@ -67,17 +67,36 @@ saved and reloaded. “What about Oakland?” keeps the cuisine constraint,
 changes the locality, and presents only the Oakland source. A following
 “why?” explains the new result. When “What about Miami?” finds no source, the
 visible list is cleared; “why?” does not replay the San Francisco result, and
-“the first one” cannot select it. All nine packet assertions and the selected
+“the first one” cannot select it. An untyped “What about French?” prompts for
+clarification instead of being silently treated as a location; the existing
+source result remains available for `why?`. All eleven packet assertions and the selected
 seven-script search/dialogue replay pass.
 
 This closes one bounded search-state transition and its stale-context controls.
-The rewrite applies only to short locality follow-ups after a visible direct
-search. It does not yet handle changes to cuisine, price, time, or other
+The location rewrite applies only to short locality follow-ups after a visible
+direct search. It does not yet handle changes to cuisine, price, time, or other
 constraints, nor does it establish general entity/topic continuity. The corpus
 and labels are Codex-authored, so this is a development regression, not
 independent dialogue-transfer evidence. See the
 [runner](../experiments/v1_520_contextual_search_location_followup.py) and
 [report](../experiments/reports/v1_520_contextual_search_location_followup.json).
+
+## Contextual search item-type follow-up (`v1_521`, 2026-10-20)
+
+Command: `python3 experiments/v1_521_contextual_search_item_type_followup.py`.
+
+After a source-only search for a Chinese restaurant in San Francisco,
+“What about Italian?” and “And the Italian one?” change the item-type modifier
+while keeping the locality. “And Italy?” changes the locality while keeping
+the Chinese restaurant constraint. In each case, only the source matching the
+updated constraints is shown; no fact is accepted, and `why?` remains anchored
+to the latest displayed result. The 12/12 assertions pass.
+
+This uses exact source-text patterns to distinguish a modifier before
+“restaurant” from a locative phrase. It covers one controlled source corpus,
+not general slot extraction, arbitrary preferences, or independent dialogue
+transfer. See the [runner](../experiments/v1_521_contextual_search_item_type_followup.py)
+and [report](../experiments/reports/v1_521_contextual_search_item_type_followup.json).
 
 ## History recall and ordinal source selection in one conversation (`v1_517`)
 

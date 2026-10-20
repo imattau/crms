@@ -2,13 +2,13 @@
   "experiment": "v1_520_contextual_search_location_followup",
   "label_provenance": "Codex-authored development controls",
   "independent_validation": false,
-  "result": "9/9 contextual search and stale-context assertions passed",
+  "result": "11/11 contextual search and stale-context assertions passed",
   "cases": [
     {
       "case": "retain cuisine and replace locality",
       "turns": [
         "Matching source excerpts (quoted evidence, not verified recommendations):\n1. Golden Dragon is a Chinese restaurant in San Francisco, California.\n   Source: Golden Dragon\nAsk about the first result to select it.",
-        "Continuing your search for a chinese restaurant in Oakland:\nMatching source excerpts (quoted evidence, not verified recommendations):\n1. Harbor Noodle is a Chinese restaurant in Oakland, California.\n   Source: Harbor Noodle\nAsk about the first result to select it."
+        "Continuing your search for a Chinese restaurant in Oakland:\nMatching source excerpts (quoted evidence, not verified recommendations):\n1. Harbor Noodle is a Chinese restaurant in Oakland, California.\n   Source: Harbor Noodle\nAsk about the first result to select it."
       ],
       "dialogue_state_reloaded_before_followup": true,
       "visible_after_followup": [
@@ -22,8 +22,17 @@
     },
     {
       "case": "miss clears old displayed results",
-      "response": "Continuing your search for a chinese restaurant in Miami:\nI couldn't find a source excerpt that matched what you're looking for, so I can't recommend an option from the indexed material.",
+      "response": "Continuing your search for a Chinese restaurant in Miami:\nI couldn't find a source excerpt that matched what you're looking for, so I can't recommend an option from the indexed material.",
       "remaining_visible_sources": 0
+    },
+    {
+      "case": "untyped term asks for disambiguation",
+      "response": "I can't tell whether that changes the location or the restaurant type. Please restate the search, or make the location explicit (for example, ‘in Oakland’).",
+      "visible_source_preserved": true
+    },
+    {
+      "case": "why after disambiguation stays with visible evidence",
+      "response": "I showed those excerpts because they matched terms in your search. Sources: Golden Dragon. They are quoted source matches, not verified recommendations."
     },
     {
       "case": "why after miss does not replay stale answer",

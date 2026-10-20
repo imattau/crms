@@ -1415,34 +1415,52 @@ def _present_direct_search_matches(
 
 
 def _contextual_search_continuation(
-        dialogue: CRMSDialogue, text: str) -> tuple[str, str, str] | None:
-    """Carry a visible direct search forward when the user changes locality.
+        dialogue: CRMSDialogue, text: str,
+        research_index: Any | None) -> tuple[str, str, str, str] | None:
+    """Carry a visible direct search forward when one typed constraint changes.
 
-    This only handles short locality substitutions after a displayed search
-    result. It does not resolve general entity mentions or infer a new search
-    category.
+    A source-backed modifier pattern selects an item-type change; a locative
+    phrase or an unambiguous source-backed location selects a locality change.
+    When the source does not resolve the slot, return a clarification plan
+    instead of guessing. No new fact is inferred.
     """
     previous_intent = dialogue.last_intent_hypothesis
     previous_query = dialogue.last_question
     if (previous_intent is None
-            or previous_intent.matched_frame != "explicit-search-request"
+            or previous_intent.matched_frame not in {
+                "explicit-search-request", "search-followup-disambiguation",
+                "explanation-follow-up"}
             or not dialogue.presented_sources
+            or research_index is None
             or not isinstance(previous_query, str)):
         return None
+    # A visible numbered result is a selectable referent; do not reinterpret
+    # “the first one” as a new locality or item-type constraint.
+    _, is_visible_selection = dialogue._select_candidate(text)
+    if (is_visible_selection
+            or (dialogue.presented_sources and re.fullmatch(
+                r"(?:(?:what about|tell me about)\s+)?(?:the\s+)?"
+                r"(?:first|1st|second|2nd|third|3rd|fourth|4th|last)\s+"
+                r"(?:one|option|source|result|item)[?!. ]*",
+                text.strip(), re.IGNORECASE))):
+        return None
     followup = re.fullmatch(
-        r"(?:(?:what|how)\s+about|and(?:\s+in)?)\s+"
-        r"(?P<location>[a-z][a-z0-9 .,'’-]{0,79})[?.!]*",
+        r"(?:(?:what|how)\s+about|and)\s+"
+        r"(?:(?P<preposition>in|near|around|at|within)\s+)?"
+        r"(?P<value>[a-z][a-z0-9 .,'’-]{0,79})[?.!]*",
         text.strip(), re.IGNORECASE)
     if followup is None:
         return None
-    location = followup.group("location").strip(" .,!?'’\"")
-    if (not location or re.match(r"^(?:a|an|the|one|it|they|this|that)\b",
-                                 location, re.IGNORECASE)):
+    value = followup.group("value").strip(" .,!?'’\"")
+    value = re.sub(r"^(?:a|an|the)\s+", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"\s+one$", "", value, flags=re.IGNORECASE).strip()
+    if (not value or re.match(r"^(?:one|it|they|this|that)\b",
+                              value, re.IGNORECASE)):
         return None
     target_match = re.search(
         r"(?:looking for|need to find|want to find|search for|look for|"
         r"find(?:\s+me)?|locate|need|want)\s+"
-        r"(?P<target>.+?)(?:[.!?]|$)", previous_query.casefold())
+        r"(?P<target>.+?)(?:[.!?]|$)", previous_query, re.IGNORECASE)
     if target_match is None:
         return None
     target_parts = re.split(
@@ -1451,7 +1469,51 @@ def _contextual_search_continuation(
     if len(target_parts) != 2 or not target_parts[0].strip():
         return None
     target = target_parts[0].strip()
-    return f"Find {target} in {location}.", target, location
+    original_location = target_parts[1].strip(" .?!")
+
+    # Use only the index's fast-ranked, source-backed hits to identify whether
+    # the bare follow-up was used as a location or as a modifier of the searched
+    # item. An explicit preposition is already enough to type a location.
+    explicit_location = bool(followup.group("preposition"))
+    location_match = explicit_location
+    modifier_match = False
+    item_pattern = re.match(
+        r"(?:(?P<article>a|an|the)\s+)?(?P<modifier>[\w-]+)\s+"
+        r"(?P<head>restaurant|restaurants|place|places|option|options)\b",
+        target, re.IGNORECASE)
+    try:
+        hits = research_index.search(value, limit=10)
+    except (AttributeError, TypeError, ValueError):
+        hits = []
+    for hit in hits:
+        excerpt = str(getattr(hit, "snippet", ""))
+        escaped = re.escape(value)
+        if re.search(
+                rf"\b(?:in|near|around|at|within)\s+{escaped}\b|"
+                rf",\s*{escaped}\b", excerpt, re.IGNORECASE):
+            location_match = True
+        if item_pattern is not None:
+            head = re.escape(item_pattern.group("head").rstrip("s"))
+            if re.search(rf"\b{escaped}\s+{head}s?\b",
+                         excerpt, re.IGNORECASE):
+                modifier_match = True
+
+    if (modifier_match and not location_match
+            and item_pattern is not None):
+        article = item_pattern.group("article")
+        if article and article.casefold() in {"a", "an"}:
+            article = "an" if value[0].casefold() in "aeiou" else "a"
+        updated_target = " ".join(
+            part for part in (article, value, item_pattern.group("head"))
+            if part)
+        query = f"Find {updated_target} in {original_location}."
+        return query, updated_target, original_location, "item-type"
+
+    # If the word is used both ways, only an explicit preposition resolves it.
+    if explicit_location or (location_match and not modifier_match):
+        query = f"Find {target} in {value}."
+        return query, target, value, "location"
+    return None, target, original_location, "clarify"
 
 
 def _compound_wh_parts(text: str) -> list[str] | None:
@@ -1614,8 +1676,10 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         # Treat "and when ...?" as a continuation of the current grounded
         # topic, while keeping the user's original wording in turn history.
         text = _COORDINATED_QUESTION_PREFIX_RE.sub("", text, count=1).lstrip()
-    search_continuation = _contextual_search_continuation(dialogue, text)
-    if search_continuation is not None:
+    search_continuation = _contextual_search_continuation(
+        dialogue, text, research_index)
+    if (search_continuation is not None
+            and search_continuation[0] is not None):
         text = search_continuation[0]
     embedded_request = _EMBEDDED_WH_REQUEST_RE.fullmatch(text.strip())
     if embedded_request is not None:
@@ -1628,7 +1692,18 @@ def respond(dialogue: CRMSDialogue, text: str, *,
                                  indirect.group("rest")))
         text = question
         text = text[:1].upper() + text[1:] + "?"
-    intent = classify_user_intent(dialogue, text)
+    if (search_continuation is not None
+            and search_continuation[3] == "clarify"):
+        intent = UserIntentHypothesis(
+            dialogue_act="clarify",
+            task_intent="seek-information",
+            decision="ambiguous",
+            matched_frame="search-followup-disambiguation",
+            context_predicates=("visible_direct_search",),
+            alternatives=("change the locality", "change the item type"),
+        )
+    else:
+        intent = classify_user_intent(dialogue, text)
     act = classify_act(text)
     preserves_question = bool(
         intent is not None and (
@@ -1696,6 +1771,14 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         dialogue.record_turn(original_text, history_act, turn, intent)
         _offer(dialogue, turn)
         return turn
+
+    if (search_continuation is not None
+            and search_continuation[3] == "clarify"):
+        return with_intent(DialogueTurn(
+            "help", original_text, dialogue.last_question,
+            text=("I can't tell whether that changes the location or the "
+                  "restaurant type. Please restate the search, or make the "
+                  "location explicit (for example, ‘in Oakland’).")))
 
     if (act is None and _EXPLANATION_FOLLOWUP_RE.fullmatch(text.strip())
             and dialogue.last_compound_evidence is not None
@@ -2076,8 +2159,9 @@ def respond(dialogue: CRMSDialogue, text: str, *,
     if act is None and _EXPLANATION_FOLLOWUP_RE.fullmatch(text.strip()):
         if (dialogue.presented_sources and dialogue.last_question
                 and dialogue.last_intent_hypothesis is not None
-                and dialogue.last_intent_hypothesis.matched_frame
-                    == "explicit-search-request"):
+                and dialogue.last_intent_hypothesis.matched_frame in {
+                    "explicit-search-request",
+                    "search-followup-disambiguation"}):
             sources = ", ".join(
                 item.get("title", "source")
                 for item in dialogue.presented_sources[:3])
@@ -2109,7 +2193,8 @@ def respond(dialogue: CRMSDialogue, text: str, *,
             turn = _present_direct_search_matches(
                 dialogue, turn, research_index)
             if search_continuation is not None:
-                _, target, location = search_continuation
+                _, target, location, _ = search_continuation
+                assert target is not None and location is not None
                 turn.text = (f"Continuing your search for {target} in "
                              f"{location}:\n{turn.text}")
         if dialogue.pending_binding is not None:
