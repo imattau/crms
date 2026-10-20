@@ -1,0 +1,342 @@
+{
+  "experiment": "v1_462_taskmaster_fresh_dialogue_intent_holdout",
+  "code_revision": "70abcd8989e94064a47bd80d4aa1d66982b1a9b6",
+  "dataset": "Taskmaster-1, two-person Wizard-of-Oz dialogues",
+  "dataset_license": "CC BY 4.0",
+  "attribution": "Bill Byrne, Karthik Krishnamoorthi, Chinnadhurai Sankar, Arvind Neelakantan, Amit Dubey, Kyu-Young Kim, and Andy Cedilnik, Taskmaster-1: Toward a Realistic and Diverse Dialog Dataset, 2019.",
+  "source_sha256": "cd3bc4e968487315d412c044d30af2bf0a4b33c3ef8b74c589f1e1fa832bf72f",
+  "sampling": "Three restaurant-table conversations from the deterministic Taskmaster test split; IDs were hash-ranked after excluding IDs in the prepared and previously labeled local Taskmaster/dialogue CSVs. IDs were frozen before this replay.",
+  "selection_audit": {
+    "eligible_unseen_restaurant_test_conversations": 63,
+    "prior_annotation_csv_count": 40,
+    "prior_annotation_csv_basenames": [
+      "crms_dialogue_dev_v1/user_turns.csv",
+      "crms_dialogue_dev_v2/user_turns.csv",
+      "crms_dialogue_dev_v3/user_turns.csv",
+      "crms_dialogue_dev_v4/user_turns.csv",
+      "crms_dialogue_dev_v4/user_turns_current_eval.csv",
+      "crms_dialogue_feasibility_repeat/assistant_turns_to_label.csv",
+      "crms_dialogue_feasibility_repeat/user_turns_to_label.csv",
+      "crms_dialogue_feasibility_v1/assistant_turns_to_label.csv",
+      "crms_dialogue_feasibility_v1/dev_first5_codex_primary.csv",
+      "crms_dialogue_feasibility_v1/dev_test_user_turns_goal_labeled.csv",
+      "crms_dialogue_feasibility_v1/dev_user_turns_goal_labeled.csv",
+      "crms_dialogue_feasibility_v1/test_fresh_goal_labeled.csv",
+      "crms_dialogue_feasibility_v1/test_fresh_labeled.csv",
+      "crms_dialogue_feasibility_v1/test_fresh_raw.csv",
+      "crms_dialogue_feasibility_v1/test_frozen_labeled.csv",
+      "crms_dialogue_feasibility_v1/test_frozen_raw.csv",
+      "crms_dialogue_feasibility_v1/test_user_turns_goal_labeled.csv",
+      "crms_dialogue_feasibility_v1/test_v1_407_labeled.csv",
+      "crms_dialogue_feasibility_v1/test_v1_407_raw.csv",
+      "crms_dialogue_feasibility_v1/test_v1_user_turns_goal_labeled.csv",
+      "crms_dialogue_feasibility_v1/user_turns_goal_labeled.csv",
+      "crms_dialogue_feasibility_v1/user_turns_to_label.csv",
+      "crms_dialogue_intent_aug_v1/augmented_train_labels.csv",
+      "crms_dialogue_intent_aug_v1/fresh_test_codex_primary.csv",
+      "crms_dialogue_intent_aug_v1/new_train_labels.csv",
+      "crms_dialogue_test_v1/user_turns.csv",
+      "crms_dialogue_test_v2/user_turns.csv",
+      "crms_taskmaster_movie_pilot/assistant_turns_to_label.csv",
+      "crms_taskmaster_movie_pilot/user_turns_to_label.csv",
+      "crms_taskmaster_movie_pilot_v2/assistant_turns_to_label.csv",
+      "crms_taskmaster_movie_pilot_v2/movie_dev_first4_codex_primary.csv",
+      "crms_taskmaster_movie_pilot_v2/movie_test_final3_codex_primary.csv",
+      "crms_taskmaster_movie_pilot_v2/movie_test_final6_codex_primary.csv",
+      "crms_taskmaster_movie_pilot_v2/movie_test_final_remaining_codex_primary.csv",
+      "crms_taskmaster_movie_pilot_v2/movie_test_first4_codex_primary.csv",
+      "crms_taskmaster_movie_pilot_v2/movie_test_next4_codex_primary.csv",
+      "crms_taskmaster_movie_pilot_v2/movie_test_untouched4_codex_primary.csv",
+      "crms_taskmaster_movie_pilot_v2/user_turns_to_label.csv",
+      "crms_taskmaster_pilot/assistant_turns_to_label.csv",
+      "crms_taskmaster_pilot/user_turns_to_label.csv"
+    ],
+    "prior_csv_conversation_id_count": 700,
+    "prior_csv_conversation_ids_sha256": "9ab39929b172768e37b5017130425b9c127d32fcc04c09ce29b6df709a781067",
+    "selected_ids_ranked_first": true
+  },
+  "annotation_provenance": "Single Codex primary labels by the protocol; no independent human review or second labeler. Agreement is not accuracy.",
+  "label_count": 27,
+  "citation_validation": {
+    "verified": 27,
+    "total": 27
+  },
+  "conversations": [
+    {
+      "conversation_id": "dlg-55ba0118-df2b-4ad9-9f92-afd4df0c5a5d",
+      "instruction_id": "restaurant-table-2",
+      "split": "test",
+      "turn_count": 21,
+      "user_turn_count": 9,
+      "normalized_transcript_sha256": "64b80213797ec1105e79dae38ac82a986d39f828eb0c45aca053ad3edf8f7741"
+    },
+    {
+      "conversation_id": "dlg-e41052fb-f4a4-4975-a198-3f668bd3f69e",
+      "instruction_id": "restaurant-table-1",
+      "split": "test",
+      "turn_count": 23,
+      "user_turn_count": 11,
+      "normalized_transcript_sha256": "3f93ac5ade3e9bd0eb74d3082c6d5efe253e71609c48f602f7d8397e23f2b790"
+    },
+    {
+      "conversation_id": "dlg-c9aff912-d0a5-48a3-b6d6-edb9f314bac8",
+      "instruction_id": "restaurant-table-1",
+      "split": "test",
+      "turn_count": 14,
+      "user_turn_count": 7,
+      "normalized_transcript_sha256": "f27c7339ade8a4051ef4739e95361dc869053cd5e9b1ad448d089b280ee89a05"
+    }
+  ],
+  "metrics": {
+    "diagnostic": "transcript_context_intent_replay",
+    "label_provenance": "Codex primary labels; not independent gold",
+    "accuracy_claimed": false,
+    "context_free": {
+      "act_match": 9,
+      "conversations": 3,
+      "hypothesis": 11,
+      "joint_match": 6,
+      "labeled": 27,
+      "no_hypothesis": 16,
+      "selected_intent": 11,
+      "task_match": 6,
+      "uncertain_label": 3,
+      "hypothesis_coverage": 0.4074074074074074,
+      "selected_intent_coverage": 0.4074074074074074,
+      "joint_label_agreement_all_labeled": 0.2222222222222222,
+      "joint_label_agreement_on_hypotheses": 0.5454545454545454,
+      "disagreements": [
+        {
+          "conversation_id": "dlg-e41052fb-f4a4-4975-a198-3f668bd3f69e",
+          "utterance_index": "1",
+          "utterance": "Hey. I need to find a Chinese restaurant. I'm in San Francisco, California.",
+          "expected": {
+            "dialogue_act": "request-action",
+            "task_intent": "seek-information"
+          },
+          "predicted": {
+            "dialogue_act": "request-action",
+            "task_intent": "other-task",
+            "decision": "selected",
+            "matched_frame": "explicit-generic-task-request"
+          }
+        },
+        {
+          "conversation_id": "dlg-e41052fb-f4a4-4975-a198-3f668bd3f69e",
+          "utterance_index": "3",
+          "utterance": "I would like one with a high rating. I would also like one that is portable. And I also like one that has take out.",
+          "expected": {
+            "dialogue_act": "provide-information",
+            "task_intent": "provide-constraint"
+          },
+          "predicted": {
+            "dialogue_act": "request-action",
+            "task_intent": "other-task",
+            "decision": "selected",
+            "matched_frame": "explicit-generic-task-request"
+          }
+        },
+        {
+          "conversation_id": "dlg-e41052fb-f4a4-4975-a198-3f668bd3f69e",
+          "utterance_index": "13",
+          "utterance": "Book a reservation with the second one?",
+          "expected": {
+            "dialogue_act": "request-action",
+            "task_intent": "make-reservation"
+          },
+          "predicted": {
+            "dialogue_act": "request-action",
+            "task_intent": "other-task",
+            "decision": "selected",
+            "matched_frame": "direct-imperative-request"
+          }
+        },
+        {
+          "conversation_id": "dlg-e41052fb-f4a4-4975-a198-3f668bd3f69e",
+          "utterance_index": "19",
+          "utterance": "Put it under Frank.",
+          "expected": {
+            "dialogue_act": "provide-information",
+            "task_intent": "provide-constraint"
+          },
+          "predicted": {
+            "dialogue_act": "request-action",
+            "task_intent": "other-task",
+            "decision": "selected",
+            "matched_frame": "direct-imperative-request"
+          }
+        },
+        {
+          "conversation_id": "dlg-c9aff912-d0a5-48a3-b6d6-edb9f314bac8",
+          "utterance_index": "11",
+          "utterance": "Okay.",
+          "expected": {
+            "dialogue_act": "acknowledgement",
+            "task_intent": "end-interaction"
+          },
+          "predicted": {
+            "dialogue_act": "acknowledgement",
+            "task_intent": "continue-current-task",
+            "decision": "selected",
+            "matched_frame": "acknowledgement"
+          }
+        }
+      ]
+    },
+    "transcript_replay": {
+      "act_match": 10,
+      "conversations": 3,
+      "hypothesis": 15,
+      "joint_match": 7,
+      "labeled": 27,
+      "no_hypothesis": 12,
+      "selected_intent": 15,
+      "task_match": 7,
+      "uncertain_label": 3,
+      "hypothesis_coverage": 0.5555555555555556,
+      "selected_intent_coverage": 0.5555555555555556,
+      "joint_label_agreement_all_labeled": 0.25925925925925924,
+      "joint_label_agreement_on_hypotheses": 0.4666666666666667,
+      "disagreements": [
+        {
+          "conversation_id": "dlg-e41052fb-f4a4-4975-a198-3f668bd3f69e",
+          "utterance_index": "1",
+          "utterance": "Hey. I need to find a Chinese restaurant. I'm in San Francisco, California.",
+          "expected": {
+            "dialogue_act": "request-action",
+            "task_intent": "seek-information"
+          },
+          "predicted": {
+            "dialogue_act": "request-action",
+            "task_intent": "other-task",
+            "decision": "selected",
+            "matched_frame": "explicit-generic-task-request"
+          }
+        },
+        {
+          "conversation_id": "dlg-e41052fb-f4a4-4975-a198-3f668bd3f69e",
+          "utterance_index": "3",
+          "utterance": "I would like one with a high rating. I would also like one that is portable. And I also like one that has take out.",
+          "expected": {
+            "dialogue_act": "provide-information",
+            "task_intent": "provide-constraint"
+          },
+          "predicted": {
+            "dialogue_act": "request-action",
+            "task_intent": "other-task",
+            "decision": "selected",
+            "matched_frame": "explicit-generic-task-request"
+          }
+        },
+        {
+          "conversation_id": "dlg-e41052fb-f4a4-4975-a198-3f668bd3f69e",
+          "utterance_index": "13",
+          "utterance": "Book a reservation with the second one?",
+          "expected": {
+            "dialogue_act": "request-action",
+            "task_intent": "make-reservation"
+          },
+          "predicted": {
+            "dialogue_act": "request-action",
+            "task_intent": "other-task",
+            "decision": "selected",
+            "matched_frame": "direct-imperative-request"
+          }
+        },
+        {
+          "conversation_id": "dlg-e41052fb-f4a4-4975-a198-3f668bd3f69e",
+          "utterance_index": "15",
+          "utterance": "Today at",
+          "expected": {
+            "dialogue_act": "provide-information",
+            "task_intent": "provide-constraint"
+          },
+          "predicted": {
+            "dialogue_act": "answer-clarification",
+            "task_intent": "make-reservation",
+            "decision": "selected",
+            "matched_frame": "answer-to-open-dialogue-question"
+          }
+        },
+        {
+          "conversation_id": "dlg-e41052fb-f4a4-4975-a198-3f668bd3f69e",
+          "utterance_index": "19",
+          "utterance": "Put it under Frank.",
+          "expected": {
+            "dialogue_act": "provide-information",
+            "task_intent": "provide-constraint"
+          },
+          "predicted": {
+            "dialogue_act": "request-action",
+            "task_intent": "other-task",
+            "decision": "selected",
+            "matched_frame": "direct-imperative-request"
+          }
+        },
+        {
+          "conversation_id": "dlg-c9aff912-d0a5-48a3-b6d6-edb9f314bac8",
+          "utterance_index": "7",
+          "utterance": "Today at 8:00 p.m.",
+          "expected": {
+            "dialogue_act": "provide-information",
+            "task_intent": "provide-constraint"
+          },
+          "predicted": {
+            "dialogue_act": "answer-clarification",
+            "task_intent": "make-reservation",
+            "decision": "selected",
+            "matched_frame": "answer-to-open-dialogue-question"
+          }
+        },
+        {
+          "conversation_id": "dlg-c9aff912-d0a5-48a3-b6d6-edb9f314bac8",
+          "utterance_index": "9",
+          "utterance": "four.",
+          "expected": {
+            "dialogue_act": "provide-information",
+            "task_intent": "provide-constraint"
+          },
+          "predicted": {
+            "dialogue_act": "answer-clarification",
+            "task_intent": "make-reservation",
+            "decision": "selected",
+            "matched_frame": "answer-to-open-dialogue-question"
+          }
+        },
+        {
+          "conversation_id": "dlg-c9aff912-d0a5-48a3-b6d6-edb9f314bac8",
+          "utterance_index": "11",
+          "utterance": "Okay.",
+          "expected": {
+            "dialogue_act": "acknowledgement",
+            "task_intent": "end-interaction"
+          },
+          "predicted": {
+            "dialogue_act": "acknowledgement",
+            "task_intent": "continue-current-task",
+            "decision": "selected",
+            "matched_frame": "acknowledgement"
+          }
+        }
+      ]
+    },
+    "replay_policy": [
+      "Reconstruct only the final visible assistant question from preceding_context.",
+      "Carry active goal only when selected by CRMS's own prior intent hypothesis.",
+      "Do not use annotated intent, goal, slot values, or expected answer to build state.",
+      "This replays the intent classifier; it does not simulate complete assistant responses."
+    ],
+    "limitations": [
+      "Three conversations from one transactional domain are not representative of open-domain dialogue.",
+      "The evaluator measures intent-label agreement, not answer correctness or task completion.",
+      "The labels are single-Codex annotations and are not independent ground truth.",
+      "Context is limited to the preceding two transcript turns and CRMS's own prior predictions."
+    ]
+  },
+  "limitations": [
+    "Three conversations from one transactional domain are not representative of open-domain dialogue.",
+    "The evaluator measures intent-label agreement, not answer correctness or task completion.",
+    "The labels are single-Codex annotations and are not independent ground truth.",
+    "Sampling excluded IDs found in local annotation CSVs; the report records inventory filenames and a digest of their combined ID set."
+  ]
+}

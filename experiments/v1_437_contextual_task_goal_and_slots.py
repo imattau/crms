@@ -128,7 +128,8 @@ def main() -> None:
         hypothesis = classify("Yes, please.", dialogue)
         require(hypothesis is not None
                 and hypothesis.dialogue_act == "confirm"
-                and hypothesis.task_intent == "other-task",
+                and hypothesis.task_intent == "resolve-ambiguity"
+                and hypothesis.goal_intent == "other-task",
                 f"bare acceptance did not resolve the proposal: {prompt!r}: {hypothesis}")
 
     no_context = classify("Two, please.", CRMSDialogue(CRMSKnowledgeBase()))

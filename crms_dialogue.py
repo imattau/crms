@@ -46,7 +46,7 @@ _OPEN_QUESTION_SLOT_TYPES = {
     "unknown", "detail", "topic", "entity", "location", "restaurant_type",
     "party_size", "quantity", "choice",
     "date_time", "seating", "cuisine", "restaurant_choice", "confirmation",
-    "yes_no",
+    "reservation_name", "yes_no",
 }
 _SESSION_SLOT_TYPES = {
     "location", "party_size", "date_time", "seating", "cuisine",
@@ -108,6 +108,11 @@ def infer_open_question_slot(prompt: str, answer_kind: str) -> str:
             "what cuisine", "which cuisine", "what kind of food",
             "what type of food", "what style of food", "food preference")):
         return "cuisine"
+    if any(cue in text for cue in (
+            "what name should i put", "what name should we put",
+            "under what name", "what name should i use",
+            "what name should we use")):
+        return "reservation_name"
     if any(cue in text for cue in (
             "which option", "which one", "which do you prefer",
             "which would you prefer", "which theater", "which theatre",

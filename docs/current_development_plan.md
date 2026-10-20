@@ -102,6 +102,25 @@ integration boundary: the dialogue layer retains the correct topic, but the
 final quoted-evidence gate must receive the exact paragraph that binds a
 pronoun to its named antecedent. A pronoun-only paragraph remains an abstention.
 
+`v1_462` now measures transcript-context intent on three newly reserved
+restaurant-table test conversations, disjoint from 700 IDs already present in
+the prepared local Taskmaster/dialogue CSV inventory. All 27 cited spans
+verified. Contextual replay covered 15/27 turns and matched both single-Codex
+act/intent labels on 7/27 (25.9%); context-free classification matched 6/27
+(22.2%). This adds only one
+joint match despite four additional hypotheses, and the labels are not
+independent ground truth. Treat the weak transfer result as evidence to keep
+the dialogue gate open, not as task accuracy. The next evaluation must score
+end-to-end completion on independently authored transcripts with frozen
+expected outcomes; do not tune against the now-inspected Taskmaster rows.
+
+The first inspection-driven repair is recorded in `v1_463`: explicit booking
+imperatives now precede generic imperative classification, and booking-name
+questions expose a typed contextual slot so “Put it under Frank” is treated as
+the answer while unrelated requests still interrupt. The chat-path and nearby
+task-goal/confirmation regressions pass. This closes a narrow precedence bug;
+the Taskmaster transfer result remains frozen at its pre-change score.
+
 **Gate:** fixed regressions pass in a clean process; unresolved referents are
 clarified or declined; no confident wrong referent appears in the held-out
 conversation set. Record transcript authorship and labeling provenance.

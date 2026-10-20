@@ -2677,3 +2677,45 @@ negative was not simplified into an alias. This validates the review/writeback
 mechanics on fixtures, not the correctness or generality of the real-corpus
 alignment. Next, evaluate a blinded sample of proposals and non-proposals
 before widening the allowlist or promoting this to a language-learning claim.
+
+## Fresh restaurant-dialogue intent holdout (2026-10-20)
+
+`experiments/v1_462_taskmaster_fresh_dialogue_intent_holdout.py` reserves the
+first three conversations from a deterministic hash ranking of unseen
+restaurant-table test conversations, after excluding IDs present in the
+prepared and previously labeled local Taskmaster/dialogue CSVs. The eligible
+pool contained 63 conversations; the selected three contain 27 user turns.
+They are disjoint from the 700 distinct conversation IDs already present in
+the local Taskmaster/dialogue CSV inventory. The source SHA-256, inventory digest, selected IDs, normalized
+transcript hashes, and outcome are recorded in
+[`v1_462_taskmaster_fresh_dialogue_intent_holdout.json`](reports/v1_462_taskmaster_fresh_dialogue_intent_holdout.json).
+All 27 generated utterance citations resolved exactly.
+
+The transcript-context replay emitted hypotheses for 15/27 turns (55.6%) and
+matched both single-Codex dialogue-act/task-intent labels on 7/27 (25.9%;
+7/15, 46.7% of hypotheses). The context-free baseline hypothesized 11/27
+(40.7%) and matched 6/27 (22.2%; 6/11, 54.5% of hypotheses). Context therefore
+added four hypotheses but only one joint match in this small slice. This
+corroborates the weak transfer signal from the movie-ticket test set; it does
+not establish dialogue accuracy because one Codex pass supplied the labels.
+Disagreements include imperative wording used to provide a name or request a
+reservation, answer-to-slot turns, and a short acknowledgment near task
+completion.
+
+This is a label-transfer probe, not an end-to-end conversation or task
+completion benchmark. It covers only three Taskmaster conversations in one
+transactional domain, and the second-turn context replay is an approximation
+of full dialogue. Do not tune the model against these rows and reuse the score.
+The next dialogue gate still needs independently authored transcripts with
+frozen task outcomes, evidence expectations, and explicit completion scoring.
+
+After this one-time replay, inspection found two related precedence gaps.
+`Book a reservation with the second one?` was captured by the generic imperative
+route before reservation intent, and `Put it under Frank.` could be read as a
+new imperative instead of a response to an open reservation-name question.
+`v1_463_contextual_booking_name_and_request.py` adds a typed
+`reservation_name` slot, routes explicit booking imperatives to
+`make-reservation`, and checks the full reply path for the name answer. An
+unrelated imperative still interrupts the slot. The relevant runtime checks
+`v1_402`, `v1_444`, `v1_461`, and `v1_463` pass. This repairs a narrow, visible
+failure class; it is not a rerun of the holdout and does not improve its score.

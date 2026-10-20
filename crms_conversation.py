@@ -242,6 +242,10 @@ _DIRECT_IMPERATIVE_REQUEST_RE = re.compile(
     r"^(?:please\s+)?(?P<verb>"
     + "|".join(sorted(_DIRECT_REQUEST_VERBS, key=len, reverse=True))
     + r")\b\s+\S.+$", re.IGNORECASE)
+_RESERVATION_NAME_SLOT_RESPONSE_RE = re.compile(
+    r"^(?:please\s+)?(?:put\s+(?:it|this|the reservation)\s+under|"
+    r"use\s+the\s+name)\s+(?P<name>[\w][\w’' .-]{0,79})[.! ]*$",
+    re.IGNORECASE)
 _EMBEDDED_WH_REQUEST_RE = re.compile(
     r"^(?:please\s+)?(?:(?:can|could|would|will)\s+you\s+)?"
     r"(?:tell|show|explain|describe)\s+me\s+"
@@ -274,8 +278,10 @@ _EXPLICIT_RESERVATION_REQUEST_RE = re.compile(
     r"(?:(?:dinner|lunch)\s+)?(?:reservation|booking|table)\b|"
     r"(?:let['’]s|please)\s+(?:make|place|book|reserve|set\s+up)\s+"
     r"(?:(?:a|the)\s+)?(?:(?:dinner|lunch)\s+)?"
-    r"(?:reservation|booking|table)\b)"
-    r".*[.! ]*$", re.IGNORECASE)
+    r"(?:reservation|booking|table)\b|"
+    r"(?:please\s+)?(?:book|reserve)\s+(?:(?:a|the)\s+)?"
+    r"(?:(?:dinner|lunch)\s+)?(?:reservation|booking|table)\b)"
+    r".*[.!? ]*$", re.IGNORECASE)
 _RESERVATION_COMMITMENT_RE = re.compile(
     r"\b(?:i|we)(?:['’]d|\s+(?:would|could))\s+"
     r"(?:like|love|want)\s+to\s+(?:make|place|book|reserve|set\s+up|do)\s+"
@@ -613,6 +619,8 @@ def _open_question_task_intent(dialogue: CRMSDialogue,
         return "provide-constraint"
     if open_question.get("expected_slot") == "confirmation":
         return "resolve-ambiguity"
+    if open_question.get("expected_slot") == "reservation_name":
+        return "make-reservation"
     if open_question.get("expected_slot") == "choice":
         return "resolve-ambiguity"
     if (re.search(r"\b(?:cancel|cancell?ing)\b", prompt)
@@ -767,6 +775,7 @@ def classify_user_intent(
                 context_predicates=("pending_candidate_choice",),
                 alternatives=tuple(dialogue.pending_result.candidates or ()),
             )
+
         if _BARE_YES_NO_RE.fullmatch(text.strip()):
             return UserIntentHypothesis(
                 dialogue_act="answer-clarification",
@@ -777,14 +786,50 @@ def classify_user_intent(
                 alternatives=tuple(dialogue.pending_result.candidates or ()),
             )
 
+    open_question = dialogue.open_dialogue_question
+
     # A clear new imperative is a new task, even while the assistant is
     # waiting for a short clarification value. Do not absorb requests such as
     # “Tell me a joke” as the entity or detail requested by the prior turn.
     direct_imperative = _DIRECT_IMPERATIVE_REQUEST_RE.fullmatch(text.strip())
+    reservation_request_text = text.strip()
+    reservation_commitment = bool(_RESERVATION_COMMITMENT_RE.search(
+        reservation_request_text))
+    trailing_clause = re.split(
+        r"(?<=[.!?])\s+", reservation_request_text)[-1].strip()
+    trailing_request = _MODAL_REQUEST_RE.fullmatch(trailing_clause)
+    if (reservation_commitment and trailing_request is not None
+            and trailing_request.group("verb").casefold()
+            in _INFORMATION_REQUEST_VERBS):
+        return UserIntentHypothesis(
+            dialogue_act="request-action",
+            task_intent="seek-information",
+            goal_intent="make-reservation",
+            decision="selected",
+            matched_frame="reservation-goal-with-information-request",
+            context_predicates=("direct-user-request",),
+        )
+    is_explicit_reservation_request = bool(
+        _EXPLICIT_RESERVATION_REQUEST_RE.fullmatch(reservation_request_text)
+        or reservation_commitment)
+    if is_explicit_reservation_request:
+        return UserIntentHypothesis(
+            dialogue_act="request-action",
+            task_intent="make-reservation",
+            goal_intent="make-reservation",
+            decision="selected",
+            matched_frame="explicit-reservation-request",
+            context_predicates=("direct-user-request",),
+        )
+    name_slot_reply = bool(
+        open_question is not None
+        and open_question.get("expected_slot") == "reservation_name"
+        and _RESERVATION_NAME_SLOT_RESPONSE_RE.fullmatch(text.strip()))
     if (direct_imperative is not None
             and _YES_NO_QUESTION_RE.fullmatch(text.strip()) is None
             and classify_act(text) is None
-            and _session_slot_correction(text) is None):
+            and _session_slot_correction(text) is None
+            and not name_slot_reply):
         verb = direct_imperative.group("verb").casefold()
         task_intent = ("seek-information" if verb in _INFORMATION_REQUEST_VERBS
                        else "other-task")
@@ -797,7 +842,6 @@ def classify_user_intent(
             context_predicates=("direct-user-request",),
         )
 
-    open_question = dialogue.open_dialogue_question
     if open_question is not None:
         intent_model = getattr(dialogue, "intent_model", None)
         context_provider = getattr(dialogue, "intent_context", None)
@@ -958,40 +1002,7 @@ def classify_user_intent(
             matched_frame=act,
         )
 
-    # Recognize a bounded, explicit booking request in ordinary declarative
-    # wording. Questions about how reservations work stay information requests.
     reservation_request = text.strip()
-    reservation_commitment = bool(_RESERVATION_COMMITMENT_RE.search(
-        reservation_request))
-    is_reservation_request = bool(
-        _EXPLICIT_RESERVATION_REQUEST_RE.fullmatch(reservation_request)
-        or reservation_commitment)
-    is_request_question = bool(
-        _RESERVATION_REQUEST_QUESTION_RE.search(reservation_request))
-    trailing_clause = re.split(r"(?<=[.!?])\s+", reservation_request)[-1].strip()
-    trailing_request = _MODAL_REQUEST_RE.fullmatch(trailing_clause)
-    if (reservation_commitment and trailing_request is not None
-            and trailing_request.group("verb").casefold()
-            in _INFORMATION_REQUEST_VERBS):
-        return UserIntentHypothesis(
-            dialogue_act="request-action",
-            task_intent="seek-information",
-            goal_intent="make-reservation",
-            decision="selected",
-            matched_frame="reservation-goal-with-information-request",
-            context_predicates=("direct-user-request",),
-        )
-    if (is_reservation_request
-            and ("?" not in reservation_request or is_request_question)):
-        return UserIntentHypothesis(
-            dialogue_act="request-action",
-            task_intent="make-reservation",
-            decision="selected",
-            matched_frame="explicit-reservation-request",
-            context_predicates=("direct-user-request",),
-            goal_intent="make-reservation",
-        )
-
     if _AVAILABILITY_SEARCH_RE.search(reservation_request):
         return UserIntentHypothesis(
             dialogue_act="request-action",
