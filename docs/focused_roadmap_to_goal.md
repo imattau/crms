@@ -423,87 +423,125 @@ academic-paper sources.
 
 The project is architecturally aligned, but it is not yet on track to claim
 broad capability: success still depends on controlled examples, hand-coded
-routes, and supervised labels. The central goal is held-out task completion
-through ordinary chat, with checkable results and correction. Keep the gates
-short and observable. Dialogue safety is a release gate for chat-facing
-changes, while source-learning research and the recombination/reasoning path
-proceed in parallel. Recombination must not wait indefinitely for a general
-source extractor: use reviewed components for its first end-to-end proof and
-label their provenance honestly.
+routes, and supervised labels. The near-term objective is to move the existing
+proof-filter/procedure slice from a narrow demonstration toward transferable
+task completion, while keeping dialogue safety in the release path. Source
+rule discovery proceeds as a separate research lane; it must not block
+recombination with already reviewed components.
 
-1. **Keep chat safe and establish a compact shared scorecard.** Turn the
-   Rome/Paris conversation into a clean-process transcript regression,
-   including the Eiffel Tower → Colosseum → “when was it completed?” switch,
-   “and Italy?” after source-only evidence, failed-turn context retention,
-   “why?” anchoring, “what did I just ask?”, and “the first one”. Fix referent
-   grounding and context lifetime before adding dialogue moves. Replay fixed
-   language, retrieval, reasoning, recombination, and dialogue controls in a
-   fresh process. Report wrong answers, omissions, clarification, abstention,
-   proof validity, and task completion separately. **Gate:** no confident
-   wrong referent or unsupported factual answer in fixed controls; ambiguous
-   context must clarify or abstain.
-2. **Prove recombination through chat with verified reasoning.** Use
-   independently reviewed components that already exist; do not make this
-   milestone depend on autonomous extraction. Construct frozen unseen
-   multi-step requests with varied wording, values, and operation order. Run
-   each through ordinary chat and fresh-process reload. Include a proof-checked
-   reasoning step, missing premises, negatives, conflicts, cycles/integrity
-   failures, unsupported operations, and incomplete search. Keep source
-   evidence, supervision, component rules, connective knowledge, proof, and
-   independent output checks separately traceable. **Gate:** chat completes a
-   held-out composition; an independent checker accepts valid results and
-   rejects invalid ones; unsupported or incomplete requests do not yield
-   confident answers. If only an experiment orchestrator can compose the
-   components, the gate remains open. The first runtime slice now exists in
-   `v1_491`: one natural-language request filters an explicit finite integer
-   list by complete, independently checked relation proofs, then applies a
-   learned list procedure. It preserves explicit negatives, blocks output if
-   any member is unknown or conflicted, cites proof and procedure-example
-   provenance, explains its current proof on `why?`, clears stale explanation
-   context on a new turn, and works after fresh-process reload. The source graph
-   is a controlled fixture and procedure labels are Codex-supplied; the next
-   step is held-out wording and independently reviewed task cases, not a broad
-   reasoning or planning claim.
-3. **Run one bounded source-learning transfer checkpoint.** Use the
-   NumPy/pandas/PyTorch/SciPy/Pydantic findings as development controls. Test
-   separately cited context bundles on those controls, but do not treat
-   context availability as claim correctness. Freeze the resulting method and
-   evaluate a new publisher and untouched API units, with proposals and
-   non-proposals selected before review. Measure useful claims, false
-   proposals, missed claims, abstentions, and review effort. **Gate:** useful
-   claims survive independent review with roles, conditions, polarity, and
-   citation spans recoverable. Otherwise narrow the claim or redesign the
-   representation; do not keep tuning on successive publishers and call that
-   transfer.
-4. **Close self-learning only after the composition gate.** Let verified
-   outputs become reviewable derived proposals with lineage, initially
-   separated from taught/source-backed knowledge. Test correction propagation,
-   invalidation, duplicate suppression, trust weighting, stale-lineage
-   abstention, and bounded store growth. **Gate:** corrections disable every
-   dependent derivation until revalidated; no derived output validates its own
-   generating rule; repeated use does not amplify an injected error.
-5. **Advance contextual intent and domain breadth from measured losses.**
-   Compare contextual intent with the explicit baseline on held-out
-   conversations and task outcomes, not label agreement alone. Dialogue-move
-   induction stays research until it improves the baseline. Then choose one
-   bounded coding, math, translation, or creative task from the scorecard and
-   evaluate it through the same natural-language interface. **Gate:** held-out
-   task performance improves without more wrong answers or inappropriate
-   actions.
-6. **Verify the distributable SQLite model as the complete runtime.** Copy it
-   to a clean location with original sources unavailable, then query, learn,
-   compose, reason, explain, correct, save/reload, and rerun the scorecard from
-   the copy alone. Record size, runtime, compatibility, migration, source
-   licensing, and unsupported cases after the correction and derived-record
-   lifecycles are stable.
+### Milestone 1 — Freeze one end-to-end scorecard and verify current failures
 
-Do not add corpus size, dialogue mechanisms, domain breadth, or storage
-migrations as stand-alone progress. Keep recombination, self-learning rules,
-and verified reasoning on the critical path; dialogue protects the route to
-those capabilities. After every gate, ask whether held-out user tasks became
-more complete without adding confident errors. If not, preserve the failure,
-state what it falsifies, and change the smallest part of the path that caused
-it.
+Build a small, versioned packet of ordinary chat tasks covering (a) the
+reported Eiffel Tower/Colosseum topic switch, source-only follow-ups, failed
+turns, `why?`, history and ordinal references; (b) relation proofs combined
+with learned procedures; and (c) negative, incomplete, conflicting, cyclic,
+and unsupported cases. Re-run the reported failures against a clean current
+process before changing code, because later commits may already have fixed
+some. Record task completion, wrong answers, omissions, clarification,
+abstention, proof validity, evidence validity, latency, and reload behavior as
+separate measures. Keep development cases out of the frozen transfer set.
+
+**Gate:** all fixed safety controls pass; ambiguous referents clarify or
+abstain; every answer is supported by the shown evidence or a verified proof.
+If this fails, repair the smallest dialogue or answer-routing seam and rerun
+the whole packet.
+
+### Milestone 2 — Make proof-backed recombination transfer through chat
+
+Extend `v1_491` from one exact request shape into a small set of user-written
+tasks with changed entities, values, wording, and operation order. Keep the
+learned procedures and knowledge components independently sourced or reviewed
+and label every supervision step. Exercise at least two composition shapes,
+including proof-based selection followed by a procedure and a multi-step
+reasoning conclusion used by a later operation. Include missing premises,
+explicit negatives, conflicts, cycles/integrity violations, unsupported
+operations, and search limits. Run through ordinary chat, a new process, and
+the copied model once its serialization path is exercised.
+
+**Gate:** frozen held-out requests complete through chat; an independent
+checker accepts valid outputs and rejects tampered or invalid ones; unknown,
+conflicting, or incomplete inputs never become confident positives. Report
+coverage and abstention as well as accuracy. If only a test harness can
+coordinate the parts, this gate is still open.
+
+### Milestone 3 — Turn verified outputs into governed learning proposals
+
+After the recombination gate, let successful outputs create *proposals* with
+complete source, rule, proof, and procedure lineage. Keep proposals separate
+from taught knowledge and require review or independent revalidation before
+they influence ordinary retrieval. Test correction and retraction propagation,
+invalidated ancestors, duplicate suppression, trust weighting, stale-lineage
+abstention, and storage growth. Include a deliberately injected bad derivation
+and show it cannot validate itself or amplify through repeated use.
+
+**Gate:** correcting any dependency identifies and disables every affected
+derived result until revalidated; invalid or incomplete proofs cannot be
+reused; growth stays within an explicit policy. Until then, write-back remains
+review-gated.
+
+### Milestone 4 — Make dialogue and contextual intent reliable enough to use
+
+Treat dialogue as both a priority research area and a release gate for changes
+to chat. First stabilize referent grounding, context lifetime, topic changes,
+history, clarification, repair, and task/subgoal tracking on complete held-out
+conversations. Compare contextual intent with the explicit baseline on task
+outcomes, not label agreement alone. In a separate scoped pilot, test cited,
+context-licensed dialogue moves against the scripted baseline; retain them only
+if they improve appropriate task completion without increasing wrong
+referents, unsupported claims, or inappropriate actions.
+
+**Gate:** unseen conversations complete more tasks than the baseline without
+more confident errors; ambiguous or unsupported turns recover through a
+focused question or honest abstention. If learned moves do not improve the
+baseline, keep the simpler handlers and record the result.
+
+### Milestone 5 — Establish source-derived rule transfer, then widen domains
+
+Continue the clause/context-aware source learner as a bounded research lane.
+Freeze its method, candidate and non-candidate samples, and evaluation before
+testing untouched API units from a new publisher. Measure reviewed useful
+claims, false proposals, missed claims, abstentions, and review effort; retain
+separate citations for claim and context. Do not let increasing candidate
+yield count as learning progress. In parallel, use the shared scorecard to
+select one bounded coding, math, translation, or creative task and test it
+through the same natural-language interface, including recombination with
+knowledge or procedures where appropriate.
+
+**Gate:** extracted rules preserve roles, conditions, polarity, and evidence
+on the frozen transfer set. Each new domain shows held-out task completion,
+independent output validation, honest abstention, and repair behavior before
+another domain is added.
+
+### Milestone 6 — Validate the portable model as the whole product
+
+When learning and correction lifecycles are stable, copy the SQLite model to a
+clean location with original sources unavailable. Query, learn, compose,
+reason, explain, correct, save/reload, and rerun the shared scorecard from the
+copy alone. Verify searchable source text, accepted knowledge, procedures,
+provenance, and licensing metadata survive distribution; measure size,
+compatibility, migration, and runtime.
+
+**Gate:** tested behavior depends only on the copied model and runtime, and
+corrections and evidence remain inspectable after reload.
+
+### Working cadence
+
+Keep the next implementation loop narrow: **reproduce a failure → add it to
+the frozen controls → change one seam → run targeted and cross-domain runtime
+checks → update the baseline and roadmap → commit**. At each milestone, review
+the qualitative 70B-class comparison in terms of task breadth, handling of
+paraphrase and compound requests, completeness, dialogue continuity, and
+repair. The comparison identifies user-visible gaps; it is not a parity target
+or a substitute for independent correctness checks.
+
+Do not count corpus size, new dialogue mechanisms, domain names, or storage
+migrations as progress by themselves. Keep verified reasoning,
+recombination, and governed self-learning on the critical path; dialogue
+protects the path to those capabilities, while domain expansion tests their
+generality. After every gate, ask whether held-out users can complete more of
+their actual task without an increase in confident errors. Preserve failures
+that disprove the current design and change the smallest part of the path that
+caused them.
 
 ## Detailed references
 
