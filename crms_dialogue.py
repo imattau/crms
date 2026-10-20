@@ -768,12 +768,26 @@ class CRMSDialogue:
         if len(pronouns) > 4:
             return None, ("This question has too many pronoun bindings to resolve; "
                           "please name the entities.")
-        entities = list(dict.fromkeys(
-            entity for entity in (
-                self.topic_entity, self.last_entity, self.subject_entity,
-                self.object_entity,
-                *(item.get("entity") for item in self.source_mentions))
-            if entity))
+        local_entities = self._question_entity_phrases(question)
+        if len(local_entities) == 1:
+            # A name explicitly written before a pronoun in the same question
+            # is a stronger local anchor than an older dialogue topic. The
+            # ordinary retrieval and source-anchor checks still decide whether
+            # any answer is supported for this entity.
+            canonical = self._canonical_entity(local_entities[0])
+            entities = [canonical or local_entities[0]]
+        elif len(local_entities) > 1:
+            names = ", ".join(local_entities)
+            return None, ("This question names multiple possible entities for "
+                          f"the pronoun ({names}); please restate it with the "
+                          "intended entity named.")
+        else:
+            entities = list(dict.fromkeys(
+                entity for entity in (
+                    self.topic_entity, self.last_entity, self.subject_entity,
+                    self.object_entity,
+                    *(item.get("entity") for item in self.source_mentions))
+                if entity))
         if not entities and self.last_question:
             focus = self._explicit_research_acronym(self.last_question)
             if focus:

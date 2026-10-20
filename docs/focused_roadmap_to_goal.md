@@ -499,12 +499,14 @@ context-licensed dialogue moves against the scripted baseline; retain them only
 if they improve appropriate task completion without increasing wrong
 referents, unsupported claims, or inappropriate actions.
 
-The latest `v1_493` runtime probe fixes one reported natural turn form:
-“and when …?” / “and how …?” now continues a visible source-only topic, while
-the same wording without an established topic still abstains. Compound WH
-questions with a pronoun in their second clause and lexical paraphrases such as
-“constructed” for “built” remain known gaps; do not count the narrow fix as
-dialogue transfer.
+The `v1_493` runtime probe fixes coordinated follow-ups (“and when …?” / “and
+how …?”) after visible source-only answers. `v1_494` then fixes a narrower
+compound case: a pronoun in the second WH clause binds to the one entity named
+in the same utterance, even after a topic change; two possible local entities
+cause clarification. Both retain cited evidence. These are explicit
+regressions, not dialogue transfer: questions whose clauses need separate
+source sentences and lexical paraphrases such as “constructed” for “built”
+remain open.
 
 **Gate:** unseen conversations complete more tasks than the baseline without
 more confident errors; ambiguous or unsupported turns recover through a

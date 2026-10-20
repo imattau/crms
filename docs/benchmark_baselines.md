@@ -3295,3 +3295,25 @@ turn asking two questions currently abstains when its second clause uses “it�
 both remain open natural-language dialogue gaps.
 
 Report: [experiment](../experiments/v1_493_dialogue_coordinated_followup.py).
+
+## Local entity anchor in compound WH questions (`v1_494`, 2026-10-20)
+
+`experiments/v1_494_compound_question_entity_binding.py` covers a single-turn
+request with two WH clauses: “When was the Eiffel Tower completed and how tall
+is it?” The source sentence states both requested properties but begins the
+second clause with “It”. CRMS now uses the unique capitalized entity phrase in
+the current question as the local anchor for that pronoun, even after the
+previous turn established Colosseum as the topic. Retrieval returns the
+sentence containing both values and the citation resolves exactly. If the
+question names both Eiffel Tower and Colosseum as possible referents, the
+resolver asks the user to restate the intended entity and returns neither
+date.
+
+The new probe, `v1_493`, and the eight selected dialogue regressions passed.
+This handles a unique local entity mention, not general compound-question
+decomposition or answering multiple clauses supported by different source
+sentences. The surface phrase is extracted from capitalization and still
+requires the ordinary evidence and source-anchor checks before an answer is
+shown.
+
+Report: [experiment](../experiments/v1_494_compound_question_entity_binding.py).
