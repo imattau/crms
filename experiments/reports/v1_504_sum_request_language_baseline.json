@@ -1,0 +1,102 @@
+{
+  "experiment": "v1_504_sum_request_language_baseline",
+  "status": "frozen_development_baseline",
+  "authorship": "Codex-authored after v1_503; not independent validation",
+  "model_state": "proof/rule corpus and learned sum phrases from v1_502/v1_503",
+  "cases": [
+    {
+      "case_id": "control_filter_then_sum",
+      "request": "Filter 23, 5, 23, and 8 to values Mira reaches, then sum the values.",
+      "expected_total": 51,
+      "composition_status": "answered",
+      "composition_output": [
+        51
+      ],
+      "chat_answered_with_expected_total": true,
+      "chat_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> CRMS> Verified values satisfying the relation 'Mira reaches': [23, 5, 23]; excluded explicitly negative values [8]. Their total is 51. Evidence sources: mira:record-23, mira:record-5, mira:record-8-negative, teacher:exact-integer-sum, teacher:sum:contrast:1, teacher:sum:contrast:2, teacher:sum:initial:0, teacher:sum:initial:1, teacher:sum:initial:2, teacher:sum:initial:3, teacher:sum:initial:4, teacher:sum:initial:5. Procedure examples: 8 (labeler: codex:sum-teacher).\nyou> CRMS state saved. Goodbye."
+    },
+    {
+      "case_id": "control_sum_first",
+      "request": "Sum every value in 23, 5, 23, and 8 that Mira reaches.",
+      "expected_total": 51,
+      "composition_status": "answered",
+      "composition_output": [
+        51
+      ],
+      "chat_answered_with_expected_total": true,
+      "chat_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> CRMS> Verified values satisfying the relation 'Mira reaches': [23, 5, 23]; excluded explicitly negative values [8]. Their total is 51. Evidence sources: mira:record-23, mira:record-5, mira:record-8-negative, teacher:exact-integer-sum, teacher:sum-first:0, teacher:sum-first:1, teacher:sum-first:2, teacher:sum-first:3, teacher:sum-first:4, teacher:sum-first:5, teacher:sum-first:contrast:1, teacher:sum-first:contrast:2. Procedure examples: 8 (labeler: codex:sum-first-phrase-teacher).\nyou> CRMS state saved. Goodbye."
+    },
+    {
+      "case_id": "operation_synonym",
+      "request": "Add up every value in 23, 5, 23, and 8 that Mira reaches.",
+      "expected_total": 51,
+      "composition_status": "no_route",
+      "composition_output": [],
+      "chat_answered_with_expected_total": false,
+      "chat_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> CRMS> I don't know this from the sources and facts I have. Add a source or teach the fact.\nyou> CRMS state saved. Goodbye."
+    },
+    {
+      "case_id": "wh_total_frame",
+      "request": "What is the total of the values Mira reaches among 23, 5, 23, and 8?",
+      "expected_total": 51,
+      "composition_status": "no_route",
+      "composition_output": [],
+      "chat_answered_with_expected_total": false,
+      "chat_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> CRMS> I don't know this from the sources and facts I have. Add a source or teach the fact.\nyou> CRMS state saved. Goodbye."
+    },
+    {
+      "case_id": "list_first_imperative",
+      "request": "From 23, 5, 23, and 8, add together only the numbers Mira reaches.",
+      "expected_total": 51,
+      "composition_status": "no_route",
+      "composition_output": [],
+      "chat_answered_with_expected_total": false,
+      "chat_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> CRMS> I don't know this from the sources and facts I have. Add a source or teach the fact.\nyou> CRMS state saved. Goodbye."
+    },
+    {
+      "case_id": "two_clause_pronoun",
+      "request": "Mira reaches some of 23, 5, 23, and 8. Add up the ones she reaches.",
+      "expected_total": 51,
+      "composition_status": "no_route",
+      "composition_output": [],
+      "chat_answered_with_expected_total": false,
+      "chat_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> CRMS> I don't know this from the sources and facts I have. Add a source or teach the fact.\nyou> CRMS state saved. Goodbye."
+    },
+    {
+      "case_id": "wh_filter_and_aggregate",
+      "request": "Which values in 23, 5, 23, and 8 does Mira reach, and what do they sum to?",
+      "expected_total": 51,
+      "composition_status": "no_route",
+      "composition_output": [],
+      "chat_answered_with_expected_total": false,
+      "chat_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> Handling 2 explicit questions separately.\nCRMS> Part 1 of 2: I don't know this from the sources and facts I have. Add a source or teach the fact.\nyou> [part 2 of 2] what do they sum to?\nCRMS> Part 2 of 2: Please name the entity this pronoun refers to.\nProcessed all 2 question parts separately.\nyou> CRMS state saved. Goodbye."
+    },
+    {
+      "case_id": "possessive_nominalization",
+      "request": "Take the total of all values Mira reaches from 23, 5, 23, and 8.",
+      "expected_total": 51,
+      "composition_status": "no_route",
+      "composition_output": [],
+      "chat_answered_with_expected_total": false,
+      "chat_output": "CRMS grounded chat. Try a question, /source PATH, or /teach-fact; type /help for a quick start and /help all for every command.\nyou> CRMS> I don't know this from the sources and facts I have. Add a source or teach the fact.\nyou> CRMS state saved. Goodbye."
+    }
+  ],
+  "summary": {
+    "count": 8,
+    "composition_answered": 2,
+    "fresh_chat_answered": 2,
+    "unanswered_case_ids": [
+      "operation_synonym",
+      "wh_total_frame",
+      "list_first_imperative",
+      "two_clause_pronoun",
+      "wh_filter_and_aggregate",
+      "possessive_nominalization"
+    ]
+  },
+  "limitations": [
+    "One relation, one small value set, and one aggregate task family.",
+    "All requests are authored by the same evaluator and are not an independent benchmark.",
+    "This measures language-frame coverage, not mathematical correctness across domains."
+  ]
+}
