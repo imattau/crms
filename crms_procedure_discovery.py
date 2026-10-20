@@ -244,6 +244,55 @@ def _shared_subject_start(text: str, will_start: int
     return subject_start, subject, (note,)
 
 
+def _coordinated_clause_subject_start(
+        text: str, will_start: int
+        ) -> tuple[int, str, tuple[str, ...]] | None:
+    """Separate an explicit subject after ``and`` from a prior finite clause.
+
+    For example, in ``if enabled, this optimizer is AdamW and the algorithm
+    will ...``, the subject of ``will`` is ``the algorithm``. Keep a nearby
+    condition as scope; do not absorb the preceding clause into the subject.
+    The finite-clause check avoids splitting ordinary compound subjects such
+    as ``the input and the output will ...``.
+    """
+    prefix = text[:will_start]
+    connectors = list(re.finditer(r"\band\s+(?=\S)", prefix, re.IGNORECASE))
+    for connector in reversed(connectors):
+        subject_text = prefix[connector.end():].strip(" \t\r\n,;:")
+        if (not subject_text or len(subject_text) > 120
+                or len(subject_text.split()) > 14
+                or re.search(r"\b(?:and|but|whereas|however)\b",
+                             subject_text, re.IGNORECASE)
+                or not re.match(
+                    r"(?:(?:the|this|that|these|those|a|an|it|they|we|"
+                    r"you|he|she|each|every|both)\b|[A-Z][\w’'-]*)",
+                    subject_text)
+                or re.search(r"\b(?:if|unless|when|which|that|who)\b",
+                             subject_text, re.IGNORECASE)):
+            continue
+        left = prefix[:connector.start()].rstrip(" \t\r\n,;:")
+        finite = re.search(
+            r"\b(?:is|are|was|were|has|have|does|do|did)\b",
+            left, re.IGNORECASE)
+        if finite is None:
+            continue
+        prior_subject = left[:finite.start()].strip(" \t\r\n,;:")
+        prior_predicate = left[finite.end():].strip(" \t\r\n,;:")
+        if not prior_subject or not prior_predicate:
+            continue
+        subject_start = connector.end() + len(
+            prefix[connector.end():]) - len(
+                prefix[connector.end():].lstrip(" \t\r\n,;:"))
+        condition = re.search(
+            r"\b(?:if|unless|when|whenever|provided\s+that|only\s+if|"
+            r"only\s+when|as\s+long\s+as)\b[^,;]{1,100}",
+            left, re.IGNORECASE)
+        context = (("condition: " + " ".join(condition.group(0).split()),)
+                   if condition else ())
+        return subject_start, subject_text, context
+    return None
+
+
 def _predicate_end(text: str, start: int) -> int | None:
     """Find a predicate boundary while preserving balanced inline literals."""
     index = start
@@ -359,6 +408,10 @@ def propose_procedure_phrase_candidates(
                 # the first claim until their implicit subject is resolved.
                 continue
         subject = _subject_start(sentence, match.start())
+        coordinated = _coordinated_clause_subject_start(
+            sentence, match.start())
+        if coordinated is not None:
+            subject = coordinated
         shared_subject = False
         if subject is None:
             subject = _shared_subject_start(sentence, match.start())

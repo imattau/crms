@@ -218,6 +218,18 @@ general paraphrase understanding or source-derived learning. The other
 source-only yes/no question in the same probe still abstains and remains an
 open natural-language coverage gap.
 
+The follow-up `v1_484_coordinated_clause_subjects.py` addresses one PyTorch
+API-source boundary from that review: in the Adam parameter description,
+“the algorithm will not accumulate weight decay …” follows another finite
+clause joined by `and`. The candidate parser now isolates the explicit later
+subject, keeps negative polarity and the `if True` condition, and shows the
+cited result in fresh chat without installing a rule. A regression caught an
+over-split of “shape and buffer length … but the type …”; the splitter was
+narrowed to require an explicit new subject, and both cases now pass. This is
+one structural source-learning improvement, not resolution of “the algorithm”
+to Adam in a user yes/no question. That source-only polarity route still needs
+an independently checked subject/context binding and conflict behavior.
+
 Use the existing excerpt and real-source acceptance experiments as regression
 controls, not as a corpus-level result. If a suitable corpus does not contain
 enough examples, change the learning signal or narrow the claim; do not add
