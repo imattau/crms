@@ -1,6 +1,6 @@
 # Focused roadmap from the current CRMS to its goal
 
-**Reviewed:** 2026-10-20
+**Reviewed:** 2026-10-20 against `e350425`
 **Status:** execution plan; the capability goal remains unmet.
 
 ## Destination
@@ -47,6 +47,58 @@ verification and correction propagation are demonstrated together.
 **Assessment:** the architecture is pointed toward the goal; the capability
 claim is not yet earned. The next work should improve held-out chat outcomes,
 not increase experiment, corpus, or feature counts by themselves.
+
+## Overall review and near-term direction
+
+The project is still pursuing the right goal. Its strongest differentiator is
+the combination of a portable knowledge store, evidence lineage, explicit
+rules, proof-checked reasoning, and reviewable learning. The main risk is
+spending effort on more isolated mechanisms without showing that ordinary chat
+can select and compose them on new tasks. The current evidence supports an
+architectural direction, not broad task competence.
+
+The latest user-driven dialogue report is a useful source of regression cases,
+including pronoun binding after a topic switch, source-only context retention,
+stale `why?`, history recall, and ordinal references. Some of these behaviors
+have since received focused fixes and controls. Replay the complete reported
+sequence against the current checkout before classifying each observation as
+open or fixed; preserve every reproduced failure as an end-to-end control.
+
+The next development cycles should follow this order:
+
+1. **Re-establish the chat baseline.** Replay the reported dialogue sequences
+   in clean processes, confirm current behavior, and freeze a compact scorecard
+   covering task completion, wrong referents, evidence validity, omissions,
+   clarification, abstention, repair, and reload. Dialogue and contextual
+   intent remain a release gate for chat-facing work.
+2. **Make recombination plus reasoning the primary capability milestone.**
+   Test ordinary-chat completion of source-disjoint, multi-step tasks with new
+   wording, values, evidence layouts, and operation order. Independently check
+   results and include missing-premise, conflict, cycle, unsupported-step, and
+   incomplete-search cases. This is the clearest route from strong components
+   to useful behavior a user can request.
+3. **Run source-derived rule transfer in parallel.** Freeze the candidate
+   method, review positive and negative samples, and test on untouched source
+   units and a new publisher. Keep proposals review-only until role, condition,
+   polarity, and scope survive that gate. This lane can feed recombination but
+   should not delay work with already reviewed rules.
+4. **Enable governed self-learning after the composition gate.** Let
+   independently verified outputs become lineage-bearing proposals; test
+   correction propagation, invalidation, trust, duplicate control, and bounded
+   growth before allowing routine reuse.
+5. **Widen domains and validate distribution from measured task gaps.** Grow
+   math, coding, translation, and creative work one independently checked
+   task slice at a time. Then replay the shared scorecard using only a copied
+   SQLite model, including searchable source text, knowledge, procedures,
+   citations, learning, correction, and reload.
+
+Do not use experiment count, corpus size, intent-label agreement, retrieval
+hits, or authored-graph proof counts as substitutes for held-out user-task
+completion. Compare the user experience with documented 70B-class capabilities
+in breadth, multi-part completion, continuity, and repair; a live 70B model or
+parity claim is not required. Re-score this direction after each gate using
+wrong-answer rate, task completion, abstention, repair, provenance, runtime,
+and model size as separate results.
 
 ## Execution principles
 
@@ -431,11 +483,11 @@ recombination with already reviewed components.
 
 ### Next execution card
 
-This is the order for the next development cycles, reviewed against the current
-checkout (`18ff1d5`, 2026-10-20). Recheck reported behavior before changing
-code; historical reports describe earlier snapshots and should not trigger
-duplicate fixes. The objective is to improve held-out user task completion,
-not to add more demonstrations of the same finite-list operations.
+This is the order for the next development cycles, reviewed against the latest
+committed snapshot (`e350425`, 2026-10-20). Recheck reported behavior before
+changing code; historical reports describe earlier snapshots and should not
+trigger duplicate fixes. The objective is to improve held-out user task
+completion, not to add more demonstrations of the same finite-list operations.
 
 | Order | Work | Concrete output | Advance when |
 | --- | --- | --- | --- |
@@ -446,7 +498,7 @@ not to add more demonstrations of the same finite-list operations.
 | 5 | **Expand breadth only through validated task slices.** Use the same natural-language interface for coding, math, translation, and creative work. Select the next task from observed failures; define held-out requests, negative cases, an independent checker or rubric, and repair behavior before implementation. Test each domain before cross-domain composition. | Per-task ordinary-chat scorecards for coverage, correctness/quality, unsupported output, provenance, repair, and cost. | Each slice demonstrates useful held-out completion and honest limits. A feature, corpus, or one-off success does not count as domain competence. |
 | 6 | **Validate SQLite as the complete distributable runtime.** Once learning and correction lifecycles stabilize, copy the model where source files are unavailable and replay the shared scorecard, including query, learning, recombination, reasoning, explanation, correction, and reload. | Reproducible copy-only report including searchable source text, accepted knowledge, rules, provenance, correction lineage, licensing metadata, size, and migration behavior. | Tested behavior depends only on the copied model and runtime, and evidence/corrections remain inspectable after reload. |
 
-**Current checkpoint (2026-10-20, `18ff1d5`):** the project has
+**Latest committed checkpoint (2026-10-20, `e350425`):** the project has
 well-instrumented controlled paths for proof-checked reasoning, bounded
 recombination, source-backed retrieval, contextual dialogue state, reviewed
 learning, and SQLite portability. The prior multi-turn dialogue failures now
@@ -475,6 +527,11 @@ capability milestone is a broader, independently authored multi-step task set
 with varied request forms and adversarial reasoning cases. Dialogue remains a
 release gate, and source-rule extraction proceeds separately. Broad capability
 and reliable self-learning remain unproven.
+
+The latest math control adds ordinary arithmetic operator phrases and
+higher/lower comparisons while preserving exact results. It evaluates supplied
+numeric operands; broad source-grounded numeric extraction and calculation
+remain a separate task slice.
 
 The new `v1_514` composition control combines an accepted source-backed
 predicate alignment with an accepted, proof-checked type hierarchy in ordinary
