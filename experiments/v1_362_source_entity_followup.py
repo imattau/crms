@@ -100,6 +100,40 @@ def main() -> None:
                 f"terminal did not restore the verified source referents: "
                 f"{resumed.stdout}")
 
+    # The ambiguity repair must resume the held question through the normal
+    # answer path, selecting evidence about the user-named entity. A generic
+    # passage match must not substitute the other person or promote the quote.
+    with tempfile.TemporaryDirectory(prefix="crms-source-pronoun-repair-") as folder:
+        root = Path(folder)
+        repair_index = CRMSResearchIndex()
+        repair_index.add_document(
+            "lovelace-followup", "Lovelace biography",
+            "Ada Lovelace worked with Charles Babbage.\n\n"
+            "Ada Lovelace worked at Somerville College.",
+            "biographies/lovelace.txt")
+        repair_index.save(root / "index.json")
+        repair_kb_path = root / "knowledge.json"
+        CRMSKnowledgeBase().save(repair_kb_path)
+        project = Path(__file__).resolve().parents[1]
+        process = subprocess.run(
+            [sys.executable, str(project / "crms_chat.py"),
+             "--knowledge", str(repair_kb_path),
+             "--index", str(root / "index.json"),
+             "--dialogue-state", str(root / "dialogue.json"),
+             "--rules", str(root / "rules.json"),
+             "--rule-session", str(root / "session.json")],
+            input=("Who worked with Charles Babbage?\n"
+                   "Where did she work?\nAda Lovelace\n/quit\n"),
+            text=True, capture_output=True, check=True, timeout=30)
+        require("Which entity do you mean?" in process.stdout
+                and "Somerville College" in process.stdout
+                and "quoted evidence, not an accepted fact" in process.stdout
+                and "Charles Babbage worked at" not in process.stdout,
+                f"clarified source-only pronoun did not resume safely: "
+                f"{process.stdout}")
+        require(not CRMSKnowledgeBase.load(repair_kb_path).facts(),
+                "clarification answer promoted source-only evidence to facts")
+
     # Once the required question frames are licensed, existing evidence can
     # resolve subject/object pronouns by supported substitution.
     framed = CRMSKnowledgeBase()
@@ -143,6 +177,7 @@ def main() -> None:
     print("source-only names stay cited referent candidates, never accepted facts: PASS")
     print("ambiguous follow-up asks for a named choice instead of guessing: PASS")
     print("terminal restores source referents across restart and asks for clarification: PASS")
+    print("named clarification resumes with matching source evidence, without fact promotion: PASS")
     print("licensed fact frames still resolve supported she/him substitutions: PASS")
 
 
