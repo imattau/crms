@@ -1,0 +1,980 @@
+{
+  "audit": "v1_487",
+  "purpose": "prototype comparison on SciPy development controls",
+  "source_audit": "v1_486",
+  "parser": {
+    "library": "spaCy",
+    "version": "3.8.14",
+    "model": "en_core_web_sm",
+    "model_version": "3.8.0"
+  },
+  "method": "For each AUX 'will', use dependency subject roots, remove simple condition subtrees from the predicate span, and preserve exact source text and citation. Candidates remain needs_review.",
+  "samples": {
+    "candidate_sample": [
+      {
+        "sample_key": "0026b6d75218650827f40fff2943b490c63fb9d343789d9f430e83bcf991df34",
+        "api_unit": "scipy.stats.weightedtau",
+        "sentence_start": 3510,
+        "sentence_end": 3576,
+        "docstring_sha256": "330d77c5c07a73475e9f12504360205c5da4f553ac9892dfec079169ed35e6d8",
+        "source_citation": "scipy.stats.weightedtau#sha256=330d77c5c07a73475e9f12504360205c5da4f553ac9892dfec079169ed35e6d8&chars=3510:3576",
+        "sentence": "- ``raise``: if a NaN is present, a ``ValueError`` will be raised.",
+        "proposals": [
+          {
+            "subject": "``raise``: if a NaN is present, a ``ValueError``",
+            "predicate_phrase": "be raised",
+            "polarity": true,
+            "scope_notes": [],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "a ``ValueError",
+            "predicate_phrase": "will be raised.",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [
+              "condition: if a NaN is present"
+            ],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "002d7adeb1c2d2828740b05d03fea3eec2591b84b8346e78162cbfa6f172f246",
+        "api_unit": "scipy.ndimage.spline_filter",
+        "sentence_start": 2142,
+        "sentence_end": 2246,
+        "docstring_sha256": "cc9e30051b635613f9b0c30b206d8b6d8ffbd4468bac9726908bce2d1fc937d3",
+        "source_citation": "scipy.ndimage.spline_filter#sha256=cc9e30051b635613f9b0c30b206d8b6d8ffbd4468bac9726908bce2d1fc937d3&chars=2142:2246",
+        "sentence": "In this\n        case it is not well defined which sample will be chosen at the point of\n        overlap.",
+        "proposals": [
+          {
+            "subject": "In this case it is not well defined which sample",
+            "predicate_phrase": "be chosen at the point of overlap",
+            "polarity": true,
+            "scope_notes": [],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "which sample",
+            "predicate_phrase": "will be chosen at the point of overlap",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "004dc870560f2c0069d6b59c5c6148c92d845ab3c2de201b7fabf1ae9e43e30b",
+        "api_unit": "scipy.stats._qmc.QMCEngine",
+        "sentence_start": 392,
+        "sentence_end": 513,
+        "docstring_sha256": "f09f915843eb8ae96988bdba541a7878c5a1109f6972aecde47b25e8976c2b44",
+        "source_citation": "scipy.stats._qmc.QMCEngine#sha256=f09f915843eb8ae96988bdba541a7878c5a1109f6972aecde47b25e8976c2b44&chars=392:513",
+        "sentence": "Note that this is a post-processing step that does not\n    guarantee that all properties of the sample will be conserved.",
+        "proposals": [
+          {
+            "subject": "Note that this is a post-processing step that does not guarantee that all properties of the sample",
+            "predicate_phrase": "be conserved",
+            "polarity": true,
+            "scope_notes": [],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "all properties of the sample",
+            "predicate_phrase": "will be conserved",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "denied",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "0074a99a7f531aefc33efb7e7db9c2fbb678e308b36217d42d70ec7a232b8ed3",
+        "api_unit": "scipy.stats.kurtosis",
+        "sentence_start": 660,
+        "sentence_end": 735,
+        "docstring_sha256": "2cab12ccf360f0bab0cafbb63f8616e0b5dac253ab80ec01c3f1b09d8754ea9a",
+        "source_citation": "scipy.stats.kurtosis#sha256=2cab12ccf360f0bab0cafbb63f8616e0b5dac253ab80ec01c3f1b09d8754ea9a&chars=660:735",
+        "sentence": "row) of the input will appear in a\n    corresponding element of the output.",
+        "proposals": [
+          {
+            "subject": "row) of the input",
+            "predicate_phrase": "appear in a corresponding element of the output",
+            "polarity": true,
+            "scope_notes": [],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "row) of the input",
+            "predicate_phrase": "will appear in a corresponding element of the output.",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "00a8a9f8d4931c35f5ca37fa46e3a9352261789ffe1008a96ff41991850baec4",
+        "api_unit": "scipy.sparse.linalg.lsqr",
+        "sentence_start": 1615,
+        "sentence_end": 1725,
+        "docstring_sha256": "b9705f81c537ed026575442aac573ce3f46c56287882e165deea3bcdcd2a36f2",
+        "source_citation": "scipy.sparse.linalg.lsqr#sha256=b9705f81c537ed026575442aac573ce3f46c56287882e165deea3bcdcd2a36f2&chars=1615:1725",
+        "sentence": "(The final ``x`` will usually have fewer correct digits,\n    depending on ``cond(A)`` and the size of LAMBDA.)",
+        "proposals": [
+          {
+            "subject": "The final ``x``",
+            "predicate_phrase": "usually have fewer correct digits, depending on ``cond(A)`` and the size of LAMBDA",
+            "polarity": true,
+            "scope_notes": [],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "The",
+            "predicate_phrase": "will usually have fewer correct digits, depending on ``cond(A)`` and the size of LAMBDA.)",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "00eb493eef8f70d6636b95d5709061ab61da9e0c7f11b7389cddcd0f81a151dd",
+        "api_unit": "scipy.stats.quantile",
+        "sentence_start": 8727,
+        "sentence_end": 8914,
+        "docstring_sha256": "0769430d6af48569e5125c5b49b63c37ac233a66ef046e6923719ae4a445c6b2",
+        "source_citation": "scipy.stats.quantile#sha256=0769430d6af48569e5125c5b49b63c37ac233a66ef046e6923719ae4a445c6b2&chars=8727:8914",
+        "sentence": "`quantile` also accepts `MArrays <https://mdhaber.github.io/marray/tutorial.html>`__ backed by the backends indicated above; masked values will be treated as though they were not present.",
+        "proposals": [
+          {
+            "subject": "`quantile` also accepts `MArrays <https://mdhaber.github.io/marray/tutorial.html>`__ backed by the backends indicated above; masked values",
+            "predicate_phrase": "be treated as though they were not present",
+            "polarity": true,
+            "scope_notes": [],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "masked values",
+            "predicate_phrase": "will be treated as though they were not present.",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "00ec66c7428fd48a555b2e62fb82c6dc4be4dc4973c33bdd69d963355a18b895",
+        "api_unit": "scipy.interpolate.approximate_taylor_polynomial",
+        "sentence_start": 68,
+        "sentence_end": 156,
+        "docstring_sha256": "62769dc235cc582400fcd59f49d07d4f22b3619914d572617019ba483c1fd533",
+        "source_citation": "scipy.interpolate.approximate_taylor_polynomial#sha256=62769dc235cc582400fcd59f49d07d4f22b3619914d572617019ba483c1fd533&chars=68:156",
+        "sentence": "deprecated:: 1.18.0\n    This function is deprecated and will be removed in SciPy 1.20.0.",
+        "proposals": [
+          {
+            "subject": "deprecated:: 1.18.0 This function",
+            "predicate_phrase": "be removed in SciPy 1.20.0",
+            "polarity": true,
+            "scope_notes": [
+              "before: shared subject clause: deprecated"
+            ],
+            "context_basis": "shared_subject",
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "This function",
+            "predicate_phrase": "will be removed in SciPy 1.20.0",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [
+              "shared subject inherited from coordinated clause"
+            ],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "00f0a49ecac556ca7c4c5f1cd0c6d1ae3a6f96fc97811ddfc412a31439830dd3",
+        "api_unit": "scipy.signal.oaconvolve",
+        "sentence_start": 177,
+        "sentence_end": 532,
+        "docstring_sha256": "e089ad08c2ee464ea9c8e70ddb17ad9a165966571d442215c3e9fa125ae9f0dc",
+        "source_citation": "scipy.signal.oaconvolve#sha256=e089ad08c2ee464ea9c8e70ddb17ad9a165966571d442215c3e9fa125ae9f0dc&chars=177:532",
+        "sentence": "This is generally much faster than `convolve` for large arrays (n > ~500),\nand generally much faster than `fftconvolve` when one array is much\nlarger than the other, but can be slower when only a few output values are\nneeded or when the arrays are very similar in shape, and can only\noutput float arrays (int or object array inputs will be cast to float).",
+        "proposals": [
+          {
+            "subject": "can be slower when only a few output values are needed or when the arrays are very similar in shape, and can only output float arrays (int or object array inputs",
+            "predicate_phrase": "be cast to float)",
+            "polarity": true,
+            "scope_notes": [
+              "before: contrast (but): This is generally much faster than `convolve` for large arrays (n > ~500), and generally much faster than `fftconvolve` when one array is much larger than the other"
+            ],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "only output float arrays (int or object array inputs",
+            "predicate_phrase": "will be cast to float)",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "0123c475e93085a4e4e22ebcc0bd6001b15e70a04d2abeca876930bcb2dc0402",
+        "api_unit": "scipy.signal.bode",
+        "sentence_start": 489,
+        "sentence_end": 542,
+        "docstring_sha256": "a66c5a691873c7c61e99eb491a42e3d96ea54d638ae513359c1cd85d36b9e8ad",
+        "source_citation": "scipy.signal.bode#sha256=a66c5a691873c7c61e99eb491a42e3d96ea54d638ae513359c1cd85d36b9e8ad&chars=489:542",
+        "sentence": "If not given a reasonable set will be\n    calculated.",
+        "proposals": [
+          {
+            "subject": "If not given a reasonable set",
+            "predicate_phrase": "be calculated",
+            "polarity": true,
+            "scope_notes": [],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": []
+      },
+      {
+        "sample_key": "01490275179cfcc976e8037cfa1a928efe359fc902b5ddd18fee8360c78b786d",
+        "api_unit": "scipy.optimize._elementwise.find_minimum",
+        "sentence_start": 3343,
+        "sentence_end": 3497,
+        "docstring_sha256": "79dace48a43a5f523f3199e01949ecf533b483c79be7f5e3cff247985377732f",
+        "source_citation": "scipy.optimize._elementwise.find_minimum#sha256=79dace48a43a5f523f3199e01949ecf533b483c79be7f5e3cff247985377732f&chars=3343:3497",
+        "sentence": "The descriptions are written as though the values will\n    be scalars; however, if `f` returns an array, the outputs will be\n    arrays of the same shape.",
+        "proposals": [
+          {
+            "subject": "The descriptions are written as though the values",
+            "predicate_phrase": "be scalars",
+            "polarity": true,
+            "scope_notes": [],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "the values",
+            "predicate_phrase": "will be scalars",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          },
+          {
+            "subject": "the outputs",
+            "predicate_phrase": "will be arrays of the same shape.",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [
+              "condition: if `f` returns an array"
+            ],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "0185af57f53fdf74d1ef0837e55f3506f6d791b63f036890a52f40d0d8cb69c8",
+        "api_unit": "scipy.stats.wilcoxon",
+        "sentence_start": 3581,
+        "sentence_end": 3646,
+        "docstring_sha256": "77bd2ecf248c35b5dcf786c7e038b12c3342dacada295513007ec747f6f02f37",
+        "source_citation": "scipy.stats.wilcoxon#sha256=77bd2ecf248c35b5dcf786c7e038b12c3342dacada295513007ec747f6f02f37&chars=3581:3646",
+        "sentence": "- ``omit``: NaNs will be omitted when performing the calculation.",
+        "proposals": [
+          {
+            "subject": "``omit``: NaNs",
+            "predicate_phrase": "be omitted when performing the calculation",
+            "polarity": true,
+            "scope_notes": [],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "NaNs",
+            "predicate_phrase": "will be omitted",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [
+              "condition: when performing the calculation"
+            ],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "022e58ed7a24cba5c669447cc5fc3959efe9c82e6d2f5fb388f2b5aa2d787c53",
+        "api_unit": "scipy.stats.pointbiserialr",
+        "sentence_start": 785,
+        "sentence_end": 855,
+        "docstring_sha256": "9332a232c784fb9b0ca171b5d761a09b57c349feb9e24c1a2c1e4c3b521ae39d",
+        "source_citation": "scipy.stats.pointbiserialr#sha256=9332a232c784fb9b0ca171b5d761a09b57c349feb9e24c1a2c1e4c3b521ae39d&chars=785:855",
+        "sentence": "If ``None``, the input will be raveled before computing the statistic.",
+        "proposals": [
+          {
+            "subject": "the input",
+            "predicate_phrase": "be raveled before computing the statistic",
+            "polarity": true,
+            "scope_notes": [
+              "before: If ``None``"
+            ],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "None``, the input",
+            "predicate_phrase": "will be raveled before computing the statistic.",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "0234ba0564b71ef477f0167f76373c23fa633057da4605c57adcdd0c17cd1abf",
+        "api_unit": "scipy.stats.moment",
+        "sentence_start": 2690,
+        "sentence_end": 2802,
+        "docstring_sha256": "576913ef4858cf86f7d2e539837a67a8696efe4a285f154db2e920cb031f648c",
+        "source_citation": "scipy.stats.moment#sha256=576913ef4858cf86f7d2e539837a67a8696efe4a285f154db2e920cb031f648c&chars=2690:2802",
+        "sentence": "In\nthis case, the output will be a scalar or ``np.ndarray`` of appropriate shape\nrather than a 2D ``np.matrix``.",
+        "proposals": [
+          {
+            "subject": "In this case, the output",
+            "predicate_phrase": "be a scalar or ``np.ndarray`` of appropriate shape rather than a 2D ``np.matrix``",
+            "polarity": true,
+            "scope_notes": [],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "the output",
+            "predicate_phrase": "will be a scalar or ``np.ndarray`` of appropriate shape rather than a 2D ``np.matrix``.",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "02a1497bfa2a1c1e4bbfbdfaad2d50c80145ecd62b296b3fa1d52cc00a700411",
+        "api_unit": "scipy.stats._distn_infrastructure.vectorize",
+        "sentence_start": 1161,
+        "sentence_end": 1316,
+        "docstring_sha256": "78a129854016f84000572296fe73d10329d9b813d46a602fb20ac3e675042450",
+        "source_citation": "scipy.stats._distn_infrastructure.vectorize#sha256=78a129854016f84000572296fe73d10329d9b813d46a602fb20ac3e675042450&chars=1161:1316",
+        "sentence": "excluded : set, optional\n    Set of strings or integers representing the positional or keyword\n    arguments for which the function will not be vectorized.",
+        "proposals": [
+          {
+            "subject": "excluded : set, optional Set of strings or integers representing the positional or keyword arguments for which the function",
+            "predicate_phrase": "be vectorized",
+            "polarity": false,
+            "scope_notes": [],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "the function",
+            "predicate_phrase": "will not be vectorized",
+            "polarity": false,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "03329fb81220632fbaf53f19f379b245185d1f7c96813b0c841f82bb1be08557",
+        "api_unit": "scipy.optimize.NonlinearConstraint",
+        "sentence_start": 2740,
+        "sentence_end": 2856,
+        "docstring_sha256": "14f90face7ff3ddda25b92c70268d935ef3c1aff56198340e236fe6cc4bbe5d6",
+        "source_citation": "scipy.optimize.NonlinearConstraint#sha256=14f90face7ff3ddda25b92c70268d935ef3c1aff56198340e236fe6cc4bbe5d6&chars=2740:2856",
+        "sentence": "Default is\n    None, which will select a reasonable value automatically depending\n    on a finite difference scheme.",
+        "proposals": [
+          {
+            "subject": "Default is None, which",
+            "predicate_phrase": "select a reasonable value automatically depending on a finite difference scheme",
+            "polarity": true,
+            "scope_notes": [],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "which",
+            "predicate_phrase": "will select a reasonable value automatically depending on a finite difference scheme",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "03b39351c95535931a3e574fe054208295f352f9a1544a21acebf95fdb370b83",
+        "api_unit": "scipy.stats.gmean",
+        "sentence_start": 2678,
+        "sentence_end": 2834,
+        "docstring_sha256": "8633b0010b8478d75cbfba3214f85e400cdd67d825f5fbc0534bdb9c355f1525",
+        "source_citation": "scipy.stats.gmean#sha256=8633b0010b8478d75cbfba3214f85e400cdd67d825f5fbc0534bdb9c355f1525&chars=2678:2834",
+        "sentence": "Similarly, while masked elements of masked\narrays are ignored, the output will be a scalar or ``np.ndarray`` rather than a\nmasked array with ``mask=False``.",
+        "proposals": [
+          {
+            "subject": "masked elements of masked arrays are ignored, the output",
+            "predicate_phrase": "be a scalar or ``np.ndarray`` rather than a masked array with ``mask=False``",
+            "polarity": true,
+            "scope_notes": [
+              "before: contrast (while): Similarly"
+            ],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "the output",
+            "predicate_phrase": "will be a scalar or ``np.ndarray`` rather than a masked array with ``mask=False``.",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "03b8623c0ca542ebce0f43609a3c0f1afc94c8b8a8ac169b2e6ce8cbbf3c30c1",
+        "api_unit": "scipy.stats.kstest",
+        "sentence_start": 6889,
+        "sentence_end": 7031,
+        "docstring_sha256": "f53f5d515d4e715dc2f117efd78cb4342d51372873931abb59b43e45d754cc52",
+        "source_citation": "scipy.stats.kstest#sha256=f53f5d515d4e715dc2f117efd78cb4342d51372873931abb59b43e45d754cc52&chars=6889:7031",
+        "sentence": "We choose a confidence level of 95%; that is, we will reject the null\nhypothesis in favor of the alternative if the p-value is less than 0.05.",
+        "proposals": [
+          {
+            "subject": "We choose a confidence level of 95%; that is, we",
+            "predicate_phrase": "reject the null hypothesis in favor of the alternative",
+            "polarity": true,
+            "scope_notes": [
+              "after: if the p-value is less than 0"
+            ],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "we",
+            "predicate_phrase": "will reject the null hypothesis in favor of the alternative",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [
+              "condition: if the p-value is less than 0.05"
+            ],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "03babcb8aa24cc19489c5a36cd34026f32567e2cf462745b2582092e439c1640",
+        "api_unit": "scipy.ndimage.zoom",
+        "sentence_start": 441,
+        "sentence_end": 508,
+        "docstring_sha256": "7f1e6147912f9e918a17344b37229e2bcaa585ca40962482b0b67c4e3680fdd8",
+        "source_citation": "scipy.ndimage.zoom#sha256=7f1e6147912f9e918a17344b37229e2bcaa585ca40962482b0b67c4e3680fdd8&chars=441:508",
+        "sentence": "By default an array of the same dtype as input\n    will be created.",
+        "proposals": [
+          {
+            "subject": "By default an array of the same dtype as input",
+            "predicate_phrase": "be created",
+            "polarity": true,
+            "scope_notes": [],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "input",
+            "predicate_phrase": "will be created",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "03db9491b79adbe70a135f356cd81b758ca1813f0795da573d638f6619b51410",
+        "api_unit": "scipy.stats.epps_singleton_2samp",
+        "sentence_start": 1633,
+        "sentence_end": 1715,
+        "docstring_sha256": "9ec277cc275d2a6ad467811c7b679e562cbf228c334a369428d34db2a8240933",
+        "source_citation": "scipy.stats.epps_singleton_2samp#sha256=9ec277cc275d2a6ad467811c7b679e562cbf228c334a369428d34db2a8240933&chars=1633:1715",
+        "sentence": "With this option,\n    the result will broadcast correctly against the input array.",
+        "proposals": [
+          {
+            "subject": "With this option, the result",
+            "predicate_phrase": "broadcast correctly against the input array",
+            "polarity": true,
+            "scope_notes": [],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "the result",
+            "predicate_phrase": "will broadcast correctly against the input array.",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "044f039974db794f7bd4517af4e239db5e1899705908ec70185255eab656476b",
+        "api_unit": "scipy.stats.yeojohnson_normmax",
+        "sentence_start": 587,
+        "sentence_end": 661,
+        "docstring_sha256": "a17e174f195e56ca690793ce64fc9362fe6592f154939ddd5a277595a5331509",
+        "source_citation": "scipy.stats.yeojohnson_normmax#sha256=a17e174f195e56ca690793ce64fc9362fe6592f154939ddd5a277595a5331509&chars=587:661",
+        "sentence": "- ``propagate``: if a NaN is present in the input, the output will be NaN.",
+        "proposals": [
+          {
+            "subject": "``propagate``: if a NaN is present in the input, the output",
+            "predicate_phrase": "be NaN",
+            "polarity": true,
+            "scope_notes": [],
+            "context_basis": null,
+            "status": "needs_review"
+          }
+        ],
+        "dependency_candidates": [
+          {
+            "subject": "the output",
+            "predicate_phrase": "will be NaN.",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [
+              "condition: if a NaN is present in the input"
+            ],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      }
+    ],
+    "unhandled_sample": [
+      {
+        "sample_key": "01835ba591ddca4fac7782193a4720376468ecf4275b6a684b1f2cea4a9b2f5e",
+        "api_unit": "scipy.linalg.eigvals_banded",
+        "sentence_start": 1022,
+        "sentence_end": 1109,
+        "docstring_sha256": "595c1bbfca9ce6b2d115c10c2b6626279853dfdf71abc9c7caac419919741044",
+        "source_citation": "scipy.linalg.eigvals_banded#sha256=595c1bbfca9ce6b2d115c10c2b6626279853dfdf71abc9c7caac419919741044&chars=1022:1109",
+        "sentence": "Note that calls with zero-size batches are unsupported and will raise a ``ValueError``.",
+        "dependency_candidates": [
+          {
+            "subject": "Note that calls with zero-size batches",
+            "predicate_phrase": "will raise a ``ValueError``",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [
+              "shared subject inherited from coordinated clause"
+            ],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "0776a1d919f281ecaee1ee9f7d205b66a866ff784799baa771ed1d134cf9d959",
+        "api_unit": "scipy.stats.variation",
+        "sentence_start": 1224,
+        "sentence_end": 1361,
+        "docstring_sha256": "090e75b2feb9a4e10b44eda5315dcf6f6161d868aa8dc201817e06a00fc6e633",
+        "source_citation": "scipy.stats.variation#sha256=090e75b2feb9a4e10b44eda5315dcf6f6161d868aa8dc201817e06a00fc6e633&chars=1224:1361",
+        "sentence": "If insufficient data remains in the axis slice along which the\n      statistic is computed, the corresponding entry of the output will be",
+        "dependency_candidates": [
+          {
+            "subject": "the corresponding entry of the output",
+            "predicate_phrase": "will be",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [
+              "condition: If insufficient data remains in the axis slice along which the\n      statistic is computed"
+            ],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "190b7c9fd441b17124d569b66cfa95ba32e664fcba1a1fc7cc16ac0aded830e6",
+        "api_unit": "scipy.stats.bartlett",
+        "sentence_start": 3832,
+        "sentence_end": 3855,
+        "docstring_sha256": "f6e9038d8dcbcb345fbbfd32bca8a8b238b2a7d1772fee8dc1e5c70f88115880",
+        "source_citation": "scipy.stats.bartlett#sha256=f6e9038d8dcbcb345fbbfd32bca8a8b238b2a7d1772fee8dc1e5c70f88115880&chars=3832:3855",
+        "sentence": "and Cochran, William G.",
+        "dependency_candidates": []
+      },
+      {
+        "sample_key": "25bb623bb204090a0560f098ed806e1398c2460fb61c063dffe1b887f65dd1cb",
+        "api_unit": "scipy.spatial.procrustes",
+        "sentence_start": 1889,
+        "sentence_end": 2085,
+        "docstring_sha256": "badc59eb8437109be0ab2a205246fb0a2cd30cfc6874a66a5d7279ba3239a04c",
+        "source_citation": "scipy.spatial.procrustes#sha256=badc59eb8437109be0ab2a205246fb0a2cd30cfc6874a66a5d7279ba3239a04c&chars=1889:2085",
+        "sentence": "- The disparity should not depend on the order of the input matrices, but\n  the output matrices will, as only the first output matrix is guaranteed\n  to be scaled such that :math:`tr(AA^{T}) = 1`.",
+        "dependency_candidates": [
+          {
+            "subject": "only the first output matrix",
+            "predicate_phrase": "will, as only the first output matrix is guaranteed to be scaled such that :math:`tr(AA^{T})",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "2ba49a8ea1cdcf8f6792a8d4fec3af7671984df3aadf5f67d8e522c17d8142dd",
+        "api_unit": "scipy.signal.lombscargle",
+        "sentence_start": 3703,
+        "sentence_end": 3861,
+        "docstring_sha256": "46a310c1755abdacc7c3d7f22103c0c4d8236a7340bfa66d4c4c932ed69a305a",
+        "source_citation": "scipy.signal.lombscargle#sha256=46a310c1755abdacc7c3d7f22103c0c4d8236a7340bfa66d4c4c932ed69a305a&chars=3703:3861",
+        "sentence": "Furthermore, `floating_mean` accounts for sample weights, and will also correct for\nany bias due to consistently missing observations at peaks and/or troughs.",
+        "dependency_candidates": []
+      },
+      {
+        "sample_key": "302236bf9087f9b10e8bf4b8e6f1715cd24ff9671a1096e295eac4ffc273e91f",
+        "api_unit": "scipy.interpolate.Akima1DInterpolator",
+        "sentence_start": 229,
+        "sentence_end": 321,
+        "docstring_sha256": "307ae6edc397211ac35643005dd44c0e831e23a5f784ee0b6bce2a9a49f0e44b",
+        "source_citation": "scipy.interpolate.Akima1DInterpolator#sha256=307ae6edc397211ac35643005dd44c0e831e23a5f784ee0b6bce2a9a49f0e44b&chars=229:321",
+        "sentence": "The resultant curve passes through the given\ndata points and will appear smooth and natural.",
+        "dependency_candidates": [
+          {
+            "subject": "The resultant curve",
+            "predicate_phrase": "will appear smooth and natural",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [
+              "shared subject inherited from coordinated clause"
+            ],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "35337e4b538a429dce6e4d5d949bcb9e5455078651616a54c514b0620844377c",
+        "api_unit": "scipy.stats.ecdf",
+        "sentence_start": 2324,
+        "sentence_end": 2349,
+        "docstring_sha256": "9a9097e797f2933edfd38890d58526b285f32624c33fa056e4c2a2418d73f591",
+        "source_citation": "scipy.stats.ecdf#sha256=9a9097e797f2933edfd38890d58526b285f32624c33fa056e4c2a2418d73f591&chars=2324:2349",
+        "sentence": "[1] Conover, William Jay.",
+        "dependency_candidates": []
+      },
+      {
+        "sample_key": "3f6ab96a32377f25a546f75674c8a8742844305ed458a130fa8368f29c72be8e",
+        "api_unit": "scipy.io.arff._arffread.tokenize_attribute",
+        "sentence_start": 589,
+        "sentence_end": 697,
+        "docstring_sha256": "2e1c0f92c9180464333af577365b84b8574a9fd7380548d6de2699b135a19c4e",
+        "source_citation": "scipy.io.arff._arffread.tokenize_attribute#sha256=2e1c0f92c9180464333af577365b84b8574a9fd7380548d6de2699b135a19c4e&chars=589:697",
+        "sentence": "If attribute is a string defined in python as r\"floupi real\", will\nreturn floupi as name, and real as value.",
+        "dependency_candidates": []
+      },
+      {
+        "sample_key": "5d69f380636ea328869c7b4f3b2d008cc0ba342dafb1de4be3d54f74c577a4c3",
+        "api_unit": "scipy.stats._continuous_distns.dpareto_lognorm_gen",
+        "sentence_start": 1333,
+        "sentence_end": 1386,
+        "docstring_sha256": "1132bafe5e915552e01fd54ffa11522b5a7595c711109b12dea5eea2e3a6fc7a",
+        "source_citation": "scipy.stats._continuous_distns.dpareto_lognorm_gen#sha256=1132bafe5e915552e01fd54ffa11522b5a7595c711109b12dea5eea2e3a6fc7a&chars=1333:1386",
+        "sentence": "[1] Hajargasht, Gholamreza, and William E. Griffiths.",
+        "dependency_candidates": []
+      },
+      {
+        "sample_key": "68199d90fa0334b279cfdc01827006f8f60eea4d460f72f5648985ce2dc98948",
+        "api_unit": "scipy.optimize.least_squares",
+        "sentence_start": 18575,
+        "sentence_end": 18600,
+        "docstring_sha256": "f34b84eb7920d6632558f07b5930f7e8926dab5c1fede180ed87632dfd801a55",
+        "source_citation": "scipy.optimize.least_squares#sha256=f34b84eb7920d6632558f07b5930f7e8926dab5c1fede180ed87632dfd801a55&chars=18575:18600",
+        "sentence": "[NR] William H. Press et.",
+        "dependency_candidates": []
+      },
+      {
+        "sample_key": "7493b489dd2e40d479eaeaf7dad78afc03e07817414ed9cf5dd52a5cdb40314f",
+        "api_unit": "scipy.stats.spearmanrho",
+        "sentence_start": 5584,
+        "sentence_end": 5602,
+        "docstring_sha256": "e5ab1be054621cdb3a3a0b439fb96abfe32026157a5fe09b4ec0f9d86e1cf54c",
+        "source_citation": "scipy.stats.spearmanrho#sha256=e5ab1be054621cdb3a3a0b439fb96abfe32026157a5fe09b4ec0f9d86e1cf54c&chars=5584:5602",
+        "sentence": "[1] Zwillinger, D.",
+        "dependency_candidates": []
+      },
+      {
+        "sample_key": "7a6ee8112b15e01c4293f03458ce30eccc273aa004c576eaaf07c46163ff6a1f",
+        "api_unit": "scipy.odr._add_newdocs.add_newdoc",
+        "sentence_start": 962,
+        "sentence_end": 1102,
+        "docstring_sha256": "97252a7abeaa79848be7f2649855efe2b74f4d5eb20c3f3fcc259ca31eaf4bcb",
+        "source_citation": "scipy.odr._add_newdocs.add_newdoc#sha256=97252a7abeaa79848be7f2649855efe2b74f4d5eb20c3f3fcc259ca31eaf4bcb&chars=962:1102",
+        "sentence": "This routine never raises an error if the docstring can't be written, but\nwill raise an error if the object being documented does not exist.",
+        "dependency_candidates": [
+          {
+            "subject": "This routine",
+            "predicate_phrase": "will raise an error",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [
+              "condition: if the object being documented",
+              "shared subject inherited from coordinated clause"
+            ],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "8d4e3c143bb2cdccc04ce57134c66bec2eaf426a347de14fc20dbb462fc987bc",
+        "api_unit": "scipy.optimize.basinhopping",
+        "sentence_start": 8719,
+        "sentence_end": 8830,
+        "docstring_sha256": "d81f3570cecc5453ad209c0ad6862c77eeab276086a47209efccb8eff20a6b19",
+        "source_citation": "scipy.optimize.basinhopping#sha256=d81f3570cecc5453ad209c0ad6862c77eeab276086a47209efccb8eff20a6b19&chars=8719:8830",
+        "sentence": "`basinhopping` will, by\ndefault, adjust `stepsize` to find an optimal value, but this may take\nmany iterations.",
+        "dependency_candidates": [
+          {
+            "subject": "basinhopping",
+            "predicate_phrase": "will, by default, adjust `stepsize` to find an optimal value, but this may take many iterations.",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "940a50d3f11eeea14a7e630ac29dbe6057f10c97cacad4db31b892530336ddce",
+        "api_unit": "scipy.stats._discrete_distns.poisson_binom_gen",
+        "sentence_start": 995,
+        "sentence_end": 1057,
+        "docstring_sha256": "a78bee3154ea2536593ec7fcce60eefbb9c33df586a776efb874f3b8930fbca6",
+        "source_citation": "scipy.stats._discrete_distns.poisson_binom_gen#sha256=a78bee3154ea2536593ec7fcce60eefbb9c33df586a776efb874f3b8930fbca6&chars=995:1057",
+        "sentence": "[2] Biscarri, William, Sihai Dave Zhao, and Robert J. Brunner.",
+        "dependency_candidates": []
+      },
+      {
+        "sample_key": "a538f45596bbcd0adccd5b6b6f3189f3905f2d242ceecb45ddf56ab5d91bbf66",
+        "api_unit": "scipy.linalg.issymmetric",
+        "sentence_start": 1272,
+        "sentence_end": 1349,
+        "docstring_sha256": "0f9d9a42dac6ffa9e456fd845129f9fb9785e756cb2080900f2fff80f1740276",
+        "source_citation": "scipy.linalg.issymmetric#sha256=0f9d9a42dac6ffa9e456fd845129f9fb9785e756cb2080900f2fff80f1740276&chars=1272:1349",
+        "sentence": "However,\n`numpy.inf` will be treated as a number, that is to say ``[[1, inf],",
+        "dependency_candidates": [
+          {
+            "subject": "numpy.inf`",
+            "predicate_phrase": "will be treated as a number, that is to say ``[[1, inf],",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "b2d793842a2ca29ba56f8f9f59258763850b2078793d9bdb6a451054cd867a9c",
+        "api_unit": "scipy.optimize.brute",
+        "sentence_start": 3970,
+        "sentence_end": 4170,
+        "docstring_sha256": "be3690c4841067d70e3672d7a16e76eaa957dcd9fa56b536dc8966fd56daf627",
+        "source_citation": "scipy.optimize.brute#sha256=be3690c4841067d70e3672d7a16e76eaa957dcd9fa56b536dc8966fd56daf627&chars=3970:4170",
+        "sentence": "Any polishing program used must take `brute's` output as its\ninitial guess as a positional argument, and take `brute's` input values\nfor `args` as keyword arguments, otherwise an error will be raised.",
+        "dependency_candidates": [
+          {
+            "subject": "an error",
+            "predicate_phrase": "will be raised.",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "b8daba70ac7c249c96903b075ff87f7f2456cf6878c491af15561f99bef71a46",
+        "api_unit": "scipy.optimize.minimize",
+        "sentence_start": 17571,
+        "sentence_end": 17799,
+        "docstring_sha256": "825a80337635c26659bacc1a9e43b3e177e3d65bf0928e6034d47c1300e9810a",
+        "source_citation": "scipy.optimize.minimize#sha256=825a80337635c26659bacc1a9e43b3e177e3d65bf0928e6034d47c1300e9810a&chars=17571:17799",
+        "sentence": "The provided `method` callable must be able to accept (and possibly ignore)\narbitrary parameters; the set of parameters accepted by `minimize` may\nexpand in future versions and then these parameters will be passed to\nthe method.",
+        "dependency_candidates": [
+          {
+            "subject": "these parameters",
+            "predicate_phrase": "will be passed to the method.",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "c773378cf8d16fb96b39198094b03b2ceb37da45d7ad9dfc37942a0640e08dd8",
+        "api_unit": "scipy.stats._continuous_distns.erlang_gen",
+        "sentence_start": 261,
+        "sentence_end": 365,
+        "docstring_sha256": "54b5614b68ac1f8a3322ba65688f818e6fec6815e53189d932560ea72f7bffe9",
+        "source_citation": "scipy.stats._continuous_distns.erlang_gen#sha256=54b5614b68ac1f8a3322ba65688f818e6fec6815e53189d932560ea72f7bffe9&chars=261:365",
+        "sentence": "It will, however, generate a warning the first time\na non-integer value is used for the shape parameter.",
+        "dependency_candidates": [
+          {
+            "subject": "It",
+            "predicate_phrase": "will, however, generate a warning the first time a non-integer value is used for the shape parameter.",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      },
+      {
+        "sample_key": "e0d7a14681cd8614238858ff32f894de742ddaa3895efc6995c1eb878daf7046",
+        "api_unit": "scipy.stats.tukey_hsd",
+        "sentence_start": 2948,
+        "sentence_end": 2982,
+        "docstring_sha256": "c6969ebc24a7d5fc1bb41c59af0d27c617f04c1c9d17bab0d038349f0ef17264",
+        "source_citation": "scipy.stats.tukey_hsd#sha256=c6969ebc24a7d5fc1bb41c59af0d27c617f04c1c9d17bab0d038349f0ef17264&chars=2948:2982",
+        "sentence": "[2] Abdi, Herve & Williams, Lynne.",
+        "dependency_candidates": []
+      },
+      {
+        "sample_key": "e9e2ac1e71a12baba51672585a0427b229df6ea946089e96375d34695dc07f13",
+        "api_unit": "scipy.sparse.linalg.lsqr",
+        "sentence_start": 6659,
+        "sentence_end": 6712,
+        "docstring_sha256": "b9705f81c537ed026575442aac573ce3f46c56287882e165deea3bcdcd2a36f2",
+        "source_citation": "scipy.sparse.linalg.lsqr#sha256=b9705f81c537ed026575442aac573ce3f46c56287882e165deea3bcdcd2a36f2&chars=6659:6712",
+        "sentence": "SYMMLQ (but will take the same number of iterations).",
+        "dependency_candidates": [
+          {
+            "subject": "SYMMLQ (but",
+            "predicate_phrase": "will take the same number of iterations).",
+            "polarity": true,
+            "quoted": false,
+            "scope_notes": [],
+            "assertion_status": "asserted",
+            "status": "needs_review"
+          }
+        ]
+      }
+    ]
+  },
+  "observations": [
+    "Synthetic controls preserve explicit subjects, negation and simple if/when scope; an embedded denial is flagged and a subjectless passive abstains.",
+    "Dependency subjects recover several passive subjects and simple output relations that the phrase boundary alone obscures.",
+    "The prototype still misbinds or truncates subjects around inline code, fragments, contrast, ellipsis, and documentation metadata.",
+    "Conditions and shared subjects are not consistently separated from the proposition.",
+    "This sample was used for prototype inspection and is development data, not a holdout."
+  ],
+  "limitations": [
+    "Single-rater diagnostic on 40 hash-selected rows from SciPy docstrings.",
+    "Does not estimate precision or recall and does not establish transfer.",
+    "The parser/model are optional development dependencies; no CRMS runtime path depends on them.",
+    "No candidates are accepted or installed as rules."
+  ],
+  "manual_review": {
+    "reviewer": "Codex",
+    "candidate_sample_structurally_coherent": 4,
+    "candidate_sample_size": 20,
+    "unhandled_sample_plausible_dependency_claims": 7,
+    "unhandled_sample_size": 20,
+    "basis": "A coherent candidate has a source-supported subject, a predicate that preserves the stated relation, and explicit conditions represented without guessing an antecedent.",
+    "interpretation": "Single-rater diagnostic on a development sample; not a precision/recall estimate. All outputs remain review-only."
+  }
+}

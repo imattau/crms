@@ -280,6 +280,21 @@ new publisher. The script and cited sample are
 [`v1_486 audit`](../experiments/audits/v1_486_scipy_will_claim_fit.py) and
 [`v1_486 report`](../experiments/reports/v1_486_scipy_will_claim_fit.json).
 
+An optional spaCy dependency-parser proposal path was then prototyped against
+the same frozen SciPy development sample in `v1_487`. It produced candidates
+for 19/20 previously proposed rows and 11/20 sampled non-proposal rows; the
+single-rater review found four structurally coherent rows in the first sample
+and seven plausible missed behavior/property claims in the second. It handles
+several simple passive subjects and explicit `if`/`when` conditions, but still
+misbinds inline-code subjects, fragments, contrast, ellipsis, and document
+metadata. This is an exploratory parser comparison, not transfer evidence;
+the parser and model remain optional and are not wired into CRMS. Keep both
+methods as development baselines, and only continue with dependency parsing if
+a revised representation can reduce review burden while preserving these
+positive, negative, conditional, and malformed-boundary controls. See the
+[`v1_487 prototype`](../experiments/audits/v1_487_spacy_dependency_prototype.py)
+and [`v1_487 report`](../experiments/reports/v1_487_spacy_dependency_prototype.json).
+
 Use the existing excerpt and real-source acceptance experiments as regression
 controls, not as a corpus-level result. If a suitable corpus does not contain
 enough examples, change the learning signal or narrow the claim; do not add
