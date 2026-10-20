@@ -3572,3 +3572,23 @@ problem solving or independent math transfer. Preserve the contrastive,
 unknown, conflict, and exact-cross-check cases as controls.
 
 Report: [experiment](../experiments/v1_502_reasoned_numeric_aggregation.py).
+
+## Review-gated predicate paraphrase in chat (`v1_513`, 2026-10-20)
+
+Command: `python3 experiments/v1_513_reviewed_predicate_paraphrase_chat.py`.
+
+Two distinct, cited fact pairs use the canonical predicate `built`; separate
+documents repeat the same pairs with `constructed`. CRMS proposes the wording
+alignment `constructed → build`, leaves it inactive before explicit review,
+and answers “Who constructed the Eiffel Tower?” after acceptance. The
+knowledge store is saved and reloaded, and the standard CLI answers with the
+accepted fact and source provenance. The unobserved wording `erected` does not
+produce that answer. All four controls pass.
+
+This confirms that the earlier “constructed” gap can be closed through CRMS's
+existing learn → review → reuse path without adding a global synonym. It does
+not establish general synonym induction: the fact pairs and accepted mapping
+are a small controlled fixture, the canonical facts are explicitly taught,
+and no publisher-held-out evaluation was run.
+
+Report: [experiment](../experiments/v1_513_reviewed_predicate_paraphrase_chat.py).

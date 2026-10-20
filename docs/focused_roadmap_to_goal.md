@@ -459,10 +459,13 @@ follow-ups and `why?`; and the 2026-10-20 runtime retest passed `v1_412`,
 `v1_419`, and `v1_435` as well. These are curated controls, not a
 representative transfer benchmark. Exact wording like “Who built the Eiffel
 Tower?” now retrieves its directly supported “designed and built” sentence;
-“Who constructed the Eiffel Tower?” still abstains, showing a paraphrase gap
-that more source text alone will not close. The clause-aware source-rule
-learner has passed selected controls but has not passed transfer: frozen
-SymPy and NetworkX diagnostics each found only 10/20 sampled proposals
+without a reviewed relation mapping, “Who constructed the Eiffel Tower?” still
+abstains. The new `v1_513` control shows this phrase can be proposed from two
+distinct cited pairs, accepted explicitly, and reused through saved/reloaded
+chat while an unobserved alternative still abstains. This is supervised
+paraphrase acquisition, not automatic synonym generalization. The clause-aware
+source-rule learner has passed selected controls but has not passed transfer:
+frozen SymPy and NetworkX diagnostics each found only 10/20 sampled proposals
 structurally reviewable, with the remainder context-dependent or boundary
 errors. These are small, single-rater diagnostics, not precision estimates.
 The next capability milestone is independently authored, paraphrased
