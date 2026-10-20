@@ -411,8 +411,9 @@ _EXPLICIT_GENERIC_TASK_REQUEST_RE = re.compile(
     r"(?:to\s+)?(?P<request>.+?)[.! ]*$",
     re.IGNORECASE)
 _INFORMATION_COMPLEMENT_RE = re.compile(
-    r"^(?:know\b|learn\b|find\s+out\b|see\s+if\b|check\s+if\b|"
-    r"ask\b|understand\b|be\s+told\b)", re.IGNORECASE)
+    r"^(?:know\b|learn\b|find\b|look\s+for\b|search\s+for\b|"
+    r"locate\b|see\s+if\b|check\s+if\b|ask\b|understand\b|"
+    r"be\s+told\b)", re.IGNORECASE)
 _AVAILABILITY_SEARCH_RE = re.compile(
     r"\b(?:looking|trying|hoping|want)\s+to\s+see\s+if\b.+\b"
     r"(?:playing|showing|available)\b|"

@@ -1,0 +1,85 @@
+{
+  "experiment": "v1_518_contextual_intent_search_request",
+  "source_report": "v1_462_taskmaster_fresh_dialogue_intent_holdout.json",
+  "source_report_revision": "70abcd8989e94064a47bd80d4aa1d66982b1a9b6",
+  "label_provenance": "Codex-authored development labels from listed Taskmaster disagreement plus contrastive controls",
+  "independent_validation": false,
+  "result": "4/4 targeted intent controls passed",
+  "cases": [
+    {
+      "case": "search goal",
+      "utterance": "I need to find a Chinese restaurant. I'm in San Francisco, California.",
+      "context": "no active task",
+      "expected": {
+        "dialogue_act": "request-action",
+        "task_intent": "seek-information",
+        "goal_intent": "seek-information"
+      },
+      "actual": {
+        "dialogue_act": "request-action",
+        "task_intent": "seek-information",
+        "goal_intent": "seek-information",
+        "decision": "selected",
+        "matched_frame": "explicit-information-request",
+        "selected_value": null
+      }
+    },
+    {
+      "case": "action goal contrast",
+      "utterance": "I need to build a restaurant reservation system.",
+      "context": "no active task",
+      "expected": {
+        "dialogue_act": "request-action",
+        "task_intent": "other-task",
+        "goal_intent": "other-task"
+      },
+      "actual": {
+        "dialogue_act": "request-action",
+        "task_intent": "other-task",
+        "goal_intent": "other-task",
+        "decision": "selected",
+        "matched_frame": "explicit-generic-task-request",
+        "selected_value": null
+      }
+    },
+    {
+      "case": "open preference slot",
+      "utterance": "I would like one with a high rating. I would also like one that is portable. And I also like one that has take out.",
+      "context": "active seek-information; awaiting cuisine/restaurant preference",
+      "expected": {
+        "dialogue_act": "provide-information",
+        "task_intent": "provide-constraint"
+      },
+      "actual": {
+        "dialogue_act": "provide-information",
+        "task_intent": "provide-constraint",
+        "goal_intent": null,
+        "decision": "selected",
+        "matched_frame": "answer-to-open-dialogue-question",
+        "selected_value": "I would like one with a high rating. I would also like one that is portable. And I also like one that has take out."
+      }
+    },
+    {
+      "case": "reservation with ordinal choice",
+      "utterance": "Book a reservation with the second one?",
+      "context": "active seek-information; two source candidates pending",
+      "expected": {
+        "task_intent": "make-reservation",
+        "goal_intent": "make-reservation"
+      },
+      "actual": {
+        "dialogue_act": "request-action",
+        "task_intent": "make-reservation",
+        "goal_intent": "make-reservation",
+        "decision": "selected",
+        "matched_frame": "explicit-reservation-request",
+        "selected_value": null
+      }
+    }
+  ],
+  "limitations": [
+    "The source Taskmaster replay was not rerun because its raw transcript input is not present in this checkout.",
+    "The four controls do not estimate intent accuracy, coverage, or task completion.",
+    "Taskmaster labels are not independent gold; this is a development regression only."
+  ]
+}

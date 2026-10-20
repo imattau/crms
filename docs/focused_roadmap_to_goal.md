@@ -845,6 +845,17 @@ more confident errors; ambiguous or unsupported turns recover through a
 focused question or honest abstention. If learned moves do not improve the
 baseline, keep the simpler handlers and record the result.
 
+The current intent code reproduced one concrete error from the older
+Taskmaster report: “I need to find a Chinese restaurant …” was classified as
+an action task. `v1_518` now recognizes explicit find/look-for/search/locate
+complements as information-seeking while a build request remains an action
+task. It also rechecks contextual preference input and a reservation request
+with a numbered choice. These four Codex-labeled controls are a narrow
+regression, not evidence of improved held-out task completion; the raw
+Taskmaster transcript is absent, so the older full replay could not be rerun.
+The next intent step remains a frozen, source-disjoint transcript comparison
+against the explicit baseline.
+
 ### Milestone 5 — Establish source-derived rule transfer, then widen domains
 
 Continue the clause/context-aware source learner as a bounded research lane.

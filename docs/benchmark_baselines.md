@@ -1,5 +1,28 @@
 # Language and recombination benchmark baselines
 
+## Contextual task-intent contrast (`v1_518`, 2026-10-20)
+
+The prior Taskmaster diagnostic (`v1_462`, code revision
+`70abcd8989e94064a47bd80d4aa1d66982b1a9b6`) recorded “I need to find a
+Chinese restaurant …” as `other-task` instead of `seek-information`. The
+current classifier reproduced that error. Its information-complement rule
+now treats bounded `find`, `look for`, `search for`, and `locate` requests as
+information seeking, while an explicit `build` request remains an action task.
+
+The focused runtime packet passes four controls: the search/action contrast,
+preferences interpreted under an open restaurant-search slot, and a reservation
+request with an ordinal candidate reference. The latter stays
+`make-reservation` rather than being swallowed as source selection. Existing
+contextual confirmation and task-slot regressions also pass (3/3 including
+`v1_518`).
+
+Report: [v1_518](../experiments/reports/v1_518_contextual_intent_search_request.json).
+Its labels are Codex-authored development labels; the four controls are not an
+intent-accuracy estimate. The raw Taskmaster transcript used by `v1_462` is not
+in this checkout, so its full replay was not rerun. Re-evaluate this change on
+a frozen, source-disjoint conversation set before claiming broader intent
+improvement.
+
 ## History recall and ordinal source selection in one conversation (`v1_517`)
 
 Command: `python3 experiments/v1_517_dialogue_history_and_ordinal_flow.py`.
