@@ -3405,3 +3405,25 @@ requests authored independently from the implementation and components, plus
 an independent result checker.
 
 Report: [experiment](../experiments/v1_498_composition_request_coverage.py).
+
+## Learned operation phrase in proof-backed chat composition (`v1_499`, 2026-10-20)
+
+Command: `python3 experiments/v1_499_learned_operation_in_reasoned_composition.py`.
+
+Starting from the `v1_498` unsupported-operation case, CRMS first abstains on
+“deduplicate the values”. The procedure learner then receives five explicitly
+labeled input/output examples, requests a contrastive input, and learns the
+stable-deduplication operation from the answer. It applies the learned phrase
+to a held-out list and composes it with the already learned reverse operation
+and proof-checked relation filtering. A clean chat process reloads both stores,
+returns `[9, 12, 4]`, and `why?` provides the proof explanation and source IDs.
+The nearby phrase “remove repeats” stays unsupported.
+
+This demonstrates a narrow teacher-supervised language-to-procedure update and
+its use in recombination. It does not show autonomous rule discovery,
+independent labels, general synonym transfer, or that CRMS learned from its own
+outputs. The contrastive sample and held-out list are development examples,
+not an independent transfer set. Continue toward independent supervision and
+held-out task phrasing while retaining the unsupported-alias control.
+
+Report: [experiment](../experiments/v1_499_learned_operation_in_reasoned_composition.py).

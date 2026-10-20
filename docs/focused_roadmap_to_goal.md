@@ -464,6 +464,15 @@ not failures of the proof checker. The sample is small and not independent
 transfer evidence; preserve it as a development control and freeze a separate
 request set before tuning against the next evaluation.
 
+`v1_499` shows a concrete learning route for one of those seams: after an
+unlicensed operation was rejected, five labeled demonstrations triggered a
+contrastive question; the teacher's answer licensed “deduplicate the values”.
+CRMS then applied it to an unseen input and composed it with proof-checked
+filtering plus a separately learned reverse operation in a fresh chat process.
+The combined target was not taught directly, and an unsupported alias still
+abstained. This advances supervised recombination, but does not establish
+independent transfer or learning from the system's own outputs.
+
 An opt-in `/practice-composition` command now re-runs and verifies each distinct
 positive relation result from the last successful composition and stores it as
 a separate derived case. It also stores the complete output, request, proofs,
@@ -534,6 +543,14 @@ Proof gates and evidence lineage remain intact. These synthetic fixtures and
 Codex-taught phrase/connective examples do not establish independent semantic
 transfer. Continue with frozen, independently reviewed tasks rather than
 treating these controls as a completed recombination milestone.
+
+`v1_499` adds one teacher-supervised acquisition test: CRMS asks for a
+contrastive example before accepting the new `deduplicate the values` phrase,
+then composes that learned operation with reverse and proof-backed filtering
+through fresh chat. The new phrase generalizes to an unseen input, while
+`remove repeats` remains unsupported. This is evidence that the existing
+learner can add a new operation to a known composition path; the task, labels,
+and examples remain authored, and autonomous learning is not shown.
 
 **Gate:** frozen held-out requests complete through chat; an independent
 checker accepts valid outputs and rejects tampered or invalid ones; unknown,
