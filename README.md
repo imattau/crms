@@ -60,9 +60,10 @@ Other things it can currently do:
   value is unknown or conflicting; this is a bounded composition, not general
   task planning.
 - Explicitly practice the positive relation results from the last successful
-  composition with `/practice-composition`. CRMS re-derives them, independently
-  verifies their proofs, and stores them as separate derived cases. This does
-  not change ordinary answers, promote results to facts, or learn the procedure.
+  composition with `/practice-composition`. CRMS re-runs the task, verifies its
+  proofs, and stores the complete output with proof and procedure-example
+  lineage, plus separate relation cases. `/derived-compositions` rechecks those
+  artifacts. They do not become facts or teach the procedure.
 - Learn new ways of phrasing questions, with your approval.
 - Compose a short, template-based fictional story from a topic, choose funny,
   mystery, or adventure, revise among those modes in the same chat, and label

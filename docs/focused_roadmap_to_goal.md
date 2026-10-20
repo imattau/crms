@@ -432,7 +432,7 @@ recombination with already reviewed components.
 ### Next execution card
 
 This is the order for the next development cycle, based on the current checkout
-(`68b3214`) and the latest dialogue and recombination findings. It deliberately
+(`629f42f`) and the latest dialogue and recombination findings. It deliberately
 starts by checking current behavior: reports describe earlier commits, and a
 regression already fixed in the current tree should not trigger duplicate code.
 
@@ -445,22 +445,27 @@ regression already fixed in the current tree should not trigger duplicate code.
 | 5 | Use the common scorecard to select one bounded task each in coding, math, translation, and creative work, after steps 1–3 establish a stable chat and recombination baseline. | For each selected task: held-out prompts, a validator independent of generation, ordinary-chat and repair results, and a portability check. | Each task shows useful completion, valid outputs, honest limits, and repair on unseen examples before scope expands. |
 | 6 | Exercise the SQLite model as the complete distributable runtime after the preceding learning paths stabilize. | A clean copied model with source files unavailable, replaying query, learn, compose, reason, explain, correct, save/reload, and the shared scorecard. | Behavior, provenance, searchable source text, and correction lineage survive from the copy alone; size and compatibility are documented. |
 
-**Current checkpoint (2026-10-20):** the fixed multi-turn regression packet
-passes 8/8, including the reported topic switch, source-only continuity,
-history, ordinal selection, and follow-ups after abstention. These are targeted
-controls, not independently authored transfer evidence. The latest recombination
-slice now passes seven requests across four bounded frames, including an
-“after removing” construction. It converts that gerund only when the existing
-procedure learner accepts the resulting taught operation sequence, and shows
-the mapping in the answer. This improves one compositional language seam; broad
-paraphrase, task planning, and transfer remain unproven.
+**Current checkpoint (2026-10-20, `629f42f`):** the fixed multi-turn
+regression packet passes 8/8, including the reported topic switch, source-only
+continuity, history, ordinal selection, and follow-ups after abstention. These
+are targeted controls, not independently authored transfer evidence. The
+latest recombination slice passes seven requests across four bounded frames,
+including an “after removing” construction. It converts that gerund only when
+the existing procedure learner accepts the resulting taught operation
+sequence, and shows the mapping in the answer. The main remaining recombination
+gap is transfer to independently authored requests with changed wording,
+entities, values, and operation order.
 
 An opt-in `/practice-composition` command now re-runs and verifies each distinct
 positive relation result from the last successful composition and stores it as
-a separate derived case. SQLite reload and source correction invalidate the
-dependent case without promoting it to a fact. This establishes a narrow
-write-back bridge; the composite output and its procedure lineage are not yet
-stored together, so the governed self-learning gate remains open.
+a separate derived case. It also stores the complete output, request, proofs,
+source/rule lineage, and procedure examples as one content-addressed artifact.
+SQLite reload is covered; source and procedure changes make the artifact stale,
+and it is never promoted to a fact or used as a proof leaf. The targeted
+`v1_497` checks pass, but this is one controlled task family and explicit
+practice. It does not yet demonstrate a system that discovers, generalizes,
+and safely reuses rules from its own outputs; the governed self-learning gate
+remains open.
 
 Dialogue intent and multi-turn safety are evaluated in every chat-facing step,
 not deferred to step 5. Research into induced dialogue moves may proceed
@@ -469,8 +474,13 @@ outcomes over the explicit dialogue baseline without increasing wrong
 referents or unsupported claims. The source-rule study can also proceed in
 parallel; it is not a prerequisite for recombination from reviewed components.
 
-The highest-priority implementation loop is therefore **step 1, then step 2**.
-Do not add more parser branches, domains, or self-write behavior until the
+The highest-priority implementation loop is therefore **step 1, then step 2**:
+first recheck and lock dialogue safety on current code, then test recombination
+transfer through ordinary chat with frozen held-out requests and an independent
+checker. Keep dialogue evaluation active in every chat-facing change. The
+source-rule transfer study is a parallel research lane; derived-artifact work
+must wait for broader recombination evidence before expanding write-back. Do
+not add more parser branches, domains, or self-write behavior until the
 corresponding failure set and gate are fixed. Preserve experiment outputs and
 user-owned working files; commit only authored plan or code paths.
 

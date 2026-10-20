@@ -8,6 +8,8 @@ members prevent a final result.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import hashlib
+import json
 import re
 from typing import Any
 
@@ -125,6 +127,98 @@ class ReasonedListComposition:
     inference_proofs: tuple[dict[str, Any], ...] = ()
     procedure_records: tuple[dict[str, Any], ...] = ()
     language_evidence: tuple[dict[str, Any], ...] = ()
+
+
+def _fingerprint(value: Any) -> str:
+    encoded = json.dumps(value, ensure_ascii=False, sort_keys=True,
+                         separators=(",", ":"))
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def create_derived_composition_record(
+        request: str, result: ReasonedListComposition,
+        knowledge: CRMSKnowledgeBase) -> dict[str, Any] | None:
+    """Build a content-addressed artifact from a freshly verified composition."""
+    if (result.status != "answered" or result.subject is None
+            or result.relation is None or result.procedure is None
+            or not result.inference_proofs or not result.procedure_records):
+        return None
+    knowledge_fingerprint, _facts, _negatives, _rules = (
+        knowledge._inference_snapshot_fingerprint(result.relation, ()))
+    proofs = [dict(proof) for proof in result.inference_proofs]
+    procedure_records = [dict(record) for record in result.procedure_records]
+    rule_ids: set[str] = set()
+
+    def collect_rules(value: Any) -> None:
+        if isinstance(value, dict):
+            rule = value.get("rule")
+            if isinstance(rule, dict) and isinstance(rule.get("rule_id"), str):
+                rule_ids.add(rule["rule_id"])
+            for child in value.values():
+                if isinstance(child, (dict, list, tuple)):
+                    collect_rules(child)
+        elif isinstance(value, (list, tuple)):
+            for child in value:
+                collect_rules(child)
+
+    collect_rules(proofs)
+    sources = set(result.evidence_sources)
+    for record in procedure_records:
+        for key in ("source_id", "instruction_source_id"):
+            source = record.get(key)
+            if isinstance(source, str) and source:
+                sources.add(source)
+    record = {
+        "format_version": 1,
+        "request": request,
+        "subject": result.subject,
+        "relation": result.relation,
+        "input_values": list(result.input_values),
+        "included_values": list(result.included_values),
+        "excluded_negative": list(result.excluded_negative),
+        "output_values": list(result.output_values),
+        "procedure": result.procedure,
+        "procedure_records": procedure_records,
+        "procedure_fingerprint": _fingerprint(procedure_records),
+        "inference_proofs": proofs,
+        "proof_fingerprint": _fingerprint(proofs),
+        "negative_evidence": [dict(item) for item in result.evidence],
+        "language_evidence": [dict(item) for item in result.language_evidence],
+        "knowledge_fingerprint": knowledge_fingerprint,
+        "lineage": {
+            "sources": sorted(sources),
+            "rule_ids": sorted(rule_ids),
+            "procedure_phrases": sorted({
+                str(item.get("phrase")) for item in procedure_records
+                if item.get("phrase")}),
+        },
+    }
+    record["artifact_id"] = CRMSKnowledgeBase.derived_composition_artifact_id(
+        record)
+    return record
+
+
+def revalidate_derived_composition(
+        record: dict[str, Any], knowledge: CRMSKnowledgeBase,
+        procedures: CRMSModel) -> tuple[str, str]:
+    """Re-run the exact request before presenting a stored composition as current."""
+    current = compose_verified_filter(record.get("request", ""),
+                                      knowledge, procedures)
+    if current is None or current.status != "answered":
+        return "stale", "the current evidence no longer proves a complete result"
+    rebuilt = create_derived_composition_record(
+        record["request"], current, knowledge)
+    if rebuilt is None:
+        return "stale", "the current proof or procedure evidence is incomplete"
+    if rebuilt["knowledge_fingerprint"] != record["knowledge_fingerprint"]:
+        return "stale", "the supporting knowledge or rule state changed"
+    if rebuilt["proof_fingerprint"] != record["proof_fingerprint"]:
+        return "stale", "the verified proof set changed"
+    if rebuilt["procedure_fingerprint"] != record["procedure_fingerprint"]:
+        return "stale", "the supporting procedure examples changed"
+    if rebuilt["artifact_id"] != record["artifact_id"]:
+        return "stale", "the composed result or its recorded lineage changed"
+    return "current", "the evidence, proofs, procedures, and output still match"
 
 
 def _relation_and_subject(claim: str, knowledge: CRMSKnowledgeBase

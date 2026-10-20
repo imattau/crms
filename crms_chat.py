@@ -70,7 +70,10 @@ from crms_translation import (
     CRMSTranslation, infer_shared_slot_templates,
     render as render_translation,
 )
-from crms_task_composition import compose_verified_filter
+from crms_task_composition import (
+    compose_verified_filter, create_derived_composition_record,
+    revalidate_derived_composition,
+)
 
 
 HELP = """Commands:
@@ -221,8 +224,9 @@ HELP = """Commands:
   /practice-question QUESTION
                  answer and retain one unique proof-backed inference
   /practice-composition
-                 reverify and retain the positive relation cases from the last
-                 successful proof-backed list composition
+                 reverify and retain the full proof/procedure trace from the
+                 last successful proof-backed list composition
+  /derived-compositions inspect stored composed outputs and current validity
   Natural-language composition: "From values 12, 4, and 7, keep only the
                  values that Nia reaches, then remove duplicates and reverse"
                  every value must be proved positive/negative without a conflict
@@ -5972,6 +5976,7 @@ def main() -> int:
     last_research_evidence: dict | None = None
     last_answer_had_inference_proof = False
     last_reasoned_filter = None
+    last_reasoned_filter_request: str | None = None
     last_reasoned_filter_practiced = False
     last_feedback_record: dict[str, Any] | None = restored_feedback_context
 
@@ -6016,6 +6021,7 @@ def main() -> int:
         explanation_followup = _natural_research_explanation_request(line)
         if not explanation_followup and line != "/practice-composition":
             last_reasoned_filter = None
+            last_reasoned_filter_request = None
             last_reasoned_filter_practiced = False
         story_revision_tone = _natural_story_revision(line)
         if story_revision_tone is not None and last_story is not None:
@@ -6379,6 +6385,8 @@ def main() -> int:
             dialogue.clear()
             dialogue.reset_history()
             last_reasoned_filter = None
+            last_reasoned_filter_request = None
+            last_reasoned_filter_practiced = False
             last_story = None
             pending_story_tone = None
             pending_candidates = []
@@ -7869,7 +7877,9 @@ def main() -> int:
             continue
         if line == "/practice-composition":
             result = last_reasoned_filter
-            if result is None or result.status != "answered":
+            request = last_reasoned_filter_request
+            if (result is None or result.status != "answered"
+                    or request is None):
                 print("CRMS> There is no successful proof-backed list composition "
                       "to practice. Run one, then use /practice-composition.")
                 continue
@@ -7877,30 +7887,72 @@ def main() -> int:
                 print("CRMS> This composition has already been practiced in this "
                       "session; no additional practice event was recorded.")
                 continue
+            current = compose_verified_filter(request, knowledge, rules)
+            if (current is None or current.status != "answered"
+                    or current.output_values != result.output_values
+                    or current.inference_proofs != result.inference_proofs
+                    or current.procedure_records != result.procedure_records):
+                print("CRMS> The composition changed during revalidation; no "
+                      "derived composition was stored. Run the request again.")
+                continue
+            artifact = create_derived_composition_record(
+                request, current, knowledge)
+            if artifact is None:
+                print("CRMS> The complete proof and procedure lineage could not "
+                      "be recorded, so no composition was practiced.")
+                continue
+            existing_artifact = next((
+                item for item in knowledge.derived_compositions()
+                if item.get("artifact_id") == artifact["artifact_id"]), None)
+            if existing_artifact is not None:
+                validity, _reason = revalidate_derived_composition(
+                    existing_artifact, knowledge, rules)
+                if validity == "current":
+                    print("CRMS> This exact composition is already stored with "
+                          "current evidence; no new practice count was recorded.")
+                    last_reasoned_filter_practiced = True
+                    continue
             retained_values: list[int] = []
+            newly_stored_values: list[int] = []
             rejected_values: list[int] = []
-            for value in dict.fromkeys(result.included_values):
+            for value in dict.fromkeys(current.included_values):
+                existing_case = knowledge.retrieve_derived_case(
+                    current.subject or "", current.relation or "", str(value),
+                    record_use=False)
+                if existing_case is not None and existing_case.get("status") == "verified":
+                    retained_values.append(value)
+                    continue
                 practiced = knowledge.practice_relation(
-                    result.subject or "", result.relation or "", str(value))
+                    current.subject or "", current.relation or "", str(value))
                 retained = knowledge.retrieve_derived_case(
-                    result.subject or "", result.relation or "", str(value),
+                    current.subject or "", current.relation or "", str(value),
                     record_use=False)
                 if (practiced.status == "answered" and practiced.complete
                         and retained is not None
                         and retained.get("status") == "verified"):
                     retained_values.append(value)
+                    newly_stored_values.append(value)
                 else:
                     rejected_values.append(value)
-            if retained_values:
+            artifact_stored = knowledge.record_derived_composition(artifact)
+            if artifact_stored or newly_stored_values:
                 knowledge.save(args.knowledge)
-                print("CRMS> Stored separately verified derived relation cases for "
-                      f"{result.subject} {result.relation}: {retained_values}. "
+            if artifact_stored:
+                print("CRMS> Stored the complete composed result "
+                      f"{list(current.output_values)} as derived artifact "
+                      f"{artifact['artifact_id'][:16]}. Its record includes the "
+                      "request, verified proofs, procedure examples, and source lineage.")
+            else:
+                print("CRMS> The exact composed artifact was already present.")
+            if retained_values:
+                print("CRMS> Separately verified derived relation cases are available for "
+                      f"{current.subject} {current.relation}: {retained_values}. "
                       "These remain derived cases, not facts or new procedures.")
             if rejected_values:
                 print("CRMS> Did not retain these as derived cases because they "
                       "were direct, incomplete, conflicted, or could not be stored: "
                       f"{rejected_values}.")
-            if not retained_values and not rejected_values:
+            if not retained_values and not rejected_values and not artifact_stored:
                 print("CRMS> The composition had no positive relation cases to practice.")
             last_reasoned_filter_practiced = True
             continue
@@ -7922,6 +7974,23 @@ def main() -> int:
             for formatted_case in _format_derived_cases(
                     knowledge.derived_cases()):
                 print(formatted_case)
+            continue
+        if line == "/derived-compositions":
+            records = knowledge.derived_compositions()
+            if not records:
+                print("CRMS> No derived compositions are stored.")
+                continue
+            for record in records:
+                validity, reason = revalidate_derived_composition(
+                    record, knowledge, rules)
+                conclusion = (f"{record['subject']} — {record['relation']} → "
+                              f"{record['output_values']}")
+                print(f"Derived composition [{validity}]: {conclusion}")
+                print(f"  Request: {record['request']}")
+                print(f"  Procedure: {record['procedure']}")
+                print(f"  Rules: {', '.join(record['lineage']['rule_ids']) or 'none'}; "
+                      f"sources: {', '.join(record['lineage']['sources']) or 'none'}.")
+                print(f"  Current check: {reason}")
             continue
         if line.startswith("/counterfactual-path-without-source "):
             fields = [value.strip() for value in line[
@@ -9771,6 +9840,7 @@ def main() -> int:
         reasoned_filter = compose_verified_filter(line, knowledge, rules)
         if reasoned_filter is not None:
             last_reasoned_filter = reasoned_filter
+            last_reasoned_filter_request = line
             last_reasoned_filter_practiced = False
             print("CRMS> " + reasoned_filter.text)
             evidence_refs = collect_feedback_refs(response=reasoned_filter)

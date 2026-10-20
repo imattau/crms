@@ -3360,19 +3360,23 @@ chat flow over the current synthetic finite-set task. A successful composition
 does not write anything by itself. After the user issues `/practice-composition`,
 CRMS independently re-runs the proof search for each distinct positive
 membership result and stores only the verified conclusions as separate derived
-cases in the SQLite knowledge model. They retain rule and source lineage, do
-not appear in `facts()`, and survive save/reload. An unresolved composition
-cannot be practiced. Retracting the source premise for `Nia reaches 12` makes
-that derived case unavailable after reload while the unrelated `4` and `9`
-cases remain valid; recomposition abstains on `12` instead of using its cached
-derived case as a proof leaf. Repeating the practice command in the same
-session does not increment practice counts or create new cases. The focused
-experiment and six recombination, proof, and invalidation controls passed.
+cases in the SQLite knowledge model. It also stores the final list as a
+content-addressed artifact with the original request, complete proof set,
+source/rule lineage, and the procedure examples used. `/derived-compositions`
+re-runs each exact request against current knowledge and procedures. A
+procedure-example change or premise correction marks the artifact stale;
+content whose stored identity no longer matches its fields is rejected.
+Artifacts do not enter `facts()` or
+act as proof leaves. The artifact also retains explicit negative evidence and
+the cited learned predicate wording used by this request. Repeating practice
+for the same artifact in a later
+session does not increment component practice counts. The focused experiment
+and eight SQLite, recombination, proof, and invalidation controls passed.
 
-This is an explicit bridge from verified output to derived memory, not a learned
-procedure or autonomous write-back loop. It stores the proof-backed relation
-results that fed the list operation, not the final list with its procedure
-lineage. All examples and labels remain controlled synthetic fixtures; no
-general learning or transfer claim follows.
+This is explicit, inspectable memory from a verified output, not a learned
+procedure or autonomous write-back loop. The artifact is not used as an answer
+shortcut, and the bounded request parser still limits transfer. All examples
+and labels remain controlled synthetic fixtures; no general learning or
+transfer claim follows.
 
 Report: [experiment](../experiments/v1_497_composition_derived_practice.py).

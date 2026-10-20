@@ -76,6 +76,7 @@ _KNOWLEDGE_RECORD_SECTIONS = frozenset({
     "fact_pattern_predicates", "fact_pattern_predicate_sources",
     "fact_pattern_surface_sources", "fact_pattern_polarities",
 })
+_MAX_DERIVED_COMPOSITIONS = 256
 
 
 def _knowledge_record_bytes(record: Any) -> bytes:
@@ -983,6 +984,9 @@ class CRMSKnowledgeBase:
         self._inference_rule_validation: dict[tuple[str, ...], dict[str, Any]] = {}
         # Derived cases are a proof-backed cache, never fact-store entries.
         self._derived_cases: dict[tuple[Any, ...], dict[str, Any]] = {}
+        # Full composed outputs are inspectable artifacts, never fact leaves.
+        self._derived_compositions: dict[str, dict[str, Any]] = {}
+        self._next_derived_composition_order = 0
         self._entity_aliases: dict[tuple[str, ...], tuple[str, set[str]]] = {}
         self._entity_alias_explicit_sources: dict[tuple[str, ...], set[str]] = {}
         self._fact_pattern_alias_sources: set[
@@ -1103,6 +1107,98 @@ class CRMSKnowledgeBase:
                 ),
             )
             del self._derived_cases[victim]
+
+    @staticmethod
+    def derived_composition_artifact_id(record: Mapping[str, Any]) -> str:
+        """Return the stable identity of an exact derived composition record."""
+        content = {key: value for key, value in record.items()
+                   if key not in {"artifact_id", "stored_order"}}
+        encoded = json.dumps(content, ensure_ascii=False, sort_keys=True,
+                             separators=(",", ":"))
+        return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+    def _enforce_derived_composition_limit(self) -> None:
+        while len(self._derived_compositions) > _MAX_DERIVED_COMPOSITIONS:
+            victim = min(
+                self._derived_compositions,
+                key=lambda artifact_id: (
+                    self._derived_compositions[artifact_id].get("stored_order", 0),
+                    artifact_id))
+            del self._derived_compositions[victim]
+
+    def record_derived_composition(self, record: Mapping[str, Any]) -> bool:
+        """Retain one fully traced, user-practiced composition artifact.
+
+        The caller must re-run the composer and proof checks before recording.
+        Records are content-addressed and bounded; they are never inserted into
+        the fact store and cannot be used as proof premises.
+        """
+        if not isinstance(record, Mapping):
+            raise ValueError("derived composition must be a mapping")
+        item = copy.deepcopy(dict(record))
+        required_strings = (
+            "request", "subject", "relation", "procedure",
+            "knowledge_fingerprint", "procedure_fingerprint",
+            "proof_fingerprint")
+        if (item.get("format_version") != 1
+                or any(not isinstance(item.get(name), str)
+                       or not item[name].strip() for name in required_strings)
+                or not isinstance(item.get("input_values"), list)
+                or not isinstance(item.get("included_values"), list)
+                or not isinstance(item.get("excluded_negative"), list)
+                or not isinstance(item.get("output_values"), list)
+                or not isinstance(item.get("inference_proofs"), list)
+                or not item["inference_proofs"]
+                or not all(isinstance(value, Mapping)
+                           for value in item["inference_proofs"])
+                or not isinstance(item.get("negative_evidence"), list)
+                or not all(isinstance(value, Mapping)
+                           for value in item["negative_evidence"])
+                or not isinstance(item.get("language_evidence"), list)
+                or not all(isinstance(value, Mapping)
+                           for value in item["language_evidence"])
+                or not isinstance(item.get("procedure_records"), list)
+                or not item["procedure_records"]
+                or not all(isinstance(value, Mapping)
+                           for value in item["procedure_records"])
+                or not isinstance(item.get("lineage"), dict)
+                or not isinstance(item["lineage"].get("sources"), list)
+                or not item["lineage"]["sources"]
+                or not all(isinstance(value, str) and value
+                           for value in item["lineage"]["sources"])
+                or not isinstance(item["lineage"].get("rule_ids"), list)
+                or not all(isinstance(value, str) and value
+                           for value in item["lineage"]["rule_ids"])
+                or not isinstance(
+                    item["lineage"].get("procedure_phrases"), list)
+                or not all(isinstance(value, str) and value
+                           for value in item["lineage"]["procedure_phrases"])):
+            raise ValueError("derived composition record is malformed")
+        for field in ("input_values", "included_values", "excluded_negative",
+                      "output_values"):
+            if any(not isinstance(value, int) or isinstance(value, bool)
+                   for value in item[field]):
+                raise ValueError("derived composition values must be integers")
+        try:
+            expected_id = self.derived_composition_artifact_id(item)
+        except (TypeError, ValueError) as error:
+            raise ValueError("derived composition content is not serializable") from error
+        if item.get("artifact_id", expected_id) != expected_id:
+            raise ValueError("derived composition identity does not match content")
+        if expected_id in self._derived_compositions:
+            return False
+        item["artifact_id"] = expected_id
+        item["stored_order"] = self._next_derived_composition_order
+        self._next_derived_composition_order += 1
+        self._derived_compositions[expected_id] = item
+        self._enforce_derived_composition_limit()
+        return expected_id in self._derived_compositions
+
+    def derived_compositions(self) -> list[dict[str, Any]]:
+        """Return copies of full composed artifacts for inspection/revalidation."""
+        return [copy.deepcopy(record) for _artifact_id, record in sorted(
+            self._derived_compositions.items(),
+            key=lambda item: (item[1].get("stored_order", 0), item[0]))]
 
     def close(self) -> None:
         """Close any optional disk-backed fact stores opened by this instance."""
@@ -16078,6 +16174,7 @@ class CRMSKnowledgeBase:
             ],
             "derived_cases": [copy.deepcopy(case) for _, case
                               in sorted(self._derived_cases.items())],
+            "derived_compositions": self.derived_compositions(),
             "entity_aliases": [
                 {"alias": list(alias), "entity": entity,
                  "sources": sorted(sources)}
@@ -16495,6 +16592,36 @@ class CRMSKnowledgeBase:
                 knowledge._next_derived_case_order = max(
                     knowledge._next_derived_case_order, practice_order + 1)
             knowledge._enforce_derived_case_limit()
+            compositions = payload.get("derived_compositions", [])
+            if (not isinstance(compositions, list)
+                    or len(compositions) > _MAX_DERIVED_COMPOSITIONS):
+                raise ValueError("stored derived compositions are malformed")
+            for order, record in enumerate(compositions):
+                if not isinstance(record, dict):
+                    raise ValueError("stored derived composition is malformed")
+                record_order = record.get("stored_order", order)
+                try:
+                    identity_matches = (
+                        record.get("artifact_id")
+                        == cls.derived_composition_artifact_id(record))
+                except (TypeError, ValueError):
+                    identity_matches = False
+                if (not isinstance(record_order, int)
+                        or isinstance(record_order, bool) or record_order < 0
+                        or not identity_matches):
+                    raise ValueError("stored derived composition identity is invalid")
+                try:
+                    added = knowledge.record_derived_composition(record)
+                except ValueError as error:
+                    raise ValueError("stored derived composition is malformed") from error
+                if not added:
+                    raise ValueError("stored derived composition is duplicated")
+                artifact_id = record["artifact_id"]
+                if artifact_id not in knowledge._derived_compositions:
+                    raise ValueError("stored derived composition was not retained")
+                knowledge._derived_compositions[artifact_id]["stored_order"] = record_order
+                knowledge._next_derived_composition_order = max(
+                    knowledge._next_derived_composition_order, record_order + 1)
             for item in payload.get("entity_aliases", []):
                 sources = item.get("sources", [])
                 if not sources:

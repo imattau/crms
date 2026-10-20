@@ -33,10 +33,14 @@ this derived-case path: it re-derives and verifies each distinct positive member
 storing it. Ordinary composition remains read-only, and the stored cases stay out of the fact store.
 The action is one-shot per successful composition in a session, so repeating the command does not
 inflate practice counts without new evidence.
-The composed list and procedure lineage are not yet stored as one derived artifact, and the command
-does not learn or modify the procedure that produced the list; a later design must capture that
-cross-store lineage before claiming complete derivation learning. See
-`experiments/v1_497_composition_derived_practice.py` for the SQLite reload and correction check.
+The command also stores a content-addressed composition artifact containing the exact request,
+output, proof set, source/rule lineage, and procedure examples. `/derived-compositions` reruns the
+request with current knowledge and procedures, showing `stale` if evidence, proofs, or procedure
+examples changed. A stored content/identity mismatch is rejected on load. The artifact is
+inspectable memory, not an answer shortcut or new procedure training example. It does not make
+the current composition grammar transferable. See
+`experiments/v1_497_composition_derived_practice.py` for SQLite reload,
+tamper, procedure-change, and source-correction checks.
 The ledger experiment checks deterministic registration and event updates, protected items, a
 preference margin, dependency-safe dormancy, stale-item listing, outer-transaction savepoints, and
 noisy revision. Across 200 synthetic 20%-noise seeds, the margin 0.30 policy averaged 1.27
