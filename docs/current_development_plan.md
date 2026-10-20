@@ -156,9 +156,10 @@ unsupported cases alongside capability results.
    ordinal references, and unresolved choices. Report wrong referents, wrong
    answer sentences, omissions, clarification, abstention, citation support,
    and task completion separately. A direct request now interrupts an open
-   clarification rather than being consumed as its missing value (`v1_444`);
-   broaden this beyond the current authored command forms and exercise it in
-   complete held-out conversations. Attribute labels and authoring; do not
+   clarification rather than being consumed as its missing value, and clear
+   embedded WH requests reach the normal fact-question path (`v1_444`); broaden
+   these forms and exercise them in complete held-out conversations. Attribute
+   labels and authoring; do not
    present the Codex-authored probe as independent human evaluation.
 2. **Advance source-derived self-learning rules.** Extend beyond current
    teacher-labeled phrase and connective examples using complete-document and
@@ -229,9 +230,11 @@ The dialogue packet also exposed a short-answer routing bug: â€œTell me a jokeâ€
 was stored as the missing entity after an open pronoun clarification. Direct
 imperative requests are now classified before the open-slot fallback, while
 valid entity replies and explicit slot corrections retain their routes. The
+same router recognizes two direct/modal embedded-WH forms and preserves the
+original wording in history while sending the question to the fact path. The
 new transcript regression and eight adjacent intent/dialogue scripts pass
-(9/9 total). This closes only that interrupted-slot failure on the covered
-commands; contextual intent generalization and open-ended creative capability
+(9/9 total). This closes only the covered interrupted-slot and embedded-WH
+forms; contextual intent generalization and open-ended creative capability
 remain unproven.
 
 Do not grow the corpus as a substitute for these packets: more documents cannot

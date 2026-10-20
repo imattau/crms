@@ -223,6 +223,11 @@ _DIRECT_IMPERATIVE_REQUEST_RE = re.compile(
     r"^(?:please\s+)?(?P<verb>"
     + "|".join(sorted(_DIRECT_REQUEST_VERBS, key=len, reverse=True))
     + r")\b\s+\S.+$", re.IGNORECASE)
+_EMBEDDED_WH_REQUEST_RE = re.compile(
+    r"^(?:please\s+)?(?:(?:can|could|would|will)\s+you\s+)?"
+    r"(?:tell|show|explain|describe)\s+me\s+"
+    r"(?P<question>(?:who|whom|whose|what|which|when|where|why|how)"
+    r"\b.+?)[?.! ]*$", re.IGNORECASE)
 _EXPLICIT_RESERVATION_REQUEST_RE = re.compile(
     r"^(?:(?:i|we)\s+(?:(?:need|want)\s+(?:to\s+)?|"
     r"(?:would|could)\s+like\s+to\s+)"
@@ -1199,7 +1204,12 @@ def _present_direct_search_matches(
 def respond(dialogue: CRMSDialogue, text: str, *,
             research_index: Any | None = None,
             pending_claims: int = 0) -> DialogueTurn:
-    """Handle simple dialogue acts, delegating every content turn unchanged."""
+    """Handle dialogue acts and route embedded WH requests to question handling."""
+    original_text = text
+    embedded_request = _EMBEDDED_WH_REQUEST_RE.fullmatch(text.strip())
+    if embedded_request is not None:
+        text = embedded_request.group("question").strip().rstrip(" .?!")
+        text = text[:1].upper() + text[1:] + "?"
     intent = classify_user_intent(dialogue, text)
     act = classify_act(text)
     preserves_question = bool(
@@ -1263,7 +1273,9 @@ def respond(dialogue: CRMSDialogue, text: str, *,
         dialogue.last_intent_hypothesis = intent
         history_act = (act or (intent.dialogue_act if intent is not None else None)
                        or "question")
-        dialogue.record_turn(text, history_act, turn, intent)
+        if embedded_request is not None:
+            turn.question = original_text
+        dialogue.record_turn(original_text, history_act, turn, intent)
         _offer(dialogue, turn)
         return turn
 

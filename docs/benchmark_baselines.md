@@ -2098,10 +2098,15 @@ requests (“Tell me a joke”, “Write a poem”, “Translate hello into Fren
 an entity slot is open, plus a valid short entity reply. Explicit imperative
 requests are classified before the generic short-answer rule, clearing the old
 slot; typed corrections such as “Set the location to San Jose” retain their
-existing correction route.
+existing correction route. Clear embedded WH requests such as “Tell me who
+created Python” and “Could you tell me who created Python?” enter the same
+fact-question path as “Who created Python?”; the answer retains the original
+utterance in its conversation history.
 
 Runtime commands: `v1_444`, `v1_388`, `v1_427`, `v1_442`, `v1_353`, `v1_391`,
 `v1_404`, `v1_419`, and `v1_438`; all nine passed. `git diff --check` passed.
-The request classifier only recognizes the current explicit command vocabulary;
-this does not establish broad intent recognition, nor does it add joke-writing
-capability. The new fixture and existing dialogue scripts are Codex-authored.
+The request classifier only recognizes the current explicit command vocabulary
+and a narrow embedded-WH form; this does not establish broad intent recognition,
+nor does it add joke-writing capability. The embedded question test uses an
+accepted fact, not a source-only retrieval case. The new fixture and existing
+dialogue scripts are Codex-authored.

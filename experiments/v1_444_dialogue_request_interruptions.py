@@ -45,8 +45,24 @@ def main() -> None:
             and dialogue.open_dialogue_question is None,
             f"valid entity clarification stopped working: {answer!r}")
 
+    # A WH request embedded in a polite imperative should still reach the
+    # existing fact-answer path, with the actual utterance retained in history.
+    kb = CRMSKnowledgeBase()
+    kb.add_fact("Guido van Rossum", "created", "Python", "fixture:python")
+    for request in ("Tell me who created Python",
+                    "Could you tell me who created Python?"):
+        dialogue = CRMSDialogue(kb)
+        reply = respond(dialogue, request)
+        require(reply.status == "answered" and reply.response is not None
+                and reply.response.answer == "Guido van Rossum"
+                and reply.question == request
+                and reply.resolved_question == "Who created Python?"
+                and dialogue.history[-1]["utterance"] == request,
+                f"embedded WH request missed the normal fact path: {reply!r}")
+
     print("three direct requests interrupt open entity clarification: PASS")
     print("valid short entity reply still fills the open slot: PASS")
+    print("direct and modal embedded WH requests answer and retain original wording: PASS")
 
 
 if __name__ == "__main__":
