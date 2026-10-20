@@ -1,5 +1,27 @@
 # Language and recombination benchmark baselines
 
+## Subject-gap realization from explicit active/passive clauses (`v1_539`, 2026-10-20)
+
+Command: `python3 experiments/v1_539_natural_subject_gap_realization.py`.
+
+For “What body of water crosses Nacre City 0133?” and the explicit source
+sentence “Nacre City 0133 is crossed by Serein River 0133,” fresh chat now
+answers “Serein River 0133 crosses Nacre City 0133” and cites the source. The
+same bounded realization handles an already active clause. It is a
+retrieval-time wording result and does not add an accepted fact. Controls
+reject a different numbered city, an unaligned predicate, negated/example
+sentences, contrastive clauses, and two conflicting agents. The reported
+Everest/Turing/Eiffel source-question checks, regular -es morphology checks,
+and 30-turn dialogue transcript also pass after this change.
+
+This closes one answer-realization gap exposed by the large-corpus chat drive.
+The question class phrase is not independently validated as an ontology
+claim; the result is grounded in the exact source participants, predicate,
+and object. The test uses one synthetic relation and does not measure
+source-disjoint paraphrase transfer, broad subject-gap coverage, or task
+completion across a representative set. See the
+[runner](../experiments/v1_539_natural_subject_gap_realization.py).
+
 ## Standard natural-language arithmetic (`v1_531`, 2026-10-20)
 
 Command: `python3 experiments/v1_531_standard_math_operator_phrases.py`.

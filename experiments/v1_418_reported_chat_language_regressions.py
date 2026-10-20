@@ -1,8 +1,7 @@
 """End-to-end chat checks for reported source-question failures.
 
-The scratch corpus tests retrieval plus answer gating. It locks the supported
-inflection/voice cases and the current abstention boundary for an unlicensed
-semantic paraphrase. Run with: python3
+The scratch corpus tests retrieval, supported voice realization, and the
+current abstention boundary for an unlicensed semantic paraphrase. Run with: python3
 experiments/v1_418_reported_chat_language_regressions.py
 """
 
@@ -75,12 +74,16 @@ def main() -> None:
             "Mount Everest is located in the Himalayas.",
             "Alan Turing worked at Bletchley Park.",
             "Gustave Eiffel designed and built the Eiffel Tower.",
-            "Nacre City 0133 is crossed by Serein River 0133.",
         )
-        for reply, sentence in zip(replies[:4], expected_sentences):
+        for reply, sentence in zip(replies[:3], expected_sentences[:3]):
             require(sentence in reply,
                     f"chat failed to return the expected cited sentence {sentence!r}: "
                     f"{reply!r}")
+        require("Serein River 0133 crosses Nacre City 0133." in replies[3]
+                and "[Source: rivers.txt; quoted evidence, not an accepted fact]"
+                in replies[3],
+                "chat failed to realize and cite the source-backed answer to the "
+                f"passive crossing sentence: {replies[3]!r}")
         require("source states yes" in replies[4].casefold(),
                 f"supported polar question did not return yes: {replies[4]!r}")
         require("can't answer with 'made' yet" in replies[5].casefold()

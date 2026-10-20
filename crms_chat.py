@@ -12115,6 +12115,10 @@ def main() -> int:
         has_realized_answer = (
             turn.research is not None
             and turn.research.realized_answer is not None)
+        verified_subject_gap_realization = (
+            isinstance(source_realization, dict)
+            and source_realization.get("method")
+                == "explicit-agent subject-gap realization")
         specialist_route_used = any((
             who_route_used, typed_relation_route_used, polar_route_used,
             where_route_used, when_route_used, why_route_used, object_wh_route_used,
@@ -12147,7 +12151,8 @@ def main() -> int:
             and not has_review_candidates
             and not has_realized_answer
             and (not specialist_route_used or specialist_route_abstained))
-        if ((quoted_evidence_reply and not has_structured_response
+        if ((quoted_evidence_reply and not verified_subject_gap_realization
+             and not has_structured_response
              and "candidate facts still need review" not in turn.text.casefold()
              and "supporting claim awaiting review" not in turn.text.casefold()
              and not (specialist_route_used

@@ -7446,6 +7446,139 @@ class CRMSKnowledgeBase:
         ``by`` agent. Negated, corrected, coordinated, and example sentences
         are excluded.
         """
+        # Subject-gap questions such as "What body of water crosses City?"
+        # ask for the source clause's agent. Resolve only an inflectional
+        # match of the requested predicate and an exact object span. In
+        # particular, this does not treat a requested class label ("body of
+        # water") as proof of the answer's type; it only realizes the named
+        # source participant and relation.
+        subject_gap = re.fullmatch(
+            r"\s*(?:what|which)\s+(?P<rest>.+?)\s*[?!.]?\s*",
+            question, flags=re.IGNORECASE)
+        if subject_gap is not None:
+            words = subject_gap.group("rest").split()
+            subject_claims: dict[tuple[tuple[str, ...], tuple[str, ...]],
+                                 dict[str, Any]] = {}
+            if len(words) >= 3:
+                agent_pattern = (
+                    r"(?P<agent>(?-i:[A-Z][\w’'-]*|[0-9]+)"
+                    r"(?:\s+(?:(?i:van|von|de|del|da|di|la|le)\s+)?"
+                    r"(?-i:[A-Z][\w’'-]*|[0-9]+))*)")
+
+                def bounded_bases(surface: str) -> set[str]:
+                    value = surface.casefold()
+                    bases = {value}
+                    irregular = next((lemma for lemma, forms in
+                                      _IRREGULAR_VERB_PARADIGMS.items()
+                                      if value in forms and lemma != "be"), None)
+                    if irregular is not None:
+                        bases.add(irregular)
+                    elif value.endswith(("sses", "xes", "zzes", "ches", "shes")):
+                        bases.add(value[:-2])
+                    elif value.endswith(("ied", "ies")) and len(value) > 4:
+                        bases.add(value[:-3] + "y")
+                    elif value.endswith("ed") and len(value) > 3:
+                        bases.add(value[:-2])
+                        bases.add(value[:-2] + "e")
+                    elif value.endswith("es") and len(value) > 3:
+                        bases.add(value[:-2])
+                        bases.add(value[:-1])
+                    elif (value.endswith("s") and not value.endswith("ss")
+                          and len(value) > 3):
+                        bases.add(value[:-1])
+                    return bases
+
+                for pivot in range(1, len(words) - 1):
+                    requested_predicate = words[pivot].strip(" ,;:").casefold()
+                    requested_object = " ".join(words[pivot + 1:]).strip(" ,;:")
+                    object_words = _tokens(requested_object)
+                    requested_bases = bounded_bases(requested_predicate)
+                    if (not requested_predicate or not object_words
+                            or not requested_bases):
+                        continue
+                    patient_pattern = (
+                        r"(?:(?i:the|a|an)\s+)?"
+                        + r"\s+".join(re.escape(word)
+                                      for word in object_words))
+                    for source in source_sentences:
+                        if source.get("context_kind") != "assertion":
+                            continue
+                        source_text = str(source.get("text", ""))
+                        source_tokens = _tokens(source_text)
+                        matching_predicates = sorted({
+                            token for token in source_tokens
+                            if len(_tokens(token)) == 1
+                            and bool(bounded_bases(token) & requested_bases)
+                        }, key=lambda token: (-len(token), token))
+                        if not matching_predicates:
+                            continue
+                        predicate_pattern = "|".join(
+                            re.escape(token)
+                            for token in matching_predicates)
+                        active = re.compile(
+                            r"^\s*" + agent_pattern
+                            + rf"\s+(?P<verb>(?:{predicate_pattern}))\b\s+"
+                            + rf"(?P<patient>{patient_pattern})"
+                            + r"(?=\s*(?:[,.;!?]|$))",
+                            flags=re.IGNORECASE)
+                        passive = re.compile(
+                            rf"^\s*(?P<patient>{patient_pattern})\s+"
+                            r"(?:(?:has|have|had)\s+been|is|are|was|were)\s+"
+                            + rf"(?P<verb>(?:{predicate_pattern}))\b"
+                            r"[^.!?;,:]{0,100}?\s+by\s+"
+                            + agent_pattern
+                            + r"(?=\s*(?:[,.;!?]|$))",
+                            flags=re.IGNORECASE)
+                        active_match = active.search(source_text)
+                        passive_match = passive.search(source_text)
+                        match = active_match or passive_match
+                        if match is None:
+                            continue
+                        if active_match is not None and re.search(
+                                r"\b(?:not|never|but|and|or|although|unless|"
+                                r"instead|rather|except)\b",
+                                source_text[active_match.end():],
+                                flags=re.IGNORECASE):
+                            continue
+                        if passive_match is not None and (
+                                re.search(
+                                    r"\b(?:not|never|but|and|or|although|unless)\b",
+                                    source_text[passive_match.start():passive_match.end()],
+                                    flags=re.IGNORECASE)
+                                or re.search(
+                                    r"\b(?:not|never|but|instead|rather|except)\b",
+                                    source_text[passive_match.end():],
+                                    flags=re.IGNORECASE)):
+                            continue
+                        agent = match.group("agent").strip()
+                        patient = match.group("patient").strip()
+                        agent_words = agent.split()
+                        if (not agent_words or len(agent_words) > 6
+                                or not all(
+                                    (word[:1].isupper()
+                                     and any(char.isalpha() for char in word))
+                                    or word.isdigit()
+                                    for word in agent_words)):
+                            continue
+                        key = (tuple(_tokens(agent)), tuple(_tokens(patient)))
+                        subject_claims.setdefault(key, {
+                            "text": f"{agent} {requested_predicate} {patient}.",
+                            "source_title": source.get("title") or "source",
+                            "citation": source.get("citation"),
+                            "document_id": source.get("document_id"),
+                            "method": "explicit-agent subject-gap realization",
+                            "agent": agent,
+                            "predicate": requested_predicate,
+                            "object": patient,
+                            "stored_as_fact": False,
+                        })
+            if len(subject_claims) == 1:
+                return next(iter(subject_claims.values()))
+            # Multiple distinct agents are ambiguous; do not let result order
+            # decide which one answers the question.
+            if subject_claims:
+                return None
+
         direct = re.fullmatch(
             r"\s*who\s+(?:(?:did|does|do)\s+)?"
             r"(?P<predicate>[a-z][\w’'-]*)\s+(?P<object>.+?)\s*[?!.]?\s*",
