@@ -2,7 +2,9 @@
 
 **Status:** proposed contract; `crms_tasks.py` implements the data and
 invariants. `crms_planner.py` implements the action contract and a deterministic
-executor. Goal planning and production action adapters are not implemented yet.
+executor. `crms_actions.py` implements the first two Family A adapters
+(`select-verified-positive`, `apply-learned-procedure`). Goal planning and the
+chat compiler are not implemented yet.
 **Date:** 2026-10-21
 
 ## Why
@@ -53,7 +55,8 @@ Every action is a typed adapter with four methods:
 class Action(Protocol):
     name: str
     def can_apply(self, inputs: Mapping[str, Any], context: ActionContext) -> bool: ...
-    def apply(self, inputs: Mapping[str, Any], context: ActionContext) -> StepResult: ...
+    def apply(self, step: Step, inputs: Mapping[str, Any],
+              context: ActionContext) -> StepResult: ...
     def verify(self, step: Step, inputs: Mapping[str, Any],
                result: StepResult, context: ActionContext) -> Verification: ...
 ```
@@ -72,8 +75,8 @@ Rules:
 
 Initial adapters, in order:
 
-1. `select-verified-positive` — facts/proofs select values or entities.
-2. `apply-learned-procedure` — `CRMSModel.predict` over a typed integer list.
+1. `select-verified-positive` — implemented in `crms_actions.py`.
+2. `apply-learned-procedure` — implemented in `crms_actions.py`.
 3. `infer-relation` — bounded inference with a verified proof.
 4. `compute-exact` — math/units with exact checks.
 5. `translate-frame` — licensed translation frame.

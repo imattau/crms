@@ -25,11 +25,11 @@ compose the answer.
 Facts (each with a distinct source label):
 
 ```
-3   approved  board   source:minutes-1
-8   approved  board   source:minutes-2
-5   approved  board   source:minutes-3
-11  rejected  board   source:minutes-4   (explicit negative)
--2  rejected  board   source:minutes-5   (explicit negative)
+board  approved  3   source:minutes-1
+board  approved  8   source:minutes-2
+board  approved  5   source:minutes-3
+board  approved  11  source:minutes-4   (explicit negative fact)
+board  approved  -2  source:minutes-5   (explicit negative fact)
 ```
 
 Learned procedures, each taught from at least two varied input/output examples
@@ -89,8 +89,8 @@ The oracle is a standalone function over the fixture, not the planner:
 def expected(values, facts, procedure, negatives):
     selected = [
         value for value in values
-        if (value, "approved") in facts
-        and (value, "rejected") not in negatives
+        if ("board", "approved", value) in facts
+        and ("board", "approved", value) not in negatives
     ]
     return apply_procedure(procedure, selected)
 ```

@@ -46,7 +46,7 @@ def plan() -> Plan:
     )
 
 
-def add_one(inputs, context):
+def add_one(step, inputs, context):
     return StepResult("add", "ok", output=inputs["value"] + context.get("offset", 1))
 
 
@@ -57,7 +57,7 @@ def verify_add(step, inputs, result, context):
                         f"expected {expected}, got {result.output}")
 
 
-def double(inputs, context):
+def double(step, inputs, context):
     return StepResult("double", "ok", output=inputs["value"] * 2)
 
 
@@ -96,10 +96,10 @@ def main() -> None:
             "executed plan identity changed")
 
     # A failing action stops the plan before later steps run.
-    def explode(inputs, context):
+    def explode(step, inputs, context):
         raise ExecutionError("upstream data unavailable")
 
-    def explode_downstream(inputs, context):
+    def explode_downstream(step, inputs, context):
         raise ExecutionError("downstream check unavailable")
 
     failing = ActionRegistry()
@@ -126,7 +126,7 @@ def main() -> None:
     # A verifier that rejects the output prevents a false success.
     bad = ActionRegistry()
     bad.register(FunctionAction(
-        "add-one", lambda inputs, context: StepResult("add", "ok", output=99),
+        "add-one", lambda step, inputs, context: StepResult("add", "ok", output=99),
         verify_add))
     bad.register(FunctionAction("double", double, verify_double))
     rejected = PlanExecutor(bad).execute(plan())
@@ -201,7 +201,7 @@ def main() -> None:
     # A mismatched step id is an implementation error, not a result.
     mismatched = ActionRegistry()
     mismatched.register(FunctionAction(
-        "add-one", lambda inputs, context: StepResult("other", "ok", output=1),
+        "add-one", lambda step, inputs, context: StepResult("other", "ok", output=1),
         verify_add))
     mismatched.register(FunctionAction("double", double, verify_double))
     mismatch_result = PlanExecutor(mismatched).execute(plan())

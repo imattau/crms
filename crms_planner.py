@@ -56,7 +56,7 @@ class Action(ABC):
         ...
 
     @abstractmethod
-    def apply(self, inputs: Mapping[str, Any],
+    def apply(self, step: Step, inputs: Mapping[str, Any],
               context: ExecutionContext) -> StepResult:
         ...
 
@@ -103,7 +103,8 @@ class FunctionAction(Action):
     """
 
     def __init__(self, name: str,
-                 handler: Callable[[Mapping[str, Any], ExecutionContext], StepResult],
+                 handler: Callable[[Step, Mapping[str, Any], ExecutionContext],
+                                   StepResult],
                  verifier: Callable[[Step, Mapping[str, Any], StepResult,
                                     ExecutionContext], Verification] | None = None,
                  *, precondition: Callable[[Mapping[str, Any], ExecutionContext],
@@ -120,9 +121,9 @@ class FunctionAction(Action):
         return True if self._precondition is None else bool(
             self._precondition(inputs, context))
 
-    def apply(self, inputs: Mapping[str, Any],
+    def apply(self, step: Step, inputs: Mapping[str, Any],
               context: ExecutionContext) -> StepResult:
-        return self._handler(inputs, context)
+        return self._handler(step, inputs, context)
 
     def verify(self, step: Step, inputs: Mapping[str, Any],
                result: StepResult,
@@ -175,7 +176,7 @@ class PlanExecutor:
                     "execution_failed", plan, results,
                     f"step {step.id}: action {step.action!r} cannot apply")
             try:
-                result = action.apply(inputs, context)
+                result = action.apply(step, inputs, context)
             except ExecutionError as error:
                 return self._failure(
                     "execution_failed", plan, results,

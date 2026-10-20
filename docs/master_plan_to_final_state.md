@@ -664,3 +664,4 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Typed task/plan IR contract: deterministic ids, 6-step bound, dependency order, evidence/check kinds, result invariants, JSON round-trip | `crms_tasks.py`, `docs/design_task_ir.md`, `experiments/v1_549_task_ir_contract.py` |
 | 2026-10-21 | Family A frozen specification (10 positive tasks, 8 negative controls, independent oracle) before planner code | `experiments/scorecard/family_a_spec.md` |
 | 2026-10-21 | Deterministic plan executor: action registry, resolved step inputs, independent per-step and plan-level verification, no partial success | `crms_planner.py`, `docs/design_task_ir.md`, `experiments/v1_550_plan_executor_contract.py` |
+| 2026-10-21 | First Family A adapters: proof-verified value selection with explicit negatives/qualifiers, learned-procedure execution with parity verification, tamper/unknown/conflict controls | `crms_actions.py`, `experiments/v1_551_family_a_actions.py` |

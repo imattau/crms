@@ -6225,9 +6225,11 @@ class CRMSModel:
                           labeler_ids=labelers,
                           instruction_source_ids=instruction_sources)
 
-    def predict(self, instruction: str, values: Iterable[int]) -> Prediction:
+    def predict(self, instruction: str, values: Iterable[int], *,
+                record_use: bool = True) -> Prediction:
         result = self._predict(instruction, values)
-        self._record_procedure_use(instruction, result)
+        if record_use:
+            self._record_procedure_use(instruction, result)
         return result
 
     def _predict(self, instruction: str, values: Iterable[int]) -> Prediction:
