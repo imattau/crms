@@ -36,6 +36,8 @@ def main() -> None:
         "duplicate values then reverse the list.",
         "From [12, 4, 4, 9, 7], return the values Nia reaches, then remove "
         "duplicate values then reverse the list.",
+        "From [12, 4, 4, 9, 7], return the values Nia reaches, then remove "
+        "duplicate values and then reverse the list.",
     )
     for request in variants:
         result = compose_verified_filter(request, knowledge, procedures)

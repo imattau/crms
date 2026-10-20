@@ -3249,7 +3249,8 @@ Report: [experiment](../experiments/v1_491_one_turn_reasoning_filter_recombinati
 `experiments/v1_492_reasoned_filter_language_coverage.py` tests three ordinary
 request frames over the same proof-checked task: “Filter … to values …; then
 …”, “Given …, keep the values …, and then …”, and “From […], return the values
-…, then …”. Each completed through a fresh chat process and returned the same
+…, then …”. It also varies the procedure connective from `then` to `and then`.
+All four requests completed through a fresh chat process and returned the same
 `[9, 4, 12]` result, preserving three verified positive proofs and excluding
 the explicit negative value. An unlicensed operation paraphrase (`deduplicate`)
 and an unlicensed relation wording (`Nia can reach`) remain unsupported in the
