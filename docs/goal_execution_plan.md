@@ -98,12 +98,12 @@ central capability bet.
 
 ## Critical path
 
-Dialogue and contextual intent are measured throughout. The capability work
-below is sequential: each stage must clear its gate before the next stage
-expands. If a gate fails, repair or redesign that stage instead of adding
-surface area. Dialogue safety is a release gate for every chat-facing
-capability; recombination, source-derived rules, and reasoning remain the
-primary capability work.
+Dialogue and contextual intent are measured throughout. Dependent capability
+gates are sequential, but source-derived rule research can proceed alongside
+recombination using reviewed components. A failed gate calls for repair of
+that mechanism before widening it. Dialogue safety is a release gate for
+every chat-facing capability; recombination, source-derived rules, and
+reasoning remain the primary capability work.
 
 ### 1. Establish the shared end-to-end baseline and close the reported dialogue failures
 
@@ -398,10 +398,10 @@ academic-paper sources.
 
 The dialogue packet is a parallel release-quality gate; it must not displace
 the learning experiment. The source-rule result decides whether CRMS advances
-the learner or redesigns the evidence-extraction step. Recombination proceeds
-only after that decision, while reasoning checks are built into its acceptance
-criteria. Math, coding, translation, and creative tasks remain next-stage
-domain slices, not current distractions.
+the learner or redesigns the evidence-extraction step. Recombination can
+proceed with reviewed components while that decision is pending; reasoning
+checks are built into its acceptance criteria. Math, coding, translation, and
+creative tasks remain next-stage domain slices, not current distractions.
 
 Self-learning write-back comes later because error amplification cannot be
 evaluated until independently checked recombination works. This ordering keeps
