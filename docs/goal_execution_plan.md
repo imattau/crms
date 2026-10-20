@@ -173,6 +173,18 @@ This remains one selected positive excerpt, not a precision or transfer result.
 Freeze this revised grammar for the next complete-document, publisher-held-out
 study. Do not add phrase-specific extractors before that study.
 
+An initial corpus-fitness probe against the locally installed indexes found
+that they are not suitable positive corpora for this construction: a bounded
+full-document scan of 2,339 SimpleWiki documents and 40 arXiv documents
+selected by co-occurrence of `will` and the candidate subject vocabulary found
+no matches. This is not evidence of low precision or general failure: these
+general-purpose corpora do not target software-operation descriptions, and
+the co-occurrence filter is only a preflight. Before measuring transfer, build
+a labeled set from complete technical reference documents and relevant open
+research material, retain source/version/license metadata, and include genuine
+non-proposal passages. If the construction is too rare in those sources, treat
+that as a yield result and reconsider whether it is the right learning signal.
+
 **Gate:** a frozen method finds useful candidates on held-out documents and a
 second publisher with measured precision and review effort; sampled
 non-proposals and negative controls do not become positive rules. Accepted
@@ -264,11 +276,19 @@ academic-paper sources.
    learning regressions, including fixed topic-switch/source-only-context cases
    and `v1_470`/`v1_471`. Record commit, corpus, splits, and scoring rubric.
    Do not use inspected holdout rows to change the implementation.
-2. **Run the decisive source-learning transfer study.** Treat
+2. **Establish corpus fitness, then run source-learning transfer.** Build a
+   frozen set of complete, source-versioned documents from technical references
+   and relevant open research, with at least two publisher families for
+   discovery and a third held out for transfer. Confirm that the documents
+   contain enough naturally occurring target constructions to evaluate
+   coverage; otherwise stop and reconsider the representation before spending
+   effort on precision tuning. Label candidate and non-candidate passages for
+   relation/operation meaning, argument roles, polarity, quotation, scope, and
+   assertion status. Treat
    `v1_469`/`v1_436` as integration controls and `v1_464`/`v1_468` as noisy
    baselines. Apply the frozen revised candidate generator to complete
-   documents from a discovery publisher and a held-out publisher, with actual
-   relation/wording overlap. Sample proposals and non-proposals; include
+   documents from discovery publishers and the held-out publisher. Sample
+   proposals and non-proposals; include
    polarity, quotation, contrast, role-reversal, boundary, and unrelated
    negatives. Report precision, useful yield, missed opportunities, source
    independence, and review effort. Keep proposals inert. If useful precision
