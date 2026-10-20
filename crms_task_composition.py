@@ -22,6 +22,10 @@ _INTEGER_LIST = (
     r"-?\d+(?:\s*,\s*-?\d+)*(?:\s*,?\s+and\s+-?\d+)?")
 _REQUESTS = (
     re.compile(
+        rf"^\s*(?P<procedure>sum\s+every\s+value)\s+in\s+"
+        rf"(?P<values>{_INTEGER_LIST})\s+that\s+"
+        r"(?P<claim>.+?)\s*[.!?]*\s*$", re.IGNORECASE),
+    re.compile(
         r"^\s*From\s+(?:the\s+)?(?:values?\s+)?"
         rf"(?P<values>{_INTEGER_LIST})"
         r",\s*keep\s+(?:only\s+)?(?:the\s+)?values\s+"
