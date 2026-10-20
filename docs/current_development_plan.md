@@ -34,15 +34,20 @@ learning and correction lifecycle without the original source files.
 
 The code snapshot at `69158a4` passed a 17-diagnostic cross-domain regression
 replay covering language, recombination, reasoning, dialogue, translation,
-math/code, and creative revision. The replay used separate fixtures and
-scoring, so 17/17 is a regression result, not a unified capability score. The
+math/code, and creative revision. A later 18-diagnostic replay including
+`v1_452` also passed after the variable-width direction-role extension. These
+replays use separate fixtures and scoring, so their pass counts are regression
+results, not unified capability scores. The current `v1_452` run passes 8/11
+held-out positive request forms, with no generated outputs for three
+unsupported-direction controls; wording and labels are Codex-authored, so this
+is a bounded transfer result, not an independent language benchmark. The
 `v1_450` role-compatible candidate probe surfaced a false created/praised match;
 the later evidence-gate fix excludes role types contradicted by explicit
 negatives and types carrying qualifiers. This improves a named safety gate but
 does not establish source-derived rule precision. The latest integration probe,
-committed as `63fbd4a`, joins held-out rule validation, verified chat reasoning,
-procedure execution, and premise-correction invalidation for one controlled
-synthetic task. It still relies on an authored graph and Codex-labeled procedure
+`v1_451`, joins held-out rule validation, verified chat reasoning, procedure
+execution, and premise-correction invalidation for one controlled synthetic
+task. It still relies on an authored graph and Codex-labeled procedure
 examples, so it does not close the generalization gap.
 
 The overall direction is sound, but CRMS is not yet on track to claim its
@@ -187,22 +192,40 @@ Report size, runtime, compatibility requirements, and unsupported cases.
 
 ## Immediate work queue
 
-1. **Dialogue safety transfer:** preserve the passing topic-anchor and
-   multi-turn regressions; add independent transcripts that vary layout,
-   entity count, topic switches, source-only answers, interruptions, and
-   corrections. Fix confident wrong referents before broadening intent behavior.
-2. **Source-derived rule-learning probe:** start with a small licensed corpus
-   of complete documents and held-out publishers. Freeze positive and negative
-   passages before writing extractors. Establish proposal precision and review
-   effort before expanding the corpus or building a larger review workflow.
-3. **Reasoned recombination task:** select one procedure composition whose
-   output is independently checkable and whose conclusion also uses a verified
-   rule. Add missing-premise, negative/conflict, invalid-output, cycle, and
-   search-limit cases; exercise derived-case lineage and correction.
+1. **Replay the latest chat failure report against the current checkout.**
+   Use fresh scratch model databases and the same multi-entity/topic-switch
+   transcript, including source-only answers, skipped or composite questions,
+   unsupported turns, `why?`, “what did I just ask?”, ordinal references, and
+   save/reload. Treat reported failures as unresolved until reproduced or
+   covered by an explicit current regression. Fix confident wrong referents
+   first; preserve context only when its evidence and lifetime are explicit.
+2. **Prove source-derived rules and recombination beyond hand-labeled phrases.**
+   Use complete documents with document- and publisher-held-out splits. Freeze
+   positive, quoted, negated, contrastive, conditional, metalinguistic, and
+   unrelated passages before implementing extraction. Track proposal
+   precision, useful coverage, false proposals, review burden, and Codex label
+   contribution. Then compose the learned components through ordinary chat,
+   reload, and an independent oracle. The current 8/11 `v1_452` result is a
+   useful syntax-transfer baseline; keep expanding it only where held-out
+   errors show a concrete loss.
+3. **Extend the reasoning/recombination integration with real source evidence.**
+   Reuse the `v1_451` synthetic vertical slice as a regression control, then
+   replace authored premises with source-grounded cases and independently
+   validated procedures. Include missing premises, explicit negatives,
+   conflicts, cycles/integrity violations, incomplete search, bad generated
+   output, correction, and derived-case invalidation. Keep provenance and
+   teacher/labeler work separate from what CRMS learned.
 
 Dialogue evaluation runs alongside packets 2 and 3. Do not add a domain, grow
 the corpus, migrate storage, or add a new dialogue mechanism unless it unblocks
 one of these gates or improves a measured scorecard result.
+
+After these gates, choose the next math, coding, translation, or creative slice
+from measured user-task loss; then validate the copied SQLite model against the
+same end-to-end scorecard with original source files unavailable. Keep
+contextual intent evaluation active throughout, but add state only to address a
+reproduced dialogue failure. Keep dialogue-move induction experimental until
+it improves held-out outcomes over the explicit baseline.
 
 ## Working rule
 
