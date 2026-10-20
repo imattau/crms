@@ -1042,12 +1042,23 @@ def classify_user_intent(
                 alternatives=(f"provide the requested {label}",
                              "ask a yes/no question"),
             )
+        token_count = len(re.findall(r"[\w’'-]+", text))
+        contains_preference_item = bool(re.search(
+            r"\b(?:one|ones|restaurant|place)\s+"
+            r"(?:with|without|that|which|offering|serving)\b",
+            text, flags=re.IGNORECASE))
+        contextual_constraint_reply = (
+            token_count <= 64
+            and contains_preference_item
+            and _open_question_task_intent(dialogue, open_question)
+            == "provide-constraint")
         is_typed_parameter_reply = (
             not expected_yes_no and not is_yes_no and not is_fresh_question
             and "?" not in text
             and social_act is None
             and _EXPLICIT_RESERVATION_REQUEST_RE.fullmatch(text) is None
-            and (len(re.findall(r"[\w’'-]+", text)) <= 24
+            and (token_count <= 24
+                 or contextual_constraint_reply
                  or (open_question.get("expected_slot") in {
                      "location", "party_size", "quantity", "date_time",
                      "seating", "cuisine", "restaurant_type"}

@@ -1,0 +1,36 @@
+{
+  "experiment": "v1_537_taskmaster_long_preference_reply",
+  "date": "2026-10-20",
+  "source": {
+    "dataset": "Taskmaster-1, restaurant-table test split",
+    "conversation_id": "dlg-e41052fb-f4a4-4975-a198-3f668bd3f69e",
+    "user_turn_index": 3,
+    "source_sha256": "cd3bc4e968487315d412c044d30af2bf0a4b33c3ef8b74c589f1e1fa832bf72f",
+    "label_provenance": "single Codex primary label; not independent gold"
+  },
+  "task": {
+    "assistant_prompt": "sure, let me help with that. what preferences do you have in mind for the chinese restaurants i look up?",
+    "user_reply": "I would like one with a high rating. I would also like one that is portable. And I also like one that has take out.",
+    "word_count": 25,
+    "expected": {
+      "dialogue_act": "provide-information",
+      "task_intent": "provide-constraint"
+    },
+    "actual": {
+      "dialogue_act": "provide-information",
+      "task_intent": "provide-constraint",
+      "frame": "answer-to-open-dialogue-question"
+    }
+  },
+  "controls": {
+    "same_reply_without_context": "other-task",
+    "unrelated_long_creative_request": "other-task",
+    "explicit_booking_request": "make-reservation",
+    "preference_saved_as_fact": false
+  },
+  "limitations": [
+    "This repairs one long preference response in one Taskmaster conversation.",
+    "The label is single-annotator and not an independent accuracy measure.",
+    "It does not establish general dialogue transfer or task completion quality."
+  ]
+}

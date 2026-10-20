@@ -101,6 +101,22 @@ experiments with manual source-to-fact labels. `v1_533` and `v1_535` use one
 PMC collection and a single measure; this is source diversity across tests,
 not publisher-independent or representative user-task transfer.
 
+Dialogue follow-up, run 2026-10-20: `v1_537` replays a 20-word restaurant
+preference answer from a frozen Taskmaster-1 test conversation through the
+live `respond()` path. The answer now remains a contextual constraint after
+the assistant asks for preferences; it is not stored as a factual claim. A
+same-text/no-context control, a long unrelated creative request, and an
+explicit booking request all remain distinct. `v1_396` and `v1_437` preserve
+their contextual-intent regressions, and `v1_427` preserves the 30-turn
+multi-entity dialogue regression. A fresh `v1_462` diagnostic over three
+restaurant conversations reported 10/27 joint act/task label matches with
+transcript context, compared with 8/27 context-free. These are single-Codex
+labels, not independent ground truth, and the evaluator does not score task
+completion. This is one corrected context boundary, not evidence that
+dialogue transfer is solved. The next dialogue gate remains complete
+held-out task outcomes across topic switches, follow-ups, corrections, and
+repairs.
+
 A focused request probe found that alternate operation wording was not
 recognized. `v1_534` now demonstrates one bounded path through this gap:
 explicitly teach two operation phrases, learn `and` and `then` sequence
