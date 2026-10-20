@@ -1,6 +1,6 @@
 # Focused plan from current CRMS to its goal
 
-**Reviewed:** 2026-10-20 (runtime probes through `v1_524`; dialogue topic-switch failure under repair)
+**Reviewed:** 2026-10-20 (runtime probes through `v1_525`)
 **Status:** active; the capability goal is not yet demonstrated.
 
 ## Goal
@@ -55,16 +55,17 @@ change the overall transfer assessment.
 
 A fresh dialogue drive has exposed another release-gate failure: after
 switching from Marie Curie to Albert Einstein, the follow-up “Where was he
-born?” can return a confidently cited birthplace for Luke Baldwin. The switch
-turn may be source-only or review-only, and a specialized WHERE route was
-reading the raw pronoun rather than the dialogue-resolved question. A focused
-repair is in progress: preserve an explicitly named topic across source-only
-and review-only turns, and run the WHERE specialization on the resolved
-question while refusing a raw pronoun as an entity. This is not yet verified
-and does not close the independent dialogue-transfer gate. Keep the original
-Eiffel Tower/Colosseum example and this Marie Curie/Einstein example as separate
-permanent controls; also check a fresh conversation with no antecedent so
-pronouns cannot bind opportunistically to unrelated corpus sentences.
+born?” could return a confidently cited birthplace for Luke Baldwin. The
+switch turn may be source-only or review-only, and the specialized WHERE route
+was reading the raw pronoun rather than the dialogue-resolved question. The
+`v1_525` repair preserves explicitly named topics across review-only turns,
+routes WHERE through the resolved question, rejects raw pronouns as entity
+keys, and filters unrelated review proposals when a direct cited birthplace
+is available. A fresh-process full-index replay now returns Einstein's Ulm
+birthplace, keeps “why?” on that evidence, and abstains when “he” has no
+antecedent. This repairs one example but does not close independent dialogue
+transfer. Keep the Eiffel Tower/Colosseum and Marie Curie/Einstein cases as
+separate permanent controls.
 
 ## Execution order
 
@@ -177,13 +178,14 @@ gaps, not to claim parity.
 
 ## Immediate next action
 
-The immediate task is to finish and verify the in-progress dialogue repair
-against both reported topic-switch cases, source-only/review-only context
-carryover, “why?” anchoring, and a no-antecedent pronoun control. Then freeze a
-small independent multi-entity conversation set and establish task-level
-outcomes, not only intent-label agreement. If this gate passes, the next
-capability packet transfers reasoning-to-procedure composition beyond curated
-demonstrations: use real source-backed material; vary held-out entities,
+The immediate task is to freeze and run an independently authored, multi-entity
+conversation set spanning topic changes, source-only/review-only answers,
+pronouns with and without antecedents, “why?”, history, clarification, and
+repair. Measure task outcomes and confident misbindings, not only intent-label
+agreement; retain the Eiffel/Colosseum and Marie/Einstein cases as controls.
+Repair any failures before widening dialogue features. In parallel, prepare
+the next capability packet to transfer reasoning-to-procedure composition
+beyond curated demonstrations: use real source-backed material; vary held-out entities,
 evidence order, layout, and request forms; include partial, unsupported,
 conflicting, and multi-source cases; and check results independently in fresh
 CLI processes and a copied model. Keep source-rule quality research moving in

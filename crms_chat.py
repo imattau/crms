@@ -1499,6 +1499,13 @@ def _natural_where_lookup(message: str) -> tuple[str, str] | None:
         return None
     entity = re.sub(r"^(?:the|a|an)\s+", "", match.group("entity").strip(),
                     flags=re.IGNORECASE)
+    if set(normalized_tokens(entity)) & {
+            "he", "she", "him", "her", "his", "hers", "they", "them",
+            "their", "theirs", "it", "its"}:
+        # Specialized source lookup must use a dialogue-resolved entity. A
+        # raw pronoun is not an entity key: searching it can return a sentence
+        # about any person or object that happens to use the same pronoun.
+        return None
     predicate = re.sub(r"\s+", " ", match.group("predicate").casefold())
     for prefix in ("was born", "is located", "are located", "is based",
                    "are based"):
@@ -10848,11 +10855,12 @@ def main() -> int:
                 if turn.research is not None:
                     turn.research.candidates = []
                     turn.research.status = "unknown"
-        where_query = _natural_where_lookup(line)
+        resolved_line = turn.resolved_question or line
+        where_query = _natural_where_lookup(resolved_line)
         where_evidence = None
         where_route_used = False
         if (where_query is not None
-                and turn.status in {"unknown", "sources_found"}
+                and turn.status in {"unknown", "sources_found", "needs_review"}
                 and not (turn.response is not None
                          and turn.response.status in {"answered", "ambiguous"})
                 and not (turn.response is not None
@@ -10875,15 +10883,16 @@ def main() -> int:
                     f"[Source: {where_evidence['title']}; quoted evidence, "
                     "not an accepted fact]")
             else:
-                location_labels = {
-                    "work": "workplace", "live": "residence",
-                    "born": "birthplace", "located": "location",
-                    "based": "base",
-                }
-                location_label = location_labels.get(predicate, "location")
-                turn.text = (
-                    f"I couldn't find a {location_label} statement for "
-                    f"{entity} in the indexed sources.")
+                if turn.status in {"unknown", "sources_found"}:
+                    location_labels = {
+                        "work": "workplace", "live": "residence",
+                        "born": "birthplace", "located": "location",
+                        "based": "base",
+                    }
+                    location_label = location_labels.get(predicate, "location")
+                    turn.text = (
+                        f"I couldn't find a {location_label} statement for "
+                        f"{entity} in the indexed sources.")
         who_question = bool(
             re.match(r"\s*(?:who|whom)\b", line, flags=re.IGNORECASE)
             or re.fullmatch(
@@ -11712,6 +11721,9 @@ def main() -> int:
                     and turn.response.status == "answered"):
                 new_candidates = _candidates_relevant_to_answer(
                     turn.resolved_question or line, new_candidates)
+            if where_route_used and where_evidence is not None:
+                new_candidates = _candidates_relevant_to_answer(
+                    turn.resolved_question or line, new_candidates)
             existing_keys = set()
             if pending_candidates_before_turn:
                 existing_keys = {
@@ -11757,7 +11769,8 @@ def main() -> int:
                     candidate.polarity) not in existing_keys]
             has_direct_answer = (
                 turn.status == "answered"
-                or (who_route_used and realized is not None))
+                or (who_route_used and realized is not None)
+                or (where_route_used and where_evidence is not None))
             if review_to_show and has_direct_answer:
                 count = len(review_to_show)
                 noun = "claim" if count == 1 else "claims"

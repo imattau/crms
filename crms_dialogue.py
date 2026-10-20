@@ -1707,17 +1707,16 @@ class CRMSDialogue:
                 # Re-enter the normal pipeline with the full question so the
                 # same source checks and context updates apply.
                 carried = self.turn(swapped, research_index=research_index)
-                if (carried.status not in {"answered", "sources_found",
-                                           "needs_review"}
-                        and target_phrase.strip()):
-                    # The user explicitly supplied the new topic even when
-                    # the old question does not apply to it. Retain that name
-                    # as dialogue context so the next pronoun can resolve;
-                    # it is not a fact or source claim, and answer retrieval
-                    # still has to ground any response independently.
-                    self.topic_entity = re.sub(
-                        r"^(?:the|a|an)\s+", "", target_phrase.strip(),
-                        flags=re.IGNORECASE)
+                # The user explicitly supplied the new topic. Keep it as
+                # discourse context even when the result is quoted evidence
+                # or a review candidate: those statuses do not answer the
+                # carried question. This is not a fact or source claim; any
+                # answer still needs independent evidence for this entity.
+                if target_phrase.strip():
+                    self.topic_entity = (
+                        target or self._canonical_entity(target_phrase.strip())
+                        or re.sub(r"^(?:the|a|an)\s+", "",
+                                  target_phrase.strip(), flags=re.IGNORECASE))
                 carried.question = message
                 return carried
         if not target_candidates:

@@ -73,6 +73,27 @@ evidence layouts, and request forms under an independent checker. Keep the
 initial Danube result as a regression for irrelevant evidence. Do not count
 curated passes as a broad task-completion estimate.
 
+## Full-corpus topic switch and pronoun follow-up (`v1_525`, 2026-10-20)
+
+Command: `python3 experiments/v1_525_dialogue_topic_switch_entity_transfer.py`.
+
+The full SimpleWiki SQLite index is opened read-only in fresh CLI processes.
+The transcript asks for Marie Curie's birthplace, explicitly switches topic to
+Albert Einstein, asks “Where was he born?”, and follows with “why?”. Chat now
+uses the current explicit topic for the pronoun, routes the resolved question
+through the exact-title birthplace field, cites Ulm, and explains that cited
+field on the follow-up. An unrelated review candidate from the Einstein page
+no longer interrupts the answer. A separate fresh process asks “Where was he
+born?” with no antecedent and does not return an arbitrary corpus birthplace.
+The focused packet and earlier topic-anchor, WHERE-role, 30-turn dialogue, and
+visible-evidence controls pass.
+
+This repairs one reproduced state-and-routing regression. It does not measure
+dialogue task success over an independent transcript set, nor establish broad
+pronoun grounding, generic source-only context transfer, or contextual intent
+accuracy. Keep the independent conversation transfer gate open. See the
+[runner](../experiments/v1_525_dialogue_topic_switch_entity_transfer.py).
+
 ## Contextual task-intent contrast (`v1_518`, 2026-10-20)
 
 The prior Taskmaster diagnostic (`v1_462`, code revision
