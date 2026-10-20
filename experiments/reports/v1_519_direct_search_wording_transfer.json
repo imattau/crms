@@ -1,0 +1,82 @@
+{
+  "experiment": "v1_519_direct_search_wording_transfer",
+  "label_provenance": "Codex-authored development controls",
+  "independent_validation": false,
+  "result": "8/8 direct-search wording and abstention controls passed",
+  "cases": [
+    {
+      "query": "I need to find a Chinese restaurant in San Francisco, California.",
+      "matched_frame": "explicit-search-request",
+      "status": "sources_found",
+      "expected_source_present": true,
+      "wrong_city_excluded": true,
+      "wrong_cuisine_excluded": true,
+      "accepted_fact_count": 0
+    },
+    {
+      "query": "I'm looking for a Chinese restaurant in San Francisco, California.",
+      "matched_frame": "explicit-search-request",
+      "status": "sources_found",
+      "expected_source_present": true,
+      "wrong_city_excluded": true,
+      "wrong_cuisine_excluded": true,
+      "accepted_fact_count": 0
+    },
+    {
+      "query": "Can you find a Chinese restaurant in San Francisco, California?",
+      "matched_frame": "explicit-search-request",
+      "status": "sources_found",
+      "expected_source_present": true,
+      "wrong_city_excluded": true,
+      "wrong_cuisine_excluded": true,
+      "accepted_fact_count": 0
+    },
+    {
+      "query": "Find me a Chinese restaurant in San Francisco, California.",
+      "matched_frame": "explicit-search-request",
+      "status": "sources_found",
+      "expected_source_present": true,
+      "wrong_city_excluded": true,
+      "wrong_cuisine_excluded": true,
+      "accepted_fact_count": 0
+    },
+    {
+      "query": "Where can I find a Chinese restaurant in San Francisco, California?",
+      "matched_frame": "explicit-search-request",
+      "status": "sources_found",
+      "expected_source_present": true,
+      "wrong_city_excluded": true,
+      "wrong_cuisine_excluded": true,
+      "accepted_fact_count": 0
+    },
+    {
+      "query": "I want a Chinese restaurant in San Francisco, California.",
+      "matched_frame": "explicit-search-request",
+      "status": "sources_found",
+      "expected_source_present": true,
+      "wrong_city_excluded": true,
+      "wrong_cuisine_excluded": true,
+      "accepted_fact_count": 0
+    },
+    {
+      "query": "Could you look for Chinese restaurants in San Francisco, California?",
+      "matched_frame": "explicit-search-request",
+      "status": "sources_found",
+      "expected_source_present": true,
+      "wrong_city_excluded": true,
+      "wrong_cuisine_excluded": true,
+      "accepted_fact_count": 0
+    },
+    {
+      "query": "Can you find a French restaurant in San Francisco, California?",
+      "status": "unknown",
+      "abstained_without_partial_results": true,
+      "accepted_fact_count": 0
+    }
+  ],
+  "limitations": [
+    "One three-source synthetic index and one cuisine/location combination; this is not a natural-language search accuracy estimate.",
+    "Wording coverage uses explicit forms and regular English plural matching, not open-ended paraphrase or semantic synonym understanding.",
+    "All result judgments and expected answers were authored by Codex; no independent labeler or 70B comparator was used."
+  ]
+}

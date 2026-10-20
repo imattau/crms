@@ -38,6 +38,26 @@ constraint combinations and paraphrases remain untested. Re-evaluate this
 change on a frozen, source-disjoint conversation set before claiming broader
 intent improvement.
 
+## Direct-search wording transfer (`v1_519`, 2026-10-20)
+
+Command: `python3 experiments/v1_519_direct_search_wording_transfer.py`.
+
+Seven common request forms—including “Can you find…?”, “Find me…”, “Where can
+I find…?”, “I want…”, and “Could you look for…”—now reach the same constrained,
+cited source-list route. Singular/plural “restaurant(s)” matches the cited
+source sentence. A French-restaurant request against a corpus with no French
+result abstains without showing the nearby Chinese or Italian sources. The
+path continues to label results as quoted source matches, not verified
+recommendations, and stores no facts. The selected regression suite passed
+7/7 (`v1_410`, `v1_422`, `v1_427`, `v1_435`, `v1_437`, `v1_518`, `v1_519`).
+
+These are Codex-authored controls over one three-source restaurant corpus, not
+a search-accuracy estimate or broad paraphrase result. Search intent uses
+explicit surface patterns and a bounded regular plural check; semantic
+synonyms, broader location formats, and independently authored requests remain
+untested. See the [runner](../experiments/v1_519_direct_search_wording_transfer.py)
+and [report](../experiments/reports/v1_519_direct_search_wording_transfer.json).
+
 ## History recall and ordinal source selection in one conversation (`v1_517`)
 
 Command: `python3 experiments/v1_517_dialogue_history_and_ordinal_flow.py`.

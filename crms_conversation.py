@@ -399,8 +399,15 @@ _DIRECT_SEARCH_REQUEST_RE = re.compile(
     r"looking\s+for|"
     r"(?:i|we)\s+(?:need|want)\s+to\s+"
     r"(?:find|look\s+for|search\s+for|locate)|"
+    r"(?:can|could|would)\s+(?:you|we)\s+(?:please\s+)?"
+    r"(?:find|look\s+for|search\s+for|locate)|"
+    r"where\s+(?:can|do|should)\s+i\s+find|"
+    r"(?:find|look\s+for|search\s+for|locate)(?:\s+me)?|"
     r"(?:i|we)\s+(?:need|want)\s+(?:a|the)\s+"
-    r"(?:place|restaurant|recommendation|option)\b)\s+\S",
+    r"(?:[a-z]+\s+){0,2}(?:restaurant|place|recommendation|option)\b|"
+    r"(?:i|we)\s+(?:need|want)\s+(?:a|the)\s+"
+    r"(?:place|restaurant|recommendation|option)\b)"
+    r"(?:\s+\S|[.!?])",
     re.IGNORECASE)
 _EXPLICIT_GENERIC_TASK_REQUEST_RE = re.compile(
     r"^(?:(?:good\s+(?:morning|afternoon|evening)|hey|hi|hello)[,!. ]+)?"
@@ -925,14 +932,17 @@ def classify_user_intent(
         verb = direct_imperative.group("verb").casefold()
         task_intent = ("seek-information" if verb in _INFORMATION_REQUEST_VERBS
                        else "other-task")
+        direct_search = bool(_DIRECT_SEARCH_REQUEST_RE.search(request_text))
         return UserIntentHypothesis(
             dialogue_act="request-action",
             task_intent=task_intent,
             goal_intent=task_intent,
             decision="selected",
-            matched_frame=("negative-with-direct-imperative"
-                           if request_text != text.strip()
-                           else "direct-imperative-request"),
+            matched_frame=(
+                "explicit-search-request" if direct_search else
+                "negative-with-direct-imperative"
+                if request_text != text.strip() else
+                "direct-imperative-request"),
             context_predicates=("direct-user-request",),
         )
 
@@ -1261,9 +1271,32 @@ def _present_direct_search_matches(
                          "the indexed material.")
         return turn
     request = turn.question.casefold()
+
+    def constraint_matches(required: set[str], available: set[str]) -> bool:
+        """Match literal terms plus regular English plural forms only."""
+        for term in required:
+            forms = {term}
+            if term.endswith("ies") and len(term) > 4:
+                forms.add(term[:-3] + "y")
+            elif (term.endswith("es") and len(term) > 4
+                  and term[:-2].endswith(("s", "x", "z", "ch", "sh"))):
+                forms.add(term[:-2])
+            elif term.endswith("s") and not term.endswith("ss"):
+                forms.add(term[:-1])
+            elif term.endswith(("s", "x", "z", "ch", "sh")):
+                forms.add(term + "es")
+            elif term.endswith("y") and len(term) > 2:
+                forms.add(term[:-1] + "ies")
+            elif not term.endswith("s"):
+                forms.add(term + "s")
+            if forms.isdisjoint(available):
+                return False
+        return True
+
     target_match = re.search(
-        r"(?:looking for|need to find|want to find|search for|"
-        r"need|want)\s+(?P<target>.+?)(?:[.!?]|$)", request)
+        r"(?:looking for|need to find|want to find|search for|look for|"
+        r"find(?:\s+me)?|locate|need|want)\s+"
+        r"(?P<target>.+?)(?:[.!?]|$)", request)
     target_terms: set[str] = set()
     location_terms: set[str] = set()
     location_qualifier_terms: set[str] = set()
@@ -1300,12 +1333,6 @@ def _present_direct_search_matches(
     for passage in passages:
         if not isinstance(passage, dict):
             continue
-        matched_terms = {str(term).casefold() for term in
-                         passage.get("matched_question_terms", [])}
-        if target_terms and not target_terms.issubset(matched_terms):
-            continue
-        if location_terms and not location_terms.issubset(matched_terms):
-            continue
         citation = passage.get("citation")
         if not isinstance(citation, str) or not citation:
             continue
@@ -1314,6 +1341,20 @@ def _present_direct_search_matches(
         except (AttributeError, KeyError, TypeError, ValueError):
             continue
         if not excerpt.strip():
+            continue
+        matched_terms = {str(term).casefold() for term in
+                         passage.get("matched_question_terms", [])}
+        # Validate the actual cited sentence too: the retrieval index's
+        # matched terms are exact-form intersections, so ordinary singular /
+        # plural variants such as “restaurants” / “restaurant” are absent.
+        # No synonym or semantic expansion is applied here.
+        cited_terms = set(re.findall(r"[a-z0-9]+", excerpt.casefold()))
+        available_terms = matched_terms | cited_terms
+        if target_terms and not constraint_matches(target_terms,
+                                                   available_terms):
+            continue
+        if location_terms and not constraint_matches(location_terms,
+                                                     available_terms):
             continue
         visible.append({
             "text": excerpt,

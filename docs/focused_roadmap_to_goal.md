@@ -432,7 +432,7 @@ recombination with already reviewed components.
 ### Next execution card
 
 This is the order for the next development cycles, reviewed against the current
-checkout (`0c4476a`, 2026-10-20). Recheck reported behavior before changing
+checkout (`d9dd317`, 2026-10-20). Recheck reported behavior before changing
 code; historical reports describe earlier snapshots and should not trigger
 duplicate fixes. The objective is to improve held-out user task completion,
 not to add more demonstrations of the same finite-list operations.
@@ -446,7 +446,7 @@ not to add more demonstrations of the same finite-list operations.
 | 5 | **Expand breadth only through validated task slices.** Use the same natural-language interface for coding, math, translation, and creative work. Select the next task from observed failures; define held-out requests, negative cases, an independent checker or rubric, and repair behavior before implementation. Test each domain before cross-domain composition. | Per-task ordinary-chat scorecards for coverage, correctness/quality, unsupported output, provenance, repair, and cost. | Each slice demonstrates useful held-out completion and honest limits. A feature, corpus, or one-off success does not count as domain competence. |
 | 6 | **Validate SQLite as the complete distributable runtime.** Once learning and correction lifecycles stabilize, copy the model where source files are unavailable and replay the shared scorecard, including query, learning, recombination, reasoning, explanation, correction, and reload. | Reproducible copy-only report including searchable source text, accepted knowledge, rules, provenance, correction lineage, licensing metadata, size, and migration behavior. | Tested behavior depends only on the copied model and runtime, and evidence/corrections remain inspectable after reload. |
 
-**Current checkpoint (2026-10-20, `6b7b437`):** the project has
+**Current checkpoint (2026-10-20, `d9dd317`):** the project has
 well-instrumented controlled paths for proof-checked reasoning, bounded
 recombination, source-backed retrieval, contextual dialogue state, reviewed
 learning, and SQLite portability. The prior multi-turn dialogue failures now
@@ -514,6 +514,15 @@ the source matching both requested cuisine and location, while preserving the
 quoted-evidence label and learning no fact. This is one authored fixture, not
 evidence of broad search constraint handling; do not count the five controls
 as an intent-accuracy or task-completion estimate.
+
+`v1_519` extends the direct-search runtime slice to seven ordinary request
+forms, including polite requests, imperatives, WH wording, first-person wants,
+and a plural restaurant noun. Each reaches the same cited source-list route;
+the matching cuisine/locality is shown, mismatches are excluded, and a French
+request with no matching result abstains. These are Codex-authored controls
+over one synthetic corpus, not independent language transfer. The route uses
+explicit patterns and regular plural matching; semantic synonyms and
+independently authored requests remain open.
 
 A fresh run of `v1_251_large_corpus_chat_stress.py` on this checkout indexed
 1,200 documents and 7,200 sentences. It found all 30 exact baseline targets,
