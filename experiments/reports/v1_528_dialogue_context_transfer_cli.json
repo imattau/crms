@@ -1,0 +1,45 @@
+{
+  "experiment": "v1_528_dialogue_context_transfer_cli",
+  "date": "2026-10-20",
+  "source": "independently authored, three-entity source fixture",
+  "method": "fresh full CLI processes with scratch knowledge, research index, and dialogue state",
+  "metrics": {
+    "scenarios": 6,
+    "passed": 6,
+    "confident_wrong_entity_or_date": 0,
+    "source_only_restart_context": "passed",
+    "no_antecedent_abstention": "passed"
+  },
+  "scenarios": [
+    {
+      "scenario": "named topic switch then pronoun and why",
+      "outcome": "pass"
+    },
+    {
+      "scenario": "return to an earlier entity after two topic switches",
+      "outcome": "pass"
+    },
+    {
+      "scenario": "unrelated interruption then historical entity switch",
+      "outcome": "pass"
+    },
+    {
+      "scenario": "explicit correction then pronoun",
+      "outcome": "pass"
+    },
+    {
+      "scenario": "source-only context across process restart",
+      "outcome": "pass"
+    },
+    {
+      "scenario": "pronoun with no antecedent",
+      "outcome": "abstained_without_wrong_date"
+    }
+  ],
+  "limitations": [
+    "One authored corpus and six targeted scenarios are a diagnostic, not a general transfer estimate.",
+    "Expected answers and labels were authored by Codex and are not independent human evaluation.",
+    "This tests source-only dialogue transfer, not broad conversational intent, source-rule induction, or reasoning-to-procedure recombination.",
+    "No external 70B-class model was run; expected interaction behavior is a qualitative rubric only."
+  ]
+}

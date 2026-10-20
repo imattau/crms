@@ -1,5 +1,28 @@
 # Language and recombination benchmark baselines
 
+## Full-chat dialogue context transfer (`v1_528`, 2026-10-20)
+
+Command: `python3 experiments/v1_528_dialogue_context_transfer_cli.py`.
+
+Six fresh full-CLI scenarios use a new three-entity corpus with separate
+paragraphs and independent scratch stores. They check a named entity switch
+followed by pronoun and `why?`, returning to an earlier entity after two topic
+switches, an unrelated interruption followed by an explicit historical topic,
+explicit correction, source-only context across a CLI restart, and a pronoun
+with no antecedent. All six targeted checks pass; no answer contains a date
+from the wrong entity, and the no-antecedent query does not select a corpus
+date. This confirms those behaviors on the tested construction in integrated
+chat; it does not estimate dialogue transfer across natural conversations.
+
+The test uses Codex-authored prompts and expected outcomes, one corpus, and a
+narrow class of location/opening-date questions. It does not test source-rule
+induction, recombination, broad conversational intent, or creative dialogue.
+The lower-level `CRMSDialogue` route still differs from full chat for the
+paragraph-anchored event-date follow-up documented in `v1_527`. No external
+70B-class model was run; interaction expectations are a qualitative rubric.
+See the [runner](../experiments/v1_528_dialogue_context_transfer_cli.py) and
+[report](../experiments/reports/v1_528_dialogue_context_transfer_cli.json).
+
 ## Natural count retrieval: article subjects and post-object counts (`v1_524`, 2026-10-20)
 
 Command: `python3 experiments/v1_524_natural_count_article_and_post_object.py`.

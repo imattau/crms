@@ -1,6 +1,6 @@
 # Focused plan from current CRMS to its goal
 
-**Reviewed:** 2026-10-20 (runtime probes through `v1_527`)
+**Reviewed:** 2026-10-20 (runtime probes through `v1_528`)
 **Status:** active; the capability goal is not yet demonstrated.
 
 ## Direction review and priority
@@ -150,6 +150,16 @@ transfer estimate. The next dialogue task is broader held-out evaluation of
 this bounded state across more entity types, topic distances, corrections,
 and interruption patterns.
 
+The full-CLI diagnostic (`v1_528`) now checks a named topic switch and
+pronoun/`why?`, return to an earlier entity after two switches, an unrelated
+interruption followed by an explicit re-anchor, a correction, source-only
+context across a process restart, and a pronoun with no antecedent. All six
+targeted checks pass on a new three-entity corpus with scratch stores. This is
+useful integration evidence, but remains one Codex-authored fixture and a
+narrow location/date task; it does not close the independently authored
+conversation-transfer gate. Keep improving the transcript set while moving
+the main capability experiment forward in parallel.
+
 ## Execution order
 
 Dialogue safety is a release gate for every chat-facing change. Source-rule
@@ -261,13 +271,15 @@ gaps, not to claim parity.
 
 ## Immediate next action
 
-Start with work packet 1 and freeze its cases before changing dialogue code.
-In parallel, specify and freeze the task set and independent checker for work
-packet 2; use reviewed components while packet 3 continues as research. Do not
-wait for a broad dialogue score before running the composition experiment.
-Keep the Eiffel/Colosseum and Marie/Einstein failures as permanent controls,
-and keep derived write-back review-gated until recombination, correction, and
-invalidation pass on held-out tasks.
+Extend work packet 1 with independently authored, complete conversations that
+vary entity class, discourse distance, and the same utterance under different
+contexts; score correct outcomes and wrong bindings separately. In parallel,
+freeze the task set and independent checker for work packet 2, then run its
+reasoning-to-procedure composition experiment through chat using reviewed
+components. Do not wait for a broad dialogue score before running that
+experiment. Keep the Eiffel/Colosseum and Marie/Einstein failures as permanent
+controls, and keep derived write-back review-gated until recombination,
+correction, and invalidation pass on held-out tasks.
 
 For detailed implementation history and experiment evidence, see
 [`focused_roadmap_to_goal.md`](focused_roadmap_to_goal.md) and
