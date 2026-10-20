@@ -9,7 +9,7 @@ labels two training paths from River Thames and Seine sources, then tests a
 held-out Tiber → Rome → Italy path. The learned request frame transfers to
 the unseen river, the fresh CLI answers from a copied model, and the cited
 passages resolve from that copy. An unsupported Danube path does not inherit
-Italy or produce a guessed answer. All seven focused checks pass.
+Italy or produce a guessed answer. All eight focused checks pass.
 
 The initial probe exposed a retrieval defect: the CLI appended an unrelated
 River Thames sentence as its “closest” evidence for Danube. The chat now omits
