@@ -2471,14 +2471,17 @@ distinct entity pairs. It also found a likely false `national museum of` /
 `born in` alignment on two pairs, demonstrating that joint title/value mentions and
 parser role compatibility do not establish semantic equivalence.
 
-A separate full-corpus call to the stricter integrated
+A separate full-corpus call to the integrated
 `CRMSKnowledgeBase._propose_structured_predicate_alignments` path found the
 same capital wording on eleven pairs and did not return the museum alignment.
-The two paths therefore disagree on candidate support and false-proposal
-filtering; the exploratory probe and runtime path are not yet a calibrated
-precision/recall comparison. Both use hand-coded field-to-relation mappings,
-and the field and prose citations come from the same page. The 11-pair figure
-is page-level repetition, not independent publisher evidence.
+This is a scope difference, not evidence of better precision: the probe has a
+five-field map including `birth_place`, while the integrated code currently
+allows only `capital`; additionally, the probe requires the document text to
+start with `Infobox`, while the integrated extractor can locate an infobox
+later. The two paths have not been compared on a matched document set. Both
+use a hand-coded field-to-relation map, and field and prose citations come
+from the same page. The 11-pair figure is page-level repetition, not
+independent publisher evidence.
 
 `python3 experiments/v1_338_structured_field_predicate_learning.py` passed all
 checks: the proposal remained inert before review, six training pages licensed

@@ -13,11 +13,15 @@ changes the rule-learning tactic: direct exact-pair predicate matching found no
 useful variants in sampled SimpleWiki windows, while structured-field/prose
 alignment found one repeated candidate (`capital city of` → `capital of`) on
 eight distinct entity pairs. A replay through the stricter integrated proposal
-API found the same candidate on eleven pairs, while suppressing a spurious
-`born in` / `national museum of` alignment seen by the exploratory probe. The
-disagreement is itself a next-step evaluation target. Use this as a report-only
-lead for a general, reviewable discovery path; do not turn the hand-coded
-field map or this candidate into a learned-language claim.
+API found the same candidate on eleven pairs. The exploratory probe also
+reported a likely false `born in` / `national museum of` candidate because it
+uses a five-field map; the integrated path currently allows only `capital`.
+The probe also requires the document text to start with `Infobox`, whereas the
+integrated extractor can locate an infobox later in the document. The count
+difference is therefore a scope difference, not evidence that the integrated
+path is more precise. Use this as a report-only lead for a general, reviewable
+discovery path; do not turn the hand-coded field map or this candidate into a
+learned-language claim.
 
 | Order | Work packet | Immediate outcome | Do not claim yet |
 |---|---|---|---|
@@ -128,16 +132,16 @@ After the records and learning lifecycle above are stable, complete migration an
    completion rates.
 2. **One decisive real-corpus discovery study.** Reproduce the structured
    alignment lead (`capital city of` / `capital of`, eight pairs in the
-   exploratory probe and eleven in the integrated API), then reconcile the
-   difference and test whether candidate groups emerge from field labels plus aligned prose across
-   disjoint documents and publishers. The algorithm may use field names to
-   propose hypotheses, but must not treat them as semantic truth. Keep every
-   candidate cited and inert pending review. Blindly label a sample containing
-   candidate and non-candidate pairs; report proposals, confirmed alignments,
-   false proposals, coverage, and labeler time. Include role reversals,
-   ambiguous fields, quotations, negation, contrast, and accidental title/value
-   overlap. Stop or redesign if yield remains negligible or precision depends
-   on hand-coded relation mappings.
+   exploratory probe and eleven in the integrated API), reconcile the scope
+   difference, and test whether candidate groups emerge from field labels plus
+   aligned prose across disjoint documents and publishers. The algorithm may
+   use field names to propose hypotheses, but must not treat them as semantic
+   truth. Keep every candidate cited and inert pending review. Blindly label a
+   sample containing candidate and non-candidate pairs; report proposals,
+   confirmed alignments, false proposals, coverage, and labeler time. Include
+   role reversals, ambiguous fields, quotations, negation, contrast, and
+   accidental title/value overlap. Stop or redesign if yield remains
+   negligible or precision depends on hand-coded relation mappings.
 3. **Promote only a proven path into recombination.** If packet 2 clears its
    precision and coverage gate, connect the reviewed alignments to source-held-
    out rule learning and a genuinely unseen multi-step task through ordinary
