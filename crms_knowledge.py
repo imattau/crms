@@ -6076,15 +6076,31 @@ class CRMSKnowledgeBase:
                 or not 0 <= document_offset <= 1_000_000):
             raise ValueError("role-compatible predicate bounds are outside supported limits")
 
-        # Only accepted, positively supported type claims with citations that
-        # resolve in this exact corpus can supply role compatibility.
+        # Only accepted, unconditional, positively supported type claims with
+        # citations that resolve in this exact corpus can supply compatibility.
+        # A matching explicit negative makes the type unusable here even if a
+        # positive claim also exists: this signal is already weak, so conflict
+        # must reduce candidate recall instead of silently choosing a side.
+        negative_type_keys = {
+            self._fact_key(fact.subject, fact.relation, fact.object,
+                           self._normalize_qualifiers(dict(fact.qualifiers)))
+            for fact in self.negative_facts()
+            if _tokens(fact.relation) == _tokens("is-a")
+        }
         type_sources: dict[tuple[str, ...], dict[tuple[str, ...], set[str]]] = {}
         for fact in self.facts():
             if _tokens(fact.relation) != _tokens("is-a"):
                 continue
+            if fact.qualifiers:
+                continue
             entity_key = _tokens(fact.subject)
             type_key = _tokens(fact.object)
             if not entity_key or not type_key:
+                continue
+            fact_key = self._fact_key(
+                fact.subject, fact.relation, fact.object,
+                self._normalize_qualifiers(dict(fact.qualifiers)))
+            if fact_key in negative_type_keys:
                 continue
             resolved_sources = set()
             for source in fact.sources:

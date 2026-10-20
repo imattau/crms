@@ -68,6 +68,36 @@ def main() -> None:
             index, f"type-{number}", f"{entity} is a {entity_type}.")
         kb.add_fact(entity, "is-a", entity_type, citation)
 
+    negative_type = add_cited(
+        index, "type-negative-ada", "Ada is not a person.")
+    conflicted_types = CRMSKnowledgeBase()
+    for fact in kb.facts():
+        for source in fact.sources:
+            conflicted_types.add_fact(
+                fact.subject, fact.relation, fact.object, source,
+                qualifiers=dict(fact.qualifiers))
+    conflicted_types.add_negative_fact(
+        "Ada", "is-a", "person", negative_type)
+
+    qualified_types = CRMSKnowledgeBase()
+    for number, (entity, entity_type) in enumerate(typed_entities):
+        citation = add_cited(
+            index, f"qualified-type-{number}",
+            f"{entity} is a {entity_type}.")
+        qualified_types.add_fact(
+            entity, "is-a", entity_type, citation,
+            qualifiers={"scope": "during the experiment"})
+    require(not qualified_types.propose_role_compatible_predicate_candidates(
+        index, maximum_documents=100),
+        "qualified type facts unexpectedly supplied general role compatibility")
+    conflicted_proposals = (
+        conflicted_types.propose_role_compatible_predicate_candidates(
+            index, maximum_documents=100))
+    require(all("Ada created Alpha" not in row["canonical_sentence"]
+                and "Ada created Alpha" not in row["candidate_sentence"]
+                for item in conflicted_proposals for row in item["support"]),
+            "a type contradicted by explicit negative evidence guided a candidate")
+
     before = kb.facts()
     # Without source-resolved, accepted type records, role matching is disabled.
     no_types = CRMSKnowledgeBase()
@@ -131,6 +161,7 @@ def main() -> None:
 
     print("cited type compatibility surfaced made and false-match praised: PASS")
     print("incompatible person-to-city relation was filtered: PASS")
+    print("qualified and explicitly contradicted type evidence was excluded: PASS")
     print("support citations resolve; proposal stays report-only and non-acceptable: PASS")
     print("chat exposes the review-only candidates and semantic limitation: PASS")
     print("scope: candidate retrieval signal, not synonym learning or acceptance")
