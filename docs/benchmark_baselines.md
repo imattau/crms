@@ -1,5 +1,32 @@
 # Language and recombination benchmark baselines
 
+## Source-disjoint typed relation recombination packet (`v1_516`, 2026-10-20)
+
+Command: `python3 experiments/v1_516_recombination_transfer_packet.py`.
+
+The experiment learns the source relation `flows through` from two training
+pairs, proposes `runs through` from two other training documents, and keeps
+that alignment inactive until explicit review. A separately reviewed
+transitive `is-a` schema combines each held-out subject-to-river fact with the
+river-to-waterway fact. After saving and reloading the model, three unseen
+route entities answer through separate fresh chat processes. Each reply carries
+the route citation, classification citation, taxonomy citation, accepted
+proof marker, and reviewed wording-alignment trace. Training and held-out
+document IDs are disjoint.
+
+Both type-safety controls abstain from asserting unsupported classifications:
+“stream” for a subject only known as a river, and “river” for an unclassified
+subject. Two extra question forms were measured without being counted as
+successes: “What waterway runs through …?” composes successfully, while “Name
+the waterway that …” falls back to source text without the type proof. The
+experiment is a controlled synthetic transfer test with pre-reviewed
+components, not evidence of autonomous source learning, representative task
+success, or 70B-class parity.
+
+Result: 3/3 held-out compositions, 2/2 unsupported-type controls, and 2
+syntactic probes recorded. See the [frozen report](../experiments/reports/v1_516_recombination_transfer_packet.json)
+and [runner](../experiments/v1_516_recombination_transfer_packet.py).
+
 ## Regular agent-noun question over a large corpus (2026-10-20)
 
 `experiments/v1_515_regular_agent_noun_evidence.py` covers the natural-language

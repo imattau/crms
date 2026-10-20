@@ -1,0 +1,69 @@
+{
+  "experiment": "v1_516_recombination_transfer_packet",
+  "training_documents": [
+    "learn-alias-0000",
+    "learn-alias-0001",
+    "learn-flow-0000",
+    "learn-flow-0001"
+  ],
+  "heldout_documents": [
+    "heldout-class-0133",
+    "heldout-class-0217",
+    "heldout-class-0881",
+    "heldout-route-0133",
+    "heldout-route-0217",
+    "heldout-route-0881",
+    "heldout-taxonomy-river-waterway",
+    "heldout-untyped-route-0882"
+  ],
+  "source_disjoint": true,
+  "learned_alignment": "runs through \u2192 flows through; explicitly reviewed",
+  "reasoning_schema": "reviewed transitive is-a",
+  "positive_transfer": 3,
+  "unsupported_type_controls": 2,
+  "diagnostic_question_forms": 2,
+  "results": [
+    {
+      "question": "Which waterway runs through Nacre City 0133?",
+      "expected": "The Serein River 0133 is a waterway that runs through Nacre City 0133.",
+      "response": "CRMS> The Serein River 0133 is a waterway that runs through Nacre City 0133. [Sources: Route dossier 0133; Classification note 0133; Waterway taxonomy; supported by an accepted transitive is-a proof; source wording 'flows through' is linked to the question wording 'runs through']",
+      "status": "passed"
+    },
+    {
+      "question": "Which waterway runs through Birch City 0217?",
+      "expected": "The Lark River 0217 is a waterway that runs through Birch City 0217.",
+      "response": "CRMS> The Lark River 0217 is a waterway that runs through Birch City 0217. [Sources: Route dossier 0217; Classification note 0217; Waterway taxonomy; supported by an accepted transitive is-a proof; source wording 'flows through' is linked to the question wording 'runs through']",
+      "status": "passed"
+    },
+    {
+      "question": "Which waterway runs through Cinder City 0881?",
+      "expected": "The Copper River 0881 is a waterway that runs through Cinder City 0881.",
+      "response": "CRMS> The Copper River 0881 is a waterway that runs through Cinder City 0881. [Sources: Route dossier 0881; Classification note 0881; Waterway taxonomy; supported by an accepted transitive is-a proof; source wording 'flows through' is linked to the question wording 'runs through']",
+      "status": "passed"
+    },
+    {
+      "question": "Which stream runs through Nacre City 0133?",
+      "expected": "abstain; no unsupported subtype",
+      "response": "CRMS> I found this source sentence: \u201cThe Serein River 0133 flows through Nacre City 0133.\u201d It supports the relation to Nacre City 0133, but I couldn't independently verify that the subject is a stream. [Source: Route dossier 0133; quoted evidence, not an accepted fact]",
+      "status": "passed"
+    },
+    {
+      "question": "Which river runs through Cinder City 0882?",
+      "expected": "abstain; no unsupported subtype",
+      "response": "CRMS> I found this source sentence: \u201cCopper 0882 flows through Cinder City 0882.\u201d It supports the relation to Cinder City 0882, but I couldn't independently verify that the subject is a river. [Source: Unclassified route 0882; quoted evidence, not an accepted fact]",
+      "status": "passed"
+    },
+    {
+      "question": "What waterway runs through Nacre City 0133?",
+      "expected": "diagnostic probe",
+      "response": "CRMS> The Serein River 0133 is a waterway that runs through Nacre City 0133. [Sources: Route dossier 0133; Classification note 0133; Waterway taxonomy; supported by an accepted transitive is-a proof; source wording 'flows through' is linked to the question wording 'runs through']",
+      "status": "measured"
+    },
+    {
+      "question": "Name the waterway that runs through Nacre City 0133.",
+      "expected": "diagnostic probe",
+      "response": "CRMS> Source text: The Serein River 0133 flows through Nacre City 0133.\nSource: Route dossier 0133. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
+      "status": "measured"
+    }
+  ]
+}
