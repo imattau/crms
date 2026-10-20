@@ -432,7 +432,7 @@ recombination with already reviewed components.
 ### Next execution card
 
 This is the order for the next development cycle, based on the current checkout
-(`0a9e1d8`, 2026-10-20). Recheck reported behavior before changing code;
+(`3f42202`, 2026-10-20). Recheck reported behavior before changing code;
 historical reports describe earlier snapshots and should not trigger duplicate
 fixes.
 
@@ -446,7 +446,7 @@ fixes.
 | 6 | **Widen task breadth one validated slice at a time.** Use the same natural-language path for distinct math, coding, translation and creative tasks. Define held-out prompts, an independent checker or quality rubric, negative cases and repair behavior before implementation. | Per-domain ordinary-chat results for coverage, correctness/quality, unsupported outputs, provenance, repair and runtime. | Each domain shows useful held-out completion and honest limits before cross-domain composition or broader claims. Strong 70B-class systems remain a qualitative reference for breadth, paraphrase, completeness and interaction, not a parity target. |
 | 7 | **Validate SQLite as the distributable runtime.** Once learning and correction stabilize, copy the model to a clean location without source files and replay the shared scorecard using the copy alone. | Reproducible copy-only query, search, learning, composition, reasoning, explanation, correction and reload report, with size and compatibility notes. | Tested behavior, searchable source text, rules, provenance and correction lineage survive without the original files. |
 
-**Current checkpoint (`0a9e1d8`, 2026-10-20):** the focused multi-turn
+**Current checkpoint (`3f42202`, 2026-10-20):** the focused multi-turn
 regression packet was reported passing 8/8, including topic switching,
 source-only continuity, history, ordinal selection and follow-ups after
 abstention. These are targeted controls, not independent dialogue-transfer
@@ -478,6 +478,18 @@ unique numeric set, a licensed subject/relation claim, and a learned procedure
 phrase. Ambiguous or incomplete parses must clarify or abstain; operation
 aliases still require reviewed teaching. Evaluate on a separately authored
 confirmation set after development, not by tuning against `v1_504` alone.
+
+`v1_505` replaces the fixed-order assumption for requests that contain one
+numeric set, one explicitly mentioned stored subject/relation, and one learned
+procedure phrase. Three reordered formulations now compose through inference
+and the learned sum; one passes copied-model fresh chat and `why?`. The test
+also confirms abstention for an unknown value, competing claims, multiple
+numeric sets, a mere phrase mention, and an unlicensed operation alias. The
+frozen `v1_504` packet remains the before-change baseline; its six language
+gaps remain open. This is bounded clause recombination, not broad language
+understanding. Next, evaluate against a separately authored confirmation set
+and extend coverage to genuinely different task shapes instead of adding more
+surface forms to this one sum frame.
 
 The immediate bottleneck is therefore no longer “can the components compose in
 a fixture?” It is whether a fresh user request can cause CRMS to select and
