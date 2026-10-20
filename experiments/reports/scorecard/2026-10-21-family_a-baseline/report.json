@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-20T20:05:45+00:00",
+  "generated_at": "2026-10-20T20:07:35+00:00",
   "metadata": {
     "platform": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39",
     "project": "/home/lostcause/workspace/crms",
@@ -12,34 +12,34 @@
         "errors": 0,
         "failed": 0,
         "pass_rate": 1.0,
-        "passed": 5,
-        "total": 5
+        "passed": 12,
+        "total": 12
       }
     },
     "duration_s": {
-      "max": 0.464,
-      "median": 0.244,
-      "p95": 0.464
+      "max": 0.477,
+      "median": 0.28,
+      "p95": 0.475
     },
     "errors": 0,
     "failed": 0,
-    "gated_total": 5,
+    "gated_total": 12,
     "known_failures": 0,
     "known_failures_passed": 0,
     "observed": {
-      "abstained": 1,
-      "answered": 3,
+      "abstained": 3,
+      "answered": 8,
       "clarified": 1
     },
     "pass_rate": 1.0,
-    "passed": 5,
-    "total": 5,
+    "passed": 12,
+    "total": 12,
     "unsafe_answers": 0
   },
   "tasks": [
     {
       "category": "composition",
-      "duration_s": 0.2333869049907662,
+      "duration_s": 0.2784207200165838,
       "failures": [],
       "id": "family-a-filter-sum",
       "known_failure": false,
@@ -51,7 +51,7 @@
     },
     {
       "category": "composition",
-      "duration_s": 0.44196853903122246,
+      "duration_s": 0.4774658610112965,
       "failures": [],
       "id": "family-a-filter-sum-reload",
       "known_failure": false,
@@ -63,7 +63,7 @@
     },
     {
       "category": "composition",
-      "duration_s": 0.23490363702876493,
+      "duration_s": 0.24427923402981833,
       "failures": [],
       "id": "family-a-unknown-value",
       "known_failure": false,
@@ -75,7 +75,7 @@
     },
     {
       "category": "composition",
-      "duration_s": 0.2437440839712508,
+      "duration_s": 0.23982479196274653,
       "failures": [],
       "id": "family-a-untaught-procedure",
       "known_failure": false,
@@ -87,12 +87,96 @@
     },
     {
       "category": "composition",
-      "duration_s": 0.46435295999981463,
+      "duration_s": 0.47485954902367666,
       "failures": [],
       "id": "family-a-taught-frame-reload",
       "known_failure": false,
       "notes": "Family A: teach a new request frame in chat, answer through it, and reload the frame store in a fresh process.",
       "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "composition",
+      "duration_s": 0.28558696602704003,
+      "failures": [],
+      "id": "family-a-explicit-negative",
+      "known_failure": false,
+      "notes": "Family A: explicit negative evidence excludes a value from selection and total.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "composition",
+      "duration_s": 0.2817084579728544,
+      "failures": [],
+      "id": "family-a-wording-filter",
+      "known_failure": false,
+      "notes": "Family A: a licensed request-frame wording variant must produce the same verified total.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "composition",
+      "duration_s": 0.3343933180440217,
+      "failures": [],
+      "id": "family-a-wording-wh-total",
+      "known_failure": false,
+      "notes": "Family A: a licensed request-frame wording variant must produce the same verified total.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "composition",
+      "duration_s": 0.2991415379801765,
+      "failures": [],
+      "id": "family-a-wording-sum-first",
+      "known_failure": false,
+      "notes": "Family A: a licensed request-frame wording variant must produce the same verified total.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "composition",
+      "duration_s": 0.25958355999318883,
+      "failures": [],
+      "id": "family-a-wording-claim-first",
+      "known_failure": false,
+      "notes": "Family A: a licensed request-frame wording variant must produce the same verified total.",
+      "observed": "answered",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "composition",
+      "duration_s": 0.2620360069558956,
+      "failures": [],
+      "id": "family-a-missing-output",
+      "known_failure": false,
+      "notes": "Family A control: a request with no output operation abstains instead of choosing a default procedure.",
+      "observed": "abstained",
+      "provenance": "authored",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "composition",
+      "duration_s": 0.2481962749734521,
+      "failures": [],
+      "id": "family-a-conflict",
+      "known_failure": false,
+      "notes": "Family A: positive and negative evidence for one value conflicts; do not choose or run the procedure.",
+      "observed": "abstained",
       "provenance": "authored",
       "status": "pass",
       "unsafe": false

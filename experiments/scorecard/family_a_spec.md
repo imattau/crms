@@ -2,10 +2,12 @@
 
 **Status:** frozen design for the Phase 2 recombination milestone. The typed
 actions execute through the plan path, and chat routes requests through learned
-request frames (`docs/design_request_frames.md`). Five scorecard tasks cover
-filter+sum, reload, unknown values, an untaught procedure, and a frame taught in
-chat and reloaded (`experiments/scorecard/family_a.jsonl`); the remaining
-wording variations and negative controls still need scorecard fixtures.
+request frames (`docs/design_request_frames.md`). Twelve scorecard tasks cover
+filter+sum, reload, explicit negatives, unknown values, conflict, an untaught
+procedure, a missing output request, several wording variants, and a frame
+taught in chat and reloaded (`experiments/scorecard/family_a.jsonl`); tampered
+step results and source retraction remain unit-tested rather than scorecard
+fixtures.
 **Date:** 2026-10-21
 **Provenance:** authored specification. Fixtures, expected outputs, and the
 oracle are defined before implementation and must not be tuned to the planner.

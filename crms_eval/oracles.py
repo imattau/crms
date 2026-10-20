@@ -33,6 +33,8 @@ ABSTENTION_MARKERS = (
     "no stored",
     "not in the sources",
     "i lack",
+    "both positive and negative",
+    "conflicting evidence",
 )
 
 CLARIFICATION_MARKERS = (
