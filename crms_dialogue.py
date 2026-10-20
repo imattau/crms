@@ -75,6 +75,8 @@ def infer_open_question_slot(prompt: str, answer_kind: str) -> str:
                 "shall i book", "should i make the reservation",
                 "should i place the reservation",
                 "do you want me to book", "would you like me to book",
+                "did you want me to book", "do you want to buy",
+                "do you want to purchase", "would you like me to reserve",
                 "will that work", "does that work", "is that okay",
                 "is that ok", "would that be okay", "would that be ok",
                 "would you like this", "would you like that",

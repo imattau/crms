@@ -66,6 +66,15 @@ All 46 source spans verified, but labels are single-annotator and do not
 measure task completion. Treat the dialogue-transfer gate as unmet; keep this
 slice frozen and develop against disjoint conversations.
 
+The separate four-conversation movie-ticket dev slice moved from 17/37 to
+18/37 exact joint label matches after composite-prompt typing and explicit
+goal/subgoal separation. Replaying the previously inspected test slice after
+that dev-driven change yielded 11/46, down from 12/46. This does not establish
+transfer improvement; that test slice is no longer a blind reserve. The latest
+change passed 12/12 dialogue and 11/11 selected cross-domain diagnostics, but
+the dialogue gate remains open pending a newly reserved sample and a task-
+completion measure.
+
 This is **on track architecturally, not yet on track to claim the capability goal**. The priority is to turn the strongest components into one measured, reproducible chat-level capability, then widen coverage without hiding abstentions or errors.
 
 The latest selected runtime replay on `edb2893` passed 10/10 diagnostics across

@@ -129,7 +129,8 @@ def main() -> None:
     confirmation = classify("And you said for two people?", "confirmation",
                             "make-reservation", "Yes.", answer_kind="yes-no")
     require(confirmation is not None and confirmation.dialogue_act == "confirm"
-            and confirmation.task_intent == "make-reservation",
+            and confirmation.task_intent == "resolve-ambiguity"
+            and confirmation.goal_intent == "make-reservation",
             f"confirmation was collapsed into a generic clarification: {confirmation}")
     live_booking_confirmation = CRMSDialogue(CRMSKnowledgeBase())
     live_booking_confirmation.active_task_intent = "make-reservation"
@@ -140,9 +141,12 @@ def main() -> None:
     booking_turn = respond(live_booking_confirmation, "Yes, please.")
     require(booking_turn.intent_hypothesis is not None
             and booking_turn.intent_hypothesis.dialogue_act == "confirm"
-            and booking_turn.intent_hypothesis.task_intent == "make-reservation"
+            and booking_turn.intent_hypothesis.task_intent == "resolve-ambiguity"
+            and booking_turn.intent_hypothesis.goal_intent == "make-reservation"
+            and live_booking_confirmation.active_task_intent == "make-reservation"
+            and live_booking_confirmation.active_task_subgoal == "resolve-ambiguity"
             and live_booking_confirmation.open_dialogue_question is None,
-            "live booking confirmation was not typed as a confirmation")
+            "live booking confirmation did not preserve its goal and subgoal")
     live_summary_prompt = CRMSDialogue(CRMSKnowledgeBase())
     live_summary_prompt.turn = lambda text, **_kwargs: DialogueTurn(
         "clarify", text, text,

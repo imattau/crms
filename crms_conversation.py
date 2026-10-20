@@ -167,8 +167,27 @@ _CONFIRMATION_STATEMENT_RE = re.compile(
 def is_open_yes_no_prompt(text: str) -> bool:
     """Recognize yes/no questions and reservation summaries awaiting approval."""
     stripped = text.strip()
-    return bool(_YES_NO_QUESTION_RE.fullmatch(stripped)
-                or _CONFIRMATION_STATEMENT_RE.fullmatch(stripped))
+    if (_YES_NO_QUESTION_RE.fullmatch(stripped)
+            or _CONFIRMATION_STATEMENT_RE.fullmatch(stripped)):
+        return True
+    if not stripped.endswith("?"):
+        return False
+
+    # Assistant turns can give context before asking for a yes/no decision:
+    # "The total is $23.89. Can I continue with the purchase?" The whole
+    # message is not itself an auxiliary-led question, so inspect the final
+    # sentence and, when needed, its final comma-delimited question clause.
+    final_sentence = re.split(r"(?<=[.!?])\s+", stripped)[-1].strip()
+    candidates = [final_sentence]
+    candidates.extend(part.strip() for part in
+                      re.split(r"[,;]\s*", final_sentence)[1:])
+    for candidate in candidates:
+        candidate = re.sub(r"^(?:and|so)\s+", "", candidate,
+                           flags=re.IGNORECASE)
+        if (candidate.endswith("?")
+                and _YES_NO_QUESTION_RE.fullmatch(candidate)):
+            return True
+    return False
 
 
 def _elaboration_topic_reply(text: str) -> re.Match[str] | None:
@@ -593,7 +612,7 @@ def _open_question_task_intent(dialogue: CRMSDialogue,
     if any(cue in prompt for cue in search_prompt_cues):
         return "provide-constraint"
     if open_question.get("expected_slot") == "confirmation":
-        return active_task or "resolve-ambiguity"
+        return "resolve-ambiguity"
     if open_question.get("expected_slot") == "choice":
         return "resolve-ambiguity"
     if (re.search(r"\b(?:cancel|cancell?ing)\b", prompt)
@@ -893,6 +912,8 @@ def classify_user_intent(
                 dialogue_act=_open_question_dialogue_act(
                     text, open_question, task_intent),
                 task_intent=task_intent,
+                goal_intent=(dialogue.active_task_intent
+                             if task_intent == "resolve-ambiguity" else None),
                 decision="selected",
                 matched_frame="answer-to-open-dialogue-question",
                 context_predicates=("pending_assistant_question",

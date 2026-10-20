@@ -2641,6 +2641,26 @@ the current representation still loses useful discourse structure. The dev
 slice can guide the next model change; retain the test slice for the next
 frozen replay.
 
+After the development-driven composite-prompt and goal/subgoal change in
+`crms_conversation.py` and `crms_dialogue.py`, the development replay rose to
+18/37 exact joint matches (48.6%; 18/21 hypotheses, 85.7%) with 21 hypotheses
+(56.8% coverage). The context-free result remained 6/37. On the previously
+inspected four-conversation test slice, the same code produced 25 hypotheses
+(54.3% coverage), 22 selected, three ambiguous, 21 abstentions, and 11/46
+joint matches (23.9%; 11/25 hypotheses, 44.0%). This is one fewer exact match
+than the prior test replay (12/46). The change was developed from dev errors,
+not test rows, but this small slice has already been inspected and is no longer
+a blind reserve. The result does not demonstrate transfer improvement; use a
+newly reserved test sample after further dev work.
+
+The implementation extracts a terminal yes/no clause from composite assistant
+prompts, recognizes purchase confirmations such as “Did you want me to book it
+now?”, and keeps the broad task (`goal_intent`) separate from the immediate
+confirmation/choice task (`resolve-ambiguity`). The focused dialogue suite
+passed 12/12 diagnostics and the selected cross-domain replay passed 11/11.
+This improves the inspectable state model; it has not yet improved held-out
+label agreement consistently.
+
 Observed disagreements include answers to assistant prompts being assigned
 the wrong move/intent, “Yes” answers needing an active confirmation or choice,
 availability questions collapsing into generic information seeking, and
