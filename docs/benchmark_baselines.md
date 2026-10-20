@@ -1,5 +1,23 @@
 # Language and recombination benchmark baselines
 
+## History recall and ordinal source selection in one conversation (`v1_517`)
+
+Command: `python3 experiments/v1_517_dialogue_history_and_ordinal_flow.py`.
+
+Fresh CLI chat indexed two cited restaurant descriptions, listed them in a
+numbered order, answered “What did I just ask?”, selected “the first one”,
+then answered “why?”. The recalled question matched the preceding search; the
+ordinal resolved to the exact first displayed citation; the explanation stayed
+on that source; and no source claim became an accepted fact. All five checks
+passed. This is a Codex-authored two-document conversation regression, not a
+representative dialogue-transfer result or an independent human evaluation.
+
+The broader targeted dialogue replay (`v1_409`, `v1_412`, `v1_426`, `v1_427`,
+`v1_442`, `v1_449`, `v1_517`) passed 7/7 selected diagnostics in 1.46 seconds
+with isolated process state. It confirms the named continuity, grounding,
+history, and ordinal controls only; open-domain conversation quality remains
+unmeasured.
+
 ## Source-disjoint typed relation recombination packet (`v1_516`, 2026-10-20)
 
 Command: `python3 experiments/v1_516_recombination_transfer_packet.py`.

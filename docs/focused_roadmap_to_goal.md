@@ -499,6 +499,16 @@ broad natural-language task completion. Continue by testing independently
 authored requests and more adversarial reasoning conditions through ordinary
 chat.
 
+The new `v1_517` transcript combines source listing, “What did I just ask?”,
+ordinal selection of “the first one”, and a final “why?” in fresh CLI chat.
+The history reply identifies the preceding search, the selection resolves to
+the first displayed citation, the explanation stays on that source, and no
+fact is stored. The dialogue regression replay (`v1_409`, `v1_412`, `v1_426`,
+`v1_427`, `v1_442`, `v1_449`, `v1_517`) passed 7/7 isolated diagnostics.
+These are targeted continuity controls, not representative conversation
+transfer; the dialogue gate still requires independently authored complete
+conversations scored for task completion and wrong or omitted content.
+
 A fresh run of `v1_251_large_corpus_chat_stress.py` on this checkout indexed
 1,200 documents and 7,200 sentences. It found all 30 exact baseline targets,
 abstained on all three negative relation controls and both unknown controls,
