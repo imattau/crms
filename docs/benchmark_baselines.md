@@ -3579,16 +3579,19 @@ Command: `python3 experiments/v1_513_reviewed_predicate_paraphrase_chat.py`.
 
 Two distinct, cited fact pairs use the canonical predicate `built`; separate
 documents repeat the same pairs with `constructed`. CRMS proposes the wording
-alignment `constructed → build`, leaves it inactive before explicit review,
-and answers “Who constructed the Eiffel Tower?” after acceptance. The
-knowledge store is saved and reloaded, and the standard CLI answers with the
-accepted fact and source provenance. The unobserved wording `erected` does not
-produce that answer. All four controls pass.
+alignment `constructed → build` and leaves it inactive before explicit review.
+After acceptance, a third, unseen pair (“Mina built the Archive”) is added
+without any `constructed` sentence. “Who constructed the Archive?” transfers
+through the saved/reloaded knowledge store and standard CLI. The answer keeps
+the Archive fact citation separate from the two documents that support the
+wording alignment. The unobserved wording `erected` does not produce an answer.
+All four controls pass.
 
 This confirms that the earlier “constructed” gap can be closed through CRMS's
 existing learn → review → reuse path without adding a global synonym. It does
-not establish general synonym induction: the fact pairs and accepted mapping
-are a small controlled fixture, the canonical facts are explicitly taught,
-and no publisher-held-out evaluation was run.
+not establish general synonym induction: the teaching and holdout pairs are a
+small controlled fixture, the canonical facts are explicitly taught, and no
+publisher-held-out evaluation was run. The existing `v1_244` and `v1_296`
+predicate-alignment controls also pass on this checkout.
 
 Report: [experiment](../experiments/v1_513_reviewed_predicate_paraphrase_chat.py).

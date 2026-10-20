@@ -460,10 +460,12 @@ follow-ups and `why?`; and the 2026-10-20 runtime retest passed `v1_412`,
 representative transfer benchmark. Exact wording like “Who built the Eiffel
 Tower?” now retrieves its directly supported “designed and built” sentence;
 without a reviewed relation mapping, “Who constructed the Eiffel Tower?” still
-abstains. The new `v1_513` control shows this phrase can be proposed from two
-distinct cited pairs, accepted explicitly, and reused through saved/reloaded
-chat while an unobserved alternative still abstains. This is supervised
-paraphrase acquisition, not automatic synonym generalization. The clause-aware
+abstains. The new `v1_513` control proposes `constructed → build` from two
+distinct cited pairs, then transfers it through saved/reloaded chat to a third
+unseen entity pair whose fact has only canonical `built` evidence. Its fact
+source stays distinct from the wording-training sources, and an unobserved
+alternative still abstains. This is supervised paraphrase acquisition, not
+automatic synonym generalization. The clause-aware
 source-rule learner has passed selected controls but has not passed transfer:
 frozen SymPy and NetworkX diagnostics each found only 10/20 sampled proposals
 structurally reviewable, with the remainder context-dependent or boundary

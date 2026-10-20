@@ -75,16 +75,37 @@ def main() -> None:
     require(accepted["predicate_phrase"] == "constructed",
             f"acceptance licensed the wrong phrase: {accepted!r}")
 
-    direct = knowledge.ask("Who constructed the Eiffel Tower?")
+    # Transfer to a new entity pair for which no `constructed` wording exists.
+    heldout_sentence = "Mina built the Archive."
+    index.add_document("built-archive", "Held-out entity pair",
+                       heldout_sentence, "built-archive.txt")
+    heldout_hit = next(item for item in index.search(
+        heldout_sentence, limit=10)
+        if item.document_id == "built-archive")
+    knowledge.add_fact_from_hit("Mina", "build", "the Archive",
+                                index, heldout_hit)
+
+    direct = knowledge.ask("Who constructed the Archive?")
     require(direct.status == "answered"
-            and direct.answer == "Gustave Eiffel"
+            and direct.answer == "Mina"
             and direct.evidence,
             f"reviewed wording did not answer from stored evidence: {direct!r}")
     source_ids = {source.split("#sha256=", 1)[0]
                   for evidence in direct.evidence or []
                   for source in evidence.get("sources", [])}
-    require({"built-eiffel", "constructed-eiffel"}.issubset(source_ids),
-            f"answer lost canonical or paraphrase provenance: {source_ids!r}")
+    require("built-archive" in source_ids
+            and "constructed-archive" not in source_ids,
+            f"held-out fact evidence was not kept distinct: {source_ids!r}")
+    language_source_ids = {
+        source.split("#sha256=", 1)[0]
+        for evidence in direct.language_evidence or []
+        for support in evidence.get("support", [])
+        for source in support.get("sources", [])
+    }
+    require({"constructed-eiffel", "constructed-palace"}
+            .issubset(language_source_ids),
+            f"accepted language alignment lost its teaching sources: "
+            f"{language_source_ids!r}")
 
     with tempfile.TemporaryDirectory(prefix="crms-v1-513-") as folder:
         root = Path(folder)
@@ -94,17 +115,17 @@ def main() -> None:
         index.save(index_path)
         restored = CRMSKnowledgeBase.load(knowledge_path)
         dialogue = CRMSDialogue(restored)
-        reply = respond(dialogue, "Who constructed the Eiffel Tower?",
+        reply = respond(dialogue, "Who constructed the Archive?",
                         research_index=index)
         require(reply.status == "answered"
                 and reply.response is not None
-                and reply.response.answer == "Gustave Eiffel"
-                and "Gustave Eiffel built the Eiffel Tower." in reply.text,
+                and reply.response.answer == "Mina"
+                and "Mina built the Archive." in reply.text,
                 f"fresh chat did not realize the supported answer: {reply!r}")
 
         # Corpus support for this form must not create a free synonym inventory.
         unlicensed = respond(CRMSDialogue(restored),
-                             "Who erected the Eiffel Tower?",
+                             "Who erected the Archive?",
                              research_index=index)
         require(unlicensed.status == "unknown",
                 f"an unobserved synonym bypassed the evidence gate: {unlicensed!r}")
@@ -122,18 +143,19 @@ def main() -> None:
         ]
         run = subprocess.run(
             command,
-            input="Who constructed the Eiffel Tower?\n"
-                  "Who erected the Eiffel Tower?\n/quit\n",
+            input="Who constructed the Archive?\n"
+                  "Who erected the Archive?\n/quit\n",
             text=True, capture_output=True, cwd=root, timeout=30, check=False)
         require(run.returncode == 0,
                 f"fresh CLI process failed: {run.stderr}\n{run.stdout}")
-        require("Gustave Eiffel built the Eiffel Tower." in run.stdout
-                and run.stdout.count("Gustave Eiffel") == 1,
+        require("Mina built the Archive." in run.stdout
+                and "I couldn't find one source sentence" in run.stdout
+                and run.stdout.count("Mina") == 1,
                 f"fresh CLI paraphrase or negative case failed: {run.stdout}")
 
     print("PASS: two distinct source pairs propose constructed → build")
     print("PASS: proposals remain inert until explicit acceptance")
-    print("PASS: accepted paraphrase answers through fresh-process chat with provenance")
+    print("PASS: held-out entity pair transfers through fresh-process chat with separate provenance")
     print("PASS: unobserved 'erected' wording still abstains")
     print("LIMIT: controlled source pairs; broad paraphrase transfer remains unmeasured")
 
