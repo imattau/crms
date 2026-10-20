@@ -208,6 +208,11 @@ def _sum_values(xs: list[int], **_: Any) -> list[int]:
     return [sum(xs)]
 
 
+def _count_values(xs: list[int], **_: Any) -> list[int]:
+    """Reduce an integer list to the number of entries, including duplicates."""
+    return [len(xs)]
+
+
 def _cumulative_sum(xs: list[int], **_: Any) -> list[int]:
     """Return the running total at each position; empty input stays empty."""
     total = 0
@@ -557,6 +562,7 @@ OPERATIONS = {
     'sort_by_magnitude': _sort_by_magnitude,
     'stable_unique': _stable_unique,
     'sum_values': _sum_values,
+    'count_values': _count_values,
     'cumulative_sum': _cumulative_sum,
     'adjacent_difference': _adjacent_difference,
     'double': _double,
@@ -610,7 +616,7 @@ _POSITION_AFFINE_OPERATIONS = _POSITION_FILTER_OPERATIONS | frozenset({
 })
 _POSITION_EXTENSIBLE_OPERATIONS = _POSITION_AFFINE_OPERATIONS | frozenset({
     'reverse', 'sort_ascending', 'sort_descending', 'rotate_left_k',
-    'stable_unique', 'sum_values',
+    'stable_unique', 'sum_values', 'count_values',
 })
 _RELATIONAL_FILTER_OPERATIONS = frozenset({
     'keep_greater_than_first', 'keep_less_than_first',
@@ -1707,6 +1713,33 @@ def _semantic_key_uncached(procedure: Iterable[Step]) -> tuple:
         compacted = tuple(step for step in steps
                           if step.operation != 'identity')
         return ('window_primitive_syntax', _procedure_key(compacted))
+    count_index = next((index for index, step in enumerate(steps)
+                        if step.operation == 'count_values'), None)
+    if count_index is not None and len(steps) > 1:
+        # Counting is invariant under any preceding operation that preserves
+        # list length. Once counted, it yields a nonnegative singleton; exact
+        # permutations, singleton-preserving operations, and sum leave that
+        # scalar unchanged. Keep filters, repetition, value changes, and any
+        # uncertain interaction in the syntax so distinct behavior is not
+        # erased.
+        count_preserving_prefix = {
+            'identity', 'reverse', 'sort_ascending', 'sort_descending',
+            'sort_by_magnitude', 'rotate_left_k', 'add_k', 'scale_k',
+            'double', 'square_values', 'absolute_values', 'add_position',
+            'add_first', 'subtract_first', 'cumulative_sum',
+        }
+        count_preserving_suffix = {
+            'identity', 'reverse', 'sort_ascending', 'sort_descending',
+            'sort_by_magnitude', 'rotate_left_k', 'stable_unique', 'first',
+            'last', 'keep_odd_positions', 'cumulative_sum', 'absolute_values',
+            'sum_values',
+        }
+        prefix = steps[:count_index]
+        suffix = steps[count_index + 1:]
+        if (all(step.operation in count_preserving_prefix for step in prefix)
+                and all(step.operation in count_preserving_suffix
+                        for step in suffix)):
+            return _semantic_key((steps[count_index],))
     if (len(steps) == 2 and steps[0].operation == 'sum_values'
             and steps[1].operation == 'keep_odd_positions'):
         # Summation produces one item, which odd-position selection preserves.
@@ -1792,7 +1825,7 @@ def _semantic_key_uncached(procedure: Iterable[Step]) -> tuple:
             singleton_reduction = True
             continue
         compacted.append(step)
-        if step.operation in {'first', 'last', 'sum_values'}:
+        if step.operation in {'first', 'last', 'sum_values', 'count_values'}:
             at_most_one = True
         elif step.operation in {'duplicate_each', 'repeat_each_k'}:
             at_most_one = False
@@ -2160,7 +2193,8 @@ def _semantic_key_uncached(procedure: Iterable[Step]) -> tuple:
         rewritten.extend(raw_steps[rotation_index + 2:])
         return _semantic_key(rewritten)
     if any(step.operation in {
-            'sum_values', 'cumulative_sum', 'adjacent_difference'}
+            'sum_values', 'count_values', 'cumulative_sum',
+            'adjacent_difference'}
            for step in raw_steps):
         # Sequence-wide and neighbor-dependent value changes retain syntax
         # until exact interaction laws are established.
@@ -2180,12 +2214,13 @@ def _semantic_key_uncached(procedure: Iterable[Step]) -> tuple:
             if at_most_one and operation in singleton_noops:
                 continue
             normalized.append(step)
-            if operation in {'sum_values', 'first', 'last'}:
+            if operation in {'sum_values', 'count_values', 'first', 'last'}:
                 at_most_one = True
             elif operation in {'duplicate_each', 'repeat_each_k'}:
                 at_most_one = False
         if not any(step.operation in {
-                'sum_values', 'cumulative_sum', 'adjacent_difference'}
+                'sum_values', 'count_values', 'cumulative_sum',
+                'adjacent_difference'}
                    for step in normalized):
             return _semantic_key(normalized)
         return ('sequence_aggregate_syntax', _procedure_key(normalized))

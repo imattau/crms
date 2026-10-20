@@ -521,6 +521,11 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
         answer_line = (f"Verified values satisfying the relation "
                        f"'{subject} {relation}': {included}{exclusions}. "
                        f"Their total is {output[0]}.")
+    elif (prediction.procedure
+          and prediction.procedure[-1].get("operation") == "count_values"
+          and len(prediction.procedure) == 1 and len(output) == 1):
+        answer_line = (f"There are {output[0]} listed entries satisfying "
+                       f"the relation '{subject} {relation}'{exclusions}.")
     else:
         answer_line = (f"Verified values satisfying {subject} {relation}: "
                        f"{included}{exclusions}. After '{procedure}': "
