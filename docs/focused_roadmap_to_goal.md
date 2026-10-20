@@ -1,1013 +1,222 @@
-# Focused roadmap from the current CRMS to its goal
+# Focused roadmap from current CRMS to its goal
 
-**Reviewed:** 2026-10-20, including the `v1_532` and `v1_533` runtime results
-**Status:** execution plan; the capability goal remains unmet.
+**Reviewed:** 2026-10-20, against the current checkout and recorded runtime
+evidence through `v1_540`; the in-progress `v1_541` subject-anchored location
+route is not yet part of the measured baseline.
+**Status:** active execution plan. The broad capability goal is not yet
+demonstrated.
 
 ## Destination
 
-CRMS aims to be a lightweight, distributable language system that can handle
-broad ordinary requests, continue across turns, combine learned knowledge and
-procedures, reason over evidence, and improve from use. Its answers and
-artifacts must remain inspectable and correctable, with clear limits on what is
+Build a lightweight, distributable language system that can handle a broad
+range of ordinary requests, maintain useful context across turns, combine
+knowledge, learned procedures and reasoning, and improve from use. Answers and
+artifacts should remain inspectable, correctable, and clear about what is
 known, inferred, uncertain, or unsupported. Coding, math, translation,
-creative work, and other domains should use the same natural-language
-interface. Strong 70B-class models are a reference for task breadth and
-interaction quality, not a parity claim or a required live comparator.
+creative work, and other domains should share the natural-language interface.
+Strong 70B-class models are qualitative references for task breadth and
+interaction quality, not parity targets or required live comparators.
 
-## Where the project is now
+## Current assessment
 
-CRMS has substantial foundations: searchable source text, provenance-bearing
+CRMS has substantial building blocks: searchable source text, provenance-rich
 knowledge and procedures, review-gated learning, bounded proof-checked
-reasoning, contextual dialogue state, and a portable SQLite model format.
-Controlled end-to-end slices show that source-backed rules can be accepted,
-held-out checked, recombined into procedures, used in chat, and carried into a
-copied model. Reasoning also has controlled paths through chat, independent
-proof verification, correction, and invalidation of derived results.
+reasoning, contextual dialogue state, feedback and correction paths, and a
+portable SQLite model. Controlled end-to-end experiments show that reviewed
+source claims and rules can be used in chat, that proof-selected results can
+feed a learned procedure, and that some learned behavior survives copying the
+model and removing original source files.
 
-The missing evidence is generalization across the complete user path. Current
-successes rely on small or synthetic fixtures, hand-coded extraction/mapping,
-Codex-provided labels, and deliberately orchestrated experiments. The latest
-arXiv audit found 8 full papers among 1,697 records and no useful procedure
-candidates in those papers; that index is unsuitable for the tested grammar,
-not evidence against academic sources in general. A read-only scan of 415
-NumPy and 100 pandas callable API docstrings now shows the grammar can find
-candidate material in relevant reference text, but its 327 candidate spans
-are not yet useful-rule evidence: repeated boilerplate dominates, and a
-source replay exposed lost subject and condition information. The source
-learning route has corpus-fit evidence but still needs labeled proposal and
-non-proposal review, better role/context preservation, and a frozen,
-source-disjoint transfer test.
-Dialogue has targeted fixes for topic switches, source-only context, and
-pronoun grounding, but its independent transfer results remain weak and do
-not establish reliable conversation. Recombination and reasoning work, but
-not yet as a broadly learned capability. Self-learning by write-back is
-designed and partly prototyped, but must remain governed until independent
-verification and correction propagation are demonstrated together.
+The architecture remains aligned with the goal; the capability claim is not
+earned yet. Most positive evidence is still synthetic, narrowly framed,
+hand-mapped, Codex-labeled, or orchestrated by experiments. The principal gap
+is transfer across the complete user path: ordinary language must select and
+combine the right evidence, rules, procedures, and checks on a held-out task.
+`v1_540` found expected text for all 30 canonical questions in a 1,200-document
+synthetic corpus, but only 4 of 14 wording probes received source-backed
+answers; 6 answer-expected probes remained incomplete. This is useful scale
+and retrieval evidence, not broad language understanding.
 
-**Assessment:** the architecture is pointed toward the goal; the capability
-claim is not yet earned. The next work should improve held-out chat outcomes,
-not increase experiment, corpus, or feature counts by themselves.
+Recombination, self-learning rules, reasoning, and dialogue are the central
+research priorities. Dialogue safety is also a release gate for every
+chat-facing change. Source-derived rule discovery should proceed in parallel
+as a measured research lane, but it should not block recombination with
+already reviewed components. Automatic reuse of derived knowledge remains
+gated on independent verification and correction propagation.
 
-## Overall review and near-term direction
+## Focused execution sequence
 
-The project is still pursuing the right goal. Its strongest differentiator is
-the combination of a portable knowledge store, evidence lineage, explicit
-rules, proof-checked reasoning, and reviewable learning. The main risk is
-spending effort on more isolated mechanisms without showing that ordinary chat
-can select and compose them on new tasks. The current evidence supports an
-architectural direction, not broad task competence.
+### 1. Freeze the end-to-end baseline and preserve dialogue safety
 
-The latest user-driven dialogue report is a useful source of regression cases,
-including pronoun binding after a topic switch, source-only context retention,
-stale `why?`, history recall, and ordinal references. Some of these behaviors
-have since received focused fixes and controls. Replay the complete reported
-sequence against the current checkout before classifying each observation as
-open or fixed; preserve every reproduced failure as an end-to-end control.
-The current `v1_427` 30-turn transcript also passes on this checkout, with no
-cross-topic leak in its Colosseum follow-ups. It is a curated regression, not a
-replacement for replaying the user's exact transcript and corpus.
+Create a compact, versioned scorecard of complete tasks and conversations,
+then run it in clean processes against the current checkout before changing
+behavior. Include the known Eiffel Tower/Colosseum pronoun switch,
+source-only context retention, failed-turn context loss, stale `why?`, history
+recall, ordinal references, Marie Curie/Einstein retrieval confusion,
+compound-question omissions, and current where-question wording gaps. Add
+independently authored conversations with varied paragraph layouts, topic
+switches, ambiguous references, repairs, and same utterances under different
+contexts. Keep the user-edited `experiments/reports/large_corpus_chat_audit.json`
+untouched; direct new runs to a fresh report path.
 
-The next development cycles should follow this order:
+Track task completion, correctness, omitted parts, wrong referents, evidence
+validity, clarification, abstention, repair, context persistence, latency, and
+reload separately. Intent-label agreement is diagnostic only. Contextual
+intent may route, clarify, or repair; it may not add facts or authorize an
+unsupported answer. Keep all known failures as permanent controls and rerun
+the fixed dialogue suite after chat changes.
 
-1. **Re-establish the chat baseline.** Replay the reported dialogue sequences
-   in clean processes, confirm current behavior, and freeze a compact scorecard
-   covering task completion, wrong referents, evidence validity, omissions,
-   clarification, abstention, repair, and reload. Dialogue and contextual
-   intent remain a release gate for chat-facing work.
-2. **Make recombination plus reasoning the primary capability milestone.**
-   Test ordinary-chat completion of source-disjoint, multi-step tasks with new
-   wording, values, evidence layouts, and operation order. Independently check
-   results and include missing-premise, conflict, cycle, unsupported-step, and
-   incomplete-search cases. This is the clearest route from strong components
-   to useful behavior a user can request.
-3. **Run source-derived rule transfer in parallel.** Freeze the candidate
-   method, review positive and negative samples, and test on untouched source
-   units and a new publisher. Keep proposals review-only until role, condition,
-   polarity, and scope survive that gate. This lane can feed recombination but
-   should not delay work with already reviewed rules.
-4. **Enable governed self-learning after the composition gate.** Let
-   independently verified outputs become lineage-bearing proposals; test
-   correction propagation, invalidation, trust, duplicate control, and bounded
-   growth before allowing routine reuse.
-5. **Widen domains and validate distribution from measured task gaps.** Grow
-   math, coding, translation, and creative work one independently checked
-   task slice at a time. Then replay the shared scorecard using only a copied
-   SQLite model, including searchable source text, knowledge, procedures,
-   citations, learning, correction, and reload.
+**Gate:** fixed cases pass in clean processes; no confident wrong referent or
+unsupported factual answer; unresolved ambiguity prompts a focused question or
+abstention; source-only evidence remains usable in relevant follow-ups; and
+explanations refer to the current answer. Any unresolved safety failure is
+fixed before widening the chat surface.
 
-Do not use experiment count, corpus size, intent-label agreement, retrieval
-hits, or authored-graph proof counts as substitutes for held-out user-task
-completion. Compare the user experience with documented 70B-class capabilities
-in breadth, multi-part completion, continuity, and repair; a live 70B model or
-parity claim is not required. Re-score this direction after each gate using
-wrong-answer rate, task completion, abstention, repair, provenance, runtime,
-and model size as separate results.
+### 2. Make recombination plus reasoning work through ordinary chat
 
-## Execution principles
+This is the primary capability milestone. Use independently reviewed facts,
+rules, and procedures to build held-out tasks that require at least two
+distinct operations, such as selecting entities with a verified relation,
+aggregating or transforming the selected results with a learned procedure,
+and explaining the result with its evidence or proof. Test at least two task
+families so one narrow route cannot stand in for general composition. Vary
+wording, entities, values, evidence order and layout, and operation order.
+Keep discovery, connective supervision, learned components, and output
+checking visible in provenance.
 
-1. Measure complete tasks through ordinary chat and a fresh process. Keep
-   answer quality, evidence/proof validity, abstention, clarification,
-   task completion, runtime, and storage as separate measures.
-2. Freeze test material before tuning. Split by source document, publisher, or
-   complete conversation as appropriate. Keep negative cases and known
-   failures as permanent controls.
-3. Treat intent as contextual and revisable. It may route, clarify, and repair;
-   it cannot add facts or authorize unsupported actions.
-4. Keep Codex labels and teacher examples explicit. They are supervision, not
-   independent validation. Preserve citations, labels, review decisions, and
-   correction lineage.
-5. Recombination, self-learning rules, reasoning, and dialogue remain the
-   central work. Add domains or storage features only when they clear a gate
-   below or address a measured user-facing failure.
+Run the tasks through normal chat and a fresh process. Use an independent
+oracle or checker, and include missing premises, explicit negatives,
+conflicts, cycles, invalid or incomplete proofs, unsupported operations,
+partial multi-part requests, and tampered outputs. The experiment harness may
+prepare examples and check results; it must not choose the answer or compose
+the steps on behalf of chat.
 
-## Focused path
+**Gate:** frozen, held-out tasks complete through chat and reload in at least
+two task families; independent checks accept valid outputs and reject invalid
+ones; incomplete, contradictory, or unsupported cases do not become confident
+positives. Report completion, errors, omissions, abstention, proof/evidence
+validity, and cost separately. If only the harness can connect the steps, the
+gate remains open.
 
-Dialogue evaluation runs alongside the capability path and is a release gate
-for every chat-facing change. Source-derived rule transfer is a research
-track; recombination can proceed using independently reviewed components.
-Only dependent capability gates are sequential: a failed gate calls for
-redesign of that mechanism before widening its scope.
+### 3. Establish source-derived rule transfer in parallel
 
-### 1. Lock the shared chat evaluation and dialogue safety baseline
+Treat rule discovery as a bounded learning research track that can supply
+future recombination. Freeze the candidate method before evaluating it on
+untouched complete source units and a publisher not used for development.
+Review proposals and sampled non-proposals. Preserve subject and object roles,
+polarity, conditions, scope, contrast, qualifiers, and separate citations for
+claims and supporting context. Candidates remain review-only until accepted
+through existing learning gates. Record labeler identity, useful proposals,
+false proposals, missed claims, abstentions, review effort, and source
+diversity. Codex labels are explicit supervision, not independent validation.
 
-Preserve the current targeted regressions for topic switching, source-only
-answers, paragraph/entity grounding, unanswered turns, stale `why?`, history,
-ordinal references, corrections, and save/reload. Add a compact set of
-independently authored multi-turn transcripts with varied paragraph layouts,
-competing entities, and follow-up wording. Include the reported Eiffel
-Tower/Colosseum sequence and “and Italy?” after source-only evidence. Score
-wrong referents, irrelevant evidence, correct resolution, clarification,
-abstention, omission, and task completion separately. Keep intent label
-agreement separate from task success.
-
-**Exit:** fixed regressions pass in clean processes; the held-out set has no
-confident wrong referent; unresolved context leads to a focused clarification
-or abstention; every factual answer is supported by the evidence shown. If the
-gate fails, fix context lifetime and source/entity grounding before adding
-intent classes or learned dialogue moves.
-
-The latest roughly 30-turn Rome/Paris drive is a small diagnostic, not a
-transfer benchmark. It confirmed useful follow-ups, named topic changes,
-source citations, and abstention, but found a high-severity wrong answer:
-after switching from the Eiffel Tower to the Colosseum, “when was it
-completed?” selected the Eiffel Tower's 1889 sentence because both paragraphs
-used “It”. It also found that source-only answers lose usable context, failed
-turns clear all referents, and a later “why?” can explain an older answer.
-“What did I just ask?” and “the first one” remain unsupported. The immediate
-dialogue task is therefore a full-turn regression packet for topic changes,
-paragraph/entity grounding, source-only continuity, failed turns, explanation
-anchoring, history, and ordinal references. Require a unique paragraph or
-explicit entity link before resolving a pronoun-led sentence; if none exists,
-ask which entity the user means. Preserve typed visible context through
-recoverable source-only answers and abstentions, and make each explanation
-refer to the answer from the immediately relevant turn. Treat the submitted
-code-review observations (large `turn()` and `_resolve_pronoun`, duplicated
-candidate gathering, brittle persisted referents) as simplification targets
-only after these behaviors are locked by end-to-end tests.
-
-### 2. Establish whether source-derived rules transfer
-
-Use complete technical references or another corpus that contains enough
-instances of the target construction. Do not use the current arXiv index as a
-positive set for the tested “subject will predicate” grammar. Freeze the
-candidate method before labeling; split discovery and holdout by document and
-publisher. Label both proposals and sampled non-proposals. Include role
-reversals, negation, quotation, contrast, conditions, scope, and misleading
-near misses. Keep each candidate cited, review-only, and unable to alter the
-rule store until accepted through existing gates. Record labeler identity,
-teacher effort, precision, useful yield, missed cases, and review burden.
-
-The `v1_474` audit establishes candidate yield in two installed API-reference
-collections: NumPy produced 303 candidates from 13,391 sentences, and pandas
-produced 24 from 5,384. This is corpus fit, not precision or transfer. A
-source-backed `/suggest-procedure-phrases` replay hid the candidate subject;
-review of its cited `numpy.add` sentence showed the candidate had dropped
-`out` and the conditional location. Repeated NumPy boilerplate accounts for
-168 of its candidates, and the spot-check found other incomplete spans around
-qualifiers and inline code. Preserve these as failure cases. Before changing
-the frozen grammar, review a fixed sample of proposals and non-proposals and
-decide whether its current representation can retain a usable, licensed
-operation claim. If not, redesign role, condition, and markup extraction as a
-general boundary model, then reserve new documents for confirmation.
-
-That review is now done in `v1_475`: in a deterministic but non-probability
-sample from the same two package corpora, all 20 candidate field sets needed
-their source sentences to restore a role, condition, qualifier, contrast, or
-markup boundary; all 20 sampled no-candidate sentences described plausible
-API behavior outside the current subject grammar. This is unblinded Codex
-error analysis, not a precision/recall estimate, and the source-cited review
-path still prevents these candidates from becoming accepted knowledge. Keep
-these cases as development controls; the current clause-aware redesign is
-described below, and confirmation must use untouched API units and a new
-publisher.
-
-The clause-aware redesign is now implemented as a review-only proposal path
-and exercised by `v1_476`. Its 25 cited fixtures cover full subjects,
-conditions, contrast, list items, parenthesized values, literals, polarity,
-quotation, denial, uncertainty, one-word predicates, and a fresh chat replay;
-candidates remain review-only. The full-package replay `v1_477` finds 657
-candidate sentences across 250 NumPy API units and 216 candidate sentences /
-217 proposals across 60 pandas units, compared with 303/177 and 24/16 in
-`v1_474`; NumPy has 279 normalized candidate patterns. A re-run of six
-topic-switch, source-only,
-paragraph-grounding, multi-turn, cross-paragraph, and unsupported-switch
-dialogue controls passed 6/6; this is regression coverage, not dialogue
-transfer evidence. The source counts are yield only: the replay
-still exposes malformed boundaries in complex parameter and conditional
-prose, and the frozen sample was used during redesign. Do not call the yield
-increase improved precision or transfer. The current `v1_478` review selected
-ten candidates and ten non-candidates per package, with exact citations and
-sentence hashes. Codex marked 10/20 candidate field sets structurally
-reviewable, 5/20 context-dependent, and 5/20 boundary errors. Of 20 sampled
-non-candidates, 14 appeared to state behavior that needs context, shared-
-subject recovery, or broader clause structure; six were fragments or not
-behavior claims. This is an unblinded, single-rater diagnostic from the same
-corpora used during parser development, not a precision/recall estimate or
-independent validation. See [`v1_478 report`](../experiments/reports/v1_478_api_candidate_boundary_review.json).
-
-The next learner task is context-aware claim assembly: use complete source-unit
-structure to resolve omitted or shared subjects and antecedents, retain
-separate citations for each supporting span, and abstain when the source does
-not determine a unique claim. Develop against the frozen sample, then freeze
-the method and measure proposal quality and missed claims on untouched API
-units and a new publisher. Keep candidates review-only throughout.
-
-The first narrow runtime slice is now exercised by
-`experiments/v1_479_contextual_procedure_candidates.py`. It covers two omitted
-subjects recovered from nearby parameter headings and two simple coordinated
-predicates with shared subjects. Source and context citations are checked
-separately; stale section context and context-free missing subjects abstain;
-the fresh chat path keeps the proposals review-only. The 19-fixture
-`v1_476` source controls and nine selected source/dialogue regressions also
-pass on this checkout. This only validates the named cases and compatibility
-controls: four hand-selected contextual examples do not establish proposal
-precision, recall, or transfer. The next step is to freeze this implementation
-and measure it on untouched API units and a new publisher, reviewing both
-proposals and non-proposals.
-
-The exploratory third-source scan `v1_480` now applies the frozen proposal
-path to scikit-learn 1.9.0 callable docstrings from six API modules. Among 209
-canonical units it found 342 sentences containing `will`; 327 were handled by
-the local parser and 15 by parameter-heading context, yielding 343 proposals
-and no abstentions in that deliberately narrow sentence universe. A
-deterministic one-per-unit sample reviewed 12 candidates: six were structurally
-reviewable from the cited text, three needed unresolved source context, and
-three had boundary errors. These are diagnostic counts, not a precision
-estimate: the corpus was inspected before the sample was frozen, the review is
-single-rater and unblinded, and docstrings are not full documentation pages.
-The corpus is now development data, not a future holdout. The next valid
-transfer test must use a publisher not yet inspected, freeze its documents and
-sample before review, and include independently selected proposal and
-non-proposal cases. See [`v1_480 report`](../experiments/reports/v1_480_sklearn_procedure_candidate_review.json).
-
-The PyTorch 2.13.0 sample was then frozen before review in `v1_481`, on a
-corpus fingerprint distinct from the NumPy/pandas/scikit-learn development
-material. It covers 251 callable API units from four modules; among 320
-`will`-sentences, the current route returned 301 proposals (297 direct, 4
-parameter-context) and abstained on 19. The sample contains 20 candidate and
-all 19 non-candidate sentences, selected by hash with at most one row per API
-unit. In the recorded Codex review (`v1_482`), six candidate rows were
-structurally reviewable, two needed context, and twelve had boundary errors.
-Of the 19 no-candidate rows, 18 stated behavior that the current path missed
-(17 conditional and one shared-subject case); one was an incomplete fragment.
-These are labeled row counts from one unblinded reviewer, not accuracy or
-precision estimates; the non-candidate sample also contains repeated API
-boilerplate. Still, the boundary errors and missed claims are concrete
-counterexamples to treating the implementation as transferred. No parser
-change was made against the frozen sample, and source discovery was not routed
-through chat for this corpus, so the full learning/review/chat gate remains
-open. Keep the PyTorch rows as development controls from now on. Redesign the
-general clause/context representation using these controls, then freeze a
-different publisher and a new sample before the next transfer evaluation.
-See [`v1_481 manifest`](../experiments/reports/v1_481_torch_publisher_transfer_manifest.json)
-and [`v1_482 review`](../experiments/reports/v1_482_torch_transfer_review.json).
-
-The same PyTorch corpus exposed a chat-level natural-language error: “When
-does an LSTM use projections?” was classified as a calendar-date question and
-rejected for lacking a year, despite a cited condition in the source. The
-quoted-evidence gate now accepts explicit date, time, or condition cues for
-`when` questions and rejects a same-entity sentence with no such cue.
-`v1_483_when_condition_evidence_gate.py` passes direct positive/negative
-checks and a fresh-process replay; the answer is still labeled as quoted
-evidence, not an accepted fact. This repairs one question-type boundary, not
-general paraphrase understanding or source-derived learning. The other
-source-only yes/no question in the same probe still abstains and remains an
-open natural-language coverage gap.
-
-The follow-up `v1_484_coordinated_clause_subjects.py` addresses one PyTorch
-API-source boundary from that review: in the Adam parameter description,
-“the algorithm will not accumulate weight decay …” follows another finite
-clause joined by `and`. The candidate parser now isolates the explicit later
-subject, keeps negative polarity and the `if True` condition, and shows the
-cited result in fresh chat without installing a rule. A regression caught an
-over-split of “shape and buffer length … but the type …”; the splitter was
-narrowed to require an explicit new subject, and both cases now pass. This is
-one structural source-learning improvement, not resolution of “the algorithm”
-to Adam in a user yes/no question. That source-only polarity route still needs
-an independently checked subject/context binding and conflict behavior.
-
-`v1_485_conditioned_api_polar_evidence.py` adds a narrow source-only yes/no
-route for this API case. It binds a generic source subject such as “the
-algorithm” to a uniquely named API title only when the user states the same
-explicit true/enabled parameter condition. The reply quotes the exact cited
-sentence and remains review-only; missing or mismatched conditions and
-duplicate matching API titles abstain. Its fresh-process replay initially
-exposed a crash when this route created candidates while `turn.research` was
-absent; that path now initializes the review result before attaching them.
-The chat regression, source-grounded positive/negative flow, open-world polar
-questions, and six selected dialogue controls pass. The older polar tests
-needed alignment with current reply wording and a repeated query after review
-acceptance. This closes one state-dependent crash and one explicit-condition
-coverage gap; it does not show general source-subject resolution or publisher
-transfer. Keep the matcher narrow and review-only until independent subject
-binding and source-conflict behavior are measured.
-
-The SciPy 1.18.0 installed API docstrings provide an adjacent corpus-fit check
-in `v1_486`. The frozen method scanned 2,038 public callable/class docstrings
-(65,660 sentence spans) and found 1,805 sentences containing `will`; it
-proposed on 1,665 of those, while a hash-selected sample of 20 proposed field
-sets had 0 promotion-ready without review. A separate, text-deduplicated
-sample of 20 unhandled sentences contained 13 plausible behavior/property
-claims. These are one-rater sample observations, not precision/recall or a
-publisher-level transfer result. They show the current grammar is both too
-permissive and misses common claims; candidate count is not useful yield. Keep
-SciPy as a development corpus and redesign claim boundaries, role binding,
-conditions, and clause scope against the frozen diagnostics before testing a
-new publisher. The script and cited sample are
-[`v1_486 audit`](../experiments/audits/v1_486_scipy_will_claim_fit.py) and
-[`v1_486 report`](../experiments/reports/v1_486_scipy_will_claim_fit.json).
-
-An optional spaCy dependency-parser proposal path was then prototyped against
-the same frozen SciPy development sample in `v1_487`. It produced candidates
-for 19/20 previously proposed rows and 11/20 sampled non-proposal rows; the
-single-rater review initially found four structurally coherent rows. A
-development-only refinement then stripped Markdown delimiters for parsing
-while preserving source offsets, recovered several explicit leading
-conditions, and improved the reviewed result to 11/20 structurally coherent
-candidate rows; seven of 20 sampled non-proposal rows still gained plausible
-behavior candidates. The same review also prompted a small production fix:
-“not well defined which …” and “as though/as if” now mark embedded claims as
-uncertain, so they cannot be rendered as ordinary positive evidence. The
-refined parser still misbinds some inline-code subjects, fragments, contrast,
-ellipsis, and metadata. This remains an exploratory comparison on development
-data, not transfer evidence; the parser and model are optional and are not
-wired into CRMS. Keep both methods as development baselines, and only continue
-with dependency parsing if a revised representation reduces review burden
-while preserving positive, negative, conditional, uncertainty, and
-malformed-boundary controls. See the
-[`v1_487 prototype`](../experiments/audits/v1_487_spacy_dependency_prototype.py)
-and [`v1_487 report`](../experiments/reports/v1_487_spacy_dependency_prototype.json).
-
-The refined method was then frozen at commit `65b151c` and applied to the
-installed Pydantic 2.13.4 package in `v1_489`, before inspecting its selected
-rows. The corpus contains 685 public callable/class docstrings, 3,402 sentence
-spans, and 184 sentences with `will`; the method proposed on 176 and missed 8.
-In the hash-selected proposal sample, Codex labeled 3/20 structurally usable
-from the sentence alone, 11/20 as needing cited context, and 6/20 as boundary
-errors. Of the eight non-proposals, five appeared to state behavior, two
-needed context, and one was not a target claim. This is a single-rater,
-package-docstring diagnostic, not a precision/recall estimate or complete
-publisher-document test. It shows that context preservation is now the main
-loss for this parser, while boundary errors remain. Keep Pydantic as
-development data; redesign candidate records to keep claim, antecedent,
-parameter heading, and condition spans separately cited, then freeze a new
-package before testing that design. See the [`v1_489 audit`](../experiments/audits/v1_489_pydantic_dependency_transfer.py)
-and [`v1_489 report`](../experiments/reports/v1_489_pydantic_dependency_transfer.json).
-
-The follow-up `v1_490` context-bundle probe attaches the nearest paragraph or
-bounded source windows, adjacent same-paragraph sentences, and API-unit
-identity as separate fields. All source text spans were verified against the
-Pydantic docstring hash and exact character offsets. In a single-Codex review
-of the same 11 rows previously labeled context-needed, three bundles added a
-cited antecedent or condition, three showed the anchor sentence already
-contained enough subject context, three supplied only package-symbol metadata,
-and two remained unresolved. This small, reused development sample does not
-measure transfer or extraction quality; it demonstrates that context can help
-selectively and must not be treated as a blanket repair. The next learner
-checkpoint should keep candidate structure and contextual evidence separate,
-and test whether reviewers can recover a correct claim without relying on
-uncited API identity. See the [`v1_490 audit`](../experiments/audits/v1_490_pydantic_context_bundle.py)
-and [`v1_490 report`](../experiments/reports/v1_490_pydantic_context_bundle.json).
-
-Use the existing excerpt and real-source acceptance experiments as regression
-controls, not as a corpus-level result. If a suitable corpus does not contain
-enough examples, change the learning signal or narrow the claim; do not add
-phrase-specific rules to make the study pass.
-
-**Exit:** the frozen method produces useful, source-supported proposals on
-held-out documents and a held-out publisher, with negative controls measured
-and review effort reported. If it fails, redesign candidate discovery before
-promoting autonomous rule learning.
-
-### 3. Prove recombination through reasoning in ordinary chat
-
-This is the main capability milestone. Learn or accept components separately,
-then ask a genuinely unseen multi-step request in ordinary language. Route it
-through retrieval, rule/procedure selection, reasoning, and the appropriate
-proof or task-specific checker. Run it after fresh-process reload. Keep source
-evidence, learned components, connective supervision, derived rule, proof, and
-output validator distinct in provenance. Exercise changed wording, values,
-and operation order, plus unsupported operations, missing steps, explicit
-negatives, conflicts, cycles/integrity failures, and search limits.
-
-**Exit:** at least one source-disjoint composition succeeds through chat and
-reload; an independent checker accepts valid results and rejects invalid
-ones; incomplete, contradictory, or unsupported requests do not produce a
-confident positive. Report which steps were learned, hand-coded, or labeled.
-If only the experiment orchestrator can compose the steps, the gate remains
-open.
+**Gate:** source-disjoint evaluation shows useful reviewable claims with
+measured error and review burden, and downstream held-out checks show that
+accepted rules transfer. Candidate count, corpus size, and retrieval yield do
+not pass this gate. Do not block the recombination milestone on this track;
+use reviewed components until new rules qualify.
 
 ### 4. Close the self-learning loop under correction controls
 
-Only after phase 3, enable derived outputs as proposals: retrieve → compose →
-verify independently → propose with lineage. Keep derived knowledge separate
-from taught/source-backed knowledge and lower-trust until revalidated. Test
-source and rule corrections, dependent-case invalidation, conflicts, duplicate
-suppression, retrieval weighting, abstention on invalid lineage, and storage
-growth. A derived result must never validate its own generating rule.
-
-**Exit:** correcting a source or rule identifies and disables all affected
-derivations until they pass verification again; no invalid or incomplete proof
-can be reused; growth and trust policies have measured limits. Until then,
-write-back remains review-gated rather than automatic.
-
-### 5. Validate dialogue intent and moves against task outcomes
-
-Model user intent as a contextual hypothesis over the utterance and explicit,
-bounded discourse state: active task/subgoal, current topic and referents,
-open question or choice, previous move, and unresolved ambiguity. Compare it
-with the explicit baseline on held-out conversations, including the same
-utterance under different contexts. Continue the dialogue-move research as a
-separate experiment: cited corpus examples and Codex labels can suggest frames,
-but the context and product-policy gates must remain explicit.
-
-**Exit:** contextual intent improves held-out task completion without raising
-wrong referents, stale context, or inappropriate moves. Learned dialogue
-moves enter runtime only if they improve the explicit baseline on held-out
-outcomes; label agreement alone is insufficient.
-
-### 6. Expand task breadth one validated slice at a time
-
-Use the same natural-language interface for one bounded task at a time in
-coding, math, translation, and creative work. Choose the first task from
-measured user-facing failures. Define held-out requests, negative cases,
-independent validation, evidence policy, and repair behavior before
-implementation. Validate each domain alone before cross-domain compositions;
-evaluate creative coherence and constraint-following separately from factual
-grounding.
-
-**Exit:** each slice reports held-out coverage, correct and wrong results,
-abstentions, completeness, provenance, repair success, and cost through chat.
-Do not infer domain breadth from a single worked example or component pass.
-
-### 7. Verify the distributable model as the complete runtime
-
-When record and correction lifecycles are stable, package searchable source
-text, accepted knowledge, rules/procedures, and provenance in the SQLite model.
-Copy it to a clean location with original source files unavailable. Query it,
-inspect citations, learn and correct through supported paths, save/reload, and
-rerun the shared scorecard using the copy alone. Record size, compatibility,
-migration behavior, and unsupported cases.
-
-**Exit:** the copied model supports the tested chat, retrieval, learning,
-reasoning, correction, and reload paths without original files. Keep source
-acquisition and licensing metadata with imported documents, including
-academic-paper sources.
-
-## Immediate sequence
-
-The project is architecturally aligned, but it is not yet on track to claim
-broad capability: success still depends on controlled examples, hand-coded
-routes, and supervised labels. The near-term objective is to move the existing
-proof-filter/procedure slice from a narrow demonstration toward transferable
-task completion, while keeping dialogue safety in the release path. Source
-rule discovery proceeds as a separate research lane; it must not block
-recombination with already reviewed components.
-
-### Next execution card
-
-This is the order for the next development cycles, reviewed against core code
-snapshot `e350425`, with source-grounded math increments `v1_532` and `v1_533`
-validated and recorded below. Recheck reported behavior before changing code;
-historical reports describe earlier snapshots and should not trigger duplicate
-fixes. The objective is to improve held-out user task completion, not to add
-more demonstrations of the same finite-list operations.
-
-| Order | Work | Concrete output | Advance when |
-| --- | --- | --- | --- |
-| 1 | **Measure dialogue as complete turns.** `v1_518` and `v1_519` route seven common explicit search forms into constrained source presentation; `v1_520` preserves and reloads search context across locality changes and clarifies untyped follow-ups; `v1_521` switches between a source-backed item modifier and locality. Expand beyond one synthetic restaurant corpus and these two slots; freeze full transcripts for topic switching, source-only continuity, pronoun grounding, failed turns, `why?`, history, and ordinal references. Add independently authored same-utterance/different-context conversations. | Fresh-process scorecard separating intent-label agreement from task completion, wrong referents, irrelevant evidence, unsupported evidence, clarification, abstention, stale context, repair, and constraint satisfaction. | Search results meet explicit constraints or disclose partial matches; no confident wrong referent or stale explanation; source-only evidence retains usable context; ambiguity gets focused clarification or abstention. Dialogue remains a release gate for chat-facing work. |
-| 2 | **Widen recombination transfer through ordinary chat.** `v1_516` transfers a reviewed relation alignment and transitive type proof across three source-disjoint held-out routes. Test independently authored task forms beyond trained question frames and vary evidence layout/order. Add missing premises, contradiction, cycles, unsupported steps, and partial/composite requests; reload a copied model and check independently. | Frozen user-task set with each taught, reviewed, hand-coded, and Codex-labeled step disclosed; report completion, correctness, omissions, abstentions, proof validity, repair, constraint satisfaction, and runtime. | The broader held-out set improves task completion over the explicit baseline with no confident invalid result, and ordinary chat—not the experiment harness—coordinates each successful composition. This remains the main capability gate. |
-| 3 | **Keep source-derived rule learning bounded and review-gated.** Redesign role/context/scope preservation using existing frozen diagnostics, then freeze the method and test on new documents and a new publisher. Review proposals and sampled non-proposals; retain separate citations for claim and context. | Transfer report for useful yield, false proposals, missed claims, abstentions, source diversity, and review burden. | Roles, conditions, polarity, and scope survive source-disjoint evaluation without phrase-specific semantic mapping. Failure pauses this lane, not reviewed-component recombination. |
-| 4 | **Close the governed self-learning loop after recombination transfers.** Create derived proposals only from independently verified outputs. Exercise source/rule correction, descendant invalidation, conflicts, duplication, restart, retrieval weighting, and growth. | End-to-end propose → independent verification → review/revalidation → reuse/invalidation in a copied SQLite model. | Every correction disables or revalidates dependents; no derivation validates its generating rule; invalid lineage abstains; reuse and growth have measured limits. Write-back remains review-gated until then. |
-| 5 | **Expand breadth only through validated task slices.** Use the same natural-language interface for coding, math, translation, and creative work. Select the next task from observed failures; define held-out requests, negative cases, an independent checker or rubric, and repair behavior before implementation. Test each domain before cross-domain composition. | Per-task ordinary-chat scorecards for coverage, correctness/quality, unsupported output, provenance, repair, and cost. | Each slice demonstrates useful held-out completion and honest limits. A feature, corpus, or one-off success does not count as domain competence. |
-| 6 | **Validate SQLite as the complete distributable runtime.** Once learning and correction lifecycles stabilize, copy the model where source files are unavailable and replay the shared scorecard, including query, learning, recombination, reasoning, explanation, correction, and reload. | Reproducible copy-only report including searchable source text, accepted knowledge, rules, provenance, correction lineage, licensing metadata, size, and migration behavior. | Tested behavior depends only on the copied model and runtime, and evidence/corrections remain inspectable after reload. |
-
-**Core capability checkpoint (2026-10-20, `e350425`):** the project has
-well-instrumented controlled paths for proof-checked reasoning, bounded
-recombination, source-backed retrieval, contextual dialogue state, reviewed
-learning, and SQLite portability. The prior multi-turn dialogue failures now
-have current passing controls: `v1_427` covers the source-only Eiffel Tower to
-Colosseum switch, `80 CE` follow-up, “and Italy?”, history recall, stale
-explanations, clarification, and save/reload; `v1_435` covers competing
-same-paragraph “It was completed” antecedents and rejects a wrong visible date
-even when an undisplayed matching citation exists; `v1_419` covers failed
-follow-ups and `why?`; and the 2026-10-20 runtime retest passed `v1_412`,
-`v1_419`, and `v1_435` as well. These are curated controls, not a
-representative transfer benchmark. Exact wording like “Who built the Eiffel
-Tower?” now retrieves its directly supported “designed and built” sentence;
-without a reviewed relation mapping, “Who constructed the Eiffel Tower?” still
-abstains. The new `v1_513` control proposes `constructed → build` from two
-distinct cited pairs, then transfers it through saved/reloaded chat to a third
-unseen entity pair whose fact has only canonical `built` evidence. Its fact
-source stays distinct from the wording-training sources, and an unobserved
-alternative still abstains. This is supervised paraphrase acquisition, not
-automatic synonym generalization. The clause-aware
-source-rule learner has passed selected controls but has not passed transfer:
-frozen SymPy and NetworkX diagnostics each found only 10/20 sampled proposals
-structurally reviewable, with the remainder context-dependent or boundary
-errors. These are small, single-rater diagnostics, not precision estimates.
-The `v1_516` packet below is an initial controlled transfer result; the next
-capability milestone is a broader, independently authored multi-step task set
-with varied request forms and adversarial reasoning cases. Dialogue remains a
-release gate, and source-rule extraction proceeds separately. Broad capability
-and reliable self-learning remain unproven.
-
-The math controls now cover conventional arithmetic language and two
-source-grounded percentage-point calculations. `v1_532` extracts proportion
-values from one cited assertion sentence; `v1_533` handles explicit percent
-values with year labels and parenthetical counts in a second article document.
-Both retain operand citations, calculate through fresh-process chat, and
-abstain on unsupported measures and conflicts; `why?` resolves to the exact
-supporting source sentence. This is early document-level transfer within one
-PMC collection. Table extraction, publisher transfer, and broad mathematical
-reasoning remain open.
-
-The new `v1_514` composition control combines an accepted source-backed
-predicate alignment with an accepted, proof-checked type hierarchy in ordinary
-chat. On a third route, “Which waterway runs through …?” returns the sourced
-answer with separate relation and type provenance; “Which stream runs through
-…?” does not inherit an unsupported narrower type. This advances the tested
-composition path, but its small synthetic fixture and pre-accepted components
-do not establish independent transfer. The next gate is a broader, frozen,
-independently authored request set with varied source layouts and an
-independent checker.
-
-The first wider transfer packet, `v1_516`, now carries the reviewed
-`runs through → flows through` alignment and proof-checked `is-a` hierarchy to
-three held-out routes from distinct source documents, through saved/reloaded
-fresh chat. All three answers retain route, classification, taxonomy, proof,
-and language-alignment provenance. Two unsupported type controls do not assert
-the narrower type. The “What waterway runs through …?” and imperative “Name
-the waterway that runs through …” forms both reach the same proof-backed
-answer path; the latter previously fell back to raw source text. This is
-controlled synthetic transfer with pre-reviewed components, not evidence of
-broad natural-language task completion. Continue by testing independently
-authored requests and more adversarial reasoning conditions through ordinary
-chat.
-
-The new `v1_517` transcript combines source listing, “What did I just ask?”,
-ordinal selection of “the first one”, and a final “why?” in fresh CLI chat.
-The history reply identifies the preceding search, the selection resolves to
-the first displayed citation, the explanation stays on that source, and no
-fact is stored. The dialogue regression replay (`v1_409`, `v1_412`, `v1_426`,
-`v1_427`, `v1_442`, `v1_449`, `v1_517`) passed 7/7 isolated diagnostics.
-These are targeted continuity controls, not representative conversation
-transfer; the dialogue gate still requires independently authored complete
-conversations scored for task completion and wrong or omitted content. The
-current `v1_518` change addresses an information-seeking intent error and
-contrasts it with an explicit build request. Its runtime fixture now shows only
-the source matching both requested cuisine and location, while preserving the
-quoted-evidence label and learning no fact. This is one authored fixture, not
-evidence of broad search constraint handling; do not count the five controls
-as an intent-accuracy or task-completion estimate.
-
-`v1_519` extends the direct-search runtime slice to seven ordinary request
-forms, including polite requests, imperatives, WH wording, first-person wants,
-and a plural restaurant noun. Each reaches the same cited source-list route;
-the matching cuisine/locality is shown, mismatches are excluded, and a French
-request with no matching result abstains. These are Codex-authored controls
-over one synthetic corpus, not independent language transfer. The route uses
-explicit patterns and regular plural matching; semantic synonyms and
-independently authored requests remain open.
-
-`v1_520` closes one conversation seam for those searches: a locality-only
-follow-up preserves cuisine and replaces the old visible result list, even
-after save/reload. A no-match update clears the old result so `why?` and an
-ordinal selection cannot revive stale evidence. This remains a bounded
-locality-change rule over synthetic restaurant passages, not general search
-dialogue or an independently authored transfer result.
-
-`v1_521` adds source-backed item-type replacement for two elliptical
-restaurant follow-ups while preserving the original locality. The same test
-distinguishes “Italian” used as a restaurant modifier from “Italy” used as a
-location, and verifies that `why?` follows the latest result. This remains
-pattern-based over one synthetic corpus and does not show broad constraint
-understanding.
-
-A fresh run of `v1_251_large_corpus_chat_stress.py` on this checkout indexed
-1,200 documents and 7,200 sentences. It found all 30 exact baseline targets,
-abstained on all three negative relation controls and both unknown controls,
-and passed the embedded-source portability gate. A current run first surfaced
-the expected sentence in 4/11 positive wording probes. Investigation showed
-the Who-answer matcher rejected subjects such as “Researcher 0000” because
-their numeric identifier also appeared in the requested object; a narrow
-matcher fix plus retrieval-only regular agent-noun morphology raised the
-result to 5/11. `v1_515` checks that quoted evidence is not accepted as a fact
-and that irregular `builder`/`built` does not yield a fabricated answer. The
-tracked user-edited report records 7/11, so two outcomes still differ; that
-report remains untouched. “Responsible for designing” and “credited with
-designing” still fail. The next audit should freeze corpus seed, code revision,
-and complete per-turn replies. Current evidence supports reliable exact
-retrieval at scale, safe negative abstention, and one additional paraphrase
-route, but not broad paraphrase coverage or accepted-fact answering at scale.
-
-`v1_503` adds one sum-first frame: “Sum every value in … that Mira reaches.”
-Before the operation phrase is taught it abstains; after contrastive examples,
-the learned operation composes with proof-selected values, explicit negative
-evidence and a checked sum through copied-model fresh chat. Unknown values still
-block output. This validates one new language frame and phrase-learning path,
-not open-ended paraphrase. The frozen `v1_504` wording baseline below is the
-first measurement of how far these components generalize beyond their taught
-frames.
-
-The frozen `v1_504` wording baseline now has eight requests over the same
-proof-selected sum task. Fresh-process chat answers the two trained controls
-(2/8); it abstains on six variants, including “add up” wording, a WH-total
-question, list-first phrasing, a two-clause pronoun request, and a compound
-WH request. This is a Codex-authored development set using one subject,
-relation, value list, and aggregate—not independent validation. Keep the
-prompts and replies frozen. The next design change should replace the
-single-order request regex assumption with bounded compositional parsing of a
-unique numeric set, a licensed subject/relation claim, and a learned procedure
-phrase. Ambiguous or incomplete parses must clarify or abstain; operation
-aliases still require reviewed teaching. Evaluate on a separately authored
-confirmation set after development, not by tuning against `v1_504` alone.
-
-`v1_505` replaces the fixed-order assumption for requests that contain one
-numeric set, one explicitly mentioned stored subject/relation, and one learned
-procedure phrase. Three reordered formulations now compose through inference
-and the learned sum; one passes copied-model fresh chat and `why?`. The test
-also confirms abstention for an unknown value, competing claims, multiple
-numeric sets, a mere phrase mention, and an unlicensed operation alias.
-
-The `v1_505` runtime packet now also covers a linked WH request asking both
-which values satisfy the relation and what those values sum to. CRMS keeps the
-clauses together, grounds the inflected “does Mira reach” form to the stored
-“Mira reaches” relation, and returns the selected values and checked total
-through copied-model chat. An unknown list member still blocks the result.
-It also covers the frozen “What is the total of the values Mira reaches among
-…” WH-total frame and routes it through the same proof-selected aggregation.
-This is one explicit filter-and-sum question shape in the Codex-authored
-development packet; it does not establish general compound-question
-understanding or broad relation inflection coverage.
-
-The frozen `v1_504` packet remains the before-change baseline; its six language
-gaps remain open for the baseline model. `v1_506` demonstrates a supervised
-resolution for the operation-synonym case: after “add up every value” is taught
-from labeled examples, it composes with a new entity and values, survives
-clause reordering and copied-model chat, and passes an independent arithmetic
-check. The examples and label are Codex-supplied; this is operation learning,
-not autonomous synonym discovery or source-derived transfer. This remains
-bounded clause recombination, not broad language understanding. Next, evaluate
-against a separately authored confirmation set and extend coverage to
-genuinely different task shapes, not just more surface forms of this sum frame.
-
-`v1_507` adds a distinct numeric task operation: count list entries selected
-by proof, counting duplicate occurrences as separate entries. The learner
-initially retained 50 candidate programs because many order/value operations
-preserve count. Exact semantic canonicalization reduced the version space to
-the intended `count_values` primitive from six labeled examples. Controls
-confirm that length-preserving transformations before count and singleton-
-preserving transformations afterward are equivalent, while deduplication and
-value changes are not. The count then composes with inferred positive and
-explicit negative evidence for a new entity; independent counting agrees, and
-unknown/conflicting values block the output. Copied SQLite chat and `why?`
-retain proof and teacher lineage. This is supervised operation acquisition
-and one controlled reasoning-to-math task, not autonomous learning or general
-word-problem solving. The next capability gate remains a separately authored
-confirmation set plus a task shape that is not just finite-list aggregation.
-
-`v1_508` checks the new count equivalences against actual procedure execution
-for 23,595 combinations of input lists (length 0–4, values from −2, 0, and 3),
-count-preserving prefixes, and singleton-preserving suffixes. Every canonical
-equivalence matched its runtime output; negative controls kept deduplication,
-value changes, filtering, and endpoint selection distinct. This is a bounded
-exhaustive check over the stated finite domain, not a proof for all integer
-lists. Keep it as a permanent control when changing the procedure grammar.
-
-`v1_509` returns to the frozen list-first sum wording. The request remains
-unsupported until “add together only the numbers” is taught from labeled
-input/output examples. The generic composer then applies that learned
-operation phrase to proof-selected values for both the original Mira case and
-a new Tavi/value set through copied-model chat; an unknown list member still
-blocks the aggregate, and an independent arithmetic check agrees. This shows
-supervised phrase learning recombining with a new entity and request ordering
-without a phrase-specific parser rule. The labels are Codex-supplied and the
-task is still finite-list summation; it does not show autonomous synonym
-discovery or broader word-problem learning.
-
-`v1_510` exercises that acquisition path through the actual chat commands,
-not a direct model API call. After the same two-clause request abstains, CRMS
-asks for contrastive inputs; Codex labels the requested sum outputs and records
-its labeler identity. The learned “add up the ones she reaches” procedure then
-combines with Mira's proof-selected values, survives a clean copied-model
-process, and refuses an unknown value. Independent arithmetic agrees. This
-shows teacher-supervised interactive learning and recombination; pronoun
-meaning and operation meaning are not autonomously induced, and Codex's labels
-are not independent validation.
-
-A current-checkout replay of the dialogue and recombination controls found two
-ordering seams. The explicit current-topic pronoun anchor now runs before the
-gendered-pronoun ambiguity guard, so a named switch to Alan Turing survives
-other entities in the cited sentence. In the reasoning path, an exact
-cross-source-taught predicate alignment now takes precedence over parsing a
-modal word as part of the subject, so `Nia can reach` correctly queries the
-stored `reaches` relation. `v1_438`, `v1_427`, `v1_426`, `v1_412`, `v1_491`,
-`v1_492`, `v1_502`, `v1_507`, and `v1_510` pass on this checkout. The
-improvements close targeted regressions; they do not establish independent
-dialogue, language, or task transfer.
-
-Source-derived procedure discovery was also measured against a package not
-used in its previous parser development: the frozen SymPy API-docstring sample
-found only 10/20 sampled proposals structurally reviewable, with four needing
-context and six boundary errors; 16/20 sampled unhandled spans appeared to
-describe behavior or mathematical properties. This is single-rater diagnostic
-evidence, not a quality estimate. It led to a general parser change separating
-leading discourse/setting context from a following explicit subject, with
-existing uncertainty, context, and coordinated-clause controls still passing.
-The revised parser was then frozen and probed on NetworkX 3.6.1. Only 10/20
-sampled proposals were structurally reviewable; two needed context and eight
-had boundary errors. Three of five sampled unhandled spans appeared to state
-behavior. This new-package, single-rater diagnostic does not establish quality
-or recall, but it shows the previous context fix did not close the transfer
-gap. SymPy and NetworkX are now development material. Redesign claim boundaries
-for parameter declarations, relative clauses, multiple predicates, and inline
-code before freezing a further untouched package. Keep source-derived claims
-review-only throughout.
-
-The immediate bottleneck is therefore no longer “can the components compose in
-a fixture?” It is whether a fresh user request can cause CRMS to select and
-compose the right components, complete the whole task, and survive independent
-checking on requests withheld from development. The next implementation cycle
-should freeze that evaluation and dialogue baseline before extending mechanisms.
-
-The `v1_498` fresh-chat diagnostic completes 3/6 authored request forms. Exact
-licensed wording, “after removing”, and source-backed “can reach” work; the
-other three cases abstain. A current rerun exposed that the broader request
-frame had previously returned only a filtered/deduplicated intermediate while
-omitting the requested reversal. The composition parser now refuses a request
-when a second command-like operation falls outside the selected licensed
-sequence, and the regression asserts that no intermediate is presented as a
-completed result. This improves task completeness and honest abstention, not
-coverage. The sample remains small and is not independent transfer evidence;
-freeze a separate request set before tuning against the next evaluation.
-
-`v1_499` shows a concrete learning route for one of those seams: after an
-unlicensed operation was rejected, five labeled demonstrations triggered a
-contrastive question; the teacher's answer licensed “deduplicate the values”.
-CRMS then applied it to an unseen input and composed it with proof-checked
-filtering plus a separately learned reverse operation in a fresh chat process.
-The combined target was not taught directly, and an unsupported alias still
-abstained. This advances supervised recombination, but does not establish
-independent transfer or learning from the system's own outputs.
-
-`v1_500` tests a harder form of recombination: two separately taught ordered
-procedure pairs induce `and` as a sequence rule, which then composes a third,
-unseen pair. An interleaved-duplicate input proves that changing the order
-changes the result, and both orders return the correct output. Fresh chat uses
-the learned sequence only after checking every membership proof; unknown
-members and an unlicensed connective remain blocked. This is a controlled
-teacher-labeled demonstration of connective induction, not independent
-natural-language transfer. The next milestone work remains to broaden the
-held-out request/task set and verify more than this one finite-list domain.
-
-`v1_501` confirms the integrated path transfers from the fixture entity `Nia`
-to a new entity, values, and two request frames. The three-premise rule proves
-new positive facts, explicit negatives exclude values, the inferred set feeds
-the learned `and` sequence, and the output/proofs survive fresh chat and
-explanation. An unknown member still blocks composition. This is meaningful
-synthetic entity/value transfer, but request authoring and expected results are
-not independent of the development work; the benchmark gate remains open.
-
-`v1_502` adds a math task to that route: a contrastively learned sum procedure
-aggregates the proof-selected values, and `CRMSMath` checks the exact total
-independently. The natural-language reply states the scalar as a total; unknown
-or conflicting members block it. This demonstrates one narrow
-reasoning-to-math composition, not broad word-problem solving. The same finite
-set format still dominates, so add a distinct math request family and
-independent prompts before claiming domain transfer.
-
-An opt-in `/practice-composition` command now re-runs and verifies each distinct
-positive relation result from the last successful composition and stores it as
-a separate derived case. It also stores the complete output, request, proofs,
-source/rule lineage, and procedure examples as one content-addressed artifact.
-SQLite reload is covered; source and procedure changes make the artifact stale,
-and it is never promoted to a fact or used as a proof leaf. The targeted
-`v1_497` checks pass, but this is one controlled task family and explicit
-practice. It does not yet demonstrate a system that discovers, generalizes,
-and safely reuses rules from its own outputs; the governed self-learning gate
-remains open.
-
-Dialogue intent and multi-turn safety are evaluated in every chat-facing step,
-not deferred to step 5. Research into induced dialogue moves may proceed
-alongside the baseline, but it advances only if it improves held-out task
-outcomes over the explicit dialogue baseline without increasing wrong
-referents or unsupported claims. The source-rule study can also proceed in
-parallel; it is not a prerequisite for recombination from reviewed components.
-
-The critical loop is **scorecard → held-out recombination through chat →
-independent check → repair the observed seam → rerun the packet**. Dialogue
-evaluation runs alongside every chat-facing change. Source-rule transfer may
-proceed in parallel but must remain review-only. Governed derived learning is
-gated on recombination transfer. Domain breadth and full distribution follow
-those gates. Do not count more fixtures, corpus volume, or isolated component
-passes as progress; preserve experiment outputs and user-owned working files.
-
-### Milestone 1 — Freeze one end-to-end scorecard and verify current failures
-
-Build a small, versioned packet of ordinary chat tasks covering (a) the
-reported Eiffel Tower/Colosseum topic switch, source-only follow-ups, failed
-turns, `why?`, history and ordinal references; (b) relation proofs combined
-with learned procedures; and (c) negative, incomplete, conflicting, cyclic,
-and unsupported cases. Re-run the reported failures against a clean current
-process before changing code, because later commits may already have fixed
-some. Record task completion, wrong answers, omissions, clarification,
-abstention, proof validity, evidence validity, latency, and reload behavior as
-separate measures. Keep development cases out of the frozen transfer set.
-
-**Gate:** all fixed safety controls pass; ambiguous referents clarify or
-abstain; every answer is supported by the shown evidence or a verified proof.
-If this fails, repair the smallest dialogue or answer-routing seam and rerun
-the whole packet.
-
-### Milestone 2 — Make proof-backed recombination transfer through chat
-
-Extend `v1_491` from one exact request shape into a small set of user-written
-tasks with changed entities, values, wording, and operation order. Keep the
-learned procedures and knowledge components independently sourced or reviewed
-and label every supervision step. Exercise at least two composition shapes,
-including proof-based selection followed by a procedure and a multi-step
-reasoning conclusion used by a later operation. Include missing premises,
-explicit negatives, conflicts, cycles/integrity violations, unsupported
-operations, and search limits. Run through ordinary chat, a new process, and
-the copied model once its serialization path is exercised.
-
-The integrated `v1_492` probe now covers four request frames across seven cases
-through the composition API. The separate `v1_491` check runs the base request
-through fresh-process chat. An interleaved-duplicate input confirms `reverse
-then deduplicate` differs from `deduplicate then reverse`; both target
-sequences are composed from separately learned primitives and other ordered
-examples rather than taught directly. A source-cited, Codex-taught
-fact-pattern alignment also lets `Nia can reach` use the stored `reaches`
-relation, with exact citations shown in the answer and `why?`; a single-
-document alignment and an unlicensed phrase both abstain.
-Proof gates and evidence lineage remain intact. These synthetic fixtures and
-Codex-taught phrase/connective examples do not establish independent semantic
-transfer. Continue with frozen, independently reviewed tasks rather than
-treating these controls as a completed recombination milestone.
-
-`v1_499` adds one teacher-supervised acquisition test: CRMS asks for a
-contrastive example before accepting the new `deduplicate the values` phrase,
-then composes that learned operation with reverse and proof-backed filtering
-through fresh chat. The new phrase generalizes to an unseen input, while
-`remove repeats` remains unsupported. This is evidence that the existing
-learner can add a new operation to a known composition path; the task, labels,
-and examples remain authored, and autonomous learning is not shown.
-
-`v1_500` and `v1_501` carry a separately induced sequence connective into the
-same proof-backed task and then vary the entity, values, and request frame.
-Together they show order-sensitive composition and one step of symbolic
-transfer beyond the original entity. They do not yet show independent
-generalization or task breadth; the next valid gate is a frozen, separately
-authored request set with an independent checker, followed by a second task
-family.
-`v1_502` adds exact summation and a separate arithmetic check after proof-based
-selection, giving one reasoning→math task beyond list transformation. All
-three are authored controls; the math path still needs varied request forms,
-more than one aggregate operation, and independent evaluation.
-
-**Gate:** frozen held-out requests complete through chat; an independent
-checker accepts valid outputs and rejects tampered or invalid ones; unknown,
-conflicting, or incomplete inputs never become confident positives. Report
-coverage and abstention as well as accuracy. If only a test harness can
-coordinate the parts, this gate is still open.
-
-### Milestone 3 — Turn verified outputs into governed learning proposals
-
-After the recombination gate, let successful outputs create *proposals* with
-complete source, rule, proof, and procedure lineage. Keep proposals separate
-from taught knowledge and require review or independent revalidation before
-they influence ordinary retrieval. Test correction and retraction propagation,
-invalidated ancestors, duplicate suppression, trust weighting, stale-lineage
-abstention, and storage growth. Include a deliberately injected bad derivation
-and show it cannot validate itself or amplify through repeated use.
-
-**Gate:** correcting any dependency identifies and disables every affected
-derived result until revalidated; invalid or incomplete proofs cannot be
-reused; growth stays within an explicit policy. Until then, write-back remains
-review-gated.
-
-### Milestone 4 — Make dialogue and contextual intent reliable enough to use
-
-Treat dialogue as both a priority research area and a release gate for changes
-to chat. First stabilize referent grounding, context lifetime, topic changes,
-history, clarification, repair, and task/subgoal tracking on complete held-out
-conversations. Compare contextual intent with the explicit baseline on task
-outcomes, not label agreement alone. In a separate scoped pilot, test cited,
-context-licensed dialogue moves against the scripted baseline; retain them only
-if they improve appropriate task completion without increasing wrong
-referents, unsupported claims, or inappropriate actions.
-
-The `v1_493` runtime probe fixes coordinated follow-ups (“and when …?” / “and
-how …?”) after visible source-only answers. `v1_494` then fixes a narrower
-compound case: a pronoun in the second WH clause binds to the one entity named
-in the same utterance, even after a topic change; two possible local entities
-cause clarification. Both retain cited evidence. These are explicit
-regressions, not dialogue transfer: questions whose clauses need separate
-source sentences and lexical paraphrases such as “constructed” for “built”
-remain open.
-
-`v1_495` now covers the separate-sentence case for two or three WH clauses
-joined by “and”. It returns exact source quotations per clause, revalidates
-both on `why?`, abstains when any requested part lacks evidence, and rejects
-pronoun-ambiguous compound requests before decomposition. This closes one
-runtime gap, but remains a bounded parser over authored fixtures rather than
-general multi-part understanding; evaluate independently authored compounds
-and varied source layouts before widening the parser.
-
-**Gate:** unseen conversations complete more tasks than the baseline without
-more confident errors; ambiguous or unsupported turns recover through a
-focused question or honest abstention. If learned moves do not improve the
-baseline, keep the simpler handlers and record the result.
-
-The current intent code reproduced one concrete error from the older
-Taskmaster report: “I need to find a Chinese restaurant …” was classified as
-an action task. `v1_518` now recognizes explicit find/look-for/search/locate
-complements as information-seeking while a build request remains an action
-task. It also rechecks contextual preference input and a reservation request
-with a numbered choice. These four Codex-labeled controls are a narrow
-regression, not evidence of improved held-out task completion; the raw
-Taskmaster transcript is absent, so the older full replay could not be rerun.
-The next intent step remains a frozen, source-disjoint transcript comparison
-against the explicit baseline.
-
-### Milestone 5 — Establish source-derived rule transfer, then widen domains
-
-Continue the clause/context-aware source learner as a bounded research lane.
-Freeze its method, candidate and non-candidate samples, and evaluation before
-testing untouched API units from a new publisher. Measure reviewed useful
-claims, false proposals, missed claims, abstentions, and review effort; retain
-separate citations for claim and context. Do not let increasing candidate
-yield count as learning progress. In parallel, use the shared scorecard to
-select one bounded coding, math, translation, or creative task and test it
-through the same natural-language interface, including recombination with
-knowledge or procedures where appropriate.
-
-**Gate:** extracted rules preserve roles, conditions, polarity, and evidence
-on the frozen transfer set. Each new domain shows held-out task completion,
-independent output validation, honest abstention, and repair behavior before
-another domain is added.
-
-### Milestone 6 — Validate the portable model as the whole product
-
-When learning and correction lifecycles are stable, copy the SQLite model to a
-clean location with original sources unavailable. Query, learn, compose,
-reason, explain, correct, save/reload, and rerun the shared scorecard from the
-copy alone. Verify searchable source text, accepted knowledge, procedures,
-provenance, and licensing metadata survive distribution; measure size,
-compatibility, migration, and runtime.
-
-**Gate:** tested behavior depends only on the copied model and runtime, and
-corrections and evidence remain inspectable after reload.
-
-### Working cadence
-
-Keep the next implementation loop narrow: **reproduce a failure → add it to
-the frozen controls → change one seam → run targeted and cross-domain runtime
-checks → update the baseline and roadmap → commit**. At each milestone, review
-the qualitative 70B-class comparison in terms of task breadth, handling of
-paraphrase and compound requests, completeness, dialogue continuity, and
-repair. The comparison identifies user-visible gaps; it is not a parity target
-or a substitute for independent correctness checks.
-
-Do not count corpus size, new dialogue mechanisms, domain names, or storage
-migrations as progress by themselves. Keep verified reasoning,
-recombination, and governed self-learning on the critical path; dialogue
-protects the path to those capabilities, while domain expansion tests their
-generality. After every gate, ask whether held-out users can complete more of
-their actual task without an increase in confident errors. Preserve failures
-that disprove the current design and change the smallest part of the path that
-caused them.
-
-## Detailed references
-
-- [Goal execution plan](goal_execution_plan.md)
-- [Current development history](current_development_plan.md)
-- [Benchmark baselines](benchmark_baselines.md)
-- [Learning dynamics](design_learning_dynamics.md)
+After the composition gate, let independently verified outputs create
+lineage-bearing derived proposals. Keep derived cases separate from taught and
+source-backed knowledge, with lower trust until revalidated. Test duplicate
+suppression, conflict handling, retrieval weighting, stale lineage,
+correction propagation, invalidation, restart, and bounded store growth.
+Inject an incorrect derivation and prove it cannot validate its generating
+rule or amplify through reuse. Keep write-back review-gated until these
+controls pass.
+
+**Gate:** correcting any premise, source, or rule identifies and disables all
+dependent derived cases until independently revalidated; invalid proofs or
+lineage cannot support answers; provenance and trust survive save, reload, and
+model copy; storage growth follows a measured policy.
+
+### 5. Improve dialogue and contextual intent from measured failures
+
+Continue dialogue as a priority research area, but compare each addition with
+the explicit baseline on complete held-out conversations. Keep discourse
+state bounded and inspectable: active task and subgoal, topic and referents,
+open questions or choices, prior move, unresolved ambiguity, and answer under
+discussion. Separate act classification, referent resolution, evidence
+lookup, response, and context update so one failed answer does not erase valid
+context or explain a stale result. Test topic change, source-only evidence,
+clarification, repair, history, and reload together.
+
+Treat induced dialogue moves as a research experiment, not a prerequisite for
+basic safe interaction. Corpus labels may be proposed by Codex but remain
+traceable and reviewable. Compare move frames and contextual intent with
+hand-checked baselines on held-out conversations; do not promote them based on
+label agreement alone.
+
+**Gate:** new dialogue behavior improves held-out task completion without
+raising wrong bindings, stale context, unsupported claims, or inappropriate
+moves. Ambiguous context is clarified or safely declined.
+
+### 6. Expand task breadth one validated domain slice at a time
+
+Add bounded coding, math, translation, and creative tasks through the same
+natural-language interface. Choose slices from observed scorecard failures.
+For each slice, define held-out requests, negative cases, independent
+validation or a clear quality rubric, evidence policy, and repair behavior
+before implementation. Validate each domain alone before testing cross-domain
+compositions. For creative work, score constraint-following and coherence
+separately from factual grounding.
+
+**Gate:** each slice demonstrates useful held-out completion through chat,
+with correctness or quality, omissions, unsupported outputs, provenance,
+repair success, abstention, and runtime reported. A worked example does not
+establish domain competence.
+
+### 7. Validate SQLite as the complete distributable model
+
+Once knowledge, rule, and correction lifecycles are stable, copy the model to
+a clean location where original source files are unavailable. From the copy
+alone, query and cite searchable source text, learn and review, recombine,
+reason, explain, correct, save/reload, and run the shared scorecard. Check that
+source text, accepted knowledge, procedures, citations, licensing metadata,
+and correction lineage survive. Record model size, compatibility, migration,
+and runtime. Academic paper platforms and other imports must preserve source
+and licensing metadata.
+
+**Gate:** all tested behavior depends only on the copied SQLite model and
+runtime; original documents are not required for distribution; evidence and
+corrections remain inspectable after reload.
+
+## Immediate execution card
+
+1. Replay the known full-turn dialogue failures on clean sessions and update
+   the scorecard with current outcomes; preserve the synthetic audit report.
+2. Freeze held-out composition/reasoning tasks and independent checkers before
+   tuning. Start with reviewed components and at least two task families.
+3. Keep dialogue regressions running for each chat change, and repair any
+   reproduced high-severity context or grounding failure before merging it.
+4. Run the frozen source-rule transfer study in parallel, keeping all
+   candidates review-only.
+5. Promote derived write-back only after the composition and correction gates
+   pass; widen domains and validate the copied model after the reusable path
+   is stable.
+
+For each change: tie it to a reproduced failure or named gate; preserve the
+case before tuning; change the smallest responsible seam; run targeted runtime
+checks and relevant cross-capability controls; record limitations; and commit
+only the intended project files. Preserve user-owned data and report the
+provenance of authored, Codex-labeled, hand-coded, and independently checked
+results separately.
+
+## Related project documents
+
+- [Current development plan](current_development_plan.md) — active work queue
+  and recent implementation history.
+- [Natural-language handling](design_natural_language_handling.md) and
+  [chat UX](design_chat_ux.md) — routing and response design.
+- [Dialogue design](design_conversation.md), [dialogue moves](design_dialogue_moves.md),
+  and [contextual intent](design_user_intent_model.md) — dialogue research.
+- [Learning dynamics](design_learning_dynamics.md) — governed derivation and
+  correction.
 - [Evidence independence and transfer](design_evidence_independence_and_transfer.md)
-- [Natural-language handling](design_natural_language_handling.md)
-- [Contextual user intent](design_user_intent_model.md)
-- [Dialogue moves](design_dialogue_moves.md)
-- [SQLite memory](sqlite_memory_design.md)
-- [70B-class capability comparison](capability_comparison_70b.md)
+  — source-disjoint validation.
+- [Domain expansion](design_domain_expansion.md) — coding, math, translation,
+  and creative task slices.
+- [70B-class capability comparison](capability_comparison_70b.md) — qualitative
+  breadth and interaction reference.
