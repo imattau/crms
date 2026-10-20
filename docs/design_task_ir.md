@@ -1,10 +1,12 @@
 # Design: typed task and plan IR
 
-**Status:** proposed contract; `crms_tasks.py` implements the data and
-invariants. `crms_planner.py` implements the action contract and a deterministic
-executor. `crms_actions.py` implements the first two Family A adapters
-(`select-verified-positive`, `apply-learned-procedure`). Goal planning and the
-chat compiler are not implemented yet.
+**Status:** active contract; `crms_tasks.py` implements the data and invariants.
+`crms_planner.py` implements the action contract and a deterministic executor.
+`crms_actions.py` implements the first two Family A adapters
+(`select-verified-positive`, `apply-learned-procedure`). The chat path for the
+explicit verified-filter frame now executes through this plan; its regex parser
+remains only as a transitional request compiler. Learned request frames are not
+implemented yet.
 **Date:** 2026-10-21
 
 ## Why
@@ -31,8 +33,8 @@ Implemented in `crms_tasks.py`:
 | `TaskRequest` | Stable request id, original text, typed goal, slots, constraints, provenance |
 | `Step` | One action invocation: id, action, inputs, output type, evidence, check, dependencies |
 | `Plan` | Ordered, bounded steps plus a final verification check; deterministic `artifact_id` |
-| `StepResult` | Outcome of one step: status, output, evidence, detail |
-| `PlanResult` | Overall status (`ok`, `not_planned`, `unsupported`, `ambiguous`, `verification_failed`), output, step results, failures |
+| `StepResult` | Outcome of one step: status, output, evidence, detail, reason code, structured metadata |
+| `PlanResult` | Overall status (`ok`, `not_planned`, `unsupported`, `ambiguous`, `verification_failed`, `execution_failed`), output, step results, failures |
 | `EvidenceRef` | Typed pointer to a fact, source, proof, procedure, rule, computation, translation, or generated artifact |
 | `CheckSpec` | The check that must pass: exact, set, proof, citation, parity, oracle, or domain |
 
@@ -100,6 +102,8 @@ Initial adapters, in order:
 - Statuses: `execution_failed` for action/precondition/reference problems,
   `verification_failed` for a rejected step or plan check, and `ok` only when
   every planned step and the plan check pass.
+- Failed and rejected step results stay in `PlanResult.steps` for audit; they
+  never become the answer.
 
 The executor never catches programming errors from an action; it converts only
 explicit `ExecutionError` failures into a refused result.
@@ -153,12 +157,18 @@ procedure (clarify), unsupported procedure (unsupported), partial request
 
 ## Migration from current composition
 
-1. Keep `crms_task_composition.py` working during the transition.
-2. Wrap its proof-filter + procedure path as two actions.
+1. Keep `crms_task_composition.py` working during the transition. — done.
+2. Wrap its proof-filter + procedure path as two actions. — done.
 3. Compile its accepted request forms into `Plan` objects and compare outputs
-   against the existing path on the same fixtures.
-4. Only then remove the regex dispatch, after parity and negative controls
-   pass.
+   against the existing path on the same fixtures. — done, including rendered
+   text parity (`experiments/v1_552_family_a_plan_parity.py`).
+4. Flip chat to the plan path. — done for the explicit verified-filter frame.
+5. Replace the transitional regex request compiler with learned request frames
+   and typed slots, then remove the old dispatch. — next.
+
+The old `compose_verified_filter` remains as the reference path used by the
+parity experiment and derived-composition checks; chat uses
+`compose_verified_filter_via_plan`.
 
 ## Open questions
 

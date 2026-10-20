@@ -131,7 +131,8 @@ def main() -> None:
     bad.register(FunctionAction("double", double, verify_double))
     rejected = PlanExecutor(bad).execute(plan())
     require(rejected.status == "verification_failed"
-            and rejected.steps == ()
+            and len(rejected.steps) == 1
+            and rejected.steps[0].output == 99
             and rejected.output is None,
             f"a rejected step produced an answer: {rejected}")
 

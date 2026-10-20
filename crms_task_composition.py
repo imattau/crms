@@ -18,6 +18,13 @@ from crms_knowledge import (
 )
 from crms_model import CRMSModel
 from crms_rule_proof import verify_inference_proof
+from crms_actions import (
+    ApplyLearnedProcedureAction, SelectVerifiedPositiveAction,
+)
+from crms_planner import (
+    ActionRegistry, ExecutionContext, PlanExecutor, Verification, check_for,
+)
+from crms_tasks import Plan, Step, TaskRequest, request_id
 
 
 _INTEGER_LIST = (
@@ -83,7 +90,8 @@ def _normalize_procedure_sequence(instruction: str) -> str:
 
 
 def _predict_licensed_procedure(procedures: CRMSModel, instruction: str,
-                                values: list[int]
+                                values: list[int], *,
+                                record_use: bool = True
                                 ) -> tuple[str, Any, str | None]:
     """Use a licensed phrase, allowing a checked gerund-to-base-form mapping.
 
@@ -91,8 +99,10 @@ def _predict_licensed_procedure(procedures: CRMSModel, instruction: str,
     learner. This changes only the grammatical form of an operation token; it
     cannot authorize a procedure the model does not already support.
     """
-    direct = procedures.predict(instruction, values)
+    direct = procedures.predict(instruction, values, record_use=False)
     if direct.status == "ok":
+        if record_use:
+            procedures.predict(instruction, values, record_use=True)
         return instruction, direct, None
 
     parts = instruction.split(" then ")
@@ -114,7 +124,8 @@ def _predict_licensed_procedure(procedures: CRMSModel, instruction: str,
             if candidate != instruction:
                 candidates.add(candidate)
 
-    licensed = [(candidate, procedures.predict(candidate, values))
+    licensed = [(candidate, procedures.predict(
+        candidate, values, record_use=False))
                 for candidate in sorted(candidates)]
     licensed = [(candidate, prediction)
                 for candidate, prediction in licensed
@@ -122,6 +133,8 @@ def _predict_licensed_procedure(procedures: CRMSModel, instruction: str,
     if len(licensed) != 1:
         return instruction, direct, None
     candidate, prediction = licensed[0]
+    if record_use:
+        procedures.predict(candidate, values, record_use=True)
     changed = next((
         f"{original.split()[0]} → {normalized.split()[0]}"
         for original, normalized in zip(parts, candidate.split(" then "))
@@ -147,6 +160,71 @@ class ReasonedListComposition:
     inference_proofs: tuple[dict[str, Any], ...] = ()
     procedure_records: tuple[dict[str, Any], ...] = ()
     language_evidence: tuple[dict[str, Any], ...] = ()
+
+
+@dataclass(frozen=True)
+class VerifiedFilterRequest:
+    values: tuple[int, ...]
+    procedure: str
+    subject: str
+    relation: str
+    language_evidence: tuple[dict[str, Any], ...] = ()
+
+
+def _parse_verified_filter_request(
+        instruction: str, knowledge: CRMSKnowledgeBase,
+        procedures: CRMSModel
+        ) -> tuple[VerifiedFilterRequest | None, ReasonedListComposition | None]:
+    """Resolve the explicit request frame without executing it."""
+    linked_aggregate = next((pattern.fullmatch(instruction)
+                             for pattern in (_FILTER_AND_SUM_QUESTION,
+                                             _WH_TOTAL_QUESTION)
+                             if pattern.fullmatch(instruction) is not None),
+                            None)
+    if linked_aggregate is not None:
+        values_text = linked_aggregate.group("values")
+        claim_text = linked_aggregate.group("claim")
+        procedure_text = "sum every value"
+    else:
+        match = None
+        for candidate in _REQUESTS:
+            match = candidate.fullmatch(instruction)
+            if match is not None:
+                break
+        if match is not None:
+            values_text = match.group("values")
+            claim_text = match.group("claim")
+            procedure_text = match.group("procedure")
+        else:
+            generic_parts = _generic_request_parts(
+                instruction, knowledge, procedures)
+            if generic_parts is None:
+                return None, None
+            values_text, claim_text, procedure_text = generic_parts
+    values = tuple(int(value) for value in
+                   re.findall(r"-?\d+", values_text))
+    if not values or len(values) > 32:
+        return None, ReasonedListComposition(
+            "unsupported", "I can check a finite list of 1 to 32 integer values.")
+    language_evidence: tuple[dict[str, Any], ...] = ()
+    learned_match = knowledge.match_fact_pattern_relation_claim(claim_text)
+    if learned_match is not None:
+        parsed = (learned_match["subject"], learned_match["relation"])
+        language_evidence = (learned_match,)
+    else:
+        parsed = _relation_and_subject(claim_text, knowledge)
+    if parsed is None:
+        return None, ReasonedListComposition(
+            "unsupported", "I couldn't identify one unambiguous stored relation and subject.")
+    subject, relation = parsed
+    procedure = _normalize_procedure_sequence(procedure_text)
+    return VerifiedFilterRequest(
+        values=values,
+        procedure=procedure,
+        subject=subject,
+        relation=relation,
+        language_evidence=language_evidence,
+    ), None
 
 
 def _fingerprint(value: Any) -> str:
@@ -414,6 +492,55 @@ def _proof_sources(proof: dict[str, Any]) -> set[str]:
     return sources
 
 
+def _render_composition_text(
+        *, subject: str, relation: str, included: list[int],
+        negative: list[int], output: tuple[int, ...], procedure: str,
+        surface_procedure: str, morphology_note: str | None,
+        sources: set[str], procedure_records: tuple[dict[str, Any], ...],
+        language_evidence: tuple[dict[str, Any], ...],
+        prediction_procedure: list[dict[str, Any]] | None) -> str:
+    exclusions = (f"; excluded explicitly negative values {negative}"
+                  if negative else "")
+    evidence = ", ".join(sorted(sources)) or "verified stored proofs"
+    labelers = sorted({str(record.get("labeler_id"))
+                       for record in procedure_records
+                       if record.get("labeler_id")})
+    support_note = (f" Procedure examples: {len(procedure_records)}"
+                    + (f" (labeler: {', '.join(labelers)})" if labelers else "")
+                    + ".")
+    language_note = ""
+    if language_evidence:
+        alignments = "; ".join(
+            f"'{row['surface_phrase']}' → '{row['relation']}'"
+            for row in language_evidence)
+        language_note = (f" Taught relation wording: {alignments}; sources: "
+                         + ", ".join(sorted({source
+                                              for row in language_evidence
+                                              for source in row.get("sources", ())}))
+                         + ".")
+    procedure_note = (
+        f" Recognized the grammatical form '{morphology_note}' in "
+        f"'{surface_procedure}' using the licensed procedure '{procedure}'."
+        if morphology_note else "")
+    if (prediction_procedure
+            and prediction_procedure[-1].get("operation") == "sum_values"
+            and len(output) == 1):
+        answer_line = (f"Verified values satisfying the relation "
+                       f"'{subject} {relation}': {included}{exclusions}. "
+                       f"Their total is {output[0]}.")
+    elif (prediction_procedure
+          and prediction_procedure[-1].get("operation") == "count_values"
+          and len(prediction_procedure) == 1 and len(output) == 1):
+        answer_line = (f"There are {output[0]} listed entries satisfying "
+                       f"the relation '{subject} {relation}'{exclusions}.")
+    else:
+        answer_line = (f"Verified values satisfying {subject} {relation}: "
+                       f"{included}{exclusions}. After '{procedure}': "
+                       f"{list(output)}.")
+    return (f"{answer_line} Evidence sources: {evidence}.{support_note}"
+            f"{language_note}{procedure_note}")
+
+
 def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
                             procedures: CRMSModel) -> ReasonedListComposition | None:
     """Apply a learned list procedure to a finite, fully classified value set.
@@ -422,53 +549,16 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
     Unknown, contradictory, incomplete, or unverifiable members cause an
     abstention rather than silently filtering away a possible value.
     """
-    linked_aggregate = next((pattern.fullmatch(instruction)
-                             for pattern in (_FILTER_AND_SUM_QUESTION,
-                                             _WH_TOTAL_QUESTION)
-                             if pattern.fullmatch(instruction) is not None),
-                            None)
-    if linked_aggregate is not None:
-        values_text = linked_aggregate.group("values")
-        claim_text = linked_aggregate.group("claim")
-        procedure_text = "sum every value"
-    else:
-        match = None
-        for candidate in _REQUESTS:
-            match = candidate.fullmatch(instruction)
-            if match is not None:
-                break
-        if match is not None:
-            values_text = match.group("values")
-            claim_text = match.group("claim")
-            procedure_text = match.group("procedure")
-        else:
-            generic_parts = _generic_request_parts(
-                instruction, knowledge, procedures)
-            if generic_parts is None:
-                return None
-            values_text, claim_text, procedure_text = generic_parts
-    values = tuple(int(value) for value in
-                   re.findall(r"-?\d+", values_text))
-    if not values or len(values) > 32:
-        return ReasonedListComposition(
-            "unsupported", "I can check a finite list of 1 to 32 integer values.")
-    language_evidence: tuple[dict[str, Any], ...] = ()
-    # Prefer an exact, source-licensed predicate alignment over interpreting
-    # its modal words as part of the subject ("Nia can reach" must not become
-    # subject "Nia can" + relation "reaches"). The alignment already carries
-    # its independent-source evidence; otherwise use canonical or inflected
-    # relation parsing as before.
-    learned_match = knowledge.match_fact_pattern_relation_claim(claim_text)
-    if learned_match is not None:
-        parsed = (learned_match["subject"], learned_match["relation"])
-        language_evidence = (learned_match,)
-    else:
-        parsed = _relation_and_subject(claim_text, knowledge)
-    if parsed is None:
-        return ReasonedListComposition(
-            "unsupported", "I couldn't identify one unambiguous stored relation and subject.")
-    subject, relation = parsed
-    procedure = _normalize_procedure_sequence(procedure_text)
+    request, early = _parse_verified_filter_request(
+        instruction, knowledge, procedures)
+    if early is not None:
+        return early
+    if request is None:
+        return None
+    values = request.values
+    subject, relation = request.subject, request.relation
+    procedure = request.procedure
+    language_evidence = request.language_evidence
     positive_facts = knowledge.facts()
     negative_facts = knowledge.negative_facts()
     fact_records = [asdict(fact) for fact in positive_facts]
@@ -574,48 +664,255 @@ def compose_verified_filter(instruction: str, knowledge: CRMSKnowledgeBase,
         refs = [str(record.get("source_id") or ""),
                 str(record.get("instruction_source_id") or "")]
         sources.update(value for value in refs if value)
-    exclusions = (f"; excluded explicitly negative values {negative}"
-                  if negative else "")
-    evidence = ", ".join(sorted(sources)) or "verified stored proofs"
-    labelers = sorted({str(record.get("labeler_id"))
-                       for record in procedure_records
-                       if record.get("labeler_id")})
-    support_note = (f" Procedure examples: {len(procedure_records)}"
-                    + (f" (labeler: {', '.join(labelers)})" if labelers else "")
-                    + ".")
-    language_note = ""
-    if language_evidence:
-        alignments = "; ".join(
-            f"'{row['surface_phrase']}' → '{row['relation']}'"
-            for row in language_evidence)
-        language_note = (f" Taught relation wording: {alignments}; sources: "
-                         + ", ".join(sorted({source
-                                              for row in language_evidence
-                                              for source in row.get("sources", ())}))
-                         + ".")
-    procedure_note = (
-        f" Recognized the grammatical form '{morphology_note}' in "
-        f"'{surface_procedure}' using the licensed procedure '{procedure}'."
-        if morphology_note else "")
-    if (prediction.procedure
-            and prediction.procedure[-1].get("operation") == "sum_values"
-            and len(output) == 1):
-        answer_line = (f"Verified values satisfying the relation "
-                       f"'{subject} {relation}': {included}{exclusions}. "
-                       f"Their total is {output[0]}.")
-    elif (prediction.procedure
-          and prediction.procedure[-1].get("operation") == "count_values"
-          and len(prediction.procedure) == 1 and len(output) == 1):
-        answer_line = (f"There are {output[0]} listed entries satisfying "
-                       f"the relation '{subject} {relation}'{exclusions}.")
-    else:
-        answer_line = (f"Verified values satisfying {subject} {relation}: "
-                       f"{included}{exclusions}. After '{procedure}': "
-                       f"{list(output)}.")
-    text = (f"{answer_line} Evidence sources: {evidence}.{support_note}"
-            f"{language_note}{procedure_note}")
+    text = _render_composition_text(
+        subject=subject, relation=relation, included=included,
+        negative=negative, output=output, procedure=procedure,
+        surface_procedure=surface_procedure,
+        morphology_note=morphology_note, sources=sources,
+        procedure_records=procedure_records,
+        language_evidence=language_evidence,
+        prediction_procedure=prediction.procedure)
     return ReasonedListComposition(
         "answered", text, subject, relation, values, tuple(included),
         tuple(negative), (), output, procedure, tuple(sorted(sources)), checks,
         tuple(negative_evidence), tuple(verified_proofs),
         procedure_records, language_evidence)
+
+
+def _select_evidence_parts(evidence):
+    """Extract proofs, negative facts, and sources from selection evidence."""
+    proofs: list[dict[str, Any]] = []
+    negative_facts: list[dict[str, Any]] = []
+    sources: set[str] = set()
+    for ref in evidence:
+        if ref.kind == "proof":
+            proof = ref.detail.get("proof")
+            if isinstance(proof, dict):
+                if proof not in proofs:
+                    proofs.append(proof)
+                sources.update(_proof_sources(proof))
+            if ref.source:
+                sources.add(str(ref.source))
+        elif ref.kind == "fact" and ref.detail.get("negative"):
+            fact = ref.detail.get("fact")
+            if isinstance(fact, dict):
+                if fact not in negative_facts:
+                    negative_facts.append(fact)
+                sources.update(str(source) for source in fact.get("sources", ())
+                               if source)
+            if ref.source:
+                sources.add(str(ref.source))
+    return tuple(proofs), tuple(negative_facts), sources
+
+
+def _procedure_evidence_parts(evidence, sources: set[str]):
+    ref = next((item for item in evidence if item.kind == "procedure"), None)
+    if ref is None:
+        return None, ()
+    records = tuple(ref.detail.get("examples", ()) or ())
+    for record in records:
+        for key in ("source_id", "instruction_source_id"):
+            value = str(record.get(key) or "")
+            if value:
+                sources.add(value)
+    return ref, records
+
+
+def _composition_from_plan(
+        request: VerifiedFilterRequest, result,
+        ) -> ReasonedListComposition:
+    """Translate a typed plan result back into the chat-facing record."""
+    subject, relation = request.subject, request.relation
+    sources: set[str] = set()
+    for row in request.language_evidence:
+        sources.update(str(source) for source in row.get("sources", ())
+                       if source)
+
+    if result.status == "ok":
+        select_step, procedure_step = result.steps[0], result.steps[1]
+        included = list(select_step.output or ())
+        negative = list(select_step.metadata.get("excluded", ()))
+        proofs, negative_facts, select_sources = _select_evidence_parts(
+            select_step.evidence)
+        sources.update(select_sources)
+        procedure_ref, procedure_records = _procedure_evidence_parts(
+            procedure_step.evidence, sources)
+        if procedure_ref is None:
+            return ReasonedListComposition(
+                "unsupported",
+                "The procedure step produced no evidence record.",
+                subject, relation, request.values, tuple(included),
+                tuple(negative), procedure=request.procedure,
+                evidence_sources=tuple(sorted(sources)),
+                proof_checks=int(select_step.metadata.get("checks", 0)),
+                evidence=negative_facts, inference_proofs=proofs,
+                language_evidence=request.language_evidence)
+        licensed = str(procedure_ref.detail.get(
+            "licensed_instruction") or request.procedure)
+        morphology_note = procedure_ref.detail.get("morphology_note")
+        output = tuple(procedure_step.output or ())
+        text = _render_composition_text(
+            subject=subject, relation=relation, included=included,
+            negative=negative, output=output, procedure=licensed,
+            surface_procedure=request.procedure,
+            morphology_note=morphology_note, sources=sources,
+            procedure_records=procedure_records,
+            language_evidence=request.language_evidence,
+            prediction_procedure=procedure_ref.detail.get("procedure"))
+        return ReasonedListComposition(
+            "answered", text, subject, relation, request.values,
+            tuple(included), tuple(negative), (), output, licensed,
+            tuple(sorted(sources)),
+            int(select_step.metadata.get("checks", 0)),
+            negative_facts, proofs, procedure_records,
+            request.language_evidence)
+
+    failed = result.steps[-1] if result.steps else None
+    select_step = (
+        failed if failed is not None and failed.step_id == "select"
+        else next((step for step in result.steps
+                   if step.step_id == "select" and step.status == "ok"), None)
+    )
+    evidence_step = (
+        failed if failed is not None
+        and failed.reason_code in {"unknown_values", "conflict"}
+        else select_step
+    )
+    if evidence_step is not None:
+        proofs, negative_facts, select_sources = _select_evidence_parts(
+            evidence_step.evidence)
+        sources.update(select_sources)
+        checks = int(evidence_step.metadata.get("checks", 0))
+        included = tuple(evidence_step.metadata.get("included", ()))
+        negative = tuple(evidence_step.metadata.get("excluded", ()))
+    else:
+        proofs, negative_facts, checks = (), (), 0
+        included, negative = (), ()
+
+    if failed is not None and failed.reason_code == "unknown_values":
+        unresolved = tuple(failed.metadata.get("unresolved", ()))
+        incomplete = tuple(failed.metadata.get("incomplete", ()))
+        unresolved = tuple(dict.fromkeys((*unresolved, *incomplete)))
+        rendered = ", ".join(map(str, sorted(set(unresolved))))
+        return ReasonedListComposition(
+            "unknown",
+            f"I can't determine whether {rendered} satisfy {subject} "
+            f"{relation}; I did not run the procedure on a partial set.",
+            subject, relation, request.values, included, negative,
+            unresolved, procedure=request.procedure,
+            evidence_sources=tuple(sorted(sources)), proof_checks=checks,
+            evidence=negative_facts, inference_proofs=proofs,
+            language_evidence=request.language_evidence)
+
+    if failed is not None and failed.reason_code == "conflict":
+        value = failed.metadata.get("conflict_value")
+        rendered = "" if value is None else f" {value}"
+        return ReasonedListComposition(
+            "conflict",
+            f"I found both positive and negative support for {subject} "
+            f"{relation}{rendered}; I did not run the procedure. Evidence "
+            f"sources: {', '.join(sorted(sources))}.",
+            subject, relation, request.values,
+            unresolved_values=(value,) if value is not None else (),
+            procedure=request.procedure,
+            evidence_sources=tuple(sorted(sources)), proof_checks=checks,
+            evidence=negative_facts, inference_proofs=proofs,
+            language_evidence=request.language_evidence)
+
+    if failed is not None and failed.reason_code == "procedure_unresolved":
+        return ReasonedListComposition(
+            "unsupported_procedure",
+            failed.detail or "I couldn't verify that learned list procedure.",
+            subject, relation, request.values, included, negative,
+            procedure=request.procedure,
+            evidence_sources=tuple(sorted(sources)), proof_checks=checks,
+            evidence=negative_facts, inference_proofs=proofs,
+            language_evidence=request.language_evidence)
+
+    reason = "; ".join(result.failures) or result.status
+    return ReasonedListComposition(
+        "unsupported", f"I couldn't verify this request: {reason}.",
+        subject, relation, request.values, included, negative,
+        procedure=request.procedure,
+        evidence_sources=tuple(sorted(sources)), proof_checks=checks,
+        evidence=negative_facts, inference_proofs=proofs,
+        language_evidence=request.language_evidence)
+
+
+def compose_verified_filter_via_plan(
+        instruction: str, knowledge: CRMSKnowledgeBase,
+        procedures: CRMSModel) -> ReasonedListComposition | None:
+    """Execute the explicit verified-filter frame through the typed planner.
+
+    This is a migration path: request parsing is still shared with
+    ``compose_verified_filter``, but selection and procedure execution run as
+    independently verified plan steps.
+    """
+    request, early = _parse_verified_filter_request(
+        instruction, knowledge, procedures)
+    if early is not None:
+        return early
+    if request is None:
+        return None
+
+    select_step = Step(
+        id="select",
+        action="select-verified-positive",
+        inputs={
+            "subject": request.subject,
+            "relation": request.relation,
+            "values": list(request.values),
+        },
+        output_type="integer-list",
+        check=check_for("proof"),
+    )
+    procedure_step = Step(
+        id="procedure",
+        action="apply-learned-procedure",
+        inputs={
+            "values": "select.output",
+            "instruction": request.procedure,
+        },
+        output_type="integer-list",
+        check=check_for("parity", ref=request.procedure),
+        depends_on=("select",),
+    )
+    plan = Plan(
+        request=TaskRequest(
+            id=request_id(instruction, "verified-filter"),
+            text=instruction,
+            goal="verified-filter-then-procedure",
+            slots={
+                "subject": request.subject,
+                "relation": request.relation,
+                "values": list(request.values),
+                "procedure": request.procedure,
+            },
+            provenance={"parser": "shared-explicit-frame"},
+        ),
+        steps=(select_step, procedure_step),
+        verification=check_for("oracle", ref="integer-list-output"),
+    )
+
+    def resolver(text: str, values: list[int], record_use: bool):
+        return _predict_licensed_procedure(
+            procedures, text, values, record_use=record_use)
+
+    registry = ActionRegistry()
+    registry.register(SelectVerifiedPositiveAction(knowledge))
+    registry.register(ApplyLearnedProcedureAction(
+        procedures, resolver=resolver))
+
+    def check_output(plan, outputs, context):
+        output = outputs.get("procedure")
+        passed = (isinstance(output, list)
+                  and all(isinstance(value, int)
+                          and not isinstance(value, bool)
+                          for value in output))
+        return Verification(
+            passed, "" if passed else "procedure output is not an integer list")
+
+    result = PlanExecutor(
+        registry, plan_verifier=check_output).execute(
+            plan, ExecutionContext({"instruction": instruction}))
+    return _composition_from_plan(request, result)

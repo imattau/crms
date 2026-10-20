@@ -197,11 +197,13 @@ class PlanExecutor:
                     "execution_failed", plan, results,
                     f"step {step.id}: invalid result: {error}")
             if result.status != "ok":
+                results.append(result)
                 return self._failure(
                     "execution_failed", plan, results,
                     f"step {step.id}: {result.detail or result.status}")
             verification = action.verify(step, inputs, result, context)
             if not verification.passed:
+                results.append(result)
                 return self._failure(
                     "verification_failed", plan, results,
                     f"step {step.id}: {verification.detail}")
@@ -212,6 +214,8 @@ class PlanExecutor:
                     output=result.output,
                     evidence=result.evidence + verification.evidence,
                     detail=result.detail,
+                    reason_code=result.reason_code,
+                    metadata=dict(result.metadata),
                 )
             outputs[step.id] = result.output
             results.append(result)

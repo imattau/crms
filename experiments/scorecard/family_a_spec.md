@@ -1,7 +1,9 @@
 # Family A specification: verified selection → learned procedure
 
-**Status:** frozen design for the Phase 2 recombination milestone. Not yet
-implemented as scorecard JSONL.
+**Status:** frozen design for the Phase 2 recombination milestone. The typed
+actions execute through the plan path and chat uses it for the explicit
+verified-filter frame. Scorecard JSONL tasks and learned request frames are not
+yet implemented.
 **Date:** 2026-10-21
 **Provenance:** authored specification. Fixtures, expected outputs, and the
 oracle are defined before implementation and must not be tuned to the planner.

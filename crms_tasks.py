@@ -322,6 +322,8 @@ class StepResult:
     output: Any = None
     evidence: tuple[EvidenceRef, ...] = ()
     detail: str = ""
+    reason_code: str = ""
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def validate(self) -> None:
         _slug(self.step_id, "step result id")
@@ -329,6 +331,10 @@ class StepResult:
             raise TaskIRError(f"unknown step result status: {self.status!r}")
         for item in self.evidence:
             item.validate()
+        if self.reason_code:
+            _slug(self.reason_code, "step reason code")
+        if not isinstance(self.metadata, Mapping):
+            raise TaskIRError("step result metadata must be a mapping")
         if self.status == "ok" and self.output is None:
             raise TaskIRError(
                 f"successful step {self.step_id!r} has no output")
@@ -344,6 +350,8 @@ class StepResult:
             "output": self.output,
             "evidence": [item.to_dict() for item in self.evidence],
             "detail": self.detail,
+            "reason_code": self.reason_code,
+            "metadata": dict(self.metadata),
         }
 
     @classmethod
@@ -356,6 +364,8 @@ class StepResult:
                 EvidenceRef.from_dict(entry)
                 for entry in raw.get("evidence", ())),
             detail=str(raw.get("detail", "")),
+            reason_code=str(raw.get("reason_code", "")),
+            metadata=_mapping(raw.get("metadata"), "step result metadata"),
         )
         item.validate()
         return item

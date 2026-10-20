@@ -622,21 +622,27 @@ redesigned or dropped.
 ## 10. Immediate work queue
 
 1. **Phase 0 harness** — `crms_eval/`, `run_scorecard.py`, smoke suite,
-   baseline report.
+   baseline report. — done; broaden the suite next.
 2. **Freeze controls** — topic switch, source-only continuity, stale `why?`,
-   history, ordinals, compound omissions, where-question wording.
-3. **Land `v1_411`/`v1_412`** as dialogue controls.
-4. **RFC for `crms_tasks.py`** — types, planner bounds, action contract.
+   history, ordinals, compound omissions, where-question wording. — in progress;
+   controls exist, scorecard coverage is still partial.
+3. **Land `v1_411`/`v1_412`** as dialogue controls. — `v1_412` lands; `v1_411`
+   still needs teacher-labelled fixtures.
+4. **RFC for `crms_tasks.py`** — types, planner bounds, action contract. — done
+   (`docs/design_task_ir.md`).
 5. **RFC for `crms_rule_registry.py`** — record schema, lifecycle, validation
-   ladder, rollback, and how existing procedure/frame/rule stores migrate.
+   ladder, rollback, and how existing procedure/frame/rule stores migrate. —
+   done for procedures; frames and inference rules are next.
 6. **Learning baseline** — instrument current rules/procedures with use counts
-   and outcomes; measure today's compounding curve before changing it.
+   and outcomes; measure today's compounding curve before changing it. —
+   procedure use counts are live; the compounding benchmark is not.
 7. **Family A specification** — 10 tasks + independent oracle, frozen before
-   planner code.
+   planner code. — done
+   (`experiments/scorecard/family_a_spec.md`).
 8. **Corpus manifest v0** — inventory of candidate sources, licences, sizes,
-   and domain targets.
+   and domain targets. — next after Family A chat coverage.
 9. **Consolidate plan docs** — this file is canonical; link the others as
-   history.
+   history. — canonical status recorded; remaining docs still need pruning.
 
 ---
 
@@ -665,3 +671,4 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Family A frozen specification (10 positive tasks, 8 negative controls, independent oracle) before planner code | `experiments/scorecard/family_a_spec.md` |
 | 2026-10-21 | Deterministic plan executor: action registry, resolved step inputs, independent per-step and plan-level verification, no partial success | `crms_planner.py`, `docs/design_task_ir.md`, `experiments/v1_550_plan_executor_contract.py` |
 | 2026-10-21 | First Family A adapters: proof-verified value selection with explicit negatives/qualifiers, learned-procedure execution with parity verification, tamper/unknown/conflict controls | `crms_actions.py`, `experiments/v1_551_family_a_actions.py` |
+| 2026-10-21 | Legacy/plan parity for explicit verified-filter requests (status, evidence, procedure lineage, and rendered text); chat switched to the plan path, regex retained only as request compiler | `crms_task_composition.py`, `crms_chat.py`, `crms_tasks.py`, `crms_planner.py`, `experiments/v1_552_family_a_plan_parity.py` |

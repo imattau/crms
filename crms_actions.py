@@ -9,7 +9,7 @@ for parity with the stored procedure.
 from __future__ import annotations
 
 from dataclasses import asdict
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 from crms_knowledge import CRMSKnowledgeBase
 from crms_model import CRMSModel
@@ -75,6 +75,7 @@ class SelectVerifiedPositiveAction(Action):
         unknown: list[int] = []
         incomplete: list[int] = []
         evidence: list[EvidenceRef] = []
+        checks = 0
 
         for value in values:
             object_text = str(value)
@@ -99,6 +100,7 @@ class SelectVerifiedPositiveAction(Action):
                         "object": object_text,
                     },
                     expected_qualifiers=qualifiers)
+                checks += 1
                 if checked.valid:
                     verified_proof = proof
                     break
@@ -109,20 +111,47 @@ class SelectVerifiedPositiveAction(Action):
                         "fact", f"{subject} {relation} {object_text}",
                         source=sorted(fact.sources)[0] if fact.sources else None,
                         detail={"negative": True, "qualifiers": qualifiers,
-                                "object": object_text}))
+                                "object": object_text,
+                                "fact": asdict(fact),
+                                "sources": sorted(fact.sources)}))
+                proof_sources = sorted(_proof_leaf_sources(verified_proof))
+                evidence.append(EvidenceRef(
+                    "proof", f"{subject} {relation} {object_text}",
+                    source=proof_sources[0] if proof_sources else None,
+                    detail={
+                        "subject": subject,
+                        "relation": relation,
+                        "object": object_text,
+                        "qualifiers": qualifiers,
+                        "proof": verified_proof,
+                    }))
                 return StepResult(
                     step.id, "failed", evidence=tuple(evidence),
+                    reason_code="conflict",
+                    metadata={"conflict_value": value, "checks": checks},
                     detail=(f"both positive proof and explicit negative "
                             f"evidence exist for {subject} {relation} "
                             f"{object_text}"))
             if inference.status in {"ambiguous", "contradicted"}:
+                for fact in matched_negative:
+                    evidence.append(EvidenceRef(
+                        "fact", f"{subject} {relation} {object_text}",
+                        source=sorted(fact.sources)[0] if fact.sources else None,
+                        detail={"negative": True, "qualifiers": qualifiers,
+                                "object": object_text,
+                                "fact": asdict(fact),
+                                "sources": sorted(fact.sources)}))
                 return StepResult(
                     step.id, "failed", evidence=tuple(evidence),
+                    reason_code="conflict",
+                    metadata={"conflict_value": value, "checks": checks},
                     detail=(f"relation evidence for {subject} {relation} "
                             f"{object_text} is {inference.status}"))
             if inferred_conflict(inference):
                 return StepResult(
                     step.id, "failed", evidence=tuple(evidence),
+                    reason_code="conflict",
+                    metadata={"conflict_value": value, "checks": checks},
                     detail=(f"relation evidence for {subject} {relation} "
                             f"{object_text} conflicts"))
             if matched_negative:
@@ -133,6 +162,7 @@ class SelectVerifiedPositiveAction(Action):
                         source=sorted(fact.sources)[0] if fact.sources else None,
                         detail={"negative": True, "qualifiers": qualifiers,
                                 "object": object_text,
+                                "fact": asdict(fact),
                                 "sources": sorted(fact.sources)}))
                 continue
             if verified_proof is not None:
@@ -162,9 +192,24 @@ class SelectVerifiedPositiveAction(Action):
                 parts.append(f"incomplete relation search for values: {incomplete}")
             return StepResult(
                 step.id, "failed", evidence=tuple(evidence),
+                reason_code="unknown_values",
+                metadata={
+                    "included": list(selected),
+                    "excluded": list(excluded),
+                    "unresolved": list(unknown),
+                    "incomplete": list(incomplete),
+                    "checks": checks,
+                },
                 detail=("no partial selection is returned; " + "; ".join(parts)))
         return StepResult(
             step.id, "ok", output=selected, evidence=tuple(evidence),
+            reason_code="selected",
+            metadata={
+                "included": list(selected),
+                "excluded": list(excluded),
+                "unresolved": [],
+                "checks": checks,
+            },
             detail=(f"selected {selected}; excluded {excluded}; "
                     f"scope {qualifiers or 'unqualified'}"))
 
@@ -240,8 +285,12 @@ class ApplyLearnedProcedureAction(Action):
 
     name = "apply-learned-procedure"
 
-    def __init__(self, model: CRMSModel) -> None:
+    def __init__(self, model: CRMSModel,
+                 resolver: Callable[[str, list[int], bool],
+                                    tuple[str, Any, str | None]]
+                 | None = None) -> None:
         self.model = model
+        self.resolver = resolver
 
     def can_apply(self, inputs: Mapping[str, Any],
                   context: ExecutionContext) -> bool:
@@ -255,33 +304,64 @@ class ApplyLearnedProcedureAction(Action):
             and isinstance(instruction, str) and bool(instruction.strip())
         )
 
+    def _resolve(self, instruction: str, values: list[int],
+                 record_use: bool) -> tuple[str, Any, str | None]:
+        if self.resolver is not None:
+            return self.resolver(instruction, values, record_use)
+        return instruction, self.model.predict(
+            instruction, values, record_use=record_use), None
+
     def apply(self, step: Step, inputs: Mapping[str, Any],
               context: ExecutionContext) -> StepResult:
         instruction = str(inputs["instruction"]).strip()
         values = [int(value) for value in inputs["values"]]
-        prediction = self.model.predict(instruction, values)
+        licensed, prediction, morphology_note = self._resolve(
+            instruction, values, True)
         if prediction.status != "ok" or prediction.output is None:
             return StepResult(
                 step.id, "failed",
+                reason_code="procedure_unresolved",
+                metadata={"surface_instruction": instruction},
                 detail=(prediction.request or prediction.message
                         or f"procedure did not resolve: {prediction.status}"))
+        phrases = sorted(set(prediction.evidence_phrases or ()))
+        records = [
+            record
+            for phrase in phrases
+            for record in self.model.example_records(phrase)
+        ]
         evidence = EvidenceRef(
-            "procedure", instruction,
+            "procedure", licensed,
             detail={
+                "surface_instruction": instruction,
+                "licensed_instruction": licensed,
+                "morphology_note": morphology_note,
                 "procedure": prediction.procedure,
-                "evidence_phrases": list(prediction.evidence_phrases or ()),
-                "examples": self.model.example_records(instruction)[:5],
+                "evidence_phrases": phrases,
+                "examples": records,
             })
+        detail = f"applied learned procedure {licensed!r}"
+        if licensed != instruction:
+            detail += f" for the surface form {instruction!r}"
+        if morphology_note:
+            detail += f" (licensed morphology: {morphology_note})"
         return StepResult(
             step.id, "ok", output=list(prediction.output),
             evidence=(evidence,),
-            detail=f"applied learned procedure {instruction!r}")
+            reason_code="procedure_applied",
+            metadata={
+                "surface_instruction": instruction,
+                "licensed_instruction": licensed,
+                "morphology_note": morphology_note,
+            },
+            detail=detail)
 
     def verify(self, step: Step, inputs: Mapping[str, Any],
                result: StepResult, context: ExecutionContext) -> Verification:
         instruction = str(inputs["instruction"]).strip()
         values = [int(value) for value in inputs["values"]]
-        replay = self.model.predict(instruction, values, record_use=False)
+        licensed, replay, morphology_note = self._resolve(
+            instruction, values, False)
         if replay.status != "ok":
             return Verification(
                 False, f"stored procedure no longer resolves: {replay.status}")
@@ -296,6 +376,14 @@ class ApplyLearnedProcedureAction(Action):
         if recorded.detail.get("procedure") != replay.procedure:
             return Verification(
                 False, "procedure changed between execution and verification")
+        if recorded.detail.get("licensed_instruction") != licensed:
+            return Verification(
+                False, "licensed procedure changed between execution and "
+                       "verification")
+        if recorded.detail.get("morphology_note") != morphology_note:
+            return Verification(
+                False, "procedure morphology changed between execution and "
+                       "verification")
         return Verification(True)
 
 

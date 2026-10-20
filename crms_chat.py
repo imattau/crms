@@ -75,7 +75,7 @@ from crms_translation import (
     render as render_translation,
 )
 from crms_task_composition import (
-    compose_verified_filter, create_derived_composition_record,
+    compose_verified_filter_via_plan, create_derived_composition_record,
     is_explicit_aggregate_question, revalidate_derived_composition,
 )
 
@@ -8738,7 +8738,7 @@ def main() -> int:
                 print("CRMS> This composition has already been practiced in this "
                       "session; no additional practice event was recorded.")
                 continue
-            current = compose_verified_filter(request, knowledge, rules)
+            current = compose_verified_filter_via_plan(request, knowledge, rules)
             if (current is None or current.status != "answered"
                     or current.output_values != result.output_values
                     or current.inference_proofs != result.inference_proofs
@@ -10752,7 +10752,7 @@ def main() -> int:
             last_research_evidence = None
             latest_research_documents = []
             continue
-        reasoned_filter = compose_verified_filter(line, knowledge, rules)
+        reasoned_filter = compose_verified_filter_via_plan(line, knowledge, rules)
         if reasoned_filter is not None:
             last_reasoned_filter = reasoned_filter
             last_reasoned_filter_request = line

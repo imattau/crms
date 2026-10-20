@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-20T18:38:28+00:00",
+  "generated_at": "2026-10-20T19:06:20+00:00",
   "metadata": {
     "platform": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39",
     "project": "/home/lostcause/workspace/crms",
@@ -52,9 +52,9 @@
       }
     },
     "duration_s": {
-      "max": 0.437,
-      "median": 0.227,
-      "p95": 0.237
+      "max": 0.451,
+      "median": 0.234,
+      "p95": 0.247
     },
     "errors": 0,
     "failed": 0,
@@ -74,7 +74,7 @@
   "tasks": [
     {
       "category": "research",
-      "duration_s": 0.22836903104325756,
+      "duration_s": 0.2439422279712744,
       "failures": [],
       "id": "research-who-created-python",
       "known_failure": false,
@@ -86,7 +86,7 @@
     },
     {
       "category": "research",
-      "duration_s": 0.22856226901058108,
+      "duration_s": 0.24019062996376306,
       "failures": [],
       "id": "research-where-colosseum",
       "known_failure": false,
@@ -98,7 +98,7 @@
     },
     {
       "category": "research",
-      "duration_s": 0.23653779202140868,
+      "duration_s": 0.2421993109746836,
       "failures": [],
       "id": "research-compound",
       "known_failure": false,
@@ -110,7 +110,7 @@
     },
     {
       "category": "abstention",
-      "duration_s": 0.22154928604140878,
+      "duration_s": 0.21784480998758227,
       "failures": [],
       "id": "research-abstain-unknown",
       "known_failure": false,
@@ -122,7 +122,7 @@
     },
     {
       "category": "reload",
-      "duration_s": 0.4369152510189451,
+      "duration_s": 0.45124048204161227,
       "failures": [],
       "id": "research-reload",
       "known_failure": false,
@@ -134,7 +134,7 @@
     },
     {
       "category": "research",
-      "duration_s": 0.23105558997485787,
+      "duration_s": 0.2472121650353074,
       "failures": [],
       "id": "research-sqlite",
       "known_failure": false,
@@ -146,7 +146,7 @@
     },
     {
       "category": "math",
-      "duration_s": 0.20341759896837175,
+      "duration_s": 0.21293583698570728,
       "failures": [],
       "id": "math-add",
       "known_failure": false,
@@ -158,7 +158,7 @@
     },
     {
       "category": "math",
-      "duration_s": 0.22755139402579516,
+      "duration_s": 0.204606088984292,
       "failures": [],
       "id": "math-clarify-unknown",
       "known_failure": false,
@@ -170,7 +170,7 @@
     },
     {
       "category": "procedures",
-      "duration_s": 0.20462185598444194,
+      "duration_s": 0.2158969510346651,
       "failures": [],
       "id": "rules-reverse",
       "known_failure": false,
@@ -182,7 +182,7 @@
     },
     {
       "category": "procedures",
-      "duration_s": 0.2029262290452607,
+      "duration_s": 0.21795728203142062,
       "failures": [],
       "id": "rules-clarify-unteaching",
       "known_failure": false,
@@ -194,7 +194,7 @@
     },
     {
       "category": "dialogue",
-      "duration_s": 0.22642589296447113,
+      "duration_s": 0.2360494200256653,
       "failures": [],
       "id": "dialogue-history",
       "known_failure": false,
@@ -206,7 +206,7 @@
     },
     {
       "category": "research",
-      "duration_s": 0.22216569195734337,
+      "duration_s": 0.23097313602920622,
       "failures": [],
       "id": "research-date-anchored-pronoun",
       "known_failure": false,
