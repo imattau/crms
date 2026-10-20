@@ -1,8 +1,7 @@
 # Focused roadmap from current CRMS to its goal
 
 **Reviewed:** 2026-10-20, against the current checkout and recorded runtime
-evidence through `v1_540`; the in-progress `v1_541` subject-anchored location
-route is not yet part of the measured baseline.
+evidence through `v1_541`.
 **Status:** active execution plan. The broad capability goal is not yet
 demonstrated.
 
@@ -36,6 +35,14 @@ combine the right evidence, rules, procedures, and checks on a held-out task.
 synthetic corpus, but only 4 of 14 wording probes received source-backed
 answers; 6 answer-expected probes remained incomplete. This is useful scale
 and retrieval evidence, not broad language understanding.
+
+The `v1_541` runtime slice now answers a bounded `Where does ENTITY VERB?`
+question from an explicit subject, matching verb form, and cited locative
+phrase. Wrong entities, object-position mentions, unlicensed verb synonyms,
+and multiple locations are controlled; multiple cited locations are reported
+together rather than ranked. The new case and four adjacent natural-language
+and dialogue suites pass. This is a narrow source-grounded route, not evidence
+of general predicate or location understanding.
 
 Recombination, self-learning rules, reasoning, and dialogue are the central
 research priorities. Dialogue safety is also a release gate for every

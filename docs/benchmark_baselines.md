@@ -4343,3 +4343,25 @@ authored during development. It expands one non-list, source-grounded math
 slice; it is not a representative benchmark, independent participant study,
 publisher transfer, or broad math result. See the [runner](../experiments/v1_535_percentage_point_language_transfer.py)
 and [results](../experiments/reports/v1_535_percentage_point_language_transfer.json).
+
+## Subject-anchored locative questions (`v1_541`, 2026-10-20)
+
+Command: `python3 experiments/v1_541_subject_anchored_where_questions.py`.
+
+The bounded `Where does ENTITY VERB?` route finds a cited sentence only when
+the requested entity is the explicit subject and the verb matches the source
+verb or a supported inflection. It returns the source sentence as quoted
+evidence, not an accepted fact. Wrong numbered entities, verbs without a
+licensed alignment (`run` versus `flow`), and entities appearing only in
+object position abstain. When distinct explicit locative phrases are found,
+chat presents all cited sentences and does not select one by retrieval rank.
+The same experiment checks the helper and fresh CLI behavior; the adjacent
+`v1_295`, `v1_418`, `v1_420`, and `v1_427` natural-language/dialogue controls,
+syntax compilation, and `git diff --check` also pass.
+
+This is a narrow, synthetic source fixture and exact predicate route. It does
+not establish general `where` understanding, broad verb paraphrase, or
+location extraction from implicit subjects. Preserve the abstention and
+multiple-location controls as regressions.
+
+Report: [experiment](../experiments/v1_541_subject_anchored_where_questions.py).

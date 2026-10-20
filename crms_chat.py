@@ -1582,6 +1582,28 @@ def _natural_where_lookup(message: str) -> tuple[str, str] | None:
     return (entity, predicate) if entity else None
 
 
+def _natural_where_action_lookup(message: str) -> tuple[str, str] | None:
+    """Parse ``Where does ENTITY VERB?`` without assigning verb meaning."""
+    match = re.fullmatch(
+        r"\s*where\s+(?:does|did|do)\s+(?P<tail>.+?)\s*[?!.]?\s*",
+        message, flags=re.IGNORECASE)
+    if match is None:
+        return None
+    parts = match.group("tail").split()
+    if len(parts) < 2:
+        return None
+    entity = " ".join(parts[:-1]).strip()
+    predicate = parts[-1].strip(" ,;:").casefold()
+    entity = re.sub(r"^(?:the|a|an)\s+", "", entity,
+                    flags=re.IGNORECASE)
+    if (not entity or not predicate
+            or set(normalized_tokens(entity)) & {
+                "he", "she", "him", "her", "his", "hers", "they",
+                "them", "their", "theirs", "it", "its"}):
+        return None
+    return entity, predicate
+
+
 def _natural_typed_relation_question(
         message: str) -> tuple[str, str, str, str] | None:
     """Parse bounded typed-relation questions without alias guessing."""
@@ -3289,6 +3311,84 @@ def _exact_title_location_evidence(
                 index, hit, start, end, entity_tokens)
             if evidence is not None:
                 return evidence
+    return None
+
+
+def _explicit_subject_locative_evidence(
+        index: CRMSSQLiteResearchIndex, entity: str, predicate: str
+        ) -> dict[str, Any] | None:
+    """Find one asserted clause with an exact subject, verb and place phrase."""
+    entity_tokens = tuple(normalized_tokens(entity))
+    if not entity_tokens:
+        return None
+    entity_pattern = r"\s+".join(re.escape(token) for token in entity_tokens)
+    verb_pattern = re.compile(
+        r"(?P<verb>[A-Za-z][\w’'-]*)\s+"
+        r"(?P<preposition>through|across|along|within|near|from|to|in|at|on)\s+"
+        r"(?P<place>[^.!?;,:]+?)\s*[.!?]?\s*$",
+        flags=re.IGNORECASE)
+    found: dict[tuple[str, ...], dict[str, Any]] = {}
+    scanned_documents: set[str] = set()
+    for hit in index.search(entity, limit=100, context_chars=240):
+        if _is_code_source(hit.location):
+            continue
+        if hit.document_id in scanned_documents:
+            continue
+        scanned_documents.add(hit.document_id)
+        document = index.document(hit.document_id)
+        if (not document.pages and len(document.text) <= 250_000):
+            # Search snippets can select a different sentence in the same
+            # document because it repeats the entity. Inspect the bounded
+            # source document so the requested predicate can select its own
+            # sentence; the query and entity checks below still constrain it.
+            spans = _sentence_spans(document.text)
+        elif (0 <= hit.start < hit.end
+                and document.text[hit.start:hit.end] == hit.snippet):
+            spans = [(hit.start + start, hit.start + end)
+                     for start, end in _sentence_spans(hit.snippet)]
+        else:
+            spans = _sentence_spans(document.text)
+        for start, end in spans:
+            sentence = document.text[start:end].strip()
+            if (_sentence_context_kind(sentence, document.text, start)
+                    != "assertion"):
+                continue
+            subject = re.match(
+                r"^\s*(?:the\s+)?" + entity_pattern + r"\b\s+",
+                sentence, flags=re.IGNORECASE)
+            if subject is None:
+                continue
+            relation = verb_pattern.fullmatch(sentence[subject.end():])
+            if relation is None:
+                continue
+            source_verb = relation.group("verb").casefold()
+            requested_verb = predicate.casefold()
+            if (source_verb != requested_verb
+                    and _analyze_predicate_spelling(
+                        requested_verb, source_verb) is None
+                    and _analyze_predicate_spelling(
+                        source_verb, requested_verb) is None):
+                continue
+            place = relation.group("place").strip()
+            if (not place or re.search(
+                    r"\b(?:and|or|not|never|but|instead|rather|except)\b",
+                    place, flags=re.IGNORECASE)):
+                continue
+            evidence = _cited_sentence_evidence(
+                index, hit, start, end,
+                tuple(sorted(set(entity_tokens) | {source_verb})))
+            if evidence is None:
+                continue
+            evidence["locative_phrase"] = (
+                relation.group("preposition") + " " + place)
+            found.setdefault(tuple(normalized_tokens(place)), evidence)
+    if len(found) == 1:
+        return next(iter(found.values()))
+    if len(found) > 1:
+        # Multiple locations may all be true (a river can cross many cities).
+        # Preserve the evidence so chat can report the set instead of choosing
+        # a search-ranked location or claiming that no statement was found.
+        return {"ambiguous": True, "alternatives": list(found.values())}
     return None
 
 
@@ -11499,6 +11599,11 @@ def main() -> int:
                     turn.research.candidates = []
                     turn.research.status = "unknown"
         where_query = _natural_where_lookup(resolved_line)
+        where_action_query = (None if where_query is not None else
+                              _natural_where_action_lookup(resolved_line))
+        generic_where_action = where_action_query is not None
+        if where_query is None:
+            where_query = where_action_query
         where_evidence = None
         where_route_used = False
         if (where_query is not None
@@ -11515,15 +11620,46 @@ def main() -> int:
             if where_evidence is None:
                 where_evidence = _exact_title_location_evidence(
                     index, entity, predicate)
+            if where_evidence is None and generic_where_action:
+                where_evidence = _explicit_subject_locative_evidence(
+                    index, entity, predicate)
+                if (where_evidence is not None
+                        and not where_evidence.get("ambiguous")):
+                    where_evidence["realized_answer"] = {
+                        "text": where_evidence["text"],
+                        "source_title": where_evidence["title"],
+                        "citation": where_evidence["citation"],
+                        "method": "explicit-subject locative realization",
+                        "stored_as_fact": False,
+                    }
+                    if turn.research is not None:
+                        turn.research.source_sentences = [where_evidence]
+                        turn.research.realized_answer = dict(
+                            where_evidence["realized_answer"])
             if where_evidence is not None:
-                realized_location = where_evidence.get("realized_answer")
-                location_text = (realized_location.get("text")
-                                 if isinstance(realized_location, dict)
-                                 else None)
-                turn.text = (
-                    f"{location_text or 'The source says: ' + where_evidence['text']} "
-                    f"[Source: {where_evidence['title']}; quoted evidence, "
-                    "not an accepted fact]")
+                if where_evidence.get("ambiguous"):
+                    alternatives = where_evidence.get("alternatives", [])
+                    rendered_alternatives = [
+                        f'“{item["text"]}” [Source: {item["title"]}; '
+                        "quoted evidence, not an accepted fact]"
+                        for item in alternatives
+                    ]
+                    turn.text = (
+                        "I found multiple source statements for that question; "
+                        "they may describe multiple locations, so I won't "
+                        "choose one: " + "; ".join(rendered_alternatives))
+                    if turn.research is not None:
+                        turn.research.source_sentences = list(alternatives)
+                        turn.research.realized_answer = None
+                else:
+                    realized_location = where_evidence.get("realized_answer")
+                    location_text = (realized_location.get("text")
+                                     if isinstance(realized_location, dict)
+                                     else None)
+                    turn.text = (
+                        f"{location_text or 'The source says: ' + where_evidence['text']} "
+                        f"[Source: {where_evidence['title']}; quoted evidence, "
+                        "not an accepted fact]")
             else:
                 if turn.status in {"unknown", "sources_found"}:
                     location_labels = {
@@ -11532,9 +11668,14 @@ def main() -> int:
                         "based": "base",
                     }
                     location_label = location_labels.get(predicate, "location")
-                    turn.text = (
-                        f"I couldn't find a {location_label} statement for "
-                        f"{entity} in the indexed sources.")
+                    if generic_where_action:
+                        turn.text = (
+                            f"I couldn't find an asserted source sentence "
+                            f"answering ‘{resolved_line.strip()}’. I won't guess.")
+                    else:
+                        turn.text = (
+                            f"I couldn't find a {location_label} statement for "
+                            f"{entity} in the indexed sources.")
         who_question = bool(
             re.match(r"\s*(?:who|whom)\b", line, flags=re.IGNORECASE)
             or re.fullmatch(
