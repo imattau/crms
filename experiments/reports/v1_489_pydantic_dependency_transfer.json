@@ -1,0 +1,595 @@
+{
+  "audit": "v1_489",
+  "purpose": "package-disjoint proposal transfer diagnostic",
+  "package": "Pydantic",
+  "package_version": "2.13.4",
+  "installed_package_license": "MIT",
+  "scope": "Public importable functions and classes with docstrings in the installed package; not the complete online documentation site.",
+  "frozen_method_revision": "65b151ceb89989ad932937b6d6affe78c810ec90",
+  "method_sha256": {
+    "dependency_prototype": "e76606b2ab1ccc93fac00b33fe331990e0f4b1d20ae1e974269ed935f53c398d",
+    "assertion_status": "c5244a250ecb45d183ab046ea3c74eed20c1061df825bbd4febff3ed6d990cc1"
+  },
+  "parser": {
+    "library": "spaCy",
+    "version": "3.8.14",
+    "model": "en_core_web_sm",
+    "model_version": "3.8.0"
+  },
+  "counts": {
+    "importable_modules": 102,
+    "public_api_docstrings": 685,
+    "sentence_spans": 3402,
+    "sentences_with_will": 184,
+    "sentences_with_candidates": 176,
+    "sentences_without_candidates": 8,
+    "candidate_sample_size": 20,
+    "unhandled_sample_size": 8
+  },
+  "sampling": "For candidate and non-candidate rows separately, sort by SHA-256(api unit, sentence offset, text), then keep the first row per API unit and exact normalized sentence, up to 20.",
+  "proposal_sample": [
+    {
+      "sample_key": "01f819701e551598039d92e0ab93a01fa30d1be2d39004b1b8db86199cf51647",
+      "api_unit": "pydantic._internal._dataclasses.patch_base_fields",
+      "sentence_start": 1179,
+      "sentence_end": 1268,
+      "docstring_sha256": "ccdb4ede211880da3d7d6cf32c7d4f6b086da3e9fa4d19c479c4750a66d09e1f",
+      "source_citation": "pydantic:pydantic._internal._dataclasses.patch_base_fields#sha256=ccdb4ede211880da3d7d6cf32c7d4f6b086da3e9fa4d19c479c4750a66d09e1f&chars=1179:1268",
+      "sentence": "When this context manager is active, `A` will be temporarily patched to be\nequivalent to:",
+      "proposals": [
+        {
+          "subject": "`A`",
+          "predicate_phrase": "will be temporarily patched to be equivalent to:",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [
+            "condition: When this context manager is active"
+          ],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "structurally_usable"
+    },
+    {
+      "sample_key": "03896e5642ca75987f7e5f173d67024dc125dcaa4d56f9e1a139c20a48191202",
+      "api_unit": "pydantic.MongoDsn",
+      "sentence_start": 213,
+      "sentence_end": 298,
+      "docstring_sha256": "e39b894dcf652b721b3aa1d57983d794358f6b7bf414c456c1767f5ec609d687",
+      "source_citation": "pydantic:pydantic.MongoDsn#sha256=e39b894dcf652b721b3aa1d57983d794358f6b7bf414c456c1767f5ec609d687&chars=213:298",
+      "sentence": "warning\n    If a port isn't specified, the default MongoDB port `27017` will be used.",
+      "proposals": [
+        {
+          "subject": "the default MongoDB port `27017`",
+          "predicate_phrase": "will be used.",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [
+            "condition: If a port isn't specified"
+          ],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "structurally_usable"
+    },
+    {
+      "sample_key": "04c13f469b1745e558be640676c5e7195c23b4538c8420f99c632057653a0737",
+      "api_unit": "pydantic.v1.Field",
+      "sentence_start": 2584,
+      "sentence_end": 2736,
+      "docstring_sha256": "adab510e546e1c7e8d5fe2a4eecb34a6e9cba6f8466fbfc65c76888d89fa218e",
+      "source_citation": "pydantic:pydantic.v1.Field#sha256=adab510e546e1c7e8d5fe2a4eecb34a6e9cba6f8466fbfc65c76888d89fa218e&chars=2584:2736",
+      "sentence": "The schema will have a ``maxItems`` validation keyword\n:param unique_items: only applies to lists, requires the field not to have duplicated\n  elements.",
+      "proposals": [
+        {
+          "subject": "The schema",
+          "predicate_phrase": "will have a ``maxItems`` validation keyword :param unique_items",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "boundary_error"
+    },
+    {
+      "sample_key": "053e88ed35dce1eafc8a751e0a5cc5700658d2b5081fd6254642e717115da655",
+      "api_unit": "pydantic.NatsDsn",
+      "sentence_start": 0,
+      "sentence_end": 37,
+      "docstring_sha256": "43c39c3e6928b04cf7608a8a9369207ad927f8ef66cc6f053e9091da26b00667",
+      "source_citation": "pydantic:pydantic.NatsDsn#sha256=43c39c3e6928b04cf7608a8a9369207ad927f8ef66cc6f053e9091da26b00667&chars=0:37",
+      "sentence": "A type that will accept any NATS DSN.",
+      "proposals": [
+        {
+          "subject": "that",
+          "predicate_phrase": "will accept any NATS DSN",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "context_needed"
+    },
+    {
+      "sample_key": "0871617114ce97833eefc32154c2af9891d498d9d2b126b16b9bc6bb9537f185",
+      "api_unit": "pydantic.Field",
+      "sentence_start": 4389,
+      "sentence_end": 4463,
+      "docstring_sha256": "279e8de5b621df66f9379aec53b354594043b7a05c05ce9dba9f5e3bfda00935",
+      "source_citation": "pydantic:pydantic.Field#sha256=279e8de5b621df66f9379aec53b354594043b7a05c05ce9dba9f5e3bfda00935&chars=4389:4463",
+      "sentence": "extra: (Deprecated) Extra fields that will be included in the JSON schema.",
+      "proposals": [
+        {
+          "subject": "that",
+          "predicate_phrase": "will be included in the JSON schema",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "context_needed"
+    },
+    {
+      "sample_key": "0a18a81e716fb0a6ce7864fd60eb4d0d750391291be4fec1bf4e97f1fd6db585",
+      "api_unit": "pydantic.v1.AmqpDsn",
+      "sentence_start": 123,
+      "sentence_end": 265,
+      "docstring_sha256": "fdf09be211280cf353c7e4ee94bd008d236e8f5bde1d9ed6f3e563cf34715d92",
+      "source_citation": "pydantic:pydantic.v1.AmqpDsn#sha256=fdf09be211280cf353c7e4ee94bd008d236e8f5bde1d9ed6f3e563cf34715d92&chars=123:265",
+      "sentence": "If encoding or\nerrors is specified, then the object must expose a data buffer\nthat will be decoded using the given encoding and error handler.",
+      "proposals": [
+        {
+          "subject": "then the object must expose a data buffer that",
+          "predicate_phrase": "will be decoded using the given encoding and error handler",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [
+            "condition: If encoding or\nerrors is specified"
+          ],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "boundary_error"
+    },
+    {
+      "sample_key": "0c79fc1da914ef74667a635cc75a1daa5a8d304ce83505f11cc71a0778d9571e",
+      "api_unit": "pydantic.field_serializer",
+      "sentence_start": 1508,
+      "sentence_end": 1576,
+      "docstring_sha256": "a3fc44d48eefcffec28091c150e6ac4a1cafb94ab9e4f288e16031ea487bd1eb",
+      "source_citation": "pydantic:pydantic.field_serializer#sha256=a3fc44d48eefcffec28091c150e6ac4a1cafb94ab9e4f288e16031ea487bd1eb&chars=1508:1576",
+      "sentence": "when_used: Determines the serializer will be used for serialization.",
+      "proposals": [
+        {
+          "subject": "the serializer",
+          "predicate_phrase": "will be used for serialization",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "context_needed"
+    },
+    {
+      "sample_key": "0eee88c4c60882d36d5c29ce3ee90b72a24680ba2817dd109fa66349af14623f",
+      "api_unit": "pydantic.model_serializer",
+      "sentence_start": 1253,
+      "sentence_end": 1475,
+      "docstring_sha256": "0040518466312d50c8489242de49249ed8a37efa118c7f69022d03ed8b5650e4",
+      "source_citation": "pydantic:pydantic.model_serializer#sha256=0040518466312d50c8489242de49249ed8a37efa118c7f69022d03ed8b5650e4&chars=1253:1475",
+      "sentence": "- `'plain'` means the function will be called instead of the default serialization logic\n        - `'wrap'` means the function will be called with an argument to optionally call the default\n            serialization logic.",
+      "proposals": [
+        {
+          "subject": "the function",
+          "predicate_phrase": "will be called instead of",
+          "polarity": true,
+          "quoted": true,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        },
+        {
+          "subject": "the function",
+          "predicate_phrase": "will be called with an argument to optionally call the default serialization logic",
+          "polarity": true,
+          "quoted": true,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "boundary_error"
+    },
+    {
+      "sample_key": "11685752f3d95b9e94aa2c204d676bf0af49bf3171036feef367c8f74f18dd55",
+      "api_unit": "pydantic.v1.generics.WeakKeyDictionary",
+      "sentence_start": 44,
+      "sentence_end": 142,
+      "docstring_sha256": "029f3a5162b1243b26adf30f764009fdb01b3f2d19564288e15ef78ca45bbb07",
+      "source_citation": "pydantic:pydantic.v1.generics.WeakKeyDictionary#sha256=029f3a5162b1243b26adf30f764009fdb01b3f2d19564288e15ef78ca45bbb07&chars=44:142",
+      "sentence": "Entries in the dictionary will be discarded when there is no\nlonger a strong reference to the key.",
+      "proposals": [
+        {
+          "subject": "Entries in the dictionary",
+          "predicate_phrase": "will be discarded",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [
+            "condition: when there is no\nlonger a strong reference to the key"
+          ],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "structurally_usable"
+    },
+    {
+      "sample_key": "13f428576f765c35758e8fa52d07bd58a63fdd77a44cc2002a2268ea8777a578",
+      "api_unit": "pydantic.TypeAdapter",
+      "sentence_start": 1277,
+      "sentence_end": 1364,
+      "docstring_sha256": "804088ab0ceb8636f914540495792199a7bd748a697ddf9e0a49b9cd344256da",
+      "source_citation": "pydantic:pydantic.TypeAdapter#sha256=804088ab0ceb8636f914540495792199a7bd748a697ddf9e0a49b9cd344256da&chars=1277:1364",
+      "sentence": "Defaults to 2, which will result in the frame where the `TypeAdapter` was instantiated.",
+      "proposals": [
+        {
+          "subject": "which",
+          "predicate_phrase": "will result in the frame where the `TypeAdapter` was instantiated",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "context_needed"
+    },
+    {
+      "sample_key": "155ce583e4e1ef1938ce5826e3f136296a3705f1876c2b5f7d27fbb1529aca5d",
+      "api_unit": "pydantic.Secret",
+      "sentence_start": 246,
+      "sentence_end": 376,
+      "docstring_sha256": "e47fc925ce3fb25bd509e3929ef6c95d18bc5b0a5cb34fc21cabce39518e7474",
+      "source_citation": "pydantic:pydantic.Secret#sha256=e47fc925ce3fb25bd509e3929ef6c95d18bc5b0a5cb34fc21cabce39518e7474&chars=246:376",
+      "sentence": "The benefit of subclassing\nis that you can define a custom `_display` method, which will be used for `repr()` and `str()` methods.",
+      "proposals": [
+        {
+          "subject": "which",
+          "predicate_phrase": "will be used for `repr",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "boundary_error"
+    },
+    {
+      "sample_key": "1582861b3a616123d537032d604d4ab5ed88607bb3f7450899e3466fd3097e12",
+      "api_unit": "pydantic.ImportString",
+      "sentence_start": 719,
+      "sentence_end": 804,
+      "docstring_sha256": "623839360956cd42607f170698fe8537d7a4a4d0e7b4e313be6422e5d76f5c83",
+      "source_citation": "pydantic:pydantic.ImportString#sha256=623839360956cd42607f170698fe8537d7a4a4d0e7b4e313be6422e5d76f5c83&chars=719:804",
+      "sentence": "# A string value will cause an automatic import\nmy_cos = ImportThings(obj='math.cos')",
+      "proposals": [
+        {
+          "subject": "# A string value",
+          "predicate_phrase": "will cause an automatic import my_cos = ImportThings(obj='math.cos')",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "boundary_error"
+    },
+    {
+      "sample_key": "177b69960ae9aed959ecbb2719461ff44878a70b7322c95cf4dc3a21aacdd820",
+      "api_unit": "pydantic.Tag",
+      "sentence_start": 2160,
+      "sentence_end": 2319,
+      "docstring_sha256": "8575189ca03f2a15bf2762b9db4e3a4a765d882afffaafe819c2a903ab723e16",
+      "source_citation": "pydantic:pydantic.Tag#sha256=8575189ca03f2a15bf2762b9db4e3a4a765d882afffaafe819c2a903ab723e16&chars=2160:2319",
+      "sentence": "Failing to do so will result in a `PydanticUserError` with code\n    [`callable-discriminator-no-tag`](../errors/usage_errors.md#callable-discriminator-no-tag).",
+      "proposals": [
+        {
+          "subject": "Failing to do so",
+          "predicate_phrase": "will result in a `PydanticUserError` with code [`callable-discriminator-no-tag`](../errors/usage_errors.md#callable-discriminator-no-tag).",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "context_needed"
+    },
+    {
+      "sample_key": "1988a0deab58740e3faf0282ba491481439f5fc97c39bb947be78ee8f6c82863",
+      "api_unit": "pydantic._internal._discriminated_union.apply_discriminator",
+      "sentence_start": 98,
+      "sentence_end": 173,
+      "docstring_sha256": "60cc32ae9e27e9385904bddd9b57b968452160b98143adee3bb07dd8988ff8ba",
+      "source_citation": "pydantic:pydantic._internal._discriminated_union.apply_discriminator#sha256=60cc32ae9e27e9385904bddd9b57b968452160b98143adee3bb07dd8988ff8ba&chars=98:173",
+      "sentence": "discriminator: The name of the field which will serve as the discriminator.",
+      "proposals": [
+        {
+          "subject": "which",
+          "predicate_phrase": "will serve as the discriminator",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "context_needed"
+    },
+    {
+      "sample_key": "1b72bdb17dbed9606824693b53e2f2cea3fdb0287354db9828723bb25b38987e",
+      "api_unit": "pydantic._internal._model_construction.ABCMeta",
+      "sentence_start": 248,
+      "sentence_end": 575,
+      "docstring_sha256": "288ad2e805be055e51c15f20165bab4c4198b8b5a3dd1ed1f317f3b0d82fc45d",
+      "source_citation": "pydantic:pydantic._internal._model_construction.ABCMeta#sha256=288ad2e805be055e51c15f20165bab4c4198b8b5a3dd1ed1f317f3b0d82fc45d&chars=248:575",
+      "sentence": "ABCs as 'virtual subclasses' -- these and their descendants will\nbe considered subclasses of the registering ABC by the built-in\nissubclass() function, but the registering ABC won't show up in\ntheir MRO (Method Resolution Order) nor will method\nimplementations defined by the registering ABC be callable (not\neven via super()).",
+      "proposals": [
+        {
+          "subject": "these and their descendants",
+          "predicate_phrase": "will be considered subclasses of the registering ABC by the built-in issubclass() function, but the registering ABC won't show up in their MRO (Method Resolution Order) nor will method implementations defined by the registering ABC be callable (not even via super()).",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        },
+        {
+          "subject": "the registering ABC",
+          "predicate_phrase": "will method implementations defined by the registering ABC",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [
+            "shared subject inherited from coordinated clause"
+          ],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "boundary_error"
+    },
+    {
+      "sample_key": "1bf70f9a7e6841703b6e78339991de36766d2f0c73d5e788f93a3b038578babc",
+      "api_unit": "pydantic.WrapSerializer",
+      "sentence_start": 1846,
+      "sentence_end": 1902,
+      "docstring_sha256": "aa87da598f367bbcd7f392b4ac21839c889a92b159509d65f6ba335796b76d3f",
+      "source_citation": "pydantic:pydantic.WrapSerializer#sha256=aa87da598f367bbcd7f392b4ac21839c889a92b159509d65f6ba335796b76d3f&chars=1846:1902",
+      "sentence": "If omitted it will be inferred from the type annotation.",
+      "proposals": [
+        {
+          "subject": "it",
+          "predicate_phrase": "will be inferred from the type annotation.",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [
+            "condition: If omitted"
+          ],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "context_needed"
+    },
+    {
+      "sample_key": "1e10200739954fe77e4e750c4981617f94f283367095f46615a43529abbd4805",
+      "api_unit": "pydantic.v1.schema.get_flat_models_from_field",
+      "sentence_start": 215,
+      "sentence_end": 532,
+      "docstring_sha256": "dfa9140ecd124f25b799dec311039137249ed43bc9a4335e8902b9e45ac09d55",
+      "source_citation": "pydantic:pydantic.v1.schema.get_flat_models_from_field#sha256=dfa9140ecd124f25b799dec311039137249ed43bc9a4335e8902b9e45ac09d55&chars=215:532",
+      "sentence": "if you pass a field that was declared to be of type ``Foo`` (subclass of BaseModel) as ``field``, and that\nmodel ``Foo`` has a field of type ``Bar`` (also subclass of ``BaseModel``) and that model ``Bar`` has a field of\ntype ``Baz`` (also subclass of ``BaseModel``), the return value will be ``set([Foo, Bar, Baz])``.",
+      "proposals": [
+        {
+          "subject": "and that model ``Foo`` has a field of type ``Bar`` (also subclass of ``BaseModel``) and that model ``Bar`` has a field of type ``Baz`` (also subclass of ``BaseModel``), the return value",
+          "predicate_phrase": "will be ``set([Foo, Bar, Baz])``.",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [
+            "condition: if you pass a field that was declared to be of type ``Foo`` (subclass of BaseModel) as ``field``"
+          ],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "context_needed"
+    },
+    {
+      "sample_key": "1e6caa4c45ab341d0818723344ff48186bc948df6dfc397a172613658364534a",
+      "api_unit": "pydantic.SnowflakeDsn",
+      "sentence_start": 0,
+      "sentence_end": 42,
+      "docstring_sha256": "7e7376d92ae8ff3767146c717e4e6efc1a67efb834394897d34389c8dc067c69",
+      "source_citation": "pydantic:pydantic.SnowflakeDsn#sha256=7e7376d92ae8ff3767146c717e4e6efc1a67efb834394897d34389c8dc067c69&chars=0:42",
+      "sentence": "A type that will accept any Snowflake DSN.",
+      "proposals": [
+        {
+          "subject": "that",
+          "predicate_phrase": "will accept any Snowflake DSN",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "context_needed"
+    },
+    {
+      "sample_key": "2112e9934dd310bb6a6916c800c250305fa59ebb906bb38d15e2838a82cda500",
+      "api_unit": "pydantic._internal._decorators.is_instance_method_from_sig",
+      "sentence_start": 45,
+      "sentence_end": 137,
+      "docstring_sha256": "9f22c9fda16db0ad244e8e87b1dc88acf6edc6286e0e3644111d5f2e331eba39",
+      "source_citation": "pydantic:pydantic._internal._decorators.is_instance_method_from_sig#sha256=9f22c9fda16db0ad244e8e87b1dc88acf6edc6286e0e3644111d5f2e331eba39&chars=45:137",
+      "sentence": "It will consider a function as instance method if the first parameter of\nfunction is `self`.",
+      "proposals": [
+        {
+          "subject": "It",
+          "predicate_phrase": "will consider a function as instance method",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [
+            "condition: if the first parameter of\nfunction is `self"
+          ],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "context_needed"
+    },
+    {
+      "sample_key": "267472f2db8267cbd1a72d020737c4ee35224c0f0f380a6ee409c08f76994346",
+      "api_unit": "pydantic._internal._typing_extra.try_eval_type",
+      "sentence_start": 150,
+      "sentence_end": 222,
+      "docstring_sha256": "90a70bae6b8a386cce904e3bd3a1c78a58070d32d8524d5c8e460f7846f0ec8a",
+      "source_citation": "pydantic:pydantic._internal._typing_extra.try_eval_type#sha256=90a70bae6b8a386cce904e3bd3a1c78a58070d32d8524d5c8e460f7846f0ec8a&chars=150:222",
+      "sentence": "If an instance\n        of `str`, it will be converted to a `ForwardRef`.",
+      "proposals": [
+        {
+          "subject": "it",
+          "predicate_phrase": "will be converted to a `ForwardRef`.",
+          "polarity": true,
+          "quoted": false,
+          "scope_notes": [
+            "condition: If an instance\n        of `str`"
+          ],
+          "assertion_status": "asserted",
+          "status": "needs_review"
+        }
+      ],
+      "manual_label": "context_needed"
+    }
+  ],
+  "unhandled_sample": [
+    {
+      "sample_key": "1996eefce8f426fd3bc435c55442bf605225b8d9581c795996512653c53b58fb",
+      "api_unit": "pydantic._internal._decorators.islice",
+      "sentence_start": 180,
+      "sentence_end": 271,
+      "docstring_sha256": "a96939b176610e3d33c1b7184108d911e0d19a31149f139882b334530308ba52",
+      "source_citation": "pydantic:pydantic._internal._decorators.islice#sha256=a96939b176610e3d33c1b7184108d911e0d19a31149f139882b334530308ba52&chars=180:271",
+      "sentence": "If start is specified, will skip all preceding elements;\notherwise, start defaults to zero.",
+      "manual_label": "context_needed_behavior_claim"
+    },
+    {
+      "sample_key": "4adc0827d59f5888a6b8baca580f9f032ad5513daffc402b32477dc09e8194d9",
+      "api_unit": "pydantic._internal._dataclasses.FieldInfo",
+      "sentence_start": 378,
+      "sentence_end": 550,
+      "docstring_sha256": "c7f0386f8b25654844a59e50cb4804579f6a65d67d18bff2fb1a204c96fea80d",
+      "source_citation": "pydantic:pydantic._internal._dataclasses.FieldInfo#sha256=c7f0386f8b25654844a59e50cb4804579f6a65d67d18bff2fb1a204c96fea80d&chars=378:550",
+      "sentence": "If you need to derive a new model from another one and are willing to alter `FieldInfo` instances,\n    refer to this [dynamic model example](../examples/dynamic_models.md).",
+      "manual_label": "not_target_claim"
+    },
+    {
+      "sample_key": "871feee4d40d129220548664e5a191a175333c1b1d58e1a530f1b92c0a80812a",
+      "api_unit": "pydantic.WithJsonSchema",
+      "sentence_start": 1432,
+      "sentence_end": 1590,
+      "docstring_sha256": "684f487b7d5c506886e97e3970095880a194af84384cf9758f65d23969409ef8",
+      "source_citation": "pydantic:pydantic.WithJsonSchema#sha256=684f487b7d5c506886e97e3970095880a194af84384cf9758f65d23969409ef8&chars=1432:1590",
+      "sentence": "* If the [`Annotated`][typing.Annotated] metadata is specified on a specific inner type, `WithJsonSchema` will unconditionally\n      override the JSON Schema:",
+      "manual_label": "plausible_behavior_claim"
+    },
+    {
+      "sample_key": "a7f1cd861794a976a63db9b3675c46503734124822cc3621fdaa726a1dac3655",
+      "api_unit": "pydantic.v1.annotated_types.is_typeddict",
+      "sentence_start": 78,
+      "sentence_end": 187,
+      "docstring_sha256": "959c65a0d42003c85a3cbab0745fa9a4d05eeb3d5b77ed004e9199ff133c97a7",
+      "source_citation": "pydantic:pydantic.v1.annotated_types.is_typeddict#sha256=959c65a0d42003c85a3cbab0745fa9a4d05eeb3d5b77ed004e9199ff133c97a7&chars=78:187",
+      "sentence": "In 3.10, there will be a public method (https://docs.python.org/3.10/library/typing.html#typing.is_typeddict)",
+      "manual_label": "plausible_behavior_claim"
+    },
+    {
+      "sample_key": "b901a05e817194eca478cb9c2fdf581c031bf42383e139b9f4b77fd7e3f42fb8",
+      "api_unit": "pydantic.v1.generics.get_caller_frame_info",
+      "sentence_start": 64,
+      "sentence_end": 146,
+      "docstring_sha256": "4d4dd7b9e8262b4cf88baa97d20ff40958a4758b6d7f47f81cb2d4a80713f1f7",
+      "source_citation": "pydantic:pydantic.v1.generics.get_caller_frame_info#sha256=4d4dd7b9e8262b4cf88baa97d20ff40958a4758b6d7f47f81cb2d4a80713f1f7&chars=64:146",
+      "sentence": "Will only work against non-compiled code, therefore used only in pydantic.generics",
+      "manual_label": "context_needed_behavior_claim"
+    },
+    {
+      "sample_key": "cf6523cd17ce6151dfb86dc618593f6e36cf42520908be9619891cbe38766cde",
+      "api_unit": "pydantic._internal._core_utils.pps",
+      "sentence_start": 432,
+      "sentence_end": 535,
+      "docstring_sha256": "4970eb471ba8ef394109c4d69d59b16f0326426c831bf0356beff9921fd27719",
+      "source_citation": "pydantic:pydantic._internal._core_utils.pps#sha256=4970eb471ba8ef394109c4d69d59b16f0326426c831bf0356beff9921fd27719&chars=432:535",
+      "sentence": "If `True` any known core metadata\n        attributes will be stripped (but custom attributes are kept).",
+      "manual_label": "plausible_behavior_claim"
+    },
+    {
+      "sample_key": "e0e3acc05c0bcf6f2e1a17a2d3af537691d2be93d093f05ed37623af2161e609",
+      "api_unit": "pydantic.ByteSize",
+      "sentence_start": 718,
+      "sentence_end": 785,
+      "docstring_sha256": "a1fda5ab6ab8712889783c61553f1956fff87e5f8011d207211fcd6559b17e8a",
+      "source_citation": "pydantic:pydantic.ByteSize#sha256=a1fda5ab6ab8712889783c61553f1956fff87e5f8011d207211fcd6559b17e8a&chars=718:785",
+      "sentence": "info\n    Note that `1b` will be parsed as \"1 byte\" and not \"1 bit\".",
+      "manual_label": "plausible_behavior_claim"
+    },
+    {
+      "sample_key": "e43976f4a1dc0aa30346c11aeb793be21d5d2b2f839257b8294bd3df5ee38899",
+      "api_unit": "pydantic._internal._generate_schema.Fraction",
+      "sentence_start": 41,
+      "sentence_end": 150,
+      "docstring_sha256": "9cbfc60af15e83e226717b0027838c022872460268bd17f7ec22b096b0dcbd0b",
+      "source_citation": "pydantic:pydantic._internal._generate_schema.Fraction#sha256=9cbfc60af15e83e226717b0027838c022872460268bd17f7ec22b096b0dcbd0b&chars=41:150",
+      "sentence": "In the two-argument form of the constructor, Fraction(8, 6) will\nproduce a rational number equivalent to 4/3.",
+      "manual_label": "plausible_behavior_claim"
+    }
+  ],
+  "manual_review": {
+    "reviewer": "Codex",
+    "candidate_sample_labels": {
+      "structurally_usable": 3,
+      "boundary_error": 6,
+      "context_needed": 11
+    },
+    "unhandled_sample_labels": {
+      "context_needed_behavior_claim": 2,
+      "not_target_claim": 1,
+      "plausible_behavior_claim": 5
+    },
+    "candidate_label_definitions": {
+      "structurally_usable": "Sentence citation alone gives a coherent subject, relation, and scope for review.",
+      "context_needed": "Claim may be valid, but a pronoun, omitted subject, parameter heading, or antecedent needs cited context.",
+      "boundary_error": "Extracted fields misbound the subject or predicate, merged clauses, or included markup/example debris."
+    },
+    "interpretation": "Single-rater review of a frozen sample; labels are not precision or recall estimates."
+  },
+  "limitations": [
+    "Package docstrings are not the complete publisher documentation.",
+    "The sample is frozen before semantic review; candidate count is not precision.",
+    "This evaluates one construction family containing 'will', not general source learning.",
+    "All proposals remain review-only and no rule store is modified."
+  ]
+}

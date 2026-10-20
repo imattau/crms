@@ -301,6 +301,22 @@ malformed-boundary controls. See the
 [`v1_487 prototype`](../experiments/audits/v1_487_spacy_dependency_prototype.py)
 and [`v1_487 report`](../experiments/reports/v1_487_spacy_dependency_prototype.json).
 
+The refined method was then frozen at commit `65b151c` and applied to the
+installed Pydantic 2.13.4 package in `v1_489`, before inspecting its selected
+rows. The corpus contains 685 public callable/class docstrings, 3,402 sentence
+spans, and 184 sentences with `will`; the method proposed on 176 and missed 8.
+In the hash-selected proposal sample, Codex labeled 3/20 structurally usable
+from the sentence alone, 11/20 as needing cited context, and 6/20 as boundary
+errors. Of the eight non-proposals, five appeared to state behavior, two
+needed context, and one was not a target claim. This is a single-rater,
+package-docstring diagnostic, not a precision/recall estimate or complete
+publisher-document test. It shows that context preservation is now the main
+loss for this parser, while boundary errors remain. Keep Pydantic as
+development data; redesign candidate records to keep claim, antecedent,
+parameter heading, and condition spans separately cited, then freeze a new
+package before testing that design. See the [`v1_489 audit`](../experiments/audits/v1_489_pydantic_dependency_transfer.py)
+and [`v1_489 report`](../experiments/reports/v1_489_pydantic_dependency_transfer.json).
+
 Use the existing excerpt and real-source acceptance experiments as regression
 controls, not as a corpus-level result. If a suitable corpus does not contain
 enough examples, change the learning signal or narrow the claim; do not add
@@ -412,10 +428,11 @@ recombination and verified reasoning. Work proceeds in this order:
 3. **Redesign and then test source-derived rule transfer.** API scans have
    shown high candidate yield, while the PyTorch and SciPy reviews show severe
    boundary errors and missed claims. The frozen method is now a baseline, not
-   a candidate for promotion. Use the reviewed NumPy/pandas/PyTorch/SciPy rows
-   as development controls to redesign general clause boundaries, role
-   binding, conditions, and markup handling. Then freeze that method and
-   confirm on untouched API units and a publisher not used for design, with
+   a candidate for promotion. Use the reviewed
+   NumPy/pandas/PyTorch/SciPy/Pydantic rows as development controls to redesign
+   general clause boundaries, role binding, conditions, markup handling, and
+   separately cited context bundles. Then freeze that method and confirm on
+   untouched API units and a publisher not used for design, with
    proposals and non-proposals sampled and labeled before inspection. Measure
    useful claims, false proposals, missed claims, abstention, and review
    effort; if it fails, redesign and reserve a fresh holdout.
