@@ -156,6 +156,12 @@ _NON_TERMINAL_ABBREVIATIONS = {
 }
 _ABBREVIATION_FOLLOWING_PROPER_NOUN = re.compile(
     r"\s+([A-Z][\w’'-]*)\b")
+_DOTTED_INITIALISM = re.compile(r"(?:[A-Z]\.){2,}$")
+_INITIALISM_SENTENCE_STARTERS = frozenset({
+    "a", "an", "and", "but", "he", "her", "here", "his", "however",
+    "i", "in", "it", "meanwhile", "she", "that", "the", "these",
+    "they", "this", "those", "we", "when", "where", "which", "who",
+})
 
 
 def _is_sentence_boundary(text: str, index: int) -> bool:
@@ -179,6 +185,24 @@ def _is_sentence_boundary(text: str, index: int) -> bool:
                 in _NON_TERMINAL_ABBREVIATIONS):
         next_word = _ABBREVIATION_FOLLOWING_PROPER_NOUN.match(text, index + 1)
         if next_word is not None:
+            return False
+    # Preserve a person's middle initial when followed by a surname:
+    # “President John F. Kennedy”.
+    initial_prefix = text[max(0, index - 4):index]
+    if re.search(r"(?:^|\s)[A-Z]$", initial_prefix):
+        next_name = _ABBREVIATION_FOLLOWING_PROPER_NOUN.match(text, index + 1)
+        if next_name is not None:
+            return False
+    # Dotted initialisms such as U.S. and U.K. are often followed by a
+    # lowercase noun (“U.S. forces”) or a capitalized title (“U.S. Secretary”).
+    # Do not turn those continuations into a false sentence ending. Common
+    # sentence starters still terminate a sentence (“...in the U.S. It ...”).
+    initialism_prefix = text[max(0, index - 16):index + 1]
+    if _DOTTED_INITIALISM.search(initialism_prefix):
+        following = re.match(r"\s+([A-Za-z][\w’'-]*)\b", text[index + 1:])
+        if (following is not None
+                and following.group(1).casefold()
+                    not in _INITIALISM_SENTENCE_STARTERS):
             return False
     return True
 

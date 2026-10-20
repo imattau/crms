@@ -1219,8 +1219,10 @@ Command: `python3 experiments/v1_331_real_corpus_alignment_sample.py`
 The read-only diagnostic sampled four 1,000-document windows (offsets 0, 25,000, 75,000,
 and 150,000) from the local 285,478-document SimpleWiki index, processing at most 12,000
 sentences per window. After rejecting candidates whose grammatical subject was resolved only
-from the article title, it found 1, 1, 1, and 4 repeated relation frames respectively, and no
-cross-predicate alignment proposals in any window. It accepted no rules and made no index writes.
+from the article title, the current checkout found 1, 3, 1, and 5 repeated relation frames
+respectively, and no cross-predicate alignment proposals in any window. It accepted no rules
+and made no index writes. The 2026-10-20 rerun after sentence-boundary changes passed the
+read-only sampler in 4.86 seconds.
 
 This is evidence that the strict shared-subject/object alignment path has low yield in these
 bounded samples, not evidence that the corpus contains no useful paraphrase pairs. Windows are
@@ -1228,9 +1230,14 @@ not exhaustive, and the frame counts are not precision estimates. The `born in` 
 show sentence-level extraction relying on article context (`He was born in Swansea`), so proposed
 rules must retain exact source citations and remain reviewable. Corpus frame mining now excludes
 such page-title substitutions because they do not establish the pronoun antecedent strongly
-enough for reusable language rules. Treat this as a motivation to improve corpus candidate recall
-and context validation together; do not lower the independent-pair or human-review requirements
-based on this sample.
+enough for reusable language rules. A read-only inspection of the Ban Ki-moon source also found
+that “U.S.” and the following middle initial in “John F. Kennedy” had been treated as sentence
+punctuation, yielding a truncated meeting candidate. Sentence splitting now keeps dotted
+initialisms with their continuation and middle initials with surnames; on rerun, the complete
+sentence is preserved and that under-specified “met → U.S.” frame is no longer proposed.
+`v1_457_dotted_initialism_sentence_boundaries.py` checks those boundaries and exact source spans.
+Treat this as a motivation to improve corpus candidate recall and context validation together;
+do not lower the independent-pair or human-review requirements based on this sample.
 
 ## Structured-field supervision probe for predicate learning
 
