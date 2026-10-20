@@ -1,0 +1,268 @@
+{
+  "audit": "v1_480_sklearn_procedure_candidate_review",
+  "date": "2026-10-20",
+  "limits": [
+    "The corpus was scanned and sample sentences inspected before this sample was frozen; it is exploratory, not untouched transfer.",
+    "Docstrings are complete callable reference units, not complete documentation pages.",
+    "The scan conditions on sentences containing 'will'; it says nothing about other constructions.",
+    "High candidate yield is not semantic precision, useful rule yield, or recall.",
+    "No candidate was accepted, installed, or used to tune the parser.",
+    "The sample is deterministic and one-per-unit, but not a probability sample."
+  ],
+  "sample": {
+    "label_counts": {
+      "boundary_error": 3,
+      "context_needed": 3,
+      "reviewable": 6
+    },
+    "label_protocol": "Unblinded, single Codex review of exact sentence and fields. Labels are a diagnostic, not independent validation or a probability-sample precision estimate.",
+    "method": "lowest SHA-256 keys, one candidate sentence per canonical API unit",
+    "rows": [
+      {
+        "api_unit": "sklearn.metrics._classification.brier_score_loss",
+        "candidate": {
+          "basis": "direct",
+          "context_citation": null,
+          "context_text": null,
+          "positive": true,
+          "predicate": "be raised and",
+          "scope": [],
+          "subject": "else if `y_true` contains string, an error"
+        },
+        "codex_review_label": "boundary_error",
+        "review_note": "A bullet conditional is absorbed into the subject and the predicate is truncated.",
+        "sample_key": "0128daea892065cf5ce71fb52e4caf93223f973083c195125c748411a4dcf860",
+        "sentence_sha256": "d4663643358e7f0db45b13dd46b657d2cef609ff381ad71ea2899a018837d74c",
+        "source_citation": "sklearn.metrics._classification.brier_score_loss#sha256=5fc84cee44004e6de5016e97bd3a7524f83c9b330314a6bda6629593091eac0e&chars=1113:1243",
+        "source_sentence": "* if `y_true` in {-1, 1} or {0, 1}, `pos_label` defaults to 1;\n    * else if `y_true` contains string, an error will be raised and"
+      },
+      {
+        "api_unit": "sklearn.metrics._ranking.average_precision_score",
+        "candidate": {
+          "basis": "nearest_parameter_heading",
+          "context_citation": "sklearn.metrics._ranking.average_precision_score#sha256=f6f45813c6dfc20a89683ceebc575101c8fec21250e241cc374cf729d1412ce2&chars=1251:1339",
+          "context_text": "average : {'micro', 'samples', 'weighted', 'macro'} or None,             default='macro'",
+          "positive": true,
+          "predicate": "be ignored when ``y_true`` is binary",
+          "scope": [
+            "parameter context: average : {'micro', 'samples', 'weighted', 'macro'} or None, default='macro'"
+          ],
+          "subject": "the average parameter"
+        },
+        "codex_review_label": "reviewable",
+        "review_note": "The average parameter is recovered from its adjacent heading; its citation is separate.",
+        "sample_key": "02e256f99359a97e70d429fc5bda62ba0d663db11340e70f2b37e6a6adc8501d",
+        "sentence_sha256": "08a88a01511c7e42dc49749d0bffe64f3003848d5d627523045ce6d8e6287f11",
+        "source_citation": "sklearn.metrics._ranking.average_precision_score#sha256=f6f45813c6dfc20a89683ceebc575101c8fec21250e241cc374cf729d1412ce2&chars=2007:2049",
+        "source_sentence": "Will be ignored when ``y_true`` is binary."
+      },
+      {
+        "api_unit": "sklearn.preprocessing._function_transformer.FunctionTransformer",
+        "candidate": {
+          "basis": "direct",
+          "context_citation": null,
+          "context_text": null,
+          "positive": true,
+          "predicate": "be passed the same arguments as transform, with args and kwargs forwarded",
+          "scope": [],
+          "subject": "This"
+        },
+        "codex_review_label": "context_needed",
+        "review_note": "The pronoun This has no antecedent in the cited sentence.",
+        "sample_key": "0307a87b7d9bc3d1b82f7c1de11955bf6953f20290ca81d8af4d8a82eda23af4",
+        "sentence_sha256": "d7ce67c8302a09d1b1bd2aaadb730194b08caceb91c4e85ce2c1a6a54ec76f03",
+        "source_citation": "sklearn.preprocessing._function_transformer.FunctionTransformer#sha256=0e893437153a7ddda6634be4e2cb59bd0e94e8b99fb6ef74f87a38eb81178cf3&chars=602:690",
+        "source_sentence": "This will be passed\n    the same arguments as transform, with args and kwargs forwarded."
+      },
+      {
+        "api_unit": "sklearn.preprocessing._data.quantile_transform",
+        "candidate": {
+          "basis": "direct",
+          "context_citation": null,
+          "context_text": null,
+          "positive": true,
+          "predicate": "be mapped to the bounds of the output distribution",
+          "scope": [],
+          "subject": "Features values of new/unseen data that fall below or above the fitted range"
+        },
+        "codex_review_label": "reviewable",
+        "review_note": "The complete feature-value subject and mapped output bounds are retained.",
+        "sample_key": "037fa38079df0aff73df64676b28bdfbe97542ef6b8a300c768f8b524f68f931",
+        "sentence_sha256": "7bcd7a2eccbb1417ebe0c5da89100c3a4630d75697671fc2a2a958fcb2377a29",
+        "source_citation": "sklearn.preprocessing._data.quantile_transform#sha256=059c7b3af41a9f52fa62c6a994540bee6f1da42cc436d71d0a8700d3d24d5ecf&chars=635:768",
+        "source_sentence": "Features values of new/unseen data that fall\nbelow or above the fitted range will be mapped to the bounds of the output\ndistribution."
+      },
+      {
+        "api_unit": "sklearn.ensemble._gb.GradientBoostingRegressor",
+        "candidate": {
+          "basis": "direct",
+          "context_citation": null,
+          "context_text": null,
+          "positive": true,
+          "predicate": "only be considered",
+          "scope": [
+            "after: if it leaves at least ``min_samples_leaf`` training samples in each of the left and right branches"
+          ],
+          "subject": "A split point at any depth"
+        },
+        "codex_review_label": "reviewable",
+        "review_note": "The split-point subject and its min_samples_leaf condition are retained.",
+        "sample_key": "039d2165e8c4cf7f65c258bd198a57d43a758e178a3ed96716121a8ccdc9e8d8",
+        "sentence_sha256": "7e58c8e32ba6b01f978b49e7f812f2b78ff7135de8b69a65ef2f8cca0587466c",
+        "source_citation": "sklearn.ensemble._gb.GradientBoostingRegressor#sha256=c5ca9f469cbd39972eb88d839ed125dcdab3b9b3e281c1ca07f15f47a29b43c3&chars=2727:2885",
+        "source_sentence": "A split point at any depth will only be considered if it leaves at\n    least ``min_samples_leaf`` training samples in each of the left and\n    right branches."
+      },
+      {
+        "api_unit": "sklearn.ensemble._forest.ExtraTreesClassifier",
+        "candidate": {
+          "basis": "direct",
+          "context_citation": null,
+          "context_text": null,
+          "positive": true,
+          "predicate": "be chosen",
+          "scope": [],
+          "subject": "``ccp_alpha``"
+        },
+        "codex_review_label": "reviewable",
+        "review_note": "The ccp_alpha subject and selected-value predicate are explicit.",
+        "sample_key": "054d816d428fb0d3e86d6f10a0b006f30add95da372b752ac3315ccfa4aa5d95",
+        "sentence_sha256": "2f054b40f65651655edb9aaadef0b9cecb4b62caabe0f58e36a8c0cd2b0f57b8",
+        "source_citation": "sklearn.ensemble._forest.ExtraTreesClassifier#sha256=0850b5480e90e76f0363e8bae5c21b347bc80f7cb5c8b92b7834c24807631414&chars=7695:7724",
+        "source_sentence": "``ccp_alpha`` will be chosen."
+      },
+      {
+        "api_unit": "sklearn.model_selection._split.StratifiedGroupKFold",
+        "candidate": {
+          "basis": "direct",
+          "context_citation": null,
+          "context_text": null,
+          "positive": true,
+          "predicate": "appear exactly once in the test set across all folds (the number of distinct groups has to be at least equal to the number of folds)",
+          "scope": [],
+          "subject": "Each group"
+        },
+        "codex_review_label": "reviewable",
+        "review_note": "The group subject and exactly-once test-fold behavior are explicit.",
+        "sample_key": "06c390951518a18a4e548f2714781be250ce1598e0eadc32272ea0294da5a35c",
+        "sentence_sha256": "de106c8a96a49c6c201c67eca130fbbcd5ed5bde1671f9c39d4e7dc90ee1288f",
+        "source_citation": "sklearn.model_selection._split.StratifiedGroupKFold#sha256=81c16f03d268bbd9f8d1ba8abb682cf4e890c36534865e7def2f2491bda81dc7&chars=350:499",
+        "source_sentence": "Each group will appear exactly once in the test set across all folds (the\nnumber of distinct groups has to be at least equal to the number of folds)."
+      },
+      {
+        "api_unit": "sklearn.ensemble._forest.RandomForestClassifier",
+        "candidate": {
+          "basis": "direct",
+          "context_citation": null,
+          "context_text": null,
+          "positive": true,
+          "predicate": "be split",
+          "scope": [
+            "after: if this split induces a decrease of the impurity greater than or equal to this value"
+          ],
+          "subject": "min_impurity_decrease : float, default=0.0 A node"
+        },
+        "codex_review_label": "boundary_error",
+        "review_note": "The parameter declaration contaminates the subject; the claim subject is a node.",
+        "sample_key": "0786bb6249768dfdb7ac224224a7ffed1371a6888a939a726f30623230f61773",
+        "sentence_sha256": "0fcfdca5adaf71431f038a5fabe7e03d1c325bb5162d27f649b38e9a6f70b7d6",
+        "source_citation": "sklearn.ensemble._forest.RandomForestClassifier#sha256=90a8a7165e7e74d97ddadc5ed4113492f8da46d7051a6b844fbfdad233f65969&chars=4293:4450",
+        "source_sentence": "min_impurity_decrease : float, default=0.0\n    A node will be split if this split induces a decrease of the impurity\n    greater than or equal to this value."
+      },
+      {
+        "api_unit": "sklearn.preprocessing._encoders.OneHotEncoder",
+        "candidate": {
+          "basis": "direct",
+          "context_citation": null,
+          "context_text": null,
+          "positive": true,
+          "predicate": "be mapped to the last position in the encoding",
+          "scope": [],
+          "subject": "The infrequent category"
+        },
+        "codex_review_label": "reviewable",
+        "review_note": "The infrequent-category subject and target position are explicit.",
+        "sample_key": "08f5658bad7fae7f5c0db604a6159ebc1e23c86dd84ed9b3b81f15412a3b886f",
+        "sentence_sha256": "ac1968dd66874b7e0d0313de09278d36c7cb1945328ee590d70db32a063f33c3",
+        "source_citation": "sklearn.preprocessing._encoders.OneHotEncoder#sha256=9efcc865e3b40dce3a424c28d98c1273295ca03069d2e9bf55d683f400dd1c5d&chars=3923:4011",
+        "source_sentence": "The\n      infrequent category will be mapped to the last position in the\n      encoding."
+      },
+      {
+        "api_unit": "sklearn.decomposition._lda.LatentDirichletAllocation",
+        "candidate": {
+          "basis": "direct",
+          "context_citation": null,
+          "context_text": null,
+          "positive": true,
+          "predicate": "also increase total training time",
+          "scope": [
+            "before: contrast (but): Evaluating perplexity can help you check convergence in training process"
+          ],
+          "subject": "it"
+        },
+        "codex_review_label": "context_needed",
+        "review_note": "The contrast clause leaves it unresolved in the sentence-local candidate.",
+        "sample_key": "09deebce0307268c5b4763258319e6b663542a8fdcae81aca77df778c6889cb2",
+        "sentence_sha256": "5bf12635c1eb625e4f3aa4e45384ac9a2513158c191b84165f29eb875303283e",
+        "source_citation": "sklearn.decomposition._lda.LatentDirichletAllocation#sha256=04e3a845e03c6d41f70a10a96a2f8db36476dc35fda93fc16550f42bb3f7474e&chars=2551:2675",
+        "source_sentence": "Evaluating perplexity can help you check convergence\n    in training process, but it will also increase total training time."
+      },
+      {
+        "api_unit": "sklearn.preprocessing._data.RobustScaler",
+        "candidate": {
+          "basis": "direct",
+          "context_citation": null,
+          "context_text": null,
+          "positive": true,
+          "predicate": "cause :meth:`transform` to raise an exception when attempted on sparse matrices",
+          "scope": [
+            "after: because centering them entails building a dense matrix which in common use cases is likely to be too large to fit in memory"
+          ],
+          "subject": "This"
+        },
+        "codex_review_label": "context_needed",
+        "review_note": "This depends on earlier source context; the candidate does not resolve it.",
+        "sample_key": "0aa67ec8ce0ab14aeba0ae0ba7f9451325b25399e89ceedce04325af9800951c",
+        "sentence_sha256": "977b070a6c0a8490ba7cc34ac31c63c80cd4fdac4141c68616f4a0eb4fc1c7ae",
+        "source_citation": "sklearn.preprocessing._data.RobustScaler#sha256=5885c424cee618a07c8f271b4b71361e6610ce1179672e022455162ce6e9fc36&chars=1219:1446",
+        "source_sentence": "This will cause :meth:`transform` to raise an exception when attempted\n    on sparse matrices, because centering them entails building a dense\n    matrix which in common use cases is likely to be too large to fit in\n    memory."
+      },
+      {
+        "api_unit": "sklearn.ensemble._bagging.BaggingRegressor",
+        "candidate": {
+          "basis": "direct",
+          "context_citation": null,
+          "context_text": null,
+          "positive": true,
+          "predicate": "ensure the expected frequency semantics of `sample_weight`",
+          "scope": [
+            "before: If fitting with `sample_weight`, it is strongly recommended to choose True"
+          ],
+          "subject": "as only drawing with replacement"
+        },
+        "codex_review_label": "boundary_error",
+        "review_note": "The subordinate as-clause is extracted with a malformed subject boundary.",
+        "sample_key": "0b4c49b2167d96a290548c2f6bdbc2e986504d19e5acf1a285cdad51b0760ddd",
+        "sentence_sha256": "567d116b4d1306d186926db2d1ee50b9274b5d45a7ebe2572d4bdefff4084e3b",
+        "source_citation": "sklearn.ensemble._bagging.BaggingRegressor#sha256=c6ea2da78523b4dfcf5fdc5a7a1b56e3cbbfa6ac4d120ef1555f971be08c6ba2&chars=2367:2548",
+        "source_sentence": "If fitting with `sample_weight`, it is\n    strongly recommended to choose True, as only drawing with replacement\n    will ensure the expected frequency semantics of `sample_weight`."
+      }
+    ],
+    "selected": 12
+  },
+  "scan": {
+    "candidate_proposals": 343,
+    "contextual_candidate_sentences": 15,
+    "direct_candidate_sentences": 327,
+    "no_candidate_sentences": 0,
+    "sentence_universe": "sentences containing the literal token 'will'",
+    "sentences": 342
+  },
+  "source": {
+    "canonical_units": 209,
+    "corpus_sha256": "e852c6f692ccbe9e1d395e02687ddad54aa7caf5490100af532f66df8da64f02",
+    "distribution": "scikit-learn",
+    "license": "BSD-3-Clause",
+    "scope": "complete installed callable docstrings from six public API modules",
+    "version": "1.9.0"
+  }
+}

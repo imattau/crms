@@ -169,6 +169,21 @@ precision, recall, or transfer. The next step is to freeze this implementation
 and measure it on untouched API units and a new publisher, reviewing both
 proposals and non-proposals.
 
+The exploratory third-source scan `v1_480` now applies the frozen proposal
+path to scikit-learn 1.9.0 callable docstrings from six API modules. Among 209
+canonical units it found 342 sentences containing `will`; 327 were handled by
+the local parser and 15 by parameter-heading context, yielding 343 proposals
+and no abstentions in that deliberately narrow sentence universe. A
+deterministic one-per-unit sample reviewed 12 candidates: six were structurally
+reviewable from the cited text, three needed unresolved source context, and
+three had boundary errors. These are diagnostic counts, not a precision
+estimate: the corpus was inspected before the sample was frozen, the review is
+single-rater and unblinded, and docstrings are not full documentation pages.
+The corpus is now development data, not a future holdout. The next valid
+transfer test must use a publisher not yet inspected, freeze its documents and
+sample before review, and include independently selected proposal and
+non-proposal cases. See [`v1_480 report`](../experiments/reports/v1_480_sklearn_procedure_candidate_review.json).
+
 Use the existing excerpt and real-source acceptance experiments as regression
 controls, not as a corpus-level result. If a suitable corpus does not contain
 enough examples, change the learning signal or narrow the claim; do not add
