@@ -169,9 +169,11 @@ def _subject_start(text: str, will_start: int
                 (f"parameter type/option: {parameter.group('type').strip()}, optional",))
 
     leading = re.match(
-        r"(?P<context>(?:note\s+that\s+)?(?:if|unless|when|whenever|assuming|provided\s+that|"
-        r"at\s+(?:the\s+)?locations?\s+where|elsewhere|otherwise|"
-        r"for\s+each\b)[\s\S]{0,400})"
+        r"(?P<context>(?:for\s+(?:example|instance),?\s+)?"
+        r"(?:note\s+that\s+)?(?:(?:if|unless|when|whenever|assuming|"
+        r"provided\s+that|at\s+(?:the\s+)?locations?\s+where|"
+        r"elsewhere|otherwise)\b|for\s+(?:each|any|a|an|the|every|"
+        r"all|given)\b)[\s\S]{0,400})"
         r"(?:,\s*(?:then\s+)?|\s+then\s+)(?P<subject>[\s\S]+?)\s*$",
         prefix, re.IGNORECASE)
     if leading:
@@ -210,6 +212,17 @@ def _subject_start(text: str, will_start: int
 
     subject = subject.strip(" \t\r\n,;:")
     if not subject or len(subject) > 180:
+        return None
+    if (leading is not None
+            and re.match(r"for\s+(?:a|an|the|any|every|all|given)\b",
+                         leading.group("context"), re.IGNORECASE)
+            and (re.search(r"\b(?:and|but|or)\s*$",
+                           leading.group("context"), re.IGNORECASE)
+                 or re.match(r"(?:and|but|or)\b", subject, re.IGNORECASE))):
+        # A list of coordinated subjects after a setting clause is not safely
+        # split by choosing the final comma ("For a spring, force and
+        # displacement will ..."). Keep the extractor conservative instead
+        # of binding only the final list item.
         return None
     if not re.search(r"[A-Za-z\u0080-\uffff]", subject):
         return None

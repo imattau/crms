@@ -190,6 +190,34 @@ PASSAGES = (
                        "after: and will not drop the missing value"), True),),
     },
     {
+        "id": "discourse-preface-before-condition",
+        "title": "Synthetic boundary fixture",
+        "url": "https://example.invalid/discourse-condition",
+        "text": "For example, if the matrix is diagonal, then ``diag`` will "
+                "refer to its diagonal entries.",
+        "expected": (("``diag``", "refer to its diagonal entries",
+                      ("before: For example, if the matrix is diagonal",),
+                      True),),
+    },
+    {
+        "id": "setting-clause-before-explicit-subject",
+        "title": "Synthetic boundary fixture",
+        "url": "https://example.invalid/setting-clause",
+        "text": "For a triangle with base ``b``, height ``h``, and unit scale "
+                "of ``1``, the area will be ``b*h/2``.",
+        "expected": (("the area", "be ``b*h/2``",
+                      ("before: For a triangle with base ``b``, height ``h``, "
+                       "and unit scale of ``1``",), True),),
+    },
+    {
+        "id": "setting-clause-coordinated-subject-ambiguity",
+        "title": "Ambiguous subject control",
+        "url": "https://example.invalid/ambiguous-subject",
+        "text": "For a spring, force and displacement will be recorded.",
+        "expected": (("force and displacement", "be recorded",
+                      ("before: For a spring",), True),),
+    },
+    {
         "id": "negative-claim",
         "title": "Negative control",
         "url": "https://example.invalid/negative",
@@ -318,7 +346,8 @@ def main() -> None:
     print("PASS: negative, quoted, denied, and uncertain controls retain their status")
     print("PASS: fresh chat shows subject, predicate, scope, and exact evidence")
     print("PASS: candidates remain review-only and do not change rules")
-    print("LIMIT: 19 cited sentence fixtures; publisher-held-out transfer remains open")
+    print(f"LIMIT: {len(PASSAGES)} cited sentence fixtures; "
+          "publisher-held-out transfer remains open")
 
 
 if __name__ == "__main__":

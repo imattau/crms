@@ -1,0 +1,717 @@
+{
+  "audit": "v1_511",
+  "purpose": "frozen new-package transfer diagnostic; no source claims accepted",
+  "package": "SymPy",
+  "package_version": "1.14.0",
+  "package_license_metadata": "BSD",
+  "method_revision": "68a8862927a9c05b5e6e3b7171fed8c2c7466986",
+  "method": [
+    "propose_procedure_phrase_candidates",
+    "nearest_parameter_heading",
+    "propose_contextual_procedure_phrase_candidates"
+  ],
+  "corpus_scope": "Importable public functions and classes with docstrings in the installed sympy package; repeated Python object identities are counted once. This is not the complete online documentation.",
+  "counts": {
+    "importable_modules": 817,
+    "api_units_with_docstrings": 4404,
+    "sentences": 49764,
+    "sentences_containing_will": 1206,
+    "sentences_with_direct_proposal": 1170,
+    "sentences_with_parameter_context_proposal": 342,
+    "sentences_with_any_proposal": 1182,
+    "unhandled_will_sentences": 24,
+    "candidate_sample_size": 20,
+    "unhandled_sample_size": 20
+  },
+  "sample_selection": "Separately sort candidate and unhandled rows by SHA-256 of API unit, sentence offset, and text; keep the first row per API unit and normalized sentence, up to 20 per group.",
+  "candidate_sample": [
+    {
+      "sample_key": "003d0eb44c62443d94d48ed645db8390501e1645991b9dda94467e2212baf776",
+      "api_unit": "sympy.classify_ode",
+      "sentence_start": 3142,
+      "sentence_end": 3220,
+      "docstring_sha256": "2ab76c0c17afd1b9adce07e00ff9b5c83a5cefbe6dac0a448402bcdd756735c5",
+      "source_citation": "sympy.classify_ode#sha256=2ab76c0c17afd1b9adce07e00ff9b5c83a5cefbe6dac0a448402bcdd756735c5&chars=3142:3220",
+      "sentence": "For\n    example, if an ODE is in terms of `f(x)`, then ``indep`` will refer to",
+      "proposals": [
+        {
+          "subject": "if an ODE is in terms of `f(x)`, then ``indep``",
+          "predicate_phrase": "refer to",
+          "polarity": true,
+          "scope_notes": [
+            "before: For example"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0043eb3c50f86cf0f1213a625a48a6d07b17bcca4f350d1c86b8605b9ccbc65d",
+      "api_unit": "sympy.physics.quantum.gate.T",
+      "sentence_start": 184,
+      "sentence_end": 225,
+      "docstring_sha256": "20c895b23ebb10dfb7aca8b3202198eb21d74031c732fb799a6c512164a911c8",
+      "source_citation": "sympy.physics.quantum.gate.T#sha256=20c895b23ebb10dfb7aca8b3202198eb21d74031c732fb799a6c512164a911c8&chars=184:225",
+      "sentence": "The target qubit this gate will apply to.",
+      "proposals": [
+        {
+          "subject": "The target qubit this gate",
+          "predicate_phrase": "apply to",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "005e32a0a55cd12a5cac08464c84436df1e7fdaebc20ecde7c82376d85124b0e",
+      "api_unit": "sympy.ordered",
+      "sentence_start": 647,
+      "sentence_end": 742,
+      "docstring_sha256": "0b835993af7a8464a02c35fe997b58988e44f3730d07f6e1371d50f4b3a2ea21",
+      "source_citation": "sympy.ordered#sha256=0b835993af7a8464a02c35fe997b58988e44f3730d07f6e1371d50f4b3a2ea21&chars=647:742",
+      "sentence": "If ``warn`` is True then an error will be raised if there were no\nkeys remaining to break ties.",
+      "proposals": [
+        {
+          "subject": "an error",
+          "predicate_phrase": "be raised",
+          "polarity": true,
+          "scope_notes": [
+            "before: If ``warn`` is True",
+            "after: if there were no keys remaining to break ties"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "009f3b7d8f1499338df3c99a323020195346cc33260505a9495347a01e68c3d0",
+      "api_unit": "sympy.physics.mechanics.ObstacleSetPathway",
+      "sentence_start": 264,
+      "sentence_end": 327,
+      "docstring_sha256": "62edf01219f55221ede4c00747f8d87f9b6f88581e22ebc561fc1a15d9d5a844",
+      "source_citation": "sympy.physics.mechanics.ObstacleSetPathway#sha256=62edf01219f55221ede4c00747f8d87f9b6f88581e22ebc561fc1a15d9d5a844&chars=264:327",
+      "sentence": "It will not interact with any other\nobjects in the system, i.e.",
+      "proposals": [
+        {
+          "subject": "It",
+          "predicate_phrase": "interact with any other objects in the system, i",
+          "polarity": false,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "00ad9af8d65f0e0053a11dd5ca500946002dea94d758325e4343d38d92dc0291",
+      "api_unit": "sympy.acot",
+      "sentence_start": 321,
+      "sentence_end": 386,
+      "docstring_sha256": "8157178c38d2504eb94b1e2e285b8ef9699c5ee5c9ca8cbf7b2064eea6572bc7",
+      "source_citation": "sympy.acot#sha256=8157178c38d2504eb94b1e2e285b8ef9699c5ee5c9ca8cbf7b2064eea6572bc7&chars=321:386",
+      "sentence": "A purely imaginary argument will lead to an ``acoth`` expression.",
+      "proposals": [
+        {
+          "subject": "A purely imaginary argument",
+          "predicate_phrase": "lead to an ``acoth`` expression",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "00fc148db281541f9a3fe0d76b668105e47db64e16aaff359736a1534bf3d9c0",
+      "api_unit": "sympy.solvers.diophantine.diophantine.sum_of_squares",
+      "sentence_start": 98,
+      "sentence_end": 167,
+      "docstring_sha256": "57501d414509c4c2d5e9eeec01ef97afe23fdd0baeb7ccfa2a878f0c7739af0a",
+      "source_citation": "sympy.solvers.diophantine.diophantine.sum_of_squares#sha256=57501d414509c4c2d5e9eeec01ef97afe23fdd0baeb7ccfa2a878f0c7739af0a&chars=98:167",
+      "sentence": "If zeros is False (default)\nthen the solution will not contain zeros.",
+      "proposals": [
+        {
+          "subject": "the solution",
+          "predicate_phrase": "contain zeros",
+          "polarity": false,
+          "scope_notes": [
+            "before: If zeros is False (default)"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0101054b4cc3844abd4086eccb3b20c6f3e63bd2ce81650fa82512d019a4a1cb",
+      "api_unit": "sympy.solvers.ode.single.FirstLinear",
+      "sentence_start": 207,
+      "sentence_end": 300,
+      "docstring_sha256": "96b909d309d051e38afbd3f627ba52f5353c9432c3ccbadd8f5acc46f3215a9e",
+      "source_citation": "sympy.solvers.ode.single.FirstLinear#sha256=96b909d309d051e38afbd3f627ba52f5353c9432c3ccbadd8f5acc46f3215a9e&chars=207:300",
+      "sentence": "The\nintegrating factor `e^{\\int P(x) \\,dx}` will turn the equation into a\nseparable equation.",
+      "proposals": [
+        {
+          "subject": "The integrating factor `e^{\\int P(x) \\,dx}`",
+          "predicate_phrase": "turn the equation into a separable equation",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "010f02db747f7b58923e32a4cdc2e512817a4cf7f1ed846943a260100c2d4166",
+      "api_unit": "sympy.physics.mechanics.LinearPathway",
+      "sentence_start": 256,
+      "sentence_end": 393,
+      "docstring_sha256": "4e8ac2ce3855e83626dfea7ac39fc1cb6d008255575dd632a51002e6378677b3",
+      "source_citation": "sympy.physics.mechanics.LinearPathway#sha256=4e8ac2ce3855e83626dfea7ac39fc1cb6d008255575dd632a51002e6378677b3&chars=256:393",
+      "sentence": "a ``LinearPathway`` will intersect other\nobjects to ensure that the path between its two ends (its attachments) is\nthe shortest possible.",
+      "proposals": [
+        {
+          "subject": "a ``LinearPathway``",
+          "predicate_phrase": "intersect other objects to ensure that the path between its two ends (its attachments) is the shortest possible",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "013a4baa9b3c98be214e17cbe978f395dde2bdeec6bad2d1f106cbc533ae0b64",
+      "api_unit": "sympy.parse_expr",
+      "sentence_start": 2758,
+      "sentence_end": 2814,
+      "docstring_sha256": "46819388bc444d7544346faa5fb72cd9929fa3341fa735b18bf05c632a9bf364",
+      "source_citation": "sympy.parse_expr#sha256=46819388bc444d7544346faa5fb72cd9929fa3341fa735b18bf05c632a9bf364&chars=2758:2814",
+      "sentence": "Standard slicing will return a tuple of transformations:",
+      "proposals": [
+        {
+          "subject": "Standard slicing",
+          "predicate_phrase": "return a tuple of transformations",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0144bdf675b393d325c2350d4e9b589c80d236525e5705bdde29663c94ffd365",
+      "api_unit": "sympy.total_degree",
+      "sentence_start": 231,
+      "sentence_end": 331,
+      "docstring_sha256": "05629d2f59ed6000f9a7609b84655a57629b288fd7fda5945d7e829781acc0e9",
+      "source_citation": "sympy.total_degree#sha256=05629d2f59ed6000f9a7609b84655a57629b288fd7fda5945d7e829781acc0e9&chars=231:331",
+      "sentence": "If the expression is a Poly and no variables are given\nthen the generators of the Poly will be used:",
+      "proposals": [
+        {
+          "subject": "the generators of the Poly",
+          "predicate_phrase": "be used",
+          "polarity": true,
+          "scope_notes": [
+            "before: If the expression is a Poly and no variables are given"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "01609c86933a744f5c4f890337bdc89a91c5f0b661aa8fa6d87e1f3ecb754c28",
+      "api_unit": "sympy.concrete.guess.guess",
+      "sentence_start": 498,
+      "sentence_end": 624,
+      "docstring_sha256": "0102d8450e236bfdeb55ee7ceba61493992812fdd5a20a903293b13e2437bcf3",
+      "source_citation": "sympy.concrete.guess.guess#sha256=0102d8450e236bfdeb55ee7ceba61493992812fdd5a20a903293b13e2437bcf3&chars=498:624",
+      "sentence": "Another option is the 'evaluate' variable (default is True); setting it\nto False will leave the involved products unevaluated.",
+      "proposals": [
+        {
+          "subject": "Another option is the 'evaluate' variable (default is True); setting it to False",
+          "predicate_phrase": "leave the involved products unevaluated",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "01685464cd3a02371648926f1ee2793bc817f9a24a3c137e4e9e24cba86238b5",
+      "api_unit": "sympy.physics.mechanics.LinearSpring",
+      "sentence_start": 235,
+      "sentence_end": 420,
+      "docstring_sha256": "3810000cccba8f72a9530ee1443d77776b0d0aaa951d644a873cbf6bea1aa78d",
+      "source_citation": "sympy.physics.mechanics.LinearSpring#sha256=3810000cccba8f72a9530ee1443d77776b0d0aaa951d644a873cbf6bea1aa78d&chars=235:420",
+      "sentence": "for a\nlinear spring with stiffness ``k``, distance between its ends of ``x``, and\nan equilibrium length of ``0``, the spring force will be ``-k*x``, which is\na linear function in ``x``.",
+      "proposals": [
+        {
+          "subject": "for a linear spring with stiffness ``k``, distance between its ends of ``x``, and an equilibrium length of ``0``, the spring force",
+          "predicate_phrase": "be ``-k*x``, which is a linear function in ``x``",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "018931b4a0646f49404215b6f97b30dcd8cf9c7243f00520de0a367df4999c71",
+      "api_unit": "sympy.testing.runtests.split_list",
+      "sentence_start": 277,
+      "sentence_end": 396,
+      "docstring_sha256": "a4aaed3f3c89c3e15b6b38354600db1f54d94872a78b19febbe98c9f6b64d4c4",
+      "source_citation": "sympy.testing.runtests.split_list#sha256=a4aaed3f3c89c3e15b6b38354600db1f54d94872a78b19febbe98c9f6b64d4c4&chars=277:396",
+      "sentence": "If specified,\ntests will be balanced so that each split has as equal-as-possible\namount of mass according to `density`.",
+      "proposals": [
+        {
+          "subject": "tests",
+          "predicate_phrase": "be balanced so that each split has as equal-as-possible amount of mass according to `density`",
+          "polarity": true,
+          "scope_notes": [
+            "before: If specified"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0214e83ba47b2148cb9e1d30e432ff469e4e3b296c8e1995a83aba5dbeceaeb9",
+      "api_unit": "sympy.polys.compatibility.dup_zz_heu_gcd",
+      "sentence_start": 315,
+      "sentence_end": 361,
+      "docstring_sha256": "eb50287ae4d84b0ddad979ad37965e1cb06868bf5784d93ff2c0c5ec0e13e03f",
+      "source_citation": "sympy.polys.compatibility.dup_zz_heu_gcd#sha256=eb50287ae4d84b0ddad979ad37965e1cb06868bf5784d93ff2c0c5ec0e13e03f&chars=315:361",
+      "sentence": "This will be signaled by raising an exception.",
+      "proposals": [
+        {
+          "subject": "This",
+          "predicate_phrase": "be signaled by raising an exception",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0228895809e3bb77b73581b80bb986bf5029b9c2664df9d3f00dc352c277e9d7",
+      "api_unit": "sympy.ConditionSet",
+      "sentence_start": 1299,
+      "sentence_end": 1418,
+      "docstring_sha256": "7e381faf7bea1d181774e449bd9932e68c33afd7d157970178d662562f6229df",
+      "source_citation": "sympy.ConditionSet#sha256=7e381faf7bea1d181774e449bd9932e68c33afd7d157970178d662562f6229df&chars=1299:1418",
+      "sentence": "When the base set is a ConditionSet, the symbols will be\nunified if possible with preference for the outermost symbols:",
+      "proposals": [
+        {
+          "subject": "the symbols",
+          "predicate_phrase": "be unified",
+          "polarity": true,
+          "scope_notes": [
+            "before: When the base set is a ConditionSet",
+            "after: if possible with preference for the outermost symbols:"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "024cfdcb457b5d5016d527c47d7485e2b076e12c1c94fc64ca3a0eb9bab91e27",
+      "api_unit": "sympy.solvers.solvers.unrad",
+      "sentence_start": 1106,
+      "sentence_end": 1283,
+      "docstring_sha256": "d53572a54c3719d3675dc68f2a101e6b85a31135276eb9c114b8eaf7b5c0c8a7",
+      "source_citation": "sympy.solvers.solvers.unrad#sha256=d53572a54c3719d3675dc68f2a101e6b85a31135276eb9c114b8eaf7b5c0c8a7&chars=1106:1283",
+      "sentence": "*syms*\n    An iterable of symbols which, if provided, will limit the focus of\n    radical removal: only radicals with one or more of the symbols of\n    interest will be cleared.",
+      "proposals": [
+        {
+          "subject": "syms* An iterable of symbols which, if provided",
+          "predicate_phrase": "limit the focus of radical removal: only radicals with one or more of the symbols of interest will be cleared",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "0252df2c9c3e5e612c41435534496c32a457ec92bd2d146796aad96a1e835394",
+      "api_unit": "sympy.physics.secondquant.substitute_dummies",
+      "sentence_start": 1612,
+      "sentence_end": 1673,
+      "docstring_sha256": "8e365f13ce253435895c6eeb82e4abdca90c31bb0ce79f79b36ac12175d2ab4d",
+      "source_citation": "sympy.physics.secondquant.substitute_dummies#sha256=8e365f13ce253435895c6eeb82e4abdca90c31bb0ce79f79b36ac12175d2ab4d&chars=1612:1673",
+      "sentence": "The letters will be used as labels for the new dummy symbols.",
+      "proposals": [
+        {
+          "subject": "The letters",
+          "predicate_phrase": "be used as labels for the new dummy symbols",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "02a06ebc3273d1498987da761d688840ab4274955b947a06c8d6336154457916",
+      "api_unit": "sympy.trigsimp",
+      "sentence_start": 114,
+      "sentence_end": 251,
+      "docstring_sha256": "4708be2992449b81f52ac1180869a7aec5f55233ad743c4effcff16831289a8d",
+      "source_citation": "sympy.trigsimp#sha256=4708be2992449b81f52ac1180869a7aec5f55233ad743c4effcff16831289a8d&chars=114:251",
+      "sentence": "If ``inverse=True``, it will be assumed that a composition of inverse\n    functions, such as sin and asin, can be cancelled in any order.",
+      "proposals": [
+        {
+          "subject": "it",
+          "predicate_phrase": "be assumed that a composition of inverse functions, such as sin and asin, can be cancelled in any order",
+          "polarity": true,
+          "scope_notes": [
+            "before: If ``inverse=True``"
+          ],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "02bd5b0e6961b41cb93fa4e23e64f2cf6e1bfdcba3984af2ef32abb67be9aa71",
+      "api_unit": "sympy.simplify.cse_main.match_common_args",
+      "sentence_start": 98,
+      "sentence_end": 267,
+      "docstring_sha256": "820a06598ed20e82757cbd253eb6bb926a8f8a4d6429d3d5d723298918fb256c",
+      "source_citation": "sympy.simplify.cse_main.match_common_args#sha256=820a06598ed20e82757cbd253eb6bb926a8f8a4d6429d3d5d723298918fb256c&chars=98:267",
+      "sentence": "For instance, for the following function calls::\n\n    x + z + y\n    sin(x + y)\n\nthis will extract a common subexpression of `x + y`::\n\n    w = x + y\n    w + z\n    sin(w)",
+      "proposals": [
+        {
+          "subject": "For instance, for the following function calls:: x + z + y sin(x + y) this",
+          "predicate_phrase": "extract a common subexpression of `x + y`:: w = x + y w + z sin(w)",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    },
+    {
+      "sample_key": "02ffdf532f4d9ef95ece20b971819d79c0d973cdd576cc8e66fd3b48cd4551ca",
+      "api_unit": "sympy.physics.mechanics.TorqueActuator",
+      "sentence_start": 1357,
+      "sentence_end": 1476,
+      "docstring_sha256": "ccf3796aa96881d776c2c800d39fc4d6c6d808c3297a8579fa3b047b462ea0a8",
+      "source_citation": "sympy.physics.mechanics.TorqueActuator#sha256=ccf3796aa96881d776c2c800d39fc4d6c6d808c3297a8579fa3b047b462ea0a8&chars=1357:1476",
+      "sentence": "reaction_frame : ReferenceFrame | RigidBody | None\n    The secondary frame on which the actuator will apply the torque.",
+      "proposals": [
+        {
+          "subject": "reaction_frame : ReferenceFrame | RigidBody | None The secondary frame on which the actuator",
+          "predicate_phrase": "apply the torque",
+          "polarity": true,
+          "scope_notes": [],
+          "context_basis": null,
+          "status": "needs_review"
+        }
+      ]
+    }
+  ],
+  "unhandled_sample": [
+    {
+      "sample_key": "06a6367a2d41bfe65369649d7f4a10228888bb9fa72a61a9fb4c2060d699f010",
+      "api_unit": "sympy.Eq",
+      "sentence_start": 105,
+      "sentence_end": 200,
+      "docstring_sha256": "8a4e080006ecc7dca273a2f748527e994054e339f9c8c3b13cbc8756cb916733",
+      "source_citation": "sympy.Eq#sha256=8a4e080006ecc7dca273a2f748527e994054e339f9c8c3b13cbc8756cb916733&chars=105:200",
+      "sentence": "If they can be easily shown\nto be definitively equal (or unequal), this will reduce to True (or"
+    },
+    {
+      "sample_key": "12bc641ff4893d4ec1a7614d0bb39f8fac5bc28394f4f604cabc26ef9b55eb52",
+      "api_unit": "sympy.solvers.diophantine.diophantine.sum_of_squares",
+      "sentence_start": 928,
+      "sentence_end": 1222,
+      "docstring_sha256": "57501d414509c4c2d5e9eeec01ef97afe23fdd0baeb7ccfa2a878f0c7739af0a",
+      "source_citation": "sympy.solvers.diophantine.diophantine.sum_of_squares#sha256=57501d414509c4c2d5e9eeec01ef97afe23fdd0baeb7ccfa2a878f0c7739af0a&chars=928:1222",
+      "sentence": "For example, if k = 6 then n is partitioned into two parts,\n  the first being written as a sum of 4 squares and the second\n  being written as a sum of 2 squares -- which can only be\n  done if the condition above for k = 2 can be met, so this will\n  automatically reject certain partitions of n."
+    },
+    {
+      "sample_key": "13d34ce13cff00b0d16347424f542b3c1c06f2ad9ee6d5da427bab0167ab82ec",
+      "api_unit": "sympy.acsc",
+      "sentence_start": 111,
+      "sentence_end": 306,
+      "docstring_sha256": "decf3f492bf41f140f438ca9fab7136609ec8ee8d84d35fd62be74f8d6f1a832",
+      "source_citation": "sympy.acsc#sha256=decf3f492bf41f140f438ca9fab7136609ec8ee8d84d35fd62be74f8d6f1a832&chars=111:306",
+      "sentence": "``acsc(x)`` will evaluate automatically in the cases\n$x \\in \\{\\infty, -\\infty, 0, 1, -1\\}$` and for some instances when the\nresult is a rational multiple of $\\pi$ (see the ``eval`` class method)."
+    },
+    {
+      "sample_key": "1425d3c73095e3306c20143c05cdf9bac7ca04c7d4d5276e8810a0ecbd05f51e",
+      "api_unit": "sympy.solvers.ode.constantsimp",
+      "sentence_start": 1300,
+      "sentence_end": 1440,
+      "docstring_sha256": "b7bba5d0a5a9386ccbeba3eca48587a57674d4a9f66c41e67b7820d62db8fd1d",
+      "source_citation": "sympy.solvers.ode.constantsimp#sha256=b7bba5d0a5a9386ccbeba3eca48587a57674d4a9f66c41e67b7820d62db8fd1d&chars=1300:1440",
+      "sentence": "terms of :py:class:`~sympy.core.add.Add`\\s are collected to try join\n   constants so `e^x (C_1 \\cos(x) + C_2 \\cos(x))` will simplify to `e^x"
+    },
+    {
+      "sample_key": "22ad240d6831bad980d8a08b47a795b805f436f2170edc5c20fd2cf44623f7f9",
+      "api_unit": "sympy.physics.optics.medium.MediumPP",
+      "sentence_start": 135,
+      "sentence_end": 403,
+      "docstring_sha256": "467d9920a98a0a3b2a8d56c9e2edad99f4a268bf0f010b5f591e83ced3c1da6f",
+      "source_citation": "sympy.physics.optics.medium.MediumPP#sha256=467d9920a98a0a3b2a8d56c9e2edad99f4a268bf0f010b5f591e83ced3c1da6f&chars=135:403",
+      "sentence": "Instead it should be\ninstantiated indirectly by instantiating Medium with any two of\npermittivity, permeability, and n specified, or by not specifying any\nof permittivity, permeability, or n, in which case default values for\npermittivity and permeability will be used."
+    },
+    {
+      "sample_key": "23362c61a309b388147393fb5af77730fe2de23cc564a25aa3c29710ff36614b",
+      "api_unit": "sympy.combinatorics.fp_groups.first_in_class",
+      "sentence_start": 1302,
+      "sentence_end": 1455,
+      "docstring_sha256": "478035966f5bd72f1b4e5e2901c6c0daabe2dad7ffc7a2944402a0634c5ea6e6",
+      "source_citation": "sympy.combinatorics.fp_groups.first_in_class#sha256=478035966f5bd72f1b4e5e2901c6c0daabe2dad7ffc7a2944402a0634c5ea6e6&chars=1302:1455",
+      "sentence": "# will happen for that value of alpha in any descendant of the table C, and so\n# the values the values of alpha for which this occurs could profitably be"
+    },
+    {
+      "sample_key": "2fd0000394f3c5184aa5d588cf6c8fb3dace5b9d2e90d1aa541d03f393d53c61",
+      "api_unit": "sympy.sign",
+      "sentence_start": 69,
+      "sentence_end": 112,
+      "docstring_sha256": "1c88b48d90d8a14015c521fe6441f5509d1c10ff1d22c5721e8c0d63258762c6",
+      "source_citation": "sympy.sign#sha256=1c88b48d90d8a14015c521fe6441f5509d1c10ff1d22c5721e8c0d63258762c6&chars=69:112",
+      "sentence": "If the expression is real the sign will be:"
+    },
+    {
+      "sample_key": "390de0d7df4e59a1ad2d0b8b304c2e2d60c293e40b4186f5e82c9be52d6664e9",
+      "api_unit": "sympy.plotting.backends.base_backend.Plot",
+      "sentence_start": 3417,
+      "sentence_end": 3547,
+      "docstring_sha256": "cb39cfb6c7f39690f7c46af7daac8cfb09815443c01b64c4162cbe7e5f8ccd13",
+      "source_citation": "sympy.plotting.backends.base_backend.Plot#sha256=cb39cfb6c7f39690f7c46af7daac8cfb09815443c01b64c4162cbe7e5f8ccd13&chars=3417:3547",
+      "sentence": "Alternatively, We can specify a function returning a single\n    float value: this will be used to apply a color-loop (for example,"
+    },
+    {
+      "sample_key": "3d7199aba492dbffcac4035141fdf6b4fdb563df17eed3a7d33d9796ea88acc5",
+      "api_unit": "sympy.simplify.fu.process_common_addends",
+      "sentence_start": 174,
+      "sentence_end": 254,
+      "docstring_sha256": "103ca6220430b61bf592224e0f522bde020e694185f2ef0f02b4bd765856dfd8",
+      "source_citation": "sympy.simplify.fu.process_common_addends#sha256=103ca6220430b61bf592224e0f522bde020e694185f2ef0f02b4bd765856dfd8&chars=174:254",
+      "sentence": "If ``key1`` is False ``key2`` must be supplied and\nwill be the only key applied."
+    },
+    {
+      "sample_key": "44903b9a11e39e506db7971bad5e409a8c82f95b253c4b7528227af3afc7683a",
+      "api_unit": "sympy.core.evalf.pure_complex",
+      "sentence_start": 92,
+      "sentence_end": 169,
+      "docstring_sha256": "7e1ef1511a72cc1354486d63f36c8974df31099c0e9930acddaaec9a9ed3650b",
+      "source_citation": "sympy.core.evalf.pure_complex#sha256=7e1ef1511a72cc1354486d63f36c8974df31099c0e9930acddaaec9a9ed3650b&chars=92:169",
+      "sentence": "If `or_real` is True then 0 will\nbe returned for `b` if `v` is a real number."
+    },
+    {
+      "sample_key": "4e45e8faa083181fa08197f36c5bfff2f590c77958816e49e5a3f28ba45cc674",
+      "api_unit": "sympy.physics.biomechanics.MusculotendonDeGroote2016",
+      "sentence_start": 6902,
+      "sentence_end": 7037,
+      "docstring_sha256": "ac060986f3c4065201a25beef45f9b74910f3ed005d069249aebfe3c11e8a909",
+      "source_citation": "sympy.physics.biomechanics.MusculotendonDeGroote2016#sha256=ac060986f3c4065201a25beef45f9b74910f3ed005d069249aebfe3c11e8a909&chars=6902:7037",
+      "sentence": "(normalized) muscle fiber length as an additional state and will produce\nthe governing ordinary differential equation in explicit form."
+    },
+    {
+      "sample_key": "5d65293488a290ca1f1949e9c9ca2101feedfe638dc372dba4b081d7f9f20947",
+      "api_unit": "sympy.solvers.ode.lie_group.islice",
+      "sentence_start": 180,
+      "sentence_end": 271,
+      "docstring_sha256": "a96939b176610e3d33c1b7184108d911e0d19a31149f139882b334530308ba52",
+      "source_citation": "sympy.solvers.ode.lie_group.islice#sha256=a96939b176610e3d33c1b7184108d911e0d19a31149f139882b334530308ba52&chars=180:271",
+      "sentence": "If start is specified, will skip all preceding elements;\notherwise, start defaults to zero."
+    },
+    {
+      "sample_key": "69887cb37274cadd28a83d18c97d11813920c6922b9bed48266e5cb410e6149a",
+      "api_unit": "sympy.inverse_laplace_transform",
+      "sentence_start": 289,
+      "sentence_end": 378,
+      "docstring_sha256": "4f148666abd1cadce06d26599b32978498e13609f64ea7e9159790b1a2cc9144",
+      "source_citation": "sympy.inverse_laplace_transform#sha256=4f148666abd1cadce06d26599b32978498e13609f64ea7e9159790b1a2cc9144&chars=289:378",
+      "sentence": "The plane can be specified by\nargument ``plane``, but will be inferred if passed as None."
+    },
+    {
+      "sample_key": "77b0864e7e06ccb4993a17fa23c33714624d113980acb66b2a2126bb8deb168a",
+      "api_unit": "sympy.combinatorics.Cycle",
+      "sentence_start": 759,
+      "sentence_end": 775,
+      "docstring_sha256": "b7a4a008c5250c8d5fc7f1ca263288e84769b245e8f5221a02e82e8a522e91d8",
+      "source_citation": "sympy.combinatorics.Cycle#sha256=b7a4a008c5250c8d5fc7f1ca263288e84769b245e8f5221a02e82e8a522e91d8&chars=759:775",
+      "sentence": "0 will be shown:"
+    },
+    {
+      "sample_key": "87913b21c53695ee0f967d6788b563959594b75b7e36a715e764c2a4b2bb891c",
+      "api_unit": "sympy.cycle_length",
+      "sentence_start": 0,
+      "sentence_end": 235,
+      "docstring_sha256": "9488de10f922e5ba8c314531c8a025526de2a86c7ac131e6a69517ba72481620",
+      "source_citation": "sympy.cycle_length#sha256=9488de10f922e5ba8c314531c8a025526de2a86c7ac131e6a69517ba72481620&chars=0:235",
+      "sentence": "For a given iterated sequence, return a generator that gives\nthe length of the iterated cycle (lambda) and the length of terms\nbefore the cycle begins (mu); if ``values`` is True then the\nterms of the sequence will be returned instead."
+    },
+    {
+      "sample_key": "8ee8da0722604f929df34a0a52dc915a2be68d5aa88f7b053508ccfa48b3badd",
+      "api_unit": "sympy.DiagonalOf",
+      "sentence_start": 351,
+      "sentence_end": 470,
+      "docstring_sha256": "df625e778ba25917fc7cb2b65fec7b33fa87d5f8a9d0994134ef7ab518dae605",
+      "source_citation": "sympy.DiagonalOf#sha256=df625e778ba25917fc7cb2b65fec7b33fa87d5f8a9d0994134ef7ab518dae605&chars=351:470",
+      "sentence": "The diagonal can be addressed like a matrix or vector and will\nreturn the corresponding element of the original matrix:"
+    },
+    {
+      "sample_key": "b5af2a5f1d6c195af30659982d8a067e6e0c11bb3d9cae89b71ebd9c9be61629",
+      "api_unit": "sympy.polys.matrices.ddm.ddm_irref_den",
+      "sentence_start": 1538,
+      "sentence_end": 1593,
+      "docstring_sha256": "d85a3984feeb858fb5da95b785899c51bf90007c71c43b6d68172caa17a7f270",
+      "source_citation": "sympy.polys.matrices.ddm.ddm_irref_den#sha256=d85a3984feeb858fb5da95b785899c51bf90007c71c43b6d68172caa17a7f270&chars=1538:1593",
+      "sentence": "George C. Nakos , Peter R. Turner , Robert M. Williams."
+    },
+    {
+      "sample_key": "d1599adcddcb32b40de17017628428edd5a6e83fcf7abce0be5f60f4ed499621",
+      "api_unit": "sympy.categories.DiagramGrid",
+      "sentence_start": 87,
+      "sentence_end": 367,
+      "docstring_sha256": "2a676a18941dc6073146324d13f6b57677befec778ac5405f386bea36e1dc370",
+      "source_citation": "sympy.categories.DiagramGrid#sha256=2a676a18941dc6073146324d13f6b57677befec778ac5405f386bea36e1dc370&chars=87:367",
+      "sentence": "The mission of this class is to analyse the structure of the\nsupplied diagram and to place its objects on a grid such that,\nwhen the objects and the morphisms are actually drawn, the diagram\nwould be \"readable\", in the sense that there will not be many\nintersections of moprhisms."
+    },
+    {
+      "sample_key": "dfd285436ea29fd21688bc3b550239fde397de88d6bee6738cf391f1b544224f",
+      "api_unit": "sympy.tensor.array.array_derivatives.ArrayDerivative",
+      "sentence_start": 4213,
+      "sentence_end": 4427,
+      "docstring_sha256": "be460d370abc28fb281574d0288ec8bf0afc6acb40a4aa8f757b2566a6da4fa3",
+      "source_citation": "sympy.tensor.array.array_derivatives.ArrayDerivative#sha256=be460d370abc28fb281574d0288ec8bf0afc6acb40a4aa8f757b2566a6da4fa3&chars=4213:4427",
+      "sentence": "One must be careful to replace undefined functions with expressions\nthat contain variables consistent with the function definition and\nthe variables of differentiation or else insconsistent result will\nbe obtained."
+    },
+    {
+      "sample_key": "f1726820b4bc30f5fe6ebc873faed080322cd830b5471af35d76cc8c57c3bbc2",
+      "api_unit": "sympy.crypto.encipher_rsa",
+      "sentence_start": 682,
+      "sentence_end": 795,
+      "docstring_sha256": "acfe443c067d7cf42420b185163b3c13c48bcc496ae8eddd4111024c378414a9",
+      "source_citation": "sympy.crypto.encipher_rsa#sha256=acfe443c067d7cf42420b185163b3c13c48bcc496ae8eddd4111024c378414a9&chars=682:795",
+      "sentence": "For example, `0`, `1` will remain always same after taking any\nnumber of exponentiation, thus, should be avoided."
+    }
+  ],
+  "manual_review": {
+    "reviewer": "Codex (single reviewer)",
+    "method": "Unblinded field-level review of the pre-frozen hash-selected sample; no source claims accepted.",
+    "candidate_rows_reviewed": 20,
+    "candidate_class_counts": {
+      "structurally_reviewable": 10,
+      "context_required": 4,
+      "boundary_error": 6
+    },
+    "candidate_classifications": [
+      {
+        "api_unit": "sympy.classify_ode",
+        "class": "boundary_error"
+      },
+      {
+        "api_unit": "sympy.physics.quantum.gate.T",
+        "class": "boundary_error"
+      },
+      {
+        "api_unit": "sympy.ordered",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "sympy.physics.mechanics.ObstacleSetPathway",
+        "class": "context_required"
+      },
+      {
+        "api_unit": "sympy.acot",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "sympy.solvers.diophantine.diophantine.sum_of_squares",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "sympy.solvers.ode.single.FirstLinear",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "sympy.physics.mechanics.LinearPathway",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "sympy.parse_expr",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "sympy.total_degree",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "sympy.concrete.guess.guess",
+        "class": "boundary_error"
+      },
+      {
+        "api_unit": "sympy.physics.mechanics.LinearSpring",
+        "class": "boundary_error"
+      },
+      {
+        "api_unit": "sympy.testing.runtests.split_list",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "sympy.polys.compatibility.dup_zz_heu_gcd",
+        "class": "context_required"
+      },
+      {
+        "api_unit": "sympy.ConditionSet",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "sympy.solvers.solvers.unrad",
+        "class": "boundary_error"
+      },
+      {
+        "api_unit": "sympy.physics.secondquant.substitute_dummies",
+        "class": "structurally_reviewable"
+      },
+      {
+        "api_unit": "sympy.trigsimp",
+        "class": "context_required"
+      },
+      {
+        "api_unit": "sympy.simplify.cse_main.match_common_args",
+        "class": "boundary_error"
+      },
+      {
+        "api_unit": "sympy.physics.mechanics.TorqueActuator",
+        "class": "context_required"
+      }
+    ],
+    "structurally_reviewable_definition": "Subject, predicate, polarity, and local scope are coherent in the cited sentence. This is not a promotion or semantic-correctness decision.",
+    "unhandled_rows_reviewed": 20,
+    "unhandled_rows_with_plausible_behavior_or_property_claim": 16,
+    "unhandled_non_target_or_incomplete": 4,
+    "unhandled_observation": "Most sampled misses appear to state behavior or properties, often with omitted/shared subjects, conditionals, passive clauses, or paragraph context. The sample is diagnostic and not a recall estimate.",
+    "limitations": [
+      "single-rater",
+      "unblinded",
+      "hash-selected diagnostic sample, not a probability sample",
+      "package API docstrings, not complete online documentation",
+      "proposal and non-proposal observations are not precision or recall estimates"
+    ]
+  },
+  "limitations": [
+    "This is a package-level sample, not a complete documentation-publisher test.",
+    "Only sentence spans containing 'will' are in scope.",
+    "The deterministic sample is diagnostic, not a precision/recall estimate.",
+    "The method was not changed in response to this sample."
+  ]
+}

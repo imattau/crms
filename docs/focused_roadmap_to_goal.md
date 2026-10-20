@@ -564,6 +564,18 @@ stored `reaches` relation. `v1_438`, `v1_427`, `v1_426`, `v1_412`, `v1_491`,
 improvements close targeted regressions; they do not establish independent
 dialogue, language, or task transfer.
 
+Source-derived procedure discovery was also measured against a package not
+used in its previous parser development: the frozen SymPy API-docstring sample
+found only 10/20 sampled proposals structurally reviewable, with four needing
+context and six boundary errors; 16/20 sampled unhandled spans appeared to
+describe behavior or mathematical properties. This is single-rater diagnostic
+evidence, not a quality estimate. It led to a general parser change separating
+leading discourse/setting context from a following explicit subject, with
+existing uncertainty, context, and coordinated-clause controls still passing.
+SymPy is now development material. The source-learning gate remains open until
+the revised method is frozen and checked on a different untouched package and
+sample.
+
 The immediate bottleneck is therefore no longer “can the components compose in
 a fixture?” It is whether a fresh user request can cause CRMS to select and
 compose the right components, complete the whole task, and survive independent

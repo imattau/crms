@@ -3213,6 +3213,32 @@ store changed.
 Report: [context-bundle report](reports/v1_490_pydantic_context_bundle.json),
 [reproduction and exact-citation check](../experiments/audits/v1_490_pydantic_context_bundle.py).
 
+## New-package procedure-candidate sample (`v1_511`, 2026-10-20)
+
+The frozen SymPy 1.14.0 package probe scanned 4,404 public API docstrings and
+49,764 sentence spans. Of 1,206 spans containing `will`, the current method
+proposed candidates for 1,182. A deterministic one-per-API-unit sample of 20
+proposals received a single-Codex review: ten had structurally reviewable
+subject/predicate/scope fields, four needed cited context, and six had
+boundary errors. In a separate sample of 20 unhandled spans, 16 appeared to
+state behavior or mathematical properties that the current method missed.
+These are diagnostic observations, not precision/recall estimates; the
+sample is unblinded, single-rater, and package-docstring scoped. The frozen
+manifest preserves exact source hashes, offsets, and both samples. SymPy is
+development data now, not a future holdout.
+
+The sample motivated a general clause-boundary update: leading “For example,
+if … then …” text is kept as scope, and “For a …, …, subject will …” separates
+the setting from an explicit subject. Coordinated subjects remain intact.
+The clause fixture grew from 19 to 24 source-span controls, including the new
+boundaries and a coordinated-subject case; the existing candidate, context,
+coordinated-clause, and uncertainty controls pass. This repairs a narrow
+structural failure and does not establish publisher-level transfer or useful
+rule yield. Freeze a different package and its sample before further tuning.
+
+Report: [frozen SymPy transfer manifest](reports/v1_511_sympy_procedure_transfer.json),
+[reproduction script](../experiments/audits/v1_511_sympy_procedure_transfer.py).
+
 ## Recombination and derived-learning control replay (`d5ebdb4`, 2026-10-20)
 
 Command: `python3 run_experiments.py --match v1_448_minimal_phrase_role_recombination --match v1_441_source_grounded_rule_recombination --match v1_82_derived_lineage_revalidation --match v1_72_proof_backed_derived_cases --timeout 300`.
