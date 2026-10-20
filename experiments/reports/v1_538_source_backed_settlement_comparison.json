@@ -1,0 +1,24 @@
+{
+  "experiment": "v1_538_source_backed_settlement_comparison",
+  "date": "2026-10-20",
+  "source": {
+    "index": "data/crms_simplewiki_research.sqlite",
+    "collection": "SimpleWiki",
+    "use": "read-only exact-title settlement infobox fields"
+  },
+  "checks": {
+    "ordinary_chat_area_comparison": "pass",
+    "ordinary_chat_population_comparison": "pass",
+    "why_followup_stays_on_latest_comparison": "pass",
+    "area_units_independently_normalized_to_km2": "pass",
+    "exact_value_and_date_citations": "pass",
+    "lexical_decoy_avoided": "pass",
+    "unsupported_entity_pair_abstains": "pass"
+  },
+  "limitations": [
+    "This is a narrow exact-title settlement comparison, not a general comparison engine.",
+    "Population figures have different reference dates and are reported as supplied, without claiming same-date counts.",
+    "Area values are compared only after explicit unit normalization; no other settlement fields are compared.",
+    "The task wording and expected interpretation are Codex-authored; the source values and citations are checked against the read-only index."
+  ]
+}

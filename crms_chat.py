@@ -4844,6 +4844,23 @@ def _natural_contrast_pair(message: str) -> tuple[str, str] | None:
     return None
 
 
+def _natural_measure_comparison_request(
+        message: str) -> tuple[str, str, str] | None:
+    """Parse a requested population or area comparison between two names."""
+    match = re.fullmatch(
+        r"\s*compare\s+(?:the\s+)?(?P<measure>population|area)\s+of\s+"
+        r"(?P<left>.+?)\s+(?:and|with|to|against|versus|vs\.?)\s+"
+        r"(?P<right>.+?)\s*[?!.]?\s*",
+        message, flags=re.IGNORECASE)
+    if match is None:
+        return None
+    left, right = (match.group(name).strip(" \"'“”")
+                   for name in ("left", "right"))
+    if not left or not right:
+        return None
+    return match.group("measure").casefold(), left, right
+
+
 def _natural_what_subject_query(question: str
                                 ) -> tuple[str, str] | None:
     """Parse a bounded ``What VERB OBJECT?`` query for role checks.
@@ -4977,6 +4994,180 @@ def _answer_contrast_from_sources(
                 "from this co-mention alone.")
     return (f"I couldn't find a source sentence that states both “{left}” and "
             f"“{right}”. I don't have direct evidence for their difference.")
+
+
+def _settlement_population_record(
+        index: CRMSSQLiteResearchIndex, entity: str,
+        match: ExactTitleMatch) -> dict[str, Any] | None:
+    """Read an administrative settlement population and its cited date."""
+    document = index.document(match.document_id)
+    settlement_types = _infobox_field_rows(document, "settlement_type")
+    if len({normalized_tokens(value) for value, _, _ in settlement_types}) != 1:
+        return None
+
+    rows = _infobox_field_rows(document, "population_total")
+    if not rows:
+        # Some normalized settlement infoboxes give the city-level total a
+        # specific administrative label instead of `population_total`.
+        for number in range(1, 11):
+            values = _infobox_field_rows(document, f"population_blank{number}")
+            labels = _infobox_field_rows(
+                document, f"population_blank{number}_title")
+            label_tokens = {token for value, _, _ in labels
+                            for token in normalized_tokens(value)}
+            if (values and len({normalized_tokens(value)
+                                for value, _, _ in values}) == 1
+                    and label_tokens & {"commune", "comune", "municipality"}):
+                rows = values
+                break
+    if len({normalized_tokens(value) for value, _, _ in rows}) != 1:
+        return None
+    value, start, end = rows[0]
+    number = re.search(r"[\d,]+(?:\.\d+)?", value)
+    if number is None:
+        return None
+    try:
+        population = Decimal(number.group().replace(",", ""))
+    except ArithmeticError:
+        return None
+    field_citation = _cited_sentence_evidence(
+        index, match, start, end, tuple(normalized_tokens(value)))
+    if field_citation is None:
+        return None
+
+    as_of_rows = _infobox_field_rows(document, "population_as_of")
+    as_of = None
+    as_of_citation = None
+    if len({normalized_tokens(item) for item, _, _ in as_of_rows}) == 1:
+        as_of, as_start, as_end = as_of_rows[0]
+        as_of_evidence = _cited_sentence_evidence(
+            index, match, as_start, as_end,
+            tuple(normalized_tokens(as_of)))
+        if as_of_evidence is not None:
+            as_of_citation = as_of_evidence["citation"]
+    return {
+        "entity": entity, "population": population,
+        "display_value": number.group(), "as_of": as_of,
+        "title": match.title, "citation": field_citation["citation"],
+        "as_of_citation": as_of_citation,
+    }
+
+
+def _answer_settlement_population_comparison(
+        index: CRMSSQLiteResearchIndex, left: str, right: str) -> str | None:
+    records = []
+    for entity in (left, right):
+        matches = [match for match in _exact_title_hits(index, entity)
+                   if not _is_code_source(match.location)]
+        if len({match.document_id for match in matches}) != 1:
+            return None
+        record = _settlement_population_record(index, entity, matches[0])
+        if record is None:
+            return None
+        records.append(record)
+    first, second = records
+    if first["population"] > second["population"]:
+        larger = first["entity"]
+    elif second["population"] > first["population"]:
+        larger = second["entity"]
+    else:
+        larger = None
+    comparison = ("The reported administrative populations are equal." if larger is None
+                  else f"The reported figure is larger for {larger}.")
+    date_text = ""
+    if first["as_of"] or second["as_of"]:
+        date_text = (
+            f" Dates: {first['entity']} — {first['as_of'] or 'not stated'}; "
+            f"{second['entity']} — {second['as_of'] or 'not stated'}."
+        )
+    date_note = (" The figures have different reference dates, so this is a "
+                 "comparison of the reported values, not same-date counts."
+                 if first["as_of"] and second["as_of"]
+                 and normalized_tokens(first["as_of"])
+                     != normalized_tokens(second["as_of"]) else "")
+    citations = (
+        f"[Source: {first['title']}; {first['citation']}] "
+        f"[Source: {second['title']}; {second['citation']}]"
+    )
+    if first["as_of_citation"] and second["as_of_citation"]:
+        citations += (
+            f" [Source: {first['title']}; {first['as_of_citation']}]"
+            f" [Source: {second['title']}; {second['as_of_citation']}]"
+        )
+    return (
+        f"The indexed settlement records list {first['entity']} at "
+        f"{first['display_value']} and {second['entity']} at "
+        f"{second['display_value']}.{date_text}{date_note} {comparison} "
+        f"{citations}"
+    )
+
+
+def _answer_settlement_area_comparison(
+        index: CRMSSQLiteResearchIndex, left: str, right: str) -> str | None:
+    """Compare exact-title settlement area fields with cited unit conversion."""
+    rows = []
+    for entity in (left, right):
+        matches = [match for match in _exact_title_hits(index, entity)
+                   if not _is_code_source(match.location)]
+        if len({match.document_id for match in matches}) != 1:
+            return None
+        match = matches[0]
+        document = index.document(match.document_id)
+        settlement_types = _infobox_field_rows(document, "settlement_type")
+        if len({normalized_tokens(value) for value, _, _ in settlement_types}) != 1:
+            return None
+
+        area = None
+        for field, unit, to_square_km in (
+                ("area_total_km2", "km²", Decimal("1")),
+                ("area_total_sq_km", "sq km", Decimal("1")),
+                ("area_total_sq_mi", "sq mi", Decimal("2.589988110336"))):
+            candidates = _infobox_field_rows(document, field)
+            distinct = {normalized_tokens(value) for value, _, _ in candidates}
+            if len(distinct) != 1:
+                continue
+            value, start, end = candidates[0]
+            number = re.search(r"[\d,]+(?:\.\d+)?", value)
+            if number is None:
+                continue
+            try:
+                amount = Decimal(number.group().replace(",", ""))
+            except ArithmeticError:
+                continue
+            cited = _cited_sentence_evidence(
+                index, match, start, end,
+                tuple(normalized_tokens(value)))
+            if cited is None:
+                return None
+            area = {
+                "entity": entity, "value": number.group(), "unit": unit,
+                "square_km": amount * to_square_km,
+                "citation": cited["citation"], "title": match.title,
+            }
+            break
+        if area is None:
+            return None
+        rows.append(area)
+
+    left_area, right_area = rows
+    if left_area["square_km"] > right_area["square_km"]:
+        larger = left_area["entity"]
+    elif right_area["square_km"] > left_area["square_km"]:
+        larger = right_area["entity"]
+    else:
+        larger = None
+    converted = right_area["square_km"].quantize(Decimal("0.1"))
+    conclusion = ("The source-listed settlement areas are equal after unit "
+                  "conversion." if larger is None else
+                  f"{larger}'s listed settlement area is larger.")
+    return (
+        f"The exact-title infoboxes list {left_area['entity']} as "
+        f"{left_area['value']} {left_area['unit']} and "
+        f"{right_area['entity']} as {right_area['value']} "
+        f"{right_area['unit']} (about {converted} km²). {conclusion} "
+        f"[Source: {left_area['title']}; {left_area['citation']}] "
+        f"[Source: {right_area['title']}; {right_area['citation']}]"
+    )
 
 
 _SUMMARY_COUNT_WORDS = {
@@ -6399,6 +6590,7 @@ def main() -> int:
     last_answer_had_inference_proof = False
     last_answer_was_quoted_evidence = False
     last_reasoned_filter = None
+    last_comparison_explanation = None
     last_reasoned_filter_request: str | None = None
     last_reasoned_filter_practiced = False
     last_feedback_record: dict[str, Any] | None = restored_feedback_context
@@ -6446,6 +6638,7 @@ def main() -> int:
             last_reasoned_filter = None
             last_reasoned_filter_request = None
             last_reasoned_filter_practiced = False
+            last_comparison_explanation = None
         story_revision_tone = _natural_story_revision(line)
         if story_revision_tone is not None and last_story is not None:
             pending_story_tone = None
@@ -10130,6 +10323,9 @@ def main() -> int:
                 pending_translation_clarification)
             continue
         if explanation_followup:
+            if last_comparison_explanation is not None:
+                print("CRMS> " + last_comparison_explanation)
+                continue
             if last_reasoned_filter is not None:
                 explanation_parts = [last_reasoned_filter.text]
                 for proof in last_reasoned_filter.inference_proofs:
@@ -10434,11 +10630,34 @@ def main() -> int:
                   "general theorem proofs yet. I won't use a loosely matching "
                   "paper as a proof.")
             continue
+        measure_comparison = _natural_measure_comparison_request(line)
+        if measure_comparison is not None:
+            measure, left, right = measure_comparison
+            answer = (
+                _answer_settlement_population_comparison(index, left, right)
+                if measure == "population" else
+                _answer_settlement_area_comparison(index, left, right))
+            last_comparison_explanation = answer or (
+                  f"I couldn't find comparable {measure} fields for exact-title "
+                  f"sources about both {left} and {right}. I won't infer a "
+                  "comparison.")
+            last_research_evidence = None
+            last_answer_was_quoted_evidence = False
+            last_answer_had_inference_proof = False
+            print("CRMS> " + last_comparison_explanation)
+            continue
         contrast_pair = _natural_contrast_pair(line)
         if contrast_pair is not None:
             dialogue.clear()
-            print("CRMS> " + _answer_contrast_from_sources(
-                index, *contrast_pair))
+            settlement_comparison = _answer_settlement_area_comparison(
+                index, *contrast_pair)
+            last_comparison_explanation = (
+                settlement_comparison or _answer_contrast_from_sources(
+                    index, *contrast_pair))
+            last_research_evidence = None
+            last_answer_was_quoted_evidence = False
+            last_answer_had_inference_proof = False
+            print("CRMS> " + last_comparison_explanation)
             continue
         summary_followup = _natural_summary_followup(line)
         if summary_followup is not None and last_summary_query is not None:

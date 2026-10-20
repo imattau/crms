@@ -519,9 +519,9 @@ This closes one source-grounded definition fallback and punctuation seam; it
 does not add general comparison, definition generation, or semantic ranking.
 In the same corpus drive, `Compare Paris and Rome.` correctly declined to
 infer a comparison from a sentence about the Prix de Rome and students in
-Paris, but it did not perform the requested comparison. Keep that case as a
-held-out task: entity disambiguation and multi-source comparison remain an
-open capability gap.
+Paris, but it did not perform the requested comparison. `v1_538` below now
+resolves this one pair from exact-title settlement fields. General entity
+disambiguation and multi-source comparison remain an open capability gap.
 
 ## Integrated replay after the definition and title-normalization fix
 
@@ -541,7 +541,32 @@ The core recombination packet still uses synthetic entities and pre-reviewed
 components. The immediate next gate is a wider, source-backed, independently
 authored task set through ordinary chat, with varied evidence layouts and
 request forms plus an independent checker. Include multi-source comparisons;
-the Paris/Rome probe remains an explicit uncovered task.
+the Paris/Rome probe now has one narrow result in `v1_538` below, while
+general cross-entity comparison remains uncovered.
+
+## Exact-title settlement comparison and unit conversion (`v1_538`, 2026-10-20)
+
+Command: `python3 experiments/v1_538_source_backed_settlement_comparison.py`.
+
+The earlier “Compare Paris and Rome” probe selected a misleading lexical
+co-mention in the Prix de Rome article. The full chat now detects exact-title
+settlement pages and compares their cited area fields, converting the Rome
+value from square miles to square kilometres with an independently checked
+decimal calculation. A metric-specific population request also reads Paris's
+`population_total` and Rome's explicitly labeled `Comune` total, cites both
+values and both reference dates, and warns that the dates differ. A request
+containing unsupported Atlantis abstains. A `why?` after the comparison
+repeats the latest comparison rather than explaining the preceding Paris
+population lookup. The source index is read-only and the CLI state is isolated
+in a temporary directory.
+
+All checks pass, including exact citation resolution for each structured
+field and date. This is one real-source, manually interpreted task family; it
+does not establish general entity comparison, arbitrary measure matching,
+semantic extraction, or independent evaluator transfer. The routine compares
+only exact-title settlement area and population fields. See the
+[runner](../experiments/v1_538_source_backed_settlement_comparison.py) and
+[report](../experiments/reports/v1_538_source_backed_settlement_comparison.json).
 
 ## Regular agent-noun question over a large corpus (2026-10-20)
 
