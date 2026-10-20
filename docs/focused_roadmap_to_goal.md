@@ -512,6 +512,14 @@ and one controlled reasoning-to-math task, not autonomous learning or general
 word-problem solving. The next capability gate remains a separately authored
 confirmation set plus a task shape that is not just finite-list aggregation.
 
+`v1_508` checks the new count equivalences against actual procedure execution
+for 23,595 combinations of input lists (length 0–4, values from −2, 0, and 3),
+count-preserving prefixes, and singleton-preserving suffixes. Every canonical
+equivalence matched its runtime output; negative controls kept deduplication,
+value changes, filtering, and endpoint selection distinct. This is a bounded
+exhaustive check over the stated finite domain, not a proof for all integer
+lists. Keep it as a permanent control when changing the procedure grammar.
+
 The immediate bottleneck is therefore no longer “can the components compose in
 a fixture?” It is whether a fresh user request can cause CRMS to select and
 compose the right components, complete the whole task, and survive independent
