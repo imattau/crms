@@ -796,3 +796,19 @@ this does not establish broad source-disjoint transfer.
 Before a source-disjoint recombination claim, validate each cited
 demonstration, record source-disjoint training/validation/test partitions, and
 verify the composed result with a validator that did not produce the examples.
+
+`CRMSModel.propose_procedure_scaffolds(require_source_disjoint=True)` adds a
+strict report-only gate for this record type. It requires every example to
+carry an example-source citation, an instruction-source citation, and a
+labeler ID; it chooses a held-out phrase only when the document IDs in its
+lineage do not overlap training documents. The proposal fingerprint includes
+these provenance fields, and retrieval must repeat the same validation policy.
+The model treats source IDs as opaque and cannot establish that citations
+resolve or that distinct documents have independent publishers; the caller
+must validate citations against the active index and measure publisher
+independence separately. `experiments/v1_446_source_disjoint_procedure_scaffolds.py`
+checks exact citation resolution, disjoint train/held-out document sets,
+missing-provenance and shared-document rejection, report-only behavior, and
+the unchanged default route. Its fixture is controlled; this is a validation
+mechanism, not evidence that prose extraction or independent-source learning
+has generalized.

@@ -3387,7 +3387,8 @@ class CRMSModel:
         ] | None = None
         self._canonical_instruction_index: dict[str, tuple[str, ...]] | None = None
         self._lexical_feature_cache: tuple[dict, dict, dict] | None = None
-        self._procedure_scaffold_cache: dict[int, list[dict[str, Any]]] = {}
+        self._procedure_scaffold_cache: dict[
+            tuple[int, bool], list[dict[str, Any]]] = {}
         self.max_workers = max_workers or _available_cpus()
         self.parallel_min_work = parallel_min_work
         self.max_search_expansions = max_search_expansions
@@ -6298,21 +6299,28 @@ class CRMSModel:
         return {phrase: _procedure_dict(proc) for phrase, proc in sorted(self._procedures.items())}
 
     def propose_procedure_scaffolds(
-            self, *, minimum_supporting_phrases: int = 3
+            self, *, minimum_supporting_phrases: int = 3,
+            require_source_disjoint: bool = False
             ) -> list[dict[str, Any]]:
         """Report repeated operation scaffolds across successful phrase rules.
 
         This is a structural analysis only: it neither changes retrieval nor
-        claims that parameter slots can be transferred to new language. One
-        phrase is held out deterministically; proposals require at least one
-        numeric parameter to vary across the training phrases and the held-out
-        procedure to share the same operation/key structure.
+        claims that parameter slots can be transferred to new language. By
+        default one phrase is held out deterministically. With
+        ``require_source_disjoint=True``, every phrase must have example,
+        instruction-source, and labeler provenance, and a phrase is held out
+        only when its cited document IDs do not occur in training lineage. The
+        caller remains responsible for resolving citations against its source
+        index. Proposals require a varying numeric parameter and matching
+        held-out operation/key structure.
         """
         if (type(minimum_supporting_phrases) is not int
                 or minimum_supporting_phrases < 3):
             raise ValueError('minimum_supporting_phrases must be at least three')
-        cached = self._procedure_scaffold_cache.get(
-            minimum_supporting_phrases)
+        if type(require_source_disjoint) is not bool:
+            raise ValueError('require_source_disjoint must be a bool')
+        cache_key = (minimum_supporting_phrases, require_source_disjoint)
+        cached = self._procedure_scaffold_cache.get(cache_key)
         if cached is not None:
             return copy.deepcopy(cached)
 
@@ -6348,14 +6356,67 @@ class CRMSModel:
             groups.setdefault(structure, []).append((phrase, procedure))
 
         proposals = []
+
+        def provenance(phrase: str) -> dict[str, Any] | None:
+            """Return complete per-example provenance for a source holdout."""
+            examples = self._examples.get(phrase, [])
+            example_sources = self._example_sources.get(phrase, [])
+            instruction_sources = self._instruction_sources.get(phrase, [])
+            labelers = self._example_labelers.get(phrase, [])
+            if (not examples or len(example_sources) != len(examples)
+                    or len(instruction_sources) != len(examples)
+                    or len(labelers) != len(examples)
+                    or any(not isinstance(source, str) or not source.strip()
+                           for source in example_sources)
+                    or any(not isinstance(source, str) or not source.strip()
+                           for source in instruction_sources)
+                    or any(not isinstance(labeler, str) or not labeler.strip()
+                           for labeler in labelers)):
+                return None
+
+            def document_id(source: str) -> str:
+                # Research citations identify a document before the hash and
+                # character offsets. Opaque source IDs remain their own unit.
+                return source.split('#sha256=', 1)[0]
+
+            return {
+                'example_source_ids': list(example_sources),
+                'instruction_source_ids': list(instruction_sources),
+                'labeler_ids': list(labelers),
+                'source_documents': sorted({
+                    document_id(source)
+                    for source in (*example_sources, *instruction_sources)}),
+            }
+
         for structure, members in sorted(groups.items(), key=lambda item: repr(item[0])):
             members.sort(key=lambda item: item[0])
             if len(members) < minimum_supporting_phrases:
                 continue
-            held_out_member = max(
+            member_provenance = {
+                phrase: provenance(phrase) for phrase, _procedure in members}
+            ordered_members = sorted(
                 members,
                 key=lambda item: hashlib.sha256(
-                    item[0].encode('utf-8')).digest())
+                    item[0].encode('utf-8')).digest(), reverse=True)
+            if require_source_disjoint:
+                if any(member_provenance[phrase] is None
+                       for phrase, _procedure in members):
+                    continue
+                held_out_member = None
+                for candidate in ordered_members:
+                    candidate_sources = set(member_provenance[
+                        candidate[0]]['source_documents'])
+                    training_sources = set().union(*(
+                        set(member_provenance[phrase]['source_documents'])
+                        for phrase, _procedure in members
+                        if phrase != candidate[0]))
+                    if candidate_sources.isdisjoint(training_sources):
+                        held_out_member = candidate
+                        break
+                if held_out_member is None:
+                    continue
+            else:
+                held_out_member = ordered_members[0]
             held_out = [held_out_member]
             training = [member for member in members
                         if member[0] != held_out_member[0]]
@@ -6442,6 +6503,7 @@ class CRMSModel:
                     'phrase': phrase,
                     'procedure': _procedure_dict(procedure),
                     'examples': self._examples[phrase],
+                    'source_provenance': member_provenance[phrase],
                 }
                 source_bytes = json.dumps(
                     source_payload, sort_keys=True,
@@ -6452,6 +6514,8 @@ class CRMSModel:
                     'procedure': _procedure_dict(procedure),
                     'example_count': len(self._examples[phrase]),
                     'fingerprint': hashlib.sha256(source_bytes).hexdigest(),
+                    'source_provenance': copy.deepcopy(
+                        member_provenance[phrase]),
                 })
             artifact_payload = {
                 'artifact_version': 1,
@@ -6464,7 +6528,10 @@ class CRMSModel:
                 'description_length_code': 'procedure-gamma-v1',
                 'description_length_bits_baseline': baseline_bits,
                 'description_length_bits_candidate': candidate_bits,
-                'validation_policy': 'heldout-reconstruction-v1',
+                'validation_policy': (
+                    'heldout-reconstruction-source-disjoint-v1'
+                    if require_source_disjoint
+                    else 'heldout-reconstruction-v1'),
             }
             artifact_id = 'procedure-scaffold-v1-' + hashlib.sha256(
                 json.dumps(artifact_payload, sort_keys=True,
@@ -6474,6 +6541,7 @@ class CRMSModel:
                 'artifact_id': artifact_id,
                 'artifact_version': 1,
                 'descriptor': descriptor,
+                'require_source_disjoint': require_source_disjoint,
                 'supporting_instructions': [phrase for phrase, _ in training],
                 'held_out_instructions': [phrase for phrase, _ in held_out],
                 'varying_parameter_slots': varying_slots,
@@ -6498,12 +6566,13 @@ class CRMSModel:
                     'and reconstruct all held-out phrase demonstrations'),
                 'report_only': True,
             })
-        self._procedure_scaffold_cache[minimum_supporting_phrases] = (
+        self._procedure_scaffold_cache[cache_key] = (
             copy.deepcopy(proposals))
         return proposals
 
     def retrieve_procedure_scaffold(
-            self, artifact_id: str, *, minimum_supporting_phrases: int = 3
+            self, artifact_id: str, *, minimum_supporting_phrases: int = 3,
+            require_source_disjoint: bool = False
             ) -> dict[str, Any] | None:
         """Retrieve a scaffold only while its current evidence still validates.
 
@@ -6517,7 +6586,8 @@ class CRMSModel:
         if not artifact_id.startswith('procedure-scaffold-v1-'):
             return None
         for proposal in self.propose_procedure_scaffolds(
-                minimum_supporting_phrases=minimum_supporting_phrases):
+                minimum_supporting_phrases=minimum_supporting_phrases,
+                require_source_disjoint=require_source_disjoint):
             if proposal['artifact_id'] == artifact_id:
                 return copy.deepcopy(proposal)
         return None

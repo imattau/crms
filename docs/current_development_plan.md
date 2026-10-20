@@ -49,6 +49,13 @@ Run the first three packets as the active program. Dialogue and contextual
 intent evaluation continue alongside them, but do not let isolated UX fixes
 displace the recombination, self-learning, and reasoning gates.
 
+The current procedure engine now has a strict document-disjoint scaffold
+proposal mode (`CRMSModel.propose_procedure_scaffolds` with
+`require_source_disjoint=True`). It can validate structural reuse across
+reviewed phrase rules when example sources, instruction sources, and labeler
+IDs are complete. It does not extract or understand procedure wording from raw
+prose, and distinct document IDs do not establish independent publishers.
+
 ### 1. Lock the evaluation contract and dialogue safety baseline
 
 Maintain a versioned, clean-process chat scorecard with complete transcripts
@@ -159,12 +166,14 @@ and reload paths without source files. Report model size, runtime, and limits.
 
 ## Immediate work packets
 
-1. **Source-rule generalization probe:** choose a small, licensed corpus with
-   complete documents and held-out publishers. Freeze candidate labels and
-   negative passages before implementation. Measure what the existing generic
-   candidate machinery can learn, where Codex labels are required, proposal
-   precision, and review time. Decide from this result whether a production
-   review path is justified; do not expand the corpus for its own sake.
+1. **Source-rule generalization probe:** use the strict source-disjoint scaffold
+   path in `v1_446` as the validation baseline, then choose a small, licensed
+   corpus with complete documents and held-out publishers. Freeze candidate
+   labels and negative passages before implementing any prose extractor.
+   Measure which operation structure transfers, where Codex labels are
+   required, proposal precision, and review time. Decide from this result
+   whether a production review path is justified; do not expand the corpus for
+   its own sake.
 2. **Unseen recombination through reasoning:** define one task whose procedure
    has a missing-premise, conflict/negative, and invalid-output control. Make
    the procedure choice, proof/check, chat wording, and provenance observable
