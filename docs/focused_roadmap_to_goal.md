@@ -484,12 +484,18 @@ numeric set, one explicitly mentioned stored subject/relation, and one learned
 procedure phrase. Three reordered formulations now compose through inference
 and the learned sum; one passes copied-model fresh chat and `why?`. The test
 also confirms abstention for an unknown value, competing claims, multiple
-numeric sets, a mere phrase mention, and an unlicensed operation alias. The
-frozen `v1_504` packet remains the before-change baseline; its six language
-gaps remain open. This is bounded clause recombination, not broad language
-understanding. Next, evaluate against a separately authored confirmation set
-and extend coverage to genuinely different task shapes instead of adding more
-surface forms to this one sum frame.
+numeric sets, a mere phrase mention, and an unlicensed operation alias.
+
+The frozen `v1_504` packet remains the before-change baseline; its six language
+gaps remain open for the baseline model. `v1_506` demonstrates a supervised
+resolution for the operation-synonym case: after “add up every value” is taught
+from labeled examples, it composes with a new entity and values, survives
+clause reordering and copied-model chat, and passes an independent arithmetic
+check. The examples and label are Codex-supplied; this is operation learning,
+not autonomous synonym discovery or source-derived transfer. This remains
+bounded clause recombination, not broad language understanding. Next, evaluate
+against a separately authored confirmation set and extend coverage to
+genuinely different task shapes, not just more surface forms of this sum frame.
 
 The immediate bottleneck is therefore no longer “can the components compose in
 a fixture?” It is whether a fresh user request can cause CRMS to select and
