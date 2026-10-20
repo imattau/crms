@@ -1,0 +1,81 @@
+{
+  "experiment": "v1_531_standard_math_operator_phrases",
+  "source": {
+    "document_id": "pmc:PMC13675955.v1.rb496c301cb6ab27e",
+    "title": "The reference shapes the signal: chrX genotype summaries and classifier sex disparity between GRCh38 and T2T-CHM13 callsets",
+    "license": "CC BY, as recorded in the local PMC snapshot",
+    "numeric_claim": "In women, the fraction of non-reference chrX genotypes that were heterozygous was 0.605 on GRCh38 and 0.644 on T2T."
+  },
+  "method": "exact math API plus fresh CLI against read-only PMC source index",
+  "metrics": {
+    "exact_natural_language_cases": 10,
+    "exact_cases_passed": 10,
+    "save_reload_cases_passed": 10,
+    "full_cli_cases_passed": 2,
+    "unsupported_operands": "abstained",
+    "division_by_zero": "abstained",
+    "consistent_standard_operator_examples": "licensed",
+    "conflicting_override_of_standard_operator": "rejected",
+    "tampered_standard_operator_store": "rejected"
+  },
+  "operator_scope": {
+    "fixed": [
+      "plus",
+      "minus",
+      "times",
+      "multiplied by",
+      "divided by",
+      "mod",
+      "modulo"
+    ],
+    "learned_phrases_remain_example_gated": true
+  },
+  "limitations": [
+    "The two article values were supplied explicitly in the math question; automatic source-value extraction and provenance linking are not tested.",
+    "The source comparison is one scientific article, not a cross-publisher evaluation set.",
+    "This covers exact arithmetic wording, not broad mathematical reasoning or theorem proving.",
+    "CRMS reports the fraction difference 39/1000; it does not yet phrase the result as 3.9 percentage points."
+  ],
+  "cases": [
+    {
+      "question": "What is 0.644 minus 0.605?",
+      "answer": "39/1000 (exact arithmetic using standard operator 'minus' for subtract)"
+    },
+    {
+      "question": "How much higher is 0.644 than 0.605?",
+      "answer": "39/1000 (exact arithmetic using standard operator 'minus' for subtract)"
+    },
+    {
+      "question": "How much lower is 0.605 than 0.644?",
+      "answer": "39/1000 (exact arithmetic using standard operator 'minus' for subtract)"
+    },
+    {
+      "question": "How much higher is 0.605 than 0.644?",
+      "answer": "-39/1000 (exact arithmetic using standard operator 'minus' for subtract)"
+    },
+    {
+      "question": "What is 2 plus 3 times 4?",
+      "answer": "14 (composed operations: 'plus' as learned exact add, standard operator 'times' for multiply; multiplication/division before addition/subtraction unless grouped; checked against 2 examples)"
+    },
+    {
+      "question": "What is (2 plus 3) times 4?",
+      "answer": "20 (composed operations: 'plus' as learned exact add, standard operator 'times' for multiply; multiplication/division before addition/subtraction unless grouped; checked against 2 examples)"
+    },
+    {
+      "question": "What is 8 multiplied by 3?",
+      "answer": "24 (exact arithmetic using standard operator 'multiplied by' for multiply)"
+    },
+    {
+      "question": "What is 9 divided by 4?",
+      "answer": "9/4 (exact arithmetic using standard operator 'divided by' for divide)"
+    },
+    {
+      "question": "What is 10 modulo 3?",
+      "answer": "1 (exact arithmetic using standard operator 'modulo' for modulo)"
+    },
+    {
+      "question": "What is 10 mod 3?",
+      "answer": "1 (exact arithmetic using standard operator 'mod' for modulo)"
+    }
+  ]
+}

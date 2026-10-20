@@ -1,5 +1,31 @@
 # Language and recombination benchmark baselines
 
+## Standard natural-language arithmetic (`v1_531`, 2026-10-20)
+
+Command: `python3 experiments/v1_531_standard_math_operator_phrases.py`.
+
+The exact arithmetic parser now recognizes conventional phrases `plus`,
+`minus`, `times`, `multiplied by`, `divided by`, `mod`, and `modulo`, plus
+numeric “how much higher/lower is A than B?” frames. Decimal operands remain
+exact rationals: `0.644 minus 0.605` returns `39/1000`. Arithmetic precedence,
+parentheses, division, and remainder are preserved. A fresh chat process
+answers the natural phrasing against a read-only local PMC full-text index
+instead of returning a lexical source match. Unsupported operands abstain;
+division by zero abstains. Teaching consistent examples remains supported,
+but a conflicting example cannot redefine a conventional operator. The
+existing learned-operator diagnostic (`v1_206`) and expression-grammar
+diagnostic (`v1_181`) still pass.
+
+The two operands are present in the CC BY PMC record for *The reference shapes
+the signal: chrX genotype summaries and classifier sex disparity between
+GRCh38 and T2T-CHM13 callsets*. This experiment supplies them in the math
+question; it does **not** extract, link, or cite the source values
+automatically. CRMS returns the exact fraction difference, not the
+human-oriented “3.9 percentage points.” This is a natural arithmetic
+improvement, not evidence of broad mathematical reasoning or theorem proving.
+See the [runner](../experiments/v1_531_standard_math_operator_phrases.py) and
+[report](../experiments/reports/v1_531_standard_math_operator_phrases.json).
+
 ## arXiv category/year reasoning-to-sort (`v1_530`, 2026-10-20)
 
 Command: `python3 experiments/v1_530_arxiv_reasoned_sort_transfer.py`.

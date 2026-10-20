@@ -125,9 +125,12 @@ def main() -> None:
             "rejected inconsistent cycle damaged the existing conversion graph")
     first = math.teach("What is 2 plus 3?", "5")
     require(first.status == "needs_more_examples",
-            "one demonstration licensed the operator too early")
-    require(math.ask("What is 7 plus 4?").status == "unknown",
-            "unlicensed operator phrase was executed")
+            "consistent examples did not remain visible as learning evidence")
+    standard_plus = math.ask("What is 7 plus 4?")
+    require(standard_plus is not None and standard_plus.status == "answered"
+            and standard_plus.value == Fraction(11)
+            and standard_plus.operation == "add",
+            "a conventional arithmetic word required redundant teaching")
     unknown_phrase = math.ask("What is 8 glorp 1?")
     require(unknown_phrase and unknown_phrase.status == "unknown"
             and "Teach math from examples" in (unknown_phrase.request or ""),

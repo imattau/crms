@@ -1,6 +1,6 @@
 # Focused plan from current CRMS to its goal
 
-**Reviewed:** 2026-10-20 (runtime probes through `v1_530`)
+**Reviewed:** 2026-10-20 (runtime probes through `v1_531`)
 **Status:** active; the capability goal is not yet demonstrated.
 
 ## Direction review and priority
@@ -208,6 +208,15 @@ manual, each rule review uses only two holdout documents, and procedures are
 separately Codex-taught. Preserve this as a new transfer control, not a
 generalization rate.
 
+The math-language diagnostic (`v1_531`) adds fixed, inspectable meanings for
+conventional arithmetic words and numeric higher/lower comparisons. Exact
+decimal math, precedence, save/reload, the chat route with the read-only PMC
+index, and the existing learned-operator path pass their targeted diagnostics.
+The operands came from one CC BY scientific article but were supplied in the
+math query: automatic extraction, evidence linkage, and a user-facing
+percentage-point answer are still missing. This closes a small language gap;
+it is not evidence of broad mathematical reasoning.
+
 ## Execution order
 
 Dialogue safety is a release gate for every chat-facing change. Source-rule
@@ -326,10 +335,12 @@ extend the `v1_529`/`v1_530` composition packet to an external publisher or
 source type, with multiple held-out relation and procedure examples, wording
 and evidence-order variation, an independent checker, and unknown, negative,
 and conflicting controls. Measure proposal precision and missed cases if
-source-derived rules are involved. Keep the Eiffel/Colosseum and
-Marie/Einstein failures as permanent dialogue controls, and keep derived
-write-back review-gated until recombination, correction, and invalidation pass
-on held-out tasks.
+source-derived rules are involved. For math, test the next composition step:
+retrieve source-backed numeric premises, calculate a requested difference,
+preserve citations for both operands, and state units such as percentage
+points accurately. Keep the Eiffel/Colosseum and Marie/Einstein failures as
+permanent dialogue controls, and keep derived write-back review-gated until
+recombination, correction, and invalidation pass on held-out tasks.
 
 For detailed implementation history and experiment evidence, see
 [`focused_roadmap_to_goal.md`](focused_roadmap_to_goal.md) and

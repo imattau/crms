@@ -1,8 +1,8 @@
 """Exact, example-grounded arithmetic with learned natural-language operators.
 
 This math slice handles exact arithmetic in a small set of explicit natural-
-language question frames. Operator phrases are learned from input/output
-examples; no English operator synonyms are built in.
+language question frames. Conventional arithmetic words have fixed meanings;
+other operator phrases are learned from input/output examples.
 """
 
 from __future__ import annotations
@@ -28,6 +28,16 @@ _QUESTION_BODY_PATTERNS = (
                r"(.+?)\s*[?!.]*\s*", re.IGNORECASE),
     re.compile(r"\s*what\s+is\s+(.+?)\s*\??\s*", re.IGNORECASE),
     re.compile(r"\s*how\s+much\s+is\s+(.+?)\s*\??\s*", re.IGNORECASE),
+)
+_RELATIVE_DIFFERENCE_PATTERNS = (
+    (re.compile(r"\s*how\s+much\s+higher\s+is\s+"
+                r"(?P<left>[+-]?(?:\d+(?:\.\d+)?|\.\d+))\s+than\s+"
+                r"(?P<right>[+-]?(?:\d+(?:\.\d+)?|\.\d+))\s*[?!.]*\s*",
+                re.IGNORECASE), "left-minus-right"),
+    (re.compile(r"\s*how\s+much\s+lower\s+is\s+"
+                r"(?P<left>[+-]?(?:\d+(?:\.\d+)?|\.\d+))\s+than\s+"
+                r"(?P<right>[+-]?(?:\d+(?:\.\d+)?|\.\d+))\s*[?!.]*\s*",
+                re.IGNORECASE), "right-minus-left"),
 )
 _BINARY_EXPRESSION_RE = re.compile(
     r"\s*([+-]?\d{1,100})\s+(.+?)\s+([+-]?\d{1,100})\s*\Z")
@@ -64,6 +74,17 @@ _SYMBOL_OPERATIONS = {
     "+": "add", "-": "subtract", "−": "subtract",
     "*": "multiply", "×": "multiply",
     "/": "divide", "÷": "divide", "%": "modulo",
+}
+# These are conventional, explicit arithmetic words. Other natural-language
+# operator phrases still require examples.
+_STANDARD_OPERATOR_PHRASES = {
+    ("plus",): "add",
+    ("minus",): "subtract",
+    ("times",): "multiply",
+    ("multiplied", "by"): "multiply",
+    ("divided", "by"): "divide",
+    ("mod",): "modulo",
+    ("modulo",): "modulo",
 }
 _MAX_RESULT_BITS = 4096
 _MAX_POLYNOMIAL_TERMS = 512
@@ -293,7 +314,7 @@ class _UnsupportedMath(ValueError):
 
 
 class _ExpressionParser:
-    """Pratt parser for learned natural-language operators and integer leaves."""
+    """Parse standard arithmetic words, learned operators, and exact leaves."""
 
     _PRECEDENCE = {"add": 1, "subtract": 1, "multiply": 2,
                    "divide": 2, "modulo": 2}
@@ -392,7 +413,8 @@ class _ExpressionParser:
                 break
             if end > self.index and any(
                     self.values[end:end + len(phrase)] == list(phrase)
-                    for phrase in self.model._examples):
+                    for phrase in (*self.model._examples,
+                                   *_STANDARD_OPERATOR_PHRASES)):
                 break
             end += 1
         unknown = " ".join(self.values[self.index:end]) or token
@@ -429,7 +451,8 @@ class _ExpressionParser:
         if start < len(self.values) and self.values[start] in _SYMBOL_OPERATIONS:
             symbol = self.values[start]
             return (symbol,), _SYMBOL_OPERATIONS[symbol]
-        matches = [phrase for phrase in self.model._examples
+        matches = [phrase for phrase in (*self.model._examples,
+                                         *_STANDARD_OPERATOR_PHRASES)
                    if self.values[start:start + len(phrase)] == list(phrase)]
         if not matches:
             end = start
@@ -442,6 +465,8 @@ class _ExpressionParser:
             unknown = " ".join(self.values[start:end]) or self.values[start]
             raise _UnknownOperator(unknown)
         phrase = max(matches, key=len)
+        if phrase in _STANDARD_OPERATOR_PHRASES:
+            return phrase, _STANDARD_OPERATOR_PHRASES[phrase]
         examples = self.model._examples[phrase]
         candidates = self.model._candidates(examples)
         if len(examples) < 2 or len(candidates) != 1:
@@ -774,6 +799,13 @@ class CRMSMath:
 
     @staticmethod
     def _question_body(question: str) -> str | None:
+        for pattern, direction in _RELATIVE_DIFFERENCE_PATTERNS:
+            match = pattern.fullmatch(question)
+            if match is not None:
+                left, right = match.group("left", "right")
+                return (f"{left} minus {right}"
+                        if direction == "left-minus-right"
+                        else f"{right} minus {left}")
         for pattern in _QUESTION_BODY_PATTERNS:
             match = pattern.fullmatch(question)
             if match is not None:
@@ -834,6 +866,10 @@ class CRMSMath:
         if phrase in {("solve",), ("equals",), ("for",)}:
             raise ValueError("operator phrase is reserved by the math question grammar")
         pair = (expression.left, expression.right)
+        if (phrase in _STANDARD_OPERATOR_PHRASES
+                and _evaluate(_STANDARD_OPERATOR_PHRASES[phrase], *pair) != expected):
+            raise ValueError(
+                f"'{ ' '.join(phrase)}' has a fixed standard arithmetic meaning")
         prior = dict(self._examples.get(phrase, {}))
         existing = prior.get(pair)
         if existing is not None and existing != expected:
@@ -1032,7 +1068,8 @@ class CRMSMath:
             return None
         has_known_operator = any(value in _SYMBOL_OPERATIONS for value in values) or any(
             values[index:index + len(phrase)] == list(phrase)
-            for index in range(len(values)) for phrase in self._examples)
+            for index in range(len(values))
+            for phrase in (*self._examples, *_STANDARD_OPERATOR_PHRASES))
         if not has_known_operator:
             unlearned = self.parse_question(question)
             if unlearned is not None:
@@ -1186,7 +1223,13 @@ class CRMSMath:
                 if pair in rows:
                     raise ValueError("duplicate math operand pair")
                 rows[pair] = _fraction(answer)
-            if not rows or not cls._candidates(rows):
+            if not rows:
+                raise ValueError("math examples do not fit a supported operation")
+            if (phrase in _STANDARD_OPERATOR_PHRASES
+                    and any(_evaluate(_STANDARD_OPERATOR_PHRASES[phrase], *pair)
+                            != answer for pair, answer in rows.items())):
+                raise ValueError("learned math phrase conflicts with standard arithmetic")
+            if not cls._candidates(rows):
                 raise ValueError("math examples do not fit a supported operation")
             model._examples[phrase] = rows
         unit_records = payload.get("unit_examples", [])
@@ -1316,15 +1359,31 @@ def render(result: MathResult) -> str:
                     f"for {operation}{numeral_note})"
                     + (f" {result.unit}" if result.unit else "")
                     + _unit_evidence_note(result))
+        if phrase in _STANDARD_OPERATOR_PHRASES:
+            if result.examples:
+                return (f"{value_text} (learned '{' '.join(phrase)}' as exact "
+                        f"{operation}; checked against {len(result.examples)} examples"
+                        f"{numeral_note})" + (f" {result.unit}" if result.unit else "")
+                        + _unit_evidence_note(result))
+            return (f"{value_text} (exact arithmetic using standard operator "
+                    f"'{ ' '.join(phrase)}' for {operation}{numeral_note})"
+                    + (f" {result.unit}" if result.unit else "")
+                    + _unit_evidence_note(result))
         return (f"{value_text} (learned '{' '.join(phrase)}' as exact "
                 f"{operation}; checked against {len(result.examples)} examples"
                 f"{numeral_note})" + (f" {result.unit}" if result.unit else "")
                 + _unit_evidence_note(result))
+    example_phrases = {tuple(tokens(str(row.get("phrase", ""))))
+                       for row in result.examples}
     mappings = ", ".join(
         ("implicit multiplication"
          if phrase == ("implicit",) else
          f"symbol '{' '.join(phrase)}' for {operation}"
          if phrase in {(symbol,) for symbol in _SYMBOL_OPERATIONS}
+         else "'" + " ".join(phrase) + f"' as learned exact {operation}"
+         if phrase in example_phrases
+         else f"standard operator '{' '.join(phrase)}' for {operation}"
+         if phrase in _STANDARD_OPERATOR_PHRASES
          else "'" + " ".join(phrase) + f"' as learned exact {operation}")
         for phrase, operation in sorted(used.items()))
     return (f"{value_text} (composed operations: {mappings}; "
