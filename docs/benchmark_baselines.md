@@ -2823,3 +2823,36 @@ transcript-replay disagreements remain. Because this slice selected the fix
 and its labels are not independent, these figures are not an accuracy claim.
 The previously inspected held-out set was not used to select the change, and
 end-to-end task completion remains unmeasured.
+
+## Reservation request draft as a multi-turn task (`v1_467`, 2026-10-20)
+
+`experiments/v1_467_reservation_request_draft_flow.py` exercises an ordinary
+chat request through a small task lifecycle. CRMS explains that it cannot check
+availability or submit a booking, asks for restaurant, date/time, and party
+size one at a time, retains each answer as session-only state, renders a
+copyable draft, regenerates that draft after a date/time correction, and
+preserves the corrected value through save/reload. The draft says explicitly
+that no reservation has been made; the test checks that no action is issued and
+no user-supplied detail becomes a factual claim. The flow passed, along with
+existing open-question, booking-name, and contextual-intent regressions.
+
+This closes one bounded chat-level task flow from intent recognition through
+clarification, correction, and a usable artifact. It does not make a booking,
+parse all possible details from the initial request, or establish broad task
+completion. The values in the test are controlled and the flow is explicitly
+hand-routed; general task planning remains open.
+
+## Current cross-domain replay at `7dcc99c` (2026-10-20)
+
+After the reservation-draft path was added, the selected cross-domain replay
+was rerun with `v1_467` and all prior selections, including the `v1_465`
+topic-switch and `v1_466` contextual-intent regressions. All 20 diagnostics
+passed in 13.92 seconds. The suite covers language transfer/retrieval,
+source-derived rules and recombination, verified reasoning, math/code,
+translation, creative revision, and dialogue. Each experiment used an isolated
+working directory.
+
+This is regression evidence only. The component tests have different fixtures
+and difficulty; 20/20 is not a unified accuracy or task-completion rate, an
+independent dialogue-transfer result, or a comparison against 70B-class model
+performance.
