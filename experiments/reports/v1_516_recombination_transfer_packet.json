@@ -19,9 +19,10 @@
   "source_disjoint": true,
   "learned_alignment": "runs through \u2192 flows through; explicitly reviewed",
   "reasoning_schema": "reviewed transitive is-a",
-  "positive_transfer": 3,
+  "distinct_route_transfers": 3,
+  "successful_positive_question_forms": 5,
   "unsupported_type_controls": 2,
-  "diagnostic_question_forms": 2,
+  "alternate_question_forms": 2,
   "results": [
     {
       "question": "Which waterway runs through Nacre City 0133?",
@@ -55,15 +56,15 @@
     },
     {
       "question": "What waterway runs through Nacre City 0133?",
-      "expected": "diagnostic probe",
+      "expected": "The Serein River 0133 is a waterway that runs through Nacre City 0133.",
       "response": "CRMS> The Serein River 0133 is a waterway that runs through Nacre City 0133. [Sources: Route dossier 0133; Classification note 0133; Waterway taxonomy; supported by an accepted transitive is-a proof; source wording 'flows through' is linked to the question wording 'runs through']",
-      "status": "measured"
+      "status": "passed"
     },
     {
       "question": "Name the waterway that runs through Nacre City 0133.",
-      "expected": "diagnostic probe",
-      "response": "CRMS> Source text: The Serein River 0133 flows through Nacre City 0133.\nSource: Route dossier 0133. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation.",
-      "status": "measured"
+      "expected": "The Serein River 0133 is a waterway that runs through Nacre City 0133.",
+      "response": "CRMS> The Serein River 0133 is a waterway that runs through Nacre City 0133. [Sources: Route dossier 0133; Classification note 0133; Waterway taxonomy; supported by an accepted transitive is-a proof; source wording 'flows through' is linked to the question wording 'runs through']",
+      "status": "passed"
     }
   ]
 }

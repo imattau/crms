@@ -16,15 +16,16 @@ document IDs are disjoint.
 
 Both type-safety controls abstain from asserting unsupported classifications:
 “stream” for a subject only known as a river, and “river” for an unclassified
-subject. Two extra question forms were measured without being counted as
-successes: “What waterway runs through …?” composes successfully, while “Name
-the waterway that …” falls back to source text without the type proof. The
-experiment is a controlled synthetic transfer test with pre-reviewed
-components, not evidence of autonomous source learning, representative task
-success, or 70B-class parity.
+subject. The alternate forms “What waterway runs through …?” and “Name the
+waterway that runs through …” now both use the same proof-backed realization
+and preserve its citations. The latter had previously fallen back to source
+text; it is now parsed into the existing typed-relation route rather than a
+separate answer path. The experiment is a controlled synthetic transfer test
+with pre-reviewed components, not evidence of autonomous source learning,
+representative task success, or 70B-class parity.
 
-Result: 3/3 held-out compositions, 2/2 unsupported-type controls, and 2
-syntactic probes recorded. See the [frozen report](../experiments/reports/v1_516_recombination_transfer_packet.json)
+Result: 5/5 held-out question forms compose across 3 unseen routes, and 2/2
+unsupported-type controls pass. See the [frozen report](../experiments/reports/v1_516_recombination_transfer_packet.json)
 and [runner](../experiments/v1_516_recombination_transfer_packet.py).
 
 ## Regular agent-noun question over a large corpus (2026-10-20)

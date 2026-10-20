@@ -188,17 +188,25 @@ def main() -> None:
                             "expected": "abstain; no unsupported subtype",
                             "response": output, "status": "passed"})
 
-        # Probe two unseen syntactic forms without counting them as failures
-        # or positives. Their outputs measure the current chat coverage edge.
+        # These forms vary both the interrogative and clause structure. They
+        # must reach the same proof-backed realization rather than the generic
+        # source-text fallback.
         probe_cases = (
-            "What waterway runs through Nacre City 0133?",
-            "Name the waterway that runs through Nacre City 0133.",
+            ("What waterway runs through Nacre City 0133?",
+             "The Serein River 0133 is a waterway that runs through Nacre City 0133."),
+            ("Name the waterway that runs through Nacre City 0133.",
+             "The Serein River 0133 is a waterway that runs through Nacre City 0133."),
         )
-        for number, question in enumerate(probe_cases):
+        for number, (question, expected) in enumerate(probe_cases):
             output = run_chat(root, knowledge_path, index_path,
                               question, f"probe-{number}")
-            results.append({"question": question, "expected": "diagnostic probe",
-                            "response": output, "status": "measured"})
+            require(expected in output,
+                    f"alternate question form lost the composed answer: {question}: {output}")
+            require("accepted transitive is-a proof" in output
+                    and "Waterway taxonomy" in output,
+                    f"alternate question form bypassed the proof/evidence route: {output}")
+            results.append({"question": question, "expected": expected,
+                            "response": output, "status": "passed"})
 
         report = {
             "experiment": "v1_516_recombination_transfer_packet",
@@ -207,10 +215,12 @@ def main() -> None:
             "source_disjoint": True,
             "learned_alignment": "runs through → flows through; explicitly reviewed",
             "reasoning_schema": "reviewed transitive is-a",
-            "positive_transfer": sum(item["status"] == "passed"
-                                      for item in results[:3]),
+            "distinct_route_transfers": 3,
+            "successful_positive_question_forms": sum(
+                item["status"] == "passed" for item in results
+                if item["expected"].startswith("The ")),
             "unsupported_type_controls": 2,
-            "diagnostic_question_forms": 2,
+            "alternate_question_forms": 2,
             "results": results,
         }
         REPORT.parent.mkdir(parents=True, exist_ok=True)
@@ -221,7 +231,7 @@ def main() -> None:
     print("PASS: 3/3 source-disjoint routes recombined through fresh chat")
     print("PASS: each positive retained route, classification, taxonomy, and proof provenance")
     print("PASS: 2/2 unsupported narrower types were not asserted")
-    print("MEASURED: 2 untrained question forms recorded as coverage probes")
+    print("PASS: both 'What' and imperative 'Name the … that' forms retain the same proof")
     print(f"REPORT: {REPORT}")
     print("LIMIT: synthetic controlled domain; no representative user-task or 70B comparison")
 

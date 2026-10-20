@@ -446,7 +446,7 @@ not to add more demonstrations of the same finite-list operations.
 | 5 | **Expand breadth only through validated task slices.** Use the same natural-language interface for coding, math, translation, and creative work. Select the next task from observed failures; define held-out requests, negative cases, an independent checker or rubric, and repair behavior before implementation. Test each domain before cross-domain composition. | Per-task ordinary-chat scorecards for coverage, correctness/quality, unsupported output, provenance, repair, and cost. | Each slice demonstrates useful held-out completion and honest limits. A feature, corpus, or one-off success does not count as domain competence. |
 | 6 | **Validate SQLite as the complete distributable runtime.** Once learning and correction lifecycles stabilize, copy the model where source files are unavailable and replay the shared scorecard, including query, learning, recombination, reasoning, explanation, correction, and reload. | Reproducible copy-only report including searchable source text, accepted knowledge, rules, provenance, correction lineage, licensing metadata, size, and migration behavior. | Tested behavior depends only on the copied model and runtime, and evidence/corrections remain inspectable after reload. |
 
-**Current checkpoint (`21ecbff`, 2026-10-20):** the project has
+**Current checkpoint (2026-10-20):** the project has
 well-instrumented controlled paths for proof-checked reasoning, bounded
 recombination, source-backed retrieval, contextual dialogue state, reviewed
 learning, and SQLite portability. The prior multi-turn dialogue failures now
@@ -491,12 +491,13 @@ The first wider transfer packet, `v1_516`, now carries the reviewed
 three held-out routes from distinct source documents, through saved/reloaded
 fresh chat. All three answers retain route, classification, taxonomy, proof,
 and language-alignment provenance. Two unsupported type controls do not assert
-the narrower type. Of two additional syntactic probes, “What waterway runs
-through …?” succeeds, while “Name the waterway that …” returns source text
-without the composed type proof. This is controlled synthetic transfer with
-pre-reviewed components, not evidence of broad natural-language task
-completion. Continue by testing independent request forms and more adversarial
-reasoning conditions through the ordinary chat route.
+the narrower type. The “What waterway runs through …?” and imperative “Name
+the waterway that runs through …” forms both reach the same proof-backed
+answer path; the latter previously fell back to raw source text. This is
+controlled synthetic transfer with pre-reviewed components, not evidence of
+broad natural-language task completion. Continue by testing independently
+authored requests and more adversarial reasoning conditions through ordinary
+chat.
 
 A fresh run of `v1_251_large_corpus_chat_stress.py` on this checkout indexed
 1,200 documents and 7,200 sentences. It found all 30 exact baseline targets,

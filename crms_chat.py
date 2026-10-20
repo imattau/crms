@@ -1472,13 +1472,24 @@ def _natural_where_lookup(message: str) -> tuple[str, str] | None:
 
 def _natural_typed_relation_question(
         message: str) -> tuple[str, str, str, str] | None:
-    """Parse `Which TYPE VERB PREPOSITION ENTITY?` without alias guessing."""
+    """Parse bounded typed-relation questions without alias guessing."""
     match = re.fullmatch(
         r"\s*(?:which|what)\s+(?P<type>[a-z][\w’'-]*)\s+"
         r"(?P<predicate>[a-z][\w’'-]*)\s+"
         r"(?P<preposition>through|into|across|along|within|near|from|to|in|at|on)\s+"
         r"(?P<object>.+?)\s*[?!.]?\s*",
         message, flags=re.IGNORECASE)
+    if match is None:
+        # Imperative identification requests express the same slots through a
+        # relative clause: "Name the waterway that runs through X". Route it
+        # into the exact same type, relation, evidence, and proof checks below.
+        match = re.fullmatch(
+            r"\s*(?:name|identify)\s+(?:the|a|an)\s+"
+            r"(?P<type>[a-z][\w’'-]*)\s+that\s+"
+            r"(?P<predicate>[a-z][\w’'-]*)\s+"
+            r"(?P<preposition>through|into|across|along|within|near|from|to|in|at|on)\s+"
+            r"(?P<object>.+?)\s*[?!.]?\s*",
+            message, flags=re.IGNORECASE)
     if match is None:
         return None
     object_text = re.sub(r"^(?:a|an|the)\s+", "",
