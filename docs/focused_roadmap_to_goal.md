@@ -432,7 +432,7 @@ recombination with already reviewed components.
 ### Next execution card
 
 This is the order for the next development cycle, based on the current checkout
-(`3f42202`, 2026-10-20). Recheck reported behavior before changing code;
+(`244b282`, 2026-10-20). Recheck reported behavior before changing code;
 historical reports describe earlier snapshots and should not trigger duplicate
 fixes.
 
@@ -446,7 +446,7 @@ fixes.
 | 6 | **Widen task breadth one validated slice at a time.** Use the same natural-language path for distinct math, coding, translation and creative tasks. Define held-out prompts, an independent checker or quality rubric, negative cases and repair behavior before implementation. | Per-domain ordinary-chat results for coverage, correctness/quality, unsupported outputs, provenance, repair and runtime. | Each domain shows useful held-out completion and honest limits before cross-domain composition or broader claims. Strong 70B-class systems remain a qualitative reference for breadth, paraphrase, completeness and interaction, not a parity target. |
 | 7 | **Validate SQLite as the distributable runtime.** Once learning and correction stabilize, copy the model to a clean location without source files and replay the shared scorecard using the copy alone. | Reproducible copy-only query, search, learning, composition, reasoning, explanation, correction and reload report, with size and compatibility notes. | Tested behavior, searchable source text, rules, provenance and correction lineage survive without the original files. |
 
-**Current checkpoint (`3f42202`, 2026-10-20):** the focused multi-turn
+**Current checkpoint (`244b282`, 2026-10-20):** the focused multi-turn
 regression packet was reported passing 8/8, including topic switching,
 source-only continuity, history, ordinal selection and follow-ups after
 abstention. These are targeted controls, not independent dialogue-transfer
@@ -496,6 +496,21 @@ not autonomous synonym discovery or source-derived transfer. This remains
 bounded clause recombination, not broad language understanding. Next, evaluate
 against a separately authored confirmation set and extend coverage to
 genuinely different task shapes, not just more surface forms of this sum frame.
+
+`v1_507` adds a distinct numeric task operation: count list entries selected
+by proof, counting duplicate occurrences as separate entries. The learner
+initially retained 50 candidate programs because many order/value operations
+preserve count. Exact semantic canonicalization reduced the version space to
+the intended `count_values` primitive from six labeled examples. Controls
+confirm that length-preserving transformations before count and singleton-
+preserving transformations afterward are equivalent, while deduplication and
+value changes are not. The count then composes with inferred positive and
+explicit negative evidence for a new entity; independent counting agrees, and
+unknown/conflicting values block the output. Copied SQLite chat and `why?`
+retain proof and teacher lineage. This is supervised operation acquisition
+and one controlled reasoning-to-math task, not autonomous learning or general
+word-problem solving. The next capability gate remains a separately authored
+confirmation set plus a task shape that is not just finite-list aggregation.
 
 The immediate bottleneck is therefore no longer “can the components compose in
 a fixture?” It is whether a fresh user request can cause CRMS to select and
