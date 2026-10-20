@@ -64,11 +64,12 @@
     "heldout_sources_shown": true,
     "unknown_route_abstained_in_engine": true,
     "unknown_route_did_not_guess_in_fresh_cli": true,
+    "unrelated_entity_evidence_omitted_from_fresh_cli": true,
     "source_citations_resolved_in_copy": true
   },
   "responses": {
     "heldout": "CRMS> Italy.\nSource: Rhea Silvia, Rome",
-    "unsupported": "CRMS> I found source text, but it does not support a grounded answer (named entity missing: Through; named entity missing: Danube; no location-bearing predicate in sentence; named entity appears as a location, not as the located subject). I won't guess.\nClosest source sentence: “The building of a new London Bridge in 1825 may have helped stop it from freezing: the new bridge had fewer pillars than the old, allowing the river to flow more easily, and stopping it from flowing slowly enough to freeze in cold winters.” [Source: River Thames; may not answer your question]"
+    "unsupported": "CRMS> I found source text, but it does not support a grounded answer (named entity missing: Danube; no location-bearing predicate in sentence; named entity appears as a location, not as the located subject). I won't guess."
   },
   "limits": [
     "Codex manually labeled claims from cited SimpleWiki text; this does not test automatic extraction or rule induction.",

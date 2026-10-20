@@ -38,7 +38,11 @@ labeled SimpleWiki paths licensed a question frame that answered a held-out
 Tiber → Rome → Italy path in a copied-model CLI process, with citations
 resolvable from the copy. It does not change the overall assessment: there was
 one held-out entity, no downstream procedure, and the unsupported Danube query
-surfaced an unrelated Thames sentence as closest evidence. Treat the recent
+initially surfaced an unrelated Thames sentence as closest evidence; the
+current runtime omits that sentence after the entity-mismatch fix. Proof-to-
+procedure composition already has controlled demonstrations (`v1_451`,
+`v1_502`, `v1_507`), so the remaining gap is its transfer to broader
+source-backed tasks. Treat the recent
 Colosseum/Eiffel pronoun report as an open dialogue release-gate regression;
 older dialogue controls do not invalidate that counterexample.
 
@@ -153,14 +157,13 @@ gaps, not to claim parity.
 
 ## Immediate next action
 
-The next capability packet must cross two boundaries not yet demonstrated:
-reasoning should drive a separate procedure, and the composed task should
-transfer across more than one held-out entity and request form. Freeze an
-independently authored packet over source-backed material; vary evidence order,
-layout, and entity disambiguation; include partial, unsupported, conflicting,
+The next capability packet must transfer the existing reasoning-to-procedure
+composition beyond curated demonstrations. Freeze an independently authored
+packet over real source-backed material; vary held-out entities, evidence
+order, layout, and request forms; include partial, unsupported, conflicting,
 and multi-source cases; and use an independent checker. Run it through fresh
-CLI processes and a copied model. Keep the Danube irrelevant-evidence result
-and the reported Colosseum/Eiffel pronoun failure as explicit quality gates.
+CLI processes and a copied model. Keep the original Danube irrelevant-evidence
+case and the reported Colosseum/Eiffel pronoun failure as explicit quality gates.
 Continue source-rule quality work in parallel, but keep derived write-back
 review-gated until recombination, correction, and invalidation pass on held-out
 tasks.

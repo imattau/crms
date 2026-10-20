@@ -19,7 +19,8 @@ _QUESTION_STARTERS = frozenset({
     "was", "were", "did", "does", "do", "can", "could", "would", "will",
     "has", "have", "please", "tell", "i", "name", "define",
     # Initial prepositions introduce answer slots, not named entities.
-    "at", "in", "on", "from", "to", "by",
+    "at", "in", "on", "from", "to", "by", "through", "across",
+    "along",
 })
 _NUMBER_WORDS = frozenset("""
 zero one two three four five six seven eight nine ten eleven twelve

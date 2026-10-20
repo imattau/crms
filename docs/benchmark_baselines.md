@@ -11,16 +11,19 @@ the unseen river, the fresh CLI answers from a copied model, and the cited
 passages resolve from that copy. An unsupported Danube path does not inherit
 Italy or produce a guessed answer. All seven focused checks pass.
 
-The abstention does surface a retrieval defect: the CLI appends an unrelated
-River Thames sentence as its “closest” evidence for Danube. The answer remains
-non-committal, but the evidence ranking and abstention presentation are weak.
-The positive reply lists the two source names but does not expose the two-step
-proof by default. The result demonstrates a source-backed two-edge path lookup
-and frame transfer, not broad natural-language transfer, automatic extraction,
-source-rule induction, or reasoning consumed by a separate procedure. Claims
-were labeled by Codex and training/test routes are a small curated set. See the
-[runner](../experiments/v1_523_simplewiki_path_question_transfer.py) and
-[report](../experiments/reports/v1_523_simplewiki_path_question_transfer.json).
+The initial probe exposed a retrieval defect: the CLI appended an unrelated
+River Thames sentence as its “closest” evidence for Danube. The chat now omits
+that excerpt when the rejected candidate lacks a requested named entity, while
+retaining near-match evidence for the entity-specific `v1_329` controls. The
+positive reply lists two source names but does not expose the two-step proof by
+default. The result demonstrates a source-backed two-edge path lookup and
+frame transfer, not broad natural-language transfer, automatic extraction, or
+source-rule induction. Reasoning-to-procedure composition is already exercised
+in controlled packets such as `v1_451`, `v1_502`, and `v1_507`; the missing
+evidence is broader transfer of that capability across independently sourced
+tasks. Claims here were labeled by Codex and routes are a small curated set.
+See the [runner](../experiments/v1_523_simplewiki_path_question_transfer.py)
+and [report](../experiments/reports/v1_523_simplewiki_path_question_transfer.json).
 
 ## Overall direction check (`2026-10-20`)
 
@@ -38,11 +41,11 @@ governed self-learning only after transfer and correction checks pass. The
 latest topic-switch report is a fresh dialogue release-gate input and is not
 closed by the older curated dialogue regressions.
 
-The next capability packet should extend `v1_523` into a downstream operation
-and add multiple held-out entities, evidence layouts, and request forms, with
-an independent checker. Keep the Danube unrelated-evidence result as a retrieval
-quality failure even though the answer abstains. Do not count curated passes as
-a broad task-completion estimate.
+The next capability packet should carry the existing proof-filter/procedure
+composition into real, source-backed tasks, then vary held-out entities,
+evidence layouts, and request forms under an independent checker. Keep the
+initial Danube result as a regression for irrelevant evidence. Do not count
+curated passes as a broad task-completion estimate.
 
 ## Contextual task-intent contrast (`v1_518`, 2026-10-20)
 

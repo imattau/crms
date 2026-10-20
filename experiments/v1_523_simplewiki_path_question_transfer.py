@@ -136,6 +136,8 @@ def main() -> None:
                             QUESTION.format(river="Danube"), "unsupported")
         require("Italy" not in negative,
                 f"fresh CLI guessed an unsupported answer: {negative}")
+        require("Closest source sentence:" not in negative,
+                f"fresh CLI showed unrelated evidence as a closest match: {negative}")
 
     source.close()
     report = {
@@ -155,6 +157,7 @@ def main() -> None:
             "heldout_sources_shown": True,
             "unknown_route_abstained_in_engine": True,
             "unknown_route_did_not_guess_in_fresh_cli": True,
+            "unrelated_entity_evidence_omitted_from_fresh_cli": True,
             "source_citations_resolved_in_copy": True,
         },
         "responses": {"heldout": positive, "unsupported": negative},
@@ -171,6 +174,7 @@ def main() -> None:
     print("PASS: two source-backed training paths license the frame")
     print("PASS: held-out Tiber → Rome → Italy path answers in engine and fresh CLI")
     print("PASS: unsupported Danube path does not guess")
+    print("PASS: unrelated evidence with no matching named entity is not shown as closest")
     print(f"REPORT: {REPORT}")
     print("LIMIT: one manually labeled SimpleWiki frame; no procedure, automatic extraction, or broad transfer claim")
 

@@ -11508,7 +11508,12 @@ def main() -> int:
                 # miss, provided it is clearly labelled as a near match and
                 # is never retained as answer evidence. Ambiguous matches are
                 # omitted because there is no unique closest sentence.
-                if decision["status"] == "rejected" and selected is not None:
+                rejected_reasons = decision.get("reasons", [])
+                has_named_entity_mismatch = any(
+                    str(reason).startswith("named entity missing:")
+                    for reason in rejected_reasons)
+                if (decision["status"] == "rejected" and selected is not None
+                        and not has_named_entity_mismatch):
                     sentence = str(selected.get("text", "")).strip()
                     if sentence:
                         title = (selected.get("title")
