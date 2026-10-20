@@ -203,12 +203,21 @@ def run(index_path: Path, *, maximum_documents: int | None = None) -> dict[str, 
             ranked = sorted(items, key=lambda item: (-len(item[1]["train"]), item[0]))
             canonical, canonical_splits = ranked[0]
             canonical_train = canonical_splits["train"]
+            canonical_pairs = set(canonical_train)
             for phrase, splits in ranked[1:]:
                 candidate_train = splits["train"]
                 if len(candidate_train) < MINIMUM_PAIRS:
                     continue
                 if len(candidate_train) >= len(canonical_train):
                     continue
+                # A shared entity pair is stronger evidence than merely
+                # sharing an infobox field and endpoint role. Keep this as a
+                # diagnostic rather than a hard filter: a useful paraphrase
+                # may occur on disjoint pages and therefore have zero overlap.
+                shared_training_pairs = canonical_pairs & set(candidate_train)
+                shared_holdout_pairs = (
+                    set(canonical_splits["holdout"])
+                    & set(splits["holdout"]))
                 proposals.append({
                     "field": field,
                     "title_role": role,
@@ -216,11 +225,19 @@ def run(index_path: Path, *, maximum_documents: int | None = None) -> dict[str, 
                     "candidate_phrase": phrase,
                     "training_support_pairs": len(candidate_train),
                     "training_dominant_pairs": len(canonical_train),
+                    "same_pair_training_support": len(shared_training_pairs),
                     "holdout_candidate_pairs": len(splits["holdout"]),
                     "holdout_dominant_pairs": len(canonical_splits["holdout"]),
+                    "same_pair_holdout_support": len(shared_holdout_pairs),
                     "support": list(candidate_train.values())[:4],
                     "heldout_support": list(splits["holdout"].values())[:4],
                     "dominant_examples": list(canonical_train.values())[:2],
+                    "same_pair_examples": [
+                        candidate_train[pair] for pair in
+                        sorted(shared_training_pairs)[:4]],
+                    "same_pair_heldout_examples": [
+                        splits["holdout"][pair] for pair in
+                        sorted(shared_holdout_pairs)[:4]],
                     "status": "report-only; field name is weak grouping evidence",
                     "accepted": False,
                 })

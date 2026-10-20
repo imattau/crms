@@ -2857,3 +2857,24 @@ This is regression evidence only. The component tests have different fixtures
 and difficulty; 20/20 is not a unified accuracy or task-completion rate, an
 independent dialogue-transfer result, or a comparison against 70B-class model
 performance.
+
+## Endpoint-pair overlap in map-free predicate discovery (`v1_468`, 2026-10-20)
+
+`experiments/v1_468_pair_overlap_discovery.py` reruns the map-free candidate
+scan on all 285,478 SimpleWiki documents and reports whether a candidate phrase
+and the dominant phrase occur with the same normalized subject/object pair.
+The scan surfaced the same 30 candidate groups as `v1_464`; none had exact
+pair overlap in either the training or document-holdout split. Thus this strict
+co-occurrence signal cannot distinguish the potentially useful phrase groups
+in this corpus. It is not a rejection criterion: valid variants may occur on
+different pages.
+
+A post-hoc content-word overlap audit at coefficient ≥0.75 retained 9 of the
+30 groups: 4 previously labeled same-relation candidates, 4 related but unsafe
+groups, and 1 parser-boundary artifact. The review labels were unblinded and
+the threshold was inspected against them, so these counts are exploratory,
+not precision, recall, or independent confirmation. The result narrows the
+next experiment: freeze candidate features before review and test role,
+qualifier, and parser controls against a blinded sample of both proposals and
+non-proposals. No candidate was accepted or stored. Full output is in
+[`v1_468_pair_overlap_discovery.json`](reports/v1_468_pair_overlap_discovery.json).

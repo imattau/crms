@@ -48,6 +48,18 @@ publisher-disjoint transfer before proposing automatic review or acceptance.
 See the [run report](../experiments/reports/v1_464_unmapped_structured_predicate_discovery.json)
 and [label review](../experiments/reports/v1_464_unmapped_structured_predicate_review.json).
 
+The follow-up `v1_468` measured exact endpoint-pair overlap across a full
+repeat scan of the same 285,478 documents. None of the 30 candidate groups had
+the same normalized subject/object pair in both the candidate and dominant
+phrase sets, so exact-pair co-occurrence is too strict to act as a useful
+filter here. A post-hoc lexical-overlap audit retained 9 groups, including all
+4 labels previously marked same-relation but also 4 related/unsafe groups and
+1 parser artifact. Because the labels were unblinded and the threshold was
+inspected after review, this is a hypothesis for a future frozen study, not a
+precision result. Keep candidate generation report-only; next freeze a
+typed-feature proposal method and evaluate candidates plus non-proposals
+blindly on publisher-disjoint sources. See the [follow-up report](../experiments/reports/v1_468_pair_overlap_discovery.json).
+
 | Order | Work packet | Immediate outcome | Do not claim yet |
 |---|---|---|---|
 | 1 | Validate dialogue transfer and safety | Preserve current clean-process regressions; test independently authored transcripts, varied layouts, visible-context carryover, topic switching, repairs, and history questions. Measure wrong referents, omissions, clarifications, and task completion separately. | Robust open-domain conversation from authored fixtures. |
