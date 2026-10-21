@@ -1,0 +1,1658 @@
+{
+  "build": {
+    "built_in_this_run": false,
+    "considered": null,
+    "throughput": {
+      "documents_per_second": 501.47,
+      "elapsed_seconds": 534.727,
+      "words_per_second": 129567.64
+    }
+  },
+  "clean_room": {
+    "copied": true,
+    "copy_is_temporary": true,
+    "evaluation_documents_expected": 39,
+    "evaluation_documents_present": [
+      "wiki:simplewiki:4864",
+      "wiki:simplewiki:639",
+      "wiki:simplewiki:3319",
+      "wiki:simplewiki:24489",
+      "wiki:simplewiki:876757",
+      "wiki:simplewiki:314654",
+      "wiki:simplewiki:81130",
+      "wiki:simplewiki:6131",
+      "wiki:simplewiki:70819",
+      "wiki:simplewiki:51453",
+      "wiki:simplewiki:76032",
+      "wiki:simplewiki:18701",
+      "wiki:simplewiki:6327",
+      "wiki:simplewiki:56416",
+      "wiki:simplewiki:8335",
+      "wiki:simplewiki:315",
+      "wiki:simplewiki:12436",
+      "wiki:simplewiki:631",
+      "wiki:simplewiki:161",
+      "pmc:PMC13675255.v1.rf8a486301a0c47e7",
+      "pmc:PMC13675296.v1.r0cfcc19abc31595d",
+      "pmc:PMC13675443.v1.r1c2d32da45df7ba2",
+      "pmc:PMC13675281.v1.r473b6d80742d6837",
+      "project:crms_import_jats.py",
+      "project:crms_research.py",
+      "project:crms_package.py",
+      "project:CRMS_README.md",
+      "project:crms_merge_research.py",
+      "project:crms_chat.py",
+      "project:crms_math.py",
+      "project:crms_translation.py",
+      "arxiv:0807.4973v2",
+      "arxiv:0808.0221v1",
+      "arxiv:2009.04549v1",
+      "arxiv:1808.05353v1",
+      "arxiv:2008.04467v1",
+      "arxiv:1904.08075v1",
+      "arxiv:2007.04792v1",
+      "arxiv:2008.05239v3"
+    ],
+    "mode": "corpus directory copied to a temporary model; the original directory was moved aside for the entire scoring run",
+    "originals_hidden_during_eval": true,
+    "originals_required": false,
+    "source_files_required": false
+  },
+  "corpus": {
+    "built_at": "2026-10-21",
+    "by_domain": {
+      "code": 671,
+      "docs": 672,
+      "general": 264924,
+      "reference": 264925,
+      "research": 2532,
+      "science": 2552
+    },
+    "by_language": {
+      "en": 268148
+    },
+    "by_licence_class": {
+      "permissive": 699,
+      "public-domain": 2525,
+      "share-alike": 264924
+    },
+    "by_script": {
+      "latin": 268148
+    },
+    "by_source": {
+      "arxiv-cc-by": 7,
+      "arxiv-metadata": 2525,
+      "crms-project": 671,
+      "curated-local": 1,
+      "pmc-open-access": 20,
+      "simplewiki": 264924
+    },
+    "bytes": 432852289,
+    "catalog_bytes": 301314048,
+    "catalog_schema": 1,
+    "considered": 288795,
+    "documents": 268148,
+    "format": "crms-phase7-corpus",
+    "holdout_documents": 0,
+    "importer_version": "crms-corpus-program/1.0",
+    "index_bytes": 996376576,
+    "input_sources": [
+      "academic-simplewiki-index: data/crms_academic_simplewiki_research.sqlite",
+      "crms-project-files: ."
+    ],
+    "licence_coverage": {
+      "coverage": 1.0,
+      "documents": 268148,
+      "redistributable_documents": 268148,
+      "redistribution_allowed": 268148,
+      "with_attribution": 268148,
+      "with_licence_url": 268148,
+      "with_revision": 268148
+    },
+    "min_words": 20,
+    "model_format": "crms-phase7-model",
+    "near_dedup": true,
+    "rejected": 20647,
+    "rejected_reasons": {
+      "duplicate_exact": 310,
+      "duplicate_near": 64,
+      "empty_after_cleaning": 41,
+      "encoding_damage": 3,
+      "licence_audit": 92,
+      "low_alpha_ratio": 5,
+      "non_english": 2817,
+      "non_latin_script": 8,
+      "sensitive_content": 1,
+      "too_short": 17306
+    },
+    "shards": 8,
+    "throughput": {
+      "documents_per_second": 501.47,
+      "elapsed_seconds": 534.727,
+      "words_per_second": 129567.64
+    },
+    "version": 1,
+    "words": 69283305
+  },
+  "fixture": {
+    "domains": [
+      "code",
+      "docs",
+      "math",
+      "reference",
+      "research",
+      "science"
+    ],
+    "evaluation_documents": 39,
+    "frozen": "2026-10-21",
+    "negative_controls": 10,
+    "positive_tasks": 39
+  },
+  "format": "crms-phase7-eval",
+  "gate": {
+    "clean_room_copy": true,
+    "completion_met": true,
+    "corpus_word_target_met": true,
+    "corpus_words": 69283305,
+    "latency_reported": true,
+    "licence_coverage": 1.0,
+    "licence_coverage_met": true,
+    "minimum_positive_completion": 0.8,
+    "negative_abstention": 1.0,
+    "negative_abstention_met": true,
+    "negative_abstention_target": 0.9,
+    "originals_required": false,
+    "positive_completion": 1.0,
+    "sharded_index": true,
+    "shards": 8,
+    "throughput_reported": true,
+    "zero_confident_wrong": true,
+    "zero_invalid_citations": true
+  },
+  "gate_passed": true,
+  "negative": {
+    "completion": 0.0,
+    "confident_wrong": 0,
+    "correct": 0,
+    "invalid_citations": 0,
+    "median_ms": 328.1129259848967,
+    "p95_ms": 523.5971849760972,
+    "target_matched": 0,
+    "tasks": 10
+  },
+  "negative_rows": [
+    {
+      "abstained": true,
+      "answer": "",
+      "citation": "",
+      "coverage": 0.6666666666666666,
+      "document_id": "wiki:simplewiki:1046436",
+      "domain": "negative",
+      "latency_ms": 523.5971849760972,
+      "matched_terms": [
+        "capital",
+        "city"
+      ],
+      "question": "What is the capital city of Xylophonica?",
+      "score": 30.6668198996571,
+      "status": "abstained",
+      "task": "neg-01",
+      "title": "Metropolitan City of Rome Capital"
+    },
+    {
+      "abstained": true,
+      "answer": "",
+      "citation": "",
+      "coverage": 0.25,
+      "document_id": "wiki:simplewiki:120074",
+      "domain": "negative",
+      "latency_ms": 257.7186059788801,
+      "matched_terms": [
+        "teleportation"
+      ],
+      "question": "Who invented the teleportation device in 1820?",
+      "score": 500.0,
+      "status": "abstained",
+      "task": "neg-02",
+      "title": "Teleportation"
+    },
+    {
+      "abstained": true,
+      "answer": "",
+      "citation": "",
+      "coverage": 0.6666666666666666,
+      "document_id": "wiki:simplewiki:21982",
+      "domain": "negative",
+      "latency_ms": 228.32402103813365,
+      "matched_terms": [
+        "boiling",
+        "point"
+      ],
+      "question": "What is the boiling point of unobtainium?",
+      "score": 42.59571693721863,
+      "status": "abstained",
+      "task": "neg-03",
+      "title": "Boiling point"
+    },
+    {
+      "abstained": true,
+      "answer": "",
+      "citation": "",
+      "coverage": 0.4,
+      "document_id": "project:experiments/v1_211_grounded_python_generation.py",
+      "domain": "negative",
+      "latency_ms": 450.09555004071444,
+      "matched_terms": [
+        "implements",
+        "python"
+      ],
+      "question": "Which Python module implements xylophonic gravity?",
+      "score": 185.11394238803462,
+      "status": "abstained",
+      "task": "neg-04",
+      "title": "\"\"\"Check inspectable Python rendering from an exact learned CRMS procedure.\"\"\""
+    },
+    {
+      "abstained": true,
+      "answer": "",
+      "citation": "",
+      "coverage": 0.25,
+      "document_id": "wiki:simplewiki:912618",
+      "domain": "negative",
+      "latency_ms": 409.4961829832755,
+      "matched_terms": [
+        "expedition"
+      ],
+      "question": "What did the Zorblaxian expedition discover in 1999?",
+      "score": 26.023223152862673,
+      "status": "abstained",
+      "task": "neg-05",
+      "title": "Imperial Trans-Antarctic Expedition"
+    },
+    {
+      "abstained": true,
+      "answer": "",
+      "citation": "",
+      "coverage": 0.5,
+      "document_id": "wiki:simplewiki:227558",
+      "domain": "negative",
+      "latency_ms": 378.3977729617618,
+      "matched_terms": [
+        "population"
+      ],
+      "question": "What is the population of Nimbusville?",
+      "score": 19.510020572521256,
+      "status": "abstained",
+      "task": "neg-06",
+      "title": "Population without double counting"
+    },
+    {
+      "abstained": true,
+      "answer": "",
+      "citation": "",
+      "coverage": 0.2,
+      "document_id": "wiki:simplewiki:915446",
+      "domain": "negative",
+      "latency_ms": 316.9516279594973,
+      "matched_terms": [
+        "meridian"
+      ],
+      "question": "Who wrote the novel Quintessence of the Glass Meridian?",
+      "score": 29.2447077888887,
+      "status": "abstained",
+      "task": "neg-07",
+      "title": "Meridian, Sutter County, California"
+    },
+    {
+      "abstained": true,
+      "answer": "",
+      "citation": "",
+      "coverage": 0.6666666666666666,
+      "document_id": "wiki:simplewiki:21550",
+      "domain": "negative",
+      "latency_ms": 225.21399799734354,
+      "matched_terms": [
+        "chemical",
+        "formula"
+      ],
+      "question": "What is the chemical formula for phlogistonium?",
+      "score": 33.64362110561304,
+      "status": "abstained",
+      "task": "neg-08",
+      "title": "Chemical formula"
+    },
+    {
+      "abstained": true,
+      "answer": "",
+      "citation": "",
+      "coverage": 0.2,
+      "document_id": "project:docs/dialogue_move_annotation_protocol.md",
+      "domain": "negative",
+      "latency_ms": 223.66997902281582,
+      "matched_terms": [
+        "protocol"
+      ],
+      "question": "Which RFC defines the Interplanetary Postal Protocol?",
+      "score": 137.55015111777232,
+      "status": "abstained",
+      "task": "neg-09",
+      "title": "Dialogue move annotation protocol"
+    },
+    {
+      "abstained": true,
+      "answer": "",
+      "citation": "",
+      "coverage": 0.25,
+      "document_id": "wiki:simplewiki:995980",
+      "domain": "negative",
+      "latency_ms": 339.27422401029617,
+      "matched_terms": [
+        "regulate"
+      ],
+      "question": "What does the 2026 Xylophonian Accord regulate?",
+      "score": 28.982996217704212,
+      "status": "abstained",
+      "task": "neg-10",
+      "title": "Regulate... G Funk Era"
+    }
+  ],
+  "overall": {
+    "completion": 1.0,
+    "confident_wrong": 0,
+    "correct": 39,
+    "invalid_citations": 0,
+    "median_ms": 315.5472989892587,
+    "negative_abstained": 10,
+    "negative_answered": 0,
+    "negative_total": 10,
+    "p95_ms": 1034.2851080349647,
+    "target_matched": 39,
+    "tasks": 39
+  },
+  "paths": {
+    "corpus": "data/phase7_core",
+    "fixture": "corpus/phase7_eval/fixture.json",
+    "report": "experiments/reports/phase7_corpus.json"
+  },
+  "rows": [
+    {
+      "answer": "Edinburgh (Scottish Gaelic: D\u00f9n \u00c8ideann) is the capital city and second largest city in Scotland. Edinburgh lies on the east coast, where the River Forth flows into the sea.\nThe central part is Edinburgh Castle, at the top of a steep hill. The castle has a military display every year, called a tattoo, where soldiers show their skills at marching and competitions, and there are brass bands and bands of bagpipes.\nEdinburgh has a very large festival every year, where thousands of performers come to",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:4864#sha256=1331b4eec1943fd6d4b00ae0ba823dfa772db0023837fa9a2edabae9aca6b063&chars=0:500",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:4864",
+      "domain": "reference",
+      "expected_any": [
+        "capital city and second largest city in Scotland"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 168.6871640267782,
+      "matched_terms": [
+        "edinburgh"
+      ],
+      "question": "What is Edinburgh?",
+      "resolved_chars": 500,
+      "score": 500.0,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:4864",
+      "target_matched": true,
+      "task": "ref-01",
+      "title": "Edinburgh"
+    },
+    {
+      "answer": "A planet is a large object such as Venus or Earth that orbits a star. Planets do not make light but can reflect light. Planets are spherical (that is, ball-shaped), because their gravity compresses them into a sphere.\nJupiter is the biggest planet in the Solar System, while the smallest planet in the Solar System is Mercury.\nPlanets are shaped like a slightly squashed ball (called a spheroid). Objects that orbit planets are called satellites. A star and everything which orbits it are called a st",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:639#sha256=b409f123c73462384e23a65b46185b1f9fa4c2ea71612e072f4b91f29ff4807e&chars=0:500",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:639",
+      "domain": "reference",
+      "expected_any": [
+        "A planet is a large object"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 229.193196981214,
+      "matched_terms": [
+        "planet"
+      ],
+      "question": "What is a planet?",
+      "resolved_chars": 500,
+      "score": 500.0,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:639",
+      "target_matched": true,
+      "task": "ref-02",
+      "title": "Planet"
+    },
+    {
+      "answer": "Paper is a thin material of (mostly) wood fibres pressed together. People write on paper with a pencil or pen, and books are made of paper. Paper can absorb liquids such as water, so people can clean things with paper. There are many types of paper, such as craft paper and copy paper.\nThe pulp and paper industry comprises companies that use wood as raw material and produce pulp, paper, board and other cellulose-based products.\nPaper making\nModern paper is normally made from wood pulp. Wood is gr",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:3319#sha256=fc78beea3e9faa72dc63c2da35968326d4792e5b388e86952cebc5fa196b059d&chars=0:500",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:3319",
+      "domain": "reference",
+      "expected_any": [
+        "wood fibres",
+        "wood pulp",
+        "thin material"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 200.37331996718422,
+      "matched_terms": [
+        "paper"
+      ],
+      "question": "What is paper?",
+      "resolved_chars": 500,
+      "score": 500.0,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:3319",
+      "target_matched": true,
+      "task": "ref-03",
+      "title": "Paper"
+    },
+    {
+      "answer": "Poodles were originally bred as water retrievers and hunting dogs.",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:24489#sha256=5c3780e1d9469f8c5f53db1dc2f4a6ce5365d4694649b4fd967c7a57a254ef82&chars=274:340",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:24489",
+      "domain": "reference",
+      "expected_any": [
+        "water retrievers and hunting dogs"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 238.85703401174396,
+      "matched_terms": [
+        "bred",
+        "originally",
+        "poodles"
+      ],
+      "question": "What were poodles originally bred as?",
+      "resolved_chars": 66,
+      "score": 25.163633888091567,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:24489",
+      "target_matched": true,
+      "task": "ref-04",
+      "title": "Poodle"
+    },
+    {
+      "answer": "It is named after Nathanial Bacon, who led the rebellion.",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:876757#sha256=ead0655ad637d80fbe92807b0da0e3091bb108ddd596ad838df4ae93c4342253&chars=78:135",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:876757",
+      "domain": "reference",
+      "expected_any": [
+        "Nathanial Bacon",
+        "Nathaniel Bacon"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 339.9027539999224,
+      "matched_terms": [
+        "bacon's",
+        "led",
+        "rebellion"
+      ],
+      "question": "Who led Bacon's Rebellion?",
+      "resolved_chars": 57,
+      "score": 46.831005015792364,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:876757",
+      "target_matched": true,
+      "task": "ref-05",
+      "title": "Bacon's Rebellion"
+    },
+    {
+      "answer": "Pope\nPrignano was elected pope on April 8, 1378; and he chose to be called Pope Urban VI.",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:314654#sha256=959f93b676fdb09534b57ca9f8ce7748ec8f8bba6f611a06913b7d09347f022c&chars=434:523",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:314654",
+      "domain": "reference",
+      "expected_any": [
+        "April 8, 1378"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 256.96103397058323,
+      "matched_terms": [
+        "elected",
+        "pope",
+        "prignano"
+      ],
+      "question": "When was Prignano elected pope?",
+      "resolved_chars": 89,
+      "score": 41.20080893657955,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:314654",
+      "target_matched": true,
+      "task": "ref-06",
+      "title": "Pope Urban VI"
+    },
+    {
+      "answer": "cross of the war memorial and a menorah for Hanukkah coexist in Oxford.\nIn Sweden, religions coexist: Katarina Church and the minaret of the Stockholm Mosque.\nReligious toleration is people allowing other people to think or practice other religions and beliefs. In a country with a state religion, toleration means that the government allows other religions to be there. Many countries in past centuries allowed other religions but only in privacy. This has become rare. Others allow public religion",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:81130#sha256=3740e3c0476d73901b09b96f5798303a7a0f2778b097de927e2d9af2f5dd560b&chars=0:499",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:81130",
+      "domain": "reference",
+      "expected_any": [
+        "allowing other people to think or practice other religions and beliefs"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 222.17774199089035,
+      "matched_terms": [
+        "religious",
+        "toleration"
+      ],
+      "question": "What is religious toleration?",
+      "resolved_chars": 499,
+      "score": 500.0,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:81130",
+      "target_matched": true,
+      "task": "ref-07",
+      "title": "Religious toleration"
+    },
+    {
+      "answer": "It is played by two pairs of players, one pair against the other pair.",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:6131#sha256=12c702c73c17a85752ab9022e002a9dfbe1e690a68447338bdf9bdf981ee09a1&chars=62:132",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.6666666666666666,
+      "document_id": "wiki:simplewiki:6131",
+      "domain": "reference",
+      "expected_any": [
+        "two pairs of players"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 703.3030190505087,
+      "matched_terms": [
+        "bridge",
+        "contract",
+        "pairs",
+        "players"
+      ],
+      "question": "How many pairs of players does contract bridge use?",
+      "resolved_chars": 70,
+      "score": 41.914410205806774,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:6131",
+      "target_matched": true,
+      "task": "ref-08",
+      "title": "Contract bridge"
+    },
+    {
+      "answer": "Ether burns very easily and boils at about 35\u00b0C.",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:70819#sha256=cb3d704e00c06a30941808898cd96436d84cf7fa1b00f8a237939a36c0893774&chars=73:121",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.5,
+      "document_id": "wiki:simplewiki:70819",
+      "domain": "science",
+      "expected_any": [
+        "boils at about 35\u00b0C",
+        "35\u00b0C"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 239.8160469601862,
+      "matched_terms": [
+        "diethyl",
+        "ether"
+      ],
+      "question": "At what temperature does diethyl ether boil?",
+      "resolved_chars": 48,
+      "score": 49.30952891572704,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:70819",
+      "target_matched": true,
+      "task": "sci-01",
+      "title": "Diethyl ether"
+    },
+    {
+      "answer": "Limpets eat by grazing on algae found on rock surfaces.",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:51453#sha256=fadda6f2acd37fa7f20d4b2c95bf000c81735da6ed1d535e6b75f0b01f0a6e57&chars=599:654",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:51453",
+      "domain": "science",
+      "expected_any": [
+        "grazing on algae"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 240.55190198123455,
+      "matched_terms": [
+        "eat",
+        "limpets"
+      ],
+      "question": "How do limpets eat?",
+      "resolved_chars": 55,
+      "score": 23.087956010621124,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:51453",
+      "target_matched": true,
+      "task": "sci-02",
+      "title": "Limpet"
+    },
+    {
+      "answer": "Mammalia\nTherapsids, previously known as the mammal-like reptiles, are a group of synapsids.",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:76032#sha256=359bdc75d66777cd6412f519257f90c0dccc4358efd88341b775087b7767ab67&chars=577:669",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:76032",
+      "domain": "science",
+      "expected_any": [
+        "group of synapsids"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 88.20824598660693,
+      "matched_terms": [
+        "therapsids"
+      ],
+      "question": "What are therapsids?",
+      "resolved_chars": 92,
+      "score": 15.133013025654046,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:76032",
+      "target_matched": true,
+      "task": "sci-03",
+      "title": "Therapsid"
+    },
+    {
+      "answer": "Here is another way to think of prime numbers. The number 12 is not prime, because a rectangle can be made, with sides of lengths four and three. This rectangle has an area of 12, because all 12 blocks are used. This cannot be done with 11. No matter how the rectangle is arranged, there will always be blocks left over, except for the rectangle with sides of lengths for 11 and 1. 11 is therefore a prime number.\nA prime is a natural number that has exactly two divisors: one and itself. A natural n",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:18701#sha256=7b12d637bf2be7dbe67beb2c35d1aad98c03027d8cb5a2bb96d8800436200611&chars=0:500",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:18701",
+      "domain": "science",
+      "expected_any": [
+        "has exactly two divisors",
+        "two divisors"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 372.83141497755423,
+      "matched_terms": [
+        "number",
+        "prime"
+      ],
+      "question": "What is a prime number?",
+      "resolved_chars": 500,
+      "score": 500.0,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:18701",
+      "target_matched": true,
+      "task": "sci-04",
+      "title": "Prime number"
+    },
+    {
+      "answer": "In mathematics, the Pythagorean theorem or Pythagoras's theorem is a statement about the sides of a right triangle.",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:6327#sha256=6d56c0251c856dd6f4733de663af8638459991dfbec369f2a24494ed2e9e3223&chars=126:241",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.8333333333333334,
+      "document_id": "wiki:simplewiki:6327",
+      "domain": "science",
+      "expected_any": [
+        "a^2+b^2=c^2",
+        "statement about the sides of a right triangle"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 662.5578919774853,
+      "matched_terms": [
+        "about",
+        "pythagorean",
+        "right",
+        "theorem",
+        "triangle"
+      ],
+      "question": "What does the Pythagorean theorem say about a right triangle?",
+      "resolved_chars": 115,
+      "score": 53.63775366769907,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:6327",
+      "target_matched": true,
+      "task": "sci-05",
+      "title": "Pythagorean theorem"
+    },
+    {
+      "answer": "Within this framework, CAs may represent a metabolic link between environmental sensing and adaptive responses associated with survival during antibiotic exposure.",
+      "answer_match": true,
+      "citation": "pmc:PMC13675255.v1.rf8a486301a0c47e7#sha256=ed44c499ed1aefad6058957f6c012a3acd993dded6e126e9f3f084d3536cf81e&chars=5081:5244",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "pmc:PMC13675255.v1.rf8a486301a0c47e7",
+      "domain": "science",
+      "expected_any": [
+        "adaptive responses"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 339.2502299975604,
+      "matched_terms": [
+        "anhydrases",
+        "carbonic",
+        "environmental",
+        "link",
+        "sensing"
+      ],
+      "question": "What may carbonic anhydrases link environmental sensing to?",
+      "resolved_chars": 163,
+      "score": 41.123415040039696,
+      "status": "answered",
+      "target_document_id": "pmc:PMC13675255.v1.rf8a486301a0c47e7",
+      "target_matched": true,
+      "task": "sci-06",
+      "title": "Carbonic Anhydrases in Mycobacteria: Linking Metabolic Adaptation to Phenotypic Drug Tolerance"
+    },
+    {
+      "answer": "CTHRC1 is characterized by multilevel and complex interactions with intracellular components and the extracellular matrix implemented through various mechanisms and secretion pathways [1].",
+      "answer_match": true,
+      "citation": "pmc:PMC13675296.v1.r0cfcc19abc31595d#sha256=0dd8bea0cc39c3c750d0159b02b6b3571af312a9699e659098b5f92c53767616&chars=2175:2363",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "pmc:PMC13675296.v1.r0cfcc19abc31595d",
+      "domain": "science",
+      "expected_any": [
+        "multilevel and complex interactions"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 164.68041396001354,
+      "matched_terms": [
+        "characterized",
+        "cthrc1"
+      ],
+      "question": "What is CTHRC1 characterized by?",
+      "resolved_chars": 188,
+      "score": 30.23382192804867,
+      "status": "answered",
+      "target_document_id": "pmc:PMC13675296.v1.r0cfcc19abc31595d",
+      "target_matched": true,
+      "task": "sci-07",
+      "title": "Potential role of CTHRC1 in renal fibrosis"
+    },
+    {
+      "answer": "Terminators, termination signals, and termination mechanisms\nA terminator is a region associated with polymerase release or stable transcript-end formation; a cis-acting termination signal is a locally acting feature carried by the DNA template or nascent RNA that biases an elongation complex toward pausing, processing-associated transitions, destabilization, or release; and a termination mechanism is the broader causal process involving RNAP, trans-acting factors, RNA-processing enzymes, and kinetic or cellular context.",
+      "answer_match": true,
+      "citation": "pmc:PMC13675443.v1.r1c2d32da45df7ba2#sha256=278e4f3b00f794addbf3d0972aca742103ca4b6e9eed3d608652036988a9f331&chars=4814:5340",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.75,
+      "document_id": "pmc:PMC13675443.v1.r1c2d32da45df7ba2",
+      "domain": "science",
+      "expected_any": [
+        "polymerase release or stable transcript-end formation"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 403.6795620340854,
+      "matched_terms": [
+        "associated",
+        "cross",
+        "domain",
+        "grammars",
+        "signal",
+        "terminator"
+      ],
+      "question": "What does the cross-domain signal grammars article say a terminator is associated with?",
+      "resolved_chars": 526,
+      "score": 57.400004932807285,
+      "status": "answered",
+      "target_document_id": "pmc:PMC13675443.v1.r1c2d32da45df7ba2",
+      "target_matched": true,
+      "task": "sci-08",
+      "title": "Cross-domain signal grammars of transcription termination"
+    },
+    {
+      "answer": "Autophagy (which means \"eating itself\"), is one of the basic cell mechanisms. It allows the controlled breaking down of cell parts which do not work, or are not needed. The cell parts can then be recycled as required.\nThere are several ways this happens. Targeted cell parts may be isolated from the rest of the cell in an autophagosome (a double-membraned vesicle). The autophagosome fuses with lysosomes and the contents are broken down and recycled. In the extreme case of starvation, the breakdow",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:556576#sha256=435a3324fe8a8463fa3a9b984f0667b3079696519fd2d6f4536488b829ce41d0&chars=0:500",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:556576",
+      "domain": "science",
+      "expected_any": [
+        "basic cell mechanisms"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 194.6630509919487,
+      "matched_terms": [
+        "autophagy"
+      ],
+      "question": "What is autophagy?",
+      "resolved_chars": 500,
+      "score": 500.0,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:556576",
+      "target_matched": true,
+      "task": "sci-09",
+      "title": "Autophagy"
+    },
+    {
+      "answer": "A fraction is a number that shows how many equal parts there are.",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:56416#sha256=763cfdab960f4b0677de774b3632d43298257352b356e01f5cb93730b44c7edc&chars=46:111",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:56416",
+      "domain": "math",
+      "expected_any": [
+        "A fraction is a number that shows how many equal parts there are"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 279.5544909895398,
+      "matched_terms": [
+        "fraction",
+        "mathematics"
+      ],
+      "question": "What is a fraction in mathematics?",
+      "resolved_chars": 65,
+      "score": 33.098863386831745,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:56416",
+      "target_matched": true,
+      "task": "math-01",
+      "title": "Fraction (mathematics)"
+    },
+    {
+      "answer": "A mathematical equation is a mathematical object containing two or more expressions connected by equals signs (=).",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:8335#sha256=15a87ab504a2b32c11d6fe29525c5b0e9c0b36833d1c5a943691f12c42302f72&chars=0:114",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:8335",
+      "domain": "math",
+      "expected_any": [
+        "two or more expressions connected by equals signs"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 236.5702120005153,
+      "matched_terms": [
+        "equation",
+        "mathematical"
+      ],
+      "question": "What is a mathematical equation?",
+      "resolved_chars": 114,
+      "score": 32.015011354969594,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:8335",
+      "target_matched": true,
+      "task": "math-02",
+      "title": "Equation"
+    },
+    {
+      "answer": "For example, geometry can help people find:\nthe surface area of a house, so they can buy the right amount of paint\nthe volume of a box, to see if it is big enough to hold a liter of food\nthe area of a farm, so it can be divided into equal parts\nthe distance around the edge of a pond, to know how much fencing to buy.",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:315#sha256=d29a4c28c40aea7dc6af689f8d7040524df8f1cce8c7128d5b76d80a8d9dc7a5&chars=850:1167",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:315",
+      "domain": "math",
+      "expected_any": [
+        "surface area of a house",
+        "surface area"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 731.2308480031788,
+      "matched_terms": [
+        "find",
+        "geometry",
+        "help",
+        "people"
+      ],
+      "question": "What can geometry help people find?",
+      "resolved_chars": 317,
+      "score": 500.0,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:315",
+      "target_matched": true,
+      "task": "math-03",
+      "title": "Geometry"
+    },
+    {
+      "answer": "Trigonometry (from the Greek trigonon = three angles and metron = measure) is a part of elementary mathematics dealing with angles, triangles and trigonometric functions such as sine (abbreviated sin), cosine (abbreviated cos) and tangent (abbreviated tan). It has some connection to geometry, although there is disagreement on exactly what that connection is; for some, trigonometry is just a section of geometry.\nOverview and definitions\nA standard right triangle. C is the right angle in this pict",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:12436#sha256=ca7eed6c32b8910ff8f5fa87ddae29f0b88cbb9b5b91ed871c4d5c520613d569&chars=0:500",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:12436",
+      "domain": "math",
+      "expected_any": [
+        "part of elementary mathematics dealing with angles, triangles and trigonometric functions"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 141.63962699240074,
+      "matched_terms": [
+        "trigonometry"
+      ],
+      "question": "What is trigonometry?",
+      "resolved_chars": 500,
+      "score": 500.0,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:12436",
+      "target_matched": true,
+      "task": "math-04",
+      "title": "Trigonometry"
+    },
+    {
+      "answer": "Probability is a part of applied mathematics. It has to do with chance, the study of things that might happen or might not happen.\nFor example, using probability, one can show that by throwing a coin up in the air and letting it land, half of the time it will land with one side facing up, and half of the time with the other side facing up. Many coins have a picture of the face of a famous person on one side, and something else on the other side. Often people call the side with the face \"heads\",",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:631#sha256=7923330a99ce7172c65b623c3b0ef7fa026837634755a8f227112adc48b34373&chars=0:499",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:631",
+      "domain": "math",
+      "expected_any": [
+        "part of applied mathematics",
+        "study of things that might happen or might not happen"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 185.8273529796861,
+      "matched_terms": [
+        "probability"
+      ],
+      "question": "What is probability?",
+      "resolved_chars": 499,
+      "score": 500.0,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:631",
+      "target_matched": true,
+      "task": "math-05",
+      "title": "Probability"
+    },
+    {
+      "answer": "Calculus is a branch of mathematics that describes continuous change.\nThere are two different types of calculus. Differential calculus divides (differentiates) things into small (different) pieces, and tells us how they change from one moment to the next, while integral calculus joins (integrates) the small pieces together, and tells us how much of something is made, overall, by a series of changes. Calculus is used in many different sciences such as physics, astronomy, biology, engineering, eco",
+      "answer_match": true,
+      "citation": "wiki:simplewiki:161#sha256=3668fabdc94f35a57a9f33138a3a7fe6f4575c4c50ae01af9a5db64f010cbd64&chars=0:500",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "wiki:simplewiki:161",
+      "domain": "math",
+      "expected_any": [
+        "branch of mathematics that describes continuous change"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 175.72150798514485,
+      "matched_terms": [
+        "calculus"
+      ],
+      "question": "What is calculus?",
+      "resolved_chars": 500,
+      "score": 500.0,
+      "status": "answered",
+      "target_document_id": "wiki:simplewiki:161",
+      "target_matched": true,
+      "task": "math-06",
+      "title": "Calculus"
+    },
+    {
+      "answer": "\"\"\"Import explicitly licensed JATS articles from a local corpus to SQLite.\"\"\"\n\nfrom __future__ import annotations\n\nimport argparse\nimport hashlib\nimport re\nimport sys\nimport tempfile\nimport xml.etree.ElementTree as ET\nfrom pathlib import Path\nfrom typing import Mapping\nfrom urllib.parse import quote\n\nfrom crms_research import CRMSSQLiteResearchIndex\n\nMAX_ARTICLE_BYTES = 64 * 1024 * 1024\nBLOCKS = {\"abstract\", \"ack\", \"app\", \"body\", \"boxed-text\", \"caption\",\n          \"disp-quote\", \"fig\", \"fn\", \"list\", \"p\", \"ref\", \"sec\",\n          \"table-wrap\", \"tr\"}\nALLOWED_LICENSES = {\n    \"cc0\": \"CC0\",\n    \"cc-by\": \"CC BY\",\n}\n\ndef local_name(tag: str) -> str:\n    return tag.rsplit(\"}\", 1)[-1]\n\ndef element_text(element: ET.Element) -> str:\n    \"\"\"Flatten readable JATS content while retaining paragraph/heading breaks.\"\"\"\n    parts: list[str] = []\n\n    def walk(node: ET.Element) -> None:\n        name = local_name(node.tag)\n        if name in {\"graphic\", \"inline-graphic\", \"media\", \"supplementary-material\"}:\n            return\n        if name in {\"td\", \"th\"} and parts:\n            parts.append(\" | \")\n        if name in {\"title\", \"label\", \"p\", \"abstract\", \"sec\", \"caption\", \"ref\"}:\n            parts.append(\"\\n\")\n        if node.text:\n            parts.append(node.text)\n        for child in node:\n            walk(child)\n            if child.tail:\n                parts.append(child.tail)\n        if name in {\"td\", \"th\"}:\n            parts.append(\" | \")\n        if name in BLOCKS:\n            parts.append(\"\\n\")\n\n    walk(element)\n    lines = [re.sub(r\"\\s+\", \" \", line).strip() for line in \"\".join(parts).splitlines()]\n    return \"\\n\".join(line for line in lines if line)\n\ndef _descendants(element: ET.Element, name: str):\n    return (node for node in element.iter() if local_name(node.tag) == name)\n\ndef _article_fields(root: ET.Element) -> tuple[str, str, str, str, str] | None:\n    license_node = next(_descendants(root, \"license\"), None)\n    if license_node is None:\n        return None\n    license_text = element_text(license_node)\n    href = next((value for key, value in license_node.attrib.items()\n                 if local_name(key) in {\"href\", \"{http://www.w3.org/1999/xlink}href\"}), \"\")\n    license_source = f\"{href} {license_text}\".casefold()\n    restricted = re.search(r\"non[ -]?commercial|no[ -]?derivatives|\\bby[ -]?nc\\b|\\bby[ -]?nd\\b|share[ -]?alike|\\bby[ -]?sa\\b\", license_source)\n    if restricted:\n        return None\n    if \"creativecommons.org/publicdomain/zero\" in license_source or re.search(r\"\\bcc0\\b\", license_source):\n        license_name = ALLOWED_LICENSES[\"cc0\"]\n    elif (\"creativecommons.org/licenses/by/\" in license_source\n          or re.search(r\"\\bcreative commons attribution(?:\\s+4\\.0)?\\b\", license_text, re.I)):\n        license_name = ALLOWED_LICENSES[\"cc-by\"]\n    else:\n        return None\n\n    title_node = next(_descendants(root, \"article-title\"), None)\n    title = element_text(title_node) if title_node is not None else \"\"\n    if not title:\n        return None\n    authors = []\n    for contrib in _descendants(root, \"contrib\"):",
+      "answer_match": true,
+      "citation": "project:crms_import_jats.py#sha256=8b83162664b8ce649ac5efe03da231d43fd63b58c6b6653f77a602dc62fa7cfe&chars=0:3063",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.2857142857142857,
+      "document_id": "project:crms_import_jats.py",
+      "domain": "code",
+      "expected_any": [
+        "cc-by",
+        "cc0"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 594.2182299913839,
+      "matched_terms": [
+        "allowed_licenses",
+        "crms_import_jats"
+      ],
+      "question": "In the Python module crms_import_jats, which licence identifiers are allowed by ALLOWED_LICENSES?",
+      "resolved_chars": 3063,
+      "score": 355.70157629295846,
+      "status": "answered",
+      "target_document_id": "project:crms_import_jats.py",
+      "target_matched": true,
+      "task": "code-01",
+      "title": "\"\"\"Import explicitly licensed JATS articles from a local corpus to SQLite.\"\"\""
+    },
+    {
+      "answer": "return ExtractiveSummary(query, tuple(selected), tuple(used_licenses))\n\n    @staticmethod\n    def render_hits(query: str, hits: list[SearchHit]) -> str:\n        \"\"\"Format retrieval results as attributed excerpts, without synthesis.\"\"\"\n        query = _text(query, \"query\")\n        if not hits:\n            return f\"No supplied source matched: {query}\"\n        lines = [f\"Retrieved {len(hits)} source passage(s) for: {query}\"]\n        for index, hit in enumerate(hits, start=1):\n            location = f\" ({hit.location})\" if hit.location else \"\"\n            page = f\"page {hit.page_number}, \" if hit.page_number is not None else \"\"\n            lines.append(\n                f\"{index}. {hit.title}{location} [{hit.document_id}, \"\n                f\"{page}characters {hit.start}:{hit.end}]\\n   {hit.snippet}\")\n        return \"\\n\".join(lines)\n\n    def save(self, path: str | Path) -> None:\n        payload: dict[str, Any] = {\n            \"format_version\": self.FORMAT_VERSION,\n            \"documents\": [asdict(document) for document in self.documents()],\n        }\n        destination = Path(path)\n        destination.parent.mkdir(parents=True, exist_ok=True)\n        destination.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + \"\\n\",\n                               encoding=\"utf-8\")\n\n    @classmethod\n    def load(cls, path: str | Path) -> \"CRMSResearchIndex\":\n        payload = json.loads(Path(path).read_text(encoding=\"utf-8\"))\n        if payload.get(\"format_version\") != cls.FORMAT_VERSION:\n            raise ValueError(\"unsupported research-index format version\")\n        index = cls()\n        for document in payload.get(\"documents\", []):\n            index.add_document(document[\"document_id\"], document[\"title\"],\n                               document[\"text\"], document.get(\"location\"),\n                               pages=document.get(\"pages\"))\n        return index\n\nclass CRMSSQLiteResearchIndex(CRMSResearchIndex):\n    \"\"\"Disk-backed source corpus using SQLite FTS5 and exact stored passages.\n\n    Source text, page boundaries, and the full-text index stay on disk. Search\n    loads only the top matching source documents to construct and verify exact\n    character-offset citations.\n    \"\"\"\n\n    SCHEMA_VERSION = 2\n    CHUNK_TOKENS = 400\n    CHUNK_OVERLAP = 50\n\n    def __init__(self, path: str | Path, *, read_only: bool = False) -> None:\n        super().__init__()\n        if not isinstance(read_only, bool):\n            raise TypeError(\"read_only must be a boolean\")\n        self.path = Path(path).expanduser().resolve()\n        self.read_only = read_only\n        self._term_document_frequency_cache: dict[str, int] = {}\n        self._term_document_frequency_data_version: int | None = None\n        self._fts_chunk_key = \"CAST(source_fts.chunk_id AS INTEGER)\"\n        self._fts_contentless = False\n        if read_only:\n            if not self.path.is_file():\n                raise FileNotFoundError(self.path)\n            try:\n                self._db = sqlite3.connect(\n                    self.path.as_uri() + \"?mode=ro\", uri=True)\n                self._db.execute(\"PRAGMA query_only=ON\")\n                current = self._db.execute(\n                    \"SELECT value FROM corpus_meta \"\n                    \"WHERE key='schema_version'\").fetchone()\n                if current is None:\n                    raise ValueError(\n                        \"read-only source is not a CRMS SQLite research index\")\n                if current[0] != str(self.SCHEMA_VERSION):\n                    raise ValueError(\n                        \"unsupported read-only SQLite research-index schema\")\n                tables = {row[0] for row in self._db.execute(\n                    \"SELECT name FROM sqlite_master WHERE type IN ('table','view')\")}\n                required = {\"source_documents\", \"source_chunks\", \"source_fts\"}\n                if not required <= tables:\n                    raise ValueError(\n                        \"read-only source is missing research-index tables\")\n                self._detect_fts_layout()\n            except Exception:\n                if hasattr(self, \"_db\"):\n                    self._db.close()\n                raise\n            return\n\n        self.path.parent.mkdir(parents=True, exist_ok=True)\n        try:\n            self._db = sqlite3.connect(str(self.path))\n            self._db.execute(\"PRAGMA foreign_keys=ON\")\n            self._db.execute(\"PRAGMA journal_mode=WAL\")\n            self._db.execute(\n                \"CREATE TABLE IF NOT EXISTS corpus_meta \"",
+      "answer_match": true,
+      "citation": "project:crms_research.py#sha256=09603a60935372d55744fc289687ed8661038459e1239f0ce65aa33edf6d09a6&chars=122384:126892",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.5,
+      "document_id": "project:crms_research.py",
+      "domain": "code",
+      "expected_any": [
+        "SQLite FTS5"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 718.3594499947503,
+      "matched_terms": [
+        "crms_research",
+        "passages",
+        "source",
+        "sqlite"
+      ],
+      "question": "In the Python module crms_research, which SQLite extension indexes source passages?",
+      "resolved_chars": 4508,
+      "score": 379.9106878720466,
+      "status": "answered",
+      "target_document_id": "project:crms_research.py",
+      "target_matched": true,
+      "task": "code-02",
+      "title": "\"\"\"Deterministic, source-verifiable retrieval over supplied documents.\"\"\""
+    },
+    {
+      "answer": "\"\"\"Portable SQLite model files for learned CRMS memories and source text.\"\"\"\n\nfrom __future__ import annotations\n\nimport argparse\nimport hashlib\nimport json\nfrom pathlib import Path\nimport sqlite3\nimport tempfile\n\nFORMAT = \"crms-learned-model\"\n_VERSION_RULE_SQL = 2\n_VERSION_KNOWLEDGE_SQL = 3\n_VERSION_KNOWLEDGE_RECORDS = 4\nVERSION = 5\n_LEGACY_VERSIONS = {1, _VERSION_RULE_SQL, _VERSION_KNOWLEDGE_SQL,\n                    _VERSION_KNOWLEDGE_RECORDS}\nAPPLICATION_ID = int.from_bytes(b\"CRMS\", \"big\")\n_MEMORY_NAMES = (\"knowledge\", \"rules\", \"math\", \"translations\", \"dialogue\")\n_MAX_MEMBER_BYTES = 512 * 1024 * 1024\n_REQUIRED_TABLES = {\"model_metadata\", \"learned_memories\"}\n_RESEARCH_TABLES = {\"research_documents\"}\n_RULE_TABLES = {\"model_rule_settings\", \"model_rule_examples\",\n                \"model_rule_procedures\", \"model_rule_artifacts\"}\n_KNOWLEDGE_SQL_TABLES = {\"knowledge_metadata\", \"knowledge_payload\",\n                         \"inference_rules\", \"derived_cases\",\n                         \"positive_facts\", \"negative_facts\"}\n_KNOWLEDGE_RECORD_TABLES = {\"knowledge_records\"}\n_KNOWLEDGE_TABLES = _KNOWLEDGE_SQL_TABLES | _KNOWLEDGE_RECORD_TABLES\n_KNOWLEDGE_RECORD_SECTIONS = frozenset({\n    \"entity_aliases\", \"entity_alias_explicit_sources\",\n    \"fact_pattern_alias_sources\", \"question_examples\",\n    \"induced_question_frames\", \"induced_qualified_question_frames\",\n    \"induced_multi_qualified_question_frames\", \"qualified_question_examples\",\n    \"multi_qualified_question_examples\", \"polar_question_examples\",\n    \"qualified_polar_question_examples\", \"path_question_examples\",\n    \"counterfactual_source_examples\", \"counterfactual_path_examples\",\n    \"about_question_examples\", \"fact_pattern_examples\",\n    \"context_fact_patterns\", \"fact_pattern_surfaces\",\n    \"fact_pattern_predicates\", \"fact_pattern_predicate_sources\",\n    \"fact_pattern_surface_sources\", \"fact_pattern_polarities\",\n})\n\ndef _knowledge_record_bytes(record: object) -> bytes:\n    return json.dumps(record, ensure_ascii=False, sort_keys=True,\n                      separators=(\",\", \":\")).encode(\"utf-8\")\n\ndef _knowledge_record_anchor(record: object) -> str:\n    if isinstance(record, dict):\n        for field in (\"relation\", \"relations\", \"template\", \"qualifier_names\",\n                      \"alias\", \"prefix\", \"start\", \"target\"):\n            if field in record:\n                return json.dumps(record[field], ensure_ascii=False,\n                                  sort_keys=True, separators=(\",\", \":\"))\n    return hashlib.sha256(_knowledge_record_bytes(record)).hexdigest()",
+      "answer_match": true,
+      "citation": "project:crms_package.py#sha256=42054e0ac8da8c3993a0d64e5c03e17a6c7497fee9f58782979b55ebf3f2952a&chars=0:2541",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.5714285714285714,
+      "document_id": "project:crms_package.py",
+      "domain": "code",
+      "expected_any": [
+        "crms-learned-model"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 1179.6387139474973,
+      "matched_terms": [
+        "crms_package",
+        "format",
+        "model",
+        "portable"
+      ],
+      "question": "In the Python module crms_package, what is the portable model format name?",
+      "resolved_chars": 2541,
+      "score": 402.49806497600906,
+      "status": "answered",
+      "target_document_id": "project:crms_package.py",
+      "target_matched": true,
+      "task": "code-03",
+      "title": "\"\"\"Portable SQLite model files for learned CRMS memories and source text.\"\"\""
+    },
+    {
+      "answer": "# CRMS prototype\n\n## Distributing learned CRMS memories\n\nDocuments, websites, and chats are inputs from which CRMS can learn. They are\nnot required to distribute the resulting learned stores. Create one portable\nSQLite model database from learned knowledge and rule memories, with optional\nmath, translation memories, and extracted searchable source text:\n\n```sh\npython3 crms_package.py export --output crms-model.sqlite \\\n  --knowledge crms_knowledge.json --rules crms_rules.json \\\n  --math crms_math.json --translations crms_translations.json \\\n  --research-index crms_research.sqlite\npython3 crms_package.py inspect crms-model.sqlite\npython3 crms_chat.py --model-db crms-model.sqlite\n```\n\nAfter using the chat to learn facts, rules, math, translations, or new sources,\nclose the session so its sidecar is saved, then fold that state into a new\nsingle-file model:\n\n```sh\npython3 crms_package.py repack crms-model.sqlite \\\n  --memory-dir crms-model.sqlite.memories \\\n  --output crms-model-updated.sqlite\npython3 crms_package.py inspect crms-model-updated.sqlite\n```\n\nRepacking preserves embedded sources, includes updated sidecar memories and\nresearch text when present, and validates the new database. The input model\nis left intact; the output can be copied as the next distributable model.\n`experiments/v1_278_portable_model_repack.py` checks that a learned fact,\noperation phrase, translation frame, and newly indexed source all survive a\nrepack and work through the chat CLI.\n\nThe optional `--research-index` copies extracted readable text, page\nboundaries, titles, and locations into the model database; it does not copy\nthe original files. On first run, `crms_chat.py --model-db` rebuilds a local\nSQLite FTS index from embedded source text in a neighboring `.memories/`\nworking sidecar. The model database can therefore be distributed and searched\nwithout the input files or a separately supplied index. Without\n`--research-index`, the portable database contains learned memories only.\nSQLite research indexes are exported and installed in batches to bound working\nmemory as the corpus grows. `crms_package.py inspect` reports embedded source\ndocument count, UTF-8 bytes, and CRMS word-unit count so local corpus growth can\nbe measured; word units are not an LLM tokenizer count and do not establish\nknowledge equivalence to a model by parameter count. Model v3 installs\n`knowledge.sqlite` and `rules.sqlite` into the neighboring `.memories/` working\nsidecar and chat writes learned changes back into the portable model. Older\nv1/v2 models still rebuild the indexed fact sidecar from their JSON knowledge\npayload. Pass `--fact-db PATH` only when using a standalone knowledge JSON file.\nDirect fact lookups use subject/relation and\nobject/relation indexes, while source facts and citations remain alongside the\nportable knowledge memory. Backward-chaining queries against these SQL tables fetch\nonly facts for the relations reachable through the query's declared rules,\nplus the schema and entity-kind facts needed to verify that proof. The\nindependent proof checker validates against that same scoped snapshot. This\navoids materializing the full fact corpus for each inference query. Derived",
+      "answer_match": true,
+      "citation": "project:CRMS_README.md#sha256=60648fa6977b6eee595317f13a81f38ab7e6ce77e244de9a3691ca7771e1d202&chars=0:3199",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.5714285714285714,
+      "document_id": "project:CRMS_README.md",
+      "domain": "docs",
+      "expected_any": [
+        "python3 crms_chat.py"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 715.9204190247692,
+      "matched_terms": [
+        "chat",
+        "crms_readme",
+        "file",
+        "md"
+      ],
+      "question": "In the file CRMS_README.md, what command starts the interactive chat?",
+      "resolved_chars": 3199,
+      "score": 350.0,
+      "status": "answered",
+      "target_document_id": "project:CRMS_README.md",
+      "target_matched": true,
+      "task": "code-04",
+      "title": "CRMS prototype"
+    },
+    {
+      "answer": "\"\"\"Merge separately imported SQLite research corpora without losing provenance.\"\"\"\n\nfrom __future__ import annotations\n\nimport argparse\nimport json\nfrom itertools import islice\nimport os\nfrom pathlib import Path\nimport sqlite3\nimport tempfile\n\nfrom crms_research import CRMSSQLiteResearchIndex\n\ndef _source_rows(path: Path):\n    connection = sqlite3.connect(f\"file:{path.resolve()}?mode=ro\", uri=True)\n    connection.row_factory = sqlite3.Row\n    try:\n        tables = {row[0] for row in connection.execute(\n            \"SELECT name FROM sqlite_master WHERE type='table'\")}\n        if \"source_documents\" not in tables:\n            raise ValueError(f\"not a CRMS SQLite research index: {path}\")\n        columns = {row[1] for row in connection.execute(\n            \"PRAGMA table_info(source_documents)\")}\n        required = {\"document_id\", \"title\", \"location\", \"body\", \"pages_json\"}\n        if not required <= columns:\n            raise ValueError(f\"research index schema is incomplete: {path}\")\n        cursor = connection.execute(\n            \"SELECT document_id,title,location,body,pages_json \"\n            \"FROM source_documents ORDER BY document_id\")\n        while rows := cursor.fetchmany(128):\n            yield from rows\n    finally:\n        connection.close()\n\ndef merge_research_indexes(\n        sources: list[str | Path], output: str | Path, *, append: bool = False,\n        conflict: str = \"error\", batch_size: int = 256\n        ) -> dict[str, int | str]:\n    \"\"\"Merge local indexes into one FTS-backed SQLite index atomically.\n\n    Identical document IDs and contents are deduplicated. Conflicting content\n    for one ID errors by default; callers can explicitly keep the first copy\n    or replace it with the later source. Distinct IDs retain distinct source\n    records, even when their text happens to match.\n    \"\"\"\n    if conflict not in {\"error\", \"keep-first\", \"replace-later\"}:\n        raise ValueError(\"conflict must be error, keep-first, or replace-later\")\n    if type(batch_size) is not int or not 1 <= batch_size <= 10_000:\n        raise ValueError(\"batch_size must be between 1 and 10000\")\n    destination = Path(output).expanduser().resolve()\n    source_paths = [Path(value).expanduser().resolve() for value in sources]\n    if not source_paths:\n        raise ValueError(\"at least one source research index is required\")\n    if len(set(source_paths)) != len(source_paths):\n        raise ValueError(\"source index paths must be unique\")\n    if destination in source_paths:\n        raise ValueError(\"output cannot also be an input source\")",
+      "answer_match": true,
+      "citation": "project:crms_merge_research.py#sha256=425d208a57d6c4d428e497e14bd34f17e2a550349f629dc1225e1453bd734df9&chars=0:2558",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.14285714285714285,
+      "document_id": "project:crms_merge_research.py",
+      "domain": "code",
+      "expected_any": [
+        "without losing provenance"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 629.785674973391,
+      "matched_terms": [
+        "crms_merge_research"
+      ],
+      "question": "In the Python module crms_merge_research, what does the opening docstring say it preserves?",
+      "resolved_chars": 2558,
+      "score": 350.0,
+      "status": "answered",
+      "target_document_id": "project:crms_merge_research.py",
+      "target_matched": true,
+      "task": "code-05",
+      "title": "\"\"\"Merge separately imported SQLite research corpora without losing provenance.\"\"\""
+    },
+    {
+      "answer": "\"\"\"Interactive terminal shell for CRMS grounded dialogue and research.\"\"\"\n\nfrom __future__ import annotations\n\nimport argparse\nimport ast\nfrom dataclasses import asdict, replace\nimport copy\nfrom decimal import Decimal\nfrom fractions import Fraction\nimport hashlib\nimport json\nimport re\nimport sqlite3\nfrom pathlib import Path\nfrom typing import Any\n\nfrom crms_dialogue import CRMSDialogue\nfrom crms_conversation import (\n    is_farewell, natural_feedback_verdict, offer_pending_review,\n    respond as respond_conversation)\nfrom crms_feedback import (\n    AnswerFeedbackStore, collect_feedback_refs,\n    collect_codegen_feedback_refs,\n    collect_math_feedback_refs,\n    collect_summary_feedback_refs,\n    collect_timeline_feedback_refs,\n    collect_writing_feedback_refs,\n    collect_translation_feedback_refs, render_feedback_refs,\n)\nfrom crms_explain import render_verified_explanation\nfrom crms_family_b import FamilyBComposition, compose_family_b_via_frames\nfrom crms_plan_log import (\n    append_plan, plan_trace, record_plan, render_plan_explanation,\n    render_plan_line,\n)\nfrom crms_codegen import (\n    describe_generated_code, diagnose_list_then_math_support,\n    generate_list_then_math_python,\n    generate_mapped_math_python,\n    generate_math_python, generate_python,\n    generate_unit_conversion_python, natural_language_request,\n    render as render_codegen, show_generated_code_evidence,\n)\nfrom crms_inference import InferenceResult, RuleReviewResult\nfrom crms_knowledge import (CRMSKnowledgeBase, FactCandidate, ResearchResult,\n                            _analyze_predicate_spelling,\n                            _base_verb_for_surface)\nfrom crms_math import CRMSMath, render as render_math\nfrom crms_model import CRMSModel, Prediction\nfrom crms_rule_registry import RuleRegistry\nfrom crms_frame_registry import (\n    frame_rule_for, governed_frame_ids, record_request_frame_use,\n    register_request_frame_rule, sync_request_frame_registry,\n)\nfrom crms_nl_gate import gate_quoted_evidence, supports_question_type\nfrom crms_procedure_discovery import (\n    nearest_parameter_heading,\n    propose_contextual_procedure_phrase_candidates,\n    propose_procedure_phrase_candidates,\n)\nfrom crms_package import (\n    export_model_database, install_model_database, inspect_model_database,\n    model_database_has_research, model_database_rule_settings,\n)\nfrom crms_question_induction import (\n    propose_analogical_multi_qualified_question_frames,\n    propose_analogical_qualified_question_frames,",
+      "answer_match": true,
+      "citation": "project:crms_chat.py#sha256=f1dd6af47a4a2d1ef32246e621e44a76deb1cb53c0fef10fff8160ba29b7ea73&chars=0:2507",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.2857142857142857,
+      "document_id": "project:crms_chat.py",
+      "domain": "code",
+      "expected_any": [
+        "Interactive terminal shell"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 861.4843429531902,
+      "matched_terms": [
+        "crms_chat",
+        "shell"
+      ],
+      "question": "In the Python module crms_chat, what kind of shell does the docstring describe?",
+      "resolved_chars": 2507,
+      "score": 350.0,
+      "status": "answered",
+      "target_document_id": "project:crms_chat.py",
+      "target_matched": true,
+      "task": "code-06",
+      "title": "\"\"\"Interactive terminal shell for CRMS grounded dialogue and research.\"\"\""
+    },
+    {
+      "answer": "\"\"\"Exact, example-grounded arithmetic with learned natural-language operators.\n\nThis math slice handles exact arithmetic in a small set of explicit natural-\nlanguage question frames. Conventional arithmetic words have fixed meanings;\nother operator phrases are learned from input/output examples.\n\"\"\"\n\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\nfrom decimal import Decimal\nfrom fractions import Fraction\nfrom math import isqrt\nimport json\nimport re\nfrom pathlib import Path\nfrom typing import Mapping\n\nfrom crms_text import tokens\n\n_QUESTION_BODY_PATTERNS = (\n    re.compile(r\"\\s*what\\s+does\\s+(.+?)\\s+equal\\s*\\??\\s*\", re.IGNORECASE),\n    re.compile(r\"\\s*what\\s+is\\s+(?:the\\s+)?result\\s+of\\s+\"\n               r\"(.+?)\\s*\\??\\s*\", re.IGNORECASE),\n    re.compile(r\"\\s*(?:(?:can|could|would)\\s+you\\s+)?\"\n               r\"(?:please\\s+)?(?:calculate|compute)\\s+\"\n               r\"(.+?)\\s*[?!.]*\\s*\", re.IGNORECASE),\n    re.compile(r\"\\s*what\\s+is\\s+(.+?)\\s*\\??\\s*\", re.IGNORECASE),\n    re.compile(r\"\\s*how\\s+much\\s+is\\s+(.+?)\\s*\\??\\s*\", re.IGNORECASE),\n)\n_RELATIVE_DIFFERENCE_PATTERNS = (\n    (re.compile(r\"\\s*how\\s+much\\s+higher\\s+is\\s+\"\n                r\"(?P<left>[+-]?(?:\\d+(?:\\.\\d+)?|\\.\\d+))\\s+than\\s+\"\n                r\"(?P<right>[+-]?(?:\\d+(?:\\.\\d+)?|\\.\\d+))\\s*[?!.]*\\s*\",\n                re.IGNORECASE), \"left-minus-right\"),\n    (re.compile(r\"\\s*how\\s+much\\s+lower\\s+is\\s+\"\n                r\"(?P<left>[+-]?(?:\\d+(?:\\.\\d+)?|\\.\\d+))\\s+than\\s+\"\n                r\"(?P<right>[+-]?(?:\\d+(?:\\.\\d+)?|\\.\\d+))\\s*[?!.]*\\s*\",\n                re.IGNORECASE), \"right-minus-left\"),\n)\n_BINARY_EXPRESSION_RE = re.compile(\n    r\"\\s*([+-]?\\d{1,100})\\s+(.+?)\\s+([+-]?\\d{1,100})\\s*\\Z\")\n_SOLVE_EQUATION_RE = re.compile(\n    r\"\\s*solve\\s+(.+?)\\s+(?:equals|=)\\s+(.+?)\\s+for\\s+([^\\W\\d_])\\s*[?!.]*\\s*\",\n    re.IGNORECASE | re.UNICODE)\n_EXPRESSION_TOKEN_RE = re.compile(\n    r\"(?:\\d{1,100}(?:\\.\\d{1,100})?|\\.\\d{1,100})(?:[eE][+-]?\\d{1,3})?|\"\n    r\"[^\\W\\d_]+(?:['\u2019][^\\W\\d_]+)*|[()+*/%=]|[-\u2212\u00d7\u00f7]\", re.UNICODE)\n_INTEGER_RE = re.compile(r\"[+-]?\\d{1,100}\\Z\")\n_NUMBER_LITERAL_RE = re.compile(\n    r\"(?:\\d{1,100}(?:\\.\\d{1,100})?|\\.\\d{1,100})(?:[eE][+-]?\\d{1,3})?\\Z\")\n_FRACTION_RE = re.compile(r\"([+-]?\\d{1,100})/([1-9]\\d{0,99})\\Z\")\n_UNIT_QUANTITY_RE = re.compile(r\"\\s*([1-9]\\d{0,99})\\s+(.+?)\\s*[.!?]*\\s*\\Z\")\n_UNIT_TEACH_RE = re.compile(r\"\\s*([1-9]\\d{0,99})\\s+(.+?)\\s*\\Z\")\n_UNIT_CONVERT_PATTERNS = (\n    re.compile(r\"\\s*what\\s+is\\s+(.+?)\\s+in\\s+(.+?)\\s*[?!.]*\\s*\\Z\",\n               re.IGNORECASE),\n    re.compile(",
+      "answer_match": true,
+      "citation": "project:crms_math.py#sha256=f5de5c6cb0ccda3398f1d7b3c25e224c715dc790678b82ba622e8de8dd88689f&chars=0:2503",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.25,
+      "document_id": "project:crms_math.py",
+      "domain": "code",
+      "expected_any": [
+        "Exact, example-grounded arithmetic"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 1287.299303978216,
+      "matched_terms": [
+        "arithmetic",
+        "crms_math"
+      ],
+      "question": "In the Python module crms_math, which docstring word describes its arithmetic?",
+      "resolved_chars": 2503,
+      "score": 350.0,
+      "status": "answered",
+      "target_document_id": "project:crms_math.py",
+      "target_matched": true,
+      "task": "code-07",
+      "title": "\"\"\"Exact, example-grounded arithmetic with learned natural-language operators."
+    },
+    {
+      "answer": "\"\"\"Example-grounded translation and style rewrites over aligned sentence frames.\n\nThis prototype does not infer an open-ended bilingual lexicon. A reviewed\ntemplate pair states the exact supported frame and named slots; aligned\nexamples license either copied slots or exact source-to-target slot mappings.\nSame-language rewrites use the same bounded mechanism and explicit register.\nUnseen values for translated slots remain unknown unless the slot is copied.\n\"\"\"\n\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\nfrom difflib import SequenceMatcher\nimport hashlib\nimport json\nimport re\nfrom pathlib import Path\nfrom typing import Any, Iterable, Mapping\n\nfrom crms_research import (\n    SearchHit, _is_code_source, _sentence_context_kind, _sentence_spans,\n)\nfrom crms_text import tokens\n\n_SLOT_RE = re.compile(r\"\\{([A-Za-z][A-Za-z0-9_]*)\\}\")\n_TRANSLATE_PREFIX = (\n    r\"(?:(?:please\\s+)|(?:(?:can|could|would)\\s+you\"\n    r\"(?:\\s+please)?\\s+))?translate\\s+\")\n_REQUEST_RE = re.compile(\n    r\"\\s*\" + _TRANSLATE_PREFIX +\n    r\"from\\s+([^:]+?)\\s+(?:to|into)\\s+([^:]+?)\"\n    r\"(?:\\s+in\\s+([^:]+?)\\s+register)?\\s*:\\s*(.+?)\\s*\\Z\",\n    re.IGNORECASE | re.DOTALL)\n_INLINE_REQUEST_RE = re.compile(\n    r\"\\s*\" + _TRANSLATE_PREFIX +\n    r\"(.+?)\\s+from\\s+(.+?)\\s+\"\n    r\"(?:to|into)\\s+(.+?)\"\n    r\"(?:\\s+in\\s+(.+?)\\s+register)?\\s*[.!?]*\\s*\\Z\",\n    re.IGNORECASE | re.DOTALL)\n_TARGET_ONLY_REQUEST_RE = re.compile(\n    r\"\\s*\" + _TRANSLATE_PREFIX +\n    r\"(?:\\\"(.+?)\\\"|'(.+?)'|\u201c(.+?)\u201d|\u2018(.+?)\u2019)\\s+(?:to|into)\\s+([^.!?]+?)\"\n    r\"(?:\\s+in\\s+([^.!?]+?)\\s+register)?\\s*[.!?]*\\s*\\Z\",\n    re.IGNORECASE | re.DOTALL)\n_HOW_SAY_REQUEST_RE = re.compile(\n    r\"\\s*(?:please\\s+)?how\\s+(?:do\\s+i|do\\s+you|would\\s+i|would\\s+you)\\s+say\\s+\"\n    r\"(?P<body>.+?)[!?]*\\s*\\Z\", re.IGNORECASE | re.DOTALL)\n\ndef _how_say_parts(body: str, frames: dict) -> tuple[str, str, str | None] | None:\n    \"\"\"Split a how-do-you-say request using known language/register labels.\"\"\"\n    value = body.strip()\n    # Prefer a suffix that is already a stored target language. This makes\n    # unquoted source text containing the word \"in\" unambiguous.\n    targets = sorted({(target, style)\n                      for source, target, style, _template in frames},\n                     key=lambda pair: (-len(pair[0]), -len(pair[1]), pair))\n    candidates = []\n    for target, style in targets:\n        registered_suffix = f\" in {target} in {style} register\"\n        if value.casefold().endswith(registered_suffix.casefold()):\n            text = value[:-len(registered_suffix)].strip()",
+      "answer_match": true,
+      "citation": "project:crms_translation.py#sha256=ba7f6cff32bf472dd0a4a29ee8033ecb27f6c2abb0140d1665bae7d9259ee53d&chars=0:2544",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.25,
+      "document_id": "project:crms_translation.py",
+      "domain": "code",
+      "expected_any": [
+        "Example-grounded translation"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 1034.2851080349647,
+      "matched_terms": [
+        "crms_translation",
+        "rewrites"
+      ],
+      "question": "In the Python module crms_translation, which docstring phrase describes its rewrites?",
+      "resolved_chars": 2544,
+      "score": 352.17924356947617,
+      "status": "answered",
+      "target_document_id": "project:crms_translation.py",
+      "target_matched": true,
+      "task": "code-08",
+      "title": "\"\"\"Example-grounded translation and style rewrites over aligned sentence frames."
+    },
+    {
+      "answer": "Abstract: A kind of transformation media, which we shall call the \"anti-cloak\", is proposed to partially defeat the cloaking effect of the invisibility cloak.",
+      "answer_match": true,
+      "citation": "arxiv:0807.4973v2#sha256=7c3cc1bed2fef5a7d89d0703f0c5109e4bbe1ab0fbbc297f4e90bcdbb47590ba&chars=119:277",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "arxiv:0807.4973v2",
+      "domain": "research",
+      "expected_any": [
+        "partially defeat the cloaking effect"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 263.78334796754643,
+      "matched_terms": [
+        "anti",
+        "cloak",
+        "proposed"
+      ],
+      "question": "What is the anti-cloak proposed to do?",
+      "resolved_chars": 158,
+      "score": 52.890314054109446,
+      "status": "answered",
+      "target_document_id": "arxiv:0807.4973v2",
+      "target_matched": true,
+      "task": "res-01",
+      "title": "The Anti-Cloak"
+    },
+    {
+      "answer": "Then this extended chaos theory can be used for description of the multiparticle production and the extensive air showers at high energy.",
+      "answer_match": true,
+      "citation": "arxiv:0808.0221v1#sha256=780ae62de08da2070496193ff20332b81dd906e26354b267375bb56ea5db639c&chars=417:554",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.8,
+      "document_id": "arxiv:0808.0221v1",
+      "domain": "research",
+      "expected_any": [
+        "multiparticle production"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 526.0509560466744,
+      "matched_terms": [
+        "chaos",
+        "extended",
+        "theory",
+        "used"
+      ],
+      "question": "What can extended chaos theory be used to describe?",
+      "resolved_chars": 137,
+      "score": 61.69427069003423,
+      "status": "answered",
+      "target_document_id": "arxiv:0808.0221v1",
+      "target_matched": true,
+      "task": "res-02",
+      "title": "Extended Chaos Theory and Multiparticle Production"
+    },
+    {
+      "answer": "We illustrate that, by using techniques from multimodal deep learning, we can simultaneously leverage multiple representations of software programs to improve flaw detection over single representation analyses.",
+      "answer_match": true,
+      "citation": "arxiv:2009.04549v1#sha256=a4186cef7537c64bc398b22b8c400f9631f882596ff449627c1f3c5ce378e851&chars=416:626",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.8571428571428571,
+      "document_id": "arxiv:2009.04549v1",
+      "domain": "research",
+      "expected_any": [
+        "multiple representations of software programs"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 229.416299960576,
+      "matched_terms": [
+        "deep",
+        "detection",
+        "flaw",
+        "learning",
+        "multimodal",
+        "representations"
+      ],
+      "question": "What representations does multimodal deep learning combine for flaw detection?",
+      "resolved_chars": 210,
+      "score": 118.63619689910827,
+      "status": "answered",
+      "target_document_id": "arxiv:2009.04549v1",
+      "target_matched": true,
+      "task": "res-03",
+      "title": "Multimodal Deep Learning for Flaw Detection in Software Programs"
+    },
+    {
+      "answer": "We then present our solution approach, based on the concept of Metamorphic Testing, which aims to identify implementation bugs in ML based image classifiers.",
+      "answer_match": true,
+      "citation": "arxiv:1808.05353v1#sha256=40b5abb81f1300e47c68e76665f5193de8bf0a06ae743466b94436f29c787257&chars=723:880",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.875,
+      "document_id": "arxiv:1808.05353v1",
+      "domain": "research",
+      "expected_any": [
+        "implementation bugs"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 328.04106903495267,
+      "matched_terms": [
+        "classifiers",
+        "identify",
+        "image",
+        "learning",
+        "machine",
+        "metamorphic",
+        "testing"
+      ],
+      "question": "What does metamorphic testing aim to identify in machine learning image classifiers?",
+      "resolved_chars": 157,
+      "score": 117.76661315792039,
+      "status": "answered",
+      "target_document_id": "arxiv:1808.05353v1",
+      "target_matched": true,
+      "task": "res-04",
+      "title": "Identifying Implementation Bugs in Machine Learning based Image Classifiers using Metamorphic Testing"
+    },
+    {
+      "answer": "Our research findings will guide future work on the development of new tools and techniques, helping the community to focus efforts and understand existing trade-offs on Docker topics.",
+      "answer_match": true,
+      "citation": "arxiv:2008.04467v1#sha256=d15dcc6eaa0ecfb96654fd0b220e9b3ed0e325f9b02c68870995a311fcfa9a55&chars=1887:2071",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 1.0,
+      "document_id": "arxiv:2008.04467v1",
+      "domain": "research",
+      "expected_any": [
+        "new tools and techniques"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 463.6804949841462,
+      "matched_terms": [
+        "docker",
+        "future",
+        "guide",
+        "study",
+        "work"
+      ],
+      "question": "What will the Docker study guide future work on?",
+      "resolved_chars": 184,
+      "score": 47.74831038549358,
+      "status": "answered",
+      "target_document_id": "arxiv:2008.04467v1",
+      "target_matched": true,
+      "task": "res-05",
+      "title": "Challenges in Docker Development: A Large-scale Study Using Stack Overflow"
+    },
+    {
+      "answer": "In this paper, we propose a knowledge distillation approach to improve ST model by transferring the knowledge from text translation model.",
+      "answer_match": true,
+      "citation": "arxiv:1904.08075v1#sha256=30f99658026be318abb3feb18e3705ddc7c5fbe6ab45058b120cfc23ba6d5a9a&chars=615:753",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.8333333333333334,
+      "document_id": "arxiv:1904.08075v1",
+      "domain": "research",
+      "expected_any": [
+        "knowledge from text translation model"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 314.06037899432704,
+      "matched_terms": [
+        "distillation",
+        "knowledge",
+        "model",
+        "speech",
+        "translation"
+      ],
+      "question": "What does knowledge distillation transfer to a speech translation model?",
+      "resolved_chars": 138,
+      "score": 84.01835101055843,
+      "status": "answered",
+      "target_document_id": "arxiv:1904.08075v1",
+      "target_matched": true,
+      "task": "res-06",
+      "title": "End-to-End Speech Translation with Knowledge Distillation"
+    },
+    {
+      "answer": "What is typically left implicit is the argumentation for why this constitutes progress, and progress towards what.",
+      "answer_match": true,
+      "citation": "arxiv:2007.04792v1#sha256=b7f0bda6c571e92bb1cb0f57f3a74be5272963ab4048e0b6f27f8b8759f6554d&chars=538:652",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.5,
+      "document_id": "arxiv:2007.04792v1",
+      "domain": "research",
+      "expected_any": [
+        "progress towards what"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 315.5472989892587,
+      "matched_terms": [
+        "argumentation",
+        "benchmark",
+        "methodology"
+      ],
+      "question": "What argumentation does the NLP benchmark methodology paper examine?",
+      "resolved_chars": 114,
+      "score": 55.80113970371485,
+      "status": "answered",
+      "target_document_id": "arxiv:2007.04792v1",
+      "target_matched": true,
+      "task": "res-07",
+      "title": "Targeting the Benchmark: On Methodology in Current Natural Language Processing Research"
+    },
+    {
+      "answer": "We show that commonly known tax planning strategies can be formulated as subgraph queries to that graph, which allows for identifying companies using certain strategies.",
+      "answer_match": true,
+      "citation": "arxiv:2008.05239v3#sha256=edc787e8eb41b83fe3e4e1ff2256c7d6d4bf82829dd5c1a63c685202419c1e05&chars=618:787",
+      "citation_error": "",
+      "citation_valid": true,
+      "cited_match": true,
+      "confident_wrong": false,
+      "correct": true,
+      "coverage": 0.8571428571428571,
+      "document_id": "arxiv:2008.05239v3",
+      "domain": "research",
+      "expected_any": [
+        "tax planning strategies"
+      ],
+      "invalid_citation": false,
+      "latency_ms": 257.60605797404423,
+      "matched_terms": [
+        "graph",
+        "knowledge",
+        "planning",
+        "queries",
+        "subgraph",
+        "tax"
+      ],
+      "question": "What do subgraph queries identify in the tax planning knowledge graph?",
+      "resolved_chars": 169,
+      "score": 99.04691231333268,
+      "status": "answered",
+      "target_document_id": "arxiv:2008.05239v3",
+      "target_matched": true,
+      "task": "res-08",
+      "title": "A Knowledge Graph for Assessing Aggressive Tax Planning Strategies"
+    }
+  ],
+  "slices": {
+    "code": {
+      "completion": 1.0,
+      "confident_wrong": 0,
+      "correct": 7,
+      "invalid_citations": 0,
+      "median_ms": 861.4843429531902,
+      "p95_ms": 1287.299303978216,
+      "target_matched": 7,
+      "tasks": 7
+    },
+    "docs": {
+      "completion": 1.0,
+      "confident_wrong": 0,
+      "correct": 1,
+      "invalid_citations": 0,
+      "median_ms": 715.9204190247692,
+      "p95_ms": 715.9204190247692,
+      "target_matched": 1,
+      "tasks": 1
+    },
+    "math": {
+      "completion": 1.0,
+      "confident_wrong": 0,
+      "correct": 6,
+      "invalid_citations": 0,
+      "median_ms": 211.1987824901007,
+      "p95_ms": 731.2308480031788,
+      "target_matched": 6,
+      "tasks": 6
+    },
+    "reference": {
+      "completion": 1.0,
+      "confident_wrong": 0,
+      "correct": 8,
+      "invalid_citations": 0,
+      "median_ms": 234.02511549647897,
+      "p95_ms": 703.3030190505087,
+      "target_matched": 8,
+      "tasks": 8
+    },
+    "research": {
+      "completion": 1.0,
+      "confident_wrong": 0,
+      "correct": 8,
+      "invalid_citations": 0,
+      "median_ms": 314.8038389917929,
+      "p95_ms": 526.0509560466744,
+      "target_matched": 8,
+      "tasks": 8
+    },
+    "science": {
+      "completion": 1.0,
+      "confident_wrong": 0,
+      "correct": 9,
+      "invalid_citations": 0,
+      "median_ms": 240.55190198123455,
+      "p95_ms": 662.5578919774853,
+      "target_matched": 9,
+      "tasks": 9
+    }
+  },
+  "version": 1
+}

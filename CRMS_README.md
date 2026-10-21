@@ -1567,6 +1567,42 @@ runs generated code in a fresh subprocess; the other slices are sub-millisecond
 on this fixture. 47 domain rules are registered and validated; retiring a code
 operation makes it abstain and rollback restores it.
 
+### Corpus program
+
+Phase 7 builds the audited evidence layer instead of a trained language model.
+Every accepted document has a per-document manifest with source, retrieval date,
+licence, licence URL, attribution, revision/content hash, importer version, and
+redistribution decision. The build removes boilerplate, rejects secrets, redacts
+ordinary PII, detects language/script, and drops exact and near duplicates. The
+remaining text lives in eight disk-backed SQLite FTS shards; search loads only
+the matching documents and citations resolve to exact digest/offset spans.
+
+Run the frozen gate with:
+
+```text
+python3 run_phase7_eval.py
+```
+
+Current report `experiments/reports/phase7_corpus.json`: 268,148 documents and
+69,283,305 words in eight shards, 100% licence coverage, 501.47 documents/s and
+129,567.64 words/s ingestion, 39/39 held-out positives with valid citations,
+zero confident wrong outputs, 10/10 negative controls abstaining, and 39/39
+target-document matches. Median query latency is 315.5 ms and p95 is 1,034.3 ms.
+The scorecard copies the corpus to a temporary clean room and hides the original
+for the whole run, so no build input is required at query time.
+
+Inspect or query the corpus directly:
+
+```text
+python3 crms_corpus_program.py inspect --corpus data/phase7_core
+python3 crms_corpus_program.py answer --corpus data/phase7_core "What is a planet?"
+```
+
+The core is SimpleWiki-dominated: books, Q&A, and parallel text are the next
+source increment, not a claim of 70B-class breadth. The frozen questions are
+held out; the target documents remain searchable because a retrieval index
+cannot answer a question about a document it never received.
+
 `/suggest-corpus-alignments` adds a corpus-only path for alternate predicate
 wording. It proposes an alignment only when the same distinct subject/object
 pairs are independently parsed under both predicates in separate documents.

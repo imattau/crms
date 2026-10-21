@@ -101,7 +101,7 @@ procedures; portable SQLite model; 533 regression experiments.
 | Correction lacks a dependency graph | Fingerprint revalidation, no reverse index | Phase 4 |
 | Learning is fragmented and unmeasured | Procedures, frames, rules, and primitives each have separate ad-hoc stores; no lifecycle, registry, utility accounting, or compounding measurement | §5 rule registry, all phases |
 | Domains are narrow prototypes | Phase 6 measures bounded math/code/translation/creative/cross-domain slices; wider coverage remains | Phase 6 lane plus later domain work |
-| Corpus skew | Project + arXiv abstracts + SimpleWiki; little code/docs/books | Phase 7 corpus program |
+| Corpus skew | Phase 7 core is measured at 69.3M words, but SimpleWiki supplies 264,924 of 268,148 documents; books, Q&A, and parallel text remain thin | Phase 7 follow-up and extended sources |
 | Distribution unproven end to end | Partial copied-model slices | Phase 8 |
 | Scale ceiling unknown | Depth-4 search ~95 s; canonicalizer hot spot | Phase 8 |
 
@@ -583,6 +583,23 @@ Pipeline:
 held-out question set with valid citations; corpus size, licence coverage,
 ingestion throughput, and index latency reported.
 
+**Status (2026-10-21): bounded Phase 7 corpus gate passed.** The measured core
+has 268,148 audited documents and 69,283,305 words in eight disk-backed FTS
+shards (432.9 MB extracted text; 996.4 MB index; 301.3 MB catalog). Every
+accepted document has a known redistributable licence, attribution, licence
+URL, retrieval date, and revision/content hash: licence coverage 1.000.
+Ingestion measured 501.47 documents/s and 129,567.64 words/s. A frozen
+question-level holdout of 39 positives across reference, science, math,
+code/docs, and research scored 39/39 with zero confident errors, zero invalid
+citations, and 39/39 target matches; 10/10 negative controls abstained. Median
+latency was 315.5 ms and p95 1,034.3 ms. The scorecard ran from a temporary copy
+of the corpus with the original directory hidden for the whole run, so the
+model required no build inputs. Rejections are retained: 17,306 too-short
+records, 2,817 non-English, 310 exact duplicates, 64 near duplicates, 92
+licence-audit failures, and smaller encoding/empty/script/PII counts. The core is
+still SimpleWiki-dominated; books, Q&A, and parallel text are the next corpus
+increment, not a claim of 70B-class breadth.
+
 ### Phase 8 — Scale, productization, distribution (weeks 48–72)
 
 Deliverables:
@@ -739,7 +756,13 @@ redesigned or dropped.
    (`corpus/manifest_v0.json`, `docs/corpus_manifest.md`,
    `experiments/v1_557_corpus_manifest.py`); 20 candidate groups, 4 documented
    exclusions, and a 94.5M-word core planning estimate.
-14. **Consolidate plan docs** — this file is canonical; link the others as
+14. **Phase 7 corpus program** — audited per-document manifests, licence
+   classes, cleaning, exact/near dedup, language/script and PII filters, eight
+   sharded FTS indexes, and a clean-room scored holdout. — done for the measured
+   core (`crms_corpus_program.py`, `crms_phase7_benchmark.py`,
+   `run_phase7_eval.py`, `experiments/reports/phase7_corpus.json`); books, Q&A,
+   parallel text, and source-disjoint external validation remain follow-ups.
+15. **Consolidate plan docs** — this file is canonical; link the others as
    history. — canonical status recorded; remaining docs still need pruning.
 
 ---
@@ -786,3 +809,5 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Phase 5 gate measured: exact frames 60/200 (30%) vs learned constructions 200/200 (100%), controls 60/60, reworded 0/140→140/140, zero confident errors, unlicensed/ambiguous abstention, holdout-backed construction rules, clean retirement/rollback, evidence-only irregulars, bounded bypassable ranker | `experiments/reports/phase5_constructions.json`, `experiments/scorecard/phase5_constructions.json` |
 | 2026-10-21 | Phase 6 domain lane implemented: exact word problems/inequalities/2x2 systems, typed list code IR with AST checks and sandboxed execution, agreement-aware English->Spanish translation, constraint story planner, two-stage task-IR plans, and 47 governed domain rules | `crms_domains.py`, `crms_phase6_benchmark.py`, `run_phase6_eval.py`, `experiments/v1_562_phase6_domains.py`, `docs/design_phase6_domains.md` |
 | 2026-10-21 | Phase 6 gate measured: 90/90 held-out tasks across five slices, zero confident errors, 15/15 negatives abstained, provenance on every answer, one repair per slice, cost reported, registry retirement/rollback clean | `experiments/reports/phase6_domains.json`, `experiments/scorecard/phase6_domains.json` |
+| 2026-10-21 | Phase 7 corpus program: audited per-document manifests, licence classes, source revision/hash, attribution, cleaning, exact/near dedup, language/script/PII filters, and eight disk-backed FTS shards | `crms_corpus_program.py`, `crms_phase7_benchmark.py`, `run_phase7_eval.py`, `experiments/v1_563_phase7_corpus.py`, `docs/design_phase7_corpus.md` |
+| 2026-10-21 | Phase 7 gate measured: 268,148 documents / 69.3M words, 100% licence coverage, 501 docs/s, 8 shards, 39/39 held-out positives with valid citations, 0 confident errors, 10/10 negatives abstained, p95 1.03s, clean-room copy with originals hidden | `experiments/reports/phase7_corpus.json`, `corpus/phase7_eval/fixture.json` |

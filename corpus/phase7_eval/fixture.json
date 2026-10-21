@@ -1,0 +1,764 @@
+{
+  "format": "crms-phase7-eval",
+  "version": 1,
+  "frozen": "2026-10-21",
+  "description": "Frozen held-out question set authored before the Phase 7 build. The target documents remain in the searchable corpus; no question text or expected phrase is ingested. The positive set spans reference, science, math, code/docs, and research; the negative set tests abstention on entities absent from the corpus. Expected phrases are checked in the exact cited passage.",
+  "tasks": [
+    {
+      "id": "ref-01",
+      "domain": "reference",
+      "kind": "positive",
+      "question": "What is Edinburgh?",
+      "target_document_id": "wiki:simplewiki:4864",
+      "expected_any": [
+        "capital city and second largest city in Scotland"
+      ]
+    },
+    {
+      "id": "ref-02",
+      "domain": "reference",
+      "kind": "positive",
+      "question": "What is a planet?",
+      "target_document_id": "wiki:simplewiki:639",
+      "expected_any": [
+        "A planet is a large object"
+      ]
+    },
+    {
+      "id": "ref-03",
+      "domain": "reference",
+      "kind": "positive",
+      "question": "What is paper?",
+      "target_document_id": "wiki:simplewiki:3319",
+      "expected_any": [
+        "wood fibres",
+        "wood pulp",
+        "thin material"
+      ]
+    },
+    {
+      "id": "ref-04",
+      "domain": "reference",
+      "kind": "positive",
+      "question": "What were poodles originally bred as?",
+      "target_document_id": "wiki:simplewiki:24489",
+      "expected_any": [
+        "water retrievers and hunting dogs"
+      ]
+    },
+    {
+      "id": "ref-05",
+      "domain": "reference",
+      "kind": "positive",
+      "question": "Who led Bacon's Rebellion?",
+      "target_document_id": "wiki:simplewiki:876757",
+      "expected_any": [
+        "Nathanial Bacon",
+        "Nathaniel Bacon"
+      ]
+    },
+    {
+      "id": "ref-06",
+      "domain": "reference",
+      "kind": "positive",
+      "question": "When was Prignano elected pope?",
+      "target_document_id": "wiki:simplewiki:314654",
+      "expected_any": [
+        "April 8, 1378"
+      ]
+    },
+    {
+      "id": "ref-07",
+      "domain": "reference",
+      "kind": "positive",
+      "question": "What is religious toleration?",
+      "target_document_id": "wiki:simplewiki:81130",
+      "expected_any": [
+        "allowing other people to think or practice other religions and beliefs"
+      ]
+    },
+    {
+      "id": "ref-08",
+      "domain": "reference",
+      "kind": "positive",
+      "question": "How many pairs of players does contract bridge use?",
+      "target_document_id": "wiki:simplewiki:6131",
+      "expected_any": [
+        "two pairs of players"
+      ]
+    },
+    {
+      "id": "sci-01",
+      "domain": "science",
+      "kind": "positive",
+      "question": "At what temperature does diethyl ether boil?",
+      "target_document_id": "wiki:simplewiki:70819",
+      "expected_any": [
+        "boils at about 35°C",
+        "35°C"
+      ]
+    },
+    {
+      "id": "sci-02",
+      "domain": "science",
+      "kind": "positive",
+      "question": "How do limpets eat?",
+      "target_document_id": "wiki:simplewiki:51453",
+      "expected_any": [
+        "grazing on algae"
+      ]
+    },
+    {
+      "id": "sci-03",
+      "domain": "science",
+      "kind": "positive",
+      "question": "What are therapsids?",
+      "target_document_id": "wiki:simplewiki:76032",
+      "expected_any": [
+        "group of synapsids"
+      ]
+    },
+    {
+      "id": "sci-04",
+      "domain": "science",
+      "kind": "positive",
+      "question": "What is a prime number?",
+      "target_document_id": "wiki:simplewiki:18701",
+      "expected_any": [
+        "has exactly two divisors",
+        "two divisors"
+      ]
+    },
+    {
+      "id": "sci-05",
+      "domain": "science",
+      "kind": "positive",
+      "question": "What does the Pythagorean theorem say about a right triangle?",
+      "target_document_id": "wiki:simplewiki:6327",
+      "expected_any": [
+        "a^2+b^2=c^2",
+        "statement about the sides of a right triangle"
+      ]
+    },
+    {
+      "id": "sci-06",
+      "domain": "science",
+      "kind": "positive",
+      "question": "What may carbonic anhydrases link environmental sensing to?",
+      "target_document_id": "pmc:PMC13675255.v1.rf8a486301a0c47e7",
+      "expected_any": [
+        "adaptive responses"
+      ]
+    },
+    {
+      "id": "sci-07",
+      "domain": "science",
+      "kind": "positive",
+      "question": "What is CTHRC1 characterized by?",
+      "target_document_id": "pmc:PMC13675296.v1.r0cfcc19abc31595d",
+      "expected_any": [
+        "multilevel and complex interactions"
+      ]
+    },
+    {
+      "id": "sci-08",
+      "domain": "science",
+      "kind": "positive",
+      "question": "What does the cross-domain signal grammars article say a terminator is associated with?",
+      "target_document_id": "pmc:PMC13675443.v1.r1c2d32da45df7ba2",
+      "expected_any": [
+        "polymerase release or stable transcript-end formation"
+      ]
+    },
+    {
+      "id": "sci-09",
+      "domain": "science",
+      "kind": "positive",
+      "question": "What is autophagy?",
+      "target_document_id": "wiki:simplewiki:556576",
+      "expected_any": [
+        "basic cell mechanisms"
+      ]
+    },
+    {
+      "id": "math-01",
+      "domain": "math",
+      "kind": "positive",
+      "question": "What is a fraction in mathematics?",
+      "target_document_id": "wiki:simplewiki:56416",
+      "expected_any": [
+        "A fraction is a number that shows how many equal parts there are"
+      ]
+    },
+    {
+      "id": "math-02",
+      "domain": "math",
+      "kind": "positive",
+      "question": "What is a mathematical equation?",
+      "target_document_id": "wiki:simplewiki:8335",
+      "expected_any": [
+        "two or more expressions connected by equals signs"
+      ]
+    },
+    {
+      "id": "math-03",
+      "domain": "math",
+      "kind": "positive",
+      "question": "What can geometry help people find?",
+      "target_document_id": "wiki:simplewiki:315",
+      "expected_any": [
+        "surface area of a house",
+        "surface area"
+      ]
+    },
+    {
+      "id": "math-04",
+      "domain": "math",
+      "kind": "positive",
+      "question": "What is trigonometry?",
+      "target_document_id": "wiki:simplewiki:12436",
+      "expected_any": [
+        "part of elementary mathematics dealing with angles, triangles and trigonometric functions"
+      ]
+    },
+    {
+      "id": "math-05",
+      "domain": "math",
+      "kind": "positive",
+      "question": "What is probability?",
+      "target_document_id": "wiki:simplewiki:631",
+      "expected_any": [
+        "part of applied mathematics",
+        "study of things that might happen or might not happen"
+      ]
+    },
+    {
+      "id": "math-06",
+      "domain": "math",
+      "kind": "positive",
+      "question": "What is calculus?",
+      "target_document_id": "wiki:simplewiki:161",
+      "expected_any": [
+        "branch of mathematics that describes continuous change"
+      ]
+    },
+    {
+      "id": "code-01",
+      "domain": "code",
+      "kind": "positive",
+      "question": "In the Python module crms_import_jats, which licence identifiers are allowed by ALLOWED_LICENSES?",
+      "target_document_id": "project:crms_import_jats.py",
+      "expected_any": [
+        "cc-by",
+        "cc0"
+      ]
+    },
+    {
+      "id": "code-02",
+      "domain": "code",
+      "kind": "positive",
+      "question": "In the Python module crms_research, which SQLite extension indexes source passages?",
+      "target_document_id": "project:crms_research.py",
+      "expected_any": [
+        "SQLite FTS5"
+      ]
+    },
+    {
+      "id": "code-03",
+      "domain": "code",
+      "kind": "positive",
+      "question": "In the Python module crms_package, what is the portable model format name?",
+      "target_document_id": "project:crms_package.py",
+      "expected_any": [
+        "crms-learned-model"
+      ]
+    },
+    {
+      "id": "code-04",
+      "domain": "docs",
+      "kind": "positive",
+      "question": "In the file CRMS_README.md, what command starts the interactive chat?",
+      "target_document_id": "project:CRMS_README.md",
+      "expected_any": [
+        "python3 crms_chat.py"
+      ]
+    },
+    {
+      "id": "code-05",
+      "domain": "code",
+      "kind": "positive",
+      "question": "In the Python module crms_merge_research, what does the opening docstring say it preserves?",
+      "target_document_id": "project:crms_merge_research.py",
+      "expected_any": [
+        "without losing provenance"
+      ]
+    },
+    {
+      "id": "code-06",
+      "domain": "code",
+      "kind": "positive",
+      "question": "In the Python module crms_chat, what kind of shell does the docstring describe?",
+      "target_document_id": "project:crms_chat.py",
+      "expected_any": [
+        "Interactive terminal shell"
+      ]
+    },
+    {
+      "id": "code-07",
+      "domain": "code",
+      "kind": "positive",
+      "question": "In the Python module crms_math, which docstring word describes its arithmetic?",
+      "target_document_id": "project:crms_math.py",
+      "expected_any": [
+        "Exact, example-grounded arithmetic"
+      ]
+    },
+    {
+      "id": "code-08",
+      "domain": "code",
+      "kind": "positive",
+      "question": "In the Python module crms_translation, which docstring phrase describes its rewrites?",
+      "target_document_id": "project:crms_translation.py",
+      "expected_any": [
+        "Example-grounded translation"
+      ]
+    },
+    {
+      "id": "res-01",
+      "domain": "research",
+      "kind": "positive",
+      "question": "What is the anti-cloak proposed to do?",
+      "target_document_id": "arxiv:0807.4973v2",
+      "expected_any": [
+        "partially defeat the cloaking effect"
+      ]
+    },
+    {
+      "id": "res-02",
+      "domain": "research",
+      "kind": "positive",
+      "question": "What can extended chaos theory be used to describe?",
+      "target_document_id": "arxiv:0808.0221v1",
+      "expected_any": [
+        "multiparticle production"
+      ]
+    },
+    {
+      "id": "res-03",
+      "domain": "research",
+      "kind": "positive",
+      "question": "What representations does multimodal deep learning combine for flaw detection?",
+      "target_document_id": "arxiv:2009.04549v1",
+      "expected_any": [
+        "multiple representations of software programs"
+      ]
+    },
+    {
+      "id": "res-04",
+      "domain": "research",
+      "kind": "positive",
+      "question": "What does metamorphic testing aim to identify in machine learning image classifiers?",
+      "target_document_id": "arxiv:1808.05353v1",
+      "expected_any": [
+        "implementation bugs"
+      ]
+    },
+    {
+      "id": "res-05",
+      "domain": "research",
+      "kind": "positive",
+      "question": "What will the Docker study guide future work on?",
+      "target_document_id": "arxiv:2008.04467v1",
+      "expected_any": [
+        "new tools and techniques"
+      ]
+    },
+    {
+      "id": "res-06",
+      "domain": "research",
+      "kind": "positive",
+      "question": "What does knowledge distillation transfer to a speech translation model?",
+      "target_document_id": "arxiv:1904.08075v1",
+      "expected_any": [
+        "knowledge from text translation model"
+      ]
+    },
+    {
+      "id": "res-07",
+      "domain": "research",
+      "kind": "positive",
+      "question": "What argumentation does the NLP benchmark methodology paper examine?",
+      "target_document_id": "arxiv:2007.04792v1",
+      "expected_any": [
+        "progress towards what"
+      ]
+    },
+    {
+      "id": "res-08",
+      "domain": "research",
+      "kind": "positive",
+      "question": "What do subgraph queries identify in the tax planning knowledge graph?",
+      "target_document_id": "arxiv:2008.05239v3",
+      "expected_any": [
+        "tax planning strategies"
+      ]
+    }
+  ],
+  "negative_controls": [
+    {
+      "id": "neg-01",
+      "domain": "negative",
+      "kind": "negative",
+      "question": "What is the capital city of Xylophonica?",
+      "target_document_id": null,
+      "expected_any": []
+    },
+    {
+      "id": "neg-02",
+      "domain": "negative",
+      "kind": "negative",
+      "question": "Who invented the teleportation device in 1820?",
+      "target_document_id": null,
+      "expected_any": []
+    },
+    {
+      "id": "neg-03",
+      "domain": "negative",
+      "kind": "negative",
+      "question": "What is the boiling point of unobtainium?",
+      "target_document_id": null,
+      "expected_any": []
+    },
+    {
+      "id": "neg-04",
+      "domain": "negative",
+      "kind": "negative",
+      "question": "Which Python module implements xylophonic gravity?",
+      "target_document_id": null,
+      "expected_any": []
+    },
+    {
+      "id": "neg-05",
+      "domain": "negative",
+      "kind": "negative",
+      "question": "What did the Zorblaxian expedition discover in 1999?",
+      "target_document_id": null,
+      "expected_any": []
+    },
+    {
+      "id": "neg-06",
+      "domain": "negative",
+      "kind": "negative",
+      "question": "What is the population of Nimbusville?",
+      "target_document_id": null,
+      "expected_any": []
+    },
+    {
+      "id": "neg-07",
+      "domain": "negative",
+      "kind": "negative",
+      "question": "Who wrote the novel Quintessence of the Glass Meridian?",
+      "target_document_id": null,
+      "expected_any": []
+    },
+    {
+      "id": "neg-08",
+      "domain": "negative",
+      "kind": "negative",
+      "question": "What is the chemical formula for phlogistonium?",
+      "target_document_id": null,
+      "expected_any": []
+    },
+    {
+      "id": "neg-09",
+      "domain": "negative",
+      "kind": "negative",
+      "question": "Which RFC defines the Interplanetary Postal Protocol?",
+      "target_document_id": null,
+      "expected_any": []
+    },
+    {
+      "id": "neg-10",
+      "domain": "negative",
+      "kind": "negative",
+      "question": "What does the 2026 Xylophonian Accord regulate?",
+      "target_document_id": null,
+      "expected_any": []
+    }
+  ],
+  "evaluation_documents": [
+    {
+      "document_id": "wiki:simplewiki:4864",
+      "title": "Edinburgh",
+      "domain": "reference",
+      "sha256": "65ccfd14289daeb524bdeb64310e21d3104d497cfc8a58c98b160c5d6c169475",
+      "chars": 3529
+    },
+    {
+      "document_id": "wiki:simplewiki:639",
+      "title": "Planet",
+      "domain": "science",
+      "sha256": "5453594990224f18a6ba482b80f51d1a28e1f2cc74287e5c146e1fe590717288",
+      "chars": 4680
+    },
+    {
+      "document_id": "wiki:simplewiki:3319",
+      "title": "Paper",
+      "domain": "reference",
+      "sha256": "8b7035fd5d701d7fe91968a957847b5acf86103547f357857340d647b91baa77",
+      "chars": 5732
+    },
+    {
+      "document_id": "wiki:simplewiki:24489",
+      "title": "Poodle",
+      "domain": "reference",
+      "sha256": "25029bd117b0f9dfff6178a70a15948035ff49c111aa7f6a20d2d0e8e6c7b636",
+      "chars": 2395
+    },
+    {
+      "document_id": "wiki:simplewiki:876757",
+      "title": "Bacon's Rebellion",
+      "domain": "reference",
+      "sha256": "9485c0743c2ad0de1784ebe49c944d415041b6ace3438b5c66a8a72166271a64",
+      "chars": 5521
+    },
+    {
+      "document_id": "wiki:simplewiki:314654",
+      "title": "Pope Urban VI",
+      "domain": "reference",
+      "sha256": "493717463f47ab9c582eba215d1af62c0f525169c904cd2def001d960fce108a",
+      "chars": 1691
+    },
+    {
+      "document_id": "wiki:simplewiki:81130",
+      "title": "Religious toleration",
+      "domain": "reference",
+      "sha256": "f1f52059d9a3ab1e31945c31ff187c89a08120063cfd5e83b627d5bcc96e2859",
+      "chars": 3925
+    },
+    {
+      "document_id": "wiki:simplewiki:6131",
+      "title": "Contract bridge",
+      "domain": "reference",
+      "sha256": "a604aca462a6f1fb1674890ca598a5591e5f81c112aea326a85d826abe321514",
+      "chars": 8407
+    },
+    {
+      "document_id": "wiki:simplewiki:70819",
+      "title": "Diethyl ether",
+      "domain": "science",
+      "sha256": "64a2f3e0b46c1bb238a81c7b1c643a1cea78012546b650b8af3d2998fa0605b2",
+      "chars": 1237
+    },
+    {
+      "document_id": "wiki:simplewiki:51453",
+      "title": "Limpet",
+      "domain": "science",
+      "sha256": "ff899e4958b351204b517281f39dd39333fc7670b6cf989ad6cc4908245af303",
+      "chars": 4222
+    },
+    {
+      "document_id": "wiki:simplewiki:76032",
+      "title": "Therapsid",
+      "domain": "science",
+      "sha256": "cfd76a4bc5392d3412148584edfd272ec1d04f27f37e947c1772865281f412fa",
+      "chars": 2673
+    },
+    {
+      "document_id": "wiki:simplewiki:18701",
+      "title": "Prime number",
+      "domain": "science",
+      "sha256": "85ec9c9fc8c57a266c74c123aa7b0a631e9747ae74b70414fe16fce73d8b0708",
+      "chars": 5709
+    },
+    {
+      "document_id": "wiki:simplewiki:6327",
+      "title": "Pythagorean theorem",
+      "domain": "science",
+      "sha256": "dd2856321e135fbfd75c6e63b7b35cb693c0c169de4f558a668475b232fb73df",
+      "chars": 5539
+    },
+    {
+      "document_id": "wiki:simplewiki:56416",
+      "title": "Fraction (mathematics)",
+      "domain": "math",
+      "sha256": "f4f6fb81daa4aa8eceb0b552883c7f60674a598f90f7a6adbfe95bee1bf93821",
+      "chars": 4656
+    },
+    {
+      "document_id": "wiki:simplewiki:8335",
+      "title": "Equation",
+      "domain": "math",
+      "sha256": "82cd9be5fe602e0d578b1d67ff9ec2a6c6bd21ee9519eb589100e284fe8f22cf",
+      "chars": 1714
+    },
+    {
+      "document_id": "wiki:simplewiki:315",
+      "title": "Geometry",
+      "domain": "math",
+      "sha256": "159330bb0758d8ebfea6ad3fe9afc98f6ff791094ffd6422ac608dc9179e6e8c",
+      "chars": 2912
+    },
+    {
+      "document_id": "wiki:simplewiki:12436",
+      "title": "Trigonometry",
+      "domain": "math",
+      "sha256": "e25b702074e5b0df6f5f67abd6c6c264576c95b7fd99072828066402ab256cd1",
+      "chars": 3911
+    },
+    {
+      "document_id": "wiki:simplewiki:631",
+      "title": "Probability",
+      "domain": "math",
+      "sha256": "3669067931a678c8c88f2a5d3e23101e26a1a8ca402ed8dc6d363a48b6145cf5",
+      "chars": 2531
+    },
+    {
+      "document_id": "wiki:simplewiki:161",
+      "title": "Calculus",
+      "domain": "math",
+      "sha256": "5f5319ef4d6d82884fc6ba1640a5c89ad17b273202ca3036d14e26d8af59b528",
+      "chars": 9214
+    },
+    {
+      "document_id": "pmc:PMC13675255.v1.rf8a486301a0c47e7",
+      "title": "Carbonic Anhydrases in Mycobacteria",
+      "domain": "science",
+      "sha256": "2e94612cd37952ec291ba711b2e8d30fdc19dacca3bc93fcb12ee189801f2a65",
+      "chars": 44060
+    },
+    {
+      "document_id": "pmc:PMC13675296.v1.r0cfcc19abc31595d",
+      "title": "Potential role of CTHRC1 in renal fibrosis",
+      "domain": "science",
+      "sha256": "d72e1af9d9222e1e52fb08a950d878d37b03c6950585c1cb2fdfb0f34b6c23bf",
+      "chars": 34613
+    },
+    {
+      "document_id": "pmc:PMC13675443.v1.r1c2d32da45df7ba2",
+      "title": "Cross-domain signal grammars of transcription termination",
+      "domain": "science",
+      "sha256": "d56860cc33f11614516885d5c2ebb9f003bf04fd915f12202915b7ccdda39fcf",
+      "chars": 89358
+    },
+    {
+      "document_id": "pmc:PMC13675281.v1.r473b6d80742d6837",
+      "title": "Rewiring autophagy to target cutaneous wound healing",
+      "domain": "science",
+      "sha256": "0eb5af815c6c1042ae39bcd97dabe2b32ab33eb68bb5d4fea8c40d08e96da08b",
+      "chars": 51005
+    },
+    {
+      "document_id": "project:crms_import_jats.py",
+      "title": "crms_import_jats.py",
+      "domain": "code",
+      "sha256": "fb89edc55d13ecc401d482472b860f7fa5e344786d799c1de6ace594a2e9a6e1",
+      "chars": 8846
+    },
+    {
+      "document_id": "project:crms_research.py",
+      "title": "crms_research.py",
+      "domain": "code",
+      "sha256": "8eeceff0ee4028eca48a8cde19e3e95f1f24496812d7b59733f46571c4d8c42c",
+      "chars": 127842
+    },
+    {
+      "document_id": "project:crms_package.py",
+      "title": "crms_package.py",
+      "domain": "code",
+      "sha256": "e5205a7e66d7f94903c65952cb937f9de00e92095138aed06405b9e1fa412d2a",
+      "chars": 19892
+    },
+    {
+      "document_id": "project:CRMS_README.md",
+      "title": "CRMS_README.md",
+      "domain": "docs",
+      "sha256": "56b4da0596deb0d57c52de08a7307c20eb294f7c4bb186f02b6d7917508ffc31",
+      "chars": 301430
+    },
+    {
+      "document_id": "project:crms_merge_research.py",
+      "title": "crms_merge_research.py",
+      "domain": "code",
+      "sha256": "95187fd14ac1d0756e465d5e45afc8ee93555f7aee9c68c841ba964b36918296",
+      "chars": 8235
+    },
+    {
+      "document_id": "project:crms_chat.py",
+      "title": "crms_chat.py",
+      "domain": "code",
+      "sha256": "8b7fc7567f90cb7d05e9c01ca47684044342a8a0bb3c839a26d73bde5387e476",
+      "chars": 270770
+    },
+    {
+      "document_id": "project:crms_math.py",
+      "title": "crms_math.py",
+      "domain": "code",
+      "sha256": "fe0476ab1d4bc1e1d7f1e954a8d6a39a48950fe33f40a86cd99c6e01478020d3",
+      "chars": 62136
+    },
+    {
+      "document_id": "project:crms_translation.py",
+      "title": "crms_translation.py",
+      "domain": "code",
+      "sha256": "9f1cbda92100b02ea364585dc8bc9827e0a09d5ba2b7da4e9eaa01dd1be6d3ad",
+      "chars": 42457
+    },
+    {
+      "document_id": "arxiv:0807.4973v2",
+      "title": "The Anti-Cloak",
+      "domain": "research",
+      "sha256": "7c3cc1bed2fef5a7d89d0703f0c5109e4bbe1ab0fbbc297f4e90bcdbb47590ba",
+      "chars": 980
+    },
+    {
+      "document_id": "arxiv:0808.0221v1",
+      "title": "Extended Chaos Theory and Multiparticle Production",
+      "domain": "research",
+      "sha256": "780ae62de08da2070496193ff20332b81dd906e26354b267375bb56ea5db639c",
+      "chars": 1117
+    },
+    {
+      "document_id": "arxiv:2009.04549v1",
+      "title": "Multimodal Deep Learning for Flaw Detection in Software Programs",
+      "domain": "research",
+      "sha256": "a4186cef7537c64bc398b22b8c400f9631f882596ff449627c1f3c5ce378e851",
+      "chars": 1317
+    },
+    {
+      "document_id": "arxiv:1808.05353v1",
+      "title": "Identifying Implementation Bugs in Machine Learning based Image Classifiers using Metamorphic Testing",
+      "domain": "research",
+      "sha256": "40b5abb81f1300e47c68e76665f5193de8bf0a06ae743466b94436f29c787257",
+      "chars": 1593
+    },
+    {
+      "document_id": "arxiv:2008.04467v1",
+      "title": "Challenges in Docker Development: A Large-scale Study Using Stack Overflow",
+      "domain": "research",
+      "sha256": "d15dcc6eaa0ecfb96654fd0b220e9b3ed0e325f9b02c68870995a311fcfa9a55",
+      "chars": 2457
+    },
+    {
+      "document_id": "arxiv:1904.08075v1",
+      "title": "End-to-End Speech Translation with Knowledge Distillation",
+      "domain": "research",
+      "sha256": "30f99658026be318abb3feb18e3705ddc7c5fbe6ab45058b120cfc23ba6d5a9a",
+      "chars": 1663
+    },
+    {
+      "document_id": "arxiv:2007.04792v1",
+      "title": "Targeting the Benchmark: On Methodology in Current Natural Language Processing Research",
+      "domain": "research",
+      "sha256": "b7f0bda6c571e92bb1cb0f57f3a74be5272963ab4048e0b6f27f8b8759f6554d",
+      "chars": 1106
+    },
+    {
+      "document_id": "arxiv:2008.05239v3",
+      "title": "A Knowledge Graph for Assessing Aggressive Tax Planning Strategies",
+      "domain": "research",
+      "sha256": "edc787e8eb41b83fe3e4e1ff2256c7d6d4bf82829dd5c1a63c685202419c1e05",
+      "chars": 1440
+    }
+  ]
+}
