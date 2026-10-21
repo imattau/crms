@@ -1,0 +1,374 @@
+{
+ "format": "crms-intake-suite",
+ "version": 1,
+ "authored_by": "project (not independent)",
+ "note": "Source sentences are deliberately longer than the facts so composition differs from quoting. Expectations were verified by reading the outputs.",
+ "cases": [
+  {
+   "id": "agents",
+   "genre": "summary",
+   "prompt": "Summarise who made each work.",
+   "source_documents": [
+    {
+     "name": "works.txt",
+     "text": "Moby Quill is a novel written by Harriet Lane. The Glass Orchard is a film directed by Sam Pike. Helios Bridge was built by Marta Voss."
+    }
+   ],
+   "intake": {
+    "questions": [
+     {
+      "question": "Who wrote Moby Quill?",
+      "role": "main"
+     },
+     {
+      "question": "Who directed The Glass Orchard?",
+      "role": "support"
+     },
+     {
+      "question": "Who built Helios Bridge?",
+      "role": "support"
+     }
+    ]
+   },
+   "expect": {
+    "status": "ok",
+    "facts": 3,
+    "contains": [
+     "Harriet Lane wrote Moby Quill",
+     "Sam Pike directed The Glass Orchard",
+     "Marta Voss built Helios Bridge"
+    ],
+    "max_copy": 0.3
+   }
+  },
+  {
+   "id": "dates",
+   "genre": "summary",
+   "prompt": "Summarise when each organisation began.",
+   "source_documents": [
+    {
+     "name": "orgs.txt",
+     "text": "Northgate Press, a small publisher in Leeds, was founded in 1921 by two brothers. Eastfield Radio, which broadcasts local news, was established in 1955 after a public vote. The Marlow Prize, a literary award, was created in 1988 to honour new writers."
+    }
+   ],
+   "intake": {
+    "questions": [
+     {
+      "question": "When was Northgate Press founded?",
+      "role": "main"
+     },
+     {
+      "question": "When was Eastfield Radio established?",
+      "role": "support"
+     },
+     {
+      "question": "When was the Marlow Prize created?",
+      "role": "support"
+     }
+    ]
+   },
+   "expect": {
+    "status": "ok",
+    "facts": 3,
+    "contains": [
+     "Northgate Press was founded in 1921",
+     "Eastfield Radio was established in 1955",
+     "Marlow Prize was created in 1988"
+    ],
+    "max_copy": 0.3
+   }
+  },
+  {
+   "id": "places",
+   "genre": "summary",
+   "prompt": "Summarise where each organisation is.",
+   "source_documents": [
+    {
+     "name": "places.txt",
+     "text": "Wexford Brewery is headquartered in Dunmore, Ireland. Tarn Rovers is a football club from Albury. Calder Labs is based in Leeds."
+    }
+   ],
+   "intake": {
+    "questions": [
+     {
+      "question": "Where is Wexford Brewery headquartered?",
+      "role": "main"
+     },
+     {
+      "question": "Where is Tarn Rovers from?",
+      "role": "support"
+     },
+     {
+      "question": "Where is Calder Labs based?",
+      "role": "support"
+     }
+    ]
+   },
+   "expect": {
+    "status": "ok",
+    "facts": 3,
+    "contains": [
+     "Wexford Brewery is headquartered in Dunmore, Ireland",
+     "Tarn Rovers is from Albury",
+     "Calder Labs is based in Leeds"
+    ],
+    "max_copy": 0.75
+   }
+  },
+  {
+   "id": "names",
+   "genre": "summary",
+   "prompt": "Summarise how places got their names.",
+   "source_documents": [
+    {
+     "name": "names.txt",
+     "text": "Lake Verity, the largest lake in the county, is named after Ada Verity, a local doctor. Crown Hill, a popular walking spot, is named after King Alder. The population of Ashby was 12,400 at the last census."
+    }
+   ],
+   "intake": {
+    "questions": [
+     {
+      "question": "Who is Lake Verity named after?",
+      "role": "main"
+     },
+     {
+      "question": "Who is Crown Hill named after?",
+      "role": "support"
+     },
+     {
+      "question": "What was the population of Ashby?",
+      "role": "support"
+     }
+    ]
+   },
+   "expect": {
+    "status": "ok",
+    "facts": 3,
+    "contains": [
+     "Lake Verity is named after Ada Verity",
+     "Crown Hill is named after King Alder",
+     "population of Ashby was 12,400"
+    ],
+    "max_copy": 0.75
+   }
+  },
+  {
+   "id": "deaths",
+   "genre": "summary",
+   "prompt": "Summarise when each person died.",
+   "source_documents": [
+    {
+     "name": "people.txt",
+     "text": "Marta Voss, a bridge engineer, died on 4 March 2011 in Oslo. Sam Pike, who made three films, died on 12 June 1999. Ida Brandt, a chemist, died on 20 May 2005 after a long illness."
+    }
+   ],
+   "intake": {
+    "questions": [
+     {
+      "question": "When did Marta Voss die?",
+      "role": "main"
+     },
+     {
+      "question": "When did Sam Pike die?",
+      "role": "support"
+     },
+     {
+      "question": "When did Ida Brandt die?",
+      "role": "support"
+     }
+    ]
+   },
+   "expect": {
+    "status": "ok",
+    "facts": 3,
+    "contains": [
+     "Marta Voss died on 4 March 2011",
+     "Sam Pike died on 12 June 1999",
+     "Ida Brandt died on 20 May 2005"
+    ],
+    "max_copy": 0.5
+   }
+  },
+  {
+   "id": "roles",
+   "genre": "summary",
+   "prompt": "Summarise who leads each company.",
+   "source_documents": [
+    {
+     "name": "roles.txt",
+     "text": "Elena Park is the managing director of Orchid Air, a regional airline. Tomas Reed is the chairman of Delta Foods, which sells frozen vegetables. Rui Silva is the president of Kelp Records, an independent label."
+    }
+   ],
+   "intake": {
+    "questions": [
+     {
+      "question": "Who is the managing director of Orchid Air?",
+      "role": "main"
+     },
+     {
+      "question": "Who is the chairman of Delta Foods?",
+      "role": "support"
+     },
+     {
+      "question": "Who is the president of Kelp Records?",
+      "role": "support"
+     }
+    ]
+   },
+   "expect": {
+    "status": "ok",
+    "facts": 3,
+    "contains": [
+     "Elena Park is the managing director of Orchid Air",
+     "Tomas Reed is the chairman of Delta Foods",
+     "Rui Silva is the president of Kelp Records"
+    ],
+    "max_copy": 0.75
+   }
+  },
+  {
+   "id": "merges",
+   "genre": "summary",
+   "prompt": "Summarise which villages merged.",
+   "source_documents": [
+    {
+     "name": "merge.txt",
+     "text": "On 1 January 2020, Alder became a part of Birchford. In 2012, Hollin became a part of Marsh. In 2005, Fenn became a part of Quay."
+    }
+   ],
+   "intake": {
+    "questions": [
+     {
+      "question": "What did Alder become a part of?",
+      "role": "main"
+     },
+     {
+      "question": "What did Hollin become a part of?",
+      "role": "support"
+     },
+     {
+      "question": "What did Fenn become a part of?",
+      "role": "support"
+     }
+    ]
+   },
+   "expect": {
+    "status": "ok",
+    "facts": 3,
+    "contains": [
+     "Alder became a part of Birchford",
+     "Hollin became a part of Marsh",
+     "Fenn became a part of Quay"
+    ],
+    "max_copy": 0.75
+   }
+  },
+  {
+   "id": "conflict",
+   "genre": "summary",
+   "prompt": "Summarise the founding dates.",
+   "source_documents": [
+    {
+     "name": "a.txt",
+     "text": "Oldtown was established in 1901. Northgate Press was founded in 1921. Eastfield Radio was established in 1955."
+    },
+    {
+     "name": "b.txt",
+     "text": "Oldtown was established in 1950."
+    }
+   ],
+   "intake": {
+    "questions": [
+     {
+      "question": "When was Oldtown established?",
+      "role": "main"
+     },
+     {
+      "question": "When was Northgate Press founded?",
+      "role": "support"
+     },
+     {
+      "question": "When was Eastfield Radio established?",
+      "role": "support"
+     }
+    ]
+   },
+   "expect": {
+    "status": "clarify",
+    "facts": 2,
+    "contains": [],
+    "excludes": [
+     "1901",
+     "1950"
+    ],
+    "note": "two sources disagree on the main question: it abstains and does not pick one"
+   }
+  },
+  {
+   "id": "pronoun",
+   "genre": "summary",
+   "prompt": "Summarise the founding dates.",
+   "source_documents": [
+    {
+     "name": "c.txt",
+     "text": "Quill Inc is a publisher. It was founded in 1990. Northgate Press was founded in 1921. Eastfield Radio was established in 1955."
+    }
+   ],
+   "intake": {
+    "questions": [
+     {
+      "question": "When was Quill Inc founded?",
+      "role": "main"
+     },
+     {
+      "question": "When was Northgate Press founded?",
+      "role": "support"
+     },
+     {
+      "question": "When was Eastfield Radio established?",
+      "role": "support"
+     }
+    ]
+   },
+   "expect": {
+    "status": "clarify",
+    "facts": 2,
+    "contains": [],
+    "excludes": [
+     "1990"
+    ],
+    "note": "the only founding sentence for Quill Inc starts with 'It'"
+   }
+  },
+  {
+   "id": "nothing",
+   "genre": "summary",
+   "prompt": "Summarise the sources.",
+   "source_documents": [
+    {
+     "name": "d.txt",
+     "text": "The weather was mild. Nobody mentioned any names."
+    }
+   ],
+   "intake": {
+    "questions": [
+     {
+      "question": "Who wrote Moby Quill?",
+      "role": "main"
+     },
+     {
+      "question": "When was Northgate Press founded?",
+      "role": "support"
+     }
+    ]
+   },
+   "expect": {
+    "status": "abstain",
+    "facts": 0,
+    "contains": [],
+    "excludes": [],
+    "note": "no question is answerable from the sources"
+   }
+  }
+ ]
+}

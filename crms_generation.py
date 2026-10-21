@@ -748,10 +748,11 @@ class Critic:
             issues.append(f"average sentence words {avg_words:.1f} exceeds limit")
         if copy > 0.75:
             issues.append(f"copy ratio {copy:.2f} exceeds first-slice limit")
-        from crms_generation_checks import check_generated
+        from crms_generation_checks import check_generated, check_role_order
         from crms_pattern_defaults import seeded_resources
-        issues.extend(check_generated(text, request.facts, seeded_resources()[0],
-                                      sources))
+        language = seeded_resources()[0]
+        issues.extend(check_generated(text, request.facts, language, sources))
+        issues.extend(check_role_order(text, request.facts, language))
         passed = not issues
         score = (
             coverage * 0.45

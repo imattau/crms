@@ -11,21 +11,11 @@ from __future__ import annotations
 import re
 from typing import Any, Iterable, Sequence
 
+from crms_relation_specs import ListSentenceSource  # noqa: F401  (re-exported)
 from crms_research import _sentence_spans   # shared sentence splitter
 
 _ROLE_FIELD = re.compile(
     r"^(occupation|position|office|title|role|profession)\s*=\s*(.+)$", re.I)
-
-
-class ListSentenceSource:
-    """A fixed pool of (title, sentence) pairs; used by tests and the verifier."""
-
-    def __init__(self, pairs: Sequence[tuple[str, str]]) -> None:
-        self.pairs = list(pairs)
-        self.synthetic: set[str] = set()
-
-    def sentences(self, entity: str, question: str) -> Iterable[tuple[str, str]]:
-        return list(self.pairs)
 
 
 class IndexSentenceSource:

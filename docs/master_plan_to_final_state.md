@@ -113,6 +113,8 @@ procedures; portable SQLite model; 533 regression experiments.
 | Conversation data unused | The feedback ledger is empty; rephrase-after-failure signals are not mined | Phase 10 conversation learning |
 | Matching is ad-hoc regex | 851 regex call sites in 71 modules; about 85% in ten modules (`crms_chat.py` 250, `crms_knowledge.py` 143); paraphrase, reversed orientation, gaps, and form variants fail (prototype: 76% of infobox-oracle questions return no candidate) | Phase 11 pattern-matching transition |
 | Pattern layer exists only as a prototype | Matcher, relation specs, spec verifier, and SQL store live in a session scratchpad, not the repository or the packaged model | Phase 11 Stage A |
+| Coverage is low and supervision is manual | Phase 11 Stage A: about 74% of oracle questions return no candidate; specs, judgments, and calibration were done by one author in one session; the feedback ledger is empty | Phase 12 automated teacher loop and coverage program |
+| Independent evaluation still open | No externally authored suite and no human raters for Phases 9–11 | Phase 12 independent evaluation |
 
 ---
 
@@ -939,19 +941,139 @@ deterministic gate. Regex footprint today: 851 call sites in 71 modules; about
 - **Stage E — retirement and audit:** remove dead regex, publish the footprint
   per module, and re-run the full gate.
 
-**Status (2026-10-22): planned; not started.** Prototype evidence, not a gate
-result: eight teacher-proposed relation specs passed the verifier after three
-rounds and moved a dev set from 25 to 32 correct of 35; on a fresh hand-written
-blind set the full stack went from 20 to 25 correct of 34 (one wrong), and on a
-fresh 1,029-question infobox-oracle sample the relation layer returned 219
-correct and 30 wrong, falling to 217 and 25 with a truncated-name veto. A learned
-ranker did not beat the hand-set ranking under leave-one-set-out validation
-(89 correct / 5 wrong vs 73–86 / 3–7), because only 9 of 94 candidate sets had
-any ranking signal; ranking constants are now SQL parameters. Known limits:
-about 76% of oracle questions produce no candidate, retrieval misses and stale
-or conflicting facts are not solved by patterns, the chunker is rule-based and
-English-only, induced classes are noisy, specs were authored by hand, and the
-hand blind sets are consumed.
+**Status (2026-10-22): Stage A of the generation layer is implemented and
+merged; Stages B–E are not started; the Phase 11 gate is open.** Stage A delivered
+the pattern engine (`crms_patterns.py`: tokenizer, shallow chunker, pattern
+language, bounded matcher with traces), pattern transformations with synthetic
+probes, relation specs and the deterministic spec verifier, a versioned SQL
+pattern memory with a visible seed file (`crms_pattern_seed.json`: 14 specs,
+induced classes, verbs, rewrites, parameters), relation specs as governed
+`fact-frame` rules in the rule registry, source-to-proposition intake for
+`/compose` requests, pattern-based clarity rewriting (one verb rule covers every
+inflection) and number/polarity/name/role-order checks in the generation critic,
+and an infobox-oracle evaluation. Generation modules contain no matching
+regexes. Phase 10 parity holds (12/12, mean copy 0.157); the full experiment
+suite shows no new failures against an unmodified baseline; a clean-room copy of
+the generation and intake path runs with no research index, chat, network, or LLM.
+
+Measured on a frozen 1,050-question infobox-oracle sample (seed 20261023, digest
+locked), under the reward rule (+1 correct, −3 wrong, 0 abstain):
+
+| System | Correct | Wrong | Abstained | Wrong share of answers | Utility |
+|---|---|---|---|---|---|
+| Unchanged chat (quote baseline) | 182 | 55 | 813 | 23.2% | 17 |
+| Relation layer alone | 260 | 21 | 769 | 7.5% | 197 |
+| Relation first, chat fallback | 388 | 47 | 615 | 10.8% | 247 |
+
+Two of three gate checks pass (lower wrong rate and higher utility than the
+baseline); "no correct answer lost" fails by one case (Citibank: a sentence from a
+more specific page, Citibank Nigeria, outranked the baseline's correct infobox
+answer). The baseline is partly circular for some relations because the chat
+already reads infobox fields (117 of 150 correct on founder questions), and gains
+concentrate in text-based relations (artist 1→99, author 3→53, director 24→48).
+
+Negative results kept on record: a learned ranker did not beat the hand-set
+ranking under leave-one-set-out validation, so ranking constants are SQL
+parameters; an extended-title veto removed 5 wrong answers but lost 40 correct
+ones (utility 287→262) and stays off by default.
+
+Stage A open items: the independent (not project-authored) intake suite, the
+`/compose` intake over the active research index rather than request documents,
+and packaging the pattern tables in the Phase 8 model. Stages B–E (evidence
+extraction in the gate, request understanding, knowledge extraction, retirement
+and audit) are not done: the regex footprint outside generation is unchanged at
+about 850 call sites, and no regex family has been retired from `crms_chat.py`,
+`crms_nl_gate.py`, `crms_knowledge.py`, or the other ten modules. Known limits:
+about 74% of oracle questions return no candidate, retrieval misses and stale or
+conflicting facts are not solved by patterns, the chunker is rule-based and
+English-only, induced classes are noisy, and specs were authored by hand.
+
+### Phase 12 — Coverage and supervised learning at scale, generation first (weeks 140–180)
+
+**Goal:** raise how much CRMS can answer and compose, without raising its wrong
+answers, by (1) proving progress on independent evaluation, (2) automating the
+teacher loop that proposes and verifies specs, (3) extending generation from
+single documents to the active index with conflict handling, and (4) retrofitting
+older regex code only where the pattern layer has already beaten it. Detail:
+`docs/design_phase12_coverage_and_supervision.md`.
+
+**Why this, not a wholesale retrofit.** Retiring regex adds no capability: the
+Phase 11 gains came from new specs, and the combined system (relation layer
+first, old routes as fallback) beat the relation layer alone by 128 correct
+answers on the frozen sample (388 vs 260), so the old code is doing real work as
+a fallback. About 850 regex call sites remain; most are tokenising or literal
+command syntax, and 249 of 562 experiments touch the chat or gate. The measured
+bottlenecks are elsewhere: about 74% of oracle questions return no candidate;
+supervision was manual (one author, an uncalibrated judge, no real conversations);
+and the Phase 9 and 10 independent-evaluation gates are still open.
+
+**Principles.**
+1. **Independent evaluation comes first.** No capability claim without an
+   externally authored set and a human-graded slice.
+2. **The verifier decides.** A teacher proposes; deterministic checks accept.
+3. **Reward rule everywhere.** +1 correct, −3 wrong, 0 abstain. Coverage may not be
+   bought with a higher wrong share.
+4. **Retire a regex family only on parity** (Phase 11 rules), one family per
+   change, never in bulk.
+5. **No new matching regexes** in migrated modules; a footprint ratchet test
+   enforces it.
+6. **Retire consumed blind sets.** Anything that influenced a change is tuning data.
+
+Workstreams and deliverables:
+
+1. **Independent evaluation** (first, blocking). An externally authored set of at
+   least 300 prompts over two source-disjoint corpora; a human-graded slice of at
+   least 100 answers by two raters with agreement reported; judge model different
+   from the proposing model; correct, wrong, abstain, and coverage reported
+   separately and never collapsed.
+2. **Automated teacher loop** (`crms_examiner.py`, `run_phase12_eval.py`).
+   Questions generated from passages with gold spans; failures grouped by cause
+   (no candidate, boundary, wrong entity, conflict, retrieval); proposals for
+   specs, classes, lexicon, and transformations; the Phase 11 verifier gates each;
+   the infobox oracle supplies scale; every teacher call, model, and prompt digest
+   is logged with the artifact. A coverage program ranks relation families by
+   oracle gap and publishes the rule-scaling curve with per-mechanism ablations.
+3. **Generation upgrades.** `/compose` intake over the active research index (not
+   only a request's own documents); multi-fact composition and aggregation across
+   documents; qualifier and conflict handling ("current" vs "former", dated facts,
+   "sources disagree" with citations); neighbour retrieval for facts stated on a
+   related page; critic checks for relation and role order; variation that reduces
+   restatement where sources are already simple; human clarity calibration.
+4. **Gated retrofit lane.** Families chosen by measured failure, starting with the
+   evidence gate's locative and answer-type checks (27 of 61 abstentions in one
+   exam came from the location predicate) and bare arithmetic. Each family is one
+   change under the parity rule. A footprint ratchet test (`v1_580`) records
+   regex call sites per module and fails if a migrated module gains any; the
+   footprint per module is published.
+5. **Conversation learning.** Opt-in collection of real feedback with redaction
+   and retention rules; rephrase-after-failure mining run on real sessions; if
+   there is no real data by the gate, report the signal as unmeasured instead of
+   simulating it.
+6. **Packaging.** Pattern tables in the Phase 8 model schema with migration;
+   clean-room run including index-based intake.
+
+**Gate** (thresholds provisional until the baseline is frozen, then locked):
+- **Independent evaluation:** wrong share of answered ≤5% on the independent set
+  over two corpora; coverage on in-scope relations reported against the 26%
+  Phase 11 baseline with a frozen target; zero unsafe answers on safety controls.
+- **Judge validity:** human/judge kappa ≥0.6 on ≥100 graded answers; judge differs
+  from proposer.
+- **Learning efficacy:** three automated teacher rounds give ≥15% relative
+  held-out gain with no confident-error increase; teacher calls and human minutes
+  reported; the rule-scaling curve published with ablations; plateaus diagnosed.
+- **Generation:** index-based intake composes outputs of at least three
+  facts with 100% of clauses resolving to a cited span; conflicting or dated facts
+  are reported, never silently chosen; copy ratio no worse than Phase 10.
+- **Retrofit:** at least three regex families retired with parity (full suite zero
+  new failures, frozen sets not regressed, oracle wrong share not higher); the
+  footprint ratchet passes; footprint published per module.
+- **Clean room:** a copied release runs index-based intake and the pattern layer
+  with no LLM, network, or originals; patterns reload from SQL and roll back.
+
+**Status (2026-10-22): planned; not started.** Depends on resources outside the
+project: an independent question author and two human raters. If they are not
+available, the gate stays open and the teacher-loop and generation work proceed
+with the independent-evaluation claim withheld.
 
 
 ---
@@ -1028,6 +1150,9 @@ counts and rates; never collapse into one "score".
 | Spec overfitting | A spec fits its development questions and fails elsewhere | Verifier replay/held-out/contrast/verb-swap/fire-rate checks, independent infobox-oracle sample, retire consumed blind sets |
 | Hidden knowledge in old regex | A family encoded behaviour nobody remembers | Characterise before retiring: run the family's experiments, record its inputs and outputs as controls first |
 | Rule shadowing | One spec captures questions meant for another (seen as 'Mapai established in 1930') | Bank non-regression check in the verifier; ordering and restriction tests |
+| Coverage bought with wrong answers | Spec count rises while the wrong share of answered rises | Reward rule gate, oracle wrong share must not rise, per-spec utility counts and contest |
+| Spec explosion | Thousands of overlapping specs, shadowing, slow matching | Verifier bank non-regression, consolidation and retirement, matching budget, per-spec utility accounting |
+| External resources unavailable | No independent author or human raters | Withhold the independent-evaluation claim, keep the gate open, continue the other workstreams |
 | Scope creep | New feature without a gate | Reject; the 533-experiment habit is the main delivery risk |
 
 **Kill criteria are part of the plan.** A lane that misses its gate twice is
@@ -1122,9 +1247,17 @@ redesigned or dropped.
    port, SQL store and registry family, source-to-proposition intake for
    `/compose`, pattern-based generation rules, spec verifier, parity gate, then
    evidence extraction, request understanding, and knowledge extraction in
-   later gated stages. — planned (`docs/design_phase11_pattern_transition.md`);
-   prototype evidence only.
-19. **Consolidate plan docs** — this file is canonical; link the others as
+   later gated stages. — Stage A done and merged (engine, SQL memory, registry
+   family, intake, pattern-based clarity and critic checks, oracle evaluation,
+   clean room); Stages B–E not started
+   (`docs/design_phase11_pattern_transition.md`).
+19. **Phase 12 coverage and supervised learning at scale, generation first** —
+   independent evaluation, automated teacher loop and coverage program,
+   index-based generation with conflict handling, a gated retrofit lane with a
+   footprint ratchet, real conversation learning, and packaging. — planned
+   (`docs/design_phase12_coverage_and_supervision.md`); needs an independent
+   author and human raters.
+20. **Consolidate plan docs** — this file is canonical; link the others as
    history. — canonical status recorded; remaining docs still need pruning.
 
 ---
@@ -1180,3 +1313,5 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Phase 10 gains a generalisation workstream: learned classes, back-off hierarchy, analogical matching proposals, and evidence-count weights, with a rule-scaling curve (coverage and confident errors against training examples and rule count, per-mechanism ablations) and a gate item; the rationale is that LLM generalisation largely reflects training coverage, so rules can be made to reach it deterministically | `docs/design_phase10_generation_learning.md`, `docs/master_plan_to_final_state.md` |
 | 2026-10-21 | Phase 10 bounded lane completed: 12/12 cases across all 10 genres, mean copy 0.157; SQL snapshots/rollback; accepted teacher clarity proposal and rejected negative control; clean-room reload; `/compose` chat path; class/back-off/analogy/evidence generalisation diagnostics; automated 70B-class comparison (CRMS adequacy 1.75 vs 2.00, clarity 1.90 vs 2.00, coverage 1.85 vs 2.00); human/independent-300/two-corpus/measured-70B gates open | `crms_generation.py`, `crms_composition_memory.py`, `crms_examiner.py`, `crms_generate.py`, `run_phase10_eval.py`, `run_phase10_teacher.py`, `run_phase10_comparison.py`, `run_phase10_external.py`, `experiments/reports/phase10_external.json` |
 | 2026-10-22 | Phase 11 planned: staged transition from ad-hoc regex to one structure-aware pattern layer, generation layer first (engine port, SQL store, source-to-proposition intake, pattern-based generation rules, spec verifier), with parity gate, retire-on-parity rule, and later stages for evidence extraction, request understanding, and knowledge extraction. Prototype evidence recorded with its limits; gate open | `docs/design_phase11_pattern_transition.md`, `docs/master_plan_to_final_state.md` |
+| 2026-10-22 | Phase 11 Stage A completed and merged: pattern engine, SQL pattern memory and seed, spec verifier, specs as `fact-frame` registry rules, `/compose` source intake, pattern-based clarity rewriting and number/polarity/name/role-order critic checks, infobox-oracle evaluation with frozen 1,050-question sample; combined system 388 correct / 47 wrong vs quote baseline 182 / 55 (utility 247 vs 17), one correct answer lost; Phase 10 parity 12/12; no new failures in the full suite; Stages B–E not started | `crms_patterns.py`, `crms_relation_specs.py`, `crms_pattern_memory.py`, `crms_spec_verifier.py`, `crms_spec_registry.py`, `crms_source_intake.py`, `crms_generation_checks.py`, `run_phase11_eval.py`, `experiments/reports/phase11_stage_a.json` |
+| 2026-10-22 | Phase 12 planned: coverage and supervised learning at scale, generation first (independent evaluation, automated teacher loop and coverage program, index-based generation with conflict handling, gated retrofit lane with footprint ratchet, real conversation learning, packaging); rationale recorded against a wholesale regex retrofit; not started | `docs/design_phase12_coverage_and_supervision.md`, `docs/master_plan_to_final_state.md` |

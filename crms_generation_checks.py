@@ -7,10 +7,9 @@ the facts). They complement the span-level evidence check; they do not replace i
 """
 from __future__ import annotations
 
-import re
 from typing import Iterable, Sequence
 
-from crms_patterns import PatternLanguage, tokenize
+from crms_patterns import PatternLanguage, sentence_spans as _sentence_spans, tokenize
 
 _NEGATIONS = frozenset({"not", "no", "never", "cannot", "without", "neither", "nor"})
 _ALLOWED_NAMES = frozenset({"i"})
@@ -52,13 +51,9 @@ def check_generated(text: str, facts: Sequence, language: PatternLanguage,
         issues.append("polarity: negation appears but no fact is negated")
 
     sentence_starts = {0}
-    for i, token in enumerate(tokens):
-        if token.text in (".", "!", "?") or (i and tokens[i - 1].text in (".", "!", "?")):
-            sentence_starts.add(i + 1)
-    # sentence boundaries by terminal punctuation in the original text
-    for m in re.finditer(r"[.!?]\s+", text):
+    for a, _b in _sentence_spans(text):
         for i, token in enumerate(tokens):
-            if token.start >= m.end():
+            if token.start >= a:
                 sentence_starts.add(i)
                 break
     unsupported = []
@@ -70,3 +65,34 @@ def check_generated(text: str, facts: Sequence, language: PatternLanguage,
     if unsupported:
         issues.append("name not found in any fact: " + ", ".join(sorted(set(unsupported))))
     return issues
+
+
+def check_role_order(text: str, facts: Sequence, language: PatternLanguage) -> list[str]:
+    """For an active fact (subject, verb, object) a sentence naming both must put
+    the subject first, unless it is passive ("by")."""
+    issues: list[str] = []
+    for fact in facts:
+        if not (fact.subject.strip() and fact.object.strip() and fact.verb.strip()):
+            continue
+        subject = [t.low for t in tokenize(fact.subject, language)]
+        obj = [t.low for t in tokenize(fact.object, language)]
+        for a, b in _sentence_spans(text):
+            tokens = tokenize(text[a:b], language)
+            words = [t.low for t in tokens]
+            si = _find(words, subject)
+            oi = _find(words, obj)
+            if si is None or oi is None or si < oi:
+                continue
+            if "by" in words[oi:si]:
+                continue    # passive: "Y was written by X"
+            issues.append(f"role order: {fact.object!r} comes before {fact.subject!r}")
+            break
+    return issues
+
+
+def _find(words: Sequence[str], needle: Sequence[str]) -> int | None:
+    n = len(needle)
+    for i in range(len(words) - n + 1):
+        if list(words[i:i + n]) == list(needle):
+            return i
+    return None

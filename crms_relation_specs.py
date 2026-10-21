@@ -65,8 +65,27 @@ class SentenceSource(Protocol):
         """Candidate (title, sentence) pairs for an entity."""
 
 
+class ListSentenceSource:
+    """A fixed pool of (title, sentence) pairs; used by intake, tests, and the verifier."""
+
+    def __init__(self, pairs: Sequence[tuple[str, str]]) -> None:
+        self.pairs = list(pairs)
+        self.synthetic: set[str] = set()
+
+    def sentences(self, entity: str, question: str) -> Iterable[tuple[str, str]]:
+        return list(self.pairs)
+
+
 def _norm(text: str) -> str:
     return re.sub(r"\W+", " ", text.lower()).strip()
+
+
+def _extended_title(candidate: dict) -> bool:
+    """True when the source page's title extends the entity ("Citibank Nigeria"
+    for "Citibank"): the sentence may be about the more specific thing."""
+    title = _norm(re.sub(r"\s*\([^)]*\)\s*$", "", candidate["title"]))
+    entity = _norm(candidate["etxt"])
+    return bool(entity) and title != entity and entity in title
 
 
 class RelationEngine:
@@ -80,6 +99,7 @@ class RelationEngine:
         self.source = source
         self.params = {**DEFAULT_PARAMS, **(params or {})}
         self._parsed: dict[str, list] = {}
+        self.allowed: set[str] | None = None   # active spec names from the registry; None = all
         self._propositions = {s.name: dict(s.proposition) for s in specs if s.proposition}
         self._pool: list[tuple[str, str]] | None = None
 
@@ -102,7 +122,8 @@ class RelationEngine:
         skip = set(exclude)
         try:
             specs = list(extra) + [s.as_tuple() for s in self.specs
-                                   if s.name not in skip]
+                                   if s.name not in skip
+                                   and (self.allowed is None or s.name in self.allowed)]
             for name, qpats, spats, template, verb_class in specs:
                 for qp in qpats:
                     for m in match_patterns(self._parse(qp),
@@ -245,6 +266,8 @@ class RelationEngine:
         chosen = best[0]
         if p.get("veto_next_cap", 0) >= 1 and chosen["f"]["a_next_cap"] == 1:
             return None   # likely a truncated name
+        if p.get("veto_extended_title", 0) >= 1 and _extended_title(chosen):
+            return None   # the sentence is from a page about a more specific entity
         return chosen
 
     def _render(self, name, template, c, entity, variables, text, tokens, qb) -> SpecAnswer:

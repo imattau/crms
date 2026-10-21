@@ -16,7 +16,7 @@ PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
 from crms_generation import ClarityRewriter, Fact, GenerationRequest  # noqa: E402
-from crms_generation_checks import check_generated  # noqa: E402
+from crms_generation_checks import check_generated, check_role_order  # noqa: E402
 from crms_generation_rules import load_rules  # noqa: E402
 from crms_pattern_defaults import seeded_resources  # noqa: E402
 
@@ -74,12 +74,22 @@ def main() -> None:
                                   source="d", source_text="Dr Rao reports clear results."),), language) == [],
             "a name from the facts was flagged")
 
+    # role order: an active fact written back to front is caught; a passive is not
+    order_facts = (Fact(fact_id="d", subject="Rafe Ostin", verb="directed", object="Lantern Bay",
+                        source="f", source_text="Lantern Bay is a film directed by Rafe Ostin."),)
+    require(check_role_order("Rafe Ostin directed Lantern Bay.", order_facts, language) == [],
+            "a correctly ordered fact was flagged")
+    require(any("role order" in i for i in check_role_order("Lantern Bay directed Rafe Ostin.", order_facts, language)),
+            "a reversed fact was not caught")
+    require(check_role_order("Lantern Bay was directed by Rafe Ostin.", order_facts, language) == [],
+            "a passive was flagged")
+
     # footprint: no matching regex in the generation modules (compiled tokenisers excepted)
     for name in ("crms_generation.py", "crms_generation_rules.py", "crms_generation_checks.py",
                  "crms_pattern_rewrite.py"):
         source = (PROJECT / name).read_text(encoding="utf-8")
         calls = re.findall(r"\bre\.(?:search|match|fullmatch|sub|subn|findall|finditer)\(", source)
-        allowed = 2 if name == "crms_generation_checks.py" else 0   # sentence-boundary scan only
+        allowed = 0
         require(len(calls) <= allowed, f"{name} still uses {len(calls)} matching regex call(s)")
     print("Phase 11 generation patterns contract passed")
 

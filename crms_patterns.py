@@ -539,3 +539,35 @@ def match_patterns(alternatives: Sequence[list[tuple]], ctx: MatchContext, *,
         for m in out:
             m["truncated"] = True
     return out
+
+
+_ABBREVIATIONS = frozenset({"dr", "mr", "mrs", "ms", "st", "jr", "sr", "vs", "etc", "no",
+                            "prof", "inc", "ltd", "co", "mt", "gen", "col", "lt", "sgt"})
+
+
+def sentence_spans(text: str) -> list[tuple[int, int]]:
+    """Sentence character spans without regex. A boundary follows . ! ? and
+    whitespace when the next character starts a sentence (capital, digit, quote),
+    except after a known abbreviation or a single-letter initial ("D. W. Griffith")."""
+    spans: list[tuple[int, int]] = []
+    start = 0
+    n = len(text)
+    for i, ch in enumerate(text):
+        if ch not in ".!?" or i + 1 >= n or not text[i + 1].isspace():
+            continue
+        if ch == ".":
+            k = i
+            while k > 0 and text[k - 1].isalpha():
+                k -= 1
+            word = text[k:i]
+            if word.lower() in _ABBREVIATIONS or (len(word) == 1 and word.isupper()):
+                continue
+        j = i + 1
+        while j < n and text[j].isspace():
+            j += 1
+        if j < n and (text[j].isupper() or text[j].isdigit() or text[j] in "\"'(“‘"):
+            spans.append((start, i + 1))
+            start = j
+    if start < n:
+        spans.append((start, n))
+    return spans

@@ -1,9 +1,11 @@
 # Phase 11 pattern-matching transition, generation layer first
 
-**Status:** planned 2026-10-22; not started. Prototype evidence only.
+**Status:** Stage A implemented and merged 2026-10-22; Stages B–E not started; gate open.
 **Plan entry:** `docs/master_plan_to_final_state.md`, Phase 11.
-**Prototype:** outside the repository (a session scratchpad). Moving it in is
-Stage A work.
+**Code:** `crms_patterns.py`, `crms_pattern_transforms.py`, `crms_relation_specs.py`,
+`crms_spec_verifier.py`, `crms_spec_registry.py`, `crms_pattern_memory.py` (+ `crms_pattern_seed.json`),
+`crms_pattern_sources.py`, `crms_source_intake.py`, `crms_pattern_rewrite.py`,
+`crms_generation_checks.py`, `crms_oracle_eval.py`, `run_phase11_eval.py`.
 
 ## What the transition is
 
@@ -204,3 +206,24 @@ are the planned sources.
 4. Which model proposes specs and which model judges them (Phase 10 decision).
 5. Whether and when a learned ranker replaces the hand-set weights; the current
    bar is beating leave-one-set-out cross-validation.
+
+## Stage A result (2026-10-22)
+
+Built: engine, SQL memory and seed, spec verifier, registry family, source intake,
+pattern-based clarity rewriting and critic checks, oracle evaluation, clean-room
+test, project-authored intake suite (10 cases). Measured on the frozen oracle
+sample (`corpus/phase11_eval/oracle_sample.json`): quote baseline 182 correct / 55
+wrong; relation layer alone 260 / 21; relation first with chat fallback 388 / 47
+(utility 247 vs 17). One correct baseline answer was lost (Citibank).
+
+Decisions recorded:
+- The extended-title veto (abstain when the source page's title extends the
+  entity) removed 5 wrong answers and lost 40 correct ones across all sets
+  (utility 287→262); it ships off (`veto_extended_title = 0`).
+- A learned ranker lost to the hand-set ranking under leave-one-set-out validation;
+  parameters stay hand-set until more labelled error data exists.
+- The generation path now depends on the pattern modules and seed; the Phase 10
+  clean-room test carries them.
+
+Open: independent intake suite; intake over the active research index; packaged
+model tables; Stages B–E.

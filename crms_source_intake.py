@@ -12,9 +12,8 @@ from typing import Any, Iterable, Sequence
 
 from crms_generation import Fact
 from crms_pattern_defaults import seeded_resources
-from crms_pattern_sources import ListSentenceSource
-from crms_relation_specs import RelationEngine
-from crms_research import _sentence_spans
+from crms_relation_specs import ListSentenceSource, RelationEngine
+from crms_patterns import sentence_spans as _sentence_spans
 
 
 def split_sentences(documents: Iterable[tuple[str, str]]) -> list[tuple[str, str]]:
