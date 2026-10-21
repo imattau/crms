@@ -941,8 +941,10 @@ deterministic gate. Regex footprint today: 851 call sites in 71 modules; about
 - **Stage E — retirement and audit:** remove dead regex, publish the footprint
   per module, and re-run the full gate.
 
-**Status (2026-10-22): Stage A of the generation layer is implemented and
-merged; Stages B–E are not started; the Phase 11 gate is open.** Stage A delivered
+**Status (2026-10-22): Stage A of the generation layer is implemented; Stages B–E
+are delivered at pilot scope (one measured family each, plus the ratchet and
+footprint audit); the remaining regex is inventoried for the Phase 12 retrofit
+lane.** Stage A delivered
 the pattern engine (`crms_patterns.py`: tokenizer, shallow chunker, pattern
 language, bounded matcher with traces), pattern transformations with synthetic
 probes, relation specs and the deterministic spec verifier, a versioned SQL
@@ -979,14 +981,39 @@ ones (utility 287→262) and stays off by default.
 
 Stage A open items: the independent (not project-authored) intake suite, the
 `/compose` intake over the active research index rather than request documents,
-and packaging the pattern tables in the Phase 8 model. Stages B–E (evidence
-extraction in the gate, request understanding, knowledge extraction, retirement
-and audit) are not done: the regex footprint outside generation is unchanged at
-about 850 call sites, and no regex family has been retired from `crms_chat.py`,
-`crms_nl_gate.py`, `crms_knowledge.py`, or the other ten modules. Known limits:
-about 74% of oracle questions return no candidate, retrieval misses and stale or
-conflicting facts are not solved by patterns, the chunker is rule-based and
-English-only, induced classes are noisy, and specs were authored by hand.
+and packaging the pattern tables in the Phase 8 model.
+
+**Stages B–E (pilot scope).** A new `pat_intent` SQL table holds ordered pattern
+rules per family (`crms_intent_rules.py`; the matcher gained an exact-word
+element `X[...]`). Four families were retired from regex, each with a frozen
+reference and a parity run before the old code was deleted:
+
+| Stage | Module | Family | Parity result |
+|---|---|---|---|
+| B | `crms_nl_gate.py` | question answer type | 0 differences on 2,907 questions |
+| B | `crms_nl_gate.py` | location-bearing predicate | 3 differences in 42,905 sentences, all old false positives (a word boundary matching inside a hyphenated word) |
+| C | `crms_math.py` | arithmetic question wrappers | 1 difference in 16,233 variants (a whitespace-only body now returns none) |
+| D | `crms_document_learning.py` | claim-status cues | 10 differences in 44,039 sentences, all word-boundary matches inside hyphenated words or contractions |
+
+Stage E added `experiments/v1_581_regex_footprint.py`, a ratchet over
+`corpus/phase11_eval/regex_footprint.json` (no module may gain regex sites; the
+migrated modules list a reason for every site left), and
+`experiments/v1_580_gate_intent_parity.py`, which keeps the retired predicates as a
+frozen reference. Regex call sites fell from 914 to 889 (about 3%). The full
+experiment suite, run with the research data linked into both trees, shows no new
+failures against an unmodified baseline. Earlier Stage A regression runs had no
+data in the worktrees, so experiments needing it failed in both trees and could
+not show a regression; the Stage A claim stands on the Phase 10 and Phase 11
+suites, which do not need it.
+
+Not done: about 890 sites remain, including the large `crms_chat.py` (269) and
+`crms_knowledge.py` (150) families, the relative-difference and unit-conversion
+math patterns (decimal numbers need a number-aware tokenizer), and the gate's
+remaining role-order, definition and measure checks. These move to the Phase 12
+gated retrofit lane. Known limits: about 74% of oracle questions return no
+candidate, retrieval misses and stale or conflicting facts are not solved by
+patterns, the chunker is rule-based and English-only, induced classes are noisy,
+and specs were authored by hand.
 
 ### Phase 12 — Coverage and supervised learning at scale, generation first (weeks 140–180)
 
@@ -1313,5 +1340,5 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Phase 10 gains a generalisation workstream: learned classes, back-off hierarchy, analogical matching proposals, and evidence-count weights, with a rule-scaling curve (coverage and confident errors against training examples and rule count, per-mechanism ablations) and a gate item; the rationale is that LLM generalisation largely reflects training coverage, so rules can be made to reach it deterministically | `docs/design_phase10_generation_learning.md`, `docs/master_plan_to_final_state.md` |
 | 2026-10-21 | Phase 10 bounded lane completed: 12/12 cases across all 10 genres, mean copy 0.157; SQL snapshots/rollback; accepted teacher clarity proposal and rejected negative control; clean-room reload; `/compose` chat path; class/back-off/analogy/evidence generalisation diagnostics; automated 70B-class comparison (CRMS adequacy 1.75 vs 2.00, clarity 1.90 vs 2.00, coverage 1.85 vs 2.00); human/independent-300/two-corpus/measured-70B gates open | `crms_generation.py`, `crms_composition_memory.py`, `crms_examiner.py`, `crms_generate.py`, `run_phase10_eval.py`, `run_phase10_teacher.py`, `run_phase10_comparison.py`, `run_phase10_external.py`, `experiments/reports/phase10_external.json` |
 | 2026-10-22 | Phase 11 planned: staged transition from ad-hoc regex to one structure-aware pattern layer, generation layer first (engine port, SQL store, source-to-proposition intake, pattern-based generation rules, spec verifier), with parity gate, retire-on-parity rule, and later stages for evidence extraction, request understanding, and knowledge extraction. Prototype evidence recorded with its limits; gate open | `docs/design_phase11_pattern_transition.md`, `docs/master_plan_to_final_state.md` |
-| 2026-10-22 | Phase 11 Stage A completed and merged: pattern engine, SQL pattern memory and seed, spec verifier, specs as `fact-frame` registry rules, `/compose` source intake, pattern-based clarity rewriting and number/polarity/name/role-order critic checks, infobox-oracle evaluation with frozen 1,050-question sample; combined system 388 correct / 47 wrong vs quote baseline 182 / 55 (utility 247 vs 17), one correct answer lost; Phase 10 parity 12/12; no new failures in the full suite; Stages B–E not started | `crms_patterns.py`, `crms_relation_specs.py`, `crms_pattern_memory.py`, `crms_spec_verifier.py`, `crms_spec_registry.py`, `crms_source_intake.py`, `crms_generation_checks.py`, `run_phase11_eval.py`, `experiments/reports/phase11_stage_a.json` |
+| 2026-10-22 | Phase 11 Stage A completed and merged: pattern engine, SQL pattern memory and seed, spec verifier, specs as `fact-frame` registry rules, `/compose` source intake, pattern-based clarity rewriting and number/polarity/name/role-order critic checks, infobox-oracle evaluation with frozen 1,050-question sample; combined system 388 correct / 47 wrong vs quote baseline 182 / 55 (utility 247 vs 17), one correct answer lost; Phase 10 parity 12/12; no new failures in the full suite; Stages B–E followed at pilot scope (see Phase 11 status) | `crms_patterns.py`, `crms_relation_specs.py`, `crms_pattern_memory.py`, `crms_spec_verifier.py`, `crms_spec_registry.py`, `crms_source_intake.py`, `crms_generation_checks.py`, `run_phase11_eval.py`, `experiments/reports/phase11_stage_a.json` |
 | 2026-10-22 | Phase 12 planned: coverage and supervised learning at scale, generation first (independent evaluation, automated teacher loop and coverage program, index-based generation with conflict handling, gated retrofit lane with footprint ratchet, real conversation learning, packaging); rationale recorded against a wholesale regex retrofit; not started | `docs/design_phase12_coverage_and_supervision.md`, `docs/master_plan_to_final_state.md` |

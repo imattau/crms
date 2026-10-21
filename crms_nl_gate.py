@@ -4,6 +4,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from crms_intent_rules import classify as classify_intent
 from crms_knowledge import _IRREGULAR_VERB_PARADIGMS
 
 
@@ -117,36 +118,8 @@ def _question_mentions(question: str) -> list[list[str]]:
 
 
 def _answer_type(question: str) -> str | None:
-    q = question.casefold().strip()
-    if re.match(r"^(is|are|was|were|did|does|do|has|have)\b", q):
-        return "POLAR"
-    if re.search(r"\b(who|whom)\b", q):
-        return "WHO"
-    if re.search(r"\b(when|what year|in what year)\b", q):
-        return "WHEN"
-    if re.search(r"\bwhere\b", q):
-        return "WHERE"
-    if re.search(
-            r"\b(?:which\s+(?:country|city|continent|range|mountain range|"
-            r"river|region|state|institute|university|laboratory|"
-            r"research\s+center|observatory)|"
-            r"(?:at|in)\s+which\s+(?:institute|university|laboratory|"
-            r"research\s+center|observatory))\b", q):
-        return "WHERE"
-    if re.search(r"\b(birthplace|place of birth|workplace|location of)\b", q):
-        return "WHERE"
-    if (re.search(r"\bhow\s+(tall|high|long|big|old)\b|\b(height|temperature|boiling point|melting point)\b", q)):
-        return "MEASURE"
-    if re.search(r"\bhow\s+(many|much)\b", q):
-        return "COUNT"
-    if re.match(r"^how\s+(?:can|do|does|should|would)\b", q):
-        return "HOW"
-    if re.match(r"^(what|define)\s+(is|are)\b", q) or re.match(
-            r"^what\s+(does|do)\b", q):
-        return "DEF"
-    if re.search(r"\b(what|which)\b", q):
-        return "NAME"
-    return None
+    """Question type from the ``answer_type`` pattern-rule family (SQL)."""
+    return classify_intent("answer_type", question)
 
 
 def supports_question_type(question: str) -> bool:
@@ -308,32 +281,12 @@ def _where_anchor_is_located_entity(sentence: str,
 
 
 def _has_locative_predicate(sentence: str) -> bool:
-    """Require a bounded location-bearing predicate, not any ``in`` phrase."""
-    text = " ".join(_tokens(sentence)).casefold()
-    preposition = r"(?:in|at|near|on|within|by|through|across|along|from|to)"
-    explicit = (
-        rf"\b(?:located|based|situated|born|resides?|lives?|lived|"
-        rf"works?|worked|lies|lie|stands?|stood|sits?|sat)\s+{preposition}\b",
-        rf"\b(?:flows?|flowed|runs?|ran|passes?|passed|cross(?:es|ed)|"
-        rf"extends?|extended|borders?|originates?|originated)\s+{preposition}\b",
-        rf"\b(?:is|are|was|were|be|been|being)\s+{preposition}\b",
-        # Nominal locatives such as "The Colosseum is an amphitheatre in Rome".
-        rf"\b(?:is|are|was|were)\s+(?:a|an|the)\s+"
-        rf"[\w'-]+\s+{preposition}\b",
-    )
-    if any(re.search(pattern, text) for pattern in explicit):
-        return True
-    words = text.split()
-    if (words and words[0] in {"in", "at", "near", "within", "across", "along"}
-            and re.search(
-                r"\b(?:lie|lies|lay|stand|stands|stood|sit|sits|sat|run|runs|ran|"
-                r"rise|rises|rose|exist|exists|existed)\b", text)):
-        return True
-    # A where-clause expresses the place relation after its target:
-    # "Bletchley Park is where Alan Turing worked".
-    return bool(re.search(
-        r"\bwhere\b.{0,100}\b(?:lie|lies|lay|stand|stands|stood|sit|sits|sat|"
-        r"work|works|worked|live|lives|lived|reside|resides|resided)\b", text))
+    """Require a bounded location-bearing predicate, not any ``in`` phrase.
+
+    Decided by the ``locative`` pattern-rule family (SQL), over the sentence's
+    word tokens."""
+    flat = " ".join(_tokens(sentence))
+    return classify_intent("locative", flat, normalise=False) == "LOCATIVE"
 
 
 def _check_candidate(question: str, sentence: str,

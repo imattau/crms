@@ -227,3 +227,13 @@ Decisions recorded:
 
 Open: independent intake suite; intake over the active research index; packaged
 model tables; Stages B–E.
+
+## Stages B–E result (pilot scope)
+
+Implemented in `crms_intent_rules.py` with the SQL table `pat_intent` and seed
+rules in `crms_pattern_seed.json`: gate answer type and location predicate,
+arithmetic question wrappers, and claim-status cues. Each family was retired only
+after a parity run against a frozen reference (see the master plan table). The
+regex footprint ratchet is `experiments/v1_581_regex_footprint.py`; the record is
+`corpus/phase11_eval/regex_footprint.json`. Total sites 914 to 889. Remaining
+families are inventoried for the Phase 12 retrofit lane.

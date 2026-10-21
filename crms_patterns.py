@@ -17,6 +17,7 @@ Pattern language (elements are separated by spaces):
     N.agent[@v]      an agentive noun of the question's verb (writer, director)
     CLS[name]        a member of an induced word class
     W[word|word]     a word matched by stem
+    X[word|word]     a word matched exactly (lower case, no stemming)
     ...{0,8}:g       a bounded gap that never crosses ; or :
     TAIL:a           everything to the end of the sentence
     NUM  NUMRANGE  DATE   typed values
@@ -418,6 +419,10 @@ def match_patterns(alternatives: Sequence[list[tuple]], ctx: MatchContext, *,
             return
         if name == "W":
             if any(stem(t.low) == stem(w) for w in (argv or "").split("|")):
+                yield from nxt(pos + 1, bind(pos + 1))
+            return
+        if name == "X":
+            if t.low in (argv or "").split("|"):
                 yield from nxt(pos + 1, bind(pos + 1))
             return
         if name == ",":

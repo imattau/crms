@@ -1370,5 +1370,303 @@
    "target": "help",
    "rationale": "plain-language verb substitution, all inflections"
   }
+ ],
+ "intents": [
+  {
+   "family": "answer_type",
+   "name": "polar",
+   "priority": 10,
+   "patterns": [
+    "X[is|are|was|were|did|does|do|has|have]"
+   ],
+   "result": "POLAR",
+   "anchored": true,
+   "rationale": "yes/no question opens with an auxiliary or copula",
+   "origin": "seed"
+  },
+  {
+   "family": "answer_type",
+   "name": "who",
+   "priority": 20,
+   "patterns": [
+    "X[who|whom]"
+   ],
+   "result": "WHO",
+   "anchored": false,
+   "rationale": "",
+   "origin": "seed"
+  },
+  {
+   "family": "answer_type",
+   "name": "when",
+   "priority": 30,
+   "patterns": [
+    "X[when]",
+    "X[what] X[year]"
+   ],
+   "result": "WHEN",
+   "anchored": false,
+   "rationale": "",
+   "origin": "seed"
+  },
+  {
+   "family": "answer_type",
+   "name": "where",
+   "priority": 40,
+   "patterns": [
+    "X[where]"
+   ],
+   "result": "WHERE",
+   "anchored": false,
+   "rationale": "",
+   "origin": "seed"
+  },
+  {
+   "family": "answer_type",
+   "name": "where_which",
+   "priority": 50,
+   "patterns": [
+    "X[which] X[country|city|continent|range|river|region|state|institute|university|laboratory|observatory]",
+    "X[which] X[mountain] X[range]",
+    "X[which] X[research] X[center]",
+    "X[at|in] X[which] X[institute|university|laboratory|observatory]",
+    "X[at|in] X[which] X[research] X[center]"
+   ],
+   "result": "WHERE",
+   "anchored": false,
+   "rationale": "typed 'which' places and venues",
+   "origin": "seed"
+  },
+  {
+   "family": "answer_type",
+   "name": "where_noun",
+   "priority": 60,
+   "patterns": [
+    "X[birthplace]",
+    "X[place] X[of] X[birth]",
+    "X[workplace]",
+    "X[location] X[of]"
+   ],
+   "result": "WHERE",
+   "anchored": false,
+   "rationale": "",
+   "origin": "seed"
+  },
+  {
+   "family": "answer_type",
+   "name": "measure",
+   "priority": 70,
+   "patterns": [
+    "X[how] X[tall|high|long|big|old]",
+    "X[height|temperature]",
+    "X[boiling|melting] X[point]"
+   ],
+   "result": "MEASURE",
+   "anchored": false,
+   "rationale": "",
+   "origin": "seed"
+  },
+  {
+   "family": "answer_type",
+   "name": "count",
+   "priority": 80,
+   "patterns": [
+    "X[how] X[many|much]"
+   ],
+   "result": "COUNT",
+   "anchored": false,
+   "rationale": "",
+   "origin": "seed"
+  },
+  {
+   "family": "answer_type",
+   "name": "how",
+   "priority": 90,
+   "patterns": [
+    "X[how] X[can|do|does|should|would]"
+   ],
+   "result": "HOW",
+   "anchored": true,
+   "rationale": "",
+   "origin": "seed"
+  },
+  {
+   "family": "answer_type",
+   "name": "def",
+   "priority": 100,
+   "patterns": [
+    "X[what|define] X[is|are]",
+    "X[what] X[does|do]"
+   ],
+   "result": "DEF",
+   "anchored": true,
+   "rationale": "",
+   "origin": "seed"
+  },
+  {
+   "family": "answer_type",
+   "name": "name",
+   "priority": 110,
+   "patterns": [
+    "X[what|which]"
+   ],
+   "result": "NAME",
+   "anchored": false,
+   "rationale": "",
+   "origin": "seed"
+  },
+  {
+   "family": "locative",
+   "name": "stative_location",
+   "priority": 10,
+   "patterns": [
+    "X[located|based|situated|born|resides|reside|lives|live|lived|works|work|worked|lies|lie|stands|stand|stood|sits|sit|sat] P[in|at|near|on|within|by|through|across|along|from|to]",
+    "X[flows|flow|flowed|runs|run|ran|passes|passed|crosses|crossed|extends|extend|extended|borders|border|originates|originate|originated] P[in|at|near|on|within|by|through|across|along|from|to]",
+    "X[is|are|was|were|be|been|being] P[in|at|near|on|within|by|through|across|along|from|to]",
+    "X[is|are|was|were] X[a|an|the] ...{1,1} P[in|at|near|on|within|by|through|across|along|from|to]",
+    "X[is|are|was|were] X[a|an|the] NUM X[st|nd|rd|th] P[in|at|near|on|within|by|through|across|along|from|to]"
+   ],
+   "result": "LOCATIVE",
+   "anchored": false,
+   "rationale": "a location-bearing predicate followed by a preposition",
+   "origin": "seed"
+  },
+  {
+   "family": "locative",
+   "name": "fronted_place",
+   "priority": 20,
+   "patterns": [
+    "X[in|at|near|within|across|along] ...{0,200} X[lie|lies|lay|stand|stands|stood|sit|sits|sat|run|runs|ran|rise|rises|rose|exist|exists|existed]"
+   ],
+   "result": "LOCATIVE",
+   "anchored": true,
+   "rationale": "a sentence that opens with a place phrase and then states where something lies",
+   "origin": "seed"
+  },
+  {
+   "family": "locative",
+   "name": "where_clause",
+   "priority": 30,
+   "patterns": [
+    "X[where] ...{0,50} X[lie|lies|lay|stand|stands|stood|sit|sits|sat|work|works|worked|live|lives|lived|reside|resides|resided]"
+   ],
+   "result": "LOCATIVE",
+   "anchored": false,
+   "rationale": "'X is where Y worked'",
+   "origin": "seed"
+  },
+  {
+   "family": "math_question_body",
+   "name": "equal",
+   "priority": 10,
+   "patterns": [
+    "X[what] X[does] ...{1,400}:body X[equal]"
+   ],
+   "result": "body:?",
+   "anchored": true,
+   "rationale": "'what does <expression> equal?'",
+   "origin": "seed"
+  },
+  {
+   "family": "math_question_body",
+   "name": "result_of",
+   "priority": 20,
+   "patterns": [
+    "X[what] X[is] (X[the])? X[result] X[of] TAIL:body"
+   ],
+   "result": "body:?",
+   "anchored": true,
+   "rationale": "'what is the result of <expression>?'",
+   "origin": "seed"
+  },
+  {
+   "family": "math_question_body",
+   "name": "calculate",
+   "priority": 30,
+   "patterns": [
+    "(X[can|could|would] X[you])? (X[please])? X[calculate|compute] TAIL:body"
+   ],
+   "result": "body:?!.",
+   "anchored": true,
+   "rationale": "'(can you) (please) calculate <expression>'",
+   "origin": "seed"
+  },
+  {
+   "family": "math_question_body",
+   "name": "what_is",
+   "priority": 40,
+   "patterns": [
+    "X[what] X[is] TAIL:body"
+   ],
+   "result": "body:?",
+   "anchored": true,
+   "rationale": "'what is <expression>?'",
+   "origin": "seed"
+  },
+  {
+   "family": "math_question_body",
+   "name": "how_much_is",
+   "priority": 50,
+   "patterns": [
+    "X[how] X[much] X[is] TAIL:body"
+   ],
+   "result": "body:?",
+   "anchored": true,
+   "rationale": "'how much is <expression>?'",
+   "origin": "seed"
+  },
+  {
+   "family": "claim_status",
+   "name": "denial",
+   "priority": 10,
+   "patterns": [
+    "X[does|did] X[not] X[guarantee|claim|assert|show|indicate|establish|prove|state|promise|confirm]",
+    "X[doesn't|didn't|cannot|can't|never] X[guarantee|claim|assert|show|indicate|establish|prove|state|promise|confirm]"
+   ],
+   "result": "denied",
+   "anchored": false,
+   "rationale": "a source that disclaims a claim",
+   "origin": "seed"
+  },
+  {
+   "family": "claim_status",
+   "name": "attribution",
+   "priority": 20,
+   "patterns": [
+    "X[according] X[to]",
+    "X[reportedly|allegedly]",
+    "X[legend] X[says]",
+    "X[source|sources] X[say]",
+    "X[it] X[is] X[said]"
+   ],
+   "result": "attributed",
+   "anchored": false,
+   "rationale": "a claim reported, not asserted",
+   "origin": "seed"
+  },
+  {
+   "family": "claim_status",
+   "name": "uncertainty",
+   "priority": 30,
+   "patterns": [
+    "X[might|may|could|probably|possibly|perhaps|uncertain|unclear|allegedly|reportedly|apparently|seem|seems|suggest|suggests|could've|might've]"
+   ],
+   "result": "uncertain",
+   "anchored": false,
+   "rationale": "hedged claim",
+   "origin": "seed"
+  },
+  {
+   "family": "claim_status",
+   "name": "negation",
+   "priority": 40,
+   "patterns": [
+    "X[not|never|no|none|neither|nor|cannot|can't|doesn't|didn't|isn't|aren't|wasn't|weren't]"
+   ],
+   "result": "negated",
+   "anchored": false,
+   "rationale": "negative polarity cue",
+   "origin": "seed"
+  }
  ]
 }

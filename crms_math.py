@@ -16,19 +16,10 @@ import re
 from pathlib import Path
 from typing import Mapping
 
+from crms_intent_rules import body_of
 from crms_text import tokens
 
 
-_QUESTION_BODY_PATTERNS = (
-    re.compile(r"\s*what\s+does\s+(.+?)\s+equal\s*\??\s*", re.IGNORECASE),
-    re.compile(r"\s*what\s+is\s+(?:the\s+)?result\s+of\s+"
-               r"(.+?)\s*\??\s*", re.IGNORECASE),
-    re.compile(r"\s*(?:(?:can|could|would)\s+you\s+)?"
-               r"(?:please\s+)?(?:calculate|compute)\s+"
-               r"(.+?)\s*[?!.]*\s*", re.IGNORECASE),
-    re.compile(r"\s*what\s+is\s+(.+?)\s*\??\s*", re.IGNORECASE),
-    re.compile(r"\s*how\s+much\s+is\s+(.+?)\s*\??\s*", re.IGNORECASE),
-)
 _RELATIVE_DIFFERENCE_PATTERNS = (
     (re.compile(r"\s*how\s+much\s+higher\s+is\s+"
                 r"(?P<left>[+-]?(?:\d+(?:\.\d+)?|\.\d+))\s+than\s+"
@@ -806,11 +797,8 @@ class CRMSMath:
                 return (f"{left} minus {right}"
                         if direction == "left-minus-right"
                         else f"{right} minus {left}")
-        for pattern in _QUESTION_BODY_PATTERNS:
-            match = pattern.fullmatch(question)
-            if match is not None:
-                return match.group(1)
-        return None
+        # wrapper phrases ("what is", "calculate", ...) are SQL pattern rules
+        return body_of("math_question_body", question)
 
     @staticmethod
     def _candidates(examples: dict[tuple[int, int], Fraction]) -> tuple[str, ...]:

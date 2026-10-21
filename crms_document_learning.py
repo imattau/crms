@@ -24,6 +24,7 @@ import re
 import sqlite3
 from typing import Any, Iterable, Mapping
 
+from crms_intent_rules import classify as classify_intent
 from crms_knowledge import CRMSKnowledgeBase
 from crms_procedure_discovery import propose_procedure_phrase_candidates
 from crms_research import _sentence_spans
@@ -39,19 +40,6 @@ LICENCE_CLASSES = frozenset({"public-domain", "permissive", "share-alike"})
 MAX_CLAIMS_PER_DOCUMENT = 200
 MAX_FIELD_CHARS = 240
 
-_UNCERTAIN_RE = re.compile(
-    r"\b(?:might|may|could|probably|possibly|perhaps|uncertain|unclear|"
-    r"allegedly|reportedly|apparently|seems?|suggests?)\b", re.IGNORECASE)
-_ATTRIBUTION_RE = re.compile(
-    r"\b(?:according\s+to|reportedly|allegedly|legend\s+says|"
-    r"sources?\s+say|it\s+is\s+said)\b", re.IGNORECASE)
-_DENIAL_RE = re.compile(
-    r"\b(?:does\s+not|doesn't|did\s+not|didn't|cannot|can't|never)\s+"
-    r"(?:guarantee|claim|assert|show|indicate|establish|prove|state|"
-    r"promise|confirm)\b", re.IGNORECASE)
-_NEGATIVE_RE = re.compile(
-    r"\b(?:not|never|no|none|neither|nor|cannot|can't|doesn't|didn't|"
-    r"isn't|aren't|wasn't|weren't)\b", re.IGNORECASE)
 _CONDITION_RE = re.compile(
     r"^\s*(?P<condition>(?:if|when|unless|provided\s+that|"
     r"as\s+long\s+as|assuming|given\s+that)\b[^,]{1,220}),\s*"
@@ -60,7 +48,7 @@ _PRONOUN_RE = re.compile(
     r"^\s*(?P<pronoun>it|they|he|she|this|these|those)\b", re.IGNORECASE)
 _HEADING_RE = re.compile(r"^\s*(?:#{1,6}\s+|\*\*[^*]+\*\*\s*$)")
 _TABLE_SPLIT_RE = re.compile(r"\s*\|\s*")
-_QUOTE_RE = re.compile(r"[\"'“”‘’]")
+_QUOTE_CHARS = frozenset("\"'“”‘’")
 _WORD_RE = re.compile(r"[A-Za-z][A-Za-z’'-]*|\d+")
 
 
@@ -280,17 +268,20 @@ def _split_condition(sentence: str) -> tuple[str, str, str | None]:
     return condition, core, condition
 
 
+_CLAIM_STATUS_REASONS = {"denied": "denial", "attributed": "attribution",
+                         "uncertain": "uncertainty", "negated": "negation"}
+
+
 def _status_for(sentence: str, *, polarity: bool, quoted: bool) -> tuple[str, str]:
-    if _QUOTE_RE.search(sentence) and quoted:
+    if quoted and any(ch in _QUOTE_CHARS for ch in sentence):
         return "quoted", "quotation"
-    if _DENIAL_RE.search(sentence):
-        return "denied", "denial"
-    if _ATTRIBUTION_RE.search(sentence):
-        return "attributed", "attribution"
-    if _UNCERTAIN_RE.search(sentence):
-        return "uncertain", "uncertainty"
-    if not polarity or _NEGATIVE_RE.search(sentence):
-        return "negated", "negation"
+    # cue families (denial, attribution, hedge, negation) are SQL pattern rules
+    status = classify_intent("claim_status", sentence.replace("’", "'"),
+                             normalise=False)
+    if status is None and not polarity:
+        status = "negated"
+    if status is not None:
+        return status, _CLAIM_STATUS_REASONS[status]
     return "asserted", ""
 
 

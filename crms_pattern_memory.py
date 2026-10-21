@@ -95,6 +95,18 @@ class PatternMemory:
                 origin TEXT NOT NULL,
                 status TEXT NOT NULL CHECK(status IN ('accepted','rejected','retired'))
             ) WITHOUT ROWID;
+            CREATE TABLE IF NOT EXISTS pat_intent (
+                family TEXT NOT NULL,
+                name TEXT NOT NULL,
+                priority INTEGER NOT NULL,
+                patterns_json TEXT NOT NULL,
+                anchored INTEGER NOT NULL CHECK(anchored IN (0,1)),
+                result TEXT NOT NULL,
+                rationale TEXT NOT NULL DEFAULT '',
+                origin TEXT NOT NULL,
+                status TEXT NOT NULL CHECK(status IN ('accepted','rejected','retired')),
+                PRIMARY KEY(family, name)
+            ) WITHOUT ROWID;
             CREATE TABLE IF NOT EXISTS pat_param (
                 name TEXT NOT NULL,
                 version INTEGER NOT NULL,
@@ -173,6 +185,35 @@ class PatternMemory:
         from crms_pattern_rewrite import Rewrite
         return [Rewrite(r["kind"], r["source"], r["target"]) for r in self.connection.execute(
             "SELECT kind,source,target FROM pat_rewrite WHERE status='accepted' ORDER BY kind,source")]
+
+    # ---------------------------------------------------------- intents
+    def put_intent(self, family: str, name: str, *, priority: int,
+                   patterns: Iterable[str], result: str, anchored: bool = False,
+                   rationale: str = "", origin: str = "seed",
+                   status: str = "accepted") -> None:
+        if origin not in ORIGINS:
+            raise PatternMemoryError(f"unknown origin: {origin!r}")
+        from crms_patterns import parse_pattern
+        patterns = list(patterns)
+        for source in patterns:
+            parse_pattern(source)       # reject a malformed pattern on entry
+        self.connection.execute(
+            "INSERT OR REPLACE INTO pat_intent VALUES(?,?,?,?,?,?,?,?,?)",
+            (family, name, int(priority), json.dumps(patterns), int(anchored),
+             result, rationale, origin, status))
+
+    def set_intent_status(self, family: str, name: str, status: str) -> None:
+        self.connection.execute(
+            "UPDATE pat_intent SET status=? WHERE family=? AND name=?",
+            (status, family, name))
+
+    def intents(self, family: str) -> list[dict[str, Any]]:
+        return [{"name": r["name"], "priority": r["priority"],
+                 "patterns": json.loads(r["patterns_json"]),
+                 "anchored": bool(r["anchored"]), "result": r["result"]}
+                for r in self.connection.execute(
+                    "SELECT * FROM pat_intent WHERE family=? AND status='accepted' "
+                    "ORDER BY priority,name", (family,))]
 
     # ----------------------------------------------------------- params
     def set_param(self, name: str, value: float, *, origin: str, rationale: str = "",
@@ -257,6 +298,12 @@ class PatternMemory:
         for row in payload.get("rewrites", ()):
             self.put_rewrite(row["kind"], row["source"], row["target"],
                              origin=row.get("origin", "teacher"), rationale=row.get("rationale", ""))
+        for row in payload.get("intents", ()):
+            self.put_intent(row["family"], row["name"], priority=row["priority"],
+                            patterns=row["patterns"], result=row["result"],
+                            anchored=row.get("anchored", False),
+                            rationale=row.get("rationale", ""),
+                            origin=row.get("origin", "seed"))
         count = 0
         for raw in payload["specs"]:
             raw = expand(dict(raw))
