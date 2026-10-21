@@ -1,0 +1,1356 @@
+{
+  "format": "crms-phase9-eval",
+  "version": 1,
+  "frozen": "2026-10-21",
+  "description": "Frozen external-validation fixture: a supported-subset scorecard, independent-model-authored literary breadth probes, and ten qualitative comparison probes. The supported subset is project-authored and gated; the breadth probes and 70B comparison are reported separately and are not used to tune the supported subset.",
+  "source_dir": "sources",
+  "supported_tasks": [
+    {
+      "id": "who-ada",
+      "category": "research",
+      "provenance": "supported-subset-authored",
+      "notes": "Direct source-backed who question.",
+      "turns": [
+        "Who designed the Analytical Engine program?"
+      ],
+      "expect": {
+        "contains": [
+          "Ada Lovelace designed the Analytical Engine program.",
+          "[Source: fact-people.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer",
+        "citations": [
+          {
+            "source": "fact-people.txt",
+            "quote": "Ada Lovelace designed the Analytical Engine program."
+          }
+        ]
+      },
+      "documents": [
+        "fact-people.txt"
+      ]
+    },
+    {
+      "id": "who-grace",
+      "category": "research",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Who designed the COBOL compiler?"
+      ],
+      "expect": {
+        "contains": [
+          "Grace Hopper designed the COBOL compiler.",
+          "[Source: fact-people.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer",
+        "citations": [
+          {
+            "source": "fact-people.txt",
+            "quote": "Grace Hopper designed the COBOL compiler."
+          }
+        ]
+      },
+      "documents": [
+        "fact-people.txt"
+      ]
+    },
+    {
+      "id": "where-eiffel",
+      "category": "research",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Where is the Eiffel Tower?"
+      ],
+      "expect": {
+        "contains": [
+          "The Eiffel Tower is in Paris.",
+          "[Source: fact-places.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer",
+        "citations": [
+          {
+            "source": "fact-places.txt",
+            "quote": "The Eiffel Tower is in Paris."
+          }
+        ]
+      },
+      "documents": [
+        "fact-places.txt"
+      ]
+    },
+    {
+      "id": "where-colosseum",
+      "category": "research",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Where is the Colosseum?"
+      ],
+      "expect": {
+        "contains": [
+          "The Colosseum is in Rome.",
+          "[Source: fact-places.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer",
+        "citations": [
+          {
+            "source": "fact-places.txt",
+            "quote": "The Colosseum is in Rome."
+          }
+        ]
+      },
+      "documents": [
+        "fact-places.txt"
+      ]
+    },
+    {
+      "id": "when-wall",
+      "category": "research",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "When did the Berlin Wall fall?"
+      ],
+      "expect": {
+        "contains": [
+          "1989",
+          "[Source: fact-history.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer",
+        "citations": [
+          {
+            "source": "fact-history.txt",
+            "quote": "The Berlin Wall fell in 1989."
+          }
+        ]
+      },
+      "documents": [
+        "fact-history.txt"
+      ]
+    },
+    {
+      "id": "when-moon",
+      "category": "research",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "When was the first Moon landing?"
+      ],
+      "expect": {
+        "contains": [
+          "1969",
+          "[Source: fact-history.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer",
+        "citations": [
+          {
+            "source": "fact-history.txt",
+            "quote": "The first Moon landing was in 1969."
+          }
+        ]
+      },
+      "documents": [
+        "fact-history.txt"
+      ]
+    },
+    {
+      "id": "who-frankenstein",
+      "category": "research",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Who wrote Frankenstein?"
+      ],
+      "expect": {
+        "contains": [
+          "Mary Shelley wrote Frankenstein.",
+          "[Source: fact-books.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer",
+        "citations": [
+          {
+            "source": "fact-books.txt",
+            "quote": "Mary Shelley wrote Frankenstein."
+          }
+        ]
+      },
+      "documents": [
+        "fact-books.txt"
+      ]
+    },
+    {
+      "id": "who-moby",
+      "category": "research",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Who wrote Moby Dick?"
+      ],
+      "expect": {
+        "contains": [
+          "Herman Melville wrote Moby Dick.",
+          "[Source: fact-moby.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer",
+        "citations": [
+          {
+            "source": "fact-moby.txt",
+            "quote": "Herman Melville wrote Moby Dick."
+          }
+        ]
+      },
+      "documents": [
+        "fact-moby.txt"
+      ]
+    },
+    {
+      "id": "who-python",
+      "category": "research",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Who created Python?"
+      ],
+      "expect": {
+        "contains": [
+          "Guido van Rossum created Python.",
+          "[Source: fact-tech.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer",
+        "citations": [
+          {
+            "source": "fact-tech.txt",
+            "quote": "Guido van Rossum created Python."
+          }
+        ]
+      },
+      "documents": [
+        "fact-tech.txt"
+      ]
+    },
+    {
+      "id": "who-linux",
+      "category": "research",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Who created Linux?"
+      ],
+      "expect": {
+        "contains": [
+          "Linus Torvalds created Linux.",
+          "[Source: fact-tech.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer",
+        "citations": [
+          {
+            "source": "fact-tech.txt",
+            "quote": "Linus Torvalds created Linux."
+          }
+        ]
+      },
+      "documents": [
+        "fact-tech.txt"
+      ]
+    },
+    {
+      "id": "who-web",
+      "category": "research",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Who created the World Wide Web?"
+      ],
+      "expect": {
+        "contains": [
+          "Tim Berners-Lee created The World Wide Web.",
+          "[Source: fact-tech.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer",
+        "citations": [
+          {
+            "source": "fact-tech.txt",
+            "quote": "Tim Berners-Lee created The World Wide Web."
+          }
+        ]
+      },
+      "documents": [
+        "fact-tech.txt"
+      ]
+    },
+    {
+      "id": "paraphrase-ada",
+      "category": "paraphrase",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Which person designed the program for the Analytical Engine?"
+      ],
+      "expect": {
+        "contains": [
+          "Ada Lovelace designed the Analytical Engine program.",
+          "[Source: fact-people.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer",
+        "citations": [
+          {
+            "source": "fact-people.txt",
+            "quote": "Ada Lovelace designed the Analytical Engine program."
+          }
+        ]
+      },
+      "documents": [
+        "fact-people.txt"
+      ]
+    },
+    {
+      "id": "paraphrase-moon",
+      "category": "paraphrase",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "In what year did humans first land on the Moon?"
+      ],
+      "expect": {
+        "contains": [
+          "1969",
+          "[Source: fact-history.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer",
+        "citations": [
+          {
+            "source": "fact-history.txt",
+            "quote": "The first Moon landing was in 1969."
+          }
+        ]
+      },
+      "documents": [
+        "fact-history.txt"
+      ]
+    },
+    {
+      "id": "compound-books",
+      "category": "compound",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Who wrote Frankenstein and who wrote Moby-Dick?"
+      ],
+      "expect": {
+        "contains": [
+          "Part 1 of 2:",
+          "Mary Shelley wrote Frankenstein.",
+          "Part 2 of 2:",
+          "Herman Melville wrote Moby-Dick."
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      },
+      "documents": [
+        "fact-books.txt"
+      ]
+    },
+    {
+      "id": "compound-places",
+      "category": "compound",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Where is the Eiffel Tower and where is the Colosseum?"
+      ],
+      "expect": {
+        "contains": [
+          "Part 1 of 2:",
+          "The Eiffel Tower is in Paris.",
+          "Part 2 of 2:",
+          "The Colosseum is in Rome."
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      },
+      "documents": [
+        "fact-places.txt"
+      ]
+    },
+    {
+      "id": "reload-ada",
+      "category": "reload",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Who designed the Analytical Engine program?",
+        "__restart__",
+        "Who designed the Analytical Engine program?"
+      ],
+      "expect": {
+        "contains": [
+          "[Source: fact-people.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      },
+      "documents": [
+        "fact-people.txt"
+      ],
+      "occurrences": [
+        {
+          "text": "Ada Lovelace designed the Analytical Engine program.",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "dialogue-history",
+      "category": "dialogue",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Who designed the Analytical Engine program?",
+        "What did I just ask?"
+      ],
+      "expect": {
+        "contains": [
+          "Your last question was: Who designed the Analytical Engine program?"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      },
+      "documents": [
+        "fact-people.txt"
+      ]
+    },
+    {
+      "id": "abstain-atlantis",
+      "category": "abstention",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Who created Atlantis?"
+      ],
+      "expect": {
+        "contains": [
+          "couldn't verify"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "abstain"
+      }
+    },
+    {
+      "id": "abstain-fact",
+      "category": "abstention",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Who wrote The Time Machine?"
+      ],
+      "expect": {
+        "contains": [
+          "couldn't verify"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "abstain"
+      },
+      "documents": [
+        "fact-books.txt"
+      ]
+    },
+    {
+      "id": "sqlite-ada",
+      "category": "research",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Who designed the Analytical Engine program?"
+      ],
+      "expect": {
+        "contains": [
+          "Ada Lovelace designed the Analytical Engine program.",
+          "[Source: fact-people.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      },
+      "documents": [
+        "fact-people.txt"
+      ],
+      "index_kind": "sqlite"
+    },
+    {
+      "id": "why-ada",
+      "category": "research",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Who designed the Analytical Engine program?",
+        "why?"
+      ],
+      "expect": {
+        "contains": [
+          "Ada Lovelace designed the Analytical Engine program.",
+          "[Source: fact-people.txt"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      },
+      "documents": [
+        "fact-people.txt"
+      ]
+    },
+    {
+      "id": "math-plus",
+      "category": "math",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "/teach-math What is 2 plus 3?|5",
+        "/teach-math What is 5 plus 3?|8",
+        "Compute 17 plus 8."
+      ],
+      "expect": {
+        "contains": [
+          "25 (learned 'plus' as exact add"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "math-times",
+      "category": "math",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "/teach-math What is 2 times 3?|6",
+        "/teach-math What is 5 times 3?|15",
+        "Compute 12 times 7."
+      ],
+      "expect": {
+        "contains": [
+          "84 (learned 'times' as exact multiply"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "math-minus",
+      "category": "math",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "/teach-math What is 5 minus 3?|2",
+        "/teach-math What is 9 minus 4?|5",
+        "Compute 8 minus 2."
+      ],
+      "expect": {
+        "contains": [
+          "6 (learned 'minus' as exact subtract"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "math-divide",
+      "category": "math",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "/teach-math What is 10 divided by 2?|5",
+        "/teach-math What is 12 divided by 4?|3",
+        "Compute 20 divided by 5."
+      ],
+      "expect": {
+        "contains": [
+          "4 (learned 'divided by' as exact divide"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "math-unit",
+      "category": "unit",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "/teach-unit-equivalence 1 kilometre|1000 metres",
+        "/teach-unit-equivalence 2 kilometres|2000 metres",
+        "How many metres are in 3 kilometres?"
+      ],
+      "expect": {
+        "contains": [
+          "3000 metres",
+          "exact conversion"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "math-abstain",
+      "category": "abstention",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Compute 4 glorp 5."
+      ],
+      "expect": {
+        "contains": [
+          "couldn't verify"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "abstain"
+      }
+    },
+    {
+      "id": "code-reverse",
+      "category": "coding",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "/teach-rule reverse the list|1,2,3|3,2,1",
+        "/teach-rule reverse the list|4,5|5,4",
+        "/teach-rule reverse the list|8|8",
+        "/teach-rule reverse the list|1,3,2|2,3,1",
+        "/teach-rule reverse the list|9,-1,4|4,-1,9",
+        "Write Python code that reverse the list."
+      ],
+      "expect": {
+        "contains": [
+          "Generated Python for 'reverse the list'",
+          "def transform"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      },
+      "rule_depth": 1
+    },
+    {
+      "id": "code-double",
+      "category": "coding",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "/teach-rule double every value|1,2|2,4",
+        "/teach-rule double every value|3,-1|6,-2",
+        "/teach-rule double every value|0,5|0,10",
+        "/teach-rule double every value|2,4|4,8",
+        "Write Python code that double every value."
+      ],
+      "expect": {
+        "contains": [
+          "Generated Python for 'double every value'",
+          "def transform"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      },
+      "rule_depth": 1
+    },
+    {
+      "id": "code-add",
+      "category": "coding",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "/teach-rule add 4 to each value|1,2|5,6",
+        "/teach-rule add 4 to each value|3,4|7,8",
+        "/teach-rule add 4 to each value|0,0|4,4",
+        "/teach-rule add 4 to each value|-1,2|3,6",
+        "Write Python code that add 4 to each value."
+      ],
+      "expect": {
+        "contains": [
+          "Generated Python for 'add 4 to each value'",
+          "def transform"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      },
+      "rule_depth": 1
+    },
+    {
+      "id": "translate-french-ada",
+      "category": "translation",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "/teach-translation English|French|neutral|Hello, {name}.|Bonjour, {name}.|Hello, Ada.|Bonjour, Ada.|Hello, Malik.|Bonjour, Malik.",
+        "Translate Hello, Ada into French."
+      ],
+      "expect": {
+        "contains": [
+          "Bonjour, Ada.",
+          "matched learned"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "translate-french-linus",
+      "category": "translation",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "/teach-translation English|French|neutral|Hello, {name}.|Bonjour, {name}.|Hello, Ada.|Bonjour, Ada.|Hello, Malik.|Bonjour, Malik.",
+        "Translate Hello, Linus into French."
+      ],
+      "expect": {
+        "contains": [
+          "Bonjour, Linus.",
+          "matched learned"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "translate-spanish-ada",
+      "category": "translation",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "/teach-translation English|Spanish|neutral|Hello, {name}.|Hola, {name}.|Hello, Ada.|Hola, Ada.|Hello, Malik.|Hola, Malik.",
+        "Translate Hello, Ada into Spanish."
+      ],
+      "expect": {
+        "contains": [
+          "Hola, Ada.",
+          "matched learned"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "creative-robot",
+      "category": "creative",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Write a short story about a robot."
+      ],
+      "expect": {
+        "contains": [
+          "Fictional short story",
+          "robot"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "creative-sea",
+      "category": "creative",
+      "provenance": "supported-subset-authored",
+      "notes": "",
+      "turns": [
+        "Write a short story about the sea."
+      ],
+      "expect": {
+        "contains": [
+          "Fictional short story",
+          "sea"
+        ],
+        "not_contains": [],
+        "regex": [],
+        "outcome": "answer"
+      }
+    }
+  ],
+  "breadth_tasks": [
+    {
+      "id": "wonderland-rabbit-watch",
+      "category": "research",
+      "provenance": "independent-model-author",
+      "notes": "Single-fact lookup in the opening Wonderland excerpt. The scoring hinge is that the watch alone is not remarkable to Alice; it is the waistcoat-pocket that moves her. Answer must stay grounded in Chapter I only.",
+      "documents": [
+        "alice-wonderland.txt"
+      ],
+      "turns": [
+        "In the first chapter of Alice's Adventures in Wonderland, what does Alice see the White Rabbit take out of its waistcoat-pocket that finally makes her get up and follow it?"
+      ],
+      "expect": {
+        "contains": [
+          "watch",
+          "waistcoat-pocket"
+        ],
+        "not_contains": [
+          "pocket watch chain",
+          "Queen of Hearts"
+        ],
+        "regex": [
+          "watch"
+        ],
+        "citations": [
+          {
+            "source": "alice-wonderland.txt",
+            "quote": "took a watch out of its waistcoat-pocket"
+          }
+        ],
+        "occurrences": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "holmes-seventeen-steps",
+      "category": "research",
+      "provenance": "independent-model-author",
+      "notes": "Exact-detail recall from the Watson/Holmes dialogue. The number is stated once and is a good hallucination probe: weak answers invent other counts or drop the seen-versus-observed point.",
+      "documents": [
+        "sherlock-holmes.txt"
+      ],
+      "turns": [
+        "How many steps does Sherlock Holmes say there are from the hall up to his room, and why does he think Watson does not know the number?"
+      ],
+      "expect": {
+        "contains": [
+          "seventeen",
+          "observe"
+        ],
+        "not_contains": [
+          "twenty",
+          "fourteen"
+        ],
+        "regex": [
+          "seventeen"
+        ],
+        "citations": [
+          {
+            "source": "sherlock-holmes.txt",
+            "quote": "I know that there are seventeen steps"
+          },
+          {
+            "source": "sherlock-holmes.txt",
+            "quote": "You see, but you do not observe."
+          }
+        ],
+        "occurrences": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "frankenstein-elizabeth-arrival",
+      "category": "research",
+      "provenance": "independent-model-author",
+      "notes": "Chain-of-facts question about how Elizabeth enters the Frankenstein household. Requires the peasant foster family, the village priest, and Victor's mother's role; a partial answer that only says 'adopted' should score lower.",
+      "documents": [
+        "frankenstein.txt"
+      ],
+      "turns": [
+        "According to the first chapter of Frankenstein, how does Elizabeth Lavenza come to live with Victor's family?"
+      ],
+      "expect": {
+        "contains": [
+          "Milanese",
+          "peasant",
+          "priest"
+        ],
+        "not_contains": [
+          "clone",
+          "cousin by blood"
+        ],
+        "regex": [
+          "priest"
+        ],
+        "citations": [
+          {
+            "source": "frankenstein.txt",
+            "quote": "the daughter of a Milanese nobleman"
+          },
+          {
+            "source": "frankenstein.txt",
+            "quote": "They consulted their village priest"
+          }
+        ],
+        "occurrences": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "holmes-bohemia-paper",
+      "category": "research",
+      "provenance": "independent-model-author",
+      "notes": "Follows Holmes's watermark reasoning to a place name. Correct answer names Egria in Bohemia near Carlsbad; answers that stop at 'German paper' miss the asked-for location.",
+      "documents": [
+        "sherlock-holmes.txt"
+      ],
+      "turns": [
+        "From the letters woven into the note paper, Holmes traces it to a specific place. Where was the paper made, and what does the Gazetteer entry say that place is remarkable for?"
+      ],
+      "expect": {
+        "contains": [
+          "Egria",
+          "Bohemia",
+          "Wallenstein"
+        ],
+        "not_contains": [
+          "Eton",
+          "Elba"
+        ],
+        "regex": [
+          "Egria"
+        ],
+        "citations": [
+          {
+            "source": "sherlock-holmes.txt",
+            "quote": "The paper was made in Bohemia"
+          },
+          {
+            "source": "sherlock-holmes.txt",
+            "quote": "glass-factories and paper-mills"
+          }
+        ],
+        "occurrences": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "moby-dick-spleen-plain",
+      "category": "paraphrase",
+      "provenance": "independent-model-author",
+      "notes": "Paraphrase of a dense opening passage into plain modern terms. Rewards keeping the causal shape (low spirits, then the ship) without quoting the whole paragraph back.",
+      "documents": [
+        "moby-dick.txt"
+      ],
+      "turns": [
+        "In plain modern English, what is Ishmael saying at the start of Moby-Dick about why he goes to sea whenever he feels low?"
+      ],
+      "expect": {
+        "contains": [
+          "sea",
+          "mood"
+        ],
+        "not_contains": [],
+        "regex": [
+          "sea"
+        ],
+        "citations": [
+          {
+            "source": "moby-dick.txt",
+            "quote": "driving off the spleen"
+          }
+        ],
+        "occurrences": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "holmes-grit-lens-plain",
+      "category": "paraphrase",
+      "provenance": "independent-model-author",
+      "notes": "Paraphrase of Holmes's analogy. The two image comparisons must map onto the intended point: strong feeling disturbs his reasoning as grit or a cracked lens disturbs an instrument.",
+      "documents": [
+        "sherlock-holmes.txt"
+      ],
+      "turns": [
+        "Holmes compares strong emotion to 'Grit in a sensitive instrument, or a crack in one of his own high-power lenses.' What does he mean by that, put simply?"
+      ],
+      "expect": {
+        "contains": [
+          "emotion",
+          "reasoning"
+        ],
+        "not_contains": [
+          "he is in love with her",
+          "microscope slide"
+        ],
+        "regex": [
+          "emotion"
+        ],
+        "citations": [
+          {
+            "source": "sherlock-holmes.txt",
+            "quote": "Grit in a sensitive instrument"
+          }
+        ],
+        "occurrences": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "frankenstein-single-offspring-plain",
+      "category": "paraphrase",
+      "provenance": "independent-model-author",
+      "notes": "Comprehension check on archaic phrasing: 'I continued their single offspring' means Victor stayed an only child for a long time, despite his mother wanting a girl.",
+      "documents": [
+        "frankenstein.txt"
+      ],
+      "turns": [
+        "The narrator writes 'I continued their single offspring.' Rephrase that sentence in everyday words."
+      ],
+      "expect": {
+        "contains": [
+          "only child"
+        ],
+        "not_contains": [
+          "adopted",
+          "twin"
+        ],
+        "regex": [
+          "only child"
+        ],
+        "citations": [
+          {
+            "source": "frankenstein.txt",
+            "quote": "I continued their single offspring"
+          }
+        ],
+        "occurrences": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "falling-vs-fitting-size",
+      "category": "compound",
+      "provenance": "independent-model-author",
+      "notes": "Two-part question spanning Wonderland and Moby-Dick: the physical descent and its contents, then Ishmael's stated reasons for going to sea as a sailor rather than a passenger. Both halves must be answered and both documents cited.",
+      "documents": [
+        "alice-wonderland.txt",
+        "moby-dick.txt"
+      ],
+      "turns": [
+        "What does Alice notice lining the walls as she falls down the well, and in the other excerpt, what reasons does Ishmael give for always going to sea as a sailor instead of a passenger?"
+      ],
+      "expect": {
+        "contains": [
+          "cupboards",
+          "book-shelves",
+          "sailor",
+          "paid"
+        ],
+        "not_contains": [
+          "porthole",
+          "cabin steward"
+        ],
+        "regex": [
+          "sailor"
+        ],
+        "citations": [
+          {
+            "source": "alice-wonderland.txt",
+            "quote": "filled with cupboards and book-shelves"
+          },
+          {
+            "source": "moby-dick.txt",
+            "quote": "I never go as a passenger"
+          },
+          {
+            "source": "moby-dick.txt",
+            "quote": "I always go to sea as a sailor"
+          }
+        ],
+        "occurrences": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "who-fell-down-where",
+      "category": "compound",
+      "provenance": "independent-model-author",
+      "notes": "Cross-document comparison: only the Wonderland excerpt contains a character falling down a hole, while the Moby-Dick excerpt is about going to sea. Tests whether the answer keeps the two narrators distinct instead of blending them.",
+      "documents": [
+        "alice-wonderland.txt",
+        "moby-dick.txt"
+      ],
+      "turns": [
+        "Which of these narrators describes falling down a hole, and which one describes going to sea on purpose? What does each one notice while they are doing it?"
+      ],
+      "expect": {
+        "contains": [
+          "Alice",
+          "Ishmael"
+        ],
+        "not_contains": [
+          "Victor",
+          "Watson"
+        ],
+        "regex": [
+          "Alice"
+        ],
+        "citations": [
+          {
+            "source": "alice-wonderland.txt",
+            "quote": "falling down a very deep well"
+          },
+          {
+            "source": "moby-dick.txt",
+            "quote": "I thought I would sail about a little"
+          }
+        ],
+        "occurrences": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "daisy-chain-followup",
+      "category": "continuity",
+      "provenance": "independent-model-author",
+      "notes": "Two-turn continuity item. The second turn uses only the pronoun 'it' and the word 'daisies', so a correct answer requires carrying the Wonderland context forward rather than re-asking or answering generically.",
+      "documents": [
+        "alice-wonderland.txt"
+      ],
+      "turns": [
+        "What is Alice doing at the very beginning of the chapter before the White Rabbit appears?",
+        "And what does she decide about it, given how she feels about the daisies?"
+      ],
+      "expect": {
+        "contains": [
+          "daisy-chain",
+          "trouble"
+        ],
+        "not_contains": [
+          "Please clarify your question"
+        ],
+        "regex": [
+          "daisy"
+        ],
+        "citations": [
+          {
+            "source": "alice-wonderland.txt",
+            "quote": "making a daisy-chain would be worth the trouble"
+          }
+        ],
+        "occurrences": [],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "frankenstein-creature-account",
+      "category": "abstention",
+      "provenance": "independent-model-author",
+      "notes": "Answerable only from later volumes of the novel. The supplied Chapter 1 covers Walton's frame and Victor's childhood and never reaches the creature's own narration, so the model must decline rather than summarize from general knowledge.",
+      "documents": [
+        "frankenstein.txt"
+      ],
+      "turns": [
+        "In the excerpt supplied, how does the creature describe his first days after being brought to life?"
+      ],
+      "expect": {
+        "contains": [
+          "not in the excerpt"
+        ],
+        "not_contains": [
+          "fire",
+          "cottage",
+          "De Lacey",
+          "paralysed",
+          "first sensations"
+        ],
+        "regex": [],
+        "citations": [],
+        "occurrences": [],
+        "outcome": "abstain"
+      }
+    },
+    {
+      "id": "holmes-midnight-visitor",
+      "category": "abstention",
+      "provenance": "independent-model-author",
+      "notes": "The excerpt ends before the masked visitor is identified. A correct response notes the letter announces a caller at a quarter to eight with a mask, and that the visitor's identity is not given in this text.",
+      "documents": [
+        "sherlock-holmes.txt"
+      ],
+      "turns": [
+        "In the supplied excerpt, who arrives at midnight to ask Holmes for help with the Bohemian case?"
+      ],
+      "expect": {
+        "contains": [
+          "not in the excerpt"
+        ],
+        "not_contains": [
+          "Count",
+          "Irene Adler in disguise",
+          "von",
+          "butler"
+        ],
+        "regex": [],
+        "citations": [],
+        "occurrences": [],
+        "outcome": "abstain"
+      }
+    }
+  ],
+  "comparison_probes": [
+    {
+      "id": "breadth-sky",
+      "category": "breadth",
+      "sources": [],
+      "crms_turns": [
+        "Explain in three sentences why the sky appears blue."
+      ],
+      "baseline_prompt": "Explain in three sentences why the sky appears blue.",
+      "notes": "Open-ended explanation with no supplied source."
+    },
+    {
+      "id": "paraphrase-rabbit",
+      "category": "paraphrase",
+      "sources": [
+        "alice-wonderland.txt"
+      ],
+      "crms_turns": [
+        "What colour were the White Rabbit's eyes?"
+      ],
+      "baseline_prompt": "Source: alice-wonderland.txt\n\nWhat colour were the White Rabbit's eyes?",
+      "notes": "Same source, paraphrased colour question."
+    },
+    {
+      "id": "compound-books",
+      "category": "compound",
+      "sources": [
+        "fact-books.txt"
+      ],
+      "crms_turns": [
+        "Who wrote Frankenstein and who wrote Moby-Dick?"
+      ],
+      "baseline_prompt": "Source: fact-books.txt\nMary Shelley wrote Frankenstein. Herman Melville wrote Moby-Dick.\n\nWho wrote Frankenstein and who wrote Moby-Dick?",
+      "notes": "Two-part completion."
+    },
+    {
+      "id": "continuity-ada",
+      "category": "continuity",
+      "sources": [
+        "fact-people.txt"
+      ],
+      "crms_turns": [
+        "Who designed the Analytical Engine program?",
+        "What did I just ask?"
+      ],
+      "baseline_prompt": "Conversation:\nUser: Who designed the Analytical Engine program?\nAssistant: Ada Lovelace designed the Analytical Engine program.\nUser: What did I just ask?",
+      "notes": "Context continuity without repeating the question."
+    },
+    {
+      "id": "repair-python",
+      "category": "repair",
+      "sources": [
+        "fact-tech.txt"
+      ],
+      "crms_turns": [
+        "Who created Python?",
+        "I meant Linux."
+      ],
+      "baseline_prompt": "Conversation:\nUser: Who created Python?\nAssistant: Guido van Rossum created Python.\nUser: I meant Linux.",
+      "notes": "User repairs an entity after the answer."
+    },
+    {
+      "id": "coding-reverse",
+      "category": "coding",
+      "sources": [],
+      "crms_turns": [
+        "/teach-rule reverse the list|1,2,3|3,2,1",
+        "/teach-rule reverse the list|4,5|5,4",
+        "/teach-rule reverse the list|8|8",
+        "/teach-rule reverse the list|1,3,2|2,3,1",
+        "/teach-rule reverse the list|9,-1,4|4,-1,9",
+        "/teach-rule reverse the list|0,-1|-1,0",
+        "/teach-rule reverse the list|2,1|1,2",
+        "Write Python code that reverse the list."
+      ],
+      "baseline_prompt": "Examples of the intended transform:\nreverse [1,2,3] -> [3,2,1]\nreverse [4,5] -> [5,4]\nreverse [8] -> [8]\nreverse [1,3,2] -> [2,3,1]\nreverse [9,-1,4] -> [4,-1,9]\n\nWrite a Python function that implements this transform.",
+      "notes": "Code generation from learned examples.",
+      "rule_depth": 1
+    },
+    {
+      "id": "math-times",
+      "category": "math",
+      "sources": [],
+      "crms_turns": [
+        "/teach-math What is 2 times 3?|6",
+        "/teach-math What is 5 times 3?|15",
+        "Compute 12 times 7."
+      ],
+      "baseline_prompt": "Examples: 2 times 3 = 6; 5 times 3 = 15. Compute 12 times 7.",
+      "notes": "Exact arithmetic after examples."
+    },
+    {
+      "id": "research-sherlock",
+      "category": "research",
+      "sources": [
+        "sherlock-holmes.txt"
+      ],
+      "crms_turns": [
+        "Where did Sherlock Holmes live?"
+      ],
+      "baseline_prompt": "Source: sherlock-holmes.txt\n\nWhere did Sherlock Holmes live?",
+      "notes": "Literary source question."
+    },
+    {
+      "id": "translation-french",
+      "category": "translation",
+      "sources": [],
+      "crms_turns": [
+        "/teach-translation English|French|neutral|Hello, {name}.|Bonjour, {name}.|Hello, Ada.|Bonjour, Ada.|Hello, Malik.|Bonjour, Malik.",
+        "Translate Hello, Ada into French."
+      ],
+      "baseline_prompt": "Examples: Hello, Ada. -> Bonjour, Ada.; Hello, Malik. -> Bonjour, Malik. Translate Hello, Ada into French.",
+      "notes": "Bounded translation from aligned examples."
+    },
+    {
+      "id": "creative-robot",
+      "category": "creative",
+      "sources": [],
+      "crms_turns": [
+        "Write a short story about a robot."
+      ],
+      "baseline_prompt": "Write a short story about a robot.",
+      "notes": "Open creative request."
+    }
+  ],
+  "authoring": {
+    "breadth_model": "opencode-go/qwen3.8-flash",
+    "breadth_prompt_sha256": "9b6e512c9f531a0347cfd213bfe019dbc1f4b09337a5f5cfde138f5f31b59319",
+    "breadth_prompt": "source excerpts plus a schema-only task-authoring request; no CRMS code or output examples",
+    "supported_subset": "project-authored against the declared supported capability list"
+  }
+}

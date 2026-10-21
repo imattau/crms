@@ -121,3 +121,16 @@ and independently authored user requests, not from implementation details.
 5. Run the suite. A failure is a result, not a reason to weaken the oracle.
 6. If the failure is an accepted open gap, mark `known_failure` and keep it
    visible in the report.
+
+## Phase 9 external lane
+
+The frozen external-validation suite lives in `corpus/phase9_eval/`, not here.
+It keeps the 35-task supported subset separate from 12 independently authored
+literary breadth probes and 10 comparison probes. Run it with:
+
+```sh
+python3 run_phase9_eval.py
+```
+
+The supported subset is gated. The breadth split is published as failures. The
+two raters are automated model instances; the human-rater gate remains open.

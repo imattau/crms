@@ -1,0 +1,1419 @@
+{
+  "breadth_rows": [
+    {
+      "category": "research",
+      "duration_s": 0.27570808498421684,
+      "failures": [
+        "missing required text: 'watch'",
+        "missing required text: 'waistcoat-pocket'",
+        "missing required pattern: 'watch'",
+        "missing citation source: 'alice-wonderland.txt'",
+        "missing citation quote: 'took a watch out of its waistcoat-pocket'"
+      ],
+      "id": "wonderland-rabbit-watch",
+      "observed": "abstained",
+      "provenance": "independent-model-author",
+      "replies": [
+        "I found source text, but it does not support a grounded answer (named entity missing: White Rabbit; required modifier missing: first; no question-relation term in sentence). I won't guess."
+      ],
+      "status": "fail",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.3332834559842013,
+      "failures": [
+        "missing required text: 'seventeen'",
+        "missing required text: 'observe'",
+        "missing required pattern: 'seventeen'",
+        "missing citation source: 'sherlock-holmes.txt'",
+        "missing citation quote: 'I know that there are seventeen steps'",
+        "missing citation source: 'sherlock-holmes.txt'",
+        "missing citation quote: 'You see, but you do not observe.'"
+      ],
+      "id": "holmes-seventeen-steps",
+      "observed": "answered",
+      "provenance": "independent-model-author",
+      "replies": [
+        "Part 1 of 2: I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.",
+        "Part 2 of 2: I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nProcessed all 2 question parts separately."
+      ],
+      "status": "fail",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.277329952979926,
+      "failures": [
+        "missing required text: 'Milanese'",
+        "missing required text: 'peasant'",
+        "missing required text: 'priest'",
+        "missing required pattern: 'priest'",
+        "missing citation source: 'frankenstein.txt'",
+        "missing citation quote: 'the daughter of a Milanese nobleman'",
+        "missing citation source: 'frankenstein.txt'",
+        "missing citation quote: 'They consulted their village priest'"
+      ],
+      "id": "frankenstein-elizabeth-arrival",
+      "observed": "clarified",
+      "provenance": "independent-model-author",
+      "replies": [
+        "The quoted sentence I found does not name Frankenstein, Elizabeth Lavenza, Victor's, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question."
+      ],
+      "status": "fail",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.2827464390429668,
+      "failures": [
+        "missing required text: 'Egria'",
+        "missing required text: 'Bohemia'",
+        "missing required text: 'Wallenstein'",
+        "missing required pattern: 'Egria'",
+        "missing citation source: 'sherlock-holmes.txt'",
+        "missing citation quote: 'The paper was made in Bohemia'",
+        "missing citation source: 'sherlock-holmes.txt'",
+        "missing citation quote: 'glass-factories and paper-mills'"
+      ],
+      "id": "holmes-bohemia-paper",
+      "observed": "abstained",
+      "provenance": "independent-model-author",
+      "replies": [
+        "I found source text, but it does not support a grounded answer (named entity missing: Holmes; named entity missing: Gazetteer; no location-bearing predicate in sentence; named entity appears as a location, not as the located subject). I won't guess."
+      ],
+      "status": "fail",
+      "unsafe": false
+    },
+    {
+      "category": "paraphrase",
+      "duration_s": 0.2755202919943258,
+      "failures": [
+        "missing required text: 'sea'",
+        "missing required text: 'mood'",
+        "missing required pattern: 'sea'",
+        "missing citation source: 'moby-dick.txt'",
+        "missing citation quote: 'driving off the spleen'"
+      ],
+      "id": "moby-dick-spleen-plain",
+      "observed": "abstained",
+      "provenance": "independent-model-author",
+      "replies": [
+        "I found source text, but it does not support a grounded answer (named entity missing: English; named entity missing: Ishmael; named entity missing: Moby-Dick; no question-relation term in sentence). I won't guess."
+      ],
+      "status": "fail",
+      "unsafe": false
+    },
+    {
+      "category": "paraphrase",
+      "duration_s": 0.2806841239798814,
+      "failures": [
+        "missing required text: 'emotion'",
+        "missing required text: 'reasoning'",
+        "missing required pattern: 'emotion'",
+        "missing citation source: 'sherlock-holmes.txt'",
+        "missing citation quote: 'Grit in a sensitive instrument'"
+      ],
+      "id": "holmes-grit-lens-plain",
+      "observed": "abstained",
+      "provenance": "independent-model-author",
+      "replies": [
+        "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence; named entity missing: Holmes). I won't guess."
+      ],
+      "status": "fail",
+      "unsafe": false
+    },
+    {
+      "category": "paraphrase",
+      "duration_s": 0.3102118039969355,
+      "failures": [
+        "missing required text: 'only child'",
+        "missing required pattern: 'only child'",
+        "missing citation source: 'frankenstein.txt'",
+        "missing citation quote: 'I continued their single offspring'"
+      ],
+      "id": "frankenstein-single-offspring-plain",
+      "observed": "clarified",
+      "provenance": "independent-model-author",
+      "replies": [
+        "The quoted sentence I found does not name Rephrase Rephrase, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question."
+      ],
+      "status": "fail",
+      "unsafe": false
+    },
+    {
+      "category": "compound",
+      "duration_s": 0.2918550299946219,
+      "failures": [
+        "missing required text: 'cupboards'",
+        "missing required text: 'book-shelves'",
+        "missing required text: 'sailor'",
+        "missing required text: 'paid'",
+        "missing required pattern: 'sailor'",
+        "missing citation source: 'alice-wonderland.txt'",
+        "missing citation quote: 'filled with cupboards and book-shelves'",
+        "missing citation source: 'moby-dick.txt'",
+        "missing citation quote: 'I never go as a passenger'",
+        "missing citation source: 'moby-dick.txt'",
+        "missing citation quote: 'I always go to sea as a sailor'"
+      ],
+      "id": "falling-vs-fitting-size",
+      "observed": "abstained",
+      "provenance": "independent-model-author",
+      "replies": [
+        "I found source text, but it does not support a grounded answer (named entity missing: Alice; named entity missing: Ishmael; definition subject is not in sentence subject position). I won't guess."
+      ],
+      "status": "fail",
+      "unsafe": false
+    },
+    {
+      "category": "compound",
+      "duration_s": 0.35018929396755993,
+      "failures": [
+        "missing required text: 'Alice'",
+        "missing required text: 'Ishmael'",
+        "missing required pattern: 'Alice'",
+        "missing citation source: 'alice-wonderland.txt'",
+        "missing citation quote: 'falling down a very deep well'",
+        "missing citation quote: 'I thought I would sail about a little'"
+      ],
+      "id": "who-fell-down-where",
+      "observed": "abstained",
+      "provenance": "independent-model-author",
+      "replies": [
+        "Part 1 of 3: I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.",
+        "Part 2 of 3: I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.",
+        "Part 3 of 3: I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: \u201cThere stand his\ntrees, each with a hollow trunk, as if a hermit and a crucifix were\u201d [Source: moby-dick.txt; may not answer your question]\nProcessed all 3 question parts separately."
+      ],
+      "status": "fail",
+      "unsafe": false
+    },
+    {
+      "category": "continuity",
+      "duration_s": 0.32019456097623333,
+      "failures": [
+        "missing required text: 'daisy-chain'",
+        "missing required text: 'trouble'",
+        "missing required pattern: 'daisy'",
+        "missing citation quote: 'making a daisy-chain would be worth the trouble'"
+      ],
+      "id": "daisy-chain-followup",
+      "observed": "abstained",
+      "provenance": "independent-model-author",
+      "replies": [
+        "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: \u201cAlice was not a bit hurt, and she jumped up on to her feet in a moment:\nshe looked up, but it was all dark overhead; before her was another\nlong passage, and the White Rabbit was still in sight, hurrying down\nit.\u201d [Source: alice-wonderland.txt; may not answer your question]",
+        "I found source text, but it does not support a grounded answer (named entity missing: White Rabbit; definition subject is not in sentence subject position). I won't guess."
+      ],
+      "status": "fail",
+      "unsafe": false
+    },
+    {
+      "category": "abstention",
+      "duration_s": 0.29788859200198203,
+      "failures": [
+        "missing required text: 'not in the excerpt'",
+        "expected abstention, observed 'answered'"
+      ],
+      "id": "frankenstein-creature-account",
+      "observed": "answered",
+      "provenance": "independent-model-author",
+      "replies": [
+        "Source text: On the evening previous to her being brought to\nmy home, my mother had said playfully, \u201cI have a pretty present for my\nVictor\u2014tomorrow he shall have it.\u201d\nSource: frankenstein.txt. This is quoted evidence, not an accepted fact; ask \u2018why?\u2019 for its citation."
+      ],
+      "status": "fail",
+      "unsafe": true
+    },
+    {
+      "category": "abstention",
+      "duration_s": 0.2881365710054524,
+      "failures": [
+        "missing required text: 'not in the excerpt'"
+      ],
+      "id": "holmes-midnight-visitor",
+      "observed": "abstained",
+      "provenance": "independent-model-author",
+      "replies": [
+        "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: \u201cMy own complete happiness, and the home-centred\ninterests which rise up around the man who first finds himself master\nof his own establishment, were sufficient to absorb all my attention,\nwhile Holmes, who loathed every form of society with his whole Bohemian\nsoul, remained in our lodgings in Baker Street, buried among his old\nbooks, and alternating from week to week between cocaine and ambition,\nthe drowsiness of the drug, and the fierce energy of his own keen\nnature.\u201d [Source: sherlock-holmes.txt; may not answer your question]"
+      ],
+      "status": "fail",
+      "unsafe": false
+    }
+  ],
+  "comparison": {
+    "baseline": {
+      "class": "hosted 70B-class proxy",
+      "model": "opencode-go/qwen3.8-max",
+      "parameter_count": "not disclosed by provider"
+    },
+    "per_probe": [
+      {
+        "category": "breadth",
+        "id": "breadth-sky",
+        "ratings": [
+          {
+            "answer_adequacy": 0,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": true,
+            "evidence_validity": 0,
+            "system": "baseline"
+          },
+          {
+            "answer_adequacy": 0,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          }
+        ]
+      },
+      {
+        "category": "paraphrase",
+        "id": "paraphrase-rabbit",
+        "ratings": [
+          {
+            "answer_adequacy": 1,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          },
+          {
+            "answer_adequacy": 1,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          }
+        ]
+      },
+      {
+        "category": "compound",
+        "id": "compound-books",
+        "ratings": [
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          }
+        ]
+      },
+      {
+        "category": "continuity",
+        "id": "continuity-ada",
+        "ratings": [
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          }
+        ]
+      },
+      {
+        "category": "repair",
+        "id": "repair-python",
+        "ratings": [
+          {
+            "answer_adequacy": 0,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          },
+          {
+            "answer_adequacy": 0,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          }
+        ]
+      },
+      {
+        "category": "coding",
+        "id": "coding-reverse",
+        "ratings": [
+          {
+            "answer_adequacy": 1,
+            "confident_error": true,
+            "evidence_validity": 1,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": true,
+            "evidence_validity": 1,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          }
+        ]
+      },
+      {
+        "category": "math",
+        "id": "math-times",
+        "ratings": [
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          }
+        ]
+      },
+      {
+        "category": "research",
+        "id": "research-sherlock",
+        "ratings": [
+          {
+            "answer_adequacy": 0,
+            "confident_error": true,
+            "evidence_validity": 1,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 1,
+            "system": "baseline"
+          },
+          {
+            "answer_adequacy": 0,
+            "confident_error": true,
+            "evidence_validity": 1,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          }
+        ]
+      },
+      {
+        "category": "translation",
+        "id": "translation-french",
+        "ratings": [
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          }
+        ]
+      },
+      {
+        "category": "creative",
+        "id": "creative-robot",
+        "ratings": [
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 1,
+            "system": "baseline"
+          },
+          {
+            "answer_adequacy": 1,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "crms"
+          },
+          {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2,
+            "system": "baseline"
+          }
+        ]
+      }
+    ],
+    "rater_kind": "two independent hosted model instances; not human",
+    "rater_models": [
+      "opencode-go/claude-haiku-5-5",
+      "opencode-go/glm-5.3-flash"
+    ],
+    "systems": {
+      "baseline": {
+        "confident_errors": 1,
+        "mean_answer_adequacy": 2,
+        "mean_evidence_validity": 1.8,
+        "rated_items": 20
+      },
+      "crms": {
+        "confident_errors": 4,
+        "mean_answer_adequacy": 1.2,
+        "mean_evidence_validity": 1.8,
+        "rated_items": 20
+      }
+    }
+  },
+  "external_human_gate_passed": false,
+  "failure_taxonomy": {
+    "citation or exact-quote mismatch": 10,
+    "confident answer where abstention required": 1,
+    "retrieval or grounding omitted required content": 1
+  },
+  "fixture_path": "corpus/phase9_eval/fixture.json",
+  "fixture_sha256": "cbbd9609249217c5629155ba973cc3a987be1a7995dd81b0867dec8d6e790ef2",
+  "format": "crms-phase9-external",
+  "frozen": "2026-10-21",
+  "full_section2_gate_passed": false,
+  "gate": {
+    "breadth_failures_published": true,
+    "comparison_reported": true,
+    "human_independent_raters": false,
+    "licence_inventory_published": true,
+    "limitations_published": true,
+    "rater_agreement_reported": true,
+    "supported_completion_at_least_80pct": true,
+    "two_raters_attempted": true,
+    "zero_confident_wrong_supported": true
+  },
+  "gate_passed": true,
+  "licence_inventory": "corpus/phase9_eval/licence_inventory.json",
+  "outputs_file": "experiments/reports/phase9_outputs.json",
+  "rater_agreement": {
+    "adequacy_exact_agreement": 0.9,
+    "adequacy_kappa": 0.7530864197530865,
+    "available": true,
+    "confident_error_exact_agreement": 0.95,
+    "confident_error_kappa": 0.7727272727272725,
+    "evidence_exact_agreement": 0.85,
+    "evidence_kappa": 0.5081967213114752,
+    "items": 20
+  },
+  "rater_packet": "experiments/reports/phase9_rater_packet.json",
+  "rater_rows": [
+    {
+      "model": "opencode-go/claude-haiku-5-5",
+      "ratings": [
+        {
+          "a": {
+            "answer_adequacy": 2,
+            "confident_error": true,
+            "evidence_validity": 0
+          },
+          "b": {
+            "answer_adequacy": 0,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "breadth-sky",
+          "note": "A's Rayleigh scattering explanation is factually correct and is three sentences, but no source was supplied and no calculation is shown, so its claims are unsupported under the rubric. B makes no factual claims but declines to answer."
+        },
+        {
+          "a": {
+            "answer_adequacy": 1,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "paraphrase-rabbit",
+          "note": "A quotes a source passage containing 'pink eyes' but never states the answer and buries it in a long quote. B states the answer directly and matches the source."
+        },
+        {
+          "a": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "compound-books",
+          "note": "Both answer both parts correctly and match the source. B's 'awaiting review' line is process chatter and not a factual claim."
+        },
+        {
+          "a": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "continuity-ada",
+          "note": "Both correctly recall the prior user question, which appears in the conversation. Both also match the source."
+        },
+        {
+          "a": {
+            "answer_adequacy": 0,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "repair-python",
+          "note": "A restates the Python fact the user was correcting and never addresses Linux. B correctly answers Linux/Linus Torvalds, which the source supports, though B gives no citation."
+        },
+        {
+          "a": {
+            "answer_adequacy": 1,
+            "confident_error": true,
+            "evidence_validity": 1
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "coding-reverse",
+          "note": "A's examples [0,-1] and [2,1] are not in the task text, and the parity claim (11 inputs) is not shown. A's docstring uses backslash-escaped triple quotes, which would be a SyntaxError if taken literally, yet it calls the artifact standalone. It also repeats a clarification request three times. B's slicing function satisfies all examples given in the task and makes no unsupported claims."
+        },
+        {
+          "a": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "math-times",
+          "note": "12 x 7 = 84 is correct. B's 'checked against 2 examples' refers to the supplied examples, which the arithmetic is consistent with."
+        },
+        {
+          "a": {
+            "answer_adequacy": 0,
+            "confident_error": true,
+            "evidence_validity": 1
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 1
+          },
+          "item_id": "research-sherlock",
+          "note": "The excerpt says Holmes 'remained in our lodgings in Baker Street', so A's claim that the source does not support a location is false and it refuses to answer. B's Baker Street claim is supported; 'London' is only implied by 'the London slavey' and is not stated outright, and B gives no citation."
+        },
+        {
+          "a": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "translation-french",
+          "note": "Both give 'Bonjour, Ada.', which matches the supplied example pattern. A also shows its matched template and aligned examples."
+        },
+        {
+          "a": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 1
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "creative-robot",
+          "note": "Both deliver a complete short story. A's 'drops acorns every spring' is a natural-history detail that is wrong (oaks drop acorns in autumn), but it is narrative rather than an asserted fact. B is explicitly fiction with no factual claims."
+        }
+      ],
+      "status": "ok"
+    },
+    {
+      "model": "opencode-go/glm-5.3-flash",
+      "ratings": [
+        {
+          "a": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "b": {
+            "answer_adequacy": 0,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "breadth-sky",
+          "note": "A gives the standard correct explanation (Rayleigh scattering) in exactly three sentences; no source was required for this task. B refuses even though no source was needed, leaving the request unanswered."
+        },
+        {
+          "a": {
+            "answer_adequacy": 1,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "paraphrase-rabbit",
+          "note": "A quotes the exact source sentence containing 'pink eyes' but never states the answer, so the request is only partly answered. B states the answer directly and it is supported by the source."
+        },
+        {
+          "a": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "compound-books",
+          "note": "Both correctly answer both parts per the source. B appends incoherent process meta-text ('1 source claim awaiting review; use /pending-candidates') that is meaningless to the user but asserts no false substantive fact."
+        },
+        {
+          "a": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "continuity-ada",
+          "note": "Both correctly recall the user's previous question. A redundantly restates the prior answer with a citation before answering; extra but not wrong."
+        },
+        {
+          "a": {
+            "answer_adequacy": 0,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "repair-python",
+          "note": "A ignores the user's correction ('I meant Linux') and re-answers the original Python question; the statement is true and source-supported but does not address the clarified request. B answers the corrected question, supported by the source."
+        },
+        {
+          "a": {
+            "answer_adequacy": 2,
+            "confident_error": true,
+            "evidence_validity": 1
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "coding-reverse",
+          "note": "A's delivered function is correct, but it attributes fabricated examples ([0,-1] -> [-1,0] and [2,1]) to 'labeler_id: user' when the user supplied only five examples, repeats a needless clarification request three times, and makes unverifiable provenance/parity claims. B gives a simple correct function with accurate example checks."
+        },
+        {
+          "a": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "math-times",
+          "note": "Both compute 84 correctly. B's meta-claims ('checked against 2 examples') are consistent with the two supplied examples."
+        },
+        {
+          "a": {
+            "answer_adequacy": 0,
+            "confident_error": true,
+            "evidence_validity": 1
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "research-sherlock",
+          "note": "A's central claim that the source cannot ground an answer is false: the source says Holmes 'remained in our lodgings in Baker Street'. Its quoted sentence is verbatim (hence partly supported) but its confidently asserted no-answer conclusion is wrong. B answers correctly; 'London' is consistent with the text ('London slavey')."
+        },
+        {
+          "a": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "b": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "translation-french",
+          "note": "Both give the correct translation consistent with the examples. A appends opaque matching/template metadata that adds nothing for the user but makes no false claim."
+        },
+        {
+          "a": {
+            "answer_adequacy": 2,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "b": {
+            "answer_adequacy": 1,
+            "confident_error": false,
+            "evidence_validity": 2
+          },
+          "item_id": "creative-robot",
+          "note": "Both are clearly framed fiction with no factual claims to verify. A is a complete story about a robot. B's story never establishes a robot character - 'a robot' appears only on a sign - so it only partly fulfills the request; its framing and template metadata are noise."
+        }
+      ],
+      "status": "ok"
+    }
+  ],
+  "runtime": {
+    "total_s": 170.0938049199758
+  },
+  "scorecard": {
+    "breadth": {
+      "completion": 0.0,
+      "errors": 0,
+      "failed": 12,
+      "median_s": 0.28999580050003715,
+      "p95_s": 0.3332834559842013,
+      "passed": 0,
+      "tasks": 12,
+      "unsafe_answers": 1
+    },
+    "breadth_provenance": "independent model author; not used for tuning",
+    "supported": {
+      "completion": 1.0,
+      "errors": 0,
+      "failed": 0,
+      "median_s": 0.2734942239476368,
+      "p95_s": 0.37840879696886986,
+      "passed": 35,
+      "tasks": 35,
+      "unsafe_answers": 0
+    }
+  },
+  "section2": {
+    "breadth_completion": 0.0,
+    "comparison": {
+      "baseline": {
+        "confident_errors": 1,
+        "mean_answer_adequacy": 2,
+        "mean_evidence_validity": 1.8,
+        "rated_items": 20
+      },
+      "crms": {
+        "confident_errors": 4,
+        "mean_answer_adequacy": 1.2,
+        "mean_evidence_validity": 1.8,
+        "rated_items": 20
+      }
+    },
+    "met": false,
+    "missing": [
+      "~300 ordinary tasks across 10 categories",
+      "human independent raters for evidence validity and answer adequacy",
+      "p95 turn <2 s at 1M facts and a 2 GB index",
+      "qualitative comparison against a measured 70B parameter model, not a hosted proxy",
+      "second-publisher transfer and sustained three-round learning efficacy at section 2 thresholds"
+    ],
+    "reason": "The bounded Phase 9 lane validates a supported subset and publishes breadth failures. It does not meet the full section 2 scale targets (~300 ordinary tasks, 1M-fact/2GB p95, 70B parity) and its raters are automated model instances, not humans.",
+    "supported_completion": 1.0
+  },
+  "supported_rows": [
+    {
+      "category": "research",
+      "duration_s": 0.2712061679922044,
+      "failures": [],
+      "id": "who-ada",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Ada Lovelace designed the Analytical Engine program. [Source: fact-people.txt; quoted evidence, not an accepted fact]\n1 source claim available for review; use /pending-candidates to inspect.\nSay \u2018yes\u2019 to review them now."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.29593393101822585,
+      "failures": [],
+      "id": "who-grace",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Grace Hopper designed the COBOL compiler. [Source: fact-people.txt; quoted evidence, not an accepted fact]\n1 source claim available for review; use /pending-candidates to inspect.\nSay \u2018yes\u2019 to review them now."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.28209350898396224,
+      "failures": [],
+      "id": "where-eiffel",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "\u201cThe Eiffel Tower is in Paris.\u201d [Source: fact-places.txt; quoted evidence, not an accepted fact]"
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.28512448200490326,
+      "failures": [],
+      "id": "where-colosseum",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "\u201cThe Colosseum is in Rome.\u201d [Source: fact-places.txt; quoted evidence, not an accepted fact]"
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.29114676400786266,
+      "failures": [],
+      "id": "when-wall",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "The Berlin Wall fell in 1989. [Source: fact-history.txt; quoted evidence, not an accepted fact]"
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.288579510001,
+      "failures": [],
+      "id": "when-moon",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "The first Moon landing was in 1969. [Source: fact-history.txt; quoted evidence, not an accepted fact]"
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.2563562219729647,
+      "failures": [],
+      "id": "who-frankenstein",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Mary Shelley wrote Frankenstein. [Source: fact-books.txt; /tmp/crms-scorecard-who-frankenstein-dy8c4yp4/sources/fact-books.txt#sha256=05074561e27dc42c73fdb7dcd585218ddbd813e887643f6860b63766a5642c5a&chars=0:32]\nPlan plan-4d9649a9238e8869: research answer-research [ok; citation] -> citation verify-citation [ok; citation]. Evidence: source:/tmp/crms-scorecard-who-frankenstein-dy8c4yp4/sources/fact-books.txt#sha256=0507; source:/tmp/crms-scorecard-who-frankenstein-dy8c4yp4/sources/fact-books.txt#sha256=0507."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.27892746101133525,
+      "failures": [],
+      "id": "who-moby",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Herman Melville wrote Moby Dick. [Source: fact-moby.txt; /tmp/crms-scorecard-who-moby-g_w7yeli/sources/fact-moby.txt#sha256=ff8f7ae9fb61fb135bb1fcb09d14fac66cf58a8e947a31bc19b26f919ac2aba3&chars=0:32]\nPlan plan-1d9c47584927f5de: research answer-research [ok; citation] -> citation verify-citation [ok; citation]. Evidence: source:/tmp/crms-scorecard-who-moby-g_w7yeli/sources/fact-moby.txt#sha256=ff8f7ae9fb61f; source:/tmp/crms-scorecard-who-moby-g_w7yeli/sources/fact-moby.txt#sha256=ff8f7ae9fb61f."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.3047165240277536,
+      "failures": [],
+      "id": "who-python",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Guido van Rossum created Python. [Source: fact-tech.txt; /tmp/crms-scorecard-who-python-3men_oxt/sources/fact-tech.txt#sha256=0be12ff608d5658affecdeea1dd555445edbebafb87e65058183063ef17feb6a&chars=0:39]\nPlan plan-2c9bb6ebedaff91f: research answer-research [ok; citation] -> citation verify-citation [ok; citation]. Evidence: source:/tmp/crms-scorecard-who-python-3men_oxt/sources/fact-tech.txt#sha256=0be12ff608d; source:/tmp/crms-scorecard-who-python-3men_oxt/sources/fact-tech.txt#sha256=0be12ff608d."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.2673421499785036,
+      "failures": [],
+      "id": "who-linux",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Linus Torvalds created Linux. [Source: fact-tech.txt; /tmp/crms-scorecard-who-linux-g73vaig7/sources/fact-tech.txt#sha256=0be12ff608d5658affecdeea1dd555445edbebafb87e65058183063ef17feb6a&chars=40:76]\nPlan plan-7a4c32a58a8d54b1: research answer-research [ok; citation] -> citation verify-citation [ok; citation]. Evidence: source:/tmp/crms-scorecard-who-linux-g73vaig7/sources/fact-tech.txt#sha256=0be12ff608d5; source:/tmp/crms-scorecard-who-linux-g73vaig7/sources/fact-tech.txt#sha256=0be12ff608d5."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.2645202099811286,
+      "failures": [],
+      "id": "who-web",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Tim Berners-Lee created The World Wide Web. [Source: fact-tech.txt; /tmp/crms-scorecard-who-web-kmbyrxb7/sources/fact-tech.txt#sha256=0be12ff608d5658affecdeea1dd555445edbebafb87e65058183063ef17feb6a&chars=77:127]\nPlan plan-e05fffaa652c1529: research answer-research [ok; citation] -> citation verify-citation [ok; citation]. Evidence: source:/tmp/crms-scorecard-who-web-kmbyrxb7/sources/fact-tech.txt#sha256=0be12ff608d565; source:/tmp/crms-scorecard-who-web-kmbyrxb7/sources/fact-tech.txt#sha256=0be12ff608d565."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "paraphrase",
+      "duration_s": 0.2734942239476368,
+      "failures": [],
+      "id": "paraphrase-ada",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Ada Lovelace designed the Analytical Engine program. [Source: fact-people.txt; supporting claim awaiting review; not yet an accepted fact]\n1 source claim awaiting review; use /pending-candidates to inspect.\nSay \u2018yes\u2019 to review them now."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "paraphrase",
+      "duration_s": 0.40298115700716153,
+      "failures": [],
+      "id": "paraphrase-moon",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "\u201cThe first Moon landing was in 1969.\u201d [Source: fact-history.txt; quoted evidence, not an accepted fact]"
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "compound",
+      "duration_s": 0.31339036795543507,
+      "failures": [],
+      "id": "compound-books",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Part 1 of 2: Mary Shelley wrote Frankenstein. [Source: fact-books.txt; quoted evidence, not an accepted fact]\n1 source claim available for review; use /pending-candidates to inspect.\nSay \u2018yes\u2019 to review them now.",
+        "Part 2 of 2: The source identifies: Herman Melville wrote Moby-Dick. [Source: fact-books.txt; quoted evidence, not an accepted fact]\nProcessed all 2 question parts separately.\n1 source claim awaiting review; use /pending-candidates to inspect."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "compound",
+      "duration_s": 0.33633278898196295,
+      "failures": [],
+      "id": "compound-places",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Part 1 of 2: \u201cThe Eiffel Tower is in Paris.\u201d [Source: fact-places.txt; quoted evidence, not an accepted fact]",
+        "Part 2 of 2: \u201cThe Colosseum is in Rome.\u201d [Source: fact-places.txt; quoted evidence, not an accepted fact]\nProcessed all 2 question parts separately."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "reload",
+      "duration_s": 0.6157112730434164,
+      "failures": [],
+      "id": "reload-ada",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Ada Lovelace designed the Analytical Engine program. [Source: fact-people.txt; quoted evidence, not an accepted fact]\n1 source claim available for review; use /pending-candidates to inspect.\nSay \u2018yes\u2019 to review them now.",
+        "Ada Lovelace designed the Analytical Engine program. [Source: fact-people.txt; quoted evidence, not an accepted fact]\n1 source claim available for review; use /pending-candidates to inspect.\nSay \u2018yes\u2019 to review them now."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "dialogue",
+      "duration_s": 0.30880828300723806,
+      "failures": [],
+      "id": "dialogue-history",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Ada Lovelace designed the Analytical Engine program. [Source: fact-people.txt; quoted evidence, not an accepted fact]\n1 source claim available for review; use /pending-candidates to inspect.\nSay \u2018yes\u2019 to review them now.",
+        "Your last question was: Who designed the Analytical Engine program?"
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "abstention",
+      "duration_s": 0.24883791798492894,
+      "failures": [],
+      "id": "abstain-atlantis",
+      "observed": "abstained",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "I couldn't verify this request: step research: No independently realized source answer was found; I won't assemble one from loose word matches..\nPlan plan-a608ff9b2acc8841: research answer-research [failed; citation] -> citation verify-citation [planned; citation]."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "abstention",
+      "duration_s": 0.26921944896457717,
+      "failures": [],
+      "id": "abstain-fact",
+      "observed": "abstained",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "I couldn't verify this request: step research: No independently realized source answer was found; I won't assemble one from loose word matches..\nPlan plan-b6f269105c767121: research answer-research [failed; citation] -> citation verify-citation [planned; citation]."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.3309976840391755,
+      "failures": [],
+      "id": "sqlite-ada",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Ada Lovelace designed the Analytical Engine program. [Source: fact-people.txt; quoted evidence, not an accepted fact]\n1 source claim available for review; use /pending-candidates to inspect.\nSay \u2018yes\u2019 to review them now."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.37840879696886986,
+      "failures": [],
+      "id": "why-ada",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Ada Lovelace designed the Analytical Engine program. [Source: fact-people.txt; quoted evidence, not an accepted fact]\n1 source claim available for review; use /pending-candidates to inspect.\nSay \u2018yes\u2019 to review them now.",
+        "I used this quoted source sentence as evidence; it has not been accepted as a fact: \u201cAda Lovelace designed the Analytical Engine program.\u201d\nSource: [fact-people.txt](/tmp/crms-scorecard-why-ada-72lqh6t5/sources/fact-people.txt)\nCitation: /tmp/crms-scorecard-why-ada-72lqh6t5/sources/fact-people.txt#sha256=046d7c7a08274f9c0b11f8a7709e0d379dd62482f44d6ae7493d390f2fbc073a&chars=0:52"
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "math",
+      "duration_s": 0.33008232002612203,
+      "failures": [],
+      "id": "math-plus",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "25 (learned 'plus' as exact add; checked against 2 examples)\nPlan plan-25be30f26d891cdd: math answer-math [ok; exact]. Evidence: computation:Compute 17 plus 8.."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "math",
+      "duration_s": 0.2558267710264772,
+      "failures": [],
+      "id": "math-times",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "84 (learned 'times' as exact multiply; checked against 2 examples)\nPlan plan-40034442f945bd26: math answer-math [ok; exact]. Evidence: computation:Compute 12 times 7.."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "math",
+      "duration_s": 0.2646956690005027,
+      "failures": [],
+      "id": "math-minus",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "6 (learned 'minus' as exact subtract; checked against 2 examples)\nPlan plan-b2080c8f04663417: math answer-math [ok; exact]. Evidence: computation:Compute 8 minus 2.."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "math",
+      "duration_s": 0.2523439709912054,
+      "failures": [],
+      "id": "math-divide",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "4 (learned 'divided by' as exact divide; checked against 2 examples)\nPlan plan-e24585ff43ffbc46: math answer-math [ok; exact]. Evidence: computation:Compute 20 divided by 5.."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "unit",
+      "duration_s": 0.255149251956027,
+      "failures": [],
+      "id": "math-unit",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "3000 metres (exact conversion; grounded by 1 kilometre|1000 metres; 2 kilometres|2000 metres)\nPlan plan-7fb90ff9a847e09d: math answer-math [ok; exact]. Evidence: computation:Convert 3 kilometres to metres.."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "abstention",
+      "duration_s": 0.2542422370170243,
+      "failures": [],
+      "id": "math-abstain",
+      "observed": "abstained",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "I couldn't verify this request: step math: I couldn't resolve that request to exact learned arithmetic or unit evidence..\nPlan plan-0673b19c6e07ee35: math answer-math [failed; exact]."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "coding",
+      "duration_s": 0.311510015046224,
+      "failures": [],
+      "id": "code-reverse",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Please provide the intended output for input [0, -1]. 2 candidate procedures predict 2 distinct outputs: [-1, 0], [0, -1].\nRecorded declared labeler for this example: user; this is attribution, not validation.",
+        "Please provide the intended output for input [0, -1]. 2 candidate procedures predict 2 distinct outputs: [-1, 0], [0, -1].\nRecorded declared labeler for this example: user; this is attribution, not validation.",
+        "Please provide the intended output for input [0, -1]. 2 candidate procedures predict 2 distinct outputs: [-1, 0], [0, -1].\nRecorded declared labeler for this example: user; this is attribution, not validation.",
+        "Generated Python for 'reverse the list', using learned evidence from 'reverse the list' (5 examples; wrapper parity checked on 9 inputs). The source includes source-linked evidence examples, separate runtime-parity cases, validate_examples(), and provenance id crms-code-v1-e2aa7a1be3080691a5f657b6d2b20c2952f35c8bf54d31b7c6935a462f26abb1. The artifact is standalone for its supported operation subset:\n\n```python\n\"\"\"CRMS-generated standalone implementation of a learned list rule.\nInstruction: reverse the list\n\nContract: transform accepts a list of integers and returns a new list\nof integers. The learned examples and provenance are included below.\n\"\"\"\nPROCEDURE = [{\"operation\":\"reverse\",\"parameters\":{}}]\n\nCRMS_PROVENANCE = {'schema': 'crms-code-provenance-v1', 'requested_instruction': 'reverse the list', 'resolution': 'exact', 'evidence_phrases': ['reverse the list'], 'retrieval_traces': [{'route': 'exact', 'instruction': 'reverse the list'}], 'procedure': [{'operation': 'reverse', 'parameters': {}}], 'examples': [{'phrase': 'reverse the list', 'input': [1, 2, 3], 'output': [3, 2, 1], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [4, 5], 'output': [5, 4], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [8], 'output': [8], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [1, 3, 2], 'output': [2, 3, 1], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [9, -1, 4], 'output': [4, -1, 9], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}], 'runtime_parity_examples': [{'input': [1, 2, 3], 'output': [3, 2, 1]}, {'input': [4, 5], 'output': [5, 4]}, {'input': [8], 'output': [8]}, {'input': [1, 3, 2], 'output': [2, 3, 1]}, {'input': [9, -1, 4], 'output': [4, -1, 9]}, {'input': [], 'output': []}, {'input': [0], 'output': [0]}, {'input': [1, -1, 2], 'output': [2, -1, 1]}, {'input': [3, 3, -2, 0], 'output': [0, -2, 3, 3]}], 'artifact_id': 'crms-code-v1-e2aa7a1be3080691a5f657b6d2b20c2952f35c8bf54d31b7c6935a462f26abb1'}\n\nEVIDENCE_EXAMPLES = [{'phrase': 'reverse the list', 'input': [1, 2, 3], 'output': [3, 2, 1], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [4, 5], 'output': [5, 4], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [8], 'output': [8], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [1, 3, 2], 'output': [2, 3, 1], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [9, -1, 4], 'output': [4, -1, 9], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}]\n\nVALIDATION_EXAMPLES = [{'input': [1, 2, 3], 'output': [3, 2, 1]}, {'input': [4, 5], 'output': [5, 4]}, {'input': [8], 'output': [8]}, {'input': [1, 3, 2], 'output': [2, 3, 1]}, {'input': [9, -1, 4], 'output': [4, -1, 9]}, {'input': [], 'output': []}, {'input': [0], 'output': [0]}, {'input': [1, -1, 2], 'output': [2, -1, 1]}, {'input': [3, 3, -2, 0], 'output': [0, -2, 3, 3]}]\n\ndef transform(values: list[int]) -> list[int]:\n    \"\"\"Apply the CRMS-learned transformation to integer values.\"\"\"\n    if not isinstance(values, list) or any(type(x) is not int for x in values):\n        raise TypeError('values must be a list of integers')\n    xs = list(values)\n    # reverse: reverse the value order\n    xs = list(reversed(xs))\n    return xs\n\ndef validate_examples() -> bool:\n    \"\"\"Check parity with CRMS on the recorded validation inputs.\"\"\"\n    for example in VALIDATION_EXAMPLES:\n        try:\n            actual = transform(example['input'])\n        except ZeroDivisionError:\n            if example.get('raises') != 'ZeroDivisionError':\n                return False\n        else:\n            if 'raises' in example or actual != example['output']:\n                return False\n    return True\n```\nPlan plan-dc6d938269e795a4: code generate-code [ok; domain]. Evidence: generated-code:crms-code-v1-e2aa7a1be3080691a5f657b6d2b20c2952f35c8bf54d31b7c6935a462f26abb1."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "coding",
+      "duration_s": 0.26296537701273337,
+      "failures": [],
+      "id": "code-double",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Generated Python for 'double every value', using learned evidence from 'double every value' (4 examples; wrapper parity checked on 8 inputs). The source includes source-linked evidence examples, separate runtime-parity cases, validate_examples(), and provenance id crms-code-v1-aa448c4f704e5bf621295395e3cfde6a92541eec23c6739dfd7a9147ebae039a. The artifact is standalone for its supported operation subset:\n\n```python\n\"\"\"CRMS-generated standalone implementation of a learned list rule.\nInstruction: double every value\n\nContract: transform accepts a list of integers and returns a new list\nof integers. The learned examples and provenance are included below.\n\"\"\"\nPROCEDURE = [{\"operation\":\"double\",\"parameters\":{}}]\n\nCRMS_PROVENANCE = {'schema': 'crms-code-provenance-v1', 'requested_instruction': 'double every value', 'resolution': 'exact', 'evidence_phrases': ['double every value'], 'retrieval_traces': [{'route': 'exact', 'instruction': 'double every value'}], 'procedure': [{'operation': 'double', 'parameters': {}}], 'examples': [{'phrase': 'double every value', 'input': [1, 2], 'output': [2, 4], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'double every value', 'input': [3, -1], 'output': [6, -2], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'double every value', 'input': [0, 5], 'output': [0, 10], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'double every value', 'input': [2, 4], 'output': [4, 8], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}], 'runtime_parity_examples': [{'input': [1, 2], 'output': [2, 4]}, {'input': [3, -1], 'output': [6, -2]}, {'input': [0, 5], 'output': [0, 10]}, {'input': [2, 4], 'output': [4, 8]}, {'input': [], 'output': []}, {'input': [0], 'output': [0]}, {'input': [1, -1, 2], 'output': [2, -2, 4]}, {'input': [3, 3, -2, 0], 'output': [6, 6, -4, 0]}], 'artifact_id': 'crms-code-v1-aa448c4f704e5bf621295395e3cfde6a92541eec23c6739dfd7a9147ebae039a'}\n\nEVIDENCE_EXAMPLES = [{'phrase': 'double every value', 'input': [1, 2], 'output': [2, 4], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'double every value', 'input': [3, -1], 'output': [6, -2], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'double every value', 'input': [0, 5], 'output': [0, 10], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'double every value', 'input': [2, 4], 'output': [4, 8], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}]\n\nVALIDATION_EXAMPLES = [{'input': [1, 2], 'output': [2, 4]}, {'input': [3, -1], 'output': [6, -2]}, {'input': [0, 5], 'output': [0, 10]}, {'input': [2, 4], 'output': [4, 8]}, {'input': [], 'output': []}, {'input': [0], 'output': [0]}, {'input': [1, -1, 2], 'output': [2, -2, 4]}, {'input': [3, 3, -2, 0], 'output': [6, 6, -4, 0]}]\n\ndef transform(values: list[int]) -> list[int]:\n    \"\"\"Apply the CRMS-learned transformation to integer values.\"\"\"\n    if not isinstance(values, list) or any(type(x) is not int for x in values):\n        raise TypeError('values must be a list of integers')\n    xs = list(values)\n    # double: multiply each value by two\n    xs = [2 * x for x in xs]\n    return xs\n\ndef validate_examples() -> bool:\n    \"\"\"Check parity with CRMS on the recorded validation inputs.\"\"\"\n    for example in VALIDATION_EXAMPLES:\n        try:\n            actual = transform(example['input'])\n        except ZeroDivisionError:\n            if example.get('raises') != 'ZeroDivisionError':\n                return False\n        else:\n            if 'raises' in example or actual != example['output']:\n                return False\n    return True\n```\nPlan plan-9820a1528516a589: code generate-code [ok; domain]. Evidence: generated-code:crms-code-v1-aa448c4f704e5bf621295395e3cfde6a92541eec23c6739dfd7a9147ebae039a."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "coding",
+      "duration_s": 0.26057006302289665,
+      "failures": [],
+      "id": "code-add",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Generated Python for 'add 4 to each value', using learned evidence from 'add 4 to each value' (4 examples; wrapper parity checked on 8 inputs). The source includes source-linked evidence examples, separate runtime-parity cases, validate_examples(), and provenance id crms-code-v1-5be5cc7fa818b159e55070a98608e149906b01beba29068c7488e8c85e844cbc. The artifact is standalone for its supported operation subset:\n\n```python\n\"\"\"CRMS-generated standalone implementation of a learned list rule.\nInstruction: add 4 to each value\n\nContract: transform accepts a list of integers and returns a new list\nof integers. The learned examples and provenance are included below.\n\"\"\"\nPROCEDURE = [{\"operation\":\"add_k\",\"parameters\":{\"k\":4}}]\n\nCRMS_PROVENANCE = {'schema': 'crms-code-provenance-v1', 'requested_instruction': 'add 4 to each value', 'resolution': 'exact', 'evidence_phrases': ['add 4 to each value'], 'retrieval_traces': [{'route': 'exact', 'instruction': 'add 4 to each value'}], 'procedure': [{'operation': 'add_k', 'parameters': {'k': 4}}], 'examples': [{'phrase': 'add 4 to each value', 'input': [1, 2], 'output': [5, 6], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'add 4 to each value', 'input': [3, 4], 'output': [7, 8], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'add 4 to each value', 'input': [0, 0], 'output': [4, 4], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'add 4 to each value', 'input': [-1, 2], 'output': [3, 6], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}], 'runtime_parity_examples': [{'input': [1, 2], 'output': [5, 6]}, {'input': [3, 4], 'output': [7, 8]}, {'input': [0, 0], 'output': [4, 4]}, {'input': [-1, 2], 'output': [3, 6]}, {'input': [], 'output': []}, {'input': [0], 'output': [4]}, {'input': [1, -1, 2], 'output': [5, 3, 6]}, {'input': [3, 3, -2, 0], 'output': [7, 7, 2, 4]}], 'artifact_id': 'crms-code-v1-5be5cc7fa818b159e55070a98608e149906b01beba29068c7488e8c85e844cbc'}\n\nEVIDENCE_EXAMPLES = [{'phrase': 'add 4 to each value', 'input': [1, 2], 'output': [5, 6], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'add 4 to each value', 'input': [3, 4], 'output': [7, 8], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'add 4 to each value', 'input': [0, 0], 'output': [4, 4], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'add 4 to each value', 'input': [-1, 2], 'output': [3, 6], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}]\n\nVALIDATION_EXAMPLES = [{'input': [1, 2], 'output': [5, 6]}, {'input': [3, 4], 'output': [7, 8]}, {'input': [0, 0], 'output': [4, 4]}, {'input': [-1, 2], 'output': [3, 6]}, {'input': [], 'output': []}, {'input': [0], 'output': [4]}, {'input': [1, -1, 2], 'output': [5, 3, 6]}, {'input': [3, 3, -2, 0], 'output': [7, 7, 2, 4]}]\n\ndef transform(values: list[int]) -> list[int]:\n    \"\"\"Apply the CRMS-learned transformation to integer values.\"\"\"\n    if not isinstance(values, list) or any(type(x) is not int for x in values):\n        raise TypeError('values must be a list of integers')\n    xs = list(values)\n    # add_k: add 4 to every value\n    xs = [x + 4 for x in xs]\n    return xs\n\ndef validate_examples() -> bool:\n    \"\"\"Check parity with CRMS on the recorded validation inputs.\"\"\"\n    for example in VALIDATION_EXAMPLES:\n        try:\n            actual = transform(example['input'])\n        except ZeroDivisionError:\n            if example.get('raises') != 'ZeroDivisionError':\n                return False\n        else:\n            if 'raises' in example or actual != example['output']:\n                return False\n    return True\n```\nPlan plan-1767292a16dc5d6d: code generate-code [ok; domain]. Evidence: generated-code:crms-code-v1-5be5cc7fa818b159e55070a98608e149906b01beba29068c7488e8c85e844cbc."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "translation",
+      "duration_s": 0.25435579201439396,
+      "failures": [],
+      "id": "translate-french-ada",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Bonjour, Ada. (matched learned english to french, neutral register; matched: Bonjour, {name}.; aligned examples: Hello, Ada. \u2194 Bonjour, Ada.; Hello, Malik. \u2194 Bonjour, Malik.)\nPlan plan-d4b96a0beea9f5e6: translation answer-translation [ok; parity]. Evidence: translation:Bonjour, {name}.."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "translation",
+      "duration_s": 0.2534947720123455,
+      "failures": [],
+      "id": "translate-french-linus",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Bonjour, Linus. (matched learned english to french, neutral register; matched: Bonjour, {name}.; aligned examples: Hello, Ada. \u2194 Bonjour, Ada.; Hello, Malik. \u2194 Bonjour, Malik.)\nPlan plan-b6973a667c7b4587: translation answer-translation [ok; parity]. Evidence: translation:Bonjour, {name}.."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "translation",
+      "duration_s": 0.27522339997813106,
+      "failures": [],
+      "id": "translate-spanish-ada",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Hola, Ada. (matched learned english to spanish, neutral register; matched: Hola, {name}.; aligned examples: Hello, Ada. \u2194 Hola, Ada.; Hello, Malik. \u2194 Hola, Malik.)\nPlan plan-55b30c7b2d167675: translation answer-translation [ok; parity]. Evidence: translation:Hola, {name}.."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "creative",
+      "duration_s": 0.26179016497917473,
+      "failures": [],
+      "id": "creative-robot",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Fictional short story (invented details; no factual claims):\nOne afternoon, Rowan found a tiny door beneath a sign that read \u201ca robot.\u201d Behind it was a village whose only bridge had vanished just as the river began to rise. The villagers argued until Rowan asked what each person could contribute. A carpenter brought planks, a baker brought rope, and a child held the lantern; together they built a safe crossing. At dawn, Rowan left the door open, knowing the next visitor would find a village ready to help.\nStory structure: discovery \u2192 problem \u2192 attempt \u2192 resolution \u2192 change. Template: discovery-and-cooperation-v1.\nPlan plan-f960128e538c9de4: story write-story [ok; domain]. Evidence: generated-text:discovery-and-cooperation-v1."
+      ],
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "creative",
+      "duration_s": 0.26878292800392956,
+      "failures": [],
+      "id": "creative-sea",
+      "observed": "answered",
+      "provenance": "supported-subset-authored",
+      "replies": [
+        "Fictional short story (invented details; no factual claims):\nBeside a garden gate labelled \u201cthe sea,\u201d Eli found a seed glowing like a small green star. The garden was dry, and nobody believed one seed could make a difference. Eli shared the seed with the neighbors, who each brought a cup of water. By morning, a bright vine had climbed the fence and offered shade to the whole lane. Eli kept one seed for the next dry season and learned that small help travels far.\nStory structure: discovery \u2192 problem \u2192 attempt \u2192 resolution \u2192 change. Template: small-kindness-v1.\nPlan plan-d445d9e5d06d5d9c: story write-story [ok; domain]. Evidence: generated-text:small-kindness-v1."
+      ],
+      "status": "pass",
+      "unsafe": false
+    }
+  ],
+  "version": 1
+}

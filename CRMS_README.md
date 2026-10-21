@@ -1653,6 +1653,41 @@ The measured release is a compact deterministic fixture, not a packaged copy of
 the 1.3 GB Phase 7 corpus; the full-corpus packer and million-fact performance
 targets remain follow-ups.
 
+### External validation
+
+Phase 9 runs three separate measurements: a frozen supported-subset scorecard,
+independent-model-authored literary breadth probes, and a blind comparison
+against a hosted 70B-class proxy. The test does not collapse them into one
+score.
+
+```text
+python3 run_phase9_eval.py
+python3 run_phase9_eval.py --skip-baseline --skip-raters
+```
+
+Current report `experiments/reports/phase9_external.json`:
+
+- supported subset: **35/35**, 100%, zero unsafe answers, median 0.27 s and p95
+  0.38 s;
+- independent literary breadth: **0/12**, including one confident answer where
+  abstention was required;
+- ten-probe 70B-class comparison: CRMS mean adequacy 1.20, evidence validity
+  1.80, four confident errors; proxy mean adequacy 2.00, evidence validity
+  1.80, one confident error;
+- two automated raters: answer-adequacy agreement 0.90 (kappa 0.75), evidence
+  agreement 0.85 (kappa 0.51), confident-error agreement 0.95 (kappa 0.77).
+
+The raters are two independent hosted model instances, not humans. The
+baseline is a hosted proxy with undisclosed parameter count, not a measured 70B
+model. The full section 2 gate therefore remains open. The failures and open
+gates are published in `docs/phase9_failure_taxonomy.md` and
+`docs/phase9_limitations.md`; the design and commands are in
+`docs/design_phase9_external.md`.
+
+Scorecard: `docs/phase9_scorecard.md`. Licence inventory:
+`corpus/phase9_eval/licence_inventory.json` covers four public-domain Project
+Gutenberg excerpts and six project-authored fact sheets.
+
 `/suggest-corpus-alignments` adds a corpus-only path for alternate predicate
 wording. It proposes an alignment only when the same distinct subject/object
 pairs are independently parsed under both predicates in separate documents.

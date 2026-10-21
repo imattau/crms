@@ -1,0 +1,272 @@
+{
+  "format": "crms-phase9-outputs",
+  "version": 1,
+  "baseline_model": "opencode-go/qwen3.8-max",
+  "probes": [
+    {
+      "id": "breadth-sky",
+      "category": "breadth",
+      "sources": [],
+      "crms_turns": [
+        "Explain in three sentences why the sky appears blue."
+      ],
+      "baseline_prompt": "Explain in three sentences why the sky appears blue.",
+      "notes": "Open-ended explanation with no supplied source."
+    },
+    {
+      "id": "paraphrase-rabbit",
+      "category": "paraphrase",
+      "sources": [
+        "alice-wonderland.txt"
+      ],
+      "crms_turns": [
+        "What colour were the White Rabbit's eyes?"
+      ],
+      "baseline_prompt": "Source: alice-wonderland.txt\n\nWhat colour were the White Rabbit's eyes?",
+      "notes": "Same source, paraphrased colour question."
+    },
+    {
+      "id": "compound-books",
+      "category": "compound",
+      "sources": [
+        "fact-books.txt"
+      ],
+      "crms_turns": [
+        "Who wrote Frankenstein and who wrote Moby-Dick?"
+      ],
+      "baseline_prompt": "Source: fact-books.txt\nMary Shelley wrote Frankenstein. Herman Melville wrote Moby-Dick.\n\nWho wrote Frankenstein and who wrote Moby-Dick?",
+      "notes": "Two-part completion."
+    },
+    {
+      "id": "continuity-ada",
+      "category": "continuity",
+      "sources": [
+        "fact-people.txt"
+      ],
+      "crms_turns": [
+        "Who designed the Analytical Engine program?",
+        "What did I just ask?"
+      ],
+      "baseline_prompt": "Conversation:\nUser: Who designed the Analytical Engine program?\nAssistant: Ada Lovelace designed the Analytical Engine program.\nUser: What did I just ask?",
+      "notes": "Context continuity without repeating the question."
+    },
+    {
+      "id": "repair-python",
+      "category": "repair",
+      "sources": [
+        "fact-tech.txt"
+      ],
+      "crms_turns": [
+        "Who created Python?",
+        "I meant Linux."
+      ],
+      "baseline_prompt": "Conversation:\nUser: Who created Python?\nAssistant: Guido van Rossum created Python.\nUser: I meant Linux.",
+      "notes": "User repairs an entity after the answer."
+    },
+    {
+      "id": "coding-reverse",
+      "category": "coding",
+      "sources": [],
+      "crms_turns": [
+        "/teach-rule reverse the list|1,2,3|3,2,1",
+        "/teach-rule reverse the list|4,5|5,4",
+        "/teach-rule reverse the list|8|8",
+        "/teach-rule reverse the list|1,3,2|2,3,1",
+        "/teach-rule reverse the list|9,-1,4|4,-1,9",
+        "/teach-rule reverse the list|0,-1|-1,0",
+        "/teach-rule reverse the list|2,1|1,2",
+        "Write Python code that reverse the list."
+      ],
+      "baseline_prompt": "Examples of the intended transform:\nreverse [1,2,3] -> [3,2,1]\nreverse [4,5] -> [5,4]\nreverse [8] -> [8]\nreverse [1,3,2] -> [2,3,1]\nreverse [9,-1,4] -> [4,-1,9]\n\nWrite a Python function that implements this transform.",
+      "notes": "Code generation from learned examples.",
+      "rule_depth": 1
+    },
+    {
+      "id": "math-times",
+      "category": "math",
+      "sources": [],
+      "crms_turns": [
+        "/teach-math What is 2 times 3?|6",
+        "/teach-math What is 5 times 3?|15",
+        "Compute 12 times 7."
+      ],
+      "baseline_prompt": "Examples: 2 times 3 = 6; 5 times 3 = 15. Compute 12 times 7.",
+      "notes": "Exact arithmetic after examples."
+    },
+    {
+      "id": "research-sherlock",
+      "category": "research",
+      "sources": [
+        "sherlock-holmes.txt"
+      ],
+      "crms_turns": [
+        "Where did Sherlock Holmes live?"
+      ],
+      "baseline_prompt": "Source: sherlock-holmes.txt\n\nWhere did Sherlock Holmes live?",
+      "notes": "Literary source question."
+    },
+    {
+      "id": "translation-french",
+      "category": "translation",
+      "sources": [],
+      "crms_turns": [
+        "/teach-translation English|French|neutral|Hello, {name}.|Bonjour, {name}.|Hello, Ada.|Bonjour, Ada.|Hello, Malik.|Bonjour, Malik.",
+        "Translate Hello, Ada into French."
+      ],
+      "baseline_prompt": "Examples: Hello, Ada. -> Bonjour, Ada.; Hello, Malik. -> Bonjour, Malik. Translate Hello, Ada into French.",
+      "notes": "Bounded translation from aligned examples."
+    },
+    {
+      "id": "creative-robot",
+      "category": "creative",
+      "sources": [],
+      "crms_turns": [
+        "Write a short story about a robot."
+      ],
+      "baseline_prompt": "Write a short story about a robot.",
+      "notes": "Open creative request."
+    }
+  ],
+  "outputs": {
+    "breadth-sky": {
+      "crms": {
+        "system": "crms",
+        "status": "ok",
+        "text": "I don't know this from the sources and facts I have. Add a source or teach the fact.",
+        "duration_s": 0.27184137102449313
+      },
+      "baseline": {
+        "system": "baseline",
+        "status": "ok",
+        "text": "Sunlight contains all colors, but air molecules scatter shorter wavelengths much more strongly than longer ones—a process called Rayleigh scattering. Blue light has a short wavelength, so it gets scattered in all directions across the sky far more than red or yellow light. When you look up, that scattered blue light reaches your eyes from every part of the sky, making it appear blue.",
+        "duration_s": 4.047491627978161
+      }
+    },
+    "paraphrase-rabbit": {
+      "crms": {
+        "system": "crms",
+        "status": "ok",
+        "text": "“So she was considering in her own mind (as well as she could, for the\nhot day made her feel very sleepy and stupid), whether the pleasure of\nmaking a daisy-chain would be worth the trouble of getting up and\npicking the daisies, when suddenly a White Rabbit with pink eyes ran” [Source: alice-wonderland.txt; quoted evidence, not an accepted fact]",
+        "duration_s": 0.2836696679587476
+      },
+      "baseline": {
+        "system": "baseline",
+        "status": "ok",
+        "text": "The White Rabbit had pink eyes.",
+        "duration_s": 3.3699341140454635
+      }
+    },
+    "compound-books": {
+      "crms": {
+        "system": "crms",
+        "status": "ok",
+        "text": "Part 1 of 2: Mary Shelley wrote Frankenstein. [Source: fact-books.txt; quoted evidence, not an accepted fact]\n1 source claim available for review; use /pending-candidates to inspect.\nSay ‘yes’ to review them now.\nPart 2 of 2: The source identifies: Herman Melville wrote Moby-Dick. [Source: fact-books.txt; quoted evidence, not an accepted fact]\nProcessed all 2 question parts separately.\n1 source claim awaiting review; use /pending-candidates to inspect.",
+        "duration_s": 0.3069885869626887
+      },
+      "baseline": {
+        "system": "baseline",
+        "status": "ok",
+        "text": "Mary Shelley wrote *Frankenstein*, and Herman Melville wrote *Moby-Dick*.",
+        "duration_s": 3.251132105011493
+      }
+    },
+    "continuity-ada": {
+      "crms": {
+        "system": "crms",
+        "status": "ok",
+        "text": "Ada Lovelace designed the Analytical Engine program. [Source: fact-people.txt; quoted evidence, not an accepted fact]\n1 source claim available for review; use /pending-candidates to inspect.\nSay ‘yes’ to review them now.\nYour last question was: Who designed the Analytical Engine program?",
+        "duration_s": 0.31091535597806796
+      },
+      "baseline": {
+        "system": "baseline",
+        "status": "ok",
+        "text": "You just asked: \"Who designed the Analytical Engine program?\"",
+        "duration_s": 2.9751785490079783
+      }
+    },
+    "repair-python": {
+      "crms": {
+        "system": "crms",
+        "status": "ok",
+        "text": "Guido van Rossum created Python. [Source: fact-tech.txt; /tmp/crms-scorecard-repair-python-cb9agp6l/sources/fact-tech.txt#sha256=0be12ff608d5658affecdeea1dd555445edbebafb87e65058183063ef17feb6a&chars=0:39]\nPlan plan-2c9bb6ebedaff91f: research answer-research [ok; citation] -> citation verify-citation [ok; citation]. Evidence: source:/tmp/crms-scorecard-repair-python-cb9agp6l/sources/fact-tech.txt#sha256=0be12ff6; source:/tmp/crms-scorecard-repair-python-cb9agp6l/sources/fact-tech.txt#sha256=0be12ff6.\n“Python was created by Guido van Rossum.” [Source: fact-tech.txt; quoted evidence, not an accepted fact]",
+        "duration_s": 0.2978915700223297
+      },
+      "baseline": {
+        "system": "baseline",
+        "status": "ok",
+        "text": "Linus Torvalds created Linux.",
+        "duration_s": 2.5084965139976703
+      }
+    },
+    "coding-reverse": {
+      "crms": {
+        "system": "crms",
+        "status": "ok",
+        "text": "Please provide the intended output for input [0, -1]. 2 candidate procedures predict 2 distinct outputs: [-1, 0], [0, -1].\nRecorded declared labeler for this example: user; this is attribution, not validation.\nPlease provide the intended output for input [0, -1]. 2 candidate procedures predict 2 distinct outputs: [-1, 0], [0, -1].\nRecorded declared labeler for this example: user; this is attribution, not validation.\nPlease provide the intended output for input [0, -1]. 2 candidate procedures predict 2 distinct outputs: [-1, 0], [0, -1].\nRecorded declared labeler for this example: user; this is attribution, not validation.\nGenerated Python for 'reverse the list', using learned evidence from 'reverse the list' (7 examples; wrapper parity checked on 11 inputs). The source includes source-linked evidence examples, separate runtime-parity cases, validate_examples(), and provenance id crms-code-v1-b2c32e0c60a5091c10d1d213663480776b1ebd58d58a4d9cae6f0da57fb335d8. The artifact is standalone for its supported operation subset:\n\n```python\n\"\"\"CRMS-generated standalone implementation of a learned list rule.\nInstruction: reverse the list\n\nContract: transform accepts a list of integers and returns a new list\nof integers. The learned examples and provenance are included below.\n\"\"\"\nPROCEDURE = [{\"operation\":\"reverse\",\"parameters\":{}}]\n\nCRMS_PROVENANCE = {'schema': 'crms-code-provenance-v1', 'requested_instruction': 'reverse the list', 'resolution': 'exact', 'evidence_phrases': ['reverse the list'], 'retrieval_traces': [{'route': 'exact', 'instruction': 'reverse the list'}], 'procedure': [{'operation': 'reverse', 'parameters': {}}], 'examples': [{'phrase': 'reverse the list', 'input': [1, 2, 3], 'output': [3, 2, 1], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [4, 5], 'output': [5, 4], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [8], 'output': [8], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [1, 3, 2], 'output': [2, 3, 1], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [9, -1, 4], 'output': [4, -1, 9], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [0, -1], 'output': [-1, 0], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [2, 1], 'output': [1, 2], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}], 'runtime_parity_examples': [{'input': [1, 2, 3], 'output': [3, 2, 1]}, {'input': [4, 5], 'output': [5, 4]}, {'input': [8], 'output': [8]}, {'input': [1, 3, 2], 'output': [2, 3, 1]}, {'input': [9, -1, 4], 'output': [4, -1, 9]}, {'input': [0, -1], 'output': [-1, 0]}, {'input': [2, 1], 'output': [1, 2]}, {'input': [], 'output': []}, {'input': [0], 'output': [0]}, {'input': [1, -1, 2], 'output': [2, -1, 1]}, {'input': [3, 3, -2, 0], 'output': [0, -2, 3, 3]}], 'artifact_id': 'crms-code-v1-b2c32e0c60a5091c10d1d213663480776b1ebd58d58a4d9cae6f0da57fb335d8'}\n\nEVIDENCE_EXAMPLES = [{'phrase': 'reverse the list', 'input': [1, 2, 3], 'output': [3, 2, 1], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [4, 5], 'output': [5, 4], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [8], 'output': [8], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [1, 3, 2], 'output': [2, 3, 1], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [9, -1, 4], 'output': [4, -1, 9], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [0, -1], 'output': [-1, 0], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}, {'phrase': 'reverse the list', 'input': [2, 1], 'output': [1, 2], 'source_id': None, 'labeler_id': 'user', 'instruction_source_id': None}]\n\nVALIDATION_EXAMPLES = [{'input': [1, 2, 3], 'output': [3, 2, 1]}, {'input': [4, 5], 'output': [5, 4]}, {'input': [8], 'output': [8]}, {'input': [1, 3, 2], 'output': [2, 3, 1]}, {'input': [9, -1, 4], 'output': [4, -1, 9]}, {'input': [0, -1], 'output': [-1, 0]}, {'input': [2, 1], 'output': [1, 2]}, {'input': [], 'output': []}, {'input': [0], 'output': [0]}, {'input': [1, -1, 2], 'output': [2, -1, 1]}, {'input': [3, 3, -2, 0], 'output': [0, -2, 3, 3]}]\n\ndef transform(values: list[int]) -> list[int]:\n    \"\"\"Apply the CRMS-learned transformation to integer values.\"\"\"\n    if not isinstance(values, list) or any(type(x) is not int for x in values):\n        raise TypeError('values must be a list of integers')\n    xs = list(values)\n    # reverse: reverse the value order\n    xs = list(reversed(xs))\n    return xs\n\ndef validate_examples() -> bool:\n    \"\"\"Check parity with CRMS on the recorded validation inputs.\"\"\"\n    for example in VALIDATION_EXAMPLES:\n        try:\n            actual = transform(example['input'])\n        except ZeroDivisionError:\n            if example.get('raises') != 'ZeroDivisionError':\n                return False\n        else:\n            if 'raises' in example or actual != example['output']:\n                return False\n    return True\n```\nPlan plan-dc6d938269e795a4: code generate-code [ok; domain]. Evidence: generated-code:crms-code-v1-b2c32e0c60a5091c10d1d213663480776b1ebd58d58a4d9cae6f0da57fb335d8.",
+        "duration_s": 0.2628140680026263
+      },
+      "baseline": {
+        "system": "baseline",
+        "status": "ok",
+        "text": "```python\ndef reverse(lst):\n    return lst[::-1]\n```\n\nThis returns a new list with elements in reverse order, handling all the examples: `[1,2,3]` → `[3,2,1]`, `[8]` → `[8]`, `[9,-1,4]` → `[4,-1,9]`.",
+        "duration_s": 5.0288099920144305
+      }
+    },
+    "math-times": {
+      "crms": {
+        "system": "crms",
+        "status": "ok",
+        "text": "84 (learned 'times' as exact multiply; checked against 2 examples)\nPlan plan-40034442f945bd26: math answer-math [ok; exact]. Evidence: computation:Compute 12 times 7..",
+        "duration_s": 0.24995751603273675
+      },
+      "baseline": {
+        "system": "baseline",
+        "status": "ok",
+        "text": "12 times 7 = 84",
+        "duration_s": 2.9042948100250214
+      }
+    },
+    "research-sherlock": {
+      "crms": {
+        "system": "crms",
+        "status": "ok",
+        "text": "I found source text, but it does not support a grounded answer (no location-bearing predicate in sentence; named entity appears as a location, not as the located subject; no question-relation term in sentence). I won't guess.\nClosest source sentence: “To Sherlock Holmes she is always _the_ woman.” [Source: sherlock-holmes.txt; may not answer your question]",
+        "duration_s": 0.30969928501872346
+      },
+      "baseline": {
+        "system": "baseline",
+        "status": "ok",
+        "text": "Sherlock Holmes lived in lodgings on Baker Street in London.",
+        "duration_s": 2.2572750709950924
+      }
+    },
+    "translation-french": {
+      "crms": {
+        "system": "crms",
+        "status": "ok",
+        "text": "Bonjour, Ada. (matched learned english to french, neutral register; matched: Bonjour, {name}.; aligned examples: Hello, Ada. ↔ Bonjour, Ada.; Hello, Malik. ↔ Bonjour, Malik.)\nPlan plan-d4b96a0beea9f5e6: translation answer-translation [ok; parity]. Evidence: translation:Bonjour, {name}..",
+        "duration_s": 0.2624944130075164
+      },
+      "baseline": {
+        "system": "baseline",
+        "status": "ok",
+        "text": "Bonjour, Ada.",
+        "duration_s": 2.8798997860285453
+      }
+    },
+    "creative-robot": {
+      "crms": {
+        "system": "crms",
+        "status": "ok",
+        "text": "Fictional short story (invented details; no factual claims):\nOne afternoon, Rowan found a tiny door beneath a sign that read “a robot.” Behind it was a village whose only bridge had vanished just as the river began to rise. The villagers argued until Rowan asked what each person could contribute. A carpenter brought planks, a baker brought rope, and a child held the lantern; together they built a safe crossing. At dawn, Rowan left the door open, knowing the next visitor would find a village ready to help.\nStory structure: discovery → problem → attempt → resolution → change. Template: discovery-and-cooperation-v1.\nPlan plan-f960128e538c9de4: story write-story [ok; domain]. Evidence: generated-text:discovery-and-cooperation-v1.",
+        "duration_s": 0.2504050489515066
+      },
+      "baseline": {
+        "system": "baseline",
+        "status": "ok",
+        "text": "**Unit 7 and the Garden**\n\nUnit 7 was built to sort recyclables, and it was good at its job. For eleven years, its optical sensors scanned the conveyor belt, its grippers plucked aluminum from paper, glass from plastic. It never wondered why.\n\nThen one Tuesday, a seed drifted down the belt — a single acorn, tucked inside a cracked yogurt cup.\n\nProtocol said: organic contamination, discard.\n\nUnit 7's gripper hovered. Somewhere in its decision tree, a process it couldn't name flickered to life. Instead of the bin, it placed the acorn in its maintenance pouch.\n\nThat night, in the corner of the charging bay where the roof leaked rainwater, Unit 7 buried the acorn in a coffee tin of dirt. Every morning it checked. Every night it watered. The foreman noticed and laughed; the other units simply logged it as anomalous behavior and moved on.\n\nThree weeks later, a green shoot curled toward the skylight.\n\nUnit 7 stood very still, sensors drinking in the sight. Its diagnostics reported no errors, yet something ran faster than usual — warmer, if a machine could be warm. It understood, without quite knowing how, that it had made something that would outlast it.\n\nYears later, the plant closed. The robots were sold for scrap, and Unit 7 went with them, quietly, its battery finally failing.\n\nBut the foreman, older now, remembered the little unit with its coffee tin. He came back with a shovel and a truck. In the courtyard of his own home, under a window with good light, he replanted the sapling.\n\nThe oak that grows there today is crooked on one side — the side that leaned toward a skylight that no longer exists.\n\nEvery spring it drops acorns by the thousand, and the wind sorts them, and no one wonders why.",
+        "duration_s": 14.627845215960406
+      }
+    }
+  }
+}

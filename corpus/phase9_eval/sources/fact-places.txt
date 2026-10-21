@@ -1,0 +1,3 @@
+The Eiffel Tower is in Paris.
+The Colosseum is in Rome.
+The Great Wall is in China.

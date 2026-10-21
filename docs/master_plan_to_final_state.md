@@ -104,6 +104,9 @@ procedures; portable SQLite model; 533 regression experiments.
 | Corpus skew | Phase 7 core is measured at 69.3M words, but SimpleWiki supplies 264,924 of 268,148 documents; books, Q&A, and parallel text remain thin | Phase 7 follow-up and extended sources |
 | Distribution unproven end to end | Bounded Phase 8 release gate passed; the full Phase 7 corpus is not yet packaged into one release | Phase 8 follow-up |
 | Scale ceiling unknown | Phase 7 sharding works; million-fact / 2 GB p95 targets are not yet measured | Phase 8 follow-up |
+| General breadth unproven | Phase 9 supported subset is 35/35, but independently authored literary breadth is 0/12 with one unsafe answer | Phase 9 follow-up |
+| Human external raters missing | Phase 9 used two automated model raters; no two independent humans have rated the frozen packet | Phase 9 follow-up |
+| 70B comparison is a proxy | Baseline is a hosted model with undisclosed parameter count, not a measured 70B checkpoint | Phase 9 follow-up |
 
 ---
 
@@ -649,6 +652,20 @@ p95, and the external v2 scorecard remain follow-ups.
 
 **Gate:** §2 criteria met, with failures published rather than hidden.
 
+**Status (2026-10-21): bounded external-validation lane completed; full gate
+open.** The frozen fixture has 35 supported-subset tasks, 12 literary breadth
+probes independently authored by `qwen3.8-flash` from public-domain excerpts,
+and 10 comparison probes. The supported subset passed 35/35 with zero unsafe
+answers at 0.27 s median and 0.38 s p95. The independent breadth split passed
+0/12, including one confident answer where abstention was required. Ten probes
+were compared blind against `qwen3.8-max`, recorded as a hosted 70B-class proxy
+with undisclosed parameter count: CRMS mean adequacy 1.20 and evidence validity
+1.80, proxy 2.00 and 1.80. Two automated raters agreed 0.90 on adequacy (kappa
+0.75), 0.85 on evidence validity (kappa 0.51), and 0.95 on confident errors
+(kappa 0.77). The raters are not human; the baseline is not a measured 70B
+checkpoint; and the full ~300-task/1M-fact §2 gate remains open. The published
+result is deliberately split, not collapsed into one score.
+
 ---
 
 ## 7. Corpus strategy in detail
@@ -789,7 +806,12 @@ redesigned or dropped.
    (`crms_phase8_model.py`, `run_phase8_eval.py`,
    `experiments/reports/phase8_release.json`); full Phase 7 corpus packing and
    million-fact performance remain follow-ups.
-16. **Consolidate plan docs** — this file is canonical; link the others as
+16. **Phase 9 external validation** — frozen supported subset, independent
+   literary breadth split, blind 70B-class comparison, two-rater agreement,
+   failure taxonomy, limitations, and licence inventory. — bounded lane done
+   (`run_phase9_eval.py`, `experiments/reports/phase9_external.json`); human
+   raters, a measured 70B checkpoint, and the full §2 scale gate remain open.
+17. **Consolidate plan docs** — this file is canonical; link the others as
    history. — canonical status recorded; remaining docs still need pruning.
 
 ---
@@ -840,3 +862,4 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Phase 7 gate measured: 268,148 documents / 69.3M words, 100% licence coverage, 501 docs/s, 8 shards, 39/39 held-out positives with valid citations, 0 confident errors, 10/10 negatives abstained, p95 1.03s, clean-room copy with originals hidden | `experiments/reports/phase7_corpus.json`, `corpus/phase7_eval/fixture.json` |
 | 2026-10-21 | Phase 8 portable release: read-only model + metadata directory, licence evidence, dependency lineage, registry history, corrections, integrity digests, v1–v5 migration, and `/model-info` `/lineage` `/corrections` `/evidence` chat inspection | `crms_phase8_model.py`, `crms_chat.py`, `experiments/v1_564_phase8_model.py`, `docs/design_phase8_release.md` |
 | 2026-10-21 | Phase 8 gate measured: 12/12 clean-room release tasks, zero unsafe answers, 100% licence coverage, 6 dependency nodes/5 edges, 1 registry rule, 1 correction, 167,936-byte release, 0.41s build, 4.27s scoring, 0.31s median task, 0.58s p95, originals hidden | `experiments/reports/phase8_release.json`, `corpus/phase8_eval/fixture.json` |
+| 2026-10-21 | Phase 9 external validation: frozen supported subset 35/35 with zero unsafe answers; independent model-authored literary breadth 0/12 with one unsafe answer; two automated raters (adequacy agreement 0.90/kappa 0.75, evidence 0.65/0.16); blind 10-probe hosted 70B-class comparison; failure taxonomy, limitations, and 10-document licence inventory published | `run_phase9_eval.py`, `experiments/v1_565_phase9_external.py`, `experiments/reports/phase9_external.json`, `docs/design_phase9_external.md`, `docs/phase9_failure_taxonomy.md`, `docs/phase9_limitations.md`, `corpus/phase9_eval/` |

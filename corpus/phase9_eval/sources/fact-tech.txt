@@ -1,0 +1,3 @@
+Python was created by Guido van Rossum.
+Linux was created by Linus Torvalds.
+The World Wide Web was created by Tim Berners-Lee.
