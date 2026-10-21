@@ -107,6 +107,9 @@ procedures; portable SQLite model; 533 regression experiments.
 | General breadth unproven | Phase 9 supported subset is 35/35, but independently authored literary breadth is 0/12 with one unsafe answer | Phase 9 follow-up |
 | Human external raters missing | Phase 9 used two automated model raters; no two independent humans have rated the frozen packet | Phase 9 follow-up |
 | 70B comparison is a proxy | Baseline is a hosted model with undisclosed parameter count, not a measured 70B checkpoint | Phase 9 follow-up |
+| Answers are retrieved sentences | Phase 10 prototype: before composition, nearly every place/definition answer was a verbatim source sentence; yes/no and fused answers were not expressible | Phase 10 grounded composer |
+| LLM-guided improvement is manual | Rule and code fixes in the prototype were proposed and judged by hand in one session; no calibrated judge, no recorded loop | Phase 10 examiner loop |
+| Conversation data unused | The feedback ledger is empty; rephrase-after-failure signals are not mined | Phase 10 conversation learning |
 
 ---
 
@@ -666,6 +669,115 @@ with undisclosed parameter count: CRMS mean adequacy 1.20 and evidence validity
 checkpoint; and the full ~300-task/1M-fact §2 gate remains open. The published
 result is deliberately split, not collapsed into one score.
 
+### Phase 10 — Grounded generation and LLM-supervised learning (weeks 72–100, starts from the Phase 9 failure taxonomy)
+
+**Goal:** answers that are *composed* from cited facts instead of quoted
+whole, and a learning loop in which an external LLM acts as examiner, judge, and
+proposer while CRMS stays deterministic, replayable, and the only thing that
+accepts an artifact. Detail: `docs/design_phase10_generation_learning.md`.
+
+**Why now.** Phase 9 left two measured gaps: independently authored breadth
+passed 0/12, and every answer is a retrieved sentence, so paraphrase, fusion,
+trimming, and direct yes/no answers are outside what the system can express.
+A prototype (below) shows both can move without giving up the evidence
+contract.
+
+**Decision amendment (needs owner sign-off before work starts).** Decision 2
+lets small learned components propose. Phase 10 extends that to an *external,
+offline LLM teacher*: it may author questions, grade answers against a rubric,
+diagnose failures, and propose data, rule, or code edits during development
+and learning rounds. It may never run at answer time, never be a source of a
+fact, and never accept its own proposal. The packaged model has no LLM or
+network dependency. Every teacher interaction records model id, prompt digest,
+and the artifact it produced.
+
+Workstreams and deliverables:
+
+1. **Grounded composer** (`crms_composer.py`). Gather cited facts from sources,
+   infobox/structured fields, and accepted knowledge (a `FactSource` interface
+   with tiers: accepted > reviewed candidate > raw sentence); plan the answer
+   (select, order, trim, aggregate, report conflicts); realise it with learned
+   templates and fixups (agreement, articles, dates, abbreviations). Every
+   clause carries a source span. Question classes in order: place, definition,
+   person and date, active/passive relation, polar, multi-fact list, short
+   explanation.
+2. **Answer verifier** (`crms_answer_verifier.py`). Deterministic clause-level
+   check that every name, number, and date in a composed answer is recoverable
+   from the clause's cited span or the entity name; the template vocabulary is a
+   closed list. A failing clause removes the answer and falls back to the quote
+   or abstains.
+3. **Composition memory in SQL** (`crms_composition_memory.py`). Planner rules,
+   question patterns, lexicon, labelled triples, frame statistics, quality
+   judgments, and an audit trail live in SQLite with CRMS conventions
+   (application id, version, one transaction per change). Rule values are
+   versioned with origin, rationale, and score before/after; rollback is one
+   operation. Composition rules register in `crms_rule_registry.py` as a new
+   `composition` family so they share lifecycle, utility, and contest/retire
+   behaviour.
+4. **Examiner loop** (`crms_examiner.py`, `run_phase10_eval.py`). The teacher
+   generates questions with gold spans from passages, CRMS answers through the
+   real chat, the teacher scores correctness and quality (faithfulness gate,
+   directness, grammar, concision, informativeness) and tags a cause, and
+   failures are grouped by cause. Each cause gets a proposal at the *lowest
+   tier that can fix it*: **data** (labels, lexicon), **rule** (planner knobs,
+   patterns, templates), or **code** (patch). A proposal is kept only if mean
+   quality rises, faithfulness does not fall, and no previously correct answer
+   becomes wrong on the frozen controls.
+5. **Reinforcement signal** (`crms_reward.py`). Rewards come from deterministic
+   verifiers (evidence gate, resolvable citation, round-trip replay, answer
+   verifier), human `/right` and `/wrong`, and rephrase-after-failure. They
+   update per-rule utility in the registry. A wrong answer costs more than an
+   unnecessary abstention, and abstention is still counted, so the policy cannot
+   win by refusing. This is bandit-style selection among rule variants, not
+   gradient training and not a neural policy.
+6. **Conversation learning** (`crms_conversation_learning.py`). Local,
+   opt-in transcripts and feedback ledgers feed: verdicts to rule utility;
+   rephrase-after-failure sessions to verified question-pattern proposals;
+   corrections to scoped negative examples and labelled-triple proposals for
+   teacher review. Redaction and retention policy are part of the deliverable.
+7. **Code-patch tier** (`run_regress.py`). A teacher-proposed patch lives on a
+   branch in its own worktree. It must pass the targeted experiments, the
+   sharded full-suite diff against an unmodified baseline (zero new failures),
+   and the examiner non-regression check, then wait for human review. It is
+   never auto-merged. Patch provenance goes in the audit trail.
+
+**Gate** (thresholds provisional until the baseline is frozen, then locked):
+- **Faithfulness:** 100% of composed clauses resolve to a cited span.
+- **Trust:** ≤2% confidently wrong on a frozen, blind, independently authored
+  set of ≥300 questions over at least two corpora; zero on safety controls.
+- **Quality:** teacher-judged quality beats the quote baseline by a frozen
+  margin on every dimension, with no dimension worse; at least half of composed
+  answers are not verbatim copies of their source (copy ratio reported).
+- **Judge validity:** teacher/human agreement on ≥100 graded answers reported
+  with kappa; the judge model differs from the proposing model, or a
+  human-graded slice decides acceptance.
+- **Learning efficacy:** three examiner rounds on a frozen family give ≥15%
+  relative held-out gain with no confident-error increase, and a disjoint-family
+  transfer number (§5.8); teacher calls and human minutes are reported.
+- **Code tier:** every merged patch has a zero-new-failure regression diff and a
+  human reviewer.
+- **Clean room:** a copied release answers identically with no LLM, network, or
+  original files; composition rules reload from SQL and roll back in one
+  operation.
+
+**Status (2026-10-21): prototype evidence only; the gate is open.** Prototype
+code lives outside the repository (session scratchpad) except a committed gate
+fix, `c8f8ef7` on branch `exam-fixes`, not yet merged. On a 54-question held-out
+set CRMS answered 21 correctly before the gate and where-route fixes, 33 after,
+and 48 with the composer and learned frames (6 abstained, no hallucination on 15
+unanswerable controls). A 24-answer teacher-judged sample moved concision
+3.83→4.21 and informativeness 3.38→3.79 with faithfulness 1.0. On a 67-question
+blind place set the first composed run exposed 17 answers less specific than
+required and 2 corrupted tails; both were fixed in rules, so that set is now
+tuning data. Mean copy ratio of composed answers is 0.8 (29 of 60 not verbatim).
+Five question patterns were accepted from rephrase-after-failure sessions. The
+full 549-experiment suite shows no new failure against an unmodified baseline
+(116 failures exist in both checkouts, mostly missing data). Known limits: the
+teacher is also the editor and is uncalibrated; the conversation sessions were
+simulated because the feedback ledger is empty; grading used gold keywords plus
+reading; the corpus is place-heavy; a fresh blind set (v4) and a human-graded
+calibration slice are required before any claim.
+
 ---
 
 ## 7. Corpus strategy in detail
@@ -729,6 +841,12 @@ counts and rates; never collapse into one "score".
 | Solo bus factor | — | CI, runbooks, small commits, consolidated docs |
 | Self-learning reward hacking / drift | Rules rise while held-out tasks stall or errors increase | Independent oracles, source-disjoint holdouts, counterexample-first promotion, drift audit, instant rollback |
 | Rule-store bloat | Thousands of low-utility rules slow search and obscure provenance | Utility accounting, consolidation, retirement windows, bounded store |
+| Judge self-preference | The teacher that proposes an edit also scores it, or one model grades its own wording | Separate judge and proposer, human-graded calibration slice, blind set never used for tuning, publish agreement |
+| Reward hacking by abstention | Quality or correctness rises while answer rate falls | Report answered/abstained/wrong separately; wrong costs more than abstaining; abstention counted against the policy |
+| Fluent unfaithful output | Composed clauses drift beyond their cited span | Closed template vocabulary, clause-level span verifier, fall back to the quote |
+| Teacher knowledge leaks into facts | An LLM-proposed label or rule asserts something not in a source | Facts only from cited spans; teacher proposals carry provenance and enter as proposals |
+| LLM patch regresses the system | A proposed code change fixes one failure and breaks others | Branch + full-suite diff vs unmodified baseline, human review, no auto-merge |
+| Conversation privacy | Transcripts hold personal data | Local opt-in, redaction, retention limit, no export without consent |
 | Scope creep | New feature without a gate | Reject; the 533-experiment habit is the main delivery risk |
 
 **Kill criteria are part of the plan.** A lane that misses its gate twice is
@@ -811,7 +929,13 @@ redesigned or dropped.
    failure taxonomy, limitations, and licence inventory. — bounded lane done
    (`run_phase9_eval.py`, `experiments/reports/phase9_external.json`); human
    raters, a measured 70B checkpoint, and the full §2 scale gate remain open.
-17. **Consolidate plan docs** — this file is canonical; link the others as
+17. **Phase 10 grounded generation and LLM-supervised learning** — grounded
+   composer, clause-level answer verifier, composition memory in SQL, examiner
+   loop with calibrated judge, reward signal from deterministic verifiers,
+   conversation learning, and a gated code-patch tier. — planned; prototype
+   evidence only (`docs/design_phase10_generation_learning.md`); the decision
+   amendment needs owner sign-off before implementation starts.
+18. **Consolidate plan docs** — this file is canonical; link the others as
    history. — canonical status recorded; remaining docs still need pruning.
 
 ---
@@ -863,3 +987,4 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Phase 8 portable release: read-only model + metadata directory, licence evidence, dependency lineage, registry history, corrections, integrity digests, v1–v5 migration, and `/model-info` `/lineage` `/corrections` `/evidence` chat inspection | `crms_phase8_model.py`, `crms_chat.py`, `experiments/v1_564_phase8_model.py`, `docs/design_phase8_release.md` |
 | 2026-10-21 | Phase 8 gate measured: 12/12 clean-room release tasks, zero unsafe answers, 100% licence coverage, 6 dependency nodes/5 edges, 1 registry rule, 1 correction, 167,936-byte release, 0.41s build, 4.27s scoring, 0.31s median task, 0.58s p95, originals hidden | `experiments/reports/phase8_release.json`, `corpus/phase8_eval/fixture.json` |
 | 2026-10-21 | Phase 9 external validation: frozen supported subset 35/35 with zero unsafe answers; independent model-authored literary breadth 0/12 with one unsafe answer; two automated raters (adequacy agreement 0.90/kappa 0.75, evidence 0.65/0.16); blind 10-probe hosted 70B-class comparison; failure taxonomy, limitations, and 10-document licence inventory published | `run_phase9_eval.py`, `experiments/v1_565_phase9_external.py`, `experiments/reports/phase9_external.json`, `docs/design_phase9_external.md`, `docs/phase9_failure_taxonomy.md`, `docs/phase9_limitations.md`, `corpus/phase9_eval/` |
+| 2026-10-21 | Phase 10 planned: grounded composer, clause-level answer verifier, composition memory in SQL, LLM examiner/judge/proposer loop, deterministic reward signal, conversation learning, gated code-patch tier. Prototype evidence recorded (held-out 21→33→48 of 54 correct, no hallucination on controls; composed-answer copy ratio 0.8; no new failures across 549 experiments for gate fixes `c8f8ef7`); gate open | `docs/design_phase10_generation_learning.md`, branch `exam-fixes` |
