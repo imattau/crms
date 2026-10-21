@@ -211,6 +211,54 @@
    "writes",
    "wrote",
    "written"
+  ],
+  "use": [
+   "use",
+   "uses",
+   "used",
+   "used"
+  ],
+  "utilize": [
+   "utilize",
+   "utilizes",
+   "utilized",
+   "utilized"
+  ],
+  "begin": [
+   "begin",
+   "begins",
+   "began",
+   "begun"
+  ],
+  "commence": [
+   "commence",
+   "commences",
+   "commenced",
+   "commenced"
+  ],
+  "buy": [
+   "buy",
+   "buys",
+   "bought",
+   "bought"
+  ],
+  "purchase": [
+   "purchase",
+   "purchases",
+   "purchased",
+   "purchased"
+  ],
+  "help": [
+   "help",
+   "helps",
+   "helped",
+   "helped"
+  ],
+  "assist": [
+   "assist",
+   "assists",
+   "assisted",
+   "assisted"
   ]
  },
  "agent_nouns": {
@@ -1260,5 +1308,67 @@
    }
   }
  ],
- "note": "Seed state exported from the Phase 11 prototype. Classes are corpus-induced (see support counts); specs were teacher-proposed and verified. Specs marked grandfathered predate the verifier and carry less evidence."
+ "note": "Seed state exported from the Phase 11 prototype. Classes are corpus-induced (see support counts); specs were teacher-proposed and verified. Specs marked grandfathered predate the verifier and carry less evidence.",
+ "rewrites": [
+  {
+   "kind": "phrase",
+   "source": "prior to",
+   "target": "before",
+   "rationale": "plain-language substitution carried over from the Phase 10 clarity rules"
+  },
+  {
+   "kind": "phrase",
+   "source": "in order to",
+   "target": "to",
+   "rationale": "Phase 10 clarity rule"
+  },
+  {
+   "kind": "phrase",
+   "source": "due to the fact that",
+   "target": "because",
+   "rationale": "Phase 10 clarity rule"
+  },
+  {
+   "kind": "phrase",
+   "source": "at this point in time",
+   "target": "now",
+   "rationale": "Phase 10 clarity rule"
+  },
+  {
+   "kind": "phrase",
+   "source": "in the event that",
+   "target": "if",
+   "rationale": "Phase 10 clarity rule"
+  },
+  {
+   "kind": "phrase",
+   "source": "a large number of",
+   "target": "many",
+   "rationale": "Phase 10 clarity rule"
+  },
+  {
+   "kind": "verb",
+   "source": "utilize",
+   "target": "use",
+   "rationale": "one rule covers utilize/utilizes/utilized/utilizing; replaces three listed forms"
+  },
+  {
+   "kind": "verb",
+   "source": "commence",
+   "target": "begin",
+   "rationale": "plain-language verb substitution, all inflections"
+  },
+  {
+   "kind": "verb",
+   "source": "purchase",
+   "target": "buy",
+   "rationale": "plain-language verb substitution, all inflections"
+  },
+  {
+   "kind": "verb",
+   "source": "assist",
+   "target": "help",
+   "rationale": "plain-language verb substitution, all inflections"
+  }
+ ]
 }

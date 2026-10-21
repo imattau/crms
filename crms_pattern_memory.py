@@ -86,6 +86,15 @@ class PatternMemory:
                 change_id INTEGER REFERENCES pat_change(change_id),
                 PRIMARY KEY(name, version)
             ) WITHOUT ROWID;
+            CREATE TABLE IF NOT EXISTS pat_rewrite (
+                name TEXT PRIMARY KEY,
+                kind TEXT NOT NULL CHECK(kind IN ('phrase','verb')),
+                source TEXT NOT NULL,
+                target TEXT NOT NULL,
+                rationale TEXT NOT NULL DEFAULT '',
+                origin TEXT NOT NULL,
+                status TEXT NOT NULL CHECK(status IN ('accepted','rejected','retired'))
+            ) WITHOUT ROWID;
             CREATE TABLE IF NOT EXISTS pat_param (
                 name TEXT NOT NULL,
                 version INTEGER NOT NULL,
@@ -150,6 +159,20 @@ class PatternMemory:
         for r in self.connection.execute("SELECT cls,member,support FROM pat_class"):
             classes.setdefault(r["cls"], {})[r["member"]] = r["support"]
         return PatternLanguage(verbs=verbs, agent_nouns=agents, classes=classes)
+
+    # --------------------------------------------------------- rewrites
+    def put_rewrite(self, kind: str, source: str, target: str, *, origin: str,
+                    rationale: str = "", status: str = "accepted") -> None:
+        if origin not in ORIGINS:
+            raise PatternMemoryError(f"unknown origin: {origin!r}")
+        self.connection.execute(
+            "INSERT OR REPLACE INTO pat_rewrite VALUES(?,?,?,?,?,?,?)",
+            (f"{kind}:{source}", kind, source, target, rationale, origin, status))
+
+    def rewrites(self):
+        from crms_pattern_rewrite import Rewrite
+        return [Rewrite(r["kind"], r["source"], r["target"]) for r in self.connection.execute(
+            "SELECT kind,source,target FROM pat_rewrite WHERE status='accepted' ORDER BY kind,source")]
 
     # ----------------------------------------------------------- params
     def set_param(self, name: str, value: float, *, origin: str, rationale: str = "",
@@ -231,6 +254,9 @@ class PatternMemory:
                 self.put_class_member(cls, member, int(info["support"]), info["origin"])
         for name, value in payload["params"].items():
             self.set_param(name, value, origin="seed", rationale="seed value")
+        for row in payload.get("rewrites", ()):
+            self.put_rewrite(row["kind"], row["source"], row["target"],
+                             origin=row.get("origin", "teacher"), rationale=row.get("rationale", ""))
         count = 0
         for raw in payload["specs"]:
             raw = expand(dict(raw))

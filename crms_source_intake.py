@@ -6,26 +6,15 @@ is kept only when its answer span really occurs in its source sentence.
 """
 from __future__ import annotations
 
-from functools import lru_cache
 import re
 import sqlite3
 from typing import Any, Iterable, Sequence
 
 from crms_generation import Fact
-from crms_pattern_memory import PatternMemory
+from crms_pattern_defaults import seeded_resources
 from crms_pattern_sources import ListSentenceSource
 from crms_relation_specs import RelationEngine
 from crms_research import _sentence_spans
-
-
-@lru_cache(maxsize=1)
-def _seeded_resources() -> tuple[Any, tuple, dict]:
-    """Seed an in-memory pattern store once; return language, specs, params."""
-    memory = PatternMemory(":memory:")
-    memory.seed()
-    resources = (memory.language(), tuple(memory.specs()), memory.params())
-    memory.close()
-    return resources
 
 
 def split_sentences(documents: Iterable[tuple[str, str]]) -> list[tuple[str, str]]:
@@ -41,7 +30,7 @@ def split_sentences(documents: Iterable[tuple[str, str]]) -> list[tuple[str, str
 def intake_facts(questions: Sequence[Any], documents: Iterable[tuple[str, str]], *,
                  prefix: str = "intake") -> tuple[list[Fact], list[dict[str, Any]]]:
     """Return (facts, report). The report lists every question, answered or not."""
-    language, specs, params = _seeded_resources()
+    language, specs, params, _rewrites = seeded_resources()
     source = ListSentenceSource(split_sentences(documents))
     engine = RelationEngine(language, specs, source, params)
     facts: list[Fact] = []

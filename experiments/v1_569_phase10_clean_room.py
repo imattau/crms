@@ -14,9 +14,16 @@ sys.path.insert(0, str(PROJECT))
 
 from run_phase10_eval import FIXTURE, REPORT, evaluate_fixture  # noqa: E402
 
+# Phase 11: the clarity pass and critic use the pattern layer, so the clean
+# room must carry those modules and the visible pattern seed too.
 MODULES = ("crms_generation.py", "crms_generation_rules.py",
-           "run_phase10_eval.py")
+           "crms_generation_checks.py", "crms_pattern_defaults.py",
+           "crms_pattern_memory.py", "crms_pattern_rewrite.py",
+           "crms_patterns.py", "crms_pattern_ranker.py",
+           "crms_pattern_transforms.py", "crms_relation_specs.py",
+           "crms_spec_verifier.py", "run_phase10_eval.py")
 RULES = PROJECT / "crms_generation_rules.json"
+PATTERN_SEED = PROJECT / "crms_pattern_seed.json"
 CLEAN_REPORT = PROJECT / "experiments" / "reports" / "phase10_clean_room.json"
 
 
@@ -40,6 +47,7 @@ def main() -> None:
         for name in MODULES:
             shutil.copy2(PROJECT / name, root / name)
         shutil.copy2(RULES, root / RULES.name)
+        shutil.copy2(PATTERN_SEED, root / PATTERN_SEED.name)
         fixture_dir = root / "corpus" / "phase10_eval"
         fixture_dir.mkdir(parents=True)
         shutil.copy2(FIXTURE, fixture_dir / "fixture.json")

@@ -642,6 +642,17 @@ class ClarityRewriter:
         self.jargon = tuple(str(item) for item in
                             rules.clarity.get("jargon_terms", ()))
         self.max_words = int(rules.clarity.get("max_sentence_words", 32))
+        # Phase 11: matching runs over tokens (whole words, every verb inflection,
+        # capitalisation kept) instead of regex substitution.
+        from crms_pattern_defaults import seeded_resources
+        from crms_pattern_rewrite import PatternRewriter, Rewrite
+        language, _specs, _params, seeded = seeded_resources()
+        listed = {("phrase", source.casefold()) for source in self.replacements}
+        extra = [r for r in seeded if (r.kind, r.source.casefold()) not in listed]
+        self.pattern_rewriter = PatternRewriter(
+            language,
+            [Rewrite("phrase", source, target)
+             for source, target in self.replacements.items()] + extra)
 
     def rewrite(self, text: str, request: GenerationRequest
                 ) -> tuple[str, tuple[str, ...]]:
@@ -651,10 +662,7 @@ class ClarityRewriter:
         paragraphs: list[str] = []
         for paragraph in text.split("\n\n"):
             rewritten = _normalize_space(paragraph)
-            for source, target in self.replacements.items():
-                rewritten = re.sub(
-                    r"\b" + re.escape(source) + r"\b", target, rewritten,
-                    flags=re.IGNORECASE)
+            rewritten = self.pattern_rewriter.rewrite(rewritten)
             sentences = [item for item in _SENTENCE.split(rewritten) if item]
             output: list[str] = []
             for sentence in sentences:
@@ -674,8 +682,7 @@ class ClarityRewriter:
                 paragraphs.append(" ".join(output))
         rewritten_all = " ".join(paragraphs)
         for term in self.jargon:
-            if re.search(r"\b" + re.escape(term) + r"\b", rewritten_all,
-                         flags=re.IGNORECASE):
+            if self.pattern_rewriter.contains(rewritten_all, term):
                 issues.append(f"uncleared jargon: {term}")
         return "\n\n".join(paragraphs), tuple(issues)
 
@@ -741,6 +748,10 @@ class Critic:
             issues.append(f"average sentence words {avg_words:.1f} exceeds limit")
         if copy > 0.75:
             issues.append(f"copy ratio {copy:.2f} exceeds first-slice limit")
+        from crms_generation_checks import check_generated
+        from crms_pattern_defaults import seeded_resources
+        issues.extend(check_generated(text, request.facts, seeded_resources()[0],
+                                      sources))
         passed = not issues
         score = (
             coverage * 0.45
