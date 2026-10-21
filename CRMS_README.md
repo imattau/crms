@@ -1688,6 +1688,27 @@ Scorecard: `docs/phase9_scorecard.md`. Licence inventory:
 `corpus/phase9_eval/licence_inventory.json` covers four public-domain Project
 Gutenberg excerpts and six project-authored fact sheets.
 
+### Rule-only generation (Phase 10 start)
+
+Phase 10 replaces whole-sentence composition with a visible generation stack:
+content plan, discourse plan, sentence plan, construction realizer, clarity
+pass, and critic/search. No LLM or network is used at generation time.
+
+```text
+python3 run_phase10_eval.py
+```
+
+The frozen first slice covers explanation, comparison, procedure, analysis, and
+summary, plus abstention and clarification controls. Current result: **7/7**
+cases, mean copy ratio **0.00**, five of ten declared genres tested. The full
+Phase 10 gate (300 blind prompts, two source-disjoint corpora, human clarity
+calibration, SQL rule lifecycle, teacher rule induction, clean room, and 70B
+comparison) remains open.
+
+Rules: `crms_generation_rules.json`. Engine: `crms_generation.py`. Report:
+`experiments/reports/phase10_generation.json`. Design:
+`docs/design_phase10_generation_learning.md`.
+
 `/suggest-corpus-alignments` adds a corpus-only path for alternate predicate
 wording. It proposes an alignment only when the same distinct subject/object
 pairs are independently parsed under both predicates in separate documents.

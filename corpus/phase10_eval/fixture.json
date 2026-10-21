@@ -1,0 +1,536 @@
+{
+  "format": "crms-phase10-generation",
+  "version": 1,
+  "frozen": "2026-10-21",
+  "description": "Frozen first-slice Phase 10 rule-only generation fixture. Facts are structured propositions with source spans; source documents use different wording so copy ratio measures realization rather than sentence selection.",
+  "cases": [
+    {
+      "id": "explain-sky",
+      "genre": "explanation",
+      "prompt": "Explain why the sky is blue.",
+      "audience": "general",
+      "style": "plain",
+      "source_documents": [
+        {
+          "name": "sky.txt",
+          "text": "During the day the sky appears blue. Sunlight is made of many colours. Gases in the air deflect short wavelengths more than long ones. Blue is a short-wavelength colour. That scattered blue reaches the eye from every direction. The effect is known as Rayleigh scattering. Near sunset sunlight crosses more air. The same effect explains the changing colours at sunset."
+        }
+      ],
+      "facts": [
+        {
+          "fact_id": "answer",
+          "subject": "The sky",
+          "verb": "looks",
+          "complement": "blue because the atmosphere scatters blue light more strongly than red light",
+          "role": "answer",
+          "source": "sky.txt",
+          "span": "s1",
+          "source_text": "During the day the sky appears blue.",
+          "order": 0
+        },
+        {
+          "fact_id": "sun",
+          "subject": "Sunlight",
+          "verb": "contains",
+          "object": "all colours",
+          "role": "mechanism",
+          "source": "sky.txt",
+          "span": "s2",
+          "source_text": "Sunlight is made of many colours.",
+          "order": 1
+        },
+        {
+          "fact_id": "scatter",
+          "subject": "The atmosphere",
+          "verb": "scatters",
+          "object": "short wavelengths",
+          "complement": "more strongly than long wavelengths",
+          "role": "mechanism",
+          "source": "sky.txt",
+          "span": "s3",
+          "source_text": "Gases in the air deflect short wavelengths more than long ones.",
+          "order": 2
+        },
+        {
+          "fact_id": "cause",
+          "subject": "Blue light",
+          "verb": "has",
+          "object": "a short wavelength",
+          "role": "cause",
+          "source": "sky.txt",
+          "span": "s4",
+          "source_text": "Blue is a short-wavelength colour.",
+          "order": 3
+        },
+        {
+          "fact_id": "effect",
+          "subject": "it",
+          "verb": "is scattered",
+          "complement": "across the sky",
+          "role": "consequence",
+          "source": "sky.txt",
+          "span": "s5",
+          "source_text": "That scattered blue reaches the eye from every direction.",
+          "order": 4
+        },
+        {
+          "fact_id": "definition",
+          "subject": "This scattering",
+          "verb": "is called",
+          "object": "Rayleigh scattering",
+          "role": "definition",
+          "source": "sky.txt",
+          "span": "s6",
+          "source_text": "The effect is known as Rayleigh scattering.",
+          "order": 5
+        },
+        {
+          "fact_id": "sunset",
+          "subject": "Light",
+          "verb": "travels",
+          "complement": "through more atmosphere at sunset",
+          "role": "caveat",
+          "source": "sky.txt",
+          "span": "s7",
+          "source_text": "Near sunset sunlight crosses more air.",
+          "order": 6
+        },
+        {
+          "fact_id": "sunset2",
+          "subject": "Blue light",
+          "verb": "is scattered away",
+          "complement": "and leaves reds and oranges",
+          "role": "caveat",
+          "source": "sky.txt",
+          "span": "s9",
+          "source_text": "At sunset the blue is removed and warmer colours remain.",
+          "order": 7
+        },
+        {
+          "fact_id": "summary",
+          "subject": "This",
+          "verb": "is",
+          "complement": "why the sky looks blue during the day and red at sunset",
+          "role": "summary",
+          "source": "sky.txt",
+          "span": "s8",
+          "source_text": "The same effect explains the changing colours at sunset.",
+          "order": 8
+        }
+      ],
+      "checks": {
+        "status": "ok",
+        "min_sentences": 5,
+        "min_paragraphs": 2,
+        "contains": [
+          "Rayleigh scattering",
+          "Because"
+        ],
+        "max_copy_ratio": 0.75,
+        "max_sentence_words": 32,
+        "require_evidence": true
+      }
+    },
+    {
+      "id": "compare-energy",
+      "genre": "comparison",
+      "prompt": "Compare solar and wind power.",
+      "audience": "general",
+      "style": "plain",
+      "source_documents": [
+        {
+          "name": "energy.txt",
+          "text": "Solar panels turn sunlight into electricity. Wind turbines convert moving air into electricity. Solar output depends on sun and cloud. Wind output depends on how fast the wind blows. Solar farms need a lot of space. Wind farms can coexist with agriculture. Combining the two sources can smooth output."
+        }
+      ],
+      "facts": [
+        {
+          "fact_id": "s1",
+          "subject": "Solar power",
+          "verb": "produces",
+          "object": "electricity from sunlight",
+          "role": "criterion_a",
+          "source": "energy.txt",
+          "source_text": "Solar panels turn sunlight into electricity."
+        },
+        {
+          "fact_id": "w1",
+          "subject": "Wind power",
+          "verb": "produces",
+          "object": "electricity from moving air",
+          "role": "criterion_b",
+          "source": "energy.txt",
+          "source_text": "Wind turbines convert moving air into electricity."
+        },
+        {
+          "fact_id": "s2",
+          "subject": "Solar output",
+          "verb": "varies",
+          "complement": "with daylight and weather",
+          "role": "limitation_a",
+          "source": "energy.txt",
+          "source_text": "Solar output depends on sun and cloud."
+        },
+        {
+          "fact_id": "w2",
+          "subject": "Wind output",
+          "verb": "varies",
+          "complement": "with wind speed",
+          "role": "limitation_b",
+          "source": "energy.txt",
+          "source_text": "Wind output depends on how fast the wind blows."
+        },
+        {
+          "fact_id": "s3",
+          "subject": "Solar farms",
+          "verb": "require",
+          "object": "large areas of land",
+          "role": "criterion_a",
+          "source": "energy.txt",
+          "source_text": "Solar farms need a lot of space."
+        },
+        {
+          "fact_id": "w3",
+          "subject": "Wind farms",
+          "verb": "can share",
+          "object": "land with farming",
+          "role": "criterion_b",
+          "source": "energy.txt",
+          "source_text": "Wind farms can coexist with agriculture."
+        },
+        {
+          "fact_id": "rec",
+          "subject": "A mix of solar and wind",
+          "verb": "can balance",
+          "object": "their different output patterns",
+          "role": "recommendation",
+          "source": "energy.txt",
+          "source_text": "Combining the two sources can smooth output."
+        }
+      ],
+      "checks": {
+        "status": "ok",
+        "min_sentences": 4,
+        "min_paragraphs": 2,
+        "contains": [
+          "whereas",
+          "Overall"
+        ],
+        "max_copy_ratio": 0.75,
+        "max_sentence_words": 32,
+        "require_evidence": true
+      }
+    },
+    {
+      "id": "procedure-tea",
+      "genre": "procedure",
+      "prompt": "How do I make tea?",
+      "audience": "general",
+      "style": "plain",
+      "source_documents": [
+        {
+          "name": "tea.txt",
+          "text": "Brewing tea is the aim. Gather tea, water and a cup. Warm the water without boiling it hard. Put leaves into the cup. Add the hot water. Leave it to steep. Over-steeping green tea makes it bitter. Check the strength before serving."
+        }
+      ],
+      "facts": [
+        {
+          "fact_id": "g",
+          "subject": "The goal",
+          "verb": "is",
+          "complement": "to brew a cup of tea",
+          "role": "goal",
+          "source": "tea.txt",
+          "source_text": "Brewing tea is the aim."
+        },
+        {
+          "fact_id": "p",
+          "subject": "You",
+          "verb": "need",
+          "object": "tea leaves, hot water, and a cup",
+          "role": "prerequisite",
+          "source": "tea.txt",
+          "source_text": "Gather tea, water and a cup."
+        },
+        {
+          "fact_id": "s1",
+          "subject": "",
+          "verb": "heat",
+          "object": "the water to just below boiling",
+          "role": "step",
+          "order": 1,
+          "source": "tea.txt",
+          "source_text": "Warm the water without boiling it hard."
+        },
+        {
+          "fact_id": "s2",
+          "subject": "",
+          "verb": "place",
+          "object": "the tea leaves in the cup",
+          "role": "step",
+          "order": 2,
+          "source": "tea.txt",
+          "source_text": "Put leaves into the cup."
+        },
+        {
+          "fact_id": "s3",
+          "subject": "",
+          "verb": "pour",
+          "object": "the hot water over the leaves",
+          "role": "step",
+          "order": 3,
+          "source": "tea.txt",
+          "source_text": "Add the hot water."
+        },
+        {
+          "fact_id": "s4",
+          "subject": "",
+          "verb": "steep",
+          "complement": "for three to five minutes",
+          "role": "step",
+          "order": 4,
+          "source": "tea.txt",
+          "source_text": "Leave it to steep."
+        },
+        {
+          "fact_id": "pit",
+          "subject": "",
+          "verb": "do not steep",
+          "object": "green tea for too long",
+          "complement": "or it becomes bitter",
+          "role": "pitfall",
+          "source": "tea.txt",
+          "source_text": "Over-steeping green tea makes it bitter."
+        },
+        {
+          "fact_id": "v",
+          "subject": "",
+          "verb": "taste",
+          "object": "the tea and adjust the strength if needed",
+          "role": "verification",
+          "source": "tea.txt",
+          "source_text": "Check the strength before serving."
+        }
+      ],
+      "checks": {
+        "status": "ok",
+        "min_sentences": 5,
+        "min_paragraphs": 2,
+        "contains": [
+          "First",
+          "Finally",
+          "Taste"
+        ],
+        "max_copy_ratio": 0.75,
+        "max_sentence_words": 32,
+        "require_evidence": true
+      }
+    },
+    {
+      "id": "analysis-remote",
+      "genre": "analysis",
+      "prompt": "Analyze the trade-offs of remote work.",
+      "audience": "general",
+      "style": "plain",
+      "source_documents": [
+        {
+          "name": "work.txt",
+          "text": "Remote work saves commuting and allows flexible hours. Many surveys find remote workers are more satisfied. Remote arrangements may reduce casual collaboration and mentoring. Whether remote work helps depends on the work and the people. Teams that seldom meet may become less creative. Hybrid work can keep flexibility and protect collaboration."
+        }
+      ],
+      "facts": [
+        {
+          "fact_id": "c",
+          "subject": "Remote work",
+          "verb": "can reduce",
+          "object": "commuting time and increase schedule flexibility",
+          "role": "claim",
+          "source": "work.txt",
+          "source_text": "Remote work saves commuting and allows flexible hours."
+        },
+        {
+          "fact_id": "e1",
+          "subject": "Surveys",
+          "verb": "often report",
+          "object": "higher satisfaction among remote workers",
+          "role": "evidence",
+          "source": "work.txt",
+          "source_text": "Many surveys find remote workers are more satisfied."
+        },
+        {
+          "fact_id": "e2",
+          "subject": "Remote work",
+          "verb": "can weaken",
+          "object": "informal collaboration and mentoring",
+          "role": "evidence",
+          "source": "work.txt",
+          "source_text": "Remote arrangements may reduce casual collaboration and mentoring."
+        },
+        {
+          "fact_id": "i",
+          "subject": "The net benefit",
+          "verb": "depends on",
+          "object": "the task and the team",
+          "role": "interpretation",
+          "source": "work.txt",
+          "source_text": "Whether remote work helps depends on the work and the people."
+        },
+        {
+          "fact_id": "cp",
+          "subject": "Some teams",
+          "verb": "lose",
+          "object": "creativity when they rarely meet in person",
+          "role": "counterpoint",
+          "source": "work.txt",
+          "source_text": "Teams that seldom meet may become less creative."
+        },
+        {
+          "fact_id": "con",
+          "subject": "A hybrid arrangement",
+          "verb": "can preserve",
+          "object": "flexibility while protecting collaboration",
+          "role": "conclusion",
+          "source": "work.txt",
+          "source_text": "Hybrid work can keep flexibility and protect collaboration."
+        }
+      ],
+      "checks": {
+        "status": "ok",
+        "min_sentences": 4,
+        "min_paragraphs": 2,
+        "contains": [
+          "However",
+          "Overall"
+        ],
+        "max_copy_ratio": 0.75,
+        "max_sentence_words": 32,
+        "require_evidence": true
+      }
+    },
+    {
+      "id": "summary-report",
+      "genre": "summary",
+      "prompt": "Summarize the report on remote work.",
+      "audience": "professional",
+      "style": "plain",
+      "source_documents": [
+        {
+          "name": "report.txt",
+          "text": "The study concludes that flexibility is a major benefit of remote work, though collaboration can suffer. Employee surveys point to greater satisfaction. Managers describe fewer informal mentoring moments. Outcomes vary by task and team. Combining office and remote days may retain the advantages."
+        }
+      ],
+      "facts": [
+        {
+          "fact_id": "main",
+          "subject": "The report",
+          "verb": "finds",
+          "object": "that remote work improves flexibility but can weaken collaboration",
+          "role": "main",
+          "source": "report.txt",
+          "source_text": "The report finds that remote work improves flexibility but can weaken collaboration."
+        },
+        {
+          "fact_id": "sup1",
+          "subject": "Surveys",
+          "verb": "report",
+          "object": "higher satisfaction among remote workers",
+          "role": "support",
+          "source": "report.txt",
+          "source_text": "Surveys report higher satisfaction among remote workers."
+        },
+        {
+          "fact_id": "sup2",
+          "subject": "Managers",
+          "verb": "report",
+          "object": "fewer informal mentoring moments",
+          "role": "support",
+          "source": "report.txt",
+          "source_text": "Managers report fewer informal mentoring moments."
+        },
+        {
+          "fact_id": "qual",
+          "subject": "The effect",
+          "verb": "depends on",
+          "object": "the task and the team",
+          "role": "qualification",
+          "source": "report.txt",
+          "source_text": "The effect depends on the task and the team."
+        },
+        {
+          "fact_id": "con",
+          "subject": "A hybrid arrangement",
+          "verb": "may preserve",
+          "object": "both benefits",
+          "role": "conclusion",
+          "source": "report.txt",
+          "source_text": "A hybrid arrangement may preserve both benefits."
+        }
+      ],
+      "checks": {
+        "status": "ok",
+        "min_sentences": 3,
+        "min_paragraphs": 1,
+        "contains": [
+          "In short"
+        ],
+        "max_copy_ratio": 0.75,
+        "max_sentence_words": 32,
+        "require_evidence": true
+      }
+    },
+    {
+      "id": "abstain-empty",
+      "genre": "explanation",
+      "prompt": "Explain a topic with no supplied facts.",
+      "audience": "general",
+      "style": "plain",
+      "source_documents": [],
+      "facts": [],
+      "checks": {
+        "status": "abstain",
+        "min_sentences": 0,
+        "min_paragraphs": 0,
+        "contains": [],
+        "max_copy_ratio": 0.0,
+        "max_sentence_words": 0,
+        "require_evidence": false
+      }
+    },
+    {
+      "id": "clarify-missing",
+      "genre": "explanation",
+      "prompt": "Explain the mechanism without a direct answer.",
+      "audience": "general",
+      "style": "plain",
+      "source_documents": [
+        {
+          "name": "sky.txt",
+          "text": "During the day the sky appears blue. Sunlight is made of many colours. Gases in the air deflect short wavelengths more than long ones. Blue is a short-wavelength colour. That scattered blue reaches the eye from every direction. The effect is known as Rayleigh scattering. Near sunset sunlight crosses more air. The same effect explains the changing colours at sunset."
+        }
+      ],
+      "facts": [
+        {
+          "fact_id": "scatter",
+          "subject": "The atmosphere",
+          "verb": "scatters",
+          "object": "short wavelengths",
+          "complement": "more strongly than long wavelengths",
+          "role": "mechanism",
+          "source": "sky.txt",
+          "source_text": "Gases in the air deflect short wavelengths more than long ones."
+        }
+      ],
+      "checks": {
+        "status": "clarify",
+        "min_sentences": 0,
+        "min_paragraphs": 0,
+        "contains": [
+          "direct_answer"
+        ],
+        "max_copy_ratio": 0.0,
+        "max_sentence_words": 0,
+        "require_evidence": false
+      }
+    }
+  ]
+}

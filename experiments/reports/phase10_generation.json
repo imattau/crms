@@ -1,0 +1,1463 @@
+{
+  "cases": [
+    {
+      "candidate_scores": [
+        {
+          "passed": true,
+          "score": 1.0,
+          "style": "plain"
+        },
+        {
+          "passed": true,
+          "score": 1.0,
+          "style": "concise"
+        },
+        {
+          "passed": true,
+          "score": 0.9,
+          "style": "explanatory"
+        }
+      ],
+      "content_plan": {
+        "genre": "explanation",
+        "missing": [],
+        "notes": [
+          "Every required move has at least one proposition."
+        ],
+        "sections": [
+          {
+            "facts": [
+              "answer"
+            ],
+            "move": "direct_answer",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "sun",
+              "scatter"
+            ],
+            "move": "mechanism",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "cause",
+              "effect"
+            ],
+            "move": "cause_effect",
+            "required": false,
+            "transition": null
+          },
+          {
+            "facts": [
+              "definition"
+            ],
+            "move": "definition",
+            "required": false,
+            "transition": null
+          },
+          {
+            "facts": [
+              "sunset",
+              "sunset2"
+            ],
+            "move": "caveat",
+            "required": false,
+            "transition": "However"
+          },
+          {
+            "facts": [
+              "summary"
+            ],
+            "move": "summary",
+            "required": false,
+            "transition": "In short"
+          }
+        ],
+        "status": "ok"
+      },
+      "critique": {
+        "avg_sentence_words": 10.25,
+        "copy_ratio": 0.0,
+        "coverage": 1.0,
+        "evidence_valid": true,
+        "issues": [],
+        "max_sentence_words": 16,
+        "multi_fact_sentences": 1,
+        "paragraph_count": 3,
+        "passed": true,
+        "score": 1.0,
+        "sentence_count": 8
+      },
+      "evidence": [
+        {
+          "fact_id": "answer",
+          "role": "answer",
+          "source": "sky.txt",
+          "span": "s1"
+        },
+        {
+          "fact_id": "sun",
+          "role": "mechanism",
+          "source": "sky.txt",
+          "span": "s2"
+        },
+        {
+          "fact_id": "scatter",
+          "role": "mechanism",
+          "source": "sky.txt",
+          "span": "s3"
+        },
+        {
+          "fact_id": "cause",
+          "role": "cause",
+          "source": "sky.txt",
+          "span": "s4"
+        },
+        {
+          "fact_id": "effect",
+          "role": "consequence",
+          "source": "sky.txt",
+          "span": "s5"
+        },
+        {
+          "fact_id": "definition",
+          "role": "definition",
+          "source": "sky.txt",
+          "span": "s6"
+        },
+        {
+          "fact_id": "sunset",
+          "role": "caveat",
+          "source": "sky.txt",
+          "span": "s7"
+        },
+        {
+          "fact_id": "sunset2",
+          "role": "caveat",
+          "source": "sky.txt",
+          "span": "s9"
+        },
+        {
+          "fact_id": "summary",
+          "role": "summary",
+          "source": "sky.txt",
+          "span": "s8"
+        }
+      ],
+      "failures": [],
+      "genre": "explanation",
+      "id": "explain-sky",
+      "passed": true,
+      "prompt": "Explain why the sky is blue.",
+      "sentence_plans": [
+        {
+          "fact_ids": [
+            "answer"
+          ],
+          "main": {
+            "complement": "blue because the atmosphere scatters blue light more strongly than red light",
+            "fact_id": "answer",
+            "object": "",
+            "source": "sky.txt",
+            "span": "s1",
+            "subject": "The sky",
+            "verb": "looks"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "sun"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "sun",
+            "object": "all colours",
+            "source": "sky.txt",
+            "span": "s2",
+            "subject": "Sunlight",
+            "verb": "contains"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "scatter"
+          ],
+          "main": {
+            "complement": "more strongly than long wavelengths",
+            "fact_id": "scatter",
+            "object": "short wavelengths",
+            "source": "sky.txt",
+            "span": "s3",
+            "subject": "The atmosphere",
+            "verb": "scatters"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "cause",
+            "effect"
+          ],
+          "main": {
+            "complement": "across the sky",
+            "fact_id": "effect",
+            "object": "",
+            "source": "sky.txt",
+            "span": "s5",
+            "subject": "it",
+            "verb": "is scattered"
+          },
+          "relation": "cause",
+          "subordinate": {
+            "complement": "",
+            "fact_id": "cause",
+            "object": "a short wavelength",
+            "source": "sky.txt",
+            "span": "s4",
+            "subject": "Blue light",
+            "verb": "has"
+          },
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "definition"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "definition",
+            "object": "Rayleigh scattering",
+            "source": "sky.txt",
+            "span": "s6",
+            "subject": "This scattering",
+            "verb": "is called"
+          },
+          "relation": "definition",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "sunset"
+          ],
+          "main": {
+            "complement": "through more atmosphere at sunset",
+            "fact_id": "sunset",
+            "object": "",
+            "source": "sky.txt",
+            "span": "s7",
+            "subject": "Light",
+            "verb": "travels"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": "However"
+        },
+        {
+          "fact_ids": [
+            "sunset2"
+          ],
+          "main": {
+            "complement": "and leaves reds and oranges",
+            "fact_id": "sunset2",
+            "object": "",
+            "source": "sky.txt",
+            "span": "s9",
+            "subject": "Blue light",
+            "verb": "is scattered away"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "summary"
+          ],
+          "main": {
+            "complement": "why the sky looks blue during the day and red at sunset",
+            "fact_id": "summary",
+            "object": "",
+            "source": "sky.txt",
+            "span": "s8",
+            "subject": "This",
+            "verb": "is"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": "In short"
+        }
+      ],
+      "status": "ok",
+      "style": "plain",
+      "text": "The sky looks blue because the atmosphere scatters blue light more strongly than red light. Sunlight contains all colours. The atmosphere scatters short wavelengths more strongly than long wavelengths.\n\nBecause blue light has a short wavelength, it is scattered across the sky. This scattering is called Rayleigh scattering.\n\nHowever, light travels through more atmosphere at sunset. Blue light is scattered away and leaves reds and oranges. In short, this is why the sky looks blue during the day and red at sunset."
+    },
+    {
+      "candidate_scores": [
+        {
+          "passed": true,
+          "score": 1.0,
+          "style": "plain"
+        },
+        {
+          "passed": true,
+          "score": 1.0,
+          "style": "concise"
+        },
+        {
+          "passed": true,
+          "score": 0.9,
+          "style": "explanatory"
+        }
+      ],
+      "content_plan": {
+        "genre": "comparison",
+        "missing": [],
+        "notes": [
+          "Every required move has at least one proposition."
+        ],
+        "sections": [
+          {
+            "facts": [
+              "s1",
+              "s3"
+            ],
+            "move": "criterion_a",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "w1",
+              "w3"
+            ],
+            "move": "criterion_b",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "s2",
+              "w2"
+            ],
+            "move": "contrast",
+            "required": false,
+            "transition": "By contrast"
+          },
+          {
+            "facts": [
+              "rec"
+            ],
+            "move": "recommendation",
+            "required": false,
+            "transition": "Overall"
+          }
+        ],
+        "status": "ok"
+      },
+      "critique": {
+        "avg_sentence_words": 9.33,
+        "copy_ratio": 0.0,
+        "coverage": 1.0,
+        "evidence_valid": true,
+        "issues": [],
+        "max_sentence_words": 16,
+        "multi_fact_sentences": 1,
+        "paragraph_count": 2,
+        "passed": true,
+        "score": 1.0,
+        "sentence_count": 6
+      },
+      "evidence": [
+        {
+          "fact_id": "s1",
+          "role": "criterion_a",
+          "source": "energy.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "w1",
+          "role": "criterion_b",
+          "source": "energy.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "s2",
+          "role": "limitation_a",
+          "source": "energy.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "w2",
+          "role": "limitation_b",
+          "source": "energy.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "s3",
+          "role": "criterion_a",
+          "source": "energy.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "w3",
+          "role": "criterion_b",
+          "source": "energy.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "rec",
+          "role": "recommendation",
+          "source": "energy.txt",
+          "span": ""
+        }
+      ],
+      "failures": [],
+      "genre": "comparison",
+      "id": "compare-energy",
+      "passed": true,
+      "prompt": "Compare solar and wind power.",
+      "sentence_plans": [
+        {
+          "fact_ids": [
+            "s1"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "s1",
+            "object": "electricity from sunlight",
+            "source": "energy.txt",
+            "span": "",
+            "subject": "Solar power",
+            "verb": "produces"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "s3"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "s3",
+            "object": "large areas of land",
+            "source": "energy.txt",
+            "span": "",
+            "subject": "Solar farms",
+            "verb": "require"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "w1"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "w1",
+            "object": "electricity from moving air",
+            "source": "energy.txt",
+            "span": "",
+            "subject": "Wind power",
+            "verb": "produces"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "w3"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "w3",
+            "object": "land with farming",
+            "source": "energy.txt",
+            "span": "",
+            "subject": "Wind farms",
+            "verb": "can share"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "s2",
+            "w2"
+          ],
+          "main": {
+            "complement": "with daylight and weather",
+            "fact_id": "s2",
+            "object": "",
+            "source": "energy.txt",
+            "span": "",
+            "subject": "Solar output",
+            "verb": "varies"
+          },
+          "relation": "contrast",
+          "subordinate": {
+            "complement": "with wind speed",
+            "fact_id": "w2",
+            "object": "",
+            "source": "energy.txt",
+            "span": "",
+            "subject": "Wind output",
+            "verb": "varies"
+          },
+          "transition": "By contrast"
+        },
+        {
+          "fact_ids": [
+            "rec"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "rec",
+            "object": "their different output patterns",
+            "source": "energy.txt",
+            "span": "",
+            "subject": "A mix of solar and wind",
+            "verb": "can balance"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": "Overall"
+        }
+      ],
+      "status": "ok",
+      "style": "plain",
+      "text": "Solar power produces electricity from sunlight. Solar farms require large areas of land. Wind power produces electricity from moving air. Wind farms can share land with farming.\n\nBy contrast, solar output varies with daylight and weather, whereas wind output varies with wind speed. Overall, a mix of solar and wind can balance their different output patterns."
+    },
+    {
+      "candidate_scores": [
+        {
+          "passed": true,
+          "score": 0.9,
+          "style": "plain"
+        },
+        {
+          "passed": true,
+          "score": 0.9,
+          "style": "explanatory"
+        },
+        {
+          "passed": true,
+          "score": 0.9,
+          "style": "concise"
+        }
+      ],
+      "content_plan": {
+        "genre": "procedure",
+        "missing": [],
+        "notes": [
+          "Every required move has at least one proposition."
+        ],
+        "sections": [
+          {
+            "facts": [
+              "g"
+            ],
+            "move": "goal",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "p"
+            ],
+            "move": "prerequisites",
+            "required": false,
+            "transition": null
+          },
+          {
+            "facts": [
+              "s1",
+              "s2",
+              "s3",
+              "s4"
+            ],
+            "move": "steps",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "pit"
+            ],
+            "move": "pitfall",
+            "required": false,
+            "transition": "Note"
+          },
+          {
+            "facts": [
+              "v"
+            ],
+            "move": "verification",
+            "required": false,
+            "transition": null
+          }
+        ],
+        "status": "ok"
+      },
+      "critique": {
+        "avg_sentence_words": 8.88,
+        "copy_ratio": 0.0,
+        "coverage": 1.0,
+        "evidence_valid": true,
+        "issues": [],
+        "max_sentence_words": 13,
+        "multi_fact_sentences": 0,
+        "paragraph_count": 3,
+        "passed": true,
+        "score": 0.9,
+        "sentence_count": 8
+      },
+      "evidence": [
+        {
+          "fact_id": "g",
+          "role": "goal",
+          "source": "tea.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "p",
+          "role": "prerequisite",
+          "source": "tea.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "s1",
+          "role": "step",
+          "source": "tea.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "s2",
+          "role": "step",
+          "source": "tea.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "s3",
+          "role": "step",
+          "source": "tea.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "s4",
+          "role": "step",
+          "source": "tea.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "pit",
+          "role": "pitfall",
+          "source": "tea.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "v",
+          "role": "verification",
+          "source": "tea.txt",
+          "span": ""
+        }
+      ],
+      "failures": [],
+      "genre": "procedure",
+      "id": "procedure-tea",
+      "passed": true,
+      "prompt": "How do I make tea?",
+      "sentence_plans": [
+        {
+          "fact_ids": [
+            "g"
+          ],
+          "main": {
+            "complement": "to brew a cup of tea",
+            "fact_id": "g",
+            "object": "",
+            "source": "tea.txt",
+            "span": "",
+            "subject": "The goal",
+            "verb": "is"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "p"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "p",
+            "object": "tea leaves, hot water, and a cup",
+            "source": "tea.txt",
+            "span": "",
+            "subject": "You",
+            "verb": "need"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "s1"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "s1",
+            "object": "the water to just below boiling",
+            "source": "tea.txt",
+            "span": "",
+            "subject": "",
+            "verb": "heat"
+          },
+          "relation": "sequence",
+          "subordinate": null,
+          "transition": "First"
+        },
+        {
+          "fact_ids": [
+            "s2"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "s2",
+            "object": "the tea leaves in the cup",
+            "source": "tea.txt",
+            "span": "",
+            "subject": "",
+            "verb": "place"
+          },
+          "relation": "sequence",
+          "subordinate": null,
+          "transition": "Then"
+        },
+        {
+          "fact_ids": [
+            "s3"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "s3",
+            "object": "the hot water over the leaves",
+            "source": "tea.txt",
+            "span": "",
+            "subject": "",
+            "verb": "pour"
+          },
+          "relation": "sequence",
+          "subordinate": null,
+          "transition": "Then"
+        },
+        {
+          "fact_ids": [
+            "s4"
+          ],
+          "main": {
+            "complement": "for three to five minutes",
+            "fact_id": "s4",
+            "object": "",
+            "source": "tea.txt",
+            "span": "",
+            "subject": "",
+            "verb": "steep"
+          },
+          "relation": "sequence",
+          "subordinate": null,
+          "transition": "Finally"
+        },
+        {
+          "fact_ids": [
+            "pit"
+          ],
+          "main": {
+            "complement": "or it becomes bitter",
+            "fact_id": "pit",
+            "object": "green tea for too long",
+            "source": "tea.txt",
+            "span": "",
+            "subject": "",
+            "verb": "do not steep"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": "Remember"
+        },
+        {
+          "fact_ids": [
+            "v"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "v",
+            "object": "the tea and adjust the strength if needed",
+            "source": "tea.txt",
+            "span": "",
+            "subject": "",
+            "verb": "taste"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        }
+      ],
+      "status": "ok",
+      "style": "plain",
+      "text": "The goal is to brew a cup of tea. You need tea leaves, hot water, and a cup.\n\nFirst, heat the water to just below boiling. Then, place the tea leaves in the cup. Then, pour the hot water over the leaves. Finally, steep for three to five minutes.\n\nRemember, do not steep green tea for too long or it becomes bitter. Taste the tea and adjust the strength if needed."
+    },
+    {
+      "candidate_scores": [
+        {
+          "passed": true,
+          "score": 0.9,
+          "style": "plain"
+        },
+        {
+          "passed": true,
+          "score": 0.9,
+          "style": "explanatory"
+        },
+        {
+          "passed": true,
+          "score": 0.9,
+          "style": "concise"
+        }
+      ],
+      "content_plan": {
+        "genre": "analysis",
+        "missing": [],
+        "notes": [
+          "Every required move has at least one proposition."
+        ],
+        "sections": [
+          {
+            "facts": [
+              "c"
+            ],
+            "move": "claim",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "e2",
+              "e1"
+            ],
+            "move": "evidence",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "i"
+            ],
+            "move": "interpretation",
+            "required": false,
+            "transition": null
+          },
+          {
+            "facts": [
+              "cp"
+            ],
+            "move": "counterpoint",
+            "required": false,
+            "transition": "However"
+          },
+          {
+            "facts": [
+              "con"
+            ],
+            "move": "conclusion",
+            "required": false,
+            "transition": "Overall"
+          }
+        ],
+        "status": "ok"
+      },
+      "critique": {
+        "avg_sentence_words": 9.5,
+        "copy_ratio": 0.0,
+        "coverage": 1.0,
+        "evidence_valid": true,
+        "issues": [],
+        "max_sentence_words": 11,
+        "multi_fact_sentences": 0,
+        "paragraph_count": 2,
+        "passed": true,
+        "score": 0.9,
+        "sentence_count": 6
+      },
+      "evidence": [
+        {
+          "fact_id": "c",
+          "role": "claim",
+          "source": "work.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "e1",
+          "role": "evidence",
+          "source": "work.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "e2",
+          "role": "evidence",
+          "source": "work.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "i",
+          "role": "interpretation",
+          "source": "work.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "cp",
+          "role": "counterpoint",
+          "source": "work.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "con",
+          "role": "conclusion",
+          "source": "work.txt",
+          "span": ""
+        }
+      ],
+      "failures": [],
+      "genre": "analysis",
+      "id": "analysis-remote",
+      "passed": true,
+      "prompt": "Analyze the trade-offs of remote work.",
+      "sentence_plans": [
+        {
+          "fact_ids": [
+            "c"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "c",
+            "object": "commuting time and increase schedule flexibility",
+            "source": "work.txt",
+            "span": "",
+            "subject": "Remote work",
+            "verb": "can reduce"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "e2"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "e2",
+            "object": "informal collaboration and mentoring",
+            "source": "work.txt",
+            "span": "",
+            "subject": "Remote work",
+            "verb": "can weaken"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "e1"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "e1",
+            "object": "higher satisfaction among remote workers",
+            "source": "work.txt",
+            "span": "",
+            "subject": "Surveys",
+            "verb": "often report"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "i"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "i",
+            "object": "the task and the team",
+            "source": "work.txt",
+            "span": "",
+            "subject": "The net benefit",
+            "verb": "depends on"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "cp"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "cp",
+            "object": "creativity when they rarely meet in person",
+            "source": "work.txt",
+            "span": "",
+            "subject": "Some teams",
+            "verb": "lose"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": "However"
+        },
+        {
+          "fact_ids": [
+            "con"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "con",
+            "object": "flexibility while protecting collaboration",
+            "source": "work.txt",
+            "span": "",
+            "subject": "A hybrid arrangement",
+            "verb": "can preserve"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": "Overall"
+        }
+      ],
+      "status": "ok",
+      "style": "plain",
+      "text": "Remote work can reduce commuting time and increase schedule flexibility. Remote work can weaken informal collaboration and mentoring. Surveys often report higher satisfaction among remote workers.\n\nThe net benefit depends on the task and the team. However, some teams lose creativity when they rarely meet in person. Overall, a hybrid arrangement can preserve flexibility while protecting collaboration."
+    },
+    {
+      "candidate_scores": [
+        {
+          "passed": true,
+          "score": 0.9,
+          "style": "plain"
+        },
+        {
+          "passed": true,
+          "score": 0.9,
+          "style": "explanatory"
+        },
+        {
+          "passed": true,
+          "score": 0.9,
+          "style": "concise"
+        }
+      ],
+      "content_plan": {
+        "genre": "summary",
+        "missing": [],
+        "notes": [
+          "Every required move has at least one proposition."
+        ],
+        "sections": [
+          {
+            "facts": [
+              "main"
+            ],
+            "move": "main_point",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "sup1",
+              "sup2"
+            ],
+            "move": "supporting",
+            "required": false,
+            "transition": null
+          },
+          {
+            "facts": [
+              "qual"
+            ],
+            "move": "qualification",
+            "required": false,
+            "transition": "However"
+          },
+          {
+            "facts": [
+              "con"
+            ],
+            "move": "conclusion",
+            "required": false,
+            "transition": "In short"
+          }
+        ],
+        "status": "ok"
+      },
+      "critique": {
+        "avg_sentence_words": 8.8,
+        "copy_ratio": 0.0,
+        "coverage": 1.0,
+        "evidence_valid": true,
+        "issues": [],
+        "max_sentence_words": 12,
+        "multi_fact_sentences": 0,
+        "paragraph_count": 2,
+        "passed": true,
+        "score": 0.9,
+        "sentence_count": 5
+      },
+      "evidence": [
+        {
+          "fact_id": "main",
+          "role": "main",
+          "source": "report.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "sup1",
+          "role": "support",
+          "source": "report.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "sup2",
+          "role": "support",
+          "source": "report.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "qual",
+          "role": "qualification",
+          "source": "report.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "con",
+          "role": "conclusion",
+          "source": "report.txt",
+          "span": ""
+        }
+      ],
+      "failures": [],
+      "genre": "summary",
+      "id": "summary-report",
+      "passed": true,
+      "prompt": "Summarize the report on remote work.",
+      "sentence_plans": [
+        {
+          "fact_ids": [
+            "main"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "main",
+            "object": "that remote work improves flexibility but can weaken collaboration",
+            "source": "report.txt",
+            "span": "",
+            "subject": "The report",
+            "verb": "finds"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "sup1"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "sup1",
+            "object": "higher satisfaction among remote workers",
+            "source": "report.txt",
+            "span": "",
+            "subject": "Surveys",
+            "verb": "report"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "sup2"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "sup2",
+            "object": "fewer informal mentoring moments",
+            "source": "report.txt",
+            "span": "",
+            "subject": "Managers",
+            "verb": "report"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "qual"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "qual",
+            "object": "the task and the team",
+            "source": "report.txt",
+            "span": "",
+            "subject": "The effect",
+            "verb": "depends on"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": "However"
+        },
+        {
+          "fact_ids": [
+            "con"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "con",
+            "object": "both benefits",
+            "source": "report.txt",
+            "span": "",
+            "subject": "A hybrid arrangement",
+            "verb": "may preserve"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": "In short"
+        }
+      ],
+      "status": "ok",
+      "style": "plain",
+      "text": "The report finds that remote work improves flexibility but can weaken collaboration. Surveys report higher satisfaction among remote workers. Managers report fewer informal mentoring moments.\n\nHowever, the effect depends on the task and the team. In short, a hybrid arrangement may preserve both benefits."
+    },
+    {
+      "candidate_scores": [],
+      "content_plan": {
+        "genre": "explanation",
+        "missing": [
+          "facts"
+        ],
+        "notes": [
+          "No source propositions were supplied."
+        ],
+        "sections": [],
+        "status": "abstain"
+      },
+      "critique": null,
+      "evidence": [],
+      "failures": [],
+      "genre": "explanation",
+      "id": "abstain-empty",
+      "passed": true,
+      "prompt": "Explain a topic with no supplied facts.",
+      "sentence_plans": [],
+      "status": "abstain",
+      "style": "plain",
+      "text": ""
+    },
+    {
+      "candidate_scores": [],
+      "content_plan": {
+        "genre": "explanation",
+        "missing": [
+          "direct_answer"
+        ],
+        "notes": [
+          "Missing required move(s): direct_answer."
+        ],
+        "sections": [
+          {
+            "facts": [
+              "scatter"
+            ],
+            "move": "mechanism",
+            "required": true,
+            "transition": null
+          }
+        ],
+        "status": "clarify"
+      },
+      "critique": null,
+      "evidence": [],
+      "failures": [],
+      "genre": "explanation",
+      "id": "clarify-missing",
+      "passed": true,
+      "prompt": "Explain the mechanism without a direct answer.",
+      "sentence_plans": [],
+      "status": "clarify",
+      "style": "plain",
+      "text": ""
+    }
+  ],
+  "coverage": {
+    "constructions_tested": [
+      "cause",
+      "contrast",
+      "definition",
+      "elaboration",
+      "sequence"
+    ],
+    "declared_genres": [
+      "analysis",
+      "argument",
+      "comparison",
+      "dialogue",
+      "explanation",
+      "narrative",
+      "procedure",
+      "professional",
+      "summary",
+      "technical_note"
+    ],
+    "moves_tested": [
+      "cause_effect",
+      "caveat",
+      "claim",
+      "conclusion",
+      "contrast",
+      "counterpoint",
+      "criterion_a",
+      "criterion_b",
+      "definition",
+      "direct_answer",
+      "evidence",
+      "goal",
+      "interpretation",
+      "main_point",
+      "mechanism",
+      "pitfall",
+      "prerequisites",
+      "qualification",
+      "recommendation",
+      "steps",
+      "summary",
+      "supporting",
+      "verification"
+    ],
+    "tested_genres": [
+      "analysis",
+      "comparison",
+      "explanation",
+      "procedure",
+      "summary"
+    ],
+    "untested_genres": [
+      "argument",
+      "dialogue",
+      "narrative",
+      "professional",
+      "technical_note"
+    ]
+  },
+  "first_slice_gate_passed": true,
+  "fixture_sha256": "d22e444e37b7a8b494cd5a981bc9c729ea028c8068f763525c825a4d3b0c920a",
+  "format": "crms-phase10-generation-report",
+  "frozen": "2026-10-21",
+  "gate": {
+    "abstention_and_clarification_present": true,
+    "all_cases_pass": true,
+    "mean_copy_ratio_below_0_5": true,
+    "no_llm_or_network_dependency": true,
+    "positive_generation_ok": true
+  },
+  "gate_passed": true,
+  "phase10_full_gate": {
+    "300_blind_prompts": false,
+    "70b_comparison": false,
+    "all_10_genres_tested": false,
+    "clean_room_release": false,
+    "human_clarity_calibration": false,
+    "judge_separation": false,
+    "sql_rule_lifecycle": false,
+    "teacher_rule_induction": false,
+    "two_source_disjoint_corpora": false
+  },
+  "phase10_full_gate_passed": false,
+  "rule_sha256": "a7cdc308ed470cfb8c428c36783b7bd3b3591a6083d8e691ffa217ab75512f7c",
+  "rules": {
+    "constructions": [
+      "cause",
+      "contrast",
+      "definition",
+      "elaboration",
+      "example",
+      "qualification",
+      "result",
+      "sequence"
+    ],
+    "digest": "a7cdc308ed470cfb8c428c36783b7bd3b3591a6083d8e691ffa217ab75512f7c",
+    "genres": [
+      "analysis",
+      "argument",
+      "comparison",
+      "dialogue",
+      "explanation",
+      "narrative",
+      "procedure",
+      "professional",
+      "summary",
+      "technical_note"
+    ],
+    "path": "/home/lostcause/workspace/crms/crms_generation_rules.json",
+    "styles": [
+      "concise",
+      "explanatory",
+      "plain"
+    ],
+    "transitions": [
+      "caveat",
+      "contrast",
+      "example",
+      "finally",
+      "first",
+      "note",
+      "recommendation",
+      "remember",
+      "summary",
+      "then"
+    ]
+  },
+  "summary": {
+    "cases": 7,
+    "completion": 1.0,
+    "failed": 0,
+    "max_copy_ratio": 0.0,
+    "mean_copy_ratio": 0.0,
+    "mean_sentences": 6.6,
+    "passed": 7
+  },
+  "version": 1
+}

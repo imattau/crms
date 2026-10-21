@@ -1,0 +1,556 @@
+{
+  "format": "crms-generation-rules",
+  "version": 1,
+  "frozen": "2026-10-21",
+  "description": "Seed rule set for the Phase 10 rule-only generation stack. Genre schemas select rhetorical moves; constructions realize clauses. No content templates and no model weights.",
+  "genres": {
+    "explanation": {
+      "moves": [
+        {
+          "name": "direct_answer",
+          "required": true,
+          "roles": [
+            "answer",
+            "claim"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "mechanism",
+          "required": true,
+          "roles": [
+            "mechanism"
+          ],
+          "max_facts": 2
+        },
+        {
+          "name": "cause_effect",
+          "required": false,
+          "roles": [
+            "cause",
+            "consequence"
+          ],
+          "max_facts": 2
+        },
+        {
+          "name": "definition",
+          "required": false,
+          "roles": [
+            "definition"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "caveat",
+          "required": false,
+          "roles": [
+            "caveat",
+            "limitation"
+          ],
+          "max_facts": 2,
+          "transition": "However"
+        },
+        {
+          "name": "summary",
+          "required": false,
+          "roles": [
+            "summary",
+            "conclusion"
+          ],
+          "max_facts": 1,
+          "transition": "In short"
+        }
+      ],
+      "paragraph_breaks_after": [
+        "mechanism",
+        "definition"
+      ]
+    },
+    "comparison": {
+      "moves": [
+        {
+          "name": "framing",
+          "required": false,
+          "roles": [
+            "framing",
+            "claim"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "criterion_a",
+          "required": true,
+          "roles": [
+            "criterion_a"
+          ],
+          "max_facts": 2
+        },
+        {
+          "name": "criterion_b",
+          "required": true,
+          "roles": [
+            "criterion_b"
+          ],
+          "max_facts": 2
+        },
+        {
+          "name": "contrast",
+          "required": false,
+          "roles": [
+            "limitation_a",
+            "limitation_b",
+            "contrast"
+          ],
+          "max_facts": 2,
+          "transition": "By contrast"
+        },
+        {
+          "name": "recommendation",
+          "required": false,
+          "roles": [
+            "recommendation",
+            "conclusion"
+          ],
+          "max_facts": 1,
+          "transition": "Overall"
+        }
+      ],
+      "paragraph_breaks_after": [
+        "criterion_b"
+      ]
+    },
+    "procedure": {
+      "moves": [
+        {
+          "name": "goal",
+          "required": true,
+          "roles": [
+            "goal"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "prerequisites",
+          "required": false,
+          "roles": [
+            "prerequisite"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "steps",
+          "required": true,
+          "roles": [
+            "step"
+          ],
+          "max_facts": 8
+        },
+        {
+          "name": "pitfall",
+          "required": false,
+          "roles": [
+            "pitfall",
+            "caveat"
+          ],
+          "max_facts": 1,
+          "transition": "Note"
+        },
+        {
+          "name": "verification",
+          "required": false,
+          "roles": [
+            "verification"
+          ],
+          "max_facts": 1
+        }
+      ],
+      "paragraph_breaks_after": [
+        "prerequisites",
+        "steps"
+      ]
+    },
+    "analysis": {
+      "moves": [
+        {
+          "name": "claim",
+          "required": true,
+          "roles": [
+            "claim",
+            "thesis"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "evidence",
+          "required": true,
+          "roles": [
+            "evidence"
+          ],
+          "max_facts": 3
+        },
+        {
+          "name": "interpretation",
+          "required": false,
+          "roles": [
+            "interpretation"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "counterpoint",
+          "required": false,
+          "roles": [
+            "counterpoint",
+            "limitation"
+          ],
+          "max_facts": 1,
+          "transition": "However"
+        },
+        {
+          "name": "conclusion",
+          "required": false,
+          "roles": [
+            "conclusion",
+            "recommendation"
+          ],
+          "max_facts": 1,
+          "transition": "Overall"
+        }
+      ],
+      "paragraph_breaks_after": [
+        "evidence"
+      ]
+    },
+    "summary": {
+      "moves": [
+        {
+          "name": "main_point",
+          "required": true,
+          "roles": [
+            "main",
+            "summary"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "supporting",
+          "required": false,
+          "roles": [
+            "support",
+            "evidence"
+          ],
+          "max_facts": 3
+        },
+        {
+          "name": "qualification",
+          "required": false,
+          "roles": [
+            "qualification",
+            "caveat"
+          ],
+          "max_facts": 1,
+          "transition": "However"
+        },
+        {
+          "name": "conclusion",
+          "required": false,
+          "roles": [
+            "conclusion"
+          ],
+          "max_facts": 1,
+          "transition": "In short"
+        }
+      ],
+      "paragraph_breaks_after": [
+        "supporting"
+      ]
+    },
+    "argument": {
+      "moves": [
+        {
+          "name": "thesis",
+          "required": true,
+          "roles": [
+            "thesis",
+            "claim"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "reasons",
+          "required": true,
+          "roles": [
+            "reason",
+            "evidence"
+          ],
+          "max_facts": 3
+        },
+        {
+          "name": "objection",
+          "required": false,
+          "roles": [
+            "objection",
+            "counterpoint"
+          ],
+          "max_facts": 1,
+          "transition": "However"
+        },
+        {
+          "name": "response",
+          "required": false,
+          "roles": [
+            "response"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "conclusion",
+          "required": false,
+          "roles": [
+            "conclusion"
+          ],
+          "max_facts": 1,
+          "transition": "Overall"
+        }
+      ],
+      "paragraph_breaks_after": [
+        "reasons"
+      ]
+    },
+    "professional": {
+      "moves": [
+        {
+          "name": "purpose",
+          "required": true,
+          "roles": [
+            "purpose",
+            "claim"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "context",
+          "required": false,
+          "roles": [
+            "context"
+          ],
+          "max_facts": 2
+        },
+        {
+          "name": "action",
+          "required": true,
+          "roles": [
+            "action",
+            "recommendation"
+          ],
+          "max_facts": 3
+        },
+        {
+          "name": "closing",
+          "required": false,
+          "roles": [
+            "closing"
+          ],
+          "max_facts": 1
+        }
+      ],
+      "paragraph_breaks_after": [
+        "context"
+      ]
+    },
+    "narrative": {
+      "moves": [
+        {
+          "name": "setup",
+          "required": true,
+          "roles": [
+            "setup"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "inciting",
+          "required": true,
+          "roles": [
+            "inciting"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "escalation",
+          "required": true,
+          "roles": [
+            "escalation"
+          ],
+          "max_facts": 2
+        },
+        {
+          "name": "climax",
+          "required": true,
+          "roles": [
+            "climax"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "resolution",
+          "required": true,
+          "roles": [
+            "resolution"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "change",
+          "required": false,
+          "roles": [
+            "change"
+          ],
+          "max_facts": 1
+        }
+      ],
+      "paragraph_breaks_after": [
+        "inciting",
+        "climax"
+      ]
+    },
+    "technical_note": {
+      "moves": [
+        {
+          "name": "purpose",
+          "required": true,
+          "roles": [
+            "purpose",
+            "claim"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "context",
+          "required": false,
+          "roles": [
+            "context"
+          ],
+          "max_facts": 2
+        },
+        {
+          "name": "steps",
+          "required": true,
+          "roles": [
+            "step",
+            "procedure"
+          ],
+          "max_facts": 6
+        },
+        {
+          "name": "caveat",
+          "required": false,
+          "roles": [
+            "caveat",
+            "limitation"
+          ],
+          "max_facts": 1,
+          "transition": "Note"
+        }
+      ],
+      "paragraph_breaks_after": [
+        "context",
+        "steps"
+      ]
+    },
+    "dialogue": {
+      "moves": [
+        {
+          "name": "acknowledgement",
+          "required": false,
+          "roles": [
+            "acknowledgement"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "answer",
+          "required": true,
+          "roles": [
+            "answer",
+            "claim"
+          ],
+          "max_facts": 1
+        },
+        {
+          "name": "follow_up",
+          "required": false,
+          "roles": [
+            "follow_up"
+          ],
+          "max_facts": 1
+        }
+      ],
+      "paragraph_breaks_after": [
+        "answer"
+      ]
+    }
+  },
+  "constructions": {
+    "definition": "{subject} {verb} {object}.",
+    "cause": "Because {subordinate}, {main}.",
+    "result": "{main}, so {subordinate}.",
+    "contrast": "{main}, whereas {subordinate}.",
+    "example": "{main}. For example, {subordinate}.",
+    "sequence": "{transition}, {main}.",
+    "qualification": "However, {main}.",
+    "elaboration": "{main}."
+  },
+  "transitions": {
+    "first": "First",
+    "then": "Then",
+    "finally": "Finally",
+    "example": "For example",
+    "contrast": "By contrast",
+    "summary": "In short",
+    "recommendation": "Overall",
+    "caveat": "However",
+    "note": "Note",
+    "remember": "Remember"
+  },
+  "clarity": {
+    "max_sentence_words": 32,
+    "max_average_sentence_words": 24,
+    "replacements": {
+      "utilize": "use",
+      "utilizes": "uses",
+      "utilized": "used",
+      "prior to": "before",
+      "in order to": "to",
+      "due to the fact that": "because",
+      "at this point in time": "now",
+      "in the event that": "if",
+      "a large number of": "many"
+    },
+    "jargon_terms": [
+      "utilize",
+      "utilizes",
+      "prior to",
+      "in order to",
+      "due to the fact that",
+      "at this point in time"
+    ]
+  },
+  "styles": {
+    "plain": {
+      "max_sentence_words": 26,
+      "include_transitions": true,
+      "fuse": true
+    },
+    "concise": {
+      "max_sentence_words": 22,
+      "include_transitions": false,
+      "fuse": true
+    },
+    "explanatory": {
+      "max_sentence_words": 32,
+      "include_transitions": true,
+      "fuse": false
+    }
+  }
+}
