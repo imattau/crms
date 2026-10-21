@@ -100,7 +100,7 @@ procedures; portable SQLite model; 533 regression experiments.
 | Dialogue state is ad hoc | Many targeted fixes; no typed discourse model | Phase 1 |
 | Correction lacks a dependency graph | Fingerprint revalidation, no reverse index | Phase 4 |
 | Learning is fragmented and unmeasured | Procedures, frames, rules, and primitives each have separate ad-hoc stores; no lifecycle, registry, utility accounting, or compounding measurement | §5 rule registry, all phases |
-| Domains are narrow prototypes | Math, code, translation are bounded slices | Phase 6 |
+| Domains are narrow prototypes | Phase 6 measures bounded math/code/translation/creative/cross-domain slices; wider coverage remains | Phase 6 lane plus later domain work |
 | Corpus skew | Project + arXiv abstracts + SimpleWiki; little code/docs/books | Phase 7 corpus program |
 | Distribution unproven end to end | Partial copied-model slices | Phase 8 |
 | Scale ceiling unknown | Depth-4 search ~95 s; canonicalizer hot spot | Phase 8 |
@@ -536,6 +536,20 @@ evidence policy → repair behaviour → scorecard integration.
 **Gate per slice:** ≥80% held-out completion, zero confident wrong outputs,
 provenance present, repair demonstrated, cost reported.
 
+**Status (2026-10-21): bounded Phase 6 lane passed.** Five slices are measured
+against a frozen 90-task fixture: math (20), coding (20), translation (20),
+creative (20), and cross-domain (10 two-step tasks). Every slice completed
+20/20 or 10/10 with zero confident wrong outputs, all 15 negative controls
+abstained, every answer carried provenance, and each slice demonstrated a
+repair. Median/p95 costs were: math 0.04/0.10 ms, coding 14.48/18.53 ms,
+translation 0.01/0.02 ms, creative 0.03/0.06 ms, cross-domain 0.08/0.16 ms.
+The slice adds exact word problems, rational inequalities, unique 2x2 systems,
+a typed list-operation code IR with static checks and sandboxed execution,
+agreement-aware English->Spanish translation with registers, a constraint story
+planner with an independent rubric, and two-stage task-IR plans. 47 domain rules
+are active; retiring a code operation abstains and rollback restores it.
+Runtime chat wiring for the expanded slices remains a follow-up.
+
 ### Phase 7 — Corpus program (weeks 18–48, continuous)
 
 **Goal:** exposure breadth comparable in *kind* to a general assistant's
@@ -714,12 +728,18 @@ redesigned or dropped.
    (`crms_constructions.py`, `crms_morphology.py`,
    `crms_construction_ranker.py`, `experiments/reports/phase5_constructions.json`);
    runtime chat routing and broader open-domain constructions remain follow-ups.
-12. **Corpus manifest v0** — inventory of candidate sources, licences, sizes,
+12. **Phase 6 domain breadth** — math word problems/inequalities/systems,
+   typed code IR with static checks and sandboxing, agreement-aware
+   translation, constraint creative planning, and two-stage task-IR composition.
+   — done for the frozen lane (`crms_domains.py`,
+   `experiments/reports/phase6_domains.json`); runtime chat wiring and wider
+   domain coverage remain follow-ups.
+13. **Corpus manifest v0** — inventory of candidate sources, licences, sizes,
    and domain targets. — done
    (`corpus/manifest_v0.json`, `docs/corpus_manifest.md`,
    `experiments/v1_557_corpus_manifest.py`); 20 candidate groups, 4 documented
    exclusions, and a 94.5M-word core planning estimate.
-13. **Consolidate plan docs** — this file is canonical; link the others as
+14. **Consolidate plan docs** — this file is canonical; link the others as
    history. — canonical status recorded; remaining docs still need pruning.
 
 ---
@@ -764,3 +784,5 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Phase 4 gate measured: 100% correction propagation (5/5), bad derivation contested, compounding 0/12→12/12 with zero confident errors, skeleton transfer 0/4→4/4, disjoint plateau 0/4, provenance/trust across copied model state, bounded dependency storage | `experiments/reports/phase4_learning.json`, `experiments/scorecard/phase4_families.json` |
 | 2026-10-21 | Phase 5 construction lane: learned token classes and typed slots over ten composition shapes, regular morphology with evidence-only irregulars, active construction gaps, propose-only size-budgeted ranker, registry entry/retirement, and 200 held-out paraphrases | `crms_constructions.py`, `crms_morphology.py`, `crms_construction_ranker.py`, `run_phase5_eval.py`, `experiments/v1_561_phase5_constructions.py`, `docs/design_phase5_constructions.md` |
 | 2026-10-21 | Phase 5 gate measured: exact frames 60/200 (30%) vs learned constructions 200/200 (100%), controls 60/60, reworded 0/140→140/140, zero confident errors, unlicensed/ambiguous abstention, holdout-backed construction rules, clean retirement/rollback, evidence-only irregulars, bounded bypassable ranker | `experiments/reports/phase5_constructions.json`, `experiments/scorecard/phase5_constructions.json` |
+| 2026-10-21 | Phase 6 domain lane implemented: exact word problems/inequalities/2x2 systems, typed list code IR with AST checks and sandboxed execution, agreement-aware English->Spanish translation, constraint story planner, two-stage task-IR plans, and 47 governed domain rules | `crms_domains.py`, `crms_phase6_benchmark.py`, `run_phase6_eval.py`, `experiments/v1_562_phase6_domains.py`, `docs/design_phase6_domains.md` |
+| 2026-10-21 | Phase 6 gate measured: 90/90 held-out tasks across five slices, zero confident errors, 15/15 negatives abstained, provenance on every answer, one repair per slice, cost reported, registry retirement/rollback clean | `experiments/reports/phase6_domains.json`, `experiments/scorecard/phase6_domains.json` |

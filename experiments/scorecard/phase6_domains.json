@@ -1,0 +1,1698 @@
+{
+  "format": "crms-phase6-domains",
+  "version": 1,
+  "description": "Phase 6 domain breadth fixture: 20 held-out tasks per slice, negative controls, repair cases, and exact expected outputs.",
+  "math": {
+    "unit_examples": [
+      "1000 metres|1 kilometre",
+      "2000 metres|2 kilometres"
+    ],
+    "tasks": [
+      {
+        "id": "math-01",
+        "text": "What is 12 plus 5?",
+        "kind": "arithmetic",
+        "expected_type": "value",
+        "expected": "17",
+        "source_id": "phase6:math:01"
+      },
+      {
+        "id": "math-02",
+        "text": "What is 9 times 4?",
+        "kind": "arithmetic",
+        "expected_type": "value",
+        "expected": "36",
+        "source_id": "phase6:math:02"
+      },
+      {
+        "id": "math-03",
+        "text": "What is 20 minus 7?",
+        "kind": "arithmetic",
+        "expected_type": "value",
+        "expected": "13",
+        "source_id": "phase6:math:03"
+      },
+      {
+        "id": "math-04",
+        "text": "What is 15 divided by 4?",
+        "kind": "arithmetic",
+        "expected_type": "value",
+        "expected": "15/4",
+        "source_id": "phase6:math:04"
+      },
+      {
+        "id": "math-05",
+        "text": "What is (2 plus 3) times 4?",
+        "kind": "arithmetic",
+        "expected_type": "value",
+        "expected": "20",
+        "source_id": "phase6:math:05"
+      },
+      {
+        "id": "math-06",
+        "text": "What is 10 mod 3?",
+        "kind": "arithmetic",
+        "expected_type": "value",
+        "expected": "1",
+        "source_id": "phase6:math:06"
+      },
+      {
+        "id": "math-07",
+        "text": "Marta has 12 marbles. She gives away 5 marbles. How many marbles does she have left?",
+        "kind": "word",
+        "expected_type": "value",
+        "expected": "7",
+        "source_id": "phase6:math:07"
+      },
+      {
+        "id": "math-08",
+        "text": "A train travels 180 kilometres in 3 hours. What is its average speed?",
+        "kind": "word",
+        "expected_type": "value",
+        "expected": "60",
+        "source_id": "phase6:math:08"
+      },
+      {
+        "id": "math-09",
+        "text": "A notebook costs 7 coins. How much do 6 notebooks cost?",
+        "kind": "word",
+        "expected_type": "value",
+        "expected": "42",
+        "source_id": "phase6:math:09"
+      },
+      {
+        "id": "math-10",
+        "text": "There are 14 birds on a wire. 6 more arrive. How many birds are there now?",
+        "kind": "word",
+        "expected_type": "value",
+        "expected": "20",
+        "source_id": "phase6:math:10"
+      },
+      {
+        "id": "math-11",
+        "text": "Solve 3x + 5 < 20 for x.",
+        "kind": "inequality",
+        "expected_type": "inequality",
+        "expected": {
+          "boundary": "5",
+          "operator": "<"
+        },
+        "source_id": "phase6:math:11"
+      },
+      {
+        "id": "math-12",
+        "text": "Solve -2x + 4 >= 10 for x.",
+        "kind": "inequality",
+        "expected_type": "inequality",
+        "expected": {
+          "boundary": "-3",
+          "operator": "<="
+        },
+        "source_id": "phase6:math:12"
+      },
+      {
+        "id": "math-13",
+        "text": "Solve x - 3 <= 7 for x.",
+        "kind": "inequality",
+        "expected_type": "inequality",
+        "expected": {
+          "boundary": "10",
+          "operator": "<="
+        },
+        "source_id": "phase6:math:13"
+      },
+      {
+        "id": "math-14",
+        "text": "Solve 4x + 1 > 9 for x.",
+        "kind": "inequality",
+        "expected_type": "inequality",
+        "expected": {
+          "boundary": "2",
+          "operator": ">"
+        },
+        "source_id": "phase6:math:14"
+      },
+      {
+        "id": "math-15",
+        "text": "Solve 2x + y = 5 and x - y = 1 for x and y.",
+        "kind": "system",
+        "expected_type": "system",
+        "expected": {
+          "x": "2",
+          "y": "1"
+        },
+        "source_id": "phase6:math:15"
+      },
+      {
+        "id": "math-16",
+        "text": "Solve x + y = 7 and x - y = 1 for x and y.",
+        "kind": "system",
+        "expected_type": "system",
+        "expected": {
+          "x": "4",
+          "y": "3"
+        },
+        "source_id": "phase6:math:16"
+      },
+      {
+        "id": "math-17",
+        "text": "Solve 2x + 3y = 12 and x + y = 5 for x and y.",
+        "kind": "system",
+        "expected_type": "system",
+        "expected": {
+          "x": "3",
+          "y": "2"
+        },
+        "source_id": "phase6:math:17"
+      },
+      {
+        "id": "math-18",
+        "text": "Solve 2x + 3 = 11 for x.",
+        "kind": "equation",
+        "expected_type": "value",
+        "expected": "4",
+        "source_id": "phase6:math:18"
+      },
+      {
+        "id": "math-19",
+        "text": "Solve x + 7 = 10 for x.",
+        "kind": "equation",
+        "expected_type": "value",
+        "expected": "3",
+        "source_id": "phase6:math:19"
+      },
+      {
+        "id": "math-20",
+        "text": "What is 3 kilometres in metres?",
+        "kind": "unit",
+        "expected_type": "value",
+        "expected": "3000",
+        "source_id": "phase6:math:20"
+      }
+    ],
+    "negative": [
+      {
+        "id": "math-neg-01",
+        "text": "Solve x^2 = 4 for x.",
+        "why": "nonlinear equation outside the declared slice"
+      },
+      {
+        "id": "math-neg-02",
+        "text": "What is 4 divided by 0?",
+        "why": "undefined division"
+      },
+      {
+        "id": "math-neg-03",
+        "text": "Solve 2x + y = 5 and 4x + 2y = 10 for x and y.",
+        "why": "non-unique system"
+      },
+      {
+        "id": "math-neg-04",
+        "text": "How many metres are in 3 kilograms?",
+        "why": "dimension mismatch"
+      }
+    ],
+    "repair": {
+      "initial": "What is 3 metres in centimetres?",
+      "unit_examples": [
+        "100 centimetres|1 metre",
+        "200 centimetres|2 metres"
+      ],
+      "expected": "300"
+    }
+  },
+  "coding": {
+    "tasks": [
+      {
+        "id": "coding-01",
+        "text": "reverse the list",
+        "operations": [
+          {
+            "name": "reverse",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "expected": [
+          4,
+          3,
+          2,
+          1
+        ],
+        "source_id": "phase6:coding:01"
+      },
+      {
+        "id": "coding-02",
+        "text": "sort the list in descending order",
+        "operations": [
+          {
+            "name": "sort_descending",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          3,
+          1,
+          4,
+          2
+        ],
+        "expected": [
+          4,
+          3,
+          2,
+          1
+        ],
+        "source_id": "phase6:coding:02"
+      },
+      {
+        "id": "coding-03",
+        "text": "remove duplicates",
+        "operations": [
+          {
+            "name": "dedupe",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          3,
+          1,
+          3,
+          2,
+          1
+        ],
+        "expected": [
+          3,
+          1,
+          2
+        ],
+        "source_id": "phase6:coding:03"
+      },
+      {
+        "id": "coding-04",
+        "text": "double each value",
+        "operations": [
+          {
+            "name": "double",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          1,
+          -2,
+          3
+        ],
+        "expected": [
+          2,
+          -4,
+          6
+        ],
+        "source_id": "phase6:coding:04"
+      },
+      {
+        "id": "coding-05",
+        "text": "square each value",
+        "operations": [
+          {
+            "name": "square",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          1,
+          -2,
+          3
+        ],
+        "expected": [
+          1,
+          4,
+          9
+        ],
+        "source_id": "phase6:coding:05"
+      },
+      {
+        "id": "coding-06",
+        "text": "take the absolute values",
+        "operations": [
+          {
+            "name": "absolute",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          -1,
+          2,
+          -3
+        ],
+        "expected": [
+          1,
+          2,
+          3
+        ],
+        "source_id": "phase6:coding:06"
+      },
+      {
+        "id": "coding-07",
+        "text": "keep the even values",
+        "operations": [
+          {
+            "name": "keep_evens",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "expected": [
+          2,
+          4
+        ],
+        "source_id": "phase6:coding:07"
+      },
+      {
+        "id": "coding-08",
+        "text": "keep the odd values",
+        "operations": [
+          {
+            "name": "keep_odds",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "expected": [
+          1,
+          3,
+          5
+        ],
+        "source_id": "phase6:coding:08"
+      },
+      {
+        "id": "coding-09",
+        "text": "sum the values",
+        "operations": [
+          {
+            "name": "sum_values",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          2,
+          3,
+          4
+        ],
+        "expected": [
+          9
+        ],
+        "source_id": "phase6:coding:09"
+      },
+      {
+        "id": "coding-10",
+        "text": "multiply each value by 3",
+        "operations": [
+          {
+            "name": "scale_k",
+            "parameters": {
+              "k": 3
+            }
+          }
+        ],
+        "values": [
+          1,
+          2,
+          3
+        ],
+        "expected": [
+          3,
+          6,
+          9
+        ],
+        "source_id": "phase6:coding:10"
+      },
+      {
+        "id": "coding-11",
+        "text": "add 4 to each value",
+        "operations": [
+          {
+            "name": "add_k",
+            "parameters": {
+              "k": 4
+            }
+          }
+        ],
+        "values": [
+          1,
+          2,
+          3
+        ],
+        "expected": [
+          5,
+          6,
+          7
+        ],
+        "source_id": "phase6:coding:11"
+      },
+      {
+        "id": "coding-12",
+        "text": "keep values divisible by 3",
+        "operations": [
+          {
+            "name": "keep_multiples_k",
+            "parameters": {
+              "k": 3
+            }
+          }
+        ],
+        "values": [
+          1,
+          3,
+          6,
+          7,
+          9
+        ],
+        "expected": [
+          3,
+          6,
+          9
+        ],
+        "source_id": "phase6:coding:12"
+      },
+      {
+        "id": "coding-13",
+        "text": "keep only the first value",
+        "operations": [
+          {
+            "name": "first",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          5,
+          6,
+          7
+        ],
+        "expected": [
+          5
+        ],
+        "source_id": "phase6:coding:13"
+      },
+      {
+        "id": "coding-14",
+        "text": "keep only the last value",
+        "operations": [
+          {
+            "name": "last",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          5,
+          6,
+          7
+        ],
+        "expected": [
+          7
+        ],
+        "source_id": "phase6:coding:14"
+      },
+      {
+        "id": "coding-15",
+        "text": "drop the first value",
+        "operations": [
+          {
+            "name": "drop_first",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          5,
+          6,
+          7
+        ],
+        "expected": [
+          6,
+          7
+        ],
+        "source_id": "phase6:coding:15"
+      },
+      {
+        "id": "coding-16",
+        "text": "drop the last value",
+        "operations": [
+          {
+            "name": "drop_last",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          5,
+          6,
+          7
+        ],
+        "expected": [
+          5,
+          6
+        ],
+        "source_id": "phase6:coding:16"
+      },
+      {
+        "id": "coding-17",
+        "text": "reverse the list then double each value",
+        "operations": [
+          {
+            "name": "reverse",
+            "parameters": {}
+          },
+          {
+            "name": "double",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          1,
+          2,
+          3
+        ],
+        "expected": [
+          6,
+          4,
+          2
+        ],
+        "source_id": "phase6:coding:17"
+      },
+      {
+        "id": "coding-18",
+        "text": "remove duplicates then sort the list",
+        "operations": [
+          {
+            "name": "dedupe",
+            "parameters": {}
+          },
+          {
+            "name": "sort_ascending",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          3,
+          1,
+          3,
+          2
+        ],
+        "expected": [
+          1,
+          2,
+          3
+        ],
+        "source_id": "phase6:coding:18"
+      },
+      {
+        "id": "coding-19",
+        "text": "keep the odd values then multiply each value by 3",
+        "operations": [
+          {
+            "name": "keep_odds",
+            "parameters": {}
+          },
+          {
+            "name": "scale_k",
+            "parameters": {
+              "k": 3
+            }
+          }
+        ],
+        "values": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "expected": [
+          3,
+          9,
+          15
+        ],
+        "source_id": "phase6:coding:19"
+      },
+      {
+        "id": "coding-20",
+        "text": "sort the list then add 2 to each value",
+        "operations": [
+          {
+            "name": "sort_ascending",
+            "parameters": {}
+          },
+          {
+            "name": "add_k",
+            "parameters": {
+              "k": 2
+            }
+          }
+        ],
+        "values": [
+          4,
+          1,
+          3
+        ],
+        "expected": [
+          3,
+          5,
+          6
+        ],
+        "source_id": "phase6:coding:20"
+      }
+    ],
+    "negative": [
+      {
+        "id": "coding-neg-01",
+        "text": "compute the median",
+        "values": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "id": "coding-neg-02",
+        "text": "reverse the list",
+        "values": [
+          "a",
+          "b"
+        ]
+      },
+      {
+        "id": "coding-neg-03",
+        "text": "sort the list then compute the median",
+        "values": [
+          1,
+          2,
+          3
+        ]
+      }
+    ],
+    "repair": {
+      "initial": "compute the median",
+      "replacement": "sort the list",
+      "values": [
+        4,
+        2,
+        9,
+        1
+      ],
+      "expected": [
+        1,
+        2,
+        4,
+        9
+      ]
+    }
+  },
+  "translation": {
+    "tasks": [
+      {
+        "id": "translation-01",
+        "text": "Translate \"the red house is in the small garden\" into Spanish",
+        "sentence": "the red house is in the small garden",
+        "register": "plain",
+        "expected": "la casa roja está en el jardín pequeño",
+        "roles": {
+          "subject": "house",
+          "subject_number": "singular",
+          "subject_gender": "f",
+          "subject_adjective": "red",
+          "location": "garden",
+          "location_number": "singular",
+          "location_adjective": "small"
+        },
+        "source_id": "phase6:translation:01"
+      },
+      {
+        "id": "translation-02",
+        "text": "Translate \"the old book is quiet\" into Spanish",
+        "sentence": "the old book is quiet",
+        "register": "plain",
+        "expected": "el libro viejo es tranquilo",
+        "roles": {
+          "subject": "book",
+          "subject_number": "singular",
+          "subject_gender": "m",
+          "subject_adjective": "old",
+          "predicate_adjective": "quiet"
+        },
+        "source_id": "phase6:translation:02"
+      },
+      {
+        "id": "translation-03",
+        "text": "Translate \"the bright window is in the narrow house\" into Spanish",
+        "sentence": "the bright window is in the narrow house",
+        "register": "plain",
+        "expected": "la ventana brillante está en la casa estrecha",
+        "roles": {
+          "subject": "window",
+          "subject_number": "singular",
+          "subject_gender": "f",
+          "subject_adjective": "bright",
+          "location": "house",
+          "location_number": "singular",
+          "location_adjective": "narrow"
+        },
+        "source_id": "phase6:translation:03"
+      },
+      {
+        "id": "translation-04",
+        "text": "Translate \"the small tables are in the red house\" into Spanish",
+        "sentence": "the small tables are in the red house",
+        "register": "plain",
+        "expected": "las mesas pequeñas están en la casa roja",
+        "roles": {
+          "subject": "table",
+          "subject_number": "plural",
+          "subject_gender": "f",
+          "subject_adjective": "small",
+          "location": "house",
+          "location_number": "singular",
+          "location_adjective": "red"
+        },
+        "source_id": "phase6:translation:04"
+      },
+      {
+        "id": "translation-05",
+        "text": "Translate \"the narrow roads are old\" into Spanish",
+        "sentence": "the narrow roads are old",
+        "register": "plain",
+        "expected": "los caminos estrechos son viejos",
+        "roles": {
+          "subject": "road",
+          "subject_number": "plural",
+          "subject_gender": "m",
+          "subject_adjective": "narrow",
+          "predicate_adjective": "old"
+        },
+        "source_id": "phase6:translation:05"
+      },
+      {
+        "id": "translation-06",
+        "text": "Translate \"the quiet garden is bright\" into Spanish",
+        "sentence": "the quiet garden is bright",
+        "register": "plain",
+        "expected": "el jardín tranquilo es brillante",
+        "roles": {
+          "subject": "garden",
+          "subject_number": "singular",
+          "subject_gender": "m",
+          "subject_adjective": "quiet",
+          "predicate_adjective": "bright"
+        },
+        "source_id": "phase6:translation:06"
+      },
+      {
+        "id": "translation-07",
+        "text": "Translate \"the red books are small\" into Spanish",
+        "sentence": "the red books are small",
+        "register": "plain",
+        "expected": "los libros rojos son pequeños",
+        "roles": {
+          "subject": "book",
+          "subject_number": "plural",
+          "subject_gender": "m",
+          "subject_adjective": "red",
+          "predicate_adjective": "small"
+        },
+        "source_id": "phase6:translation:07"
+      },
+      {
+        "id": "translation-08",
+        "text": "Translate \"the old windows are in the bright house\" into Spanish",
+        "sentence": "the old windows are in the bright house",
+        "register": "plain",
+        "expected": "las ventanas viejas están en la casa brillante",
+        "roles": {
+          "subject": "window",
+          "subject_number": "plural",
+          "subject_gender": "f",
+          "subject_adjective": "old",
+          "location": "house",
+          "location_number": "singular",
+          "location_adjective": "bright"
+        },
+        "source_id": "phase6:translation:08"
+      },
+      {
+        "id": "translation-09",
+        "text": "Translate \"the red house is in the small garden\" into Spanish in formal register",
+        "sentence": "the red house is in the small garden",
+        "register": "formal",
+        "expected": "la casa roja se encuentra en el jardín pequeño",
+        "roles": {
+          "subject": "house",
+          "subject_number": "singular",
+          "subject_gender": "f",
+          "subject_adjective": "red",
+          "location": "garden",
+          "location_number": "singular",
+          "location_adjective": "small"
+        },
+        "source_id": "phase6:translation:09"
+      },
+      {
+        "id": "translation-10",
+        "text": "Translate \"the old book is quiet\" into Spanish in formal register",
+        "sentence": "the old book is quiet",
+        "register": "formal",
+        "expected": "el libro viejo es tranquilo",
+        "roles": {
+          "subject": "book",
+          "subject_number": "singular",
+          "subject_gender": "m",
+          "subject_adjective": "old",
+          "predicate_adjective": "quiet"
+        },
+        "source_id": "phase6:translation:10"
+      },
+      {
+        "id": "translation-11",
+        "text": "Translate \"the narrow window is in the old house\" into Spanish",
+        "sentence": "the narrow window is in the old house",
+        "register": "plain",
+        "expected": "la ventana estrecha está en la casa vieja",
+        "roles": {
+          "subject": "window",
+          "subject_number": "singular",
+          "subject_gender": "f",
+          "subject_adjective": "narrow",
+          "location": "house",
+          "location_number": "singular",
+          "location_adjective": "old"
+        },
+        "source_id": "phase6:translation:11"
+      },
+      {
+        "id": "translation-12",
+        "text": "Translate \"the small river is quiet\" into Spanish",
+        "sentence": "the small river is quiet",
+        "register": "plain",
+        "expected": "el río pequeño es tranquilo",
+        "roles": {
+          "subject": "river",
+          "subject_number": "singular",
+          "subject_gender": "m",
+          "subject_adjective": "small",
+          "predicate_adjective": "quiet"
+        },
+        "source_id": "phase6:translation:12"
+      },
+      {
+        "id": "translation-13",
+        "text": "Translate \"the red tables are in the narrow garden\" into Spanish",
+        "sentence": "the red tables are in the narrow garden",
+        "register": "plain",
+        "expected": "las mesas rojas están en el jardín estrecho",
+        "roles": {
+          "subject": "table",
+          "subject_number": "plural",
+          "subject_gender": "f",
+          "subject_adjective": "red",
+          "location": "garden",
+          "location_number": "singular",
+          "location_adjective": "narrow"
+        },
+        "source_id": "phase6:translation:13"
+      },
+      {
+        "id": "translation-14",
+        "text": "Translate \"the bright books are old\" into Spanish",
+        "sentence": "the bright books are old",
+        "register": "plain",
+        "expected": "los libros brillantes son viejos",
+        "roles": {
+          "subject": "book",
+          "subject_number": "plural",
+          "subject_gender": "m",
+          "subject_adjective": "bright",
+          "predicate_adjective": "old"
+        },
+        "source_id": "phase6:translation:14"
+      },
+      {
+        "id": "translation-15",
+        "text": "Translate \"the quiet house is in the red garden\" into Spanish",
+        "sentence": "the quiet house is in the red garden",
+        "register": "plain",
+        "expected": "la casa tranquila está en el jardín rojo",
+        "roles": {
+          "subject": "house",
+          "subject_number": "singular",
+          "subject_gender": "f",
+          "subject_adjective": "quiet",
+          "location": "garden",
+          "location_number": "singular",
+          "location_adjective": "red"
+        },
+        "source_id": "phase6:translation:15"
+      },
+      {
+        "id": "translation-16",
+        "text": "Translate \"the old roads are narrow\" into Spanish",
+        "sentence": "the old roads are narrow",
+        "register": "plain",
+        "expected": "los caminos viejos son estrechos",
+        "roles": {
+          "subject": "road",
+          "subject_number": "plural",
+          "subject_gender": "m",
+          "subject_adjective": "old",
+          "predicate_adjective": "narrow"
+        },
+        "source_id": "phase6:translation:16"
+      },
+      {
+        "id": "translation-17",
+        "text": "Translate \"the small candle is in the bright window\" into Spanish",
+        "sentence": "the small candle is in the bright window",
+        "register": "plain",
+        "expected": "la vela pequeña está en la ventana brillante",
+        "roles": {
+          "subject": "candle",
+          "subject_number": "singular",
+          "subject_gender": "f",
+          "subject_adjective": "small",
+          "location": "window",
+          "location_number": "singular",
+          "location_adjective": "bright"
+        },
+        "source_id": "phase6:translation:17"
+      },
+      {
+        "id": "translation-18",
+        "text": "Translate \"the red windows are small\" into Spanish",
+        "sentence": "the red windows are small",
+        "register": "plain",
+        "expected": "las ventanas rojas son pequeñas",
+        "roles": {
+          "subject": "window",
+          "subject_number": "plural",
+          "subject_gender": "f",
+          "subject_adjective": "red",
+          "predicate_adjective": "small"
+        },
+        "source_id": "phase6:translation:18"
+      },
+      {
+        "id": "translation-19",
+        "text": "Translate \"the small tables are in the red house\" into Spanish in formal register",
+        "sentence": "the small tables are in the red house",
+        "register": "formal",
+        "expected": "las mesas pequeñas se encuentran en la casa roja",
+        "roles": {
+          "subject": "table",
+          "subject_number": "plural",
+          "subject_gender": "f",
+          "subject_adjective": "small",
+          "location": "house",
+          "location_number": "singular",
+          "location_adjective": "red"
+        },
+        "source_id": "phase6:translation:19"
+      },
+      {
+        "id": "translation-20",
+        "text": "Translate \"the narrow book is in the quiet house\" into Spanish",
+        "sentence": "the narrow book is in the quiet house",
+        "register": "plain",
+        "expected": "el libro estrecho está en la casa tranquila",
+        "roles": {
+          "subject": "book",
+          "subject_number": "singular",
+          "subject_gender": "m",
+          "subject_adjective": "narrow",
+          "location": "house",
+          "location_number": "singular",
+          "location_adjective": "quiet"
+        },
+        "source_id": "phase6:translation:20"
+      }
+    ],
+    "negative": [
+      {
+        "id": "translation-neg-01",
+        "sentence": "the red lamp is in the old house",
+        "why": "unknown noun"
+      },
+      {
+        "id": "translation-neg-02",
+        "sentence": "the red house is near the garden",
+        "why": "unsupported relation"
+      },
+      {
+        "id": "translation-neg-03",
+        "sentence": "the red houses is in the garden",
+        "why": "number disagreement"
+      }
+    ],
+    "repair": {
+      "sentence": "the red lamp is in the old house",
+      "teach": {
+        "source": "lamp",
+        "gender": "f",
+        "singular": "lámpara",
+        "plural": "lámparas"
+      },
+      "expected": "la lámpara roja está en la casa vieja"
+    }
+  },
+  "creative": {
+    "tasks": [
+      {
+        "id": "creative-01",
+        "brief": {
+          "topic": "a village bridge",
+          "tone": "adventure",
+          "must_include": [
+            "lantern"
+          ],
+          "must_avoid": [
+            "dragon"
+          ],
+          "max_words": 180,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:01"
+      },
+      {
+        "id": "creative-02",
+        "brief": {
+          "topic": "a midnight library",
+          "tone": "mystery",
+          "must_include": [
+            "brass key"
+          ],
+          "must_avoid": [
+            "laser"
+          ],
+          "max_words": 190,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:02"
+      },
+      {
+        "id": "creative-03",
+        "brief": {
+          "topic": "a garden gate",
+          "tone": "adventure",
+          "must_include": [
+            "seed"
+          ],
+          "must_avoid": [
+            "dragon"
+          ],
+          "max_words": 170,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:03"
+      },
+      {
+        "id": "creative-04",
+        "brief": {
+          "topic": "a small kindness",
+          "tone": "funny",
+          "must_include": [
+            "bell"
+          ],
+          "must_avoid": [
+            "laser"
+          ],
+          "max_words": 180,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:04"
+      },
+      {
+        "id": "creative-05",
+        "brief": {
+          "topic": "a council meeting",
+          "tone": "funny",
+          "must_include": [
+            "cheese"
+          ],
+          "must_avoid": [
+            "dragon"
+          ],
+          "max_words": 200,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:05"
+      },
+      {
+        "id": "creative-06",
+        "brief": {
+          "topic": "a lost map",
+          "tone": "mystery",
+          "must_include": [
+            "map"
+          ],
+          "must_avoid": [
+            "laser"
+          ],
+          "max_words": 190,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:06"
+      },
+      {
+        "id": "creative-07",
+        "brief": {
+          "topic": "a river crossing",
+          "tone": "adventure",
+          "must_include": [
+            "rope"
+          ],
+          "must_avoid": [
+            "dragon"
+          ],
+          "max_words": 180,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:07"
+      },
+      {
+        "id": "creative-08",
+        "brief": {
+          "topic": "a quiet station",
+          "tone": "mystery",
+          "must_include": [
+            "pocket watch"
+          ],
+          "must_avoid": [
+            "laser"
+          ],
+          "max_words": 200,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:08"
+      },
+      {
+        "id": "creative-09",
+        "brief": {
+          "topic": "a bright window",
+          "tone": "adventure",
+          "must_include": [
+            "candle"
+          ],
+          "must_avoid": [
+            "dragon"
+          ],
+          "max_words": 170,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:09"
+      },
+      {
+        "id": "creative-10",
+        "brief": {
+          "topic": "a narrow road",
+          "tone": "mystery",
+          "must_include": [
+            "compass"
+          ],
+          "must_avoid": [
+            "laser"
+          ],
+          "max_words": 190,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:10"
+      },
+      {
+        "id": "creative-11",
+        "brief": {
+          "topic": "a table for two",
+          "tone": "funny",
+          "must_include": [
+            "teapot"
+          ],
+          "must_avoid": [
+            "dragon"
+          ],
+          "max_words": 180,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:11"
+      },
+      {
+        "id": "creative-12",
+        "brief": {
+          "topic": "a book of doors",
+          "tone": "adventure",
+          "must_include": [
+            "key"
+          ],
+          "must_avoid": [
+            "laser"
+          ],
+          "max_words": 190,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:12"
+      },
+      {
+        "id": "creative-13",
+        "brief": {
+          "topic": "a garden at dawn",
+          "tone": "adventure",
+          "must_include": [
+            "watering can"
+          ],
+          "must_avoid": [
+            "dragon"
+          ],
+          "max_words": 180,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:13"
+      },
+      {
+        "id": "creative-14",
+        "brief": {
+          "topic": "a clockmaker's shop",
+          "tone": "mystery",
+          "must_include": [
+            "gear"
+          ],
+          "must_avoid": [
+            "laser"
+          ],
+          "max_words": 200,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:14"
+      },
+      {
+        "id": "creative-15",
+        "brief": {
+          "topic": "a mayor's problem",
+          "tone": "funny",
+          "must_include": [
+            "cheese"
+          ],
+          "must_avoid": [
+            "dragon"
+          ],
+          "max_words": 190,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:15"
+      },
+      {
+        "id": "creative-16",
+        "brief": {
+          "topic": "a winter lantern",
+          "tone": "adventure",
+          "must_include": [
+            "lantern"
+          ],
+          "must_avoid": [
+            "laser"
+          ],
+          "max_words": 180,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:16"
+      },
+      {
+        "id": "creative-17",
+        "brief": {
+          "topic": "a library at midnight",
+          "tone": "mystery",
+          "must_include": [
+            "brass key"
+          ],
+          "must_avoid": [
+            "dragon"
+          ],
+          "max_words": 200,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:17"
+      },
+      {
+        "id": "creative-18",
+        "brief": {
+          "topic": "a seed for the lane",
+          "tone": "adventure",
+          "must_include": [
+            "seed"
+          ],
+          "must_avoid": [
+            "laser"
+          ],
+          "max_words": 170,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:18"
+      },
+      {
+        "id": "creative-19",
+        "brief": {
+          "topic": "a bell for the town",
+          "tone": "funny",
+          "must_include": [
+            "bell"
+          ],
+          "must_avoid": [
+            "dragon"
+          ],
+          "max_words": 180,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:19"
+      },
+      {
+        "id": "creative-20",
+        "brief": {
+          "topic": "a map of the garden",
+          "tone": "mystery",
+          "must_include": [
+            "map"
+          ],
+          "must_avoid": [
+            "laser"
+          ],
+          "max_words": 190,
+          "pov": "third"
+        },
+        "source_id": "phase6:creative:20"
+      }
+    ],
+    "negative": [
+      {
+        "id": "creative-neg-01",
+        "brief": {
+          "topic": "a village bridge",
+          "tone": "adventure",
+          "must_include": [
+            "lantern"
+          ],
+          "must_avoid": [
+            "lantern"
+          ],
+          "max_words": 180,
+          "pov": "third"
+        },
+        "why": "contradictory constraints"
+      },
+      {
+        "id": "creative-neg-02",
+        "brief": {
+          "topic": "a village bridge",
+          "tone": "adventure",
+          "must_include": [],
+          "must_avoid": [],
+          "max_words": 10,
+          "pov": "third"
+        },
+        "why": "word limit below the bounded minimum"
+      },
+      {
+        "id": "creative-neg-03",
+        "brief": {
+          "topic": "a village bridge",
+          "tone": "epic",
+          "must_include": [],
+          "must_avoid": [],
+          "max_words": 180,
+          "pov": "third"
+        },
+        "why": "unsupported tone"
+      }
+    ],
+    "repair": {
+      "brief": {
+        "topic": "a village bridge",
+        "tone": "adventure",
+        "must_include": [
+          "lantern"
+        ],
+        "must_avoid": [
+          "lantern"
+        ],
+        "max_words": 180,
+        "pov": "third"
+      },
+      "remove_avoid": "lantern"
+    }
+  },
+  "cross": {
+    "tasks": [
+      {
+        "id": "cross-01",
+        "kind": "list-math",
+        "text": "reverse the values, then double each",
+        "operations": [
+          {
+            "name": "reverse",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          1,
+          2,
+          3
+        ],
+        "math_op": "double",
+        "k": 1,
+        "expected": [
+          6,
+          4,
+          2
+        ],
+        "source_id": "phase6:cross:01"
+      },
+      {
+        "id": "cross-02",
+        "kind": "list-math",
+        "text": "sort the values, then add 2 to each",
+        "operations": [
+          {
+            "name": "sort_ascending",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          4,
+          1,
+          3
+        ],
+        "math_op": "add_k",
+        "k": 2,
+        "expected": [
+          3,
+          5,
+          6
+        ],
+        "source_id": "phase6:cross:02"
+      },
+      {
+        "id": "cross-03",
+        "kind": "list-math",
+        "text": "keep the odd values, then multiply each by 3",
+        "operations": [
+          {
+            "name": "keep_odds",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "math_op": "scale_k",
+        "k": 3,
+        "expected": [
+          3,
+          9,
+          15
+        ],
+        "source_id": "phase6:cross:03"
+      },
+      {
+        "id": "cross-04",
+        "kind": "list-math",
+        "text": "remove duplicates, then double each",
+        "operations": [
+          {
+            "name": "dedupe",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          2,
+          2,
+          3,
+          1
+        ],
+        "math_op": "double",
+        "k": 1,
+        "expected": [
+          4,
+          6,
+          2
+        ],
+        "source_id": "phase6:cross:04"
+      },
+      {
+        "id": "cross-05",
+        "kind": "list-math",
+        "text": "drop the first value, then sort the values",
+        "operations": [
+          {
+            "name": "drop_first",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          9,
+          3,
+          1,
+          7
+        ],
+        "math_op": "double",
+        "k": 1,
+        "expected": [
+          6,
+          2,
+          14
+        ],
+        "source_id": "phase6:cross:05"
+      },
+      {
+        "id": "cross-06",
+        "kind": "list-math",
+        "text": "square each value, then add 1 to each",
+        "operations": [
+          {
+            "name": "square",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          1,
+          2,
+          3
+        ],
+        "math_op": "add_k",
+        "k": 1,
+        "expected": [
+          2,
+          5,
+          10
+        ],
+        "source_id": "phase6:cross:06"
+      },
+      {
+        "id": "cross-07",
+        "kind": "translate-count",
+        "text": "Translate \"the red house is in the small garden\" into Spanish, then count the words.",
+        "sentence": "the red house is in the small garden",
+        "register": "plain",
+        "expected": 8,
+        "expected_translation": "la casa roja está en el jardín pequeño",
+        "source_id": "phase6:cross:07"
+      },
+      {
+        "id": "cross-08",
+        "kind": "translate-count",
+        "text": "Translate \"the old book is quiet\" into Spanish, then count the words.",
+        "sentence": "the old book is quiet",
+        "register": "plain",
+        "expected": 5,
+        "expected_translation": "el libro viejo es tranquilo",
+        "source_id": "phase6:cross:08"
+      },
+      {
+        "id": "cross-09",
+        "kind": "translate-count",
+        "text": "Translate \"the small tables are in the red house\" into Spanish in formal register, then count the words.",
+        "sentence": "the small tables are in the red house",
+        "register": "formal",
+        "expected": 9,
+        "expected_translation": "las mesas pequeñas se encuentran en la casa roja",
+        "source_id": "phase6:cross:09"
+      },
+      {
+        "id": "cross-10",
+        "kind": "translate-count",
+        "text": "Translate \"the bright window is in the narrow house\" into Spanish, then count the words.",
+        "sentence": "the bright window is in the narrow house",
+        "register": "plain",
+        "expected": 8,
+        "expected_translation": "la ventana brillante está en la casa estrecha",
+        "source_id": "phase6:cross:10"
+      }
+    ],
+    "negative": [
+      {
+        "id": "cross-neg-01",
+        "kind": "list-math",
+        "operations": [
+          {
+            "name": "reverse",
+            "parameters": {}
+          }
+        ],
+        "values": [
+          1,
+          2,
+          3
+        ],
+        "math_op": "median",
+        "k": 1,
+        "why": "unsupported second stage"
+      },
+      {
+        "id": "cross-neg-02",
+        "kind": "translate-count",
+        "sentence": "the red mirror is in the old house",
+        "register": "plain",
+        "why": "unknown translation word"
+      }
+    ],
+    "repair": {
+      "text": "reverse the values, then double each",
+      "invalid_operations": [
+        {
+          "name": "reverse",
+          "parameters": {}
+        }
+      ],
+      "values": [
+        1,
+        2,
+        3
+      ],
+      "invalid_math_op": "median",
+      "replacement_math_op": "double",
+      "expected": [
+        6,
+        4,
+        2
+      ]
+    }
+  }
+}

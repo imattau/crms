@@ -1538,6 +1538,35 @@ Unlicensed, malformed, single-example, and ambiguous productions abstain.
 Every active construction carries 20 held-out cases and 20 sources; retirement
 removes it from matching without dangling references and rollback restores it.
 
+### Domain breadth
+
+Phase 6 measures five bounded slices with independent checks and repair:
+
+- **Math:** exact word problems, rational linear inequalities, unique 2x2
+  systems, arithmetic, equations, and learned units.
+- **Coding:** a typed `list[int]` operation IR, multi-step composition, input/
+  output contracts, static AST checks, and sandboxed execution.
+- **Translation:** reviewed English-to-Spanish lexicon, noun/adjective
+  agreement, plain/formal register, and semantic-role checks.
+- **Creative:** constraint-driven fictional story planning with a separate
+  rubric for required motifs, forbidden words, word limits, and coherence.
+- **Cross-domain:** two-stage list-to-math and translate-to-count plans through
+  the typed task IR.
+
+Run it with:
+
+```text
+python3 run_phase6_eval.py
+```
+
+Current report `experiments/reports/phase6_domains.json`: 90/90 held-out tasks
+across the five slices, zero confident wrong outputs, 15/15 negative controls
+abstaining, provenance on every answer, and one demonstrated repair per slice.
+Coding is the slowest slice at roughly 14.5 ms median and 18.5 ms p95 because it
+runs generated code in a fresh subprocess; the other slices are sub-millisecond
+on this fixture. 47 domain rules are registered and validated; retiring a code
+operation makes it abstain and rollback restores it.
+
 `/suggest-corpus-alignments` adds a corpus-only path for alternate predicate
 wording. It proposes an alignment only when the same distinct subject/object
 pairs are independently parsed under both predicates in separate documents.

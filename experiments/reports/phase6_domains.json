@@ -1,0 +1,843 @@
+{
+  "format": "crms-phase6-eval",
+  "gate": {
+    "all_slices_meet_80_percent": true,
+    "cost_reported": true,
+    "domain_rule_retirement": true,
+    "domain_rules_registered": true,
+    "negative_controls_abstain": true,
+    "provenance_on_every_answer": true,
+    "repair_demonstrated": true,
+    "zero_confident_wrong_outputs": true
+  },
+  "gate_passed": true,
+  "overall": {
+    "completion": 1.0,
+    "confident_errors": 0,
+    "correct": 90,
+    "tasks": 90
+  },
+  "provenance": {
+    "fixture": "/home/lostcause/workspace/crms/experiments/scorecard/phase6_domains.json",
+    "method": "frozen held-out tasks; exact/substitution math checks; independent code interpreter; authored translation targets and role checks; constraint rubric; two-step task-IR execution"
+  },
+  "registry": {
+    "active_rules": 47,
+    "all_validated": true,
+    "retired_abstained": true,
+    "rollback_restored": true,
+    "rule_id": "domain-code-op-reverse"
+  },
+  "rows": {
+    "coding": [
+      {
+        "duration_ms": 11.283593019470572,
+        "status": "answered",
+        "task": "coding-01",
+        "value": [
+          4,
+          3,
+          2,
+          1
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 10.933908983133733,
+        "status": "answered",
+        "task": "coding-02",
+        "value": [
+          4,
+          3,
+          2,
+          1
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 12.544848024845123,
+        "status": "answered",
+        "task": "coding-03",
+        "value": [
+          3,
+          1,
+          2
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 15.643496997654438,
+        "status": "answered",
+        "task": "coding-04",
+        "value": [
+          2,
+          -4,
+          6
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 14.198800956364721,
+        "status": "answered",
+        "task": "coding-05",
+        "value": [
+          1,
+          4,
+          9
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 16.568191000260413,
+        "status": "answered",
+        "task": "coding-06",
+        "value": [
+          1,
+          2,
+          3
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 15.28148801298812,
+        "status": "answered",
+        "task": "coding-07",
+        "value": [
+          2,
+          4
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 17.39901100518182,
+        "status": "answered",
+        "task": "coding-08",
+        "value": [
+          1,
+          3,
+          5
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 18.52940599201247,
+        "status": "answered",
+        "task": "coding-09",
+        "value": [
+          9
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 18.708946998231113,
+        "status": "answered",
+        "task": "coding-10",
+        "value": [
+          3,
+          6,
+          9
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 14.267439022660255,
+        "status": "answered",
+        "task": "coding-11",
+        "value": [
+          5,
+          6,
+          7
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 11.634676018729806,
+        "status": "answered",
+        "task": "coding-12",
+        "value": [
+          3,
+          6,
+          9
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 11.99924701359123,
+        "status": "answered",
+        "task": "coding-13",
+        "value": [
+          5
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 14.69982200069353,
+        "status": "answered",
+        "task": "coding-14",
+        "value": [
+          7
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 16.08124899212271,
+        "status": "answered",
+        "task": "coding-15",
+        "value": [
+          6,
+          7
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 13.924650964327157,
+        "status": "answered",
+        "task": "coding-16",
+        "value": [
+          5,
+          6
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 15.510995988734066,
+        "status": "answered",
+        "task": "coding-17",
+        "value": [
+          6,
+          4,
+          2
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 17.87408097879961,
+        "status": "answered",
+        "task": "coding-18",
+        "value": [
+          1,
+          2,
+          3
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 13.5188780259341,
+        "status": "answered",
+        "task": "coding-19",
+        "value": [
+          3,
+          9,
+          15
+        ],
+        "verified": true
+      },
+      {
+        "duration_ms": 10.366328991949558,
+        "status": "answered",
+        "task": "coding-20",
+        "value": [
+          3,
+          5,
+          6
+        ],
+        "verified": true
+      }
+    ],
+    "creative": [
+      {
+        "duration_ms": 0.16983598470687866,
+        "status": "answered",
+        "task": "creative-01",
+        "verified": true,
+        "words": 101
+      },
+      {
+        "duration_ms": 0.04380004247650504,
+        "status": "answered",
+        "task": "creative-02",
+        "verified": true,
+        "words": 105
+      },
+      {
+        "duration_ms": 0.033070973586291075,
+        "status": "answered",
+        "task": "creative-03",
+        "verified": true,
+        "words": 94
+      },
+      {
+        "duration_ms": 0.03581703640520573,
+        "status": "answered",
+        "task": "creative-04",
+        "verified": true,
+        "words": 98
+      },
+      {
+        "duration_ms": 0.029399991035461426,
+        "status": "answered",
+        "task": "creative-05",
+        "verified": true,
+        "words": 91
+      },
+      {
+        "duration_ms": 0.029149989131838083,
+        "status": "answered",
+        "task": "creative-06",
+        "verified": true,
+        "words": 105
+      },
+      {
+        "duration_ms": 0.03276200732216239,
+        "status": "answered",
+        "task": "creative-07",
+        "verified": true,
+        "words": 101
+      },
+      {
+        "duration_ms": 0.026744964998215437,
+        "status": "answered",
+        "task": "creative-08",
+        "verified": true,
+        "words": 89
+      },
+      {
+        "duration_ms": 0.029511982575058937,
+        "status": "answered",
+        "task": "creative-09",
+        "verified": true,
+        "words": 101
+      },
+      {
+        "duration_ms": 0.029830029234290123,
+        "status": "answered",
+        "task": "creative-10",
+        "verified": true,
+        "words": 112
+      },
+      {
+        "duration_ms": 0.02767401747405529,
+        "status": "answered",
+        "task": "creative-11",
+        "verified": true,
+        "words": 99
+      },
+      {
+        "duration_ms": 0.030835974030196667,
+        "status": "answered",
+        "task": "creative-12",
+        "verified": true,
+        "words": 106
+      },
+      {
+        "duration_ms": 0.027869013138115406,
+        "status": "answered",
+        "task": "creative-13",
+        "verified": true,
+        "words": 103
+      },
+      {
+        "duration_ms": 0.0325710279867053,
+        "status": "answered",
+        "task": "creative-14",
+        "verified": true,
+        "words": 112
+      },
+      {
+        "duration_ms": 0.026615976821631193,
+        "status": "answered",
+        "task": "creative-15",
+        "verified": true,
+        "words": 91
+      },
+      {
+        "duration_ms": 0.0255129998549819,
+        "status": "answered",
+        "task": "creative-16",
+        "verified": true,
+        "words": 94
+      },
+      {
+        "duration_ms": 0.027704983949661255,
+        "status": "answered",
+        "task": "creative-17",
+        "verified": true,
+        "words": 106
+      },
+      {
+        "duration_ms": 0.02472399501129985,
+        "status": "answered",
+        "task": "creative-18",
+        "verified": true,
+        "words": 96
+      },
+      {
+        "duration_ms": 0.05878199590370059,
+        "status": "answered",
+        "task": "creative-19",
+        "verified": true,
+        "words": 93
+      },
+      {
+        "duration_ms": 0.024657987523823977,
+        "status": "answered",
+        "task": "creative-20",
+        "verified": true,
+        "words": 91
+      }
+    ],
+    "cross": [
+      {
+        "duration_ms": 0.15598000027239323,
+        "output": [
+          6,
+          4,
+          2
+        ],
+        "status": "ok",
+        "task": "cross-01",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.0891759991645813,
+        "output": [
+          3,
+          5,
+          6
+        ],
+        "status": "ok",
+        "task": "cross-02",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.07841701153665781,
+        "output": [
+          3,
+          9,
+          15
+        ],
+        "status": "ok",
+        "task": "cross-03",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.06404297892004251,
+        "output": [
+          4,
+          6,
+          2
+        ],
+        "status": "ok",
+        "task": "cross-04",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.06112799746915698,
+        "output": [
+          6,
+          2,
+          14
+        ],
+        "status": "ok",
+        "task": "cross-05",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.05967996548861265,
+        "output": [
+          2,
+          5,
+          10
+        ],
+        "status": "ok",
+        "task": "cross-06",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.1055269967764616,
+        "output": 8,
+        "status": "ok",
+        "task": "cross-07",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.08316902676597238,
+        "output": 5,
+        "status": "ok",
+        "task": "cross-08",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.09201600914821029,
+        "output": 9,
+        "status": "ok",
+        "task": "cross-09",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.08012802572920918,
+        "output": 8,
+        "status": "ok",
+        "task": "cross-10",
+        "verified": true
+      }
+    ],
+    "math": [
+      {
+        "duration_ms": 0.12922001769766212,
+        "status": "answered",
+        "task": "math-01",
+        "text": "17 (exact arithmetic using standard operator 'plus' for add)",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.07417600136250257,
+        "status": "answered",
+        "task": "math-02",
+        "text": "36 (exact arithmetic using standard operator 'times' for multiply)",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.06975798169150949,
+        "status": "answered",
+        "task": "math-03",
+        "text": "13 (exact arithmetic using standard operator 'minus' for subtract)",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.05901302210986614,
+        "status": "answered",
+        "task": "math-04",
+        "text": "15/4 (exact arithmetic using standard operator 'divided by' for divide)",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.07692503277212381,
+        "status": "answered",
+        "task": "math-05",
+        "text": "20 (composed operations: standard operator 'plus' for add, standard operator 'times' for multiply; multiplication/division before addition/subtraction unless grouped; checked against 0 examples)",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.0462029711343348,
+        "status": "answered",
+        "task": "math-06",
+        "text": "1 (exact arithmetic using standard operator 'mod' for modulo)",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.012238044291734695,
+        "status": "answered",
+        "task": "math-07",
+        "text": "7",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.007233000360429287,
+        "status": "answered",
+        "task": "math-08",
+        "text": "60 kilometres per hour",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.004624016582965851,
+        "status": "answered",
+        "task": "math-09",
+        "text": "42 coins",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.004225003067404032,
+        "status": "answered",
+        "task": "math-10",
+        "text": "20",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.09816000238060951,
+        "status": "answered",
+        "task": "math-11",
+        "text": "x < 5",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.016785983461886644,
+        "status": "answered",
+        "task": "math-12",
+        "text": "x <= -3",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.014195975381880999,
+        "status": "answered",
+        "task": "math-13",
+        "text": "x <= 10",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.010372023098170757,
+        "status": "answered",
+        "task": "math-14",
+        "text": "x > 2",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.03745697904378176,
+        "status": "answered",
+        "task": "math-15",
+        "text": "x = 2, y = 1",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.030677008908241987,
+        "status": "answered",
+        "task": "math-16",
+        "text": "x = 4, y = 3",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.029152026399970055,
+        "status": "answered",
+        "task": "math-17",
+        "text": "x = 3, y = 2",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.10056298924610019,
+        "status": "answered",
+        "task": "math-18",
+        "text": "x = 4 (exact linear solution; substitution verified; learned operation evidence: 0 examples)",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.060049991589039564,
+        "status": "answered",
+        "task": "math-19",
+        "text": "x = 3 (exact linear solution; substitution verified; learned operation evidence: 0 examples)",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.08662499021738768,
+        "status": "answered",
+        "task": "math-20",
+        "text": "3000 metres (exact conversion; grounded by 1000 metres|1 kilometre; 2000 metres|2 kilometres)",
+        "verified": true
+      }
+    ],
+    "translation": [
+      {
+        "duration_ms": 0.40093500865623355,
+        "status": "answered",
+        "task": "translation-01",
+        "text": "la casa roja est\u00e1 en el jard\u00edn peque\u00f1o",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.020239967852830887,
+        "status": "answered",
+        "task": "translation-02",
+        "text": "el libro viejo es tranquilo",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.017829006537795067,
+        "status": "answered",
+        "task": "translation-03",
+        "text": "la ventana brillante est\u00e1 en la casa estrecha",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.013665994629263878,
+        "status": "answered",
+        "task": "translation-04",
+        "text": "las mesas peque\u00f1as est\u00e1n en la casa roja",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.011428957805037498,
+        "status": "answered",
+        "task": "translation-05",
+        "text": "los caminos estrechos son viejos",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.009382958523929119,
+        "status": "answered",
+        "task": "translation-06",
+        "text": "el jard\u00edn tranquilo es brillante",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.009126029908657074,
+        "status": "answered",
+        "task": "translation-07",
+        "text": "los libros rojos son peque\u00f1os",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.010096991900354624,
+        "status": "answered",
+        "task": "translation-08",
+        "text": "las ventanas viejas est\u00e1n en la casa brillante",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.011195952538400888,
+        "status": "answered",
+        "task": "translation-09",
+        "text": "la casa roja se encuentra en el jard\u00edn peque\u00f1o",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.008293951395899057,
+        "status": "answered",
+        "task": "translation-10",
+        "text": "el libro viejo es tranquilo",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.009818992111831903,
+        "status": "answered",
+        "task": "translation-11",
+        "text": "la ventana estrecha est\u00e1 en la casa vieja",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.008612987585365772,
+        "status": "answered",
+        "task": "translation-12",
+        "text": "el r\u00edo peque\u00f1o es tranquilo",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.011697993613779545,
+        "status": "answered",
+        "task": "translation-13",
+        "text": "las mesas rojas est\u00e1n en el jard\u00edn estrecho",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.00797200482338667,
+        "status": "answered",
+        "task": "translation-14",
+        "text": "los libros brillantes son viejos",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.016758975107222795,
+        "status": "answered",
+        "task": "translation-15",
+        "text": "la casa tranquila est\u00e1 en el jard\u00edn rojo",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.008393020834773779,
+        "status": "answered",
+        "task": "translation-16",
+        "text": "los caminos viejos son estrechos",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.010956020560115576,
+        "status": "answered",
+        "task": "translation-17",
+        "text": "la vela peque\u00f1a est\u00e1 en la ventana brillante",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.00759598333388567,
+        "status": "answered",
+        "task": "translation-18",
+        "text": "las ventanas rojas son peque\u00f1as",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.010201998520642519,
+        "status": "answered",
+        "task": "translation-19",
+        "text": "las mesas peque\u00f1as se encuentran en la casa roja",
+        "verified": true
+      },
+      {
+        "duration_ms": 0.009156996384263039,
+        "status": "answered",
+        "task": "translation-20",
+        "text": "el libro estrecho est\u00e1 en la casa tranquila",
+        "verified": true
+      }
+    ]
+  },
+  "slices": {
+    "coding": {
+      "abstained": 0,
+      "completion": 1.0,
+      "confident_errors": 0,
+      "correct": 20,
+      "gate_passed": true,
+      "median_ms": 14.483630511676893,
+      "negative_abstained": 3,
+      "negative_total": 3,
+      "p95_ms": 18.52940599201247,
+      "provenance_present": 20,
+      "repair_passed": true,
+      "tasks": 20
+    },
+    "creative": {
+      "abstained": 0,
+      "completion": 1.0,
+      "confident_errors": 0,
+      "correct": 20,
+      "gate_passed": true,
+      "median_ms": 0.02945598680526018,
+      "negative_abstained": 3,
+      "negative_total": 3,
+      "p95_ms": 0.05878199590370059,
+      "provenance_present": 20,
+      "repair_passed": true,
+      "tasks": 20
+    },
+    "cross-domain": {
+      "abstained": 0,
+      "completion": 1.0,
+      "confident_errors": 0,
+      "correct": 10,
+      "gate_passed": true,
+      "median_ms": 0.08164852624759078,
+      "negative_abstained": 2,
+      "negative_total": 2,
+      "p95_ms": 0.15598000027239323,
+      "provenance_present": 10,
+      "repair_passed": true,
+      "tasks": 10
+    },
+    "math": {
+      "abstained": 0,
+      "completion": 1.0,
+      "confident_errors": 0,
+      "correct": 20,
+      "gate_passed": true,
+      "median_ms": 0.04182997508905828,
+      "negative_abstained": 4,
+      "negative_total": 4,
+      "p95_ms": 0.10056298924610019,
+      "provenance_present": 20,
+      "repair_passed": true,
+      "tasks": 20
+    },
+    "translation": {
+      "abstained": 0,
+      "completion": 1.0,
+      "confident_errors": 0,
+      "correct": 20,
+      "gate_passed": true,
+      "median_ms": 0.010149495210498571,
+      "negative_abstained": 3,
+      "negative_total": 3,
+      "p95_ms": 0.020239967852830887,
+      "provenance_present": 20,
+      "repair_passed": true,
+      "tasks": 20
+    }
+  },
+  "version": 1
+}
