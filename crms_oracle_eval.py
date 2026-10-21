@@ -11,6 +11,7 @@ import collections
 import random
 import re
 import sqlite3
+import sys
 from pathlib import Path
 from typing import Any, Iterable, Sequence
 
@@ -47,7 +48,8 @@ def sample_questions(index_path: str | Path, *, per_relation: int = 150, seed: i
     for kind, field, template, mode in RELATIONS:
         rows = connection.execute(
             "SELECT title, substr(body,1,2500) FROM source_documents WHERE body LIKE ? "
-            "ORDER BY random() LIMIT 1500", (kind + "%",)).fetchall()
+            "ORDER BY (rowid * 2654435761 + ?) % 4294967296 LIMIT 1500",
+            (kind + "%", seed)).fetchall()      # deterministic for a given seed
         rng.shuffle(rows)
         taken = 0
         for title, body in rows:
@@ -102,3 +104,82 @@ def evaluate(engine: Any, items: Sequence[dict[str, Any]]) -> dict[str, Any]:
             "utility": total["correct"] - 3 * total["wrong"],
             "per_relation": {k: dict(v) for k, v in sorted(per.items())},
             "wrong_examples": wrong_examples}
+
+
+_ABSTAIN = re.compile(
+    r"won't guess|couldn't verify|does not support|can't safely|I don't have|I don't know|"
+    r"do not have|I couldn't|couldn't find|no retrieved sentence|I can't|not enough", re.I)
+
+
+def chat_answer(chat: Path, index: Path, question: str, *, timeout: int = 180) -> str:
+    """Ask one question in a fresh, isolated chat session; return the answer text."""
+    import subprocess
+    import tempfile
+    with tempfile.TemporaryDirectory(prefix="crms-baseline-") as folder:
+        command = [sys.executable, str(chat), "--index", str(index)]
+        for name in ("dialogue-state", "candidate-session", "rule-session", "math-session"):
+            command += [f"--{name}", f"{folder}/{name}.json"]
+        command += ["--feedback-db", f"{folder}/feedback.sqlite3"]
+        try:
+            out = subprocess.run(command, input=question + "\n/quit\n", text=True,
+                                 capture_output=True, timeout=timeout, cwd=folder).stdout
+        except (subprocess.TimeoutExpired, OSError):
+            return ""
+    parts = out.split("CRMS> ")
+    if len(parts) < 2:
+        return ""
+    answer = re.sub(r"\s*you>\s*$", "", parts[1].strip())
+    answer = re.sub(r"\[Source:[^\]]*\]", "", answer)
+    return answer.split("CRMS state saved")[0].strip()
+
+
+def baseline_chat(chat: Path, index: Path, items: Sequence[dict[str, Any]], *,
+                  workers: int = 8) -> list[str]:
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(workers) as pool:
+        return list(pool.map(lambda it: chat_answer(chat, index, it["question"]), items))
+
+
+def grade(item: dict[str, Any], answer: str | None) -> str:
+    """correct / wrong / abstain for one answer to one oracle question."""
+    if not answer or _ABSTAIN.search(answer):
+        return "abstain"
+    return "correct" if matches(item["gold"], answer) else "wrong"
+
+
+def compare(items: Sequence[dict[str, Any]], relation_answers: Sequence[str | None],
+            baseline_answers: Sequence[str]) -> dict[str, Any]:
+    """Quote baseline vs relation layer alone vs relation-first with baseline fallback."""
+    systems = {"baseline": collections.Counter(), "relation_only": collections.Counter(),
+               "combined": collections.Counter()}
+    per: dict[str, dict[str, collections.Counter]] = collections.defaultdict(
+        lambda: {k: collections.Counter() for k in systems})
+    changes = {"gained": 0, "lost": 0, "wrong_to_correct": 0, "correct_to_wrong": 0}
+    examples: list[dict[str, str]] = []
+    for item, rel, base in zip(items, relation_answers, baseline_answers):
+        b = grade(item, base)
+        r = grade(item, rel) if rel else "abstain"
+        c = grade(item, rel) if rel else b
+        for name, status in (("baseline", b), ("relation_only", r), ("combined", c)):
+            systems[name][status] += 1
+            per[item["relation"]][name][status] += 1
+        if b != "correct" and c == "correct":
+            changes["gained"] += 1
+        if b == "correct" and c != "correct":
+            changes["lost"] += 1
+            if len(examples) < 20:
+                examples.append({"question": item["question"], "gold": item["gold"],
+                                 "baseline": (base or "")[:120], "combined": (rel or "")[:120]})
+        if b == "wrong" and c == "correct":
+            changes["wrong_to_correct"] += 1
+        if b == "correct" and c == "wrong":
+            changes["correct_to_wrong"] += 1
+    def summary(counter):
+        n = sum(counter.values())
+        answered = counter["correct"] + counter["wrong"]
+        return {**dict(counter), "questions": n,
+                "wrong_rate_of_answered": round(counter["wrong"] / answered, 4) if answered else 0.0,
+                "utility": counter["correct"] - 3 * counter["wrong"]}
+    return {"systems": {k: summary(v) for k, v in systems.items()},
+            "per_relation": {rel: {k: dict(v) for k, v in d.items()} for rel, d in sorted(per.items())},
+            "changes_vs_baseline": changes, "lost_examples": examples}

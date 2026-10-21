@@ -7,155 +7,182 @@
     "passed": 12,
     "mean_copy_ratio": 0.15696
   },
-  "oracle_sample": {
-    "questions": 1050,
-    "no_candidate": 777,
-    "correct": 254,
-    "wrong": 19,
-    "coverage": 0.26,
-    "wrong_rate_of_answered": 0.0696,
-    "utility": 197,
-    "per_relation": {
-      "artist": {
-        "no_candidate": 51,
-        "correct": 96,
-        "wrong": 3
+  "oracle_comparison": {
+    "systems": {
+      "baseline": {
+        "abstain": 813,
+        "correct": 182,
+        "wrong": 55,
+        "questions": 1050,
+        "wrong_rate_of_answered": 0.2321,
+        "utility": 17
       },
-      "author": {
-        "no_candidate": 93,
-        "correct": 51,
-        "wrong": 6
+      "relation_only": {
+        "correct": 260,
+        "abstain": 769,
+        "wrong": 21,
+        "questions": 1050,
+        "wrong_rate_of_answered": 0.0747,
+        "utility": 197
       },
-      "developer": {
-        "no_candidate": 117,
-        "correct": 27,
-        "wrong": 6
-      },
-      "director": {
-        "no_candidate": 106,
-        "correct": 42,
-        "wrong": 2
-      },
-      "foundation": {
-        "no_candidate": 135,
-        "correct": 14,
-        "wrong": 1
-      },
-      "founder": {
-        "no_candidate": 138,
-        "wrong": 1,
-        "correct": 11
-      },
-      "producer": {
-        "no_candidate": 137,
-        "correct": 13
+      "combined": {
+        "correct": 388,
+        "abstain": 615,
+        "wrong": 47,
+        "questions": 1050,
+        "wrong_rate_of_answered": 0.108,
+        "utility": 247
       }
     },
-    "wrong_examples": [
-      {
-        "question": "Who directed Near Dark?",
-        "gold": "Kathryn Bigelow",
-        "answer": "Alex Proyas directed Near Dark."
+    "per_relation": {
+      "artist": {
+        "baseline": {
+          "abstain": 145,
+          "correct": 1,
+          "wrong": 4
+        },
+        "relation_only": {
+          "correct": 99,
+          "abstain": 50,
+          "wrong": 1
+        },
+        "combined": {
+          "correct": 99,
+          "abstain": 49,
+          "wrong": 2
+        }
       },
-      {
-        "question": "Who directed Zombie Night?",
-        "gold": "John Gulager",
-        "answer": "David Michael together directed Zombie Night."
+      "author": {
+        "baseline": {
+          "abstain": 147,
+          "correct": 3
+        },
+        "relation_only": {
+          "correct": 51,
+          "abstain": 95,
+          "wrong": 4
+        },
+        "combined": {
+          "correct": 53,
+          "abstain": 93,
+          "wrong": 4
+        }
       },
-      {
-        "question": "Who wrote Chicka Chicka 1, 2, 3?",
-        "gold": "Bill Martin, Jr. & Michael Sampson",
-        "answer": "Bill Martin, Jr wrote Chicka Chicka 1, 2, 3."
+      "developer": {
+        "baseline": {
+          "wrong": 19,
+          "abstain": 120,
+          "correct": 11
+        },
+        "relation_only": {
+          "abstain": 111,
+          "correct": 31,
+          "wrong": 8
+        },
+        "combined": {
+          "wrong": 10,
+          "abstain": 106,
+          "correct": 34
+        }
       },
-      {
-        "question": "Who wrote Middlemarch?",
-        "gold": "George Eliot (Mary Ann Evans)",
-        "answer": "English author George Eliot wrote Middlemarch."
+      "director": {
+        "baseline": {
+          "abstain": 117,
+          "correct": 24,
+          "wrong": 9
+        },
+        "relation_only": {
+          "correct": 39,
+          "abstain": 109,
+          "wrong": 2
+        },
+        "combined": {
+          "correct": 48,
+          "abstain": 93,
+          "wrong": 9
+        }
       },
-      {
-        "question": "Who wrote Fire and Fury?",
-        "gold": "Michael Wolff",
-        "answer": "Fire and Fury is a book by Michael Woff."
+      "foundation": {
+        "baseline": {
+          "abstain": 124,
+          "wrong": 5,
+          "correct": 21
+        },
+        "relation_only": {
+          "abstain": 135,
+          "wrong": 2,
+          "correct": 13
+        },
+        "combined": {
+          "abstain": 123,
+          "wrong": 5,
+          "correct": 22
+        }
       },
-      {
-        "question": "Who wrote The Bad Beginning?",
-        "gold": "Lemony Snicket (pen name of Daniel Handler)",
-        "answer": "The Bad Beginning is a book by Lemony Snicket."
+      "founder": {
+        "baseline": {
+          "correct": 117,
+          "abstain": 30,
+          "wrong": 3
+        },
+        "relation_only": {
+          "abstain": 132,
+          "wrong": 3,
+          "correct": 15
+        },
+        "combined": {
+          "correct": 117,
+          "abstain": 28,
+          "wrong": 5
+        }
       },
+      "producer": {
+        "baseline": {
+          "abstain": 130,
+          "wrong": 15,
+          "correct": 5
+        },
+        "relation_only": {
+          "abstain": 137,
+          "wrong": 1,
+          "correct": 12
+        },
+        "combined": {
+          "abstain": 123,
+          "wrong": 12,
+          "correct": 15
+        }
+      }
+    },
+    "changes_vs_baseline": {
+      "gained": 207,
+      "lost": 1,
+      "wrong_to_correct": 22,
+      "correct_to_wrong": 1
+    },
+    "lost_examples": [
       {
-        "question": "Who wrote The Reptile Room?",
-        "gold": "Lemony Snicket (pen name of Daniel Handler)",
-        "answer": "Lemony Snicket wrote The Reptile Room."
-      },
-      {
-        "question": "Who wrote A Brief History of Time?",
-        "gold": "Stephen Hawking",
-        "answer": "The scientist wrote A Brief History of Time."
-      },
-      {
-        "question": "Who made Mama?",
-        "gold": "Exo",
-        "answer": "Mama is the third album by Martha Wainwright."
-      },
-      {
-        "question": "Who made We Invented the Remix?",
-        "gold": "P. Diddy and The Bad Boy Family",
-        "answer": "We Invented the Remix is a remix album by P. Diddy."
-      },
-      {
-        "question": "Who made Heaven Up Here?",
-        "gold": "Echo & the Bunnymen",
-        "answer": "Heaven Up Here is the second studio album by Echo."
-      },
-      {
-        "question": "Who founded Haribo?",
-        "gold": "Hans Riegel Sr.",
-        "answer": "Johannes founded Haribo."
-      },
-      {
-        "question": "When was Naughty Dog founded?",
-        "gold": "1984",
-        "answer": "Naughty Dog was founded in 1986."
-      },
-      {
-        "question": "Who developed Twin Goddesses?",
-        "gold": "Polygram K.K.",
-        "answer": "PolyGram developed Twin Goddesses."
-      },
-      {
-        "question": "Who developed Europe Racing?",
-        "gold": "Davilex Games",
-        "answer": "Davilex developed Europe Racing."
-      },
-      {
-        "question": "Who developed A Hat in Time?",
-        "gold": "Gears for Breakfast",
-        "answer": "Danish game studio Gears developed A Hat in Time."
-      },
-      {
-        "question": "Who developed Ultrakill?",
-        "gold": "Arsi \"Hakita\" Patala",
-        "answer": "Arsi developed Ultrakill."
-      },
-      {
-        "question": "Who developed Nintendo Land?",
-        "gold": "Nintendo EAD Group No. 2",
-        "answer": "Nintendo developed Nintendo Land."
-      },
-      {
-        "question": "Who developed Splatoon 2?",
-        "gold": "Nintendo EPD",
-        "answer": "Nintendo developed Splatoon 2."
+        "question": "Who founded Citibank?",
+        "gold": "Samuel Osgood",
+        "baseline": "Samuel Osgood is listed as the founder of Citibank. \nyou>",
+        "combined": "Chairman Chukwuma Soludo founded Citibank."
       }
     ],
-    "seed": 20261023
+    "sample": {
+      "questions": 1050,
+      "digest": "fc3272d3967d5be295918d1aa12737d2c1e207d221e0357cf423a067c6e51a6a"
+    }
+  },
+  "oracle_gate_checks": {
+    "combined_wrong_rate_not_above_baseline": true,
+    "combined_utility_not_below_baseline": true,
+    "no_correct_answer_lost": false
   },
   "open_items": [
-    "quote-baseline comparison on the same sample",
-    "pattern-based clarity and critic rules",
-    "registry family and packaged-model tables",
-    "full experiment suite diff recorded",
+    "registry rule-family integration and packaged-model tables",
+    "clean-room run of the intake path and the oracle runner",
     "independent hand-authored intake suite",
-    "clean-room copy run"
+    "critic checks for relation and role order",
+    "sentence-boundary regex in the checks module"
   ]
 }

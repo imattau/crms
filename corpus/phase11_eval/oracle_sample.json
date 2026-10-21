@@ -1,0 +1,5256 @@
+{
+ "seed": 20261023,
+ "per_relation": 150,
+ "items": [
+  {
+   "relation": "director",
+   "question": "Who directed Pat and Mike?",
+   "gold": "George Cukor"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Turks in Space?",
+   "gold": "Kartal Tibet"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Venom: The Last Dance?",
+   "gold": "Kelly Marcel"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed We Bare Bears: The Movie?",
+   "gold": "Daniel Chong"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Come un fiore?",
+   "gold": "Benedicta Boccoli"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Story of Chinese Gods?",
+   "gold": "Chang Chih Hui"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Alien from the Deep?",
+   "gold": "Antonio Margheriti"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Fantasamagorie?",
+   "gold": "Émile Cohl"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Main Tera Hero?",
+   "gold": "David Dhawan"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Lovely Mary?",
+   "gold": "Edgar Jones"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Hello Anatolia?",
+   "gold": "Chrysovalantis Stamelos"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Munna Michael?",
+   "gold": "Sabbir Khan"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Kal Ho Naa Ho?",
+   "gold": "Nikhil Advani"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Masam Masam Manis?",
+   "gold": "P. Ramlee"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Glass Onion: A Knives Out Mystery?",
+   "gold": "Rian Johnson"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Being There?",
+   "gold": "Hal Ashby"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Hockey Homicide?",
+   "gold": "Jack Kinney"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Zombie Night?",
+   "gold": "John Gulager"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Forty Hearts?",
+   "gold": "Lev Kuleshov"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Shadow of the Vampire?",
+   "gold": "E. Elias Merhige"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Fortunella?",
+   "gold": "Eduardo De Filippo"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Furry Vengeance?",
+   "gold": "Roger Kumble"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Mr. Harrigan's Phone?",
+   "gold": "John Lee Hancock"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Winter People?",
+   "gold": "Ted Kotcheff"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed A Ghost Story?",
+   "gold": "David Lowery"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Batman v Superman: Dawn of Justice?",
+   "gold": "Zack Snyder"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Clifford's Really Big Movie?",
+   "gold": "Robert Ramirez"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Wonderful Ice Cream Suit?",
+   "gold": "Stuart Gordon"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Tale of Catfish and Toad?",
+   "gold": "Ngô Mạnh Lân"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Night of the Ghouls?",
+   "gold": "Ed Wood"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Best Exotic Marigold Hotel?",
+   "gold": "John Madden"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Titanic 666?",
+   "gold": "Nick Lyon"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Last Farm?",
+   "gold": "Rúnar Rúnarsson"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Brotherhood?",
+   "gold": "Martin Ritt"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Giantland?",
+   "gold": "Burt Gillett"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Cured?",
+   "gold": "David Freyne"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Tale of the Woods?",
+   "gold": "Yuri Tarich"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Love Untangled?",
+   "gold": "Namkoong Sun"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The babygirl and the flowerpot?",
+   "gold": "Nghiêm Dung"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Battle: Los Angeles?",
+   "gold": "Jonathan Liebesman"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Chengiz?",
+   "gold": "Rajesh Ganguly"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Zindagi Na Milegi Dobara?",
+   "gold": "Zoya Akhtar"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Mukhya Gamanika?",
+   "gold": "Venu Muralidhar Vadnala"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Usual Suspects?",
+   "gold": "Bryan Singer"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Cassandra Crossing?",
+   "gold": "George Pan Cosmatos"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Fantastic Four: First Steps?",
+   "gold": "Matt Shakman"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Mr. Peabody & Sherman?",
+   "gold": "Rob Minkoff"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Alien: Night Shift?",
+   "gold": "Aidan Brezonick"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Pursuit of Happyness?",
+   "gold": "Gabriele Muccino"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Yokai Monsters: Along With Ghosts?",
+   "gold": "Yoshiyuki Kuroda"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Bakti?",
+   "gold": "L. Krishnan"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed 97th Academy Awards?",
+   "gold": "Hamish Hamilton"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Baby Driver?",
+   "gold": "Edgar Wright"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed A Quiet Place: Day One?",
+   "gold": "Michael Sarnoski"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Mitchells vs. the Machines?",
+   "gold": "Mike Rianda"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Ice Age: Collision Course?",
+   "gold": "Mike Thurmeier"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Abu Hassan Penchuri?",
+   "gold": "B. N. Rao"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Branimals?",
+   "gold": "Paulo Munhoz"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Satellite Girl and Milk Cow?",
+   "gold": "Hyeong-yoon Jang"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Madu Tiga?",
+   "gold": "P. Ramlee"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Musang Berjanggut?",
+   "gold": "P. Ramlee"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Wrath of the Titans?",
+   "gold": "Jonathan Liebesman"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Skyfall?",
+   "gold": "Sam Mendes"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Be Happy?",
+   "gold": "Remo D'Souza"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Shaolin Soccer?",
+   "gold": "Stephen Chow"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Tarzan and His Mate?",
+   "gold": "Cedric Gibbons"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Revelations?",
+   "gold": "Yeon Sang-ho"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Man Trouble?",
+   "gold": "Bob Rafelson"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Symphony Hour?",
+   "gold": "Riley Thomson"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Powerpuff Girls Movie?",
+   "gold": "Craig McCracken"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Hasht Behesht?",
+   "gold": "Saeed Alemzadeh"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Pele Eterno?",
+   "gold": "Anibal Massaini Neto"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Do Patti?",
+   "gold": "Shashanka Chaturvedi"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Zona Zamfirova?",
+   "gold": "Zdravko Šotra"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Donald's Garden?",
+   "gold": "Dick Lundy"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Bell, Book and Candle?",
+   "gold": "Richard Quine"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed A Grand Day Out?",
+   "gold": "Nick Park"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Day-Time Wife?",
+   "gold": "Gregory Ratoff"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Daredevil Droopy?",
+   "gold": "Tex Avery"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Whalers?",
+   "gold": "David Hand"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Rio 2?",
+   "gold": "Carlos Saldanha"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The House in the Snow-Drifts?",
+   "gold": "Fridrikh Ermler"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Nasib?",
+   "gold": "B. S. Rajhans"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Tale of Gióng the Saint?",
+   "gold": "Ngô Mạnh Lân"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Mickey's Circus?",
+   "gold": "Ben Sharpsteen"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Mickey's Rival?",
+   "gold": "Wilfred Jackson"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Aashiqui?",
+   "gold": "Mahesh Bhatt"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Fall for Me?",
+   "gold": "Sherry Hormann"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Godzilla: Final Wars?",
+   "gold": "Ryuhei Kitamura"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Hyappatsu hyakuchu?",
+   "gold": "Jun Fukuda"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Antara Dua Darjat?",
+   "gold": "P. Ramlee"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Just One of the Guys?",
+   "gold": "Lisa Gottlieb"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Aquamania?",
+   "gold": "Wolfgang Reitherman"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Sorry, Wrong Number?",
+   "gold": "Anatole Litvak"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Run of the Country?",
+   "gold": "Peter Yates"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Little Whirlwind?",
+   "gold": "Riley Thomson"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed ¡Que viva México!?",
+   "gold": "Sergei Eisenstein"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Nilam?",
+   "gold": "B. S. Rajhans"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Pluto's Christmas Tree?",
+   "gold": "Jack Hannah"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Killing a Traitor?",
+   "gold": "Masoud Kimiai"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Avatar: Fire and Ash?",
+   "gold": "James Cameron"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed School Ties?",
+   "gold": "Robert Mandel"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed A Simple Case?",
+   "gold": "Vsevolod Pudovkin"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed 10,000 Kids and a Cop?",
+   "gold": "Charles Barton"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Winter Storage?",
+   "gold": "Jack Hannah"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed R.I.P.D. 2: Rise of the Damned?",
+   "gold": "Paul Leyden"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Shin Godzilla?",
+   "gold": "Hideki Anno"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Bab El-Oued City?",
+   "gold": "Merzak Allouache"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Des Hommes?",
+   "gold": "Lucas Belvaux"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Rocketry: The Nambi Effect?",
+   "gold": "R. Madhavan"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Nifty Nineties?",
+   "gold": "Riley Thomson"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Krrish?",
+   "gold": "Rakesh Roshan"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Brave Little Tailor?",
+   "gold": "Bill Roberts"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Pendekar Bujang Lapok?",
+   "gold": "P. Ramlee"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Finding Bliss?",
+   "gold": "Julie Davis"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Passion Fish?",
+   "gold": "John Sayles"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Koi... Mil Gaya?",
+   "gold": "Rakesh Roshan"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Beezy Bear?",
+   "gold": "Jack Hannah"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Re-Animator?",
+   "gold": "Stuart Gordon"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Bujang Lapok Kembali Daa?",
+   "gold": "Aziz Sattar"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed D.A.R.Y.L.?",
+   "gold": "Simon Wincer"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Ain't Them Bodies Saints?",
+   "gold": "David Lowery"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Doraemon: Nobita's Little Star Wars 2021?",
+   "gold": "Susumu Yamaguchi"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Thor: Ragnarok?",
+   "gold": "Taika Waititi"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Mickey's Trailer?",
+   "gold": "Ben Sharpsteen"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Father's Lion?",
+   "gold": "Jack Kinney"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed EuroTrip?",
+   "gold": "Jeff Schaffer"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Outlaw King?",
+   "gold": "David Mackenzie"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Sadak 2?",
+   "gold": "Mahesh Bhatt"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed To Sir, with Love?",
+   "gold": "James Clavell"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Other Sister?",
+   "gold": "Garry Marshall"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed R'coon Dawg?",
+   "gold": "Charles A. Nichols"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Damsel?",
+   "gold": "Juan Carlos Fresnadillo"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed She's All That?",
+   "gold": "Robert Iscove"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Don's Fountain of Youth?",
+   "gold": "Jack Hannah"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed 7aum Arivu?",
+   "gold": "A. R. Murugadoss"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Loud House Movie?",
+   "gold": "Chris Savino"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed La légende de Thierry Mauvignier?",
+   "gold": "Dylan Besseau"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Kya Kehna?",
+   "gold": "Kundan Shah"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Kabhi Alvida Naa Kehna?",
+   "gold": "Karan Johar"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed All This and Rabbit Stew?",
+   "gold": "Fred Avery (not credited)"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Maleficent: Mistress of Evil?",
+   "gold": "Joachim Rønning"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Super Inframan?",
+   "gold": "Hua Shan"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Contrary Condor?",
+   "gold": "Jack King"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Amar Prem Ki Prem Kahani?",
+   "gold": "Hardik Gajjar"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Cat Daddies?",
+   "gold": "Mye Hoang"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed From Hand to Mouth?",
+   "gold": "Alfred J. Goulding"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Mickey's Polo Team?",
+   "gold": "David Hand"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed The Northman?",
+   "gold": "Robert Eggers"
+  },
+  {
+   "relation": "director",
+   "question": "Who directed Jungle Rhythm?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Doraemon: Nobita's Little Star Wars 2021?",
+   "gold": "writer ="
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Kabhi Alvida Naa Kehna?",
+   "gold": "Hiroo Yash Johar"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Night Coachman?",
+   "gold": "writer = Moses Zats"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Olympic Champ?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Thor: Ragnarok?",
+   "gold": "Kevin Feige"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Aquamania?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Trailer Horn?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Cities and Years?",
+   "gold": "writer ="
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Clearing?",
+   "gold": "writer = David Matalon"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Thor: The Dark World?",
+   "gold": "Kevin Feige"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Zindagi Na Milegi Dobara?",
+   "gold": "Farhan Akhtar"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Batman v Superman: Dawn of Justice?",
+   "gold": "Charles Roven"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Titanic 666?",
+   "gold": "David Michael Latt"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Bujang Lapok Kembali Daa?",
+   "gold": "writer = Aziz Sattar"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Alarm in the Circus?",
+   "gold": "Paul Ramacher"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Kabhi Khushi Kabhie Gham?",
+   "gold": "Yash Johar"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Jewel Thief – The Heist Begins?",
+   "gold": "Siddharth Anand"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Dil Bechara?",
+   "gold": "writer ="
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Loud House Movie?",
+   "gold": "Karen Malach"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced 7aum Arivu?",
+   "gold": "Udhayanidhi Stalin"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Toy Tinkers?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Aashiqui?",
+   "gold": "Gulshan Kumar"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Don 2?",
+   "gold": "Farhan Akhtar"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Shark Night?",
+   "gold": "Chris Briggs"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Chinta?",
+   "gold": "writer ="
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Baaghi 2?",
+   "gold": "Sajid Nadiadwala"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Lizzie McGuire Movie?",
+   "gold": "Stan Rogow"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced My Hero Academia: Two Heroes?",
+   "gold": "writer = Yōsuke Kuroda"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Oggy and the Cockroaches: The Movie?",
+   "gold": "Marc du Pontavice"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Branimals?",
+   "gold": "writer ="
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Back Bencherz?",
+   "gold": "Ramya Rajshekar"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The New Neighbor?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Dreambuilders?",
+   "gold": "Sunit Parekh"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Brave Little Tailor?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Kolamavu Kokila?",
+   "gold": "Allirajah Subaskaran"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Nanak Naam Jahaz Hai?",
+   "gold": "* Maann Singh Deep"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Bujang Lapok?",
+   "gold": "Run Run Shaw"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced House of 1000 Corpses?",
+   "gold": "Andy Gould"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Window Cleaners?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Cruel Intentions?",
+   "gold": "Neal H. Moritz"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced How to Fish?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The House in the Snow-Drifts?",
+   "gold": "screenplay = Boris Leonidov"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced La légende de Thierry Mauvignier?",
+   "gold": "Guillaume Gevart"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Hockey Homicide?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Ek Kori Prem Katha?",
+   "gold": "starring ="
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Uriyadi 2?",
+   "gold": "Suriya"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Croods: A New Age?",
+   "gold": "Mark Swift"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Chennai Express?",
+   "gold": "Gauri Khan"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Kaabil?",
+   "gold": "Rakesh Roshan"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Lupo the Butcher?",
+   "gold": "Marv Newland"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Khun Tong Daeng: The Inspirations?",
+   "gold": "writer = Issaraporn Kuntisuk"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Two-Buldi-Two?",
+   "gold": "writer ="
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced 3 Giant Men?",
+   "gold": "Hasan Tual"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Clifford's Really Big Movie?",
+   "gold": "Deborah Forte"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Krrish 3?",
+   "gold": "Rakesh Roshan"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced How to Play Football?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Sadak 2?",
+   "gold": "Mukesh Bhatt"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Lagaan?",
+   "gold": "Aamir Khan"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced A Knight for a Day?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Dekalog?",
+   "gold": "Ryszard Chutkowski"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Tarzan the Ape Man?",
+   "gold": "Irving Thalberg"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Welldeserved Fox?",
+   "gold": "Lê Minh Hiền"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced French Roast?",
+   "gold": "Bibo Bergeron"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Ice Age: Boiling Point?",
+   "gold": "screenplay ="
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Daech, les enfants fantômes?",
+   "gold": "Cinétévé"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced All in a Nutshell?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Donald's Tire Trouble?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Pele Eterno?",
+   "gold": "writer ="
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Alien from the Deep?",
+   "gold": "Gianfranco Couyoumdjian"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced White Shirt?",
+   "gold": "Sumit Arora"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Lambasingi - A Pure Love Story?",
+   "gold": "Anand Tanniru"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Cats & Dogs?",
+   "gold": "Ed Jones"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Ahmad Albab?",
+   "gold": "writer = P. Ramlee"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Hasht Behesht?",
+   "gold": "Amir Hossein Sharifi"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Spirited Away?",
+   "gold": "Toshio Suzuki"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Mujhse Dosti Karoge?",
+   "gold": "Yash Chopra"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Dexter's Laboratory: Ego Trip?",
+   "gold": "Genndy Tartakovsky"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The babygirl and the flowerpot?",
+   "gold": "Lê Thanh"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Gulliver Mickey?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Spiders: Wild Scheme A-Go Go?",
+   "gold": "Hideo Sasai"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Winter Storage?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced 12 Monkeys?",
+   "gold": "Charles Roven"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Accattone?",
+   "gold": "Alfredo Bini"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Happiness Is... Part 2?",
+   "gold": "Marina Zhigalova-Ozkan"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Fortunella?",
+   "gold": "writer ="
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Allah Is Not Obliged?",
+   "gold": "Adrien Chef"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced We Bare Bears: The Movie?",
+   "gold": "Carrie Wilksen"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Minnale?",
+   "gold": "Sunanda Murali Manohar"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Frozen II?",
+   "gold": "Peter Del Vecho"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Kiss Me Kosher?",
+   "gold": "Christine Günther"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Race 2?",
+   "gold": "Ramesh S Taurani"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Man Who Saved The World?",
+   "gold": "Mehmet Karahafız"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Pee-wee's Big Holiday?",
+   "gold": "Judd Apatow"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Tarzan and His Mate?",
+   "gold": "Bernard H. Hyman"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Bootle Beetle?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Earwig and the Witch?",
+   "gold": "Toshio Suzuki"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Theeran Adhigaram Ondru?",
+   "gold": "S. R. Prakashbabu"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Jews on Land?",
+   "gold": "writer ="
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Dhayam?",
+   "gold": "A. R. S. Sunder"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Duran Duran: A Hollywood High?",
+   "gold": "James Belsham"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The House on Trubnaya?",
+   "gold": "writer = Bella Zorich"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Last Attraction?",
+   "gold": "writer ="
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced KPop Demon Hunters?",
+   "gold": "Michelle Wong"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced From Hand to Mouth?",
+   "gold": "Hal Roach"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Chef Donald?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Hold That Pose?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Whalers?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Nasib Si Labu Labi?",
+   "gold": "writer = P. Ramlee"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced EuroTrip?",
+   "gold": "Alec Berg"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Rwanda : Le silence des mots?",
+   "gold": "Babel Doc"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced An Hour with Chekhov?",
+   "gold": "writer = Anton Chekhov"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Rescuers Down Under?",
+   "gold": "Thomas Schumacher"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Thru the Mirror?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Gadar: Ek Prem Katha?",
+   "gold": "Nittin Keni"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Main Tera Hero?",
+   "gold": "Shobha Kapoor"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Daredevil Droopy?",
+   "gold": "Fred Quimby"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Once Upon Two Times?",
+   "gold": "Shashi Mittal"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Humraaz?",
+   "gold": "Ganesh Jain"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Hasaki Ya Suda?",
+   "gold": "DACP Films I Do Films"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Night of the Ghouls?",
+   "gold": "Ed Wood"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Zombie Night?",
+   "gold": "David Michael Latt"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Powerpuff Girls Movie?",
+   "gold": "Donna Castricone"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Koi... Mil Gaya?",
+   "gold": "Rakesh Roshan"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Three for Breakfast?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Almost Cops?",
+   "gold": "Netflix Netherlands"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Jungle Rhythm?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Fantasamagorie?",
+   "gold": "Émile Cohl"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Man Trouble?",
+   "gold": "Vittorio Cecchi Gori"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Golden Beak?",
+   "gold": "writer ="
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced To Sir, with Love?",
+   "gold": "James Clavell"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced A Wild Hare?",
+   "gold": "Leon Schlesinger"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Tom and Jerry: The Forbidden Compass?",
+   "gold": "Zhang Gang"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Machine Girl?",
+   "gold": "Yoshinori Chiba"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Smosh: The Movie?",
+   "gold": "Brian Robbins"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Kya Kehna?",
+   "gold": "Kumar S Taurani"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Almost Heroes?",
+   "gold": "Denise Di Novi"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Simple Things?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Pardes?",
+   "gold": "Subhash Ghai"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Story of Chinese Gods?",
+   "gold": "Chang Ying"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Mr. Duck Steps Out?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Lion Around?",
+   "gold": "Walt Disney"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Shaheed-e-Mohabbat Boota Singh?",
+   "gold": "Manjeet Maan"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Hanu-Man?",
+   "gold": "K. Niranjan Reddy"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Tale of moon rabbits?",
+   "gold": "Xuân Phương"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Civil Servant?",
+   "gold": "writer = Vsevolod Pavlovskiy"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced The Last Farm?",
+   "gold": "Þórir Snær Sigurjónsson"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Tale of Gióng the Saint?",
+   "gold": "writer = Tô Hoài"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Hello Anatolia?",
+   "gold": "Chrysovalantis Stamelos"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Crrush?",
+   "gold": "Ravi Babu"
+  },
+  {
+   "relation": "producer",
+   "question": "Who produced Yokai Monsters: Along With Ghosts?",
+   "gold": "Masaichi Nagata"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Hidden Oracle?",
+   "gold": "Rick Riordan"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote A Child's Garden of Verses?",
+   "gold": "Robert Louis Stevenson"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote With Chronos' Permit?",
+   "gold": "Andrei Gusev"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Miracles from Heaven?",
+   "gold": "Christy Beam"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Tarikh-e-Mirza?",
+   "gold": "Sanaullah Amritsari"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Orsinian Tales?",
+   "gold": "Ursula K. Le Guin"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Història de la Marina Catalana?",
+   "gold": "Arcadi Garcia Sanz"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Robinson Crusoe?",
+   "gold": "Daniel Defoe"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote A Treatise of Human Nature?",
+   "gold": "David Hume"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Geographia Generalis?",
+   "gold": "Bernhardus Varenius"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Militancy in the name of Islam?",
+   "gold": "Khandaker Abdullah Jahangir"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote In Mortal Hands?",
+   "gold": "Stephanie Cooke"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Discworld?",
+   "gold": "Terry Pratchett"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Eugene Onegin?",
+   "gold": "Alexander Pushkin"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Bert Diaries?",
+   "gold": "Anders Jacobsson and Sören Olsson"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Night Flights?",
+   "gold": "Philip Reeve"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Primavera para Madrid?",
+   "gold": "Diego Corbalán (Magius)"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Wind's Twelve Quarters?",
+   "gold": "Ursula K. Le Guin"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Beyond Order?",
+   "gold": "Jordan Peterson"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Language of the Night?",
+   "gold": "Ursula K. Le Guin"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Mister Novelist?",
+   "gold": "Andrei Gusev"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Power of One?",
+   "gold": "Bryce Courtenay"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote This Earth of Mankind?",
+   "gold": "Pramoedya Ananta Toer"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Refugee Boy?",
+   "gold": "Benjamin Zephaniah"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote A Place Apart?",
+   "gold": "Dervla Murphy"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Jack and Jill: A Village Story?",
+   "gold": "Louisa May Alcott"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Communist Manifesto?",
+   "gold": "Karl Marx and Friedrich Engels"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Great Soviet Encyclopedia?",
+   "gold": "country ="
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Fertilisation of Orchids?",
+   "gold": "Charles Darwin"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Wild Baby?",
+   "gold": "Barbro Lindgren"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Max the Mighty?",
+   "gold": "Rodman Philbrick"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Dead Children Playing?",
+   "gold": "Stanley Donwood"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Rude Boy USA?",
+   "gold": "Victoria Bolton"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Understanding Media?",
+   "gold": "Marshall McLuhan"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Fever Crumb?",
+   "gold": "Philip Reeve"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Seven Spiritual Laws of Success?",
+   "gold": "Deepak Chopra"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Angel's Command?",
+   "gold": "Brian Jacques"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Theory of Colours?",
+   "gold": "Johann Wolfgang von Goethe"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Heart of Darkness?",
+   "gold": "Joseph Conrad"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote A Murder of Quality?",
+   "gold": "John le Carré"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Fire and Fury?",
+   "gold": "Michael Wolff"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Hōjōki?",
+   "gold": "Kamo no Chōmei"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Naked Lunch?",
+   "gold": "William S. Burroughs"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Tale of Peter Rabbit?",
+   "gold": "Beatrix Potter"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Inkheart?",
+   "gold": "Cornelia Funke"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Nur al-Idah?",
+   "gold": "Imam Shurunbulali"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Salmon of Doubt?",
+   "gold": "Douglas Adams"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote I Ching?",
+   "gold": "title_orig ="
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Rogue Crew?",
+   "gold": "Brian Jacques"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote A Study in Scarlet?",
+   "gold": "Sir Arthur Conan Doyle"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Slaughterhouse-Five?",
+   "gold": "Kurt Vonnegut"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Selfish Gene?",
+   "gold": "Richard Dawkins"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Majamu al-Fatawa?",
+   "gold": "Ibn Taymiyyah"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Autobiography of Alice B. Toklas?",
+   "gold": "Gertrude Stein"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Gulag Archipelago?",
+   "gold": "Aleksandr Solzhenitsyn"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Journey to the West?",
+   "gold": "Wu Cheng'en"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Jane Eyre?",
+   "gold": "Charlotte Brontë"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Black Arrow?",
+   "gold": "Robert Louis Stevenson"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Rest of the Robots?",
+   "gold": "Isaac Asimov"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The White Guard?",
+   "gold": "Mikhail Bulgakov"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Little Prince?",
+   "gold": "Antoine de Saint-Exupéry"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Contesting the Future of Nuclear Power?",
+   "gold": "Benjamin K. Sovacool"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Azerbaijani Soviet Encyclopedia?",
+   "gold": "Rasul Rza, Jemil Kuliyev"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Epistulae Morales ad Lucilium?",
+   "gold": "Seneca"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Australian Dictionary of Biography?",
+   "gold": "audio_read_by ="
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Moomins?",
+   "gold": "Tove Jansson"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Unlimited Dream Company?",
+   "gold": "J. G. Ballard"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Dream of the Red Chamber?",
+   "gold": "Cao Xueqin"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Malay Dilemma?",
+   "gold": "Mahathir Mohamad"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Uncle Tom's Cabin?",
+   "gold": "Harriet Beecher Stowe"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Neue Deutsche Biographie?",
+   "gold": "Bavarian Academy of Sciences and Humanities"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Where the Red Fern Grows?",
+   "gold": "Wilson Rawls"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Encyclopedia of Ancient Christianity?",
+   "gold": "illustrator ="
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Coming Up for Air?",
+   "gold": "George Orwell"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Green Mansions?",
+   "gold": "W. H. Hudson"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Evelina?",
+   "gold": "Frances Burney"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Great Expectations?",
+   "gold": "Charles Dickens"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Sexual Revolution?",
+   "gold": "Wilhelm Reich"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Pasyon?",
+   "gold": "Gaspar Aquino de Belén"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Gospel in Brief?",
+   "gold": "Leo Tolstoy"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Tales of Kanglei Throne?",
+   "gold": "Linthoi Chanu"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Enciclopedia d'arte italiana?",
+   "gold": "Alberto Moioli"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Thérèse Raquin?",
+   "gold": "Emile Zola"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Future I Saw?",
+   "gold": "Ryo Tatsuki"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Go Set a Watchman?",
+   "gold": "Harper Lee"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Bad Beginning?",
+   "gold": "Lemony Snicket (pen name of Daniel Handler)"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Theory of Moral Sentiments?",
+   "gold": "Adam Smith"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Island Nights' Entertainments?",
+   "gold": "Robert Louis Stevenson"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote A Clergyman's Daughter?",
+   "gold": "George Orwell"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote A Web of Air?",
+   "gold": "Philip Reeve"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Kitab al-Futuh?",
+   "gold": "Sayf ibn Umar"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Ickabog?",
+   "gold": "J.K. Rowling"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Ben-Hur: A Tale of the Christ?",
+   "gold": "Lew Wallace"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Reptile Room?",
+   "gold": "Lemony Snicket (pen name of Daniel Handler)"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote 12 Rules for Life?",
+   "gold": "Jordan Peterson"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Bartlett's Familiar Quotations?",
+   "gold": "John Bartlett"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Vocabulario de la Lengua Bicol?",
+   "gold": "illustrator ="
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Illustrated World of Mortal Engines?",
+   "gold": "Philip Reeve"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Worm Ouroboros?",
+   "gold": "E.R. Eddison"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Les Fleurs du mal?",
+   "gold": "Charles Baudelaire"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Old Yeller?",
+   "gold": "Fred Gipson"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Mr. Chatterbox?",
+   "gold": "Roger Hargreaves"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Chicka Chicka 1, 2, 3?",
+   "gold": "Bill Martin, Jr. & Michael Sampson"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Go, Dog. Go!?",
+   "gold": "P. D. Eastman"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Memories of My Melancholy Whores?",
+   "gold": "Gabriel García Márquez"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Romance of the Three Kingdoms?",
+   "gold": "Luo Guanzhong"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote On the Road?",
+   "gold": "Jack Kerouac"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Meitheis?",
+   "gold": "Thomas Callan Hodson"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote I, Robot?",
+   "gold": "Isaac Asimov"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Castle of Otranto?",
+   "gold": "Horace Walpole"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Kural?",
+   "gold": "Valluvar"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Basic Economics?",
+   "gold": "Thomas Sowell"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Great Russian Encyclopedia?",
+   "gold": "Various contributors"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Kitab at-Tawheed?",
+   "gold": "Muhammad ibn Abd al-Wahhab"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Named?",
+   "gold": "Marianne Curley"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Little Red Book?",
+   "gold": "Mao Zedong"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Sable Quean?",
+   "gold": "Brian Jacques"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Foundations of Geopolitics?",
+   "gold": "Aleksandr Dugin"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Going Solo?",
+   "gold": "Roald Dahl"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Death of the West?",
+   "gold": "Patrick J. Buchanan"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Great Redwall Feast?",
+   "gold": "Brian Jacques"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Leaves of Grass?",
+   "gold": "Walt Whitman"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Voyage of Slaves?",
+   "gold": "Brian Jacques"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Bud, Not Buddy?",
+   "gold": "Christopher Paul Curtis"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Millennial Women?",
+   "gold": "Edited by Virginia Kidd"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Pickwick Papers?",
+   "gold": "Charles Dickens (\"Boz\")"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Little Lord Fauntleroy?",
+   "gold": "Frances Hodgson Burnett"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Steering the Craft?",
+   "gold": "Ursula K. Le Guin"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The President's Keeper?",
+   "gold": "Pauw Jacques"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Four Ways to Forgiveness?",
+   "gold": "Ursula K. Le Guin"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Spirit of the Laws?",
+   "gold": "Montesquieu"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Fault in Our Stars?",
+   "gold": "John Green"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote What Were We Thinking?",
+   "gold": "Carlos Lozada"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The World According to Novikoff?",
+   "gold": "Andrei Gusev"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Vagabonds!?",
+   "gold": "Eloghosa Osunde"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Hunting of the Snark?",
+   "gold": "Lewis Carroll"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Tarikh e Khandan e Timuriyah?",
+   "gold": "Akbar"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Son of Neptune?",
+   "gold": "Rick Riordan"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Banglapedia?",
+   "gold": "Professor Sirajul Islam (Chief Editor)"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote The Crow Eaters?",
+   "gold": "Bapsi Sidhwa"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Cancer Ward?",
+   "gold": "Aleksandr Solzhenitsyn"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Let Me Stand Alone?",
+   "gold": "Rachel Corrie"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Phouoibi Waron?",
+   "gold": "Anonymous"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote After the Spike?",
+   "gold": "Dean Spears and Michael Geruso"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Ten, Nine, Eight?",
+   "gold": "Molly Bang"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Paradise Lost?",
+   "gold": "John Milton"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Konthoujam Nongarol?",
+   "gold": "Meitei scriptures"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Lord of the Flies?",
+   "gold": "William Golding"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Minecart?",
+   "gold": "Ryūnosuke Akutagawa"
+  },
+  {
+   "relation": "author",
+   "question": "Who wrote Heart of a Dog?",
+   "gold": "Mikhail Bulgakov"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Ultimate Victory?",
+   "gold": "Chamillionaire"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made S4!Sash!?",
+   "gold": "Sash!"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made The Fall of Rome?",
+   "gold": "Winter Solstice"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made One Wild Night Live 1985–2001?",
+   "gold": "Bon Jovi"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made The Jazz Soul of Little Stevie?",
+   "gold": "Little Stevie Wonder"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Life Is a Beach?",
+   "gold": "Sash!"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Tales from the Punchbowl?",
+   "gold": "Primus"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Automatic for the People?",
+   "gold": "R.E.M."
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Sounds of Christmas?",
+   "gold": "Johnny Mathis"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Who's Zoomin' Who??",
+   "gold": "Aretha Franklin"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made A.R.S.O.N.?",
+   "gold": "Story of the Year"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made The Bitter Truth?",
+   "gold": "Evanescence"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Still, Alive... and Well??",
+   "gold": "Megadeth"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made No Sacrifice, No Victory?",
+   "gold": "HammerFall"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Scream Bloody Gore?",
+   "gold": "Death"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Where Sleeplessness Is Rest from Nightmares?",
+   "gold": "Arma Angelus"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made England's Newest Hit Makers?",
+   "gold": "The Rolling Stones"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Get Ya Mind Correct?",
+   "gold": "Paul Wall & Chamillionaire"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Chapter V: Unbent, Unbowed, Unbroken?",
+   "gold": "HammerFall"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Senjutsu?",
+   "gold": "Iron Maiden"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made To Be One With You?",
+   "gold": "Pluralone"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Jesus Is King?",
+   "gold": "Kanye West"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Miracles in December?",
+   "gold": "Exo"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Ultimate Aaliyah?",
+   "gold": "Aaliyah"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Lonely Road?",
+   "gold": "The Red Jumpsuit Apparatus"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made A Crash Course in Roses?",
+   "gold": "Catie Curtis"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Lookin' Through the Windows?",
+   "gold": "The Jackson 5"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made When We Were the New Boys?",
+   "gold": "Rod Stewart"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Tear the World Down?",
+   "gold": "We Are the Fallen"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Wind & Wuthering?",
+   "gold": "Genesis"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made The Unraveling?",
+   "gold": "Rise Against"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made The Only Easy Day Was Yesterday?",
+   "gold": "12 Stones"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made .5: The Gray Chapter?",
+   "gold": "Slipknot"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Nada Se Compara Contigo?",
+   "gold": "Álvaro Torres"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Dirty Diamonds?",
+   "gold": "Alice Cooper"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Blue Moves?",
+   "gold": "Elton John"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Queen II?",
+   "gold": "Queen"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made In Pieces?",
+   "gold": "Garth Brooks"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Shady XV?",
+   "gold": "Shady Records"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made If Only You Were Lonely XV?",
+   "gold": "Hawthorne Heights"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Weathered?",
+   "gold": "Creed"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made 4: The Remix?",
+   "gold": "Beyoncé"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Speak Now?",
+   "gold": "Taylor Swift"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Meddle?",
+   "gold": "Pink Floyd"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Conversation Peace?",
+   "gold": "Stevie Wonder"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made FanMail?",
+   "gold": "TLC"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Primera Fila: Hecho Realidad?",
+   "gold": "Ha*Ash"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made R.O.S.E.?",
+   "gold": "Jessie J"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Save Rock and Roll?",
+   "gold": "Fall Out Boy"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Otra Cosa?",
+   "gold": "Julieta Venegas"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Stardust We Are?",
+   "gold": "The Flower Kings"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Exology Chapter 1: The Lost Planet?",
+   "gold": "Exo"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Take It from the Man!?",
+   "gold": "The Brian Jonestown Massacre"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Greatest Hits: 1985–1995?",
+   "gold": "Heart"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Johnny's Greatest Hits?",
+   "gold": "Johnny Mathis"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Queen Forever?",
+   "gold": "Queen"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Baby Woman?",
+   "gold": "Naomi Campbell"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Innervisions?",
+   "gold": "Stevie Wonder"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Goodbye Yellow Brick Road?",
+   "gold": "Elton John"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Adrenalize?",
+   "gold": "Def Leppard"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Late Registration?",
+   "gold": "Kanye West"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made The Soul Sessions?",
+   "gold": "Joss Stone"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Colour Me Free!?",
+   "gold": "Joss Stone"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Sonic Firestorm?",
+   "gold": "DragonForce"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Schlagenheim?",
+   "gold": "Black Midi"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Show No Mercy?",
+   "gold": "Slayer"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Pretzel Logic?",
+   "gold": "Steely Dan"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Under the Radar Over the Top?",
+   "gold": "Scooter"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Wednesday Morning, 3 A.M.?",
+   "gold": "Simon & Garfunkel"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Countdown to Ecstasy?",
+   "gold": "Steely Dan"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Growing Up?",
+   "gold": "the Linda Lindas"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made BlackAcetate?",
+   "gold": "John Cale"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Mystery to Me?",
+   "gold": "Fleetwood Mac"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made The Best of Nudimension?",
+   "gold": "Nudimension"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Through the Window?",
+   "gold": "Calum Bowie"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Anthology 4?",
+   "gold": "The Beatles"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Tumbleweed Connection?",
+   "gold": "Elton John"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Wicked Lips?",
+   "gold": "Iggy Azalea"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made A Very Trainor Christmas?",
+   "gold": "Meghan Trainor"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Daughter from Hell?",
+   "gold": "Gracie Abrams"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made The Open Door?",
+   "gold": "Evanescence"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made High Risk Behaviour?",
+   "gold": "The Chats"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made More Johnny's Greatest Hits?",
+   "gold": "Johnny Mathis"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Heartbreak on Hold?",
+   "gold": "Alexandra Burke"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Pecados y Milagros?",
+   "gold": "Lila Downs"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Janet Jackson's Rhythm Nation 1814?",
+   "gold": "Janet Jackson"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made No Heroes?",
+   "gold": "Converge"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Grass Roots?",
+   "gold": "Atban Klann"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Can't Take Me Home?",
+   "gold": "Pink"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Only the Strong Survive?",
+   "gold": "Bruce Springsteen"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made While a Nation Sleeps...?",
+   "gold": "Boysetsfire"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Lupe Fiasco's Food & Liquor?",
+   "gold": "Lupe Fiasco"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Rudebox?",
+   "gold": "Robbie Williams"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Chayanne es mi Nombre?",
+   "gold": "Chayanne"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Ænima?",
+   "gold": "Tool"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made I've Been Expecting You?",
+   "gold": "Robbie Williams"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Control: The Remixes?",
+   "gold": "Janet Jackson"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Off the Wall?",
+   "gold": "Michael Jackson"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Superstar – The Hits?",
+   "gold": "Jamelia"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Born to Run?",
+   "gold": "Bruce Springsteen"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made This Is Acting?",
+   "gold": "Sia"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Someday at Christmas?",
+   "gold": "Stevie Wonder"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made A Twist in My Story?",
+   "gold": "Secondhand Serenade"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made 1000 Fires?",
+   "gold": "Traci Lords"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Oracular Spectular?",
+   "gold": "MGMT"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made All Mod Cons?",
+   "gold": "the Jam"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Freedom of Choice?",
+   "gold": "Devo"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Children of the World?",
+   "gold": "Bee Gees"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Fantasy Ride?",
+   "gold": "Ciara"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Zero She Flies?",
+   "gold": "Al Stewart"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Darkness on the Edge of Town?",
+   "gold": "Bruce Springsteen"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Beauty Behind the Madness?",
+   "gold": "the Weeknd"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made I Disagree?",
+   "gold": "Poppy"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Stella & Steve?",
+   "gold": "Benee"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Rebel Heart?",
+   "gold": "Madonna"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Live from Le Cabaret?",
+   "gold": "Maroon 5"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Face to Face vs. Dropkick Murphys?",
+   "gold": "Face to Face and Dropkick Murphys"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Regulate... G Funk Era?",
+   "gold": "Warren G"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Come to the Well?",
+   "gold": "Casting Crowns"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Sin Egen Motståndare?",
+   "gold": "Totalitär"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Around the Fur?",
+   "gold": "Deftones"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Nostalgia, Ultra?",
+   "gold": "Frank Ocean"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Alive II?",
+   "gold": "Kiss"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Designer Music?",
+   "gold": "Lipps Inc."
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Metal Magic?",
+   "gold": "Pantera"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Disomus?",
+   "gold": "Through the Eyes of the Dead"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Songs in the Key of Life?",
+   "gold": "Stevie Wonder"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Astroworld?",
+   "gold": "Travis Scott"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Dance Remixes?",
+   "gold": "Lil' Kim"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made So Far, So Good... So What!?",
+   "gold": "Megadeth"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Methodrone?",
+   "gold": "The Brian Jonestown Massacre"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Inhuman Rampage?",
+   "gold": "DragonForce"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Ice on Fire?",
+   "gold": "Elton John"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made The Alesha Show?",
+   "gold": "Alesha Dixon"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Frizzle Fry?",
+   "gold": "Primus"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Raditude?",
+   "gold": "Weezer"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made First Under the Wire?",
+   "gold": "The Little River Band"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Swings Both Ways?",
+   "gold": "Robbie Williams"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made You've Got to Stand for Something?",
+   "gold": "Aaron Tippin"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made NYC Ghosts & Flowers?",
+   "gold": "Sonic Youth"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Foolish Behaviour?",
+   "gold": "Rod Stewart"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Flip Your Wig?",
+   "gold": "Hüsker Dü"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Ready or Not?",
+   "gold": "Lou Gramm"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made The G Files?",
+   "gold": "Warren G"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made The Soul Sessions Vol. 2?",
+   "gold": "Joss Stone"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Tango in the Night?",
+   "gold": "Fleetwood Mac"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Among the Living?",
+   "gold": "Anthrax"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Chaosphere?",
+   "gold": "Meshuggah"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made The Sweetest Days?",
+   "gold": "Vanessa Williams"
+  },
+  {
+   "relation": "artist",
+   "question": "Who made Lifes Rich Pageant?",
+   "gold": "R.E.M."
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Hallmark Cards?",
+   "gold": "Joyce Hall"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Filmation?",
+   "gold": "Norm Prescott"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Sero Electric?",
+   "gold": "Pablo Naya"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded DJI?",
+   "gold": "Frank Wang"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Saerom Animation?",
+   "gold": "Kil Whan Kim"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Home Box Office, Inc.?",
+   "gold": "Charles Dolan"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Art And Animation studio?",
+   "gold": "Jan Sarkandr Tománek"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Hyundai Motor Company?",
+   "gold": "Chung Ju-yung"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Cosworth?",
+   "gold": "Mike Costin and"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Boeing Canada?",
+   "gold": "defunct ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded The Walt Disney Company France?",
+   "gold": "location_city = Paris, France"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Smokey Bones?",
+   "gold": "location = Aventura, Florida"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded LIV Swiss Watches?",
+   "gold": "Esti Chazanow"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded ACE EV Group?",
+   "gold": "ubl"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded NCB Group?",
+   "gold": "Dermot Desmond"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Repsol?",
+   "gold": "hq_location_city = Madrid"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded AccuWeather?",
+   "gold": "Joel N. Myers"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Leon's?",
+   "gold": "Ablan Leon"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Affiliated Computer Services?",
+   "gold": "Darwin Deason"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Banco Santander Argentina?",
+   "gold": "location_city = Bartolomé Mitre 480"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Enron?",
+   "gold": "Kenneth Lay"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Wisconsin Bell?",
+   "gold": "hq_location_city = Milwaukee, WI"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Wetherspoons?",
+   "gold": "Tim Martin"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Biodata?",
+   "gold": "Tan Siekmann"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded SIN Cars?",
+   "gold": "Rosen Daskalov"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Zuffa?",
+   "gold": "Frank Fertitta III"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Wix.com?",
+   "gold": "Avishai Abrahami"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Realme?",
+   "gold": "Sky Li"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Jewish National Fund?",
+   "gold": "hq_location ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Robot Communications?",
+   "gold": "Shūji Abe"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Société Générale?",
+   "gold": "area_served = Worldwide"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded VLF Automotive?",
+   "gold": "Bob Lutz"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Warner Bros. Pictures Animation?",
+   "gold": "Jeff Robinov"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Garnier?",
+   "gold": "Alfred Amour Garnier"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Onde?",
+   "gold": "hq_location_city = Tallinn"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded E. Marinella?",
+   "gold": "Eugenio Marinella"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded New Relic?",
+   "gold": "Lew Cirne"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Konami?",
+   "gold": "Kagemasa Kōzuki"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded The Boring Company?",
+   "gold": "Elon Musk"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded B&Q?",
+   "gold": "Richard Block & David Quayle"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Rite Aid?",
+   "gold": "Alex Grass"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Nintendo Research & Development 2?",
+   "gold": "Hiroshi Yamauchi"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Selfridges?",
+   "gold": "Harry Gordon Selfridge"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Raytheon?",
+   "gold": "Vannevar Bush"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Megaupload?",
+   "gold": "dissolved = January 20th, 2012"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded All Elite Wrestling?",
+   "gold": "Tony Khan"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Wang Film Productions?",
+   "gold": "James C.Y. Wang"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Shuraa?",
+   "gold": "Saeed Khalifa Mohammed Al Fuqaei"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Radical Sportscars?",
+   "gold": "Phil Abbott"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Upper Deck Company?",
+   "gold": "Paul Sumner (co-founder)"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded ZeniMax Media?",
+   "gold": "Christopher Weaver"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded JYP Entertainment?",
+   "gold": "J. Y. Park"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Burberry?",
+   "gold": "Thomas Burberry"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Hearst Media Production Group?",
+   "gold": "Dave Morgan"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Burger King?",
+   "gold": "Insta-Burger King:"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Blockbuster?",
+   "gold": "David Cook"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Polyphony Digital?",
+   "gold": "Kazunori Yamauchi"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Virgin EMI Records?",
+   "gold": "EMI Group"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Citibank?",
+   "gold": "Samuel Osgood"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Reality Kings?",
+   "gold": "location ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Barco?",
+   "gold": "Lucien De Puydt"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Fox 21 Television Studios?",
+   "gold": "David Madden"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded MSC Cruises?",
+   "gold": "Gianluigi Aponte"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Burlington Coat Factory?",
+   "gold": "Monroe Milstein"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Rockstar London?",
+   "gold": "Mark Washbrook"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Lamborghini?",
+   "gold": "Ferruccio Lamborghini"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Nintendo Entertainment Analysis & Development?",
+   "gold": "Hiroshi Yamauchi"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded DIGI Hungary?",
+   "gold": "Zoltán Teszári"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Family Dollar?",
+   "gold": "Leon Levine"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Sonshine Media Network International?",
+   "gold": "key_people ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Unqork?",
+   "gold": "Gary Hoberman"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded GSC Game World?",
+   "gold": "Sergiy Grygorovych"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Rocket Lab?",
+   "gold": "Peter Beck"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Other Ocean Interactive?",
+   "gold": "defunct ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded LG Corporation?",
+   "gold": "Koo In-Hwoi"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Doğuş Group?",
+   "gold": "Ayhan Şahenk"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded TriStar Pictures?",
+   "gold": "Victor Kaufman"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded WPP plc?",
+   "gold": "Martin Sorrell (as an advertising company)"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Loews Cineplex Entertainment?",
+   "gold": "Marcus Loew (for the Loews Incorporated branch)"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Intamin?",
+   "gold": "defunct ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Qwest?",
+   "gold": "Phillip Anschutz"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Clear Energy?",
+   "gold": "Andriy Grinenko"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Spidertracks?",
+   "gold": "James McCarthy"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Lakeshore Entertainment?",
+   "gold": "Tom Rosenberg,"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Ben & Jerry's?",
+   "gold": "Ben Cohen"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Grammarly?",
+   "gold": "Alex Shevchenko, Max Lytvyn, and Dmytro Lider"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Mamamusic?",
+   "gold": "Yurii Nikitin"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Naspers?",
+   "gold": "defunct ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Parmalat?",
+   "gold": "Calisto Tanzi"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Citrix Systems?",
+   "gold": "Ed Iacobucci"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded 1Malaysia Development Berhad?",
+   "gold": "defunct ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded TPV Technology?",
+   "gold": "hq_location = 108 Wai Ye Street, Kwun Tong"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Verizon New England?",
+   "gold": "location ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded DC Studios?",
+   "gold": "Geoff Johns"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Range Rover?",
+   "gold": "Ratan Tata"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Leyland Motors?",
+   "gold": "defunct ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Vernalossom?",
+   "gold": "defunct ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Zellers?",
+   "gold": "Walter P. Zeller"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded EstLine?",
+   "gold": "defunct = 2001"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded VDL Bova?",
+   "gold": "defunct = 2010"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded American International Group?",
+   "gold": "Cornelius Vander Starr"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Olivia Travel?",
+   "gold": "Judy Dlugacz"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Železničná spoločnosť Slovensko?",
+   "gold": "Government of Slovakia"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Rezvani Motors?",
+   "gold": "Ferris Rezvani"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Dunkin' Donuts?",
+   "gold": "Bill Rosenberg"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Masason Foundation?",
+   "gold": "Masayoshi Son"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Nintendo Research & Development 1?",
+   "gold": "Hiroshi Yamauchi"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Chupa Chups?",
+   "gold": "Bijoux Goddard"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Barrick Mining Corporation?",
+   "gold": "Peter Munk"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Imabari Shipbuilding?",
+   "gold": "Tameji Higaki"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded National Railway Company of Belgium?",
+   "gold": "Government of Belgium"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Cewe?",
+   "gold": "dissolved ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Thomas Built Buses?",
+   "gold": "Perley A. Thomas"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Zanella?",
+   "gold": "defunct ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Entertainment One?",
+   "gold": "Darren Throop"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Egyptian General Petroleum Corporation?",
+   "gold": "eala' albatal."
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded U.S. Games?",
+   "gold": "Donald Yu"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded TomTom?",
+   "gold": "Harold Goddijn"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Oscar Mayer?",
+   "gold": "Oscar F. Mayer"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Nintendo?",
+   "gold": "Fusajiro Yamauchi"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Hearst Communications?",
+   "gold": "William Randolph Hearst"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Elf Aquitaine?",
+   "gold": "Ernest Mercier"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded China Southern Power Grid?",
+   "gold": "location_city = Guangzhou, Guangdong"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded WildWorks?",
+   "gold": "Kris Johnson"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Raising Cane's Chicken Fingers?",
+   "gold": "Todd Graves, Craig Silvey"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded D. E. Shaw & Co.?",
+   "gold": "David E. Shaw"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Media Molecule?",
+   "gold": "Kareem Ettourney"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Happy Madison Productions?",
+   "gold": "Adam Sandler"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Barnes & Noble?",
+   "gold": "Charles Barnes"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Waste Connections of Canada?",
+   "gold": "key_people=Ronald J. Mittelstaedt (CEO)"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Rockstar San Diego?",
+   "gold": "Diego Angel"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Fry's Electronics?",
+   "gold": "John Fry"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Viacom?",
+   "gold": "Sumner Redstone"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Black Hills Corporation?",
+   "gold": "J. B. French"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded GAC Group?",
+   "gold": "location ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded ComplyAdvantage?",
+   "gold": "Charles Delingpole"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Spice Money?",
+   "gold": "Dilip Modi"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded DocuSign?",
+   "gold": "Tom Gonser"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Grafa?",
+   "gold": "Heidi Cuthbert"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Vivo?",
+   "gold": "Shen Wei"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded OfficeMax?",
+   "gold": "Bob Hurwitz and Michael Feuer"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Neuralink?",
+   "gold": "Elon Musk"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Walton Group?",
+   "gold": "S.M Nazrul Islam"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Prudential?",
+   "gold": "foundation ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Malay Film Productions?",
+   "gold": "defunct ="
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Commodore International?",
+   "gold": "Jack Tramiel"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Heimdal?",
+   "gold": "Morten Kjærsgaard"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Costa Coffee?",
+   "gold": "Bruno Costa"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Smart Technologies?",
+   "gold": "David Martin"
+  },
+  {
+   "relation": "founder",
+   "question": "Who founded Altium?",
+   "gold": "Nick Martin"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Landesbank Helaba founded?",
+   "gold": "1953"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Norwegian Cruise Line founded?",
+   "gold": "1966"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Ben & Jerry's founded?",
+   "gold": "1978"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was LG Corporation founded?",
+   "gold": "1947"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Starbucks founded?",
+   "gold": "1971"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Conagra Brands founded?",
+   "gold": "1919"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Litex Motors founded?",
+   "gold": "2008"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Bethesda Softworks founded?",
+   "gold": "1986"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was VR Group founded?",
+   "gold": "1862"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Naughty Dog founded?",
+   "gold": "1984"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Activision Blizzard founded?",
+   "gold": "2008"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Insomniac Games founded?",
+   "gold": "1994"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Celtrak founded?",
+   "gold": "2000"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Bandai founded?",
+   "gold": "1950"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Nederlandse Spoorwegen founded?",
+   "gold": "1938"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Hurricane Electric founded?",
+   "gold": "1994"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Polish State Railways founded?",
+   "gold": "1926"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Little Caesars founded?",
+   "gold": "1959"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Cosworth founded?",
+   "gold": "1958"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was IRewind founded?",
+   "gold": "2013"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Cabinet of Japan founded?",
+   "gold": "1885"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was United States Lines founded?",
+   "gold": "1921"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was AVN Media Network founded?",
+   "gold": "1982"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was East Japan Railway Company founded?",
+   "gold": "1987"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was China Central Television founded?",
+   "gold": "1958"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Cewe founded?",
+   "gold": "1961"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was BelAZ founded?",
+   "gold": "1948"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Firestone Tire and Rubber Company founded?",
+   "gold": "1900"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Arby's founded?",
+   "gold": "1964"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was TT Games founded?",
+   "gold": "2005"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Culver's founded?",
+   "gold": "1984"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Jaaz Multimedia founded?",
+   "gold": "2011"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Western Digital founded?",
+   "gold": "1970"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was ProSci Incorporated founded?",
+   "gold": "1998"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Upper Deck Company founded?",
+   "gold": "1988"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was SunRice founded?",
+   "gold": "1950"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Hungry Jack's founded?",
+   "gold": "1971"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Goldman Sachs founded?",
+   "gold": "1869"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Sprint Corporation founded?",
+   "gold": "1937"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Dairy Queen founded?",
+   "gold": "1940"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Dollarama founded?",
+   "gold": "1992"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Pro Wrestling Guerrilla founded?",
+   "gold": "2003"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Calvin Klein founded?",
+   "gold": "1968"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Pike Place Fish Market founded?",
+   "gold": "1930"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was AD Ports Group founded?",
+   "gold": "2006"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Sport1 Medien founded?",
+   "gold": "1989"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Dark Horse Comics founded?",
+   "gold": "1986"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was PwC founded?",
+   "gold": "1998"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was C&P Telephone founded?",
+   "gold": "1883"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was No Frills founded?",
+   "gold": "1978"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Cold Stone Creamery founded?",
+   "gold": "1988"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was TD Canada Trust founded?",
+   "gold": "2000"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Kharkiv Morozov Machine Building Design Bureau founded?",
+   "gold": "1927"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Comboios de Portugal founded?",
+   "gold": "1975"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Virgin EMI Records founded?",
+   "gold": "2013"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Elementar founded?",
+   "gold": "1897"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Thompson and Morgan founded?",
+   "gold": "1855"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Bain Capital Ventures founded?",
+   "gold": "2001"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Midco founded?",
+   "gold": "1931"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Atom.com founded?",
+   "gold": "1998"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was West Coast Railways founded?",
+   "gold": "1998"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Legendary Pictures founded?",
+   "gold": "2000"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Société Bic founded?",
+   "gold": "1945"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Combat Zone Wrestling founded?",
+   "gold": "1999"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Gucci founded?",
+   "gold": "1921"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Iliad Italia founded?",
+   "gold": "2016"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was College of Arms founded?",
+   "gold": "1484"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Cooper Tire & Rubber Company founded?",
+   "gold": "1926"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Telus founded?",
+   "gold": "1999"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Pakistan Aeronautical Complex founded?",
+   "gold": "1971"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Bethesda Game Studios founded?",
+   "gold": "2001"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Godfather's Pizza founded?",
+   "gold": "1973"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Quaker Oats Company founded?",
+   "gold": "1901"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Balaji Telefilms founded?",
+   "gold": "1994"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was HTC founded?",
+   "gold": "1997"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Quiznos founded?",
+   "gold": "1981"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was OfficeMax founded?",
+   "gold": "1988"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was No Fear founded?",
+   "gold": "1989"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Hafei founded?",
+   "gold": "1980"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Filmation founded?",
+   "gold": "1962"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Heathrow Airport Holdings founded?",
+   "gold": "1985"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Philippine National Railways founded?",
+   "gold": "1892"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was New York Mercantile Exchange founded?",
+   "gold": "1882"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Encyclopædia Britannica, Inc. founded?",
+   "gold": "1768"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Namco founded?",
+   "gold": "1955"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was České dráhy founded?",
+   "gold": "2003"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Genmab founded?",
+   "gold": "1999"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Meraas founded?",
+   "gold": "2007"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was LuxAnimation founded?",
+   "gold": "2000"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Blue Ant Media founded?",
+   "gold": "2011"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Grameen Bank founded?",
+   "gold": "1983"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Kraft Foods founded?",
+   "gold": "1903"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Pizza Hut founded?",
+   "gold": "1958"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Olivia Travel founded?",
+   "gold": "1973"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Dodge founded?",
+   "gold": "1900"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Gameloft founded?",
+   "gold": "1999"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was AGCO founded?",
+   "gold": "1990"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Royal Caribbean International founded?",
+   "gold": "1968"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Virgin Interactive founded?",
+   "gold": "1981"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Bolwell founded?",
+   "gold": "1962"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was FAS Sanos founded?",
+   "gold": "1946"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Westvleteren Brewery founded?",
+   "gold": "1838"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Kiteworks founded?",
+   "gold": "1999"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Bell Labs founded?",
+   "gold": "1925"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was China Investment Corporation founded?",
+   "gold": "2007"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Austin Motor Company founded?",
+   "gold": "1905"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Six Flags founded?",
+   "gold": "2024"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Trident Media Guard founded?",
+   "gold": "2002"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Ska Studios founded?",
+   "gold": "2007"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Singapore Telecommunications founded?",
+   "gold": "1879"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Game Freak founded?",
+   "gold": "1989"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Alleanza Securitas Esperia founded?",
+   "gold": "1933"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Pandemic Studios founded?",
+   "gold": "1998"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Ohio Art Company founded?",
+   "gold": "1908"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Gunnar Optiks founded?",
+   "gold": "2007"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Vernalossom founded?",
+   "gold": "2006"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Voyah founded?",
+   "gold": "2019"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Mercedes AMG High Performance Powertrains founded?",
+   "gold": "1983"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Yamaichi Securities founded?",
+   "gold": "1897"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Bridgestone founded?",
+   "gold": "1931"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Edran founded?",
+   "gold": "1984"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Extreme Pita founded?",
+   "gold": "1997"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Zanella founded?",
+   "gold": "1948"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Maximus Inc. founded?",
+   "gold": "1975"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Qoros founded?",
+   "gold": "2007"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Warid Telecom founded?",
+   "gold": "2004"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Theranos founded?",
+   "gold": "2003"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Virtustream founded?",
+   "gold": "2009"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Soueast founded?",
+   "gold": "1995"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Saint-Gobain founded?",
+   "gold": "1665"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was JB Hi-Fi founded?",
+   "gold": "1974"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Canon Inc. founded?",
+   "gold": "1937"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was British Sugar founded?",
+   "gold": "1936"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Lenovo founded?",
+   "gold": "1984"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Thales Group founded?",
+   "gold": "2000"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Black Hills Corporation founded?",
+   "gold": "1941"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Marathon Motors Engineering founded?",
+   "gold": "2009"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Jelly Belly founded?",
+   "gold": "1869"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Citrix Systems founded?",
+   "gold": "1989"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Lithuanian Railways founded?",
+   "gold": "1860"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Tumblr founded?",
+   "gold": "2007"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Whataburger founded?",
+   "gold": "1950"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Telecom Argentina founded?",
+   "gold": "1990"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Grupo Santander founded?",
+   "gold": "1857"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was PrivatBank founded?",
+   "gold": "1992"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Bitplane founded?",
+   "gold": "1992"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Jazzercise founded?",
+   "gold": "1969"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Green Gold Animations founded?",
+   "gold": "2001"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was First City Monument Bank founded?",
+   "gold": "1982"
+  },
+  {
+   "relation": "foundation",
+   "question": "When was Prada founded?",
+   "gold": "1913"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Metro Exodus?",
+   "gold": "4A Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Luigi's Mansion 3?",
+   "gold": "Next Level Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Valorant?",
+   "gold": "Riot Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Tom Clancy's Rainbow Six Extraction?",
+   "gold": "Ubisoft Montreal"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Little Nightmares II?",
+   "gold": "Tarsier Studios"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Animal Crossing: City Folk?",
+   "gold": "Nintendo EAD"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Mother 1 + 2?",
+   "gold": "Pax Softonica"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Donkey Kong Land 2?",
+   "gold": "Rare, Ltd."
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Astro Bot Rescue Mission?",
+   "gold": "Team Asobi (Japan Studio)"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed SimCity 4?",
+   "gold": "Maxis"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Panzer Dragoon Saga?",
+   "gold": "Team Andromeda"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed The Escapists 2?",
+   "gold": "Mouldy Toof Studios"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Noctiluca II ~Murder Route~?",
+   "gold": "Athena"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Metroid Prime 3: Corruption?",
+   "gold": "Retro Studios"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed NES Open Tournament Golf?",
+   "gold": "Nintendo R&D2, HAL Laboratory"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Pokémon Pokopia?",
+   "gold": "Game Freak"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Cartoon Network Speedway?",
+   "gold": "DC Studios"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed GooBall?",
+   "gold": "Over the Edge I/S"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Super Mario Party Jamboree?",
+   "gold": "Nintendo Cube"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Zap! Snowboarding Trix?",
+   "gold": "Atelier Double"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Go Vacation?",
+   "gold": "Namco Bandai Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed WWF No Mercy?",
+   "gold": "Asmik Ace Entertainment"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed F1 25?",
+   "gold": "Codemasters"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Growlanser I?",
+   "gold": "Career Soft"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Flappy Bird?",
+   "gold": "dotGears"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Dora the Explorer: Barnyard Buddies?",
+   "gold": "Imaginengine"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Roblox?",
+   "gold": "Roblox Corporation"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed The Legend of Zelda: Link's Awakening?",
+   "gold": "Nintendo Entertainment Analysis & Development"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Germs Nerawareta Machi?",
+   "gold": "KAJ"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Pac-Man Collection?",
+   "gold": "Mass Media"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Mermaid Prism?",
+   "gold": "Vingt-et-un Systems"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Bleach: Erabareshi Tamashii?",
+   "gold": "Aspect Co."
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Bujingai: The Forsaken City?",
+   "gold": "Taito, Red Entertaiment"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Horizon Forbidden West?",
+   "gold": "Guerrilla Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Phantasy Star Generation: 2?",
+   "gold": "Sega"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Ratchet & Clank: Rift Apart?",
+   "gold": "Insomniac Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Falcata?",
+   "gold": "Gust"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Rocket Power: Team Rocket Rescue?",
+   "gold": "Darkblack"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Project CARS 2?",
+   "gold": "Slightly Mad Studios"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Nintendo Switch 2 Welcome Tour?",
+   "gold": "Nintendo EPD"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Sonic Unleashed?",
+   "gold": "Sonic Team"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Game & Watch Gallery 4?",
+   "gold": "Nintendo R&D1"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Animal Crossing: Pocket Camp?",
+   "gold": "Nintendo EPD, NDcube"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Beautiful Katamari?",
+   "gold": "Namco Bandai Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Sea Monsters: A Prehistoric Adventure?",
+   "gold": "Atomic Planet"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Call of Duty 4: Modern Warfare?",
+   "gold": "Infinity Ward"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Wario Land 4?",
+   "gold": "Nintendo R&D1"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed A Hat in Time?",
+   "gold": "Gears for Breakfast"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Disney Sports Basketball?",
+   "gold": "Konami Computer Entertainment Osaka"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Pitfall: The Lost Expedition?",
+   "gold": "Edge of Reality"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Yarudora Series Vol. 1: Double Cast?",
+   "gold": "Sugar & Rockets Inc."
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Beyond: Two Souls?",
+   "gold": "Quantic Dream"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed The Wild Thornberrys: Animal Adventures?",
+   "gold": "Know Wonder"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed EA Sports FC 25?",
+   "gold": "EA Vancouver"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Nintendo eShop?",
+   "gold": "Nintendo"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Clash Royale?",
+   "gold": "Supercell"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Dexter's Laboratory: Robot Rampage?",
+   "gold": "Altron"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Mario Strikers Charged?",
+   "gold": "Next Level Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Far Cry 6?",
+   "gold": "Ubisoft Toronto"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Ace Attorney?",
+   "gold": "Capcom"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Pokémon Platinum?",
+   "gold": "Game Freak"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Helltaker?",
+   "gold": "vanripper"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Super Mario 64?",
+   "gold": "Nintendo EAD"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Dora the Explorer: Super Star Adventures?",
+   "gold": "Imaginengine"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Sonic Spinball?",
+   "gold": "Sega Technical Institute"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed EarthBound?",
+   "gold": "Ape, Inc. and HAL Laboratory"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Alto's Adventure?",
+   "gold": "Snowman"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Tokyo Highway Battle?",
+   "gold": "Genki"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Minecraft Dungeons?",
+   "gold": "Mojang Studios"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Akiba's Trip: Undread & Undressed?",
+   "gold": "Acquire"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Itadaki Street DS?",
+   "gold": "Armor Project"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Camp Lazlo: Leaky Lake Games?",
+   "gold": "Collision Studios"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Donk! The Samurai Duck!?",
+   "gold": "Supervision Entertainment"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed WWE SmackDown vs. Raw 2009?",
+   "gold": "Yuke's"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Thrillville?",
+   "gold": "Frontier Developments"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Bleach GC: Tasogare Ni Mamieru Shinigami?",
+   "gold": "Polygon Magic"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Olympic Hockey Nagano '98?",
+   "gold": "Treyarch"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Super Mario World 2: Yoshi's Island?",
+   "gold": "Nintendo EAD"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed XPilot?",
+   "gold": "Various"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Congo Bongo?",
+   "gold": "Sega"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Madagascar 3: The Video Game?",
+   "gold": "Monkey Bar Games (PS3/Xbox 360/Wii)"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Disney's Hercules?",
+   "gold": "Eurocom (PC, PlayStation)"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Sonic X-treme?",
+   "gold": "Sega Technical Institute"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Virtual League Baseball?",
+   "gold": "Kemco"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Super Mario 128?",
+   "gold": "Nintendo EAD"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Dexter's Laboratory: Chess Challenge?",
+   "gold": "Virtucraft Studios"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Skate 2?",
+   "gold": "EA Black Box"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Friday Night Funkin'?",
+   "gold": "Cameron Taylor (Ninjamuffin99)"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Far Cry New Dawn?",
+   "gold": "Ubisoft Montreal"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Hyrule Warriors?",
+   "gold": "Omega Force"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed GTC Africa?",
+   "gold": "Rage Games Ltd."
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Rise of the Rōnin?",
+   "gold": "Team Ninja"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Shining Force III?",
+   "gold": "Sonic! Software Planning"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Animated StoryBook: Mulan?",
+   "gold": "Kids Revolution"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Flicky?",
+   "gold": "Sega"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Pokémon Go?",
+   "gold": "Niantic"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed NBA 2K10?",
+   "gold": "Visual Concepts"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Amazing Cultivation Simulator?",
+   "gold": "GSQ Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Smite?",
+   "gold": "Titan Forge Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Cartoon Network: Block Party?",
+   "gold": "Monkeystone Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Nintendo Land?",
+   "gold": "Nintendo EAD Group No. 2"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Ico?",
+   "gold": "Japan Studio"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Deltarune?",
+   "gold": "Toby Fox"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Saturday Night Speedway?",
+   "gold": "Ratbag Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Super Mario Bros. Wonder?",
+   "gold": "Nintendo EPD"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Skate 3?",
+   "gold": "EA Black Box"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Sengoku Basara 2?",
+   "gold": "Capcom"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Super Mario Land?",
+   "gold": "Nintendo R&D1"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Race with Ryan?",
+   "gold": "3D Clouds"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Stuntman: Ignition?",
+   "gold": "Paradigm Entertainment"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Ed, Edd n Eddy: The Mis-Edventures?",
+   "gold": "Artificial Mind and Movement"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Sonic and the Dark Knight?",
+   "gold": "Sonic Team"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Animal Crossing: Happy Home Designer?",
+   "gold": "Nintendo EAD"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Yoshi and the Mysterious Book?",
+   "gold": "Good-Feel"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Among Us?",
+   "gold": "Innersloth"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Macross Plus: Game Edition?",
+   "gold": "Takara"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed WWE SuperCard?",
+   "gold": "Cat Daddy Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Hytale?",
+   "gold": "Hypixel Studios"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Bloody Roar II?",
+   "gold": "Eighting"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Xenosaga Freaks?",
+   "gold": "Monolith Soft"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed The Orange Box?",
+   "gold": "Valve Corporation"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed The Sims FreePlay?",
+   "gold": "EA Mobile,"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Astro's Playroom?",
+   "gold": "Team Asobi (Japan Studio)"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Steal a Brainrot?",
+   "gold": "DoBig Studios"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed All-Star Cheer Squad?",
+   "gold": "Gorilla Systems Corp."
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Happy Wheels?",
+   "gold": "Jim Bonacci, Jason Schymick"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Resident Evil Zero?",
+   "gold": "Capcom"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Adopt Me!?",
+   "gold": "Uplift Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Assassin's Creed?",
+   "gold": "Ubisoft Montreal"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Monster Strike?",
+   "gold": "Mixi"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Dr. Mario 64?",
+   "gold": "Nintendo"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Retry?",
+   "gold": "Rovio LVL11"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Dance Dance Revolution: Mario Mix?",
+   "gold": "Konami"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Twin Goddesses?",
+   "gold": "Polygram K.K."
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Tonka: Rescue Patrol?",
+   "gold": "Lucky Chicken Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Paper Mario: Color Splash?",
+   "gold": "Intelligent Systems"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed EA Sports FC 26?",
+   "gold": "EA Vancouver"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Bloons?",
+   "gold": "Ninja Kiwi"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Velldeselba Senki: Tsubasa-No-Kunshou?",
+   "gold": "Tenki"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Itadaki Street: Gorgeous King?",
+   "gold": "Tomcat System"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Counter-Strike 2?",
+   "gold": "Valve"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed TwinBee Portable?",
+   "gold": "M2"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed 19:03 Ueno Hatsu Yakou Ressha?",
+   "gold": "Visit"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Shining Force III Scenario 2?",
+   "gold": "Sonic! Software Planning"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Dragon Force?",
+   "gold": "Sega CS"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Crash Bandicoot Nitro Kart 2?",
+   "gold": "Polarbit"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Care Bears: Care Quest?",
+   "gold": "Sirius Games"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Knuckles' Chaotix?",
+   "gold": "Sonic Team"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Doom 3?",
+   "gold": "id Software"
+  },
+  {
+   "relation": "developer",
+   "question": "Who developed Nintendo World Championships: NES Edition?",
+   "gold": "Nintendo"
+  }
+ ]
+}
