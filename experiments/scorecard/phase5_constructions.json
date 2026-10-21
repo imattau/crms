@@ -1,0 +1,6333 @@
+{
+  "format": "crms-phase5-constructions",
+  "version": 1,
+  "description": "Ten learned construction shapes and 200 held-out paraphrase tasks. Controls reuse a training wording with new fillers; reworded tasks recombine learned token-class alternatives.",
+  "selection": {
+    "positive": [
+      3,
+      8,
+      5,
+      13
+    ],
+    "negative": [
+      11,
+      -2,
+      4,
+      7
+    ]
+  },
+  "specs": [
+    {
+      "id": "direct-sum",
+      "name": "Direct sum",
+      "composition": "direct",
+      "operation": "sum",
+      "goal": "select-transform",
+      "scope": "English list-transform",
+      "parts": [
+        {
+          "kind": "class",
+          "id": "verb",
+          "members": [
+            "sum",
+            "total",
+            "tally"
+          ]
+        },
+        {
+          "kind": "class",
+          "id": "det",
+          "members": [
+            "every",
+            "each",
+            "all"
+          ]
+        },
+        {
+          "kind": "class",
+          "id": "noun",
+          "members": [
+            "value",
+            "number",
+            "entry"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "claim",
+          "slot_kind": "claim"
+        },
+        {
+          "kind": "class",
+          "id": "prep",
+          "members": [
+            "in",
+            "from",
+            "among"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "values",
+          "slot_kind": "values"
+        }
+      ],
+      "variants": [
+        {
+          "verb": "sum",
+          "det": "every",
+          "noun": "value",
+          "prep": "in"
+        },
+        {
+          "verb": "total",
+          "det": "each",
+          "noun": "number",
+          "prep": "from"
+        },
+        {
+          "verb": "tally",
+          "det": "all",
+          "noun": "entry",
+          "prep": "among"
+        }
+      ],
+      "heldout_count": 20
+    },
+    {
+      "id": "wh-double",
+      "name": "Wh double",
+      "composition": "wh",
+      "operation": "double",
+      "goal": "select-transform",
+      "scope": "English list-transform",
+      "parts": [
+        {
+          "kind": "class",
+          "id": "wh",
+          "members": [
+            "what",
+            "which"
+          ]
+        },
+        {
+          "kind": "literal",
+          "text": "is"
+        },
+        {
+          "kind": "class",
+          "id": "degree",
+          "members": [
+            "twice",
+            "double"
+          ]
+        },
+        {
+          "kind": "literal",
+          "text": "the"
+        },
+        {
+          "kind": "class",
+          "id": "noun",
+          "members": [
+            "value",
+            "number",
+            "entry"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "claim",
+          "slot_kind": "claim"
+        },
+        {
+          "kind": "class",
+          "id": "prep",
+          "members": [
+            "among",
+            "in",
+            "from"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "values",
+          "slot_kind": "values"
+        }
+      ],
+      "variants": [
+        {
+          "wh": "what",
+          "degree": "twice",
+          "noun": "value",
+          "prep": "among"
+        },
+        {
+          "wh": "which",
+          "degree": "double",
+          "noun": "number",
+          "prep": "in"
+        },
+        {
+          "wh": "what",
+          "degree": "double",
+          "noun": "entry",
+          "prep": "from"
+        }
+      ],
+      "heldout_count": 20
+    },
+    {
+      "id": "relative-reverse",
+      "name": "Relative reverse",
+      "composition": "relative",
+      "operation": "reverse",
+      "goal": "select-transform",
+      "scope": "English list-transform",
+      "parts": [
+        {
+          "kind": "class",
+          "id": "verb",
+          "members": [
+            "reverse",
+            "flip",
+            "invert"
+          ]
+        },
+        {
+          "kind": "literal",
+          "text": "the"
+        },
+        {
+          "kind": "class",
+          "id": "noun",
+          "members": [
+            "values",
+            "numbers",
+            "entries"
+          ]
+        },
+        {
+          "kind": "literal",
+          "text": "that"
+        },
+        {
+          "kind": "slot",
+          "name": "claim",
+          "slot_kind": "claim"
+        },
+        {
+          "kind": "class",
+          "id": "prep",
+          "members": [
+            "in",
+            "from",
+            "among"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "values",
+          "slot_kind": "values"
+        }
+      ],
+      "variants": [
+        {
+          "verb": "reverse",
+          "noun": "values",
+          "prep": "in"
+        },
+        {
+          "verb": "flip",
+          "noun": "numbers",
+          "prep": "from"
+        },
+        {
+          "verb": "invert",
+          "noun": "entries",
+          "prep": "among"
+        }
+      ],
+      "heldout_count": 20
+    },
+    {
+      "id": "coordinate-dedupe",
+      "name": "Coordinate dedupe",
+      "composition": "coordination",
+      "operation": "dedupe",
+      "goal": "select-transform",
+      "scope": "English list-transform",
+      "parts": [
+        {
+          "kind": "slot",
+          "name": "claim",
+          "slot_kind": "claim"
+        },
+        {
+          "kind": "class",
+          "id": "noun",
+          "members": [
+            "values",
+            "numbers",
+            "entries"
+          ]
+        },
+        {
+          "kind": "class",
+          "id": "prep",
+          "members": [
+            "in",
+            "from",
+            "among"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "values",
+          "slot_kind": "values"
+        },
+        {
+          "kind": "literal",
+          "text": "then"
+        },
+        {
+          "kind": "class",
+          "id": "verb",
+          "members": [
+            "remove",
+            "drop",
+            "delete"
+          ]
+        },
+        {
+          "kind": "class",
+          "id": "object",
+          "members": [
+            "duplicates",
+            "repeats",
+            "copies"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "noun": "values",
+          "prep": "in",
+          "verb": "remove",
+          "object": "duplicates"
+        },
+        {
+          "noun": "numbers",
+          "prep": "from",
+          "verb": "drop",
+          "object": "repeats"
+        },
+        {
+          "noun": "entries",
+          "prep": "among",
+          "verb": "delete",
+          "object": "copies"
+        }
+      ],
+      "heldout_count": 20
+    },
+    {
+      "id": "conditional-keep-odd",
+      "name": "Conditional keep odd",
+      "composition": "conditional",
+      "operation": "keep_odd",
+      "goal": "select-transform",
+      "scope": "English list-transform",
+      "parts": [
+        {
+          "kind": "class",
+          "id": "conj",
+          "members": [
+            "if",
+            "when",
+            "whenever"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "condition",
+          "slot_kind": "condition"
+        },
+        {
+          "kind": "class",
+          "id": "verb",
+          "members": [
+            "keep",
+            "retain",
+            "preserve"
+          ]
+        },
+        {
+          "kind": "literal",
+          "text": "odd"
+        },
+        {
+          "kind": "class",
+          "id": "noun",
+          "members": [
+            "values",
+            "numbers",
+            "entries"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "claim",
+          "slot_kind": "claim"
+        },
+        {
+          "kind": "class",
+          "id": "prep",
+          "members": [
+            "among",
+            "in",
+            "from"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "values",
+          "slot_kind": "values"
+        }
+      ],
+      "variants": [
+        {
+          "conj": "if",
+          "verb": "keep",
+          "noun": "values",
+          "prep": "among"
+        },
+        {
+          "conj": "when",
+          "verb": "retain",
+          "noun": "numbers",
+          "prep": "in"
+        },
+        {
+          "conj": "whenever",
+          "verb": "preserve",
+          "noun": "entries",
+          "prep": "from"
+        }
+      ],
+      "heldout_count": 20
+    },
+    {
+      "id": "passive-count",
+      "name": "Passive count",
+      "composition": "passive",
+      "operation": "count",
+      "goal": "select-transform",
+      "scope": "English list-transform",
+      "parts": [
+        {
+          "kind": "literal",
+          "text": "how"
+        },
+        {
+          "kind": "literal",
+          "text": "many"
+        },
+        {
+          "kind": "class",
+          "id": "noun",
+          "members": [
+            "values",
+            "numbers",
+            "entries"
+          ]
+        },
+        {
+          "kind": "literal",
+          "text": "are"
+        },
+        {
+          "kind": "class",
+          "id": "verb",
+          "members": [
+            "reached",
+            "hit",
+            "matched"
+          ]
+        },
+        {
+          "kind": "literal",
+          "text": "by"
+        },
+        {
+          "kind": "slot",
+          "name": "claim",
+          "slot_kind": "claim"
+        },
+        {
+          "kind": "class",
+          "id": "prep",
+          "members": [
+            "in",
+            "from",
+            "among"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "values",
+          "slot_kind": "values"
+        }
+      ],
+      "variants": [
+        {
+          "noun": "values",
+          "verb": "reached",
+          "prep": "in"
+        },
+        {
+          "noun": "numbers",
+          "verb": "hit",
+          "prep": "from"
+        },
+        {
+          "noun": "entries",
+          "verb": "matched",
+          "prep": "among"
+        }
+      ],
+      "heldout_count": 20
+    },
+    {
+      "id": "fronted-sort",
+      "name": "Fronted sort",
+      "composition": "fronted-pp",
+      "operation": "sort",
+      "goal": "select-transform",
+      "scope": "English list-transform",
+      "parts": [
+        {
+          "kind": "class",
+          "id": "prep",
+          "members": [
+            "among",
+            "from",
+            "within"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "values",
+          "slot_kind": "values"
+        },
+        {
+          "kind": "class",
+          "id": "verb",
+          "members": [
+            "sort",
+            "order",
+            "arrange"
+          ]
+        },
+        {
+          "kind": "literal",
+          "text": "the"
+        },
+        {
+          "kind": "class",
+          "id": "noun",
+          "members": [
+            "values",
+            "numbers",
+            "entries"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "claim",
+          "slot_kind": "claim"
+        }
+      ],
+      "variants": [
+        {
+          "prep": "among",
+          "verb": "sort",
+          "noun": "values"
+        },
+        {
+          "prep": "from",
+          "verb": "order",
+          "noun": "numbers"
+        },
+        {
+          "prep": "within",
+          "verb": "arrange",
+          "noun": "entries"
+        }
+      ],
+      "heldout_count": 20
+    },
+    {
+      "id": "manner-product",
+      "name": "Manner product",
+      "composition": "manner",
+      "operation": "product",
+      "goal": "select-transform",
+      "scope": "English list-transform",
+      "parts": [
+        {
+          "kind": "class",
+          "id": "verb",
+          "members": [
+            "multiply",
+            "times",
+            "compound"
+          ]
+        },
+        {
+          "kind": "literal",
+          "text": "the"
+        },
+        {
+          "kind": "class",
+          "id": "noun",
+          "members": [
+            "values",
+            "numbers",
+            "entries"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "claim",
+          "slot_kind": "claim"
+        },
+        {
+          "kind": "class",
+          "id": "prep",
+          "members": [
+            "in",
+            "from",
+            "among"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "values",
+          "slot_kind": "values"
+        },
+        {
+          "kind": "class",
+          "id": "manner",
+          "members": [
+            "carefully",
+            "directly",
+            "quickly"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "verb": "multiply",
+          "noun": "values",
+          "prep": "in",
+          "manner": "carefully"
+        },
+        {
+          "verb": "times",
+          "noun": "numbers",
+          "prep": "from",
+          "manner": "directly"
+        },
+        {
+          "verb": "compound",
+          "noun": "entries",
+          "prep": "among",
+          "manner": "quickly"
+        }
+      ],
+      "heldout_count": 20
+    },
+    {
+      "id": "comparative-max",
+      "name": "Comparative max",
+      "composition": "comparative",
+      "operation": "max",
+      "goal": "select-transform",
+      "scope": "English list-transform",
+      "parts": [
+        {
+          "kind": "class",
+          "id": "wh",
+          "members": [
+            "what",
+            "which"
+          ]
+        },
+        {
+          "kind": "literal",
+          "text": "is"
+        },
+        {
+          "kind": "literal",
+          "text": "the"
+        },
+        {
+          "kind": "class",
+          "id": "adj",
+          "members": [
+            "largest",
+            "biggest",
+            "greatest"
+          ]
+        },
+        {
+          "kind": "class",
+          "id": "noun",
+          "members": [
+            "value",
+            "number",
+            "entry"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "claim",
+          "slot_kind": "claim"
+        },
+        {
+          "kind": "class",
+          "id": "prep",
+          "members": [
+            "in",
+            "from",
+            "among"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "values",
+          "slot_kind": "values"
+        }
+      ],
+      "variants": [
+        {
+          "wh": "what",
+          "adj": "largest",
+          "noun": "value",
+          "prep": "in"
+        },
+        {
+          "wh": "which",
+          "adj": "biggest",
+          "noun": "number",
+          "prep": "from"
+        },
+        {
+          "wh": "what",
+          "adj": "greatest",
+          "noun": "entry",
+          "prep": "among"
+        }
+      ],
+      "heldout_count": 20
+    },
+    {
+      "id": "purpose-min",
+      "name": "Purpose min",
+      "composition": "purpose",
+      "operation": "min",
+      "goal": "select-transform",
+      "scope": "English list-transform",
+      "parts": [
+        {
+          "kind": "class",
+          "id": "verb",
+          "members": [
+            "use",
+            "take",
+            "try"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "values",
+          "slot_kind": "values"
+        },
+        {
+          "kind": "literal",
+          "text": "to"
+        },
+        {
+          "kind": "class",
+          "id": "verb2",
+          "members": [
+            "find",
+            "get",
+            "choose"
+          ]
+        },
+        {
+          "kind": "literal",
+          "text": "the"
+        },
+        {
+          "kind": "class",
+          "id": "adj",
+          "members": [
+            "smallest",
+            "least",
+            "lowest"
+          ]
+        },
+        {
+          "kind": "class",
+          "id": "noun",
+          "members": [
+            "value",
+            "number",
+            "entry"
+          ]
+        },
+        {
+          "kind": "slot",
+          "name": "claim",
+          "slot_kind": "claim"
+        }
+      ],
+      "variants": [
+        {
+          "verb": "use",
+          "verb2": "find",
+          "adj": "smallest",
+          "noun": "value"
+        },
+        {
+          "verb": "take",
+          "verb2": "get",
+          "adj": "least",
+          "noun": "number"
+        },
+        {
+          "verb": "try",
+          "verb2": "choose",
+          "adj": "lowest",
+          "noun": "entry"
+        }
+      ],
+      "heldout_count": 20
+    }
+  ],
+  "training": [
+    {
+      "text": "sum every value {claim:claim:Mira reaches} in {values:values:3, 8, 5, 11, -2}",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:train:direct-sum:0:0",
+      "kind": "train-0",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        16
+      ],
+      "goal": "select-transform",
+      "operation": "sum",
+      "name": "Direct sum",
+      "composition": "direct",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "sum every value {claim:claim:Nia can reach} in {values:values:5, 5, 3, 11, 8}",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:train:direct-sum:0:1",
+      "kind": "train-0",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        21
+      ],
+      "goal": "select-transform",
+      "operation": "sum",
+      "name": "Direct sum",
+      "composition": "direct",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "total each number {claim:claim:Tavi reaches} from {values:values:13, -2, 8, 3, 5}",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:train:direct-sum:1:0",
+      "kind": "train-1",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        29
+      ],
+      "goal": "select-transform",
+      "operation": "sum",
+      "name": "Direct sum",
+      "composition": "direct",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "total each number {claim:claim:Ada can reach} from {values:values:8, 11, 5, -2, 3}",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:train:direct-sum:1:1",
+      "kind": "train-1",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        16
+      ],
+      "goal": "select-transform",
+      "operation": "sum",
+      "name": "Direct sum",
+      "composition": "direct",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "tally all entry {claim:claim:Rui reaches} among {values:values:3, 3, 13, 5}",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:train:direct-sum:2:0",
+      "kind": "train-2",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        24
+      ],
+      "goal": "select-transform",
+      "operation": "sum",
+      "name": "Direct sum",
+      "composition": "direct",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "tally all entry {claim:claim:Mira reaches} among {values:values:5, 8, 8, 3}",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:train:direct-sum:2:1",
+      "kind": "train-2",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        24
+      ],
+      "goal": "select-transform",
+      "operation": "sum",
+      "name": "Direct sum",
+      "composition": "direct",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "what is twice the value {claim:claim:Mira reaches} among {values:values:3, 8, 5, 11, -2}",
+      "construction_id": "wh-double",
+      "source_id": "phase5:train:wh-double:0:0",
+      "kind": "train-0",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        6,
+        16,
+        10
+      ],
+      "goal": "select-transform",
+      "operation": "double",
+      "name": "Wh double",
+      "composition": "wh",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "what is twice the value {claim:claim:Nia can reach} among {values:values:5, 5, 3, 11, 8}",
+      "construction_id": "wh-double",
+      "source_id": "phase5:train:wh-double:0:1",
+      "kind": "train-0",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        10,
+        10,
+        6,
+        16
+      ],
+      "goal": "select-transform",
+      "operation": "double",
+      "name": "Wh double",
+      "composition": "wh",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "which is double the number {claim:claim:Tavi reaches} in {values:values:13, -2, 8, 3, 5}",
+      "construction_id": "wh-double",
+      "source_id": "phase5:train:wh-double:1:0",
+      "kind": "train-1",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        26,
+        16,
+        6,
+        10
+      ],
+      "goal": "select-transform",
+      "operation": "double",
+      "name": "Wh double",
+      "composition": "wh",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "which is double the number {claim:claim:Ada can reach} in {values:values:8, 11, 5, -2, 3}",
+      "construction_id": "wh-double",
+      "source_id": "phase5:train:wh-double:1:1",
+      "kind": "train-1",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        16,
+        10,
+        6
+      ],
+      "goal": "select-transform",
+      "operation": "double",
+      "name": "Wh double",
+      "composition": "wh",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "what is double the entry {claim:claim:Rui reaches} from {values:values:3, 3, 13, 5}",
+      "construction_id": "wh-double",
+      "source_id": "phase5:train:wh-double:2:0",
+      "kind": "train-2",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        6,
+        6,
+        26,
+        10
+      ],
+      "goal": "select-transform",
+      "operation": "double",
+      "name": "Wh double",
+      "composition": "wh",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "what is double the entry {claim:claim:Mira reaches} from {values:values:5, 8, 8, 3}",
+      "construction_id": "wh-double",
+      "source_id": "phase5:train:wh-double:2:1",
+      "kind": "train-2",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        10,
+        16,
+        16,
+        6
+      ],
+      "goal": "select-transform",
+      "operation": "double",
+      "name": "Wh double",
+      "composition": "wh",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "reverse the values that {claim:claim:Mira reaches} in {values:values:3, 8, 5, 11, -2}",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:train:relative-reverse:0:0",
+      "kind": "train-0",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        5,
+        8,
+        3
+      ],
+      "goal": "select-transform",
+      "operation": "reverse",
+      "name": "Relative reverse",
+      "composition": "relative",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "reverse the values that {claim:claim:Nia can reach} in {values:values:5, 5, 3, 11, 8}",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:train:relative-reverse:0:1",
+      "kind": "train-0",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        8,
+        3,
+        5,
+        5
+      ],
+      "goal": "select-transform",
+      "operation": "reverse",
+      "name": "Relative reverse",
+      "composition": "relative",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "flip the numbers that {claim:claim:Tavi reaches} from {values:values:13, -2, 8, 3, 5}",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:train:relative-reverse:1:0",
+      "kind": "train-1",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        5,
+        3,
+        8,
+        13
+      ],
+      "goal": "select-transform",
+      "operation": "reverse",
+      "name": "Relative reverse",
+      "composition": "relative",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "flip the numbers that {claim:claim:Ada can reach} from {values:values:8, 11, 5, -2, 3}",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:train:relative-reverse:1:1",
+      "kind": "train-1",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5,
+        8
+      ],
+      "goal": "select-transform",
+      "operation": "reverse",
+      "name": "Relative reverse",
+      "composition": "relative",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "invert the entries that {claim:claim:Rui reaches} among {values:values:3, 3, 13, 5}",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:train:relative-reverse:2:0",
+      "kind": "train-2",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        5,
+        13,
+        3,
+        3
+      ],
+      "goal": "select-transform",
+      "operation": "reverse",
+      "name": "Relative reverse",
+      "composition": "relative",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "invert the entries that {claim:claim:Mira reaches} among {values:values:5, 8, 8, 3}",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:train:relative-reverse:2:1",
+      "kind": "train-2",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3,
+        8,
+        8,
+        5
+      ],
+      "goal": "select-transform",
+      "operation": "reverse",
+      "name": "Relative reverse",
+      "composition": "relative",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "{claim:claim:Mira reaches} values in {values:values:3, 8, 5, 11, -2} then remove duplicates",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:train:coordinate-dedupe:0:0",
+      "kind": "train-0",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        8,
+        5
+      ],
+      "goal": "select-transform",
+      "operation": "dedupe",
+      "name": "Coordinate dedupe",
+      "composition": "coordination",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "{claim:claim:Nia can reach} values in {values:values:5, 5, 3, 11, 8} then remove duplicates",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:train:coordinate-dedupe:0:1",
+      "kind": "train-0",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        5,
+        3,
+        8
+      ],
+      "goal": "select-transform",
+      "operation": "dedupe",
+      "name": "Coordinate dedupe",
+      "composition": "coordination",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "{claim:claim:Tavi reaches} numbers from {values:values:13, -2, 8, 3, 5} then drop repeats",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:train:coordinate-dedupe:1:0",
+      "kind": "train-1",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        13,
+        8,
+        3,
+        5
+      ],
+      "goal": "select-transform",
+      "operation": "dedupe",
+      "name": "Coordinate dedupe",
+      "composition": "coordination",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "{claim:claim:Ada can reach} numbers from {values:values:8, 11, 5, -2, 3} then drop repeats",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:train:coordinate-dedupe:1:1",
+      "kind": "train-1",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        8,
+        5,
+        3
+      ],
+      "goal": "select-transform",
+      "operation": "dedupe",
+      "name": "Coordinate dedupe",
+      "composition": "coordination",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "{claim:claim:Rui reaches} entries among {values:values:3, 3, 13, 5} then delete copies",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:train:coordinate-dedupe:2:0",
+      "kind": "train-2",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        13,
+        5
+      ],
+      "goal": "select-transform",
+      "operation": "dedupe",
+      "name": "Coordinate dedupe",
+      "composition": "coordination",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "{claim:claim:Mira reaches} entries among {values:values:5, 8, 8, 3} then delete copies",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:train:coordinate-dedupe:2:1",
+      "kind": "train-2",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        5,
+        8,
+        3
+      ],
+      "goal": "select-transform",
+      "operation": "dedupe",
+      "name": "Coordinate dedupe",
+      "composition": "coordination",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "if {condition:condition:the review is open} keep odd values {claim:claim:Mira reaches} among {values:values:3, 8, 5, 11, -2}",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:train:conditional-keep-odd:0:0",
+      "kind": "train-0",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5
+      ],
+      "goal": "select-transform",
+      "operation": "keep_odd",
+      "name": "Conditional keep odd",
+      "composition": "conditional",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "if {condition:condition:the list is ready} keep odd values {claim:claim:Nia can reach} among {values:values:5, 5, 3, 11, 8}",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:train:conditional-keep-odd:0:1",
+      "kind": "train-0",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        5,
+        5,
+        3
+      ],
+      "goal": "select-transform",
+      "operation": "keep_odd",
+      "name": "Conditional keep odd",
+      "composition": "conditional",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "when {condition:condition:the board agrees} retain odd numbers {claim:claim:Tavi reaches} in {values:values:13, -2, 8, 3, 5}",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:train:conditional-keep-odd:1:0",
+      "kind": "train-1",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        13,
+        3,
+        5
+      ],
+      "goal": "select-transform",
+      "operation": "keep_odd",
+      "name": "Conditional keep odd",
+      "composition": "conditional",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "when {condition:condition:the review is open} retain odd numbers {claim:claim:Ada can reach} in {values:values:8, 11, 5, -2, 3}",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:train:conditional-keep-odd:1:1",
+      "kind": "train-1",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        5,
+        3
+      ],
+      "goal": "select-transform",
+      "operation": "keep_odd",
+      "name": "Conditional keep odd",
+      "composition": "conditional",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "whenever {condition:condition:the list is ready} preserve odd entries {claim:claim:Rui reaches} from {values:values:3, 3, 13, 5}",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:train:conditional-keep-odd:2:0",
+      "kind": "train-2",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "goal": "select-transform",
+      "operation": "keep_odd",
+      "name": "Conditional keep odd",
+      "composition": "conditional",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "whenever {condition:condition:the board agrees} preserve odd entries {claim:claim:Mira reaches} from {values:values:5, 8, 8, 3}",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:train:conditional-keep-odd:2:1",
+      "kind": "train-2",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        5,
+        3
+      ],
+      "goal": "select-transform",
+      "operation": "keep_odd",
+      "name": "Conditional keep odd",
+      "composition": "conditional",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "how many values are reached by {claim:claim:Mira reaches} in {values:values:3, 8, 5, 11, -2}",
+      "construction_id": "passive-count",
+      "source_id": "phase5:train:passive-count:0:0",
+      "kind": "train-0",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3
+      ],
+      "goal": "select-transform",
+      "operation": "count",
+      "name": "Passive count",
+      "composition": "passive",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "how many values are reached by {claim:claim:Nia can reach} in {values:values:5, 5, 3, 11, 8}",
+      "construction_id": "passive-count",
+      "source_id": "phase5:train:passive-count:0:1",
+      "kind": "train-0",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        4
+      ],
+      "goal": "select-transform",
+      "operation": "count",
+      "name": "Passive count",
+      "composition": "passive",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "how many numbers are hit by {claim:claim:Tavi reaches} from {values:values:13, -2, 8, 3, 5}",
+      "construction_id": "passive-count",
+      "source_id": "phase5:train:passive-count:1:0",
+      "kind": "train-1",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        4
+      ],
+      "goal": "select-transform",
+      "operation": "count",
+      "name": "Passive count",
+      "composition": "passive",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "how many numbers are hit by {claim:claim:Ada can reach} from {values:values:8, 11, 5, -2, 3}",
+      "construction_id": "passive-count",
+      "source_id": "phase5:train:passive-count:1:1",
+      "kind": "train-1",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3
+      ],
+      "goal": "select-transform",
+      "operation": "count",
+      "name": "Passive count",
+      "composition": "passive",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "how many entries are matched by {claim:claim:Rui reaches} among {values:values:3, 3, 13, 5}",
+      "construction_id": "passive-count",
+      "source_id": "phase5:train:passive-count:2:0",
+      "kind": "train-2",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        4
+      ],
+      "goal": "select-transform",
+      "operation": "count",
+      "name": "Passive count",
+      "composition": "passive",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "how many entries are matched by {claim:claim:Mira reaches} among {values:values:5, 8, 8, 3}",
+      "construction_id": "passive-count",
+      "source_id": "phase5:train:passive-count:2:1",
+      "kind": "train-2",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        4
+      ],
+      "goal": "select-transform",
+      "operation": "count",
+      "name": "Passive count",
+      "composition": "passive",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "among {values:values:3, 8, 5, 11, -2} sort the values {claim:claim:Mira reaches}",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:train:fronted-sort:0:0",
+      "kind": "train-0",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5,
+        8
+      ],
+      "goal": "select-transform",
+      "operation": "sort",
+      "name": "Fronted sort",
+      "composition": "fronted-pp",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "among {values:values:5, 5, 3, 11, 8} sort the values {claim:claim:Nia can reach}",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:train:fronted-sort:0:1",
+      "kind": "train-0",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        5,
+        5,
+        8
+      ],
+      "goal": "select-transform",
+      "operation": "sort",
+      "name": "Fronted sort",
+      "composition": "fronted-pp",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "from {values:values:13, -2, 8, 3, 5} order the numbers {claim:claim:Tavi reaches}",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:train:fronted-sort:1:0",
+      "kind": "train-1",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3,
+        5,
+        8,
+        13
+      ],
+      "goal": "select-transform",
+      "operation": "sort",
+      "name": "Fronted sort",
+      "composition": "fronted-pp",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "from {values:values:8, 11, 5, -2, 3} order the numbers {claim:claim:Ada can reach}",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:train:fronted-sort:1:1",
+      "kind": "train-1",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5,
+        8
+      ],
+      "goal": "select-transform",
+      "operation": "sort",
+      "name": "Fronted sort",
+      "composition": "fronted-pp",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "within {values:values:3, 3, 13, 5} arrange the entries {claim:claim:Rui reaches}",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:train:fronted-sort:2:0",
+      "kind": "train-2",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        3,
+        5,
+        13
+      ],
+      "goal": "select-transform",
+      "operation": "sort",
+      "name": "Fronted sort",
+      "composition": "fronted-pp",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "within {values:values:5, 8, 8, 3} arrange the entries {claim:claim:Mira reaches}",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:train:fronted-sort:2:1",
+      "kind": "train-2",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3,
+        5,
+        8,
+        8
+      ],
+      "goal": "select-transform",
+      "operation": "sort",
+      "name": "Fronted sort",
+      "composition": "fronted-pp",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "multiply the values {claim:claim:Mira reaches} in {values:values:3, 8, 5, 11, -2} carefully",
+      "construction_id": "manner-product",
+      "source_id": "phase5:train:manner-product:0:0",
+      "kind": "train-0",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        120
+      ],
+      "goal": "select-transform",
+      "operation": "product",
+      "name": "Manner product",
+      "composition": "manner",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "multiply the values {claim:claim:Nia can reach} in {values:values:5, 5, 3, 11, 8} carefully",
+      "construction_id": "manner-product",
+      "source_id": "phase5:train:manner-product:0:1",
+      "kind": "train-0",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        600
+      ],
+      "goal": "select-transform",
+      "operation": "product",
+      "name": "Manner product",
+      "composition": "manner",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "times the numbers {claim:claim:Tavi reaches} from {values:values:13, -2, 8, 3, 5} directly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:train:manner-product:1:0",
+      "kind": "train-1",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        1560
+      ],
+      "goal": "select-transform",
+      "operation": "product",
+      "name": "Manner product",
+      "composition": "manner",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "times the numbers {claim:claim:Ada can reach} from {values:values:8, 11, 5, -2, 3} directly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:train:manner-product:1:1",
+      "kind": "train-1",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        120
+      ],
+      "goal": "select-transform",
+      "operation": "product",
+      "name": "Manner product",
+      "composition": "manner",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "compound the entries {claim:claim:Rui reaches} among {values:values:3, 3, 13, 5} quickly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:train:manner-product:2:0",
+      "kind": "train-2",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        585
+      ],
+      "goal": "select-transform",
+      "operation": "product",
+      "name": "Manner product",
+      "composition": "manner",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "compound the entries {claim:claim:Mira reaches} among {values:values:5, 8, 8, 3} quickly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:train:manner-product:2:1",
+      "kind": "train-2",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        960
+      ],
+      "goal": "select-transform",
+      "operation": "product",
+      "name": "Manner product",
+      "composition": "manner",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "what is the largest value {claim:claim:Mira reaches} in {values:values:3, 8, 5, 11, -2}",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:train:comparative-max:0:0",
+      "kind": "train-0",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        8
+      ],
+      "goal": "select-transform",
+      "operation": "max",
+      "name": "Comparative max",
+      "composition": "comparative",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "what is the largest value {claim:claim:Nia can reach} in {values:values:5, 5, 3, 11, 8}",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:train:comparative-max:0:1",
+      "kind": "train-0",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        8
+      ],
+      "goal": "select-transform",
+      "operation": "max",
+      "name": "Comparative max",
+      "composition": "comparative",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "which is the biggest number {claim:claim:Tavi reaches} from {values:values:13, -2, 8, 3, 5}",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:train:comparative-max:1:0",
+      "kind": "train-1",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        13
+      ],
+      "goal": "select-transform",
+      "operation": "max",
+      "name": "Comparative max",
+      "composition": "comparative",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "which is the biggest number {claim:claim:Ada can reach} from {values:values:8, 11, 5, -2, 3}",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:train:comparative-max:1:1",
+      "kind": "train-1",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        8
+      ],
+      "goal": "select-transform",
+      "operation": "max",
+      "name": "Comparative max",
+      "composition": "comparative",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "what is the greatest entry {claim:claim:Rui reaches} among {values:values:3, 3, 13, 5}",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:train:comparative-max:2:0",
+      "kind": "train-2",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        13
+      ],
+      "goal": "select-transform",
+      "operation": "max",
+      "name": "Comparative max",
+      "composition": "comparative",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "what is the greatest entry {claim:claim:Mira reaches} among {values:values:5, 8, 8, 3}",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:train:comparative-max:2:1",
+      "kind": "train-2",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        8
+      ],
+      "goal": "select-transform",
+      "operation": "max",
+      "name": "Comparative max",
+      "composition": "comparative",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "use {values:values:3, 8, 5, 11, -2} to find the smallest value {claim:claim:Mira reaches}",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:train:purpose-min:0:0",
+      "kind": "train-0",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3
+      ],
+      "goal": "select-transform",
+      "operation": "min",
+      "name": "Purpose min",
+      "composition": "purpose",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "use {values:values:5, 5, 3, 11, 8} to find the smallest value {claim:claim:Nia can reach}",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:train:purpose-min:0:1",
+      "kind": "train-0",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3
+      ],
+      "goal": "select-transform",
+      "operation": "min",
+      "name": "Purpose min",
+      "composition": "purpose",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "take {values:values:13, -2, 8, 3, 5} to get the least number {claim:claim:Tavi reaches}",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:train:purpose-min:1:0",
+      "kind": "train-1",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3
+      ],
+      "goal": "select-transform",
+      "operation": "min",
+      "name": "Purpose min",
+      "composition": "purpose",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "take {values:values:8, 11, 5, -2, 3} to get the least number {claim:claim:Ada can reach}",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:train:purpose-min:1:1",
+      "kind": "train-1",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3
+      ],
+      "goal": "select-transform",
+      "operation": "min",
+      "name": "Purpose min",
+      "composition": "purpose",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "try {values:values:3, 3, 13, 5} to choose the lowest entry {claim:claim:Rui reaches}",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:train:purpose-min:2:0",
+      "kind": "train-2",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3
+      ],
+      "goal": "select-transform",
+      "operation": "min",
+      "name": "Purpose min",
+      "composition": "purpose",
+      "scope": "English list-transform"
+    },
+    {
+      "text": "try {values:values:5, 8, 8, 3} to choose the lowest entry {claim:claim:Mira reaches}",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:train:purpose-min:2:1",
+      "kind": "train-2",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3
+      ],
+      "goal": "select-transform",
+      "operation": "min",
+      "name": "Purpose min",
+      "composition": "purpose",
+      "scope": "English list-transform"
+    }
+  ],
+  "heldout": [
+    {
+      "text": "sum every value Tavi reaches in 13, 8, 5, 3, 11",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:control:direct-sum:12",
+      "kind": "control",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        29
+      ]
+    },
+    {
+      "text": "sum every value Ada can reach in 3, 5, 5, 8, -2",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:control:direct-sum:13",
+      "kind": "control",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        21
+      ]
+    },
+    {
+      "text": "total each number Rui reaches from 8, 8, 13, 3, 11",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:control:direct-sum:14",
+      "kind": "control",
+      "values": [
+        8,
+        8,
+        13,
+        3,
+        11
+      ],
+      "claim": "Rui reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        32
+      ]
+    },
+    {
+      "text": "total each number Mira reaches from 5, -2, 3, 5, 8",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:control:direct-sum:15",
+      "kind": "control",
+      "values": [
+        5,
+        -2,
+        3,
+        5,
+        8
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        21
+      ]
+    },
+    {
+      "text": "tally all entry Nia can reach among 13, 3, 8, 5, 4",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:control:direct-sum:16",
+      "kind": "control",
+      "values": [
+        13,
+        3,
+        8,
+        5,
+        4
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        29
+      ]
+    },
+    {
+      "text": "tally all entry Tavi reaches among 3, 13, 8, 5, -2",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:control:direct-sum:17",
+      "kind": "control",
+      "values": [
+        3,
+        13,
+        8,
+        5,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        29
+      ]
+    },
+    {
+      "text": "sum every value Mira reaches from 3, 8, 5, 11, -2",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:reworded:direct-sum:00",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        16
+      ]
+    },
+    {
+      "text": "sum every value Nia can reach among 5, 5, 3, 11, 8",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:reworded:direct-sum:01",
+      "kind": "reworded",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        21
+      ]
+    },
+    {
+      "text": "sum every number Tavi reaches in 13, -2, 8, 3, 5",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:reworded:direct-sum:02",
+      "kind": "reworded",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        29
+      ]
+    },
+    {
+      "text": "sum every number Ada can reach from 8, 11, 5, -2, 3",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:reworded:direct-sum:03",
+      "kind": "reworded",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        16
+      ]
+    },
+    {
+      "text": "sum every number Rui reaches among 3, 3, 13, 5",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:reworded:direct-sum:04",
+      "kind": "reworded",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        24
+      ]
+    },
+    {
+      "text": "sum every entry Mira reaches in 5, 8, 8, 3",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:reworded:direct-sum:05",
+      "kind": "reworded",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        24
+      ]
+    },
+    {
+      "text": "sum every entry Nia can reach from 11, 3, 5, -2, 8",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:reworded:direct-sum:06",
+      "kind": "reworded",
+      "values": [
+        11,
+        3,
+        5,
+        -2,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        16
+      ]
+    },
+    {
+      "text": "sum every entry Tavi reaches among 13, 5, 11, 3, -2",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:reworded:direct-sum:07",
+      "kind": "reworded",
+      "values": [
+        13,
+        5,
+        11,
+        3,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        21
+      ]
+    },
+    {
+      "text": "sum each value Ada can reach in 8, 3, 3, 5",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:reworded:direct-sum:08",
+      "kind": "reworded",
+      "values": [
+        8,
+        3,
+        3,
+        5
+      ],
+      "claim": "Ada can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        19
+      ]
+    },
+    {
+      "text": "sum each value Rui reaches from 5, 13, 8, -2, 3",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:reworded:direct-sum:09",
+      "kind": "reworded",
+      "values": [
+        5,
+        13,
+        8,
+        -2,
+        3
+      ],
+      "claim": "Rui reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        29
+      ]
+    },
+    {
+      "text": "sum each value Mira reaches among 3, 8, 11, 5, 4",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:reworded:direct-sum:10",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        11,
+        5,
+        4
+      ],
+      "claim": "Mira reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        16
+      ]
+    },
+    {
+      "text": "sum each number Nia can reach in 5, 3, 8, 7, 13",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:reworded:direct-sum:11",
+      "kind": "reworded",
+      "values": [
+        5,
+        3,
+        8,
+        7,
+        13
+      ],
+      "claim": "Nia can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        29
+      ]
+    },
+    {
+      "text": "sum each number Tavi reaches from 13, 8, 5, 3, 11",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:reworded:direct-sum:12",
+      "kind": "reworded",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        29
+      ]
+    },
+    {
+      "text": "sum each number Ada can reach among 3, 5, 5, 8, -2",
+      "construction_id": "direct-sum",
+      "source_id": "phase5:reworded:direct-sum:13",
+      "kind": "reworded",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        21
+      ]
+    },
+    {
+      "text": "what is twice the value Tavi reaches among 13, 8, 5, 3, 11",
+      "construction_id": "wh-double",
+      "source_id": "phase5:control:wh-double:12",
+      "kind": "control",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        26,
+        16,
+        10,
+        6
+      ]
+    },
+    {
+      "text": "what is twice the value Ada can reach among 3, 5, 5, 8, -2",
+      "construction_id": "wh-double",
+      "source_id": "phase5:control:wh-double:13",
+      "kind": "control",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        6,
+        10,
+        10,
+        16
+      ]
+    },
+    {
+      "text": "which is double the number Rui reaches in 8, 8, 13, 3, 11",
+      "construction_id": "wh-double",
+      "source_id": "phase5:control:wh-double:14",
+      "kind": "control",
+      "values": [
+        8,
+        8,
+        13,
+        3,
+        11
+      ],
+      "claim": "Rui reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        16,
+        16,
+        26,
+        6
+      ]
+    },
+    {
+      "text": "which is double the number Mira reaches in 5, -2, 3, 5, 8",
+      "construction_id": "wh-double",
+      "source_id": "phase5:control:wh-double:15",
+      "kind": "control",
+      "values": [
+        5,
+        -2,
+        3,
+        5,
+        8
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        10,
+        6,
+        10,
+        16
+      ]
+    },
+    {
+      "text": "what is double the entry Nia can reach from 13, 3, 8, 5, 4",
+      "construction_id": "wh-double",
+      "source_id": "phase5:control:wh-double:16",
+      "kind": "control",
+      "values": [
+        13,
+        3,
+        8,
+        5,
+        4
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        26,
+        6,
+        16,
+        10
+      ]
+    },
+    {
+      "text": "what is double the entry Tavi reaches from 3, 13, 8, 5, -2",
+      "construction_id": "wh-double",
+      "source_id": "phase5:control:wh-double:17",
+      "kind": "control",
+      "values": [
+        3,
+        13,
+        8,
+        5,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        6,
+        26,
+        16,
+        10
+      ]
+    },
+    {
+      "text": "what is twice the value Mira reaches in 3, 8, 5, 11, -2",
+      "construction_id": "wh-double",
+      "source_id": "phase5:reworded:wh-double:00",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        6,
+        16,
+        10
+      ]
+    },
+    {
+      "text": "what is twice the value Nia can reach from 5, 5, 3, 11, 8",
+      "construction_id": "wh-double",
+      "source_id": "phase5:reworded:wh-double:01",
+      "kind": "reworded",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        10,
+        10,
+        6,
+        16
+      ]
+    },
+    {
+      "text": "what is twice the number Tavi reaches among 13, -2, 8, 3, 5",
+      "construction_id": "wh-double",
+      "source_id": "phase5:reworded:wh-double:02",
+      "kind": "reworded",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        26,
+        16,
+        6,
+        10
+      ]
+    },
+    {
+      "text": "what is twice the number Ada can reach in 8, 11, 5, -2, 3",
+      "construction_id": "wh-double",
+      "source_id": "phase5:reworded:wh-double:03",
+      "kind": "reworded",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        16,
+        10,
+        6
+      ]
+    },
+    {
+      "text": "what is twice the number Rui reaches from 3, 3, 13, 5",
+      "construction_id": "wh-double",
+      "source_id": "phase5:reworded:wh-double:04",
+      "kind": "reworded",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        6,
+        6,
+        26,
+        10
+      ]
+    },
+    {
+      "text": "what is twice the entry Mira reaches among 5, 8, 8, 3",
+      "construction_id": "wh-double",
+      "source_id": "phase5:reworded:wh-double:05",
+      "kind": "reworded",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        10,
+        16,
+        16,
+        6
+      ]
+    },
+    {
+      "text": "what is twice the entry Nia can reach in 11, 3, 5, -2, 8",
+      "construction_id": "wh-double",
+      "source_id": "phase5:reworded:wh-double:06",
+      "kind": "reworded",
+      "values": [
+        11,
+        3,
+        5,
+        -2,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        6,
+        10,
+        16
+      ]
+    },
+    {
+      "text": "what is twice the entry Tavi reaches from 13, 5, 11, 3, -2",
+      "construction_id": "wh-double",
+      "source_id": "phase5:reworded:wh-double:07",
+      "kind": "reworded",
+      "values": [
+        13,
+        5,
+        11,
+        3,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        26,
+        10,
+        6
+      ]
+    },
+    {
+      "text": "what is double the value Ada can reach among 8, 3, 3, 5",
+      "construction_id": "wh-double",
+      "source_id": "phase5:reworded:wh-double:08",
+      "kind": "reworded",
+      "values": [
+        8,
+        3,
+        3,
+        5
+      ],
+      "claim": "Ada can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        16,
+        6,
+        6,
+        10
+      ]
+    },
+    {
+      "text": "what is double the value Rui reaches in 5, 13, 8, -2, 3",
+      "construction_id": "wh-double",
+      "source_id": "phase5:reworded:wh-double:09",
+      "kind": "reworded",
+      "values": [
+        5,
+        13,
+        8,
+        -2,
+        3
+      ],
+      "claim": "Rui reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        10,
+        26,
+        16,
+        6
+      ]
+    },
+    {
+      "text": "what is double the value Mira reaches from 3, 8, 11, 5, 4",
+      "construction_id": "wh-double",
+      "source_id": "phase5:reworded:wh-double:10",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        11,
+        5,
+        4
+      ],
+      "claim": "Mira reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        6,
+        16,
+        10
+      ]
+    },
+    {
+      "text": "what is double the number Nia can reach among 5, 3, 8, 7, 13",
+      "construction_id": "wh-double",
+      "source_id": "phase5:reworded:wh-double:11",
+      "kind": "reworded",
+      "values": [
+        5,
+        3,
+        8,
+        7,
+        13
+      ],
+      "claim": "Nia can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        10,
+        6,
+        16,
+        26
+      ]
+    },
+    {
+      "text": "what is double the number Tavi reaches in 13, 8, 5, 3, 11",
+      "construction_id": "wh-double",
+      "source_id": "phase5:reworded:wh-double:12",
+      "kind": "reworded",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        26,
+        16,
+        10,
+        6
+      ]
+    },
+    {
+      "text": "what is double the number Ada can reach from 3, 5, 5, 8, -2",
+      "construction_id": "wh-double",
+      "source_id": "phase5:reworded:wh-double:13",
+      "kind": "reworded",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        6,
+        10,
+        10,
+        16
+      ]
+    },
+    {
+      "text": "reverse the values that Tavi reaches in 13, 8, 5, 3, 11",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:control:relative-reverse:12",
+      "kind": "control",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5,
+        8,
+        13
+      ]
+    },
+    {
+      "text": "reverse the values that Ada can reach in 3, 5, 5, 8, -2",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:control:relative-reverse:13",
+      "kind": "control",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        8,
+        5,
+        5,
+        3
+      ]
+    },
+    {
+      "text": "flip the numbers that Rui reaches from 8, 8, 13, 3, 11",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:control:relative-reverse:14",
+      "kind": "control",
+      "values": [
+        8,
+        8,
+        13,
+        3,
+        11
+      ],
+      "claim": "Rui reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3,
+        13,
+        8,
+        8
+      ]
+    },
+    {
+      "text": "flip the numbers that Mira reaches from 5, -2, 3, 5, 8",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:control:relative-reverse:15",
+      "kind": "control",
+      "values": [
+        5,
+        -2,
+        3,
+        5,
+        8
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        8,
+        5,
+        3,
+        5
+      ]
+    },
+    {
+      "text": "invert the entries that Nia can reach among 13, 3, 8, 5, 4",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:control:relative-reverse:16",
+      "kind": "control",
+      "values": [
+        13,
+        3,
+        8,
+        5,
+        4
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        5,
+        8,
+        3,
+        13
+      ]
+    },
+    {
+      "text": "invert the entries that Tavi reaches among 3, 13, 8, 5, -2",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:control:relative-reverse:17",
+      "kind": "control",
+      "values": [
+        3,
+        13,
+        8,
+        5,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        5,
+        8,
+        13,
+        3
+      ]
+    },
+    {
+      "text": "reverse the values that Mira reaches from 3, 8, 5, 11, -2",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:reworded:relative-reverse:00",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        5,
+        8,
+        3
+      ]
+    },
+    {
+      "text": "reverse the values that Nia can reach among 5, 5, 3, 11, 8",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:reworded:relative-reverse:01",
+      "kind": "reworded",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        8,
+        3,
+        5,
+        5
+      ]
+    },
+    {
+      "text": "reverse the numbers that Tavi reaches in 13, -2, 8, 3, 5",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:reworded:relative-reverse:02",
+      "kind": "reworded",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        5,
+        3,
+        8,
+        13
+      ]
+    },
+    {
+      "text": "reverse the numbers that Ada can reach from 8, 11, 5, -2, 3",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:reworded:relative-reverse:03",
+      "kind": "reworded",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5,
+        8
+      ]
+    },
+    {
+      "text": "reverse the numbers that Rui reaches among 3, 3, 13, 5",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:reworded:relative-reverse:04",
+      "kind": "reworded",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        5,
+        13,
+        3,
+        3
+      ]
+    },
+    {
+      "text": "reverse the entries that Mira reaches in 5, 8, 8, 3",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:reworded:relative-reverse:05",
+      "kind": "reworded",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3,
+        8,
+        8,
+        5
+      ]
+    },
+    {
+      "text": "reverse the entries that Nia can reach from 11, 3, 5, -2, 8",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:reworded:relative-reverse:06",
+      "kind": "reworded",
+      "values": [
+        11,
+        3,
+        5,
+        -2,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        8,
+        5,
+        3
+      ]
+    },
+    {
+      "text": "reverse the entries that Tavi reaches among 13, 5, 11, 3, -2",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:reworded:relative-reverse:07",
+      "kind": "reworded",
+      "values": [
+        13,
+        5,
+        11,
+        3,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        5,
+        13
+      ]
+    },
+    {
+      "text": "flip the values that Ada can reach in 8, 3, 3, 5",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:reworded:relative-reverse:08",
+      "kind": "reworded",
+      "values": [
+        8,
+        3,
+        3,
+        5
+      ],
+      "claim": "Ada can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        5,
+        3,
+        3,
+        8
+      ]
+    },
+    {
+      "text": "flip the values that Rui reaches from 5, 13, 8, -2, 3",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:reworded:relative-reverse:09",
+      "kind": "reworded",
+      "values": [
+        5,
+        13,
+        8,
+        -2,
+        3
+      ],
+      "claim": "Rui reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        8,
+        13,
+        5
+      ]
+    },
+    {
+      "text": "flip the values that Mira reaches among 3, 8, 11, 5, 4",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:reworded:relative-reverse:10",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        11,
+        5,
+        4
+      ],
+      "claim": "Mira reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        5,
+        8,
+        3
+      ]
+    },
+    {
+      "text": "flip the numbers that Nia can reach in 5, 3, 8, 7, 13",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:reworded:relative-reverse:11",
+      "kind": "reworded",
+      "values": [
+        5,
+        3,
+        8,
+        7,
+        13
+      ],
+      "claim": "Nia can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        13,
+        8,
+        3,
+        5
+      ]
+    },
+    {
+      "text": "flip the numbers that Tavi reaches among 13, 8, 5, 3, 11",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:reworded:relative-reverse:12",
+      "kind": "reworded",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5,
+        8,
+        13
+      ]
+    },
+    {
+      "text": "flip the entries that Ada can reach in 3, 5, 5, 8, -2",
+      "construction_id": "relative-reverse",
+      "source_id": "phase5:reworded:relative-reverse:13",
+      "kind": "reworded",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        8,
+        5,
+        5,
+        3
+      ]
+    },
+    {
+      "text": "Tavi reaches values in 13, 8, 5, 3, 11 then remove duplicates",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:control:coordinate-dedupe:12",
+      "kind": "control",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        13,
+        8,
+        5,
+        3
+      ]
+    },
+    {
+      "text": "Ada can reach values in 3, 5, 5, 8, -2 then remove duplicates",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:control:coordinate-dedupe:13",
+      "kind": "control",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        5,
+        8
+      ]
+    },
+    {
+      "text": "Rui reaches numbers from 8, 8, 13, 3, 11 then drop repeats",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:control:coordinate-dedupe:14",
+      "kind": "control",
+      "values": [
+        8,
+        8,
+        13,
+        3,
+        11
+      ],
+      "claim": "Rui reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        8,
+        13,
+        3
+      ]
+    },
+    {
+      "text": "Mira reaches numbers from 5, -2, 3, 5, 8 then drop repeats",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:control:coordinate-dedupe:15",
+      "kind": "control",
+      "values": [
+        5,
+        -2,
+        3,
+        5,
+        8
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        5,
+        3,
+        8
+      ]
+    },
+    {
+      "text": "Nia can reach entries among 13, 3, 8, 5, 4 then delete copies",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:control:coordinate-dedupe:16",
+      "kind": "control",
+      "values": [
+        13,
+        3,
+        8,
+        5,
+        4
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        13,
+        3,
+        8,
+        5
+      ]
+    },
+    {
+      "text": "Tavi reaches entries among 3, 13, 8, 5, -2 then delete copies",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:control:coordinate-dedupe:17",
+      "kind": "control",
+      "values": [
+        3,
+        13,
+        8,
+        5,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3,
+        13,
+        8,
+        5
+      ]
+    },
+    {
+      "text": "Mira reaches values in 3, 8, 5, 11, -2 then remove repeats",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:reworded:coordinate-dedupe:00",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        8,
+        5
+      ]
+    },
+    {
+      "text": "Nia can reach values in 5, 5, 3, 11, 8 then remove copies",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:reworded:coordinate-dedupe:01",
+      "kind": "reworded",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        5,
+        3,
+        8
+      ]
+    },
+    {
+      "text": "Tavi reaches values in 13, -2, 8, 3, 5 then drop duplicates",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:reworded:coordinate-dedupe:02",
+      "kind": "reworded",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        13,
+        8,
+        3,
+        5
+      ]
+    },
+    {
+      "text": "Ada can reach values in 8, 11, 5, -2, 3 then drop repeats",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:reworded:coordinate-dedupe:03",
+      "kind": "reworded",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        8,
+        5,
+        3
+      ]
+    },
+    {
+      "text": "Rui reaches values in 3, 3, 13, 5 then drop copies",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:reworded:coordinate-dedupe:04",
+      "kind": "reworded",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        13,
+        5
+      ]
+    },
+    {
+      "text": "Mira reaches values in 5, 8, 8, 3 then delete duplicates",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:reworded:coordinate-dedupe:05",
+      "kind": "reworded",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        5,
+        8,
+        3
+      ]
+    },
+    {
+      "text": "Nia can reach values in 11, 3, 5, -2, 8 then delete repeats",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:reworded:coordinate-dedupe:06",
+      "kind": "reworded",
+      "values": [
+        11,
+        3,
+        5,
+        -2,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5,
+        8
+      ]
+    },
+    {
+      "text": "Tavi reaches values in 13, 5, 11, 3, -2 then delete copies",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:reworded:coordinate-dedupe:07",
+      "kind": "reworded",
+      "values": [
+        13,
+        5,
+        11,
+        3,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        13,
+        5,
+        3
+      ]
+    },
+    {
+      "text": "Ada can reach values from 8, 3, 3, 5 then remove duplicates",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:reworded:coordinate-dedupe:08",
+      "kind": "reworded",
+      "values": [
+        8,
+        3,
+        3,
+        5
+      ],
+      "claim": "Ada can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        8,
+        3,
+        5
+      ]
+    },
+    {
+      "text": "Rui reaches values from 5, 13, 8, -2, 3 then remove repeats",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:reworded:coordinate-dedupe:09",
+      "kind": "reworded",
+      "values": [
+        5,
+        13,
+        8,
+        -2,
+        3
+      ],
+      "claim": "Rui reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        5,
+        13,
+        8,
+        3
+      ]
+    },
+    {
+      "text": "Mira reaches values from 3, 8, 11, 5, 4 then remove copies",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:reworded:coordinate-dedupe:10",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        11,
+        5,
+        4
+      ],
+      "claim": "Mira reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        8,
+        5
+      ]
+    },
+    {
+      "text": "Nia can reach values from 5, 3, 8, 7, 13 then drop duplicates",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:reworded:coordinate-dedupe:11",
+      "kind": "reworded",
+      "values": [
+        5,
+        3,
+        8,
+        7,
+        13
+      ],
+      "claim": "Nia can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        5,
+        3,
+        8,
+        13
+      ]
+    },
+    {
+      "text": "Tavi reaches values from 13, 8, 5, 3, 11 then drop repeats",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:reworded:coordinate-dedupe:12",
+      "kind": "reworded",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        13,
+        8,
+        5,
+        3
+      ]
+    },
+    {
+      "text": "Ada can reach values from 3, 5, 5, 8, -2 then drop copies",
+      "construction_id": "coordinate-dedupe",
+      "source_id": "phase5:reworded:coordinate-dedupe:13",
+      "kind": "reworded",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        5,
+        8
+      ]
+    },
+    {
+      "text": "if the review is open keep odd values Tavi reaches among 13, 8, 5, 3, 11",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:control:conditional-keep-odd:12",
+      "kind": "control",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        13,
+        5,
+        3
+      ]
+    },
+    {
+      "text": "if the list is ready keep odd values Ada can reach among 3, 5, 5, 8, -2",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:control:conditional-keep-odd:13",
+      "kind": "control",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        5,
+        5
+      ]
+    },
+    {
+      "text": "when the board agrees retain odd numbers Rui reaches in 8, 8, 13, 3, 11",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:control:conditional-keep-odd:14",
+      "kind": "control",
+      "values": [
+        8,
+        8,
+        13,
+        3,
+        11
+      ],
+      "claim": "Rui reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        13,
+        3
+      ]
+    },
+    {
+      "text": "when the review is open retain odd numbers Mira reaches in 5, -2, 3, 5, 8",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:control:conditional-keep-odd:15",
+      "kind": "control",
+      "values": [
+        5,
+        -2,
+        3,
+        5,
+        8
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        5,
+        3,
+        5
+      ]
+    },
+    {
+      "text": "whenever the list is ready preserve odd entries Nia can reach from 13, 3, 8, 5, 4",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:control:conditional-keep-odd:16",
+      "kind": "control",
+      "values": [
+        13,
+        3,
+        8,
+        5,
+        4
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        13,
+        3,
+        5
+      ]
+    },
+    {
+      "text": "whenever the board agrees preserve odd entries Tavi reaches from 3, 13, 8, 5, -2",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:control:conditional-keep-odd:17",
+      "kind": "control",
+      "values": [
+        3,
+        13,
+        8,
+        5,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3,
+        13,
+        5
+      ]
+    },
+    {
+      "text": "if the review is open keep odd values Mira reaches in 3, 8, 5, 11, -2",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:reworded:conditional-keep-odd:00",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5
+      ]
+    },
+    {
+      "text": "if the list is ready keep odd values Nia can reach from 5, 5, 3, 11, 8",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:reworded:conditional-keep-odd:01",
+      "kind": "reworded",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        5,
+        5,
+        3
+      ]
+    },
+    {
+      "text": "if the board agrees keep odd numbers Tavi reaches among 13, -2, 8, 3, 5",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:reworded:conditional-keep-odd:02",
+      "kind": "reworded",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        13,
+        3,
+        5
+      ]
+    },
+    {
+      "text": "if the review is open keep odd numbers Ada can reach in 8, 11, 5, -2, 3",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:reworded:conditional-keep-odd:03",
+      "kind": "reworded",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        5,
+        3
+      ]
+    },
+    {
+      "text": "if the list is ready keep odd numbers Rui reaches from 3, 3, 13, 5",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:reworded:conditional-keep-odd:04",
+      "kind": "reworded",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        3,
+        13,
+        5
+      ]
+    },
+    {
+      "text": "if the board agrees keep odd entries Mira reaches among 5, 8, 8, 3",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:reworded:conditional-keep-odd:05",
+      "kind": "reworded",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        5,
+        3
+      ]
+    },
+    {
+      "text": "if the review is open keep odd entries Nia can reach in 11, 3, 5, -2, 8",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:reworded:conditional-keep-odd:06",
+      "kind": "reworded",
+      "values": [
+        11,
+        3,
+        5,
+        -2,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5
+      ]
+    },
+    {
+      "text": "if the list is ready keep odd entries Tavi reaches from 13, 5, 11, 3, -2",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:reworded:conditional-keep-odd:07",
+      "kind": "reworded",
+      "values": [
+        13,
+        5,
+        11,
+        3,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        13,
+        5,
+        3
+      ]
+    },
+    {
+      "text": "if the board agrees retain odd values Ada can reach among 8, 3, 3, 5",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:reworded:conditional-keep-odd:08",
+      "kind": "reworded",
+      "values": [
+        8,
+        3,
+        3,
+        5
+      ],
+      "claim": "Ada can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3,
+        3,
+        5
+      ]
+    },
+    {
+      "text": "if the review is open retain odd values Rui reaches in 5, 13, 8, -2, 3",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:reworded:conditional-keep-odd:09",
+      "kind": "reworded",
+      "values": [
+        5,
+        13,
+        8,
+        -2,
+        3
+      ],
+      "claim": "Rui reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        5,
+        13,
+        3
+      ]
+    },
+    {
+      "text": "if the list is ready retain odd values Mira reaches from 3, 8, 11, 5, 4",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:reworded:conditional-keep-odd:10",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        11,
+        5,
+        4
+      ],
+      "claim": "Mira reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        5
+      ]
+    },
+    {
+      "text": "if the board agrees retain odd numbers Nia can reach among 5, 3, 8, 7, 13",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:reworded:conditional-keep-odd:11",
+      "kind": "reworded",
+      "values": [
+        5,
+        3,
+        8,
+        7,
+        13
+      ],
+      "claim": "Nia can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        5,
+        3,
+        13
+      ]
+    },
+    {
+      "text": "if the review is open retain odd numbers Tavi reaches in 13, 8, 5, 3, 11",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:reworded:conditional-keep-odd:12",
+      "kind": "reworded",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        13,
+        5,
+        3
+      ]
+    },
+    {
+      "text": "if the list is ready retain odd numbers Ada can reach from 3, 5, 5, 8, -2",
+      "construction_id": "conditional-keep-odd",
+      "source_id": "phase5:reworded:conditional-keep-odd:13",
+      "kind": "reworded",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        5,
+        5
+      ]
+    },
+    {
+      "text": "how many values are reached by Tavi reaches in 13, 8, 5, 3, 11",
+      "construction_id": "passive-count",
+      "source_id": "phase5:control:passive-count:12",
+      "kind": "control",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        4
+      ]
+    },
+    {
+      "text": "how many values are reached by Ada can reach in 3, 5, 5, 8, -2",
+      "construction_id": "passive-count",
+      "source_id": "phase5:control:passive-count:13",
+      "kind": "control",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        4
+      ]
+    },
+    {
+      "text": "how many numbers are hit by Rui reaches from 8, 8, 13, 3, 11",
+      "construction_id": "passive-count",
+      "source_id": "phase5:control:passive-count:14",
+      "kind": "control",
+      "values": [
+        8,
+        8,
+        13,
+        3,
+        11
+      ],
+      "claim": "Rui reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        4
+      ]
+    },
+    {
+      "text": "how many numbers are hit by Mira reaches from 5, -2, 3, 5, 8",
+      "construction_id": "passive-count",
+      "source_id": "phase5:control:passive-count:15",
+      "kind": "control",
+      "values": [
+        5,
+        -2,
+        3,
+        5,
+        8
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        4
+      ]
+    },
+    {
+      "text": "how many entries are matched by Nia can reach among 13, 3, 8, 5, 4",
+      "construction_id": "passive-count",
+      "source_id": "phase5:control:passive-count:16",
+      "kind": "control",
+      "values": [
+        13,
+        3,
+        8,
+        5,
+        4
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        4
+      ]
+    },
+    {
+      "text": "how many entries are matched by Tavi reaches among 3, 13, 8, 5, -2",
+      "construction_id": "passive-count",
+      "source_id": "phase5:control:passive-count:17",
+      "kind": "control",
+      "values": [
+        3,
+        13,
+        8,
+        5,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        4
+      ]
+    },
+    {
+      "text": "how many values are reached by Mira reaches from 3, 8, 5, 11, -2",
+      "construction_id": "passive-count",
+      "source_id": "phase5:reworded:passive-count:00",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "how many values are reached by Nia can reach among 5, 5, 3, 11, 8",
+      "construction_id": "passive-count",
+      "source_id": "phase5:reworded:passive-count:01",
+      "kind": "reworded",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        4
+      ]
+    },
+    {
+      "text": "how many values are hit by Tavi reaches in 13, -2, 8, 3, 5",
+      "construction_id": "passive-count",
+      "source_id": "phase5:reworded:passive-count:02",
+      "kind": "reworded",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        4
+      ]
+    },
+    {
+      "text": "how many values are hit by Ada can reach from 8, 11, 5, -2, 3",
+      "construction_id": "passive-count",
+      "source_id": "phase5:reworded:passive-count:03",
+      "kind": "reworded",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "how many values are hit by Rui reaches among 3, 3, 13, 5",
+      "construction_id": "passive-count",
+      "source_id": "phase5:reworded:passive-count:04",
+      "kind": "reworded",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        4
+      ]
+    },
+    {
+      "text": "how many values are matched by Mira reaches in 5, 8, 8, 3",
+      "construction_id": "passive-count",
+      "source_id": "phase5:reworded:passive-count:05",
+      "kind": "reworded",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        4
+      ]
+    },
+    {
+      "text": "how many values are matched by Nia can reach from 11, 3, 5, -2, 8",
+      "construction_id": "passive-count",
+      "source_id": "phase5:reworded:passive-count:06",
+      "kind": "reworded",
+      "values": [
+        11,
+        3,
+        5,
+        -2,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "how many values are matched by Tavi reaches among 13, 5, 11, 3, -2",
+      "construction_id": "passive-count",
+      "source_id": "phase5:reworded:passive-count:07",
+      "kind": "reworded",
+      "values": [
+        13,
+        5,
+        11,
+        3,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "how many numbers are reached by Ada can reach in 8, 3, 3, 5",
+      "construction_id": "passive-count",
+      "source_id": "phase5:reworded:passive-count:08",
+      "kind": "reworded",
+      "values": [
+        8,
+        3,
+        3,
+        5
+      ],
+      "claim": "Ada can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        4
+      ]
+    },
+    {
+      "text": "how many numbers are reached by Rui reaches from 5, 13, 8, -2, 3",
+      "construction_id": "passive-count",
+      "source_id": "phase5:reworded:passive-count:09",
+      "kind": "reworded",
+      "values": [
+        5,
+        13,
+        8,
+        -2,
+        3
+      ],
+      "claim": "Rui reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        4
+      ]
+    },
+    {
+      "text": "how many numbers are reached by Mira reaches among 3, 8, 11, 5, 4",
+      "construction_id": "passive-count",
+      "source_id": "phase5:reworded:passive-count:10",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        11,
+        5,
+        4
+      ],
+      "claim": "Mira reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "how many numbers are hit by Nia can reach in 5, 3, 8, 7, 13",
+      "construction_id": "passive-count",
+      "source_id": "phase5:reworded:passive-count:11",
+      "kind": "reworded",
+      "values": [
+        5,
+        3,
+        8,
+        7,
+        13
+      ],
+      "claim": "Nia can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        4
+      ]
+    },
+    {
+      "text": "how many numbers are hit by Tavi reaches among 13, 8, 5, 3, 11",
+      "construction_id": "passive-count",
+      "source_id": "phase5:reworded:passive-count:12",
+      "kind": "reworded",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        4
+      ]
+    },
+    {
+      "text": "how many numbers are matched by Ada can reach in 3, 5, 5, 8, -2",
+      "construction_id": "passive-count",
+      "source_id": "phase5:reworded:passive-count:13",
+      "kind": "reworded",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        4
+      ]
+    },
+    {
+      "text": "among 13, 8, 5, 3, 11 sort the values Tavi reaches",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:control:fronted-sort:12",
+      "kind": "control",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5,
+        8,
+        13
+      ]
+    },
+    {
+      "text": "among 3, 5, 5, 8, -2 sort the values Ada can reach",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:control:fronted-sort:13",
+      "kind": "control",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        5,
+        5,
+        8
+      ]
+    },
+    {
+      "text": "from 8, 8, 13, 3, 11 order the numbers Rui reaches",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:control:fronted-sort:14",
+      "kind": "control",
+      "values": [
+        8,
+        8,
+        13,
+        3,
+        11
+      ],
+      "claim": "Rui reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3,
+        8,
+        8,
+        13
+      ]
+    },
+    {
+      "text": "from 5, -2, 3, 5, 8 order the numbers Mira reaches",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:control:fronted-sort:15",
+      "kind": "control",
+      "values": [
+        5,
+        -2,
+        3,
+        5,
+        8
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5,
+        5,
+        8
+      ]
+    },
+    {
+      "text": "within 13, 3, 8, 5, 4 arrange the entries Nia can reach",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:control:fronted-sort:16",
+      "kind": "control",
+      "values": [
+        13,
+        3,
+        8,
+        5,
+        4
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        5,
+        8,
+        13
+      ]
+    },
+    {
+      "text": "within 3, 13, 8, 5, -2 arrange the entries Tavi reaches",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:control:fronted-sort:17",
+      "kind": "control",
+      "values": [
+        3,
+        13,
+        8,
+        5,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3,
+        5,
+        8,
+        13
+      ]
+    },
+    {
+      "text": "among 3, 8, 5, 11, -2 sort the numbers Mira reaches",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:reworded:fronted-sort:00",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5,
+        8
+      ]
+    },
+    {
+      "text": "among 5, 5, 3, 11, 8 sort the entries Nia can reach",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:reworded:fronted-sort:01",
+      "kind": "reworded",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        5,
+        5,
+        8
+      ]
+    },
+    {
+      "text": "among 13, -2, 8, 3, 5 order the values Tavi reaches",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:reworded:fronted-sort:02",
+      "kind": "reworded",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3,
+        5,
+        8,
+        13
+      ]
+    },
+    {
+      "text": "among 8, 11, 5, -2, 3 order the numbers Ada can reach",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:reworded:fronted-sort:03",
+      "kind": "reworded",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5,
+        8
+      ]
+    },
+    {
+      "text": "among 3, 3, 13, 5 order the entries Rui reaches",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:reworded:fronted-sort:04",
+      "kind": "reworded",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        3,
+        5,
+        13
+      ]
+    },
+    {
+      "text": "among 5, 8, 8, 3 arrange the values Mira reaches",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:reworded:fronted-sort:05",
+      "kind": "reworded",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3,
+        5,
+        8,
+        8
+      ]
+    },
+    {
+      "text": "among 11, 3, 5, -2, 8 arrange the numbers Nia can reach",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:reworded:fronted-sort:06",
+      "kind": "reworded",
+      "values": [
+        11,
+        3,
+        5,
+        -2,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5,
+        8
+      ]
+    },
+    {
+      "text": "among 13, 5, 11, 3, -2 arrange the entries Tavi reaches",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:reworded:fronted-sort:07",
+      "kind": "reworded",
+      "values": [
+        13,
+        5,
+        11,
+        3,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        5,
+        13
+      ]
+    },
+    {
+      "text": "from 8, 3, 3, 5 sort the values Ada can reach",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:reworded:fronted-sort:08",
+      "kind": "reworded",
+      "values": [
+        8,
+        3,
+        3,
+        5
+      ],
+      "claim": "Ada can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3,
+        3,
+        5,
+        8
+      ]
+    },
+    {
+      "text": "from 5, 13, 8, -2, 3 sort the numbers Rui reaches",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:reworded:fronted-sort:09",
+      "kind": "reworded",
+      "values": [
+        5,
+        13,
+        8,
+        -2,
+        3
+      ],
+      "claim": "Rui reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5,
+        8,
+        13
+      ]
+    },
+    {
+      "text": "from 3, 8, 11, 5, 4 sort the entries Mira reaches",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:reworded:fronted-sort:10",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        11,
+        5,
+        4
+      ],
+      "claim": "Mira reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        5,
+        8
+      ]
+    },
+    {
+      "text": "from 5, 3, 8, 7, 13 order the values Nia can reach",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:reworded:fronted-sort:11",
+      "kind": "reworded",
+      "values": [
+        5,
+        3,
+        8,
+        7,
+        13
+      ],
+      "claim": "Nia can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3,
+        5,
+        8,
+        13
+      ]
+    },
+    {
+      "text": "from 13, 8, 5, 3, 11 order the entries Tavi reaches",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:reworded:fronted-sort:12",
+      "kind": "reworded",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3,
+        5,
+        8,
+        13
+      ]
+    },
+    {
+      "text": "from 3, 5, 5, 8, -2 arrange the values Ada can reach",
+      "construction_id": "fronted-sort",
+      "source_id": "phase5:reworded:fronted-sort:13",
+      "kind": "reworded",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3,
+        5,
+        5,
+        8
+      ]
+    },
+    {
+      "text": "multiply the values Tavi reaches in 13, 8, 5, 3, 11 carefully",
+      "construction_id": "manner-product",
+      "source_id": "phase5:control:manner-product:12",
+      "kind": "control",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        1560
+      ]
+    },
+    {
+      "text": "multiply the values Ada can reach in 3, 5, 5, 8, -2 carefully",
+      "construction_id": "manner-product",
+      "source_id": "phase5:control:manner-product:13",
+      "kind": "control",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        600
+      ]
+    },
+    {
+      "text": "times the numbers Rui reaches from 8, 8, 13, 3, 11 directly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:control:manner-product:14",
+      "kind": "control",
+      "values": [
+        8,
+        8,
+        13,
+        3,
+        11
+      ],
+      "claim": "Rui reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        2496
+      ]
+    },
+    {
+      "text": "times the numbers Mira reaches from 5, -2, 3, 5, 8 directly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:control:manner-product:15",
+      "kind": "control",
+      "values": [
+        5,
+        -2,
+        3,
+        5,
+        8
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        600
+      ]
+    },
+    {
+      "text": "compound the entries Nia can reach among 13, 3, 8, 5, 4 quickly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:control:manner-product:16",
+      "kind": "control",
+      "values": [
+        13,
+        3,
+        8,
+        5,
+        4
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        1560
+      ]
+    },
+    {
+      "text": "compound the entries Tavi reaches among 3, 13, 8, 5, -2 quickly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:control:manner-product:17",
+      "kind": "control",
+      "values": [
+        3,
+        13,
+        8,
+        5,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        1560
+      ]
+    },
+    {
+      "text": "multiply the values Mira reaches in 3, 8, 5, 11, -2 directly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:reworded:manner-product:00",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        120
+      ]
+    },
+    {
+      "text": "multiply the values Nia can reach in 5, 5, 3, 11, 8 quickly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:reworded:manner-product:01",
+      "kind": "reworded",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        600
+      ]
+    },
+    {
+      "text": "multiply the values Tavi reaches from 13, -2, 8, 3, 5 carefully",
+      "construction_id": "manner-product",
+      "source_id": "phase5:reworded:manner-product:02",
+      "kind": "reworded",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        1560
+      ]
+    },
+    {
+      "text": "multiply the values Ada can reach from 8, 11, 5, -2, 3 directly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:reworded:manner-product:03",
+      "kind": "reworded",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        120
+      ]
+    },
+    {
+      "text": "multiply the values Rui reaches from 3, 3, 13, 5 quickly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:reworded:manner-product:04",
+      "kind": "reworded",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        585
+      ]
+    },
+    {
+      "text": "multiply the values Mira reaches among 5, 8, 8, 3 carefully",
+      "construction_id": "manner-product",
+      "source_id": "phase5:reworded:manner-product:05",
+      "kind": "reworded",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        960
+      ]
+    },
+    {
+      "text": "multiply the values Nia can reach among 11, 3, 5, -2, 8 directly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:reworded:manner-product:06",
+      "kind": "reworded",
+      "values": [
+        11,
+        3,
+        5,
+        -2,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        120
+      ]
+    },
+    {
+      "text": "multiply the values Tavi reaches among 13, 5, 11, 3, -2 quickly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:reworded:manner-product:07",
+      "kind": "reworded",
+      "values": [
+        13,
+        5,
+        11,
+        3,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        195
+      ]
+    },
+    {
+      "text": "multiply the numbers Ada can reach in 8, 3, 3, 5 carefully",
+      "construction_id": "manner-product",
+      "source_id": "phase5:reworded:manner-product:08",
+      "kind": "reworded",
+      "values": [
+        8,
+        3,
+        3,
+        5
+      ],
+      "claim": "Ada can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        360
+      ]
+    },
+    {
+      "text": "multiply the numbers Rui reaches in 5, 13, 8, -2, 3 directly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:reworded:manner-product:09",
+      "kind": "reworded",
+      "values": [
+        5,
+        13,
+        8,
+        -2,
+        3
+      ],
+      "claim": "Rui reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        1560
+      ]
+    },
+    {
+      "text": "multiply the numbers Mira reaches in 3, 8, 11, 5, 4 quickly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:reworded:manner-product:10",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        11,
+        5,
+        4
+      ],
+      "claim": "Mira reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        120
+      ]
+    },
+    {
+      "text": "multiply the numbers Nia can reach from 5, 3, 8, 7, 13 carefully",
+      "construction_id": "manner-product",
+      "source_id": "phase5:reworded:manner-product:11",
+      "kind": "reworded",
+      "values": [
+        5,
+        3,
+        8,
+        7,
+        13
+      ],
+      "claim": "Nia can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        1560
+      ]
+    },
+    {
+      "text": "multiply the numbers Tavi reaches from 13, 8, 5, 3, 11 directly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:reworded:manner-product:12",
+      "kind": "reworded",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        1560
+      ]
+    },
+    {
+      "text": "multiply the numbers Ada can reach from 3, 5, 5, 8, -2 quickly",
+      "construction_id": "manner-product",
+      "source_id": "phase5:reworded:manner-product:13",
+      "kind": "reworded",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        600
+      ]
+    },
+    {
+      "text": "what is the largest value Tavi reaches in 13, 8, 5, 3, 11",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:control:comparative-max:12",
+      "kind": "control",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        13
+      ]
+    },
+    {
+      "text": "what is the largest value Ada can reach in 3, 5, 5, 8, -2",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:control:comparative-max:13",
+      "kind": "control",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        8
+      ]
+    },
+    {
+      "text": "which is the biggest number Rui reaches from 8, 8, 13, 3, 11",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:control:comparative-max:14",
+      "kind": "control",
+      "values": [
+        8,
+        8,
+        13,
+        3,
+        11
+      ],
+      "claim": "Rui reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        13
+      ]
+    },
+    {
+      "text": "which is the biggest number Mira reaches from 5, -2, 3, 5, 8",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:control:comparative-max:15",
+      "kind": "control",
+      "values": [
+        5,
+        -2,
+        3,
+        5,
+        8
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        8
+      ]
+    },
+    {
+      "text": "what is the greatest entry Nia can reach among 13, 3, 8, 5, 4",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:control:comparative-max:16",
+      "kind": "control",
+      "values": [
+        13,
+        3,
+        8,
+        5,
+        4
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        13
+      ]
+    },
+    {
+      "text": "what is the greatest entry Tavi reaches among 3, 13, 8, 5, -2",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:control:comparative-max:17",
+      "kind": "control",
+      "values": [
+        3,
+        13,
+        8,
+        5,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        13
+      ]
+    },
+    {
+      "text": "what is the largest value Mira reaches from 3, 8, 5, 11, -2",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:reworded:comparative-max:00",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        8
+      ]
+    },
+    {
+      "text": "what is the largest value Nia can reach among 5, 5, 3, 11, 8",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:reworded:comparative-max:01",
+      "kind": "reworded",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        8
+      ]
+    },
+    {
+      "text": "what is the largest number Tavi reaches in 13, -2, 8, 3, 5",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:reworded:comparative-max:02",
+      "kind": "reworded",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        13
+      ]
+    },
+    {
+      "text": "what is the largest number Ada can reach from 8, 11, 5, -2, 3",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:reworded:comparative-max:03",
+      "kind": "reworded",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        8
+      ]
+    },
+    {
+      "text": "what is the largest number Rui reaches among 3, 3, 13, 5",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:reworded:comparative-max:04",
+      "kind": "reworded",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        13
+      ]
+    },
+    {
+      "text": "what is the largest entry Mira reaches in 5, 8, 8, 3",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:reworded:comparative-max:05",
+      "kind": "reworded",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        8
+      ]
+    },
+    {
+      "text": "what is the largest entry Nia can reach from 11, 3, 5, -2, 8",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:reworded:comparative-max:06",
+      "kind": "reworded",
+      "values": [
+        11,
+        3,
+        5,
+        -2,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        8
+      ]
+    },
+    {
+      "text": "what is the largest entry Tavi reaches among 13, 5, 11, 3, -2",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:reworded:comparative-max:07",
+      "kind": "reworded",
+      "values": [
+        13,
+        5,
+        11,
+        3,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        13
+      ]
+    },
+    {
+      "text": "what is the biggest value Ada can reach in 8, 3, 3, 5",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:reworded:comparative-max:08",
+      "kind": "reworded",
+      "values": [
+        8,
+        3,
+        3,
+        5
+      ],
+      "claim": "Ada can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        8
+      ]
+    },
+    {
+      "text": "what is the biggest value Rui reaches from 5, 13, 8, -2, 3",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:reworded:comparative-max:09",
+      "kind": "reworded",
+      "values": [
+        5,
+        13,
+        8,
+        -2,
+        3
+      ],
+      "claim": "Rui reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        13
+      ]
+    },
+    {
+      "text": "what is the biggest value Mira reaches among 3, 8, 11, 5, 4",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:reworded:comparative-max:10",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        11,
+        5,
+        4
+      ],
+      "claim": "Mira reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        8
+      ]
+    },
+    {
+      "text": "what is the biggest number Nia can reach in 5, 3, 8, 7, 13",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:reworded:comparative-max:11",
+      "kind": "reworded",
+      "values": [
+        5,
+        3,
+        8,
+        7,
+        13
+      ],
+      "claim": "Nia can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        13
+      ]
+    },
+    {
+      "text": "what is the biggest number Tavi reaches from 13, 8, 5, 3, 11",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:reworded:comparative-max:12",
+      "kind": "reworded",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        13
+      ]
+    },
+    {
+      "text": "what is the biggest number Ada can reach among 3, 5, 5, 8, -2",
+      "construction_id": "comparative-max",
+      "source_id": "phase5:reworded:comparative-max:13",
+      "kind": "reworded",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        8
+      ]
+    },
+    {
+      "text": "use 13, 8, 5, 3, 11 to find the smallest value Tavi reaches",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:control:purpose-min:12",
+      "kind": "control",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "use 3, 5, 5, 8, -2 to find the smallest value Ada can reach",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:control:purpose-min:13",
+      "kind": "control",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "take 8, 8, 13, 3, 11 to get the least number Rui reaches",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:control:purpose-min:14",
+      "kind": "control",
+      "values": [
+        8,
+        8,
+        13,
+        3,
+        11
+      ],
+      "claim": "Rui reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "take 5, -2, 3, 5, 8 to get the least number Mira reaches",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:control:purpose-min:15",
+      "kind": "control",
+      "values": [
+        5,
+        -2,
+        3,
+        5,
+        8
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "try 13, 3, 8, 5, 4 to choose the lowest entry Nia can reach",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:control:purpose-min:16",
+      "kind": "control",
+      "values": [
+        13,
+        3,
+        8,
+        5,
+        4
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "try 3, 13, 8, 5, -2 to choose the lowest entry Tavi reaches",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:control:purpose-min:17",
+      "kind": "control",
+      "values": [
+        3,
+        13,
+        8,
+        5,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "use 3, 8, 5, 11, -2 to find the smallest number Mira reaches",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:reworded:purpose-min:00",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        5,
+        11,
+        -2
+      ],
+      "claim": "Mira reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "use 5, 5, 3, 11, 8 to find the smallest entry Nia can reach",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:reworded:purpose-min:01",
+      "kind": "reworded",
+      "values": [
+        5,
+        5,
+        3,
+        11,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "use 13, -2, 8, 3, 5 to find the least value Tavi reaches",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:reworded:purpose-min:02",
+      "kind": "reworded",
+      "values": [
+        13,
+        -2,
+        8,
+        3,
+        5
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "use 8, 11, 5, -2, 3 to find the least number Ada can reach",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:reworded:purpose-min:03",
+      "kind": "reworded",
+      "values": [
+        8,
+        11,
+        5,
+        -2,
+        3
+      ],
+      "claim": "Ada can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "use 3, 3, 13, 5 to find the least entry Rui reaches",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:reworded:purpose-min:04",
+      "kind": "reworded",
+      "values": [
+        3,
+        3,
+        13,
+        5
+      ],
+      "claim": "Rui reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "use 5, 8, 8, 3 to find the lowest value Mira reaches",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:reworded:purpose-min:05",
+      "kind": "reworded",
+      "values": [
+        5,
+        8,
+        8,
+        3
+      ],
+      "claim": "Mira reaches",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "use 11, 3, 5, -2, 8 to find the lowest number Nia can reach",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:reworded:purpose-min:06",
+      "kind": "reworded",
+      "values": [
+        11,
+        3,
+        5,
+        -2,
+        8
+      ],
+      "claim": "Nia can reach",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "use 13, 5, 11, 3, -2 to find the lowest entry Tavi reaches",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:reworded:purpose-min:07",
+      "kind": "reworded",
+      "values": [
+        13,
+        5,
+        11,
+        3,
+        -2
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "use 8, 3, 3, 5 to get the smallest value Ada can reach",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:reworded:purpose-min:08",
+      "kind": "reworded",
+      "values": [
+        8,
+        3,
+        3,
+        5
+      ],
+      "claim": "Ada can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "use 5, 13, 8, -2, 3 to get the smallest number Rui reaches",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:reworded:purpose-min:09",
+      "kind": "reworded",
+      "values": [
+        5,
+        13,
+        8,
+        -2,
+        3
+      ],
+      "claim": "Rui reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "use 3, 8, 11, 5, 4 to get the smallest entry Mira reaches",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:reworded:purpose-min:10",
+      "kind": "reworded",
+      "values": [
+        3,
+        8,
+        11,
+        5,
+        4
+      ],
+      "claim": "Mira reaches",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "use 5, 3, 8, 7, 13 to get the least value Nia can reach",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:reworded:purpose-min:11",
+      "kind": "reworded",
+      "values": [
+        5,
+        3,
+        8,
+        7,
+        13
+      ],
+      "claim": "Nia can reach",
+      "condition": "the board agrees",
+      "manner": "quickly",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "use 13, 8, 5, 3, 11 to get the least number Tavi reaches",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:reworded:purpose-min:12",
+      "kind": "reworded",
+      "values": [
+        13,
+        8,
+        5,
+        3,
+        11
+      ],
+      "claim": "Tavi reaches",
+      "condition": "the review is open",
+      "manner": "carefully",
+      "expected": [
+        3
+      ]
+    },
+    {
+      "text": "use 3, 5, 5, 8, -2 to get the least entry Ada can reach",
+      "construction_id": "purpose-min",
+      "source_id": "phase5:reworded:purpose-min:13",
+      "kind": "reworded",
+      "values": [
+        3,
+        5,
+        5,
+        8,
+        -2
+      ],
+      "claim": "Ada can reach",
+      "condition": "the list is ready",
+      "manner": "directly",
+      "expected": [
+        3
+      ]
+    }
+  ]
+}

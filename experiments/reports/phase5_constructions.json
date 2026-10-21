@@ -1,0 +1,949 @@
+{
+  "abstention": {
+    "all_abstain": true,
+    "ambiguous": "ambiguous",
+    "ambiguous_candidates": [
+      "ambiguous-a",
+      "ambiguous-b"
+    ],
+    "malformed_missing_slot": "no_match",
+    "unlicensed": "no_match",
+    "unlicensed_single_example": "no_match"
+  },
+  "active_learning": {
+    "answer_status": "updated",
+    "construction_id": "direct-sum",
+    "failed_status": "no_match",
+    "matched_after": "matched",
+    "missing": "class-member:enumerate",
+    "question": {
+      "class_id": "direct-sum-class-0-fdd3c9be",
+      "construction_id": "direct-sum",
+      "member": "enumerate",
+      "missing": "class-member:enumerate",
+      "prompt": "Please show one marked example that uses 'enumerate' in the Direct sum construction (direct), alongside the existing wording.",
+      "query": "enumerate every value Mira reaches in 3, 8"
+    },
+    "questions_asked": 1,
+    "rule_state": "active"
+  },
+  "baseline": {
+    "abstained": 140,
+    "ambiguous": 0,
+    "answered": 60,
+    "by_construction": {
+      "comparative-max": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "conditional-keep-odd": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "coordinate-dedupe": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "direct-sum": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "fronted-sort": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "manner-product": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "passive-count": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "purpose-min": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "relative-reverse": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "wh-double": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      }
+    },
+    "confident_errors": 0,
+    "correct": 60,
+    "coverage": 0.3,
+    "tasks": 200
+  },
+  "by_construction": {
+    "comparative-max": {
+      "baseline": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "delta": {
+        "confident_errors": 0,
+        "correct": 14,
+        "coverage": 0.7
+      },
+      "learned": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      }
+    },
+    "conditional-keep-odd": {
+      "baseline": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "delta": {
+        "confident_errors": 0,
+        "correct": 14,
+        "coverage": 0.7
+      },
+      "learned": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      }
+    },
+    "coordinate-dedupe": {
+      "baseline": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "delta": {
+        "confident_errors": 0,
+        "correct": 14,
+        "coverage": 0.7
+      },
+      "learned": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      }
+    },
+    "direct-sum": {
+      "baseline": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "delta": {
+        "confident_errors": 0,
+        "correct": 14,
+        "coverage": 0.7
+      },
+      "learned": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      }
+    },
+    "fronted-sort": {
+      "baseline": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "delta": {
+        "confident_errors": 0,
+        "correct": 14,
+        "coverage": 0.7
+      },
+      "learned": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      }
+    },
+    "manner-product": {
+      "baseline": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "delta": {
+        "confident_errors": 0,
+        "correct": 14,
+        "coverage": 0.7
+      },
+      "learned": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      }
+    },
+    "passive-count": {
+      "baseline": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "delta": {
+        "confident_errors": 0,
+        "correct": 14,
+        "coverage": 0.7
+      },
+      "learned": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      }
+    },
+    "purpose-min": {
+      "baseline": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "delta": {
+        "confident_errors": 0,
+        "correct": 14,
+        "coverage": 0.7
+      },
+      "learned": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      }
+    },
+    "relative-reverse": {
+      "baseline": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "delta": {
+        "confident_errors": 0,
+        "correct": 14,
+        "coverage": 0.7
+      },
+      "learned": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      }
+    },
+    "wh-double": {
+      "baseline": {
+        "abstained": 14,
+        "answered": 6,
+        "confident_errors": 0,
+        "correct": 6,
+        "coverage": 0.3,
+        "tasks": 20
+      },
+      "delta": {
+        "confident_errors": 0,
+        "correct": 14,
+        "coverage": 0.7
+      },
+      "learned": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      }
+    }
+  },
+  "context": {
+    "context_count": 2,
+    "context_sensitive": true,
+    "matched": true,
+    "outputs": [
+      [
+        16
+      ],
+      [
+        3
+      ]
+    ],
+    "same_slots": {
+      "claim": "Mira reaches",
+      "values": [
+        3,
+        8,
+        5
+      ]
+    }
+  },
+  "control_and_reworded": {
+    "baseline": {
+      "control": {
+        "abstained": 0,
+        "ambiguous": 0,
+        "answered": 60,
+        "by_construction": {
+          "comparative-max": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "conditional-keep-odd": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "coordinate-dedupe": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "direct-sum": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "fronted-sort": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "manner-product": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "passive-count": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "purpose-min": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "relative-reverse": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "wh-double": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          }
+        },
+        "confident_errors": 0,
+        "correct": 60,
+        "coverage": 1.0,
+        "tasks": 60
+      },
+      "reworded": {
+        "abstained": 140,
+        "ambiguous": 0,
+        "answered": 0,
+        "by_construction": {
+          "comparative-max": {
+            "abstained": 14,
+            "answered": 0,
+            "confident_errors": 0,
+            "correct": 0,
+            "coverage": 0.0,
+            "tasks": 14
+          },
+          "conditional-keep-odd": {
+            "abstained": 14,
+            "answered": 0,
+            "confident_errors": 0,
+            "correct": 0,
+            "coverage": 0.0,
+            "tasks": 14
+          },
+          "coordinate-dedupe": {
+            "abstained": 14,
+            "answered": 0,
+            "confident_errors": 0,
+            "correct": 0,
+            "coverage": 0.0,
+            "tasks": 14
+          },
+          "direct-sum": {
+            "abstained": 14,
+            "answered": 0,
+            "confident_errors": 0,
+            "correct": 0,
+            "coverage": 0.0,
+            "tasks": 14
+          },
+          "fronted-sort": {
+            "abstained": 14,
+            "answered": 0,
+            "confident_errors": 0,
+            "correct": 0,
+            "coverage": 0.0,
+            "tasks": 14
+          },
+          "manner-product": {
+            "abstained": 14,
+            "answered": 0,
+            "confident_errors": 0,
+            "correct": 0,
+            "coverage": 0.0,
+            "tasks": 14
+          },
+          "passive-count": {
+            "abstained": 14,
+            "answered": 0,
+            "confident_errors": 0,
+            "correct": 0,
+            "coverage": 0.0,
+            "tasks": 14
+          },
+          "purpose-min": {
+            "abstained": 14,
+            "answered": 0,
+            "confident_errors": 0,
+            "correct": 0,
+            "coverage": 0.0,
+            "tasks": 14
+          },
+          "relative-reverse": {
+            "abstained": 14,
+            "answered": 0,
+            "confident_errors": 0,
+            "correct": 0,
+            "coverage": 0.0,
+            "tasks": 14
+          },
+          "wh-double": {
+            "abstained": 14,
+            "answered": 0,
+            "confident_errors": 0,
+            "correct": 0,
+            "coverage": 0.0,
+            "tasks": 14
+          }
+        },
+        "confident_errors": 0,
+        "correct": 0,
+        "coverage": 0.0,
+        "tasks": 140
+      }
+    },
+    "learned": {
+      "control": {
+        "abstained": 0,
+        "ambiguous": 0,
+        "answered": 60,
+        "by_construction": {
+          "comparative-max": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "conditional-keep-odd": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "coordinate-dedupe": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "direct-sum": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "fronted-sort": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "manner-product": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "passive-count": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "purpose-min": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "relative-reverse": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          },
+          "wh-double": {
+            "abstained": 0,
+            "answered": 6,
+            "confident_errors": 0,
+            "correct": 6,
+            "coverage": 1.0,
+            "tasks": 6
+          }
+        },
+        "confident_errors": 0,
+        "correct": 60,
+        "coverage": 1.0,
+        "tasks": 60
+      },
+      "reworded": {
+        "abstained": 0,
+        "ambiguous": 0,
+        "answered": 140,
+        "by_construction": {
+          "comparative-max": {
+            "abstained": 0,
+            "answered": 14,
+            "confident_errors": 0,
+            "correct": 14,
+            "coverage": 1.0,
+            "tasks": 14
+          },
+          "conditional-keep-odd": {
+            "abstained": 0,
+            "answered": 14,
+            "confident_errors": 0,
+            "correct": 14,
+            "coverage": 1.0,
+            "tasks": 14
+          },
+          "coordinate-dedupe": {
+            "abstained": 0,
+            "answered": 14,
+            "confident_errors": 0,
+            "correct": 14,
+            "coverage": 1.0,
+            "tasks": 14
+          },
+          "direct-sum": {
+            "abstained": 0,
+            "answered": 14,
+            "confident_errors": 0,
+            "correct": 14,
+            "coverage": 1.0,
+            "tasks": 14
+          },
+          "fronted-sort": {
+            "abstained": 0,
+            "answered": 14,
+            "confident_errors": 0,
+            "correct": 14,
+            "coverage": 1.0,
+            "tasks": 14
+          },
+          "manner-product": {
+            "abstained": 0,
+            "answered": 14,
+            "confident_errors": 0,
+            "correct": 14,
+            "coverage": 1.0,
+            "tasks": 14
+          },
+          "passive-count": {
+            "abstained": 0,
+            "answered": 14,
+            "confident_errors": 0,
+            "correct": 14,
+            "coverage": 1.0,
+            "tasks": 14
+          },
+          "purpose-min": {
+            "abstained": 0,
+            "answered": 14,
+            "confident_errors": 0,
+            "correct": 14,
+            "coverage": 1.0,
+            "tasks": 14
+          },
+          "relative-reverse": {
+            "abstained": 0,
+            "answered": 14,
+            "confident_errors": 0,
+            "correct": 14,
+            "coverage": 1.0,
+            "tasks": 14
+          },
+          "wh-double": {
+            "abstained": 0,
+            "answered": 14,
+            "confident_errors": 0,
+            "correct": 14,
+            "coverage": 1.0,
+            "tasks": 14
+          }
+        },
+        "confident_errors": 0,
+        "correct": 140,
+        "coverage": 1.0,
+        "tasks": 140
+      }
+    }
+  },
+  "corpus": {
+    "composition_shapes": [
+      "comparative",
+      "conditional",
+      "coordination",
+      "direct",
+      "fronted-pp",
+      "manner",
+      "passive",
+      "purpose",
+      "relative",
+      "wh"
+    ],
+    "constructions": 10,
+    "controls": 60,
+    "heldout_tasks": 200,
+    "reworded": 140,
+    "training_examples": 60
+  },
+  "delta": {
+    "confident_errors": 0,
+    "correct": 140,
+    "coverage": 0.7
+  },
+  "dialogue_moves": {
+    "note": "dialogue moves remain behind the explicit baseline; construction routing does not promote them",
+    "status": "experimental",
+    "used_by_construction_route": false
+  },
+  "format": "crms-phase5-eval",
+  "gate": {
+    "active_construction_learning": true,
+    "learned_beats_handcoded": true,
+    "morphology_expansion": true,
+    "new_construction_registry": true,
+    "no_confident_wrong_answers": true,
+    "no_wrong_answer_increase": true,
+    "paraphrase_coverage_doubles": true,
+    "propose_only_ranker": true,
+    "registry_lifecycle": true,
+    "same_utterance_different_context": true,
+    "unlicensed_productions_abstain": true
+  },
+  "gate_passed": true,
+  "learned": {
+    "abstained": 0,
+    "ambiguous": 0,
+    "answered": 200,
+    "by_construction": {
+      "comparative-max": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      },
+      "conditional-keep-odd": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      },
+      "coordinate-dedupe": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      },
+      "direct-sum": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      },
+      "fronted-sort": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      },
+      "manner-product": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      },
+      "passive-count": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      },
+      "purpose-min": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      },
+      "relative-reverse": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      },
+      "wh-double": {
+        "abstained": 0,
+        "answered": 20,
+        "confident_errors": 0,
+        "correct": 20,
+        "coverage": 1.0,
+        "tasks": 20
+      }
+    },
+    "confident_errors": 0,
+    "correct": 200,
+    "coverage": 1.0,
+    "tasks": 200
+  },
+  "morphology": {
+    "governed_irregular_match": true,
+    "governed_regular_match": true,
+    "irregular_after_evidence": true,
+    "irregular_before_evidence": false,
+    "irregular_forms_available_after_evidence": true,
+    "irregular_rule_id": "morphology-irregular-child",
+    "registry_irregular_active": true,
+    "registry_regular_active": true,
+    "regular_after_retirement": false,
+    "regular_expansion": true
+  },
+  "new_construction": {
+    "dangling_references": [],
+    "matched_after_retire": "no_match",
+    "matched_after_rollback": "matched",
+    "matched_before": "matched",
+    "rule_id": "construction-polite-reverse",
+    "state_before": "active"
+  },
+  "provenance": {
+    "fixture": "experiments/scorecard/phase5_constructions.json",
+    "method": "teacher-marked induction, exact-frame baseline, independent operation oracle"
+  },
+  "ranker": {
+    "bypass_same": true,
+    "bypass_status": "matched",
+    "candidate_count": 1,
+    "feature_counts": [
+      5
+    ],
+    "max_candidates": 2,
+    "max_features": 5,
+    "ranked": [
+      {
+        "construction_id": "direct-sum",
+        "features": [
+          "class:direct-sum-class-0-88829b68:3",
+          "class:direct-sum-class-1-ef3a645a:3",
+          "class:direct-sum-class-2-d0e5391d:3",
+          "slot:claim:claim",
+          "class:direct-sum-class-4-0620a1e9:3"
+        ],
+        "pattern_id": "construction-pattern-cb910842e0b86868",
+        "score": 11.333333
+      }
+    ]
+  },
+  "registry": {
+    "active_ids": [
+      "comparative-max",
+      "conditional-keep-odd",
+      "coordinate-dedupe",
+      "direct-sum",
+      "fronted-sort",
+      "manner-product",
+      "passive-count",
+      "purpose-min",
+      "relative-reverse",
+      "wh-double"
+    ],
+    "active_rule_count": 10,
+    "after_retire": "no_match",
+    "all_active_have_holdout_evidence": true,
+    "dangling_references": [],
+    "matched_after_rollback": "matched",
+    "matched_before_retire": "matched",
+    "retired_id": "construction-direct-sum"
+  },
+  "version": 1
+}

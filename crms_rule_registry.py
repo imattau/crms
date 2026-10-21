@@ -23,6 +23,7 @@ VERSION = 1
 
 FAMILIES = frozenset({
     "lexical",
+    "construction",
     "morphology",
     "procedure",
     "request-frame",

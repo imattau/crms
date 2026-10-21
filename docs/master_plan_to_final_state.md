@@ -499,6 +499,21 @@ increase; learned constructions beat hand-coded frames on held-out wording;
 unlicensed productions abstain; new constructions enter through the registry
 and can be retired without leaving dangling references.
 
+**Status (2026-10-21): bounded Phase 5 lane passed.** Ten construction shapes
+(direct, wh, relative, coordination, conditional, passive, fronted PP, manner,
+comparative, purpose) are induced from teacher-marked examples, with learned
+token classes and typed slots. On 200 held-out paraphrases, exact hand-coded
+frames score 60/200 (30%) and learned constructions score 200/200 (100%), with
+zero confident wrong answers in both. The 60 same-wording controls are 60/60 for
+both systems; on 140 reworded paraphrases the exact baseline scores 0/140 and
+the learned grammar 140/140. Unlicensed, malformed, single-example, and
+ambiguous productions abstain. Every active construction carries 20 held-out
+cases and 20 sources; retirement removes it from matching with no dangling
+references and rollback restores it. Regular morphology expands while irregular
+forms remain evidence-only. The ranker is bounded, deterministic, and
+bypassable. A failed query asks for the smallest missing class member and is
+fixed by one marked example.
+
 ### Phase 6 — Domain breadth (weeks 30–56, one slice at a time)
 
 Each slice: held-out requests → negative cases → independent checker or rubric →
@@ -693,12 +708,18 @@ redesigned or dropped.
    `crms_active_learning.py`, `crms_consolidation.py`,
    `experiments/reports/phase4_learning.json`); real user corrections and
    runtime chat integration remain follow-ups.
-11. **Corpus manifest v0** — inventory of candidate sources, licences, sizes,
+11. **Phase 5 construction learning** — learned token classes, typed slots, ten
+   composition shapes, morphology, active construction learning, propose-only
+   ranker, and a 200-paraphrase held-out suite. — done for the frozen lane
+   (`crms_constructions.py`, `crms_morphology.py`,
+   `crms_construction_ranker.py`, `experiments/reports/phase5_constructions.json`);
+   runtime chat routing and broader open-domain constructions remain follow-ups.
+12. **Corpus manifest v0** — inventory of candidate sources, licences, sizes,
    and domain targets. — done
    (`corpus/manifest_v0.json`, `docs/corpus_manifest.md`,
    `experiments/v1_557_corpus_manifest.py`); 20 candidate groups, 4 documented
    exclusions, and a 94.5M-word core planning estimate.
-12. **Consolidate plan docs** — this file is canonical; link the others as
+13. **Consolidate plan docs** — this file is canonical; link the others as
    history. — canonical status recorded; remaining docs still need pruning.
 
 ---
@@ -741,3 +762,5 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Phase 3 gate measured: 16 reviewed proposals, 93.8% precision, 100% seeded recall, 7/7 controls, 0.36 review minutes/claim, 4/4 transfer, 15/15 retention, zero pre-review active rules | `experiments/reports/phase3_document_learning.json` |
 | 2026-10-21 | Phase 4 learning lane: SQLite dependency index, taught/source-reviewed/derived trust conflicts, support-aware correction propagation, verified-work replay learning, correction/failure scoped negatives, active probing, consolidation, and scoped auto-accept policy | `crms_dependency.py`, `crms_verified_work.py`, `crms_corrections.py`, `crms_active_learning.py`, `crms_consolidation.py`, `run_phase4_eval.py`, `experiments/v1_560_phase4_learning.py`, `docs/design_phase4_learning.md` |
 | 2026-10-21 | Phase 4 gate measured: 100% correction propagation (5/5), bad derivation contested, compounding 0/12→12/12 with zero confident errors, skeleton transfer 0/4→4/4, disjoint plateau 0/4, provenance/trust across copied model state, bounded dependency storage | `experiments/reports/phase4_learning.json`, `experiments/scorecard/phase4_families.json` |
+| 2026-10-21 | Phase 5 construction lane: learned token classes and typed slots over ten composition shapes, regular morphology with evidence-only irregulars, active construction gaps, propose-only size-budgeted ranker, registry entry/retirement, and 200 held-out paraphrases | `crms_constructions.py`, `crms_morphology.py`, `crms_construction_ranker.py`, `run_phase5_eval.py`, `experiments/v1_561_phase5_constructions.py`, `docs/design_phase5_constructions.md` |
+| 2026-10-21 | Phase 5 gate measured: exact frames 60/200 (30%) vs learned constructions 200/200 (100%), controls 60/60, reworded 0/140→140/140, zero confident errors, unlicensed/ambiguous abstention, holdout-backed construction rules, clean retirement/rollback, evidence-only irregulars, bounded bypassable ranker | `experiments/reports/phase5_constructions.json`, `experiments/scorecard/phase5_constructions.json` |

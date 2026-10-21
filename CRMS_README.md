@@ -1510,6 +1510,34 @@ transfer 0/4 → 4/4 for a second family, a disjoint-family plateau at 0/4,
 provenance and trust surviving copied model/registry/dependency state, and
 bounded dependency storage.
 
+### Learned constructions and paraphrase breadth
+
+Phase 5 learns construction productions instead of adding hand-written request
+frames. `crms_constructions.py` aligns teacher-marked examples, turns varying
+literal positions into token classes, binds typed slots, and keeps example
+lineage on every pattern. Ten shapes are covered: direct, wh, relative,
+coordination, conditional, passive, fronted PP, manner, comparative, and
+purpose. `crms_morphology.py` expands regular plurals while irregular forms are
+usable only as observed lexical pairs. `crms_construction_ranker.py` is an
+offline, size-budgeted candidate proposer that never decides or filters the
+parser result. Failed wording can ask for the smallest missing class member and
+is repaired by one marked example.
+
+Run the frozen paraphrase suite with:
+
+```text
+python3 run_phase5_eval.py
+```
+
+Current report `experiments/reports/phase5_constructions.json`: 200 held-out
+paraphrases over 10 constructions. Exact hand-coded frames answer 60/200 (30%);
+learned constructions answer 200/200 (100%). The 60 same-wording controls are
+60/60 for both; the 140 reworded paraphrases are 0/140 for exact frames and
+140/140 for the learned grammar. Confident wrong answers are 0 for both.
+Unlicensed, malformed, single-example, and ambiguous productions abstain.
+Every active construction carries 20 held-out cases and 20 sources; retirement
+removes it from matching without dangling references and rollback restores it.
+
 `/suggest-corpus-alignments` adds a corpus-only path for alternate predicate
 wording. It proposes an alignment only when the same distinct subject/object
 pairs are independently parsed under both predicates in separate documents.
