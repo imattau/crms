@@ -1,0 +1,1264 @@
+{
+ "format": "crms-pattern-seed",
+ "version": 1,
+ "verbs": {
+  "base": [
+   "base",
+   "bases",
+   "based",
+   "based"
+  ],
+  "bear": [
+   "bear",
+   "bears",
+   "bore",
+   "born"
+  ],
+  "become": [
+   "become",
+   "becomes",
+   "became",
+   "become"
+  ],
+  "build": [
+   "build",
+   "builds",
+   "built",
+   "built"
+  ],
+  "bury": [
+   "bury",
+   "buries",
+   "buried",
+   "buried"
+  ],
+  "compose": [
+   "compose",
+   "composes",
+   "composed",
+   "composed"
+  ],
+  "create": [
+   "create",
+   "creates",
+   "created",
+   "created"
+  ],
+  "design": [
+   "design",
+   "designs",
+   "designed",
+   "designed"
+  ],
+  "develop": [
+   "develop",
+   "develops",
+   "developed",
+   "developed"
+  ],
+  "die": [
+   "die",
+   "dies",
+   "died",
+   "died"
+  ],
+  "direct": [
+   "direct",
+   "directs",
+   "directed",
+   "directed"
+  ],
+  "discover": [
+   "discover",
+   "discovers",
+   "discovered",
+   "discovered"
+  ],
+  "establish": [
+   "establish",
+   "establishes",
+   "established",
+   "established"
+  ],
+  "form": [
+   "form",
+   "forms",
+   "formed",
+   "formed"
+  ],
+  "found": [
+   "found",
+   "founds",
+   "founded",
+   "founded"
+  ],
+  "headquarter": [
+   "headquarter",
+   "headquarters",
+   "headquartered",
+   "headquartered"
+  ],
+  "host": [
+   "host",
+   "hosts",
+   "hosted",
+   "hosted"
+  ],
+  "invent": [
+   "invent",
+   "invents",
+   "invented",
+   "invented"
+  ],
+  "kill": [
+   "kill",
+   "kills",
+   "killed",
+   "killed"
+  ],
+  "lead": [
+   "lead",
+   "leads",
+   "led",
+   "led"
+  ],
+  "live": [
+   "live",
+   "lives",
+   "lived",
+   "lived"
+  ],
+  "locate": [
+   "locate",
+   "locates",
+   "located",
+   "located"
+  ],
+  "make": [
+   "make",
+   "makes",
+   "made",
+   "made"
+  ],
+  "manage": [
+   "manage",
+   "manages",
+   "managed",
+   "managed"
+  ],
+  "manufacture": [
+   "manufacture",
+   "manufactures",
+   "manufactured",
+   "manufactured"
+  ],
+  "name": [
+   "name",
+   "names",
+   "named",
+   "named"
+  ],
+  "open": [
+   "open",
+   "opens",
+   "opened",
+   "opened"
+  ],
+  "operate": [
+   "operate",
+   "operates",
+   "operated",
+   "operated"
+  ],
+  "own": [
+   "own",
+   "owns",
+   "owned",
+   "owned"
+  ],
+  "produce": [
+   "produce",
+   "produces",
+   "produced",
+   "produced"
+  ],
+  "publish": [
+   "publish",
+   "publishes",
+   "published",
+   "published"
+  ],
+  "release": [
+   "release",
+   "releases",
+   "released",
+   "released"
+  ],
+  "sing": [
+   "sing",
+   "sings",
+   "sang",
+   "sung"
+  ],
+  "star": [
+   "star",
+   "stars",
+   "starred",
+   "starred"
+  ],
+  "write": [
+   "write",
+   "writes",
+   "wrote",
+   "written"
+  ]
+ },
+ "agent_nouns": {
+  "build": [
+   "builder"
+  ],
+  "compose": [
+   "composer"
+  ],
+  "create": [
+   "creator"
+  ],
+  "design": [
+   "designer"
+  ],
+  "develop": [
+   "developer"
+  ],
+  "direct": [
+   "director"
+  ],
+  "discover": [
+   "discoverer"
+  ],
+  "found": [
+   "founder"
+  ],
+  "invent": [
+   "inventor"
+  ],
+  "lead": [
+   "leader"
+  ],
+  "make": [
+   "maker",
+   "manufacturer"
+  ],
+  "manage": [
+   "manager"
+  ],
+  "manufacture": [
+   "manufacturer"
+  ],
+  "own": [
+   "owner"
+  ],
+  "produce": [
+   "producer"
+  ],
+  "publish": [
+   "publisher"
+  ],
+  "sing": [
+   "singer"
+  ],
+  "write": [
+   "author",
+   "writer"
+  ]
+ },
+ "classes": {
+  "creative_verb": {
+   "compose": {
+    "support": 1,
+    "origin": "teacher"
+   },
+   "create": {
+    "support": 1,
+    "origin": "teacher"
+   },
+   "design": {
+    "support": 1,
+    "origin": "teacher"
+   },
+   "direct": {
+    "support": 1,
+    "origin": "teacher"
+   },
+   "make": {
+    "support": 1,
+    "origin": "teacher"
+   },
+   "paint": {
+    "support": 1,
+    "origin": "teacher"
+   },
+   "perform": {
+    "support": 1,
+    "origin": "teacher"
+   },
+   "produce": {
+    "support": 1,
+    "origin": "teacher"
+   },
+   "publish": {
+    "support": 1,
+    "origin": "teacher"
+   },
+   "record": {
+    "support": 1,
+    "origin": "teacher"
+   },
+   "release": {
+    "support": 1,
+    "origin": "teacher"
+   },
+   "sing": {
+    "support": 1,
+    "origin": "teacher"
+   },
+   "write": {
+    "support": 1,
+    "origin": "teacher"
+   }
+  },
+  "creative_work": {
+   "song": {
+    "support": 815,
+    "origin": "induced"
+   },
+   "album": {
+    "support": 396,
+    "origin": "induced"
+   },
+   "single": {
+    "support": 54,
+    "origin": "induced"
+   },
+   "book": {
+    "support": 46,
+    "origin": "induced"
+   },
+   "novel": {
+    "support": 37,
+    "origin": "induced"
+   },
+   "play": {
+    "support": 22,
+    "origin": "induced"
+   },
+   "tour": {
+    "support": 13,
+    "origin": "induced"
+   }
+  },
+  "place_noun": {
+   "city": {
+    "support": 2317,
+    "origin": "induced"
+   },
+   "town": {
+    "support": 1295,
+    "origin": "induced"
+   },
+   "municipality": {
+    "support": 999,
+    "origin": "induced"
+   },
+   "commune": {
+    "support": 784,
+    "origin": "induced"
+   },
+   "county": {
+    "support": 504,
+    "origin": "induced"
+   },
+   "village": {
+    "support": 474,
+    "origin": "induced"
+   },
+   "comune": {
+    "support": 401,
+    "origin": "induced"
+   },
+   "district": {
+    "support": 246,
+    "origin": "induced"
+   },
+   "station": {
+    "support": 154,
+    "origin": "induced"
+   },
+   "province": {
+    "support": 139,
+    "origin": "induced"
+   },
+   "university": {
+    "support": 137,
+    "origin": "induced"
+   },
+   "community": {
+    "support": 127,
+    "origin": "induced"
+   },
+   "locality": {
+    "support": 101,
+    "origin": "induced"
+   },
+   "character": {
+    "support": 95,
+    "origin": "induced"
+   },
+   "constituency": {
+    "support": 93,
+    "origin": "induced"
+   },
+   "team": {
+    "support": 93,
+    "origin": "induced"
+   },
+   "party": {
+    "support": 86,
+    "origin": "induced"
+   },
+   "stadium": {
+    "support": 81,
+    "origin": "induced"
+   },
+   "region": {
+    "support": 80,
+    "origin": "induced"
+   },
+   "river": {
+    "support": 78,
+    "origin": "induced"
+   },
+   "island": {
+    "support": 73,
+    "origin": "induced"
+   },
+   "park": {
+    "support": 71,
+    "origin": "induced"
+   },
+   "state": {
+    "support": 66,
+    "origin": "induced"
+   },
+   "borough": {
+    "support": 64,
+    "origin": "induced"
+   },
+   "place": {
+    "support": 58,
+    "origin": "induced"
+   },
+   "area": {
+    "support": 56,
+    "origin": "induced"
+   },
+   "division": {
+    "support": 56,
+    "origin": "induced"
+   },
+   "mountain": {
+    "support": 56,
+    "origin": "induced"
+   },
+   "language": {
+    "support": 55,
+    "origin": "induced"
+   },
+   "group": {
+    "support": 52,
+    "origin": "induced"
+   },
+   "game": {
+    "support": 47,
+    "origin": "induced"
+   },
+   "lake": {
+    "support": 46,
+    "origin": "induced"
+   },
+   "airport": {
+    "support": 42,
+    "origin": "induced"
+   },
+   "department": {
+    "support": 42,
+    "origin": "induced"
+   },
+   "house": {
+    "support": 41,
+    "origin": "induced"
+   },
+   "letter": {
+    "support": 37,
+    "origin": "induced"
+   },
+   "township": {
+    "support": 37,
+    "origin": "induced"
+   },
+   "club": {
+    "support": 36,
+    "origin": "induced"
+   },
+   "school": {
+    "support": 36,
+    "origin": "induced"
+   },
+   "country": {
+    "support": 35,
+    "origin": "induced"
+   },
+   "officer": {
+    "support": 35,
+    "origin": "induced"
+   },
+   "settlement": {
+    "support": 33,
+    "origin": "induced"
+   },
+   "book": {
+    "support": 32,
+    "origin": "induced"
+   },
+   "company": {
+    "support": 30,
+    "origin": "induced"
+   },
+   "movie": {
+    "support": 30,
+    "origin": "induced"
+   },
+   "museum": {
+    "support": 30,
+    "origin": "induced"
+   },
+   "highway": {
+    "support": 26,
+    "origin": "induced"
+   },
+   "site": {
+    "support": 26,
+    "origin": "induced"
+   },
+   "person": {
+    "support": 25,
+    "origin": "induced"
+   },
+   "skyscraper": {
+    "support": 25,
+    "origin": "induced"
+   }
+  }
+ },
+ "params": {
+  "rk_alt": -1.0,
+  "rk_e_late": -12.0,
+  "rk_gap": -1.0,
+  "rk_tau": 1e-09,
+  "rk_title_eq": 1.0,
+  "rk_window": 14.0,
+  "veto_next_cap": 1.0
+ },
+ "specs": [
+  {
+   "name": "attribute_apposition",
+   "priority": 5,
+   "question_patterns": [
+    "W[what] COP NP:q"
+   ],
+   "sentence_patterns": [
+    "NP:X , NP[cap]:A , COP QPHRASE"
+   ],
+   "template": "{A} is {q}.",
+   "verb_class": "",
+   "rationale": "the answer is the appositive name in a sentence whose predicate is the question phrase (possessives and plurals matched by stem)",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "What is Botswana's main international airport?",
+      "S": "Gaborone's airport, Sir Seretse Khama International Airport, is Botswana's main international airport.",
+      "A": "Sir Seretse Khama International Airport"
+     }
+    ],
+    "grandfathered": true
+   },
+   "grandfathered": true,
+   "proposition": {
+    "subject": "{A}",
+    "verb": "is",
+    "complement": "{q}"
+   }
+  },
+  {
+   "name": "work_by_artist",
+   "priority": 8,
+   "question_patterns": [
+    "W[who] V.any:v TAIL:E"
+   ],
+   "sentence_patterns": [
+    "E COP NP[cls=creative_work]:W P[by] NP[name]:A"
+   ],
+   "template": "{E} is {W} by {A}.",
+   "verb_class": "creative_verb",
+   "rationale": "'Who sang/wrote X' is answered by '<work noun> by <Name>'; stated as the sentence says it, not as an inferred verb; revised: the artist must be a name (ends in a capital), found when 'the English rock band' was returned for 'Rubber Soul'",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "Who sang These Are Special Times?",
+      "E": "These Are Special Times",
+      "S": "These Are Special Times is a holiday album by Canadian singer Celine Dion.",
+      "A": "Celine Dion"
+     },
+     {
+      "q": "Who made Same Trailer Different Park?",
+      "E": "Same Trailer Different Park",
+      "S": "Same Trailer Different Park is the debut studio album by American country music artist Kacey Musgraves, released on March 19, 2013, through Mercury Nashville.",
+      "A": "Kacey Musgraves"
+     }
+    ],
+    "heldout": [
+     {
+      "q": "Who made Revivor?",
+      "S": "Revivor is the eighth studio album by the German aggrotech band Funker Vogt.",
+      "A": "Funker Vogt"
+     }
+    ],
+    "contrast": [
+     {
+      "q": "Who sang Foo?",
+      "S": "Foo is a holiday album from Canada."
+     }
+    ]
+   },
+   "proposition": {
+    "subject": "{E}",
+    "verb": "is",
+    "complement": "{W} by {A}"
+   }
+  },
+  {
+   "name": "agent_transformed",
+   "priority": 9,
+   "question_patterns": [
+    "W[who] V.any:v (P:prt)? TAIL:E"
+   ],
+   "sentence_patterns": [
+    "NP:A V.fin[@v] E~",
+    "E ...{0,16} AUX? V.part[@v] ...{0,4} P[by] NP:A",
+    "NP:A COP DET ...{0,3} N.agent[@v] P[of] E~",
+    "E ...{0,16} V.ing[@v] (P[in])? NP:A"
+   ],
+   "template": "{A} {v.q}{prt} {E}.",
+   "verb_class": "",
+   "rationale": "one relation written once as an active base pattern; passive, agentive-noun and participle variants are derived by named transformations and each is probed. Replaces two hand-written specs (5 patterns).",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "Who built Tenochtitlan?",
+      "E": "Tenochtitlan",
+      "S": "The Aztecs built Tenochtitlan around 1325, right on a lake called Lake Texcoco.",
+      "A": "The Aztecs"
+     },
+     {
+      "q": "Who wrote A Clockwork Orange?",
+      "E": "A Clockwork Orange",
+      "S": "A Clockwork Orange is an English dystopian novella written by Anthony Burgess and published in 1962.",
+      "A": "Anthony Burgess"
+     },
+     {
+      "q": "Who starred in Hellcats of the Navy?",
+      "E": "Hellcats of the Navy",
+      "S": "Hellcats of the Navy is a 1957 American World II drama movie starring Ronald Reagan and Nancy Davis, his future wife and First Lady.",
+      "A": "Ronald Reagan"
+     },
+     {
+      "q": "Who created the BMW i3?",
+      "E": "the BMW i3",
+      "S": "Bayerische Motoren is the creator of the popular BMW i3.",
+      "A": "Bayerische Motoren"
+     },
+     {
+      "q": "Who produces the Dacia Spring?",
+      "E": "the Dacia Spring",
+      "S": "The Dacia Spring is an economical small car produced since 2021 by Dacia.",
+      "A": "Dacia"
+     }
+    ],
+    "heldout": [
+     {
+      "q": "Who produces the Kia Sportage?",
+      "S": "The Kia Sportage is an SUV produced by the car manufacturer Kia Motors since 1993.",
+      "A": "Kia Motors"
+     },
+     {
+      "q": "Who created Jiminy Glick?",
+      "S": "Jiminy Glick is a fictional character created and portrayed by Martin Short.",
+      "A": "Martin Short"
+     },
+     {
+      "q": "Who discovered Jaekelopterus?",
+      "S": "Jaekelopterus was discovered by Otto Jaekel in 1914 as a Pterygotus species.",
+      "A": "Otto Jaekel"
+     }
+    ],
+    "contrast": [
+     {
+      "q": "Who wrote Foo?",
+      "S": "Foo was edited by Bar."
+     },
+     {
+      "q": "Who owns Foo?",
+      "S": "Foo is owned in Japan."
+     }
+    ]
+   },
+   "base": "NP:A V.fin[@v] E~",
+   "transforms": [
+    "passive",
+    "agentive_noun",
+    "participle"
+   ],
+   "proposition": {
+    "subject": "{A}",
+    "verb": "{v.q}",
+    "object": "{E}"
+   }
+  },
+  {
+   "name": "become_part",
+   "priority": 12,
+   "question_patterns": [
+    "W[what] AUX ...{1,4}:E V.any:v DET? ...{0,2}:X P[of]"
+   ],
+   "sentence_patterns": [
+    "E V.any[@v] DET? ...{0,2} P[of] NP:A"
+   ],
+   "template": "{E} {v.past} a{X} of {A}.",
+   "verb_class": "",
+   "rationale": "municipality mergers: 'X became a part of Y'; round 2: extra evidence supplied after the verifier required at least 2 support examples; round 3: removed a doubled space in the rendered sentence",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "What did Essertes become a part of?",
+      "E": "Essertes",
+      "S": "On 1 January 2022, Essertes became a part of Oron.",
+      "A": "Oron"
+     },
+     {
+      "q": "What did Korpilahti become a part of?",
+      "E": "Korpilahti",
+      "S": "Since 2009, Korpilahti became a part of Jyväskylä.",
+      "A": "Jyväskylä"
+     },
+     {
+      "q": "What did Ylikiiminki become a part of?",
+      "E": "Ylikiiminki",
+      "S": "In 2009, the former municipality of Ylikiiminki became a part of Oulu.",
+      "A": "Oulu"
+     }
+    ],
+    "heldout": [
+     {
+      "q": "What did Krinau become a part of?",
+      "S": "On 1 January 2013, Krinau became a part of Wattwil.",
+      "A": "Wattwil"
+     },
+     {
+      "q": "What did Eritrea become a part of?",
+      "S": "After 1952, Eritrea became a part of Ethiopia.",
+      "A": "Ethiopia"
+     }
+    ],
+    "contrast": [
+     {
+      "q": "What did Foo become a part of?",
+      "S": "Foo became a city."
+     }
+    ]
+   },
+   "proposition": {
+    "subject": "{E}",
+    "verb": "{v.past}",
+    "complement": "a{X} of {A}"
+   }
+  },
+  {
+   "name": "named_after",
+   "priority": 12,
+   "question_patterns": [
+    "W[who|what] COP:cop ...{1,14}:E V.any:v P[after]"
+   ],
+   "sentence_patterns": [
+    "E ...{0,16} AUX? V.part[@v] P[after] NP:A"
+   ],
+   "template": "{E} {cop} {v.part} after {A}.",
+   "verb_class": "",
+   "rationale": "'named after' with an arbitrary gap before the verb",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "Who is Wilkes Land named after?",
+      "E": "Wilkes Land",
+      "S": "Wilkes Land is named after Charles Wilkes, an American explorer who led an expedition there in the 1840s.",
+      "A": "Charles Wilkes"
+     },
+     {
+      "q": "Who is the Walter Cronkite School of Journalism and Mass Communication named after?",
+      "E": "Walter Cronkite School of Journalism and Mass Communication",
+      "S": "The Walter Cronkite School of Journalism and Mass Communication at Arizona State University in Tempe, Arizona was named after Walter Cronkite.",
+      "A": "Walter Cronkite"
+     }
+    ],
+    "heldout": [
+     {
+      "q": "What is Ebern named after?",
+      "S": "That is why the town Ebern is named after the boar, and the town's flag carries the head of the boar.",
+      "A": "boar"
+     }
+    ],
+    "contrast": [
+     {
+      "q": "Who is Foo named after?",
+      "S": "Foo is named for Bar."
+     }
+    ]
+   },
+   "proposition": {
+    "subject": "{E}",
+    "verb": "{cop}",
+    "complement": "{v.part} after {A}"
+   }
+  },
+  {
+   "name": "population_of",
+   "priority": 12,
+   "question_patterns": [
+    "W[what] COP:cop DET W[population] P[of] TAIL:E"
+   ],
+   "sentence_patterns": [
+    "E ...{0,4} W[have|has|had] DET W[population] P[of] NUM:A",
+    "DET W[population] P[of] E COP NUM:A"
+   ],
+   "template": "The population of {E} {cop} {A}.",
+   "verb_class": "",
+   "rationale": "population statements in two surface forms: 'X had a population of N' and 'The population of X is N'",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "What was the population of West Kallada?",
+      "E": "West Kallada",
+      "S": "India census, West Kallada had a population of 17,958 with 8,705 males and 9,253 females.",
+      "A": "17,958"
+     },
+     {
+      "q": "What is the population of County Laois?",
+      "E": "County Laois",
+      "S": "The population of County Laois is 80,559 as of 2011.",
+      "A": "80,559"
+     }
+    ],
+    "heldout": [
+     {
+      "q": "What was the population of Zhytomyr Oblast?",
+      "S": "The population of Zhytomyr Oblast was 1,266,000 in 2013.",
+      "A": "1,266,000"
+     }
+    ],
+    "contrast": [
+     {
+      "q": "What is the population of Foo?",
+      "S": "Foo has a large population of birds."
+     }
+    ]
+   },
+   "proposition": {
+    "subject": "The population of {E}",
+    "verb": "{cop}",
+    "complement": "{A}"
+   }
+  },
+  {
+   "name": "when_event",
+   "priority": 12,
+   "question_patterns": [
+    "W[when] W[did] ...{1,6}:E V.any:v ...{0,4}:X"
+   ],
+   "sentence_patterns": [
+    "E ...{0,8} V.any[@v] ...{0,6} P[on|in]:p DATE:A"
+   ],
+   "template": "{E} {v.past}{X} {p} {A}.",
+   "verb_class": "",
+   "rationale": "'When did X die / become independent' answered by '<verb> ... on|in <date>'; the question's trailing complement is kept; round 3: restricted to 'did' so 'was' questions reach when_participle (a spec shadowed another, visible as 'Mapai established in 1930')",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "When did Baruch Mordechai Ezrachi die?",
+      "E": "Baruch Mordechai Ezrachi",
+      "S": "Baruch Mordechai Ezrachi died on 26 October 2023, at the age of 94.",
+      "A": "26 October 2023"
+     },
+     {
+      "q": "When did Finland become independent?",
+      "E": "Finland",
+      "S": "Finland became independent of Russia on 6 December 1917.",
+      "A": "6 December 1917"
+     }
+    ],
+    "heldout": [
+     {
+      "q": "When did Sandra Reemer die?",
+      "S": "Sandra Reemer died on 6 June 2017 from breast cancer in Amsterdam, Netherlands at the age of 66.",
+      "A": "6 June 2017"
+     }
+    ],
+    "contrast": [
+     {
+      "q": "When did John die?",
+      "S": "John died in a care home."
+     }
+    ]
+   },
+   "proposition": {
+    "subject": "{E}",
+    "verb": "{v.past}",
+    "complement": "{X} {p} {A}"
+   }
+  },
+  {
+   "name": "when_participle",
+   "priority": 12,
+   "question_patterns": [
+    "W[when] COP:cop ...{1,8}:E V.any:v"
+   ],
+   "sentence_patterns": [
+    "E ...{0,10} AUX? V.part[@v] ...{0,8} P[on|in]:p DATE:A"
+   ],
+   "template": "{E} {cop} {v.part} {p} {A}.",
+   "verb_class": "",
+   "rationale": "dated events phrased 'was released/established/founded <gap> on|in <date>'",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "When was Left 4 Dead 2 released?",
+      "E": "Left 4 Dead 2",
+      "S": "The sequel, Left 4 Dead 2 was released on November 17, 2009.",
+      "A": "November 17, 2009"
+     },
+     {
+      "q": "When was Magician Mickey released?",
+      "E": "Magician Mickey",
+      "S": "Magician Mickey is a 1937 Walt Disney Mickey Mouse cartoon, originally released to theaters on February 6, 1937.",
+      "A": "February 6, 1937"
+     },
+     {
+      "q": "When was Mapai established?",
+      "E": "Mapai",
+      "S": "Mapai was established in the British Mandate of Palestine in 1930 and merged into HaAvoda in 1968.",
+      "A": "1930"
+     }
+    ],
+    "heldout": [
+     {
+      "q": "When was the Nokia 6700 classic released?",
+      "S": "The Nokia 6700 classic was released to the public on January 7, 2009.",
+      "A": "January 7, 2009"
+     },
+     {
+      "q": "When was Waterworld released?",
+      "S": "Waterworld was released in the United States on July 28, 1995.",
+      "A": "July 28, 1995"
+     }
+    ],
+    "contrast": [
+     {
+      "q": "When was the Colosseum built?",
+      "S": "The Colosseum was built to hold about 50,000 spectators."
+     }
+    ]
+   },
+   "proposition": {
+    "subject": "{E}",
+    "verb": "{cop}",
+    "complement": "{v.part} {p} {A}"
+   }
+  },
+  {
+   "name": "where_born_date",
+   "priority": 14,
+   "question_patterns": [
+    "W[where] COP:cop ...{1,8}:E V.any:v"
+   ],
+   "sentence_patterns": [
+    "E ...{0,12} V.part[@v] (P[on|in])? DATE ,? P[in|at|near] NP[cap]:A"
+   ],
+   "template": "{E} {cop} {v.part} in {A}.",
+   "verb_class": "",
+   "rationale": "'born <date> in <place>' with the date between the verb and the place; round 2: optional 'on' before the date after replay/held-out failed on '... born on 19 September 1982 in Isfahan'",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "Where was Didí Torrico Camacho born?",
+      "E": "Didí Torrico Camacho",
+      "S": "Didí Torrico Camacho (born 18 May 1988 in Cochabamba) is a Bolivian football midfielder who currently plays for Wilsterman and the Bolivian national team.",
+      "A": "Cochabamba"
+     },
+     {
+      "q": "Where was Sara Bahrami born?",
+      "E": "Sara Bahrami",
+      "S": "Sara Bahrami is an Iranian actress, born on 19 September 1982 in Isfahan, Iran.",
+      "A": "Isfahan, Iran"
+     }
+    ],
+    "heldout": [
+     {
+      "q": "Where was Akari Takeuchi born?",
+      "S": "Akari Takeuchi was born on November 23, 1997, in Saitama, Japan.",
+      "A": "Saitama, Japan"
+     }
+    ],
+    "contrast": [
+     {
+      "q": "Where was Ann born?",
+      "S": "Ann was born on 5 May 2001."
+     }
+    ]
+   },
+   "proposition": {
+    "subject": "{E}",
+    "verb": "{cop}",
+    "complement": "{v.part} in {A}"
+   }
+  },
+  {
+   "name": "where_event",
+   "priority": 14,
+   "question_patterns": [
+    "W[where] W[did] ...{1,8}:E V.any:v"
+   ],
+   "sentence_patterns": [
+    "E ...{0,8} V.part[@v] ...{0,16} P[in|at|near] NP[cap]:A"
+   ],
+   "template": "{E} {v.past} in {A}.",
+   "verb_class": "",
+   "rationale": "'Where did X die' answered by a capitalised place after '<verb> ... in|at'; round 2: gap widened to 16 after replay failed on 'died in her sleep ... in a care home in King's Lynn'; round 3: restricted to 'did' (it shadowed the 'was/are' participle spec and dropped the auxiliary)",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "Where did Sandra Reemer die?",
+      "E": "Sandra Reemer",
+      "S": "Sandra Reemer died on 6 June 2017 from breast cancer in Amsterdam, Netherlands at the age of 66.",
+      "A": "Amsterdam, Netherlands"
+     },
+     {
+      "q": "Where did Florence Green die?",
+      "E": "Florence Green",
+      "S": "Florence Green died in her sleep two weeks before her 111th birthday in a care home in King's Lynn, Norfolk.",
+      "A": "King's Lynn, Norfolk"
+     }
+    ],
+    "heldout": [
+     {
+      "q": "Where did Fred Catherwood die?",
+      "S": "Fred Catherwood died in Cambridge, England on 30 November 2014 at the age of 89.",
+      "A": "Cambridge, England"
+     }
+    ],
+    "contrast": [
+     {
+      "q": "Where did John die?",
+      "S": "John died on 5 May 2001."
+     }
+    ]
+   },
+   "proposition": {
+    "subject": "{E}",
+    "verb": "{v.past}",
+    "complement": "in {A}"
+   }
+  },
+  {
+   "name": "time_range_live",
+   "priority": 15,
+   "question_patterns": [
+    "W[when] AUX ...{1,8}:E V.any:v"
+   ],
+   "sentence_patterns": [
+    "E ...{0,14} V.ing[@v] NUMRANGE:A W[year] W[ago]"
+   ],
+   "template": "{E} {v.past} {A} years ago.",
+   "verb_class": "",
+   "rationale": "a numeric range with units as a typed value",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "When did Panoplosaurus live?",
+      "E": "Panoplosaurus",
+      "S": "Panoplosaurus was an armored tank-like dinosaur from the Upper Cretaceous, living about 76–73 million years ago.",
+      "A": "76"
+     }
+    ],
+    "grandfathered": true
+   },
+   "grandfathered": true,
+   "proposition": {
+    "subject": "{E}",
+    "verb": "{v.past}",
+    "complement": "{A} years ago"
+   }
+  },
+  {
+   "name": "where_from",
+   "priority": 15,
+   "question_patterns": [
+    "W[where] COP ...{1,8}:E P[from]"
+   ],
+   "sentence_patterns": [
+    "E (, ...{1,8} ,)? COP DET ...{0,6} P[from] NP:A (P[in|of] NP:B)?"
+   ],
+   "template": "{E} is from {A_B}.",
+   "verb_class": "",
+   "rationale": "origin phrased with 'from' and a nested place",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "Where is Gyllene Tider from?",
+      "E": "Gyllene Tider",
+      "S": "Gyllene Tider is a pop band from the town of Halmstad in Sweden.",
+      "A": "Halmstad"
+     },
+     {
+      "q": "Where is Kyiv City Ballet from?",
+      "E": "Kyiv City Ballet",
+      "S": "Kyiv City Ballet, also called Kiev City Ballet, is an independent touring ballet troupe from Ukraine, currently operating from Paris, France.",
+      "A": "Ukraine"
+     }
+    ],
+    "heldout": [
+     {
+      "q": "Where is Simple Plan from?",
+      "S": "Simple Plan is a rock band from Montréal, Canada that was founded in 1999.",
+      "A": "Montréal"
+     }
+    ],
+    "contrast": [
+     {
+      "q": "Where is Foo from?",
+      "S": "Foo is a band."
+     }
+    ]
+   },
+   "proposition": {
+    "subject": "{E}",
+    "verb": "is",
+    "complement": "from {A_B}"
+   }
+  },
+  {
+   "name": "where_participle",
+   "priority": 15,
+   "question_patterns": [
+    "W[where] COP:cop ...{1,8}:E V.any:v"
+   ],
+   "sentence_patterns": [
+    "E ...{0,14} V.part[@v] P[in|at|near] NP:A"
+   ],
+   "template": "{E} {cop} {v.part} in {A}.",
+   "verb_class": "",
+   "rationale": "'headquartered/based/located in <place>' as a participle after a gap",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "Where is HSBC Continental Europe headquartered?",
+      "E": "HSBC Continental Europe",
+      "S": "HSBC Continental Europe, formerly known as HSBC France, is a subsidiary of HSBC, headquartered in Paris, France.",
+      "A": "Paris"
+     },
+     {
+      "q": "Where is Acer Inc. headquartered?",
+      "E": "Acer Inc.",
+      "S": "Acer Inc. is a Taiwanese multinational hardware and electronics corporation headquartered in Xizhi, New Taipei City, Taiwan.",
+      "A": "Xizhi"
+     }
+    ],
+    "heldout": [
+     {
+      "q": "Where is ZeniMax Media Inc. based?",
+      "S": "ZeniMax Media Inc. is an American video game holding company based in Rockville, Maryland, and founded in 1999.",
+      "A": "Rockville"
+     }
+    ],
+    "contrast": [
+     {
+      "q": "Where is Foo headquartered?",
+      "S": "Foo is a company."
+     }
+    ]
+   },
+   "proposition": {
+    "subject": "{E}",
+    "verb": "{cop}",
+    "complement": "{v.part} in {A}"
+   }
+  },
+  {
+   "name": "role_holder",
+   "priority": 20,
+   "question_patterns": [
+    "W[who] COP NP:q P[of] TAIL:E"
+   ],
+   "sentence_patterns": [
+    "NP:A COP DET? ...{0,2} QPHRASE P[of] ...{0,3} E~"
+   ],
+   "template": "{A} is the {q} of {E}.",
+   "verb_class": "",
+   "rationale": "'X is the <role> of Y' with modifiers allowed between the determiner and the role",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "Who is the managing director of Aigle Azur?",
+      "E": "Aigle Azur",
+      "S": "Frantz Yvelin is the current managing director of French airline Aigle Azur, since 2017.",
+      "A": "Frantz Yvelin"
+     },
+     {
+      "q": "Who is the managing director of Aigle Azur?",
+      "E": "Aigle Azur",
+      "S": "Méziane Idjerouidène is Managing director of Aigle Azur.",
+      "A": "Méziane Idjerouidène"
+     }
+    ],
+    "grandfathered": true
+   },
+   "grandfathered": true,
+   "proposition": {
+    "subject": "{A}",
+    "verb": "is",
+    "complement": "the {q} of {E}"
+   }
+  }
+ ],
+ "note": "Seed state exported from the Phase 11 prototype. Classes are corpus-induced (see support counts); specs were teacher-proposed and verified. Specs marked grandfathered predate the verifier and carry less evidence."
+}

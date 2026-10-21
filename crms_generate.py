@@ -39,6 +39,16 @@ def request_from_mapping(raw: dict[str, Any]) -> GenerationRequest:
         source_text=str(row.get("source_text", "")),
         tags=tuple(str(tag) for tag in row.get("tags", ())),
     ) for row in raw.get("facts", ()))
+    intake = raw.get("intake")
+    if intake:
+        # Phase 11: answer the listed questions from the request's own source
+        # documents with relation specs; each verified match becomes a fact.
+        from crms_source_intake import intake_facts
+        extra, _report = intake_facts(
+            list(intake.get("questions", ())),
+            [(str(doc["name"]), str(doc["text"]))
+             for doc in raw.get("source_documents", ())])
+        facts = facts + tuple(extra)
     return GenerationRequest(
         prompt=str(raw["prompt"]), genre=str(raw["genre"]), facts=facts,
         audience=str(raw.get("audience", "general")),
