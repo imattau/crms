@@ -1480,6 +1480,36 @@ second-publisher transfer labels, 15/15 rule and citation retention after 100
 distractors, and 0.36 review minutes per claim. The corpus is a controlled
 benchmark, not a claim about arbitrary internet prose.
 
+### Verified work, corrections, and compounding
+
+Phase 4 adds the reverse dependency index and measured learning from completed
+work. `crms_dependency.py` links sources, facts, schemas, procedures, rules,
+plans, and derived artifacts; retracting the last support contests the affected
+artifacts and every dependent rule, while independently supported facts remain.
+Trust is ordered `taught` > `source-reviewed` > `derived`.
+
+`crms_verified_work.py` proposes task-plan or procedure rules from completed
+work and accepts them only after an independent replay. `crms_corrections.py`
+turns corrections and failures into scoped negative examples and proposed rule
+revisions. `crms_active_learning.py` asks the single example that best separates
+competing hypotheses and records the answer as supervision.
+`crms_consolidation.py` dedupes, merges compatible rules, reports conflicts, and
+retires old zero-utility rules. The scoped auto-accept policy remains off by
+default and refuses fact-frame and derived rules.
+
+Run the frozen three-round benchmark with:
+
+```text
+python3 run_phase4_eval.py
+```
+
+Current report `experiments/reports/phase4_learning.json`: 100% correction
+propagation (5/5), an injected bad derivation contested, held-out completion
+0/12 → 12/12 over three rounds with zero confident errors, plan-skeleton
+transfer 0/4 → 4/4 for a second family, a disjoint-family plateau at 0/4,
+provenance and trust surviving copied model/registry/dependency state, and
+bounded dependency storage.
+
 `/suggest-corpus-alignments` adds a corpus-only path for alternate predicate
 wording. It proposes an alignment only when the same distinct subject/object
 pairs are independently parsed under both predicates in separate documents.

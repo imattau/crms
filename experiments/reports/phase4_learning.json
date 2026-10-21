@@ -1,0 +1,1432 @@
+{
+  "active_learning": {
+    "decision": "resolved",
+    "proposed_rule_state": "proposed",
+    "question": {
+      "candidates": [
+        "double",
+        "sum"
+      ],
+      "case": [
+        1,
+        2
+      ],
+      "outcomes": [
+        [
+          3
+        ],
+        [
+          2,
+          4
+        ]
+      ]
+    },
+    "questions_asked": 1,
+    "remaining": [
+      "sum"
+    ],
+    "supervision": [
+      {
+        "at": "2026-10-21T05:55:40+00:00",
+        "case": [
+          1,
+          2
+        ],
+        "hypothesis_id": "sum",
+        "observed": [
+          3
+        ],
+        "source": "teacher:phase4:active"
+      }
+    ],
+    "supervision_count": 1
+  },
+  "compounding": {
+    "baseline_completion": 0.0,
+    "confident_errors": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "disjoint_family": {
+      "baseline_completion": 0.0,
+      "diagnosis": "plateau: the disjoint family has no verified procedure or learned rule; the system abstains instead of transferring the plan skeleton without evidence",
+      "family": "keep-odd",
+      "final_completion": 0.0,
+      "gain": 0.0
+    },
+    "final_completion": 1.0,
+    "measured_gain": 1.0,
+    "no_confident_error_regression": true,
+    "plan_skeleton_transfer": {
+      "after_round_2": 4,
+      "before_round_2": 0,
+      "family": "double",
+      "transfer": true
+    },
+    "provenance": {
+      "learning": "verified-work replay; no model self-scoring",
+      "source": "experiments/scorecard/phase4_families.json"
+    },
+    "round_count": 3,
+    "rounds": [
+      {
+        "active_rules": 0,
+        "confident_errors": 0,
+        "dependency_nodes": 0,
+        "disjoint": {
+          "answered": 0,
+          "confident_errors": 0,
+          "family": "keep-odd",
+          "results": [
+            {
+              "expected": [
+                3,
+                5
+              ],
+              "output": null,
+              "reason": "no active select-transform rule",
+              "selected": [
+                3,
+                8,
+                5
+              ],
+              "status": "unsupported"
+            },
+            {
+              "expected": [
+                5
+              ],
+              "output": null,
+              "reason": "no active select-transform rule",
+              "selected": [
+                8,
+                5
+              ],
+              "status": "unsupported"
+            },
+            {
+              "expected": [
+                3
+              ],
+              "output": null,
+              "reason": "no active select-transform rule",
+              "selected": [
+                3
+              ],
+              "status": "unsupported"
+            },
+            {
+              "expected": [
+                5
+              ],
+              "output": null,
+              "reason": "no active select-transform rule",
+              "selected": [
+                5,
+                8
+              ],
+              "status": "unsupported"
+            }
+          ],
+          "tasks": 4,
+          "unsupported": 4
+        },
+        "disjoint_completion": 0.0,
+        "heldout": {
+          "double": {
+            "answered": 0,
+            "confident_errors": 0,
+            "family": "double",
+            "results": [
+              {
+                "expected": [
+                  6,
+                  16,
+                  10
+                ],
+                "output": null,
+                "reason": "no active select-transform rule",
+                "selected": [
+                  3,
+                  8,
+                  5
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  16,
+                  10
+                ],
+                "output": null,
+                "reason": "no active select-transform rule",
+                "selected": [
+                  8,
+                  5
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  6
+                ],
+                "output": null,
+                "reason": "no active select-transform rule",
+                "selected": [
+                  3
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  10,
+                  16
+                ],
+                "output": null,
+                "reason": "no active select-transform rule",
+                "selected": [
+                  5,
+                  8
+                ],
+                "status": "unsupported"
+              }
+            ],
+            "tasks": 4,
+            "unsupported": 4
+          },
+          "reverse": {
+            "answered": 0,
+            "confident_errors": 0,
+            "family": "reverse",
+            "results": [
+              {
+                "expected": [
+                  5,
+                  8,
+                  3
+                ],
+                "output": null,
+                "reason": "no active select-transform rule",
+                "selected": [
+                  3,
+                  8,
+                  5
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  5,
+                  8
+                ],
+                "output": null,
+                "reason": "no active select-transform rule",
+                "selected": [
+                  8,
+                  5
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  3
+                ],
+                "output": null,
+                "reason": "no active select-transform rule",
+                "selected": [
+                  3
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  8,
+                  5
+                ],
+                "output": null,
+                "reason": "no active select-transform rule",
+                "selected": [
+                  5,
+                  8
+                ],
+                "status": "unsupported"
+              }
+            ],
+            "tasks": 4,
+            "unsupported": 4
+          },
+          "sum": {
+            "answered": 0,
+            "confident_errors": 0,
+            "family": "sum",
+            "results": [
+              {
+                "expected": [
+                  16
+                ],
+                "output": null,
+                "reason": "no active select-transform rule",
+                "selected": [
+                  3,
+                  8,
+                  5
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  13
+                ],
+                "output": null,
+                "reason": "no active select-transform rule",
+                "selected": [
+                  8,
+                  5
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  3
+                ],
+                "output": null,
+                "reason": "no active select-transform rule",
+                "selected": [
+                  3
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  13
+                ],
+                "output": null,
+                "reason": "no active select-transform rule",
+                "selected": [
+                  5,
+                  8
+                ],
+                "status": "unsupported"
+              }
+            ],
+            "tasks": 4,
+            "unsupported": 4
+          }
+        },
+        "heldout_answered": 0,
+        "heldout_completion": 0.0,
+        "heldout_tasks": 12,
+        "learned": [],
+        "round": 0
+      },
+      {
+        "active_rules": 2,
+        "confident_errors": 0,
+        "dependency_nodes": 8,
+        "disjoint": {
+          "answered": 0,
+          "confident_errors": 0,
+          "family": "keep-odd",
+          "results": [
+            {
+              "expected": [
+                3,
+                5
+              ],
+              "output": null,
+              "reason": "procedure not learned",
+              "selected": [
+                3,
+                8,
+                5
+              ],
+              "status": "unsupported"
+            },
+            {
+              "expected": [
+                5
+              ],
+              "output": null,
+              "reason": "procedure not learned",
+              "selected": [
+                8,
+                5
+              ],
+              "status": "unsupported"
+            },
+            {
+              "expected": [
+                3
+              ],
+              "output": null,
+              "reason": "procedure not learned",
+              "selected": [
+                3
+              ],
+              "status": "unsupported"
+            },
+            {
+              "expected": [
+                5
+              ],
+              "output": null,
+              "reason": "procedure not learned",
+              "selected": [
+                5,
+                8
+              ],
+              "status": "unsupported"
+            }
+          ],
+          "tasks": 4,
+          "unsupported": 4
+        },
+        "disjoint_completion": 0.0,
+        "heldout": {
+          "double": {
+            "answered": 0,
+            "confident_errors": 0,
+            "family": "double",
+            "results": [
+              {
+                "expected": [
+                  6,
+                  16,
+                  10
+                ],
+                "output": null,
+                "reason": "procedure not learned",
+                "selected": [
+                  3,
+                  8,
+                  5
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  16,
+                  10
+                ],
+                "output": null,
+                "reason": "procedure not learned",
+                "selected": [
+                  8,
+                  5
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  6
+                ],
+                "output": null,
+                "reason": "procedure not learned",
+                "selected": [
+                  3
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  10,
+                  16
+                ],
+                "output": null,
+                "reason": "procedure not learned",
+                "selected": [
+                  5,
+                  8
+                ],
+                "status": "unsupported"
+              }
+            ],
+            "tasks": 4,
+            "unsupported": 4
+          },
+          "reverse": {
+            "answered": 0,
+            "confident_errors": 0,
+            "family": "reverse",
+            "results": [
+              {
+                "expected": [
+                  5,
+                  8,
+                  3
+                ],
+                "output": null,
+                "reason": "procedure not learned",
+                "selected": [
+                  3,
+                  8,
+                  5
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  5,
+                  8
+                ],
+                "output": null,
+                "reason": "procedure not learned",
+                "selected": [
+                  8,
+                  5
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  3
+                ],
+                "output": null,
+                "reason": "procedure not learned",
+                "selected": [
+                  3
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  8,
+                  5
+                ],
+                "output": null,
+                "reason": "procedure not learned",
+                "selected": [
+                  5,
+                  8
+                ],
+                "status": "unsupported"
+              }
+            ],
+            "tasks": 4,
+            "unsupported": 4
+          },
+          "sum": {
+            "answered": 4,
+            "confident_errors": 0,
+            "family": "sum",
+            "results": [
+              {
+                "expected": [
+                  16
+                ],
+                "output": [
+                  16
+                ],
+                "reason": "",
+                "selected": [
+                  3,
+                  8,
+                  5
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  13
+                ],
+                "output": [
+                  13
+                ],
+                "reason": "",
+                "selected": [
+                  8,
+                  5
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  3
+                ],
+                "output": [
+                  3
+                ],
+                "reason": "",
+                "selected": [
+                  3
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  13
+                ],
+                "output": [
+                  13
+                ],
+                "reason": "",
+                "selected": [
+                  5,
+                  8
+                ],
+                "status": "answered"
+              }
+            ],
+            "tasks": 4,
+            "unsupported": 0
+          }
+        },
+        "heldout_answered": 4,
+        "heldout_completion": 0.3333333333333333,
+        "heldout_tasks": 12,
+        "learned": [
+          "sum"
+        ],
+        "round": 1
+      },
+      {
+        "active_rules": 3,
+        "confident_errors": 0,
+        "dependency_nodes": 10,
+        "disjoint": {
+          "answered": 0,
+          "confident_errors": 0,
+          "family": "keep-odd",
+          "results": [
+            {
+              "expected": [
+                3,
+                5
+              ],
+              "output": null,
+              "reason": "procedure not learned",
+              "selected": [
+                3,
+                8,
+                5
+              ],
+              "status": "unsupported"
+            },
+            {
+              "expected": [
+                5
+              ],
+              "output": null,
+              "reason": "procedure not learned",
+              "selected": [
+                8,
+                5
+              ],
+              "status": "unsupported"
+            },
+            {
+              "expected": [
+                3
+              ],
+              "output": null,
+              "reason": "procedure not learned",
+              "selected": [
+                3
+              ],
+              "status": "unsupported"
+            },
+            {
+              "expected": [
+                5
+              ],
+              "output": null,
+              "reason": "procedure not learned",
+              "selected": [
+                5,
+                8
+              ],
+              "status": "unsupported"
+            }
+          ],
+          "tasks": 4,
+          "unsupported": 4
+        },
+        "disjoint_completion": 0.0,
+        "heldout": {
+          "double": {
+            "answered": 4,
+            "confident_errors": 0,
+            "family": "double",
+            "results": [
+              {
+                "expected": [
+                  6,
+                  16,
+                  10
+                ],
+                "output": [
+                  6,
+                  16,
+                  10
+                ],
+                "reason": "",
+                "selected": [
+                  3,
+                  8,
+                  5
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  16,
+                  10
+                ],
+                "output": [
+                  16,
+                  10
+                ],
+                "reason": "",
+                "selected": [
+                  8,
+                  5
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  6
+                ],
+                "output": [
+                  6
+                ],
+                "reason": "",
+                "selected": [
+                  3
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  10,
+                  16
+                ],
+                "output": [
+                  10,
+                  16
+                ],
+                "reason": "",
+                "selected": [
+                  5,
+                  8
+                ],
+                "status": "answered"
+              }
+            ],
+            "tasks": 4,
+            "unsupported": 0
+          },
+          "reverse": {
+            "answered": 0,
+            "confident_errors": 0,
+            "family": "reverse",
+            "results": [
+              {
+                "expected": [
+                  5,
+                  8,
+                  3
+                ],
+                "output": null,
+                "reason": "procedure not learned",
+                "selected": [
+                  3,
+                  8,
+                  5
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  5,
+                  8
+                ],
+                "output": null,
+                "reason": "procedure not learned",
+                "selected": [
+                  8,
+                  5
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  3
+                ],
+                "output": null,
+                "reason": "procedure not learned",
+                "selected": [
+                  3
+                ],
+                "status": "unsupported"
+              },
+              {
+                "expected": [
+                  8,
+                  5
+                ],
+                "output": null,
+                "reason": "procedure not learned",
+                "selected": [
+                  5,
+                  8
+                ],
+                "status": "unsupported"
+              }
+            ],
+            "tasks": 4,
+            "unsupported": 4
+          },
+          "sum": {
+            "answered": 4,
+            "confident_errors": 0,
+            "family": "sum",
+            "results": [
+              {
+                "expected": [
+                  16
+                ],
+                "output": [
+                  16
+                ],
+                "reason": "",
+                "selected": [
+                  3,
+                  8,
+                  5
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  13
+                ],
+                "output": [
+                  13
+                ],
+                "reason": "",
+                "selected": [
+                  8,
+                  5
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  3
+                ],
+                "output": [
+                  3
+                ],
+                "reason": "",
+                "selected": [
+                  3
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  13
+                ],
+                "output": [
+                  13
+                ],
+                "reason": "",
+                "selected": [
+                  5,
+                  8
+                ],
+                "status": "answered"
+              }
+            ],
+            "tasks": 4,
+            "unsupported": 0
+          }
+        },
+        "heldout_answered": 8,
+        "heldout_completion": 0.6666666666666666,
+        "heldout_tasks": 12,
+        "learned": [
+          "sum",
+          "double"
+        ],
+        "round": 2
+      },
+      {
+        "active_rules": 4,
+        "confident_errors": 0,
+        "dependency_nodes": 12,
+        "disjoint": {
+          "answered": 0,
+          "confident_errors": 0,
+          "family": "keep-odd",
+          "results": [
+            {
+              "expected": [
+                3,
+                5
+              ],
+              "output": null,
+              "reason": "procedure not learned",
+              "selected": [
+                3,
+                8,
+                5
+              ],
+              "status": "unsupported"
+            },
+            {
+              "expected": [
+                5
+              ],
+              "output": null,
+              "reason": "procedure not learned",
+              "selected": [
+                8,
+                5
+              ],
+              "status": "unsupported"
+            },
+            {
+              "expected": [
+                3
+              ],
+              "output": null,
+              "reason": "procedure not learned",
+              "selected": [
+                3
+              ],
+              "status": "unsupported"
+            },
+            {
+              "expected": [
+                5
+              ],
+              "output": null,
+              "reason": "procedure not learned",
+              "selected": [
+                5,
+                8
+              ],
+              "status": "unsupported"
+            }
+          ],
+          "tasks": 4,
+          "unsupported": 4
+        },
+        "disjoint_completion": 0.0,
+        "heldout": {
+          "double": {
+            "answered": 4,
+            "confident_errors": 0,
+            "family": "double",
+            "results": [
+              {
+                "expected": [
+                  6,
+                  16,
+                  10
+                ],
+                "output": [
+                  6,
+                  16,
+                  10
+                ],
+                "reason": "",
+                "selected": [
+                  3,
+                  8,
+                  5
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  16,
+                  10
+                ],
+                "output": [
+                  16,
+                  10
+                ],
+                "reason": "",
+                "selected": [
+                  8,
+                  5
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  6
+                ],
+                "output": [
+                  6
+                ],
+                "reason": "",
+                "selected": [
+                  3
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  10,
+                  16
+                ],
+                "output": [
+                  10,
+                  16
+                ],
+                "reason": "",
+                "selected": [
+                  5,
+                  8
+                ],
+                "status": "answered"
+              }
+            ],
+            "tasks": 4,
+            "unsupported": 0
+          },
+          "reverse": {
+            "answered": 4,
+            "confident_errors": 0,
+            "family": "reverse",
+            "results": [
+              {
+                "expected": [
+                  5,
+                  8,
+                  3
+                ],
+                "output": [
+                  5,
+                  8,
+                  3
+                ],
+                "reason": "",
+                "selected": [
+                  3,
+                  8,
+                  5
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  5,
+                  8
+                ],
+                "output": [
+                  5,
+                  8
+                ],
+                "reason": "",
+                "selected": [
+                  8,
+                  5
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  3
+                ],
+                "output": [
+                  3
+                ],
+                "reason": "",
+                "selected": [
+                  3
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  8,
+                  5
+                ],
+                "output": [
+                  8,
+                  5
+                ],
+                "reason": "",
+                "selected": [
+                  5,
+                  8
+                ],
+                "status": "answered"
+              }
+            ],
+            "tasks": 4,
+            "unsupported": 0
+          },
+          "sum": {
+            "answered": 4,
+            "confident_errors": 0,
+            "family": "sum",
+            "results": [
+              {
+                "expected": [
+                  16
+                ],
+                "output": [
+                  16
+                ],
+                "reason": "",
+                "selected": [
+                  3,
+                  8,
+                  5
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  13
+                ],
+                "output": [
+                  13
+                ],
+                "reason": "",
+                "selected": [
+                  8,
+                  5
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  3
+                ],
+                "output": [
+                  3
+                ],
+                "reason": "",
+                "selected": [
+                  3
+                ],
+                "status": "answered"
+              },
+              {
+                "expected": [
+                  13
+                ],
+                "output": [
+                  13
+                ],
+                "reason": "",
+                "selected": [
+                  5,
+                  8
+                ],
+                "status": "answered"
+              }
+            ],
+            "tasks": 4,
+            "unsupported": 0
+          }
+        },
+        "heldout_answered": 12,
+        "heldout_completion": 1.0,
+        "heldout_tasks": 12,
+        "learned": [
+          "sum",
+          "double",
+          "reverse"
+        ],
+        "round": 3
+      }
+    ],
+    "storage": {
+      "by_kind": {
+        "plan": 3,
+        "procedure": 3,
+        "rule": 4,
+        "source": 1,
+        "work": 1
+      },
+      "by_state": {
+        "active": 12
+      },
+      "edges": 10,
+      "max_edges": 100000,
+      "max_nodes": 20000,
+      "nodes": 12,
+      "within_bound": true
+    }
+  },
+  "consolidation": {
+    "all_active_ids": [
+      "compatible-b",
+      "conflict-a",
+      "conflict-b",
+      "dup-b"
+    ],
+    "compatible_merged": true,
+    "conflicts_detected": 1,
+    "duplicate_canonical_active": true,
+    "duplicate_provenance_merged": true,
+    "duplicate_retired": [
+      "dup-a"
+    ],
+    "report": {
+      "compatible_merges": [
+        {
+          "canonical": "compatible-b",
+          "merge_key": "lexical:reverse",
+          "retired": [
+            "compatible-a"
+          ]
+        }
+      ],
+      "conflicts": [
+        {
+          "conflict_key": "shared-policy",
+          "family": "dialogue-policy",
+          "rules": [
+            "conflict-a",
+            "conflict-b"
+          ],
+          "scope": "shared",
+          "signatures": [
+            "{\"outcome\": null, \"polarity\": null, \"value\": \"allow\"}",
+            "{\"outcome\": null, \"polarity\": null, \"value\": \"deny\"}"
+          ]
+        }
+      ],
+      "kept": [
+        "compatible-b",
+        "conflict-a",
+        "conflict-b",
+        "dup-b"
+      ],
+      "merged": [
+        {
+          "canonical": "dup-b",
+          "family": "lexical",
+          "retired": [
+            "dup-a"
+          ]
+        }
+      ],
+      "merged_groups": 1,
+      "retired_duplicates": [
+        "dup-a",
+        "compatible-a"
+      ],
+      "retired_zero_utility": [
+        "old-zero"
+      ]
+    },
+    "zero_utility_retired": true
+  },
+  "correction": {
+    "all_expected_contested": true,
+    "expected_affected": [
+      "derived:selection-3",
+      "fact:board-approved-3",
+      "rule:fact-approved-3",
+      "rule:plan-approved-3",
+      "schema:approved-selection"
+    ],
+    "last_source_contested_fact": true,
+    "node_states": {
+      "derived:selection-3": "contested",
+      "fact:board-approved-3": "contested",
+      "rule:fact-approved-3": "contested",
+      "rule:plan-approved-3": "contested",
+      "schema:approved-selection": "contested"
+    },
+    "observed_affected": [
+      "derived:selection-3",
+      "fact:board-approved-3",
+      "rule:fact-approved-3",
+      "rule:plan-approved-3",
+      "schema:approved-selection"
+    ],
+    "propagation_rate": 1.0,
+    "retained_unsupported_branch": true,
+    "rules_contested": true,
+    "second_source_retained_fact": true,
+    "unrelated_source_active": true
+  },
+  "correction_learning": {
+    "correction": {
+      "correction_id": "correction-empty-sum",
+      "negative": {
+        "excluded": [],
+        "id": "negative-2ed2b8ef861f39ce",
+        "reason": "the empty list sums to zero, not an unknown",
+        "scope": "empty integer lists",
+        "source": "teacher:correction:empty-sum",
+        "target": "procedure-sum"
+      },
+      "revision_rule_id": "procedure-sum-revision",
+      "revision_state": "proposed"
+    },
+    "correction_node_trust": "taught",
+    "correction_revision_proposed": true,
+    "failure": {
+      "correction_id": "failure-odd-sum",
+      "negative": {
+        "excluded": {
+          "action": "apply-learned-procedure",
+          "reason": "procedure not learned for odd-only selection",
+          "request": "sum every odd value"
+        },
+        "id": "negative-7a92aad5cddbd393",
+        "reason": "procedure not learned for odd-only selection",
+        "scope": "odd-only selection",
+        "source": "plan-log:failure:odd-sum",
+        "target": "procedure-sum"
+      },
+      "revision_rule_id": "procedure-sum-failure-revision",
+      "revision_state": "proposed"
+    },
+    "failure_node_trust": "taught",
+    "failure_revision_proposed": true,
+    "negative_examples": 2,
+    "no_revision_active": true,
+    "revision_lineage": {
+      "correction": "procedure-sum-revision",
+      "failure": "procedure-sum-failure-revision"
+    }
+  },
+  "format": "crms-phase4-eval",
+  "gate": {
+    "active_learning": true,
+    "compounding": true,
+    "consolidation": true,
+    "correction_learning": true,
+    "correction_propagation": true,
+    "injected_bad_derivation_blocked": true,
+    "provenance_and_trust": true,
+    "scoped_auto_pilot": true,
+    "storage_bounded": true,
+    "taught_authoritative": true
+  },
+  "gate_passed": true,
+  "persistence": {
+    "deepcopy_graph": 12,
+    "deepcopy_rules": 4,
+    "dependency_nodes": 12,
+    "graph_limits": {
+      "by_kind": {
+        "plan": 3,
+        "procedure": 3,
+        "rule": 4,
+        "source": 1,
+        "work": 1
+      },
+      "by_state": {
+        "active": 12
+      },
+      "edges": 10,
+      "max_edges": 100000,
+      "max_nodes": 20000,
+      "nodes": 12,
+      "within_bound": true
+    },
+    "prediction": {
+      "output": [
+        5
+      ],
+      "status": "ok"
+    },
+    "registry_rules": 4,
+    "skeleton_provenance_kept": true,
+    "skeleton_state": "active",
+    "skeleton_trust": "derived"
+  },
+  "provenance": {
+    "families": "experiments/scorecard/phase4_families.json",
+    "method": "frozen independent oracles and replay verifiers"
+  },
+  "scoped_auto": {
+    "derived_refused": true,
+    "eligible_lexical_active": true,
+    "eligible_procedure_active": true,
+    "high_risk_refused": true,
+    "off_by_default": true,
+    "policy": [
+      "auto-lexical",
+      "auto-procedure"
+    ]
+  },
+  "storage": {
+    "bounded": true,
+    "removed": 150,
+    "stats": {
+      "by_kind": {
+        "work": 250
+      },
+      "by_state": {
+        "active": 250
+      },
+      "edges": 0,
+      "max_edges": 800,
+      "max_nodes": 250,
+      "nodes": 250,
+      "within_bound": true
+    }
+  },
+  "trust": {
+    "losers_contested": true,
+    "selected_trust": "taught",
+    "source_reviewed_beats_derived": true,
+    "taught_wins": true
+  },
+  "verified_work": {
+    "bad_derivation_active": false,
+    "bad_result": {
+      "dependency_id": "rule:bad-sum-plan",
+      "rule_id": "bad-sum-plan",
+      "state": "proposed",
+      "validation": {
+        "cases": 2,
+        "detail": "independent sum oracle and an independent list source",
+        "independent_sources": 2,
+        "oracle": "verified-work-replay",
+        "passed": false,
+        "validated_at": "2026-10-21T05:55:40+00:00"
+      },
+      "work_id": "phase4-bad-sum"
+    },
+    "bad_revision": {
+      "dependency_id": "rule:verified-sum-plan",
+      "rule_id": "verified-sum-plan",
+      "state": "contested",
+      "validation": {
+        "cases": 2,
+        "detail": "independent sum oracle and an independent list source",
+        "independent_sources": 2,
+        "oracle": "verified-work-replay",
+        "passed": false,
+        "validated_at": "2026-10-21T05:55:40+00:00"
+      },
+      "work_id": "phase4-bad-revision"
+    },
+    "bad_validation_failed": true,
+    "good_result": {
+      "dependency_id": "rule:verified-sum-plan",
+      "rule_id": "verified-sum-plan",
+      "state": "active",
+      "validation": {
+        "cases": 2,
+        "detail": "independent sum oracle and an independent list source",
+        "independent_sources": 2,
+        "oracle": "verified-work-replay",
+        "passed": true,
+        "validated_at": "2026-10-21T05:55:40+00:00"
+      },
+      "work_id": "phase4-good-sum"
+    },
+    "good_rule_state_after_bad_revision": "contested",
+    "lineage_nodes": 7
+  },
+  "version": 1
+}

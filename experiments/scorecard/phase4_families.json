@@ -1,0 +1,75 @@
+{
+  "format": "crms-phase4-families",
+  "version": 1,
+  "description": "Frozen Phase 4 compounding families. Three training families share one verified select-then-transform skeleton; a fourth family is disjoint and is never taught in the three rounds.",
+  "selection": {
+    "subject": "board",
+    "relation": "approved",
+    "positive": [3, 8, 5],
+    "negative": [11, -2]
+  },
+  "procedures": {
+    "sum": {
+      "instruction": "sum every value",
+      "examples": [[[1, 2], [3]], [[4, 5, 6], [15]]]
+    },
+    "double": {
+      "instruction": "double every value",
+      "examples": [[[1, 2], [2, 4]], [[3, 4], [6, 8]]]
+    },
+    "reverse": {
+      "instruction": "reverse the list",
+      "examples": [[[1, 2, 3], [3, 2, 1]], [[5, 0, -2], [-2, 0, 5]]]
+    },
+    "keep_odd": {
+      "instruction": "keep odd values",
+      "examples": [[[1, 2, 3], [1, 3]], [[4, 5, 6], [5]]]
+    }
+  },
+  "families": [
+    {
+      "id": "sum",
+      "goal": "select-sum",
+      "procedure": "sum",
+      "tasks": [
+        {"values": [3, 8, 5, 11, -2], "expected": [16]},
+        {"values": [8, 5], "expected": [13]},
+        {"values": [3, 11], "expected": [3]},
+        {"values": [5, -2, 8], "expected": [13]}
+      ]
+    },
+    {
+      "id": "double",
+      "goal": "select-double",
+      "procedure": "double",
+      "tasks": [
+        {"values": [3, 8, 5, 11, -2], "expected": [6, 16, 10]},
+        {"values": [8, 5], "expected": [16, 10]},
+        {"values": [3, 11], "expected": [6]},
+        {"values": [5, -2, 8], "expected": [10, 16]}
+      ]
+    },
+    {
+      "id": "reverse",
+      "goal": "select-reverse",
+      "procedure": "reverse",
+      "tasks": [
+        {"values": [3, 8, 5, 11, -2], "expected": [5, 8, 3]},
+        {"values": [8, 5], "expected": [5, 8]},
+        {"values": [3, 11], "expected": [3]},
+        {"values": [5, -2, 8], "expected": [8, 5]}
+      ]
+    }
+  ],
+  "disjoint": {
+    "id": "keep-odd",
+    "goal": "select-keep-odd",
+    "procedure": "keep_odd",
+    "tasks": [
+      {"values": [3, 8, 5, 11, -2], "expected": [3, 5]},
+      {"values": [8, 5], "expected": [5]},
+      {"values": [3, 11], "expected": [3]},
+      {"values": [5, -2, 8], "expected": [5]}
+    ]
+  }
+}
