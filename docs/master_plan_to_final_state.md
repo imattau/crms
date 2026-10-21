@@ -111,6 +111,8 @@ procedures; portable SQLite model; 533 regression experiments.
 | Rule sufficiency is only partially measured | 12 cases cover all 10 genres and 40 moves, with class/back-off/evidence diagnostics; the independent 300-prompt suite, two-corpus split, and full 10^2–10^5 scaling curve are open | Phase 10 rule-sufficiency and generalisation gates |
 | LLM-guided improvement lacks human calibration | The teacher proposal loop now records model/prompt/change and accepts only on frozen no-regression; the judge is automated and uncalibrated against humans | Phase 10 human judge calibration |
 | Conversation data unused | The feedback ledger is empty; rephrase-after-failure signals are not mined | Phase 10 conversation learning |
+| Matching is ad-hoc regex | 851 regex call sites in 71 modules; about 85% in ten modules (`crms_chat.py` 250, `crms_knowledge.py` 143); paraphrase, reversed orientation, gaps, and form variants fail (prototype: 76% of infobox-oracle questions return no candidate) | Phase 11 pattern-matching transition |
+| Pattern layer exists only as a prototype | Matcher, relation specs, spec verifier, and SQL store live in a session scratchpad, not the repository or the packaged model | Phase 11 Stage A |
 
 ---
 
@@ -843,6 +845,114 @@ two source-disjoint corpora, and a measured 70B checkpoint. The bounded gate
 report is `experiments/reports/phase10_external.json`; the full gate remains
 false by construction.
 
+### Phase 11 — Pattern-matching transition, generation layer first (weeks 100–140, staged)
+
+**Goal:** replace ad-hoc regex and word-list matching with one structure-aware
+pattern layer (tokenizer, shallow chunker, pattern language, backtracking
+matcher with captures and a trace), owned by CRMS and stored as data. The
+transition is staged and reversible: new layer first, old route as fallback,
+old route retired one family at a time only after measured parity. **Stage A is
+the generation layer**; later stages move evidence extraction, request
+understanding, and knowledge extraction. Detail:
+`docs/design_phase11_pattern_transition.md`.
+
+**Why now.** Phase 10 made generation rule-complete over structured
+propositions, but its source-to-proposition intake is open: ordinary research
+chat still returns whole retrieved sentences. A prototype outside the repository
+(session scratchpad) showed that sentence patterns with gaps, alternation,
+verb forms, induced classes, and typed values can feed that intake, and that
+pattern specs can be proposed by an offline teacher and accepted only by a
+deterministic gate. Regex footprint today: 851 call sites in 71 modules; about
+85% sit in ten modules (`crms_chat.py` 250, `crms_knowledge.py` 143,
+`crms_conversation.py` 88, `crms_research.py` 37, `crms_dialogue.py` 32,
+`crms_domains.py` 32, `crms_task_composition.py` 27, `crms_nl_gate.py` 28,
+`crms_procedure_discovery.py` 42, `crms_corpus_program.py` 38). Generation
+(`crms_generation.py`) has only 4, which is why it can move first and cheaply.
+
+**Transition rules.**
+1. **New layer first, old route as fallback.** A spec answers only when it
+   matches and verifies; otherwise the request falls through unchanged.
+2. **Retire only on parity.** A regex family is removed after the full
+   experiment suite shows zero new failures against an unmodified baseline, the
+   frozen exam sets do not regress, and the independent oracle shows no higher
+   wrong-answer rate (reward rule: +1 correct, −3 wrong, 0 abstain).
+3. **One family per change, reversible by registry status.** No bulk rewrite.
+4. **Parameters are data.** Ranking weights, gap bounds, and thresholds live in
+   SQL with origin and metrics. A learned replacement is adopted only when
+   cross-validation beats the hand-set values (the prototype's learned ranker did
+   not; that result is the baseline to beat).
+5. **Commands and flags stay literal.** `/commands`, file paths, and CLI syntax
+   are not natural language and are not migrated.
+6. **No evaluation leakage.** Spec authors do not tune against a blind set; a
+   blind set that influenced a change is retired and replaced.
+
+**Stage A — generation layer (starts first).**
+1. **Engine port** (`crms_patterns.py`, `crms_pattern_transforms.py`,
+   `crms_relation_specs.py`, `crms_spec_verifier.py`). Tokenizer with features,
+   rule-based chunker (NP/PP/VG/appositive/parenthetical), pattern language,
+   matcher, derived-variant transformations with synthetic probes, relation
+   specs, and the deterministic spec verifier (replay, held-out, contrast,
+   verb-swap, corpus fire-rate, variant probes, non-regression).
+2. **SQL store.** Extend `crms_composition_memory.py` with classes, agentive
+   nouns, match specs, parameters, and an audit trail; register specs as a rule
+   family in `crms_rule_registry.py` with lifecycle, utility, contest, retire,
+   and rollback; include the tables in the packaged model and Phase 8 migration.
+3. **Source-to-proposition intake.** Patterns turn retrieved sentences into
+   propositions (subject, relation, object, source span) for the content planner,
+   closing the Phase 10 gap; `/compose` accepts a topic or question and builds
+   propositions from retrieved sources instead of requiring structured input.
+4. **Pattern-based generation rules.** Clarity rewrite rules and critic checks
+   (relation, role, number, polarity) move from regex/word lists to pattern
+   rules over chunks stored in SQL.
+5. **Faithfulness and verification.** Every composed clause traces to a source
+   span; the spec verifier gates new specs; the closed-template check remains.
+6. **Evaluation** (`run_phase11_eval.py`). Frozen Phase 10 suite (12 cases) for
+   parity; a new source-intake suite built from a fresh infobox-oracle sample of
+   at least 1,000 questions plus hand-authored and unanswerable controls, with
+   correct/wrong/abstain and coverage reported separately.
+
+**Stage A gate:**
+- **Parity:** Phase 10 frozen suite 12/12 unchanged; mean copy ratio and clarity
+  no worse; full experiment suite shows zero new failures against an
+  unmodified baseline.
+- **Intake precision:** wrong-answer rate on the fresh oracle sample no higher
+  than the quote baseline, with coverage reported (prototype: 219 correct,
+  30 wrong, 780 no-candidate of 1,029).
+- **Faithfulness:** 100% of composed clauses resolve to a cited span.
+- **Specs:** every accepted spec passes the verifier; every transformation has a
+  passing probe; no spec shadows another (detected by the bank).
+- **Footprint:** matching regexes in `crms_generation*.py` are zero (tokenising
+  and string cleanup excepted); remaining sites are listed with a reason.
+- **Clean room:** a copied release runs the pattern layer with no LLM, network, or
+  originals; patterns, classes, and parameters reload from SQL and roll back in
+  one operation.
+
+**Later stages (each gated like Stage A).**
+- **Stage B — evidence extraction:** `crms_nl_gate.py`, `crms_research.py`
+  sentence selection; relation specs ahead of the gate, then retire gate regex
+  families on parity.
+- **Stage C — request understanding:** `crms_chat.py`, `crms_conversation.py`,
+  `crms_dialogue.py`, `crms_task_composition.py`, `crms_math.py` intent and route
+  families, one family per change.
+- **Stage D — knowledge extraction:** `crms_knowledge.py`,
+  `crms_document_learning.py`, `crms_procedure_discovery.py` extraction patterns.
+- **Stage E — retirement and audit:** remove dead regex, publish the footprint
+  per module, and re-run the full gate.
+
+**Status (2026-10-22): planned; not started.** Prototype evidence, not a gate
+result: eight teacher-proposed relation specs passed the verifier after three
+rounds and moved a dev set from 25 to 32 correct of 35; on a fresh hand-written
+blind set the full stack went from 20 to 25 correct of 34 (one wrong), and on a
+fresh 1,029-question infobox-oracle sample the relation layer returned 219
+correct and 30 wrong, falling to 217 and 25 with a truncated-name veto. A learned
+ranker did not beat the hand-set ranking under leave-one-set-out validation
+(89 correct / 5 wrong vs 73–86 / 3–7), because only 9 of 94 candidate sets had
+any ranking signal; ranking constants are now SQL parameters. Known limits:
+about 76% of oracle questions produce no candidate, retrieval misses and stale
+or conflicting facts are not solved by patterns, the chunker is rule-based and
+English-only, induced classes are noisy, specs were authored by hand, and the
+hand blind sets are consumed.
+
 
 ---
 
@@ -914,6 +1024,10 @@ counts and rates; never collapse into one "score".
 | LLM patch regresses the system | A proposed code change fixes one failure and breaks others | Branch + full-suite diff vs unmodified baseline, human review, no auto-merge |
 | Conversation privacy | Transcripts hold personal data | Local opt-in, redaction, retention limit, no export without consent |
 | Overgeneralisation | A learned class or back-off rule covers cases it should not, as the region-and-country place shortening did in the prototype | Propose-only, counterexample search before activation, source-disjoint blind set, record the class/back-off path on every use, one-operation rollback |
+| Regression during regex retirement | A migrated family changes behaviour in the 562-experiment suite (249 touch the chat or gate) | New layer first with fallback, one family per change, sharded full-suite diff against an unmodified baseline, reversible by registry status |
+| Spec overfitting | A spec fits its development questions and fails elsewhere | Verifier replay/held-out/contrast/verb-swap/fire-rate checks, independent infobox-oracle sample, retire consumed blind sets |
+| Hidden knowledge in old regex | A family encoded behaviour nobody remembers | Characterise before retiring: run the family's experiments, record its inputs and outputs as controls first |
+| Rule shadowing | One spec captures questions meant for another (seen as 'Mapai established in 1930') | Bank non-regression check in the verifier; ordering and restriction tests |
 | Scope creep | New feature without a gate | Reject; the 533-experiment habit is the main delivery risk |
 
 **Kill criteria are part of the plan.** A lane that misses its gate twice is
@@ -1004,7 +1118,13 @@ redesigned or dropped.
    teacher/SQL/clean-room/automated comparison
    (`experiments/reports/phase10_external.json`); human, independent-300,
    two-corpus, and measured-70B gates open.
-18. **Consolidate plan docs** — this file is canonical; link the others as
+18. **Phase 11 pattern-matching transition, generation layer first** — engine
+   port, SQL store and registry family, source-to-proposition intake for
+   `/compose`, pattern-based generation rules, spec verifier, parity gate, then
+   evidence extraction, request understanding, and knowledge extraction in
+   later gated stages. — planned (`docs/design_phase11_pattern_transition.md`);
+   prototype evidence only.
+19. **Consolidate plan docs** — this file is canonical; link the others as
    history. — canonical status recorded; remaining docs still need pruning.
 
 ---
@@ -1059,3 +1179,4 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Phase 10 re-scoped to rule-complete generation: declared genres, content/discourse/sentence planning, construction grammar realizer, clarity/style revision, critic/search, LLM-supervised rule induction, no LLM at inference. First rule-only vertical slice and frozen generation evaluation added; gate open | `crms_generation.py`, `crms_generation_rules.py`, `crms_generation_rules.json`, `experiments/v1_566_phase10_generation.py`, `docs/design_phase10_generation_learning.md` |
 | 2026-10-21 | Phase 10 gains a generalisation workstream: learned classes, back-off hierarchy, analogical matching proposals, and evidence-count weights, with a rule-scaling curve (coverage and confident errors against training examples and rule count, per-mechanism ablations) and a gate item; the rationale is that LLM generalisation largely reflects training coverage, so rules can be made to reach it deterministically | `docs/design_phase10_generation_learning.md`, `docs/master_plan_to_final_state.md` |
 | 2026-10-21 | Phase 10 bounded lane completed: 12/12 cases across all 10 genres, mean copy 0.157; SQL snapshots/rollback; accepted teacher clarity proposal and rejected negative control; clean-room reload; `/compose` chat path; class/back-off/analogy/evidence generalisation diagnostics; automated 70B-class comparison (CRMS adequacy 1.75 vs 2.00, clarity 1.90 vs 2.00, coverage 1.85 vs 2.00); human/independent-300/two-corpus/measured-70B gates open | `crms_generation.py`, `crms_composition_memory.py`, `crms_examiner.py`, `crms_generate.py`, `run_phase10_eval.py`, `run_phase10_teacher.py`, `run_phase10_comparison.py`, `run_phase10_external.py`, `experiments/reports/phase10_external.json` |
+| 2026-10-22 | Phase 11 planned: staged transition from ad-hoc regex to one structure-aware pattern layer, generation layer first (engine port, SQL store, source-to-proposition intake, pattern-based generation rules, spec verifier), with parity gate, retire-on-parity rule, and later stages for evidence extraction, request understanding, and knowledge extraction. Prototype evidence recorded with its limits; gate open | `docs/design_phase11_pattern_transition.md`, `docs/master_plan_to_final_state.md` |
