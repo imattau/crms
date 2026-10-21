@@ -296,6 +296,11 @@ HELP = """Commands:
   /rule-health   inspect rule-registry lifecycle, validation, and conflicts
   /rule-detail ID
                  inspect one rule's statement, scope, validation, and utility
+  /model-info    inspect the attached Phase 8 release, size, licence coverage
+  /lineage NODE  inspect dependency inputs and dependents for a release node
+  /corrections   inspect release correction history
+  /evidence [DOCUMENT]
+                 inspect per-document licence evidence in the release
   /write-fact S|R|O|positive/negative
                  write a stored fact with a learned sentence frame
   /write-about ENTITY[|KEY=VALUE...]
@@ -9684,6 +9689,85 @@ def main() -> int:
                   f"{len(health['orphan_dependencies'])}")
             print(f"  scoped auto-accept: "
                   f"{'on' if health['allow_scoped_auto'] else 'off'}")
+            continue
+        if (line in {"/model-info", "/corrections", "/evidence"}
+                or line.startswith(("/lineage ", "/evidence "))):
+            from crms_phase8_model import open_release
+            release_root = (args.model_db.parent
+                            if args.model_db is not None else None)
+            if (release_root is None
+                    or not (release_root / "release.json").is_file()):
+                print("No Phase 8 release metadata is attached to this model.")
+                continue
+            try:
+                release = open_release(release_root)
+            except (OSError, ValueError, KeyError) as error:
+                print(f"Could not inspect the Phase 8 release: {error}")
+                continue
+            try:
+                if line == "/model-info":
+                    info = release.inspect()
+                    print(f"Phase 8 release: {info['path']}")
+                    print(f"  format: {info['format']} v{info['version']}; "
+                          f"model schema {info['model_schema']}; read-only "
+                          f"{info['read_only']}")
+                    print(f"  size: {info['total_bytes']:,} bytes "
+                          f"({info['model_bytes']:,} model, "
+                          f"{info['metadata_bytes']:,} metadata)")
+                    print(f"  sources: {info['research']['documents']:,}; "
+                          f"words: {info['research']['word_units']:,}")
+                    print(f"  licence coverage: "
+                          f"{info['licences']['coverage']:.1%}")
+                    print(f"  dependencies: {info['dependencies']['nodes']} "
+                          f"nodes, {info['dependencies']['edges']} edges; "
+                          f"corrections: {info['corrections']}; "
+                          f"registry rules: {info['registry']['rules']}")
+                    continue
+                if line == "/corrections":
+                    rows = release.corrections()
+                    if not rows:
+                        print("No release corrections are recorded.")
+                    for row in rows:
+                        affected = ", ".join(row["affected"]) or "none"
+                        print(f"{row['correction_id']}: {row['reason']}")
+                        print(f"  trigger: {row['trigger']}")
+                        print(f"  affected: {affected}")
+                    continue
+                if line.startswith("/lineage "):
+                    node_id = line[len("/lineage "):].strip()
+                    if not node_id:
+                        print("Use: /lineage NODE")
+                        continue
+                    try:
+                        lineage = release.lineage(node_id)
+                    except KeyError as error:
+                        print(str(error))
+                        continue
+                    node = lineage["node"]
+                    print(f"{node['id']}: {node['kind']}; trust {node['trust']}; "
+                          f"state {node['state']}")
+                    print(f"  payload: {json.dumps(node['payload'], sort_keys=True)}")
+                    for edge in lineage["inputs"]:
+                        print(f"  input: {edge['source']} "
+                              f"({edge['relation']})")
+                    for edge in lineage["dependents"]:
+                        print(f"  dependent: {edge['target']} "
+                              f"({edge['relation']})")
+                    continue
+                document_id = line[len("/evidence"):].strip() or None
+                try:
+                    rows = release.evidence(document_id)
+                except KeyError as error:
+                    print(str(error))
+                    continue
+                for row in rows:
+                    print(f"{row['document_id']}: {row['title']}")
+                    print(f"  licence: {row['licence']} "
+                          f"({row['licence_class']}); source: {row['source']}")
+                    print(f"  revision: {row['revision']}; "
+                          f"sha256: {row['body_sha256'][:16]}...")
+            finally:
+                release.close()
             continue
         if line.startswith("/rule-detail "):
             rule_id = line[len("/rule-detail "):].strip()

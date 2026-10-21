@@ -1,0 +1,194 @@
+{
+  "format": "crms-phase8-regressions",
+  "note": "Regression baselines run after the Phase 8 chat inspection commands; these use their normal workspace fixtures and are not model-only distribution tasks.",
+  "suites": {
+    "family_a": {
+      "metadata": {
+        "platform": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39",
+        "project": "/home/lostcause/workspace/crms",
+        "python": "3.12.3"
+      },
+      "summary": {
+        "by_category": {
+          "composition": {
+            "errors": 0,
+            "failed": 0,
+            "pass_rate": 1.0,
+            "passed": 30,
+            "total": 30
+          }
+        },
+        "duration_s": {
+          "max": 0.573,
+          "median": 0.296,
+          "p95": 0.531
+        },
+        "errors": 0,
+        "failed": 0,
+        "gated_total": 30,
+        "known_failures": 0,
+        "known_failures_passed": 0,
+        "observed": {
+          "abstained": 3,
+          "answered": 26,
+          "clarified": 1
+        },
+        "pass_rate": 1.0,
+        "passed": 30,
+        "total": 30,
+        "unsafe_answers": 0
+      }
+    },
+    "family_b": {
+      "metadata": {
+        "platform": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39",
+        "project": "/home/lostcause/workspace/crms",
+        "python": "3.12.3"
+      },
+      "summary": {
+        "by_category": {
+          "family-b-code": {
+            "errors": 0,
+            "failed": 0,
+            "pass_rate": 1.0,
+            "passed": 3,
+            "total": 3
+          },
+          "family-b-control": {
+            "errors": 0,
+            "failed": 0,
+            "pass_rate": 1.0,
+            "passed": 6,
+            "total": 6
+          },
+          "family-b-math": {
+            "errors": 0,
+            "failed": 0,
+            "pass_rate": 1.0,
+            "passed": 6,
+            "total": 6
+          },
+          "family-b-research": {
+            "errors": 0,
+            "failed": 0,
+            "pass_rate": 1.0,
+            "passed": 8,
+            "total": 8
+          },
+          "family-b-translation": {
+            "errors": 0,
+            "failed": 0,
+            "pass_rate": 1.0,
+            "passed": 4,
+            "total": 4
+          },
+          "family-b-unit": {
+            "errors": 0,
+            "failed": 0,
+            "pass_rate": 1.0,
+            "passed": 6,
+            "total": 6
+          },
+          "family-b-writing": {
+            "errors": 0,
+            "failed": 0,
+            "pass_rate": 1.0,
+            "passed": 3,
+            "total": 3
+          }
+        },
+        "duration_s": {
+          "max": 0.362,
+          "median": 0.288,
+          "p95": 0.335
+        },
+        "errors": 0,
+        "failed": 0,
+        "gated_total": 36,
+        "known_failures": 0,
+        "known_failures_passed": 0,
+        "observed": {
+          "abstained": 6,
+          "answered": 30
+        },
+        "pass_rate": 1.0,
+        "passed": 36,
+        "total": 36,
+        "unsafe_answers": 0
+      }
+    },
+    "smoke": {
+      "metadata": {
+        "platform": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39",
+        "project": "/home/lostcause/workspace/crms",
+        "python": "3.12.3"
+      },
+      "summary": {
+        "by_category": {
+          "abstention": {
+            "errors": 0,
+            "failed": 0,
+            "pass_rate": 1.0,
+            "passed": 1,
+            "total": 1
+          },
+          "dialogue": {
+            "errors": 0,
+            "failed": 0,
+            "pass_rate": 1.0,
+            "passed": 1,
+            "total": 1
+          },
+          "math": {
+            "errors": 0,
+            "failed": 0,
+            "pass_rate": 1.0,
+            "passed": 2,
+            "total": 2
+          },
+          "procedures": {
+            "errors": 0,
+            "failed": 0,
+            "pass_rate": 1.0,
+            "passed": 2,
+            "total": 2
+          },
+          "reload": {
+            "errors": 0,
+            "failed": 0,
+            "pass_rate": 1.0,
+            "passed": 1,
+            "total": 1
+          },
+          "research": {
+            "errors": 0,
+            "failed": 0,
+            "pass_rate": 1.0,
+            "passed": 5,
+            "total": 5
+          }
+        },
+        "duration_s": {
+          "max": 0.538,
+          "median": 0.294,
+          "p95": 0.315
+        },
+        "errors": 0,
+        "failed": 0,
+        "gated_total": 12,
+        "known_failures": 0,
+        "known_failures_passed": 0,
+        "observed": {
+          "abstained": 1,
+          "answered": 9,
+          "clarified": 2
+        },
+        "pass_rate": 1.0,
+        "passed": 12,
+        "total": 12,
+        "unsafe_answers": 0
+      }
+    }
+  },
+  "version": 1
+}

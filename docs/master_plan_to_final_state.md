@@ -102,8 +102,8 @@ procedures; portable SQLite model; 533 regression experiments.
 | Learning is fragmented and unmeasured | Procedures, frames, rules, and primitives each have separate ad-hoc stores; no lifecycle, registry, utility accounting, or compounding measurement | §5 rule registry, all phases |
 | Domains are narrow prototypes | Phase 6 measures bounded math/code/translation/creative/cross-domain slices; wider coverage remains | Phase 6 lane plus later domain work |
 | Corpus skew | Phase 7 core is measured at 69.3M words, but SimpleWiki supplies 264,924 of 268,148 documents; books, Q&A, and parallel text remain thin | Phase 7 follow-up and extended sources |
-| Distribution unproven end to end | Partial copied-model slices | Phase 8 |
-| Scale ceiling unknown | Depth-4 search ~95 s; canonicalizer hot spot | Phase 8 |
+| Distribution unproven end to end | Bounded Phase 8 release gate passed; the full Phase 7 corpus is not yet packaged into one release | Phase 8 follow-up |
+| Scale ceiling unknown | Phase 7 sharding works; million-fact / 2 GB p95 targets are not yet measured | Phase 8 follow-up |
 
 ---
 
@@ -618,6 +618,26 @@ Deliverables:
 **Gate:** scorecard passes from the copied model alone; evidence, corrections,
 and lineage inspectable; no original files required; size/runtime reported.
 
+**Status (2026-10-21): bounded Phase 8 release gate passed.** A release is a
+read-only directory containing a chat-compatible `model.sqlite`, a
+`phase8.sqlite` metadata store, and `release.json` with file digests and
+compatibility. The metadata records per-document licences, dependency lineage,
+governed registry history, corrections, and integrity. `model_schema` is 4 and
+the compatibility range covers package schemas 1–5; older models migrate through
+`crms_phase8_model.py migrate`. The frozen clean-room scorecard passed 12/12
+with zero unsafe answers. It covers source citation, a second source answer,
+learned math, dialogue history, abstention, source reload, learn-a-new-math-
+phrase then reload, rule-health inspection, release inspection, lineage,
+corrections, and per-document licence evidence. Licence coverage was 100% over
+two embedded sources; the release had six dependency nodes, five edges, one
+registry rule, and one correction. Release size was 167,936 bytes (98,304 model
++ 69,632 metadata); build 0.41 s, scoring 4.27 s, median task 0.31 s, p95
+0.58 s. The original release was hidden and each task used a fresh copy with no
+seed source directory. Existing regression baselines remain green: smoke 12/12,
+Family A 30/30, Family B 36/36, zero unsafe. This is a compact deterministic release fixture, not a
+packaged copy of the 1.3 GB Phase 7 corpus; full-corpus packing, million-fact
+p95, and the external v2 scorecard remain follow-ups.
+
 ### Phase 9 — External validation and release (weeks 72+)
 
 - v2 scorecard authored outside the project; blind held-out split.
@@ -762,7 +782,14 @@ redesigned or dropped.
    core (`crms_corpus_program.py`, `crms_phase7_benchmark.py`,
    `run_phase7_eval.py`, `experiments/reports/phase7_corpus.json`); books, Q&A,
    parallel text, and source-disjoint external validation remain follow-ups.
-15. **Consolidate plan docs** — this file is canonical; link the others as
+15. **Phase 8 release and clean room** — read-only release directory,
+   licence/evidence metadata, dependency lineage, registry history, corrections,
+   integrity digests, migration, release inspection commands, and a copied-model
+   scorecard. — done for the bounded fixture
+   (`crms_phase8_model.py`, `run_phase8_eval.py`,
+   `experiments/reports/phase8_release.json`); full Phase 7 corpus packing and
+   million-fact performance remain follow-ups.
+16. **Consolidate plan docs** — this file is canonical; link the others as
    history. — canonical status recorded; remaining docs still need pruning.
 
 ---
@@ -811,3 +838,5 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Phase 6 gate measured: 90/90 held-out tasks across five slices, zero confident errors, 15/15 negatives abstained, provenance on every answer, one repair per slice, cost reported, registry retirement/rollback clean | `experiments/reports/phase6_domains.json`, `experiments/scorecard/phase6_domains.json` |
 | 2026-10-21 | Phase 7 corpus program: audited per-document manifests, licence classes, source revision/hash, attribution, cleaning, exact/near dedup, language/script/PII filters, and eight disk-backed FTS shards | `crms_corpus_program.py`, `crms_phase7_benchmark.py`, `run_phase7_eval.py`, `experiments/v1_563_phase7_corpus.py`, `docs/design_phase7_corpus.md` |
 | 2026-10-21 | Phase 7 gate measured: 268,148 documents / 69.3M words, 100% licence coverage, 501 docs/s, 8 shards, 39/39 held-out positives with valid citations, 0 confident errors, 10/10 negatives abstained, p95 1.03s, clean-room copy with originals hidden | `experiments/reports/phase7_corpus.json`, `corpus/phase7_eval/fixture.json` |
+| 2026-10-21 | Phase 8 portable release: read-only model + metadata directory, licence evidence, dependency lineage, registry history, corrections, integrity digests, v1–v5 migration, and `/model-info` `/lineage` `/corrections` `/evidence` chat inspection | `crms_phase8_model.py`, `crms_chat.py`, `experiments/v1_564_phase8_model.py`, `docs/design_phase8_release.md` |
+| 2026-10-21 | Phase 8 gate measured: 12/12 clean-room release tasks, zero unsafe answers, 100% licence coverage, 6 dependency nodes/5 edges, 1 registry rule, 1 correction, 167,936-byte release, 0.41s build, 4.27s scoring, 0.31s median task, 0.58s p95, originals hidden | `experiments/reports/phase8_release.json`, `corpus/phase8_eval/fixture.json` |

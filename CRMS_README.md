@@ -1603,6 +1603,56 @@ source increment, not a claim of 70B-class breadth. The frozen questions are
 held out; the target documents remain searchable because a retrieval index
 cannot answer a question about a document it never received.
 
+### Portable release and clean room
+
+Phase 8 packages the learned model and its evidence into a copyable release
+directory:
+
+```text
+phase8_release/
+  model.sqlite      chat-compatible learned model and embedded sources
+  phase8.sqlite     licences, dependency graph, registry, corrections, integrity
+  release.json      format, model schema, compatibility, file digests, counts
+```
+
+The release is read-only. `model.sqlite` remains the existing chat format; the
+Phase 8 metadata adds per-document licence evidence, dependency lineage, rule
+history, corrections, and file digests. A changed model byte, missing file, or
+unsupported schema fails closed. Older package models can be migrated with
+`crms_phase8_model.py migrate`.
+
+Run the clean-room gate:
+
+```text
+python3 run_phase8_eval.py
+```
+
+Current report `experiments/reports/phase8_release.json`: 12/12 release tasks,
+zero unsafe answers, 100% licence coverage over two embedded sources, six
+dependency nodes and five edges, one registry rule, and one correction. The
+release is 167,936 bytes (98,304 model + 69,632 metadata), with a 0.41 s build
+and 4.27 s scoring run; median task 0.31 s and p95 0.58 s. The original release
+is hidden for the whole run and every task gets a fresh copy. The suite covers
+source citation, math, dialogue history, abstention, reload, learn-then-reload,
+release inspection, lineage, corrections, and licence evidence. Existing regression baselines remain green:
+smoke 12/12, Family A 30/30, and Family B 36/36, all with zero unsafe answers
+(`experiments/reports/phase8_regressions.json`).
+
+Inspect the release directly:
+
+```text
+python3 crms_phase8_model.py inspect --release data/phase8_release
+python3 crms_phase8_model.py lineage --release data/phase8_release derived:sum-mira
+python3 crms_phase8_model.py corrections --release data/phase8_release
+python3 crms_phase8_model.py evidence --release data/phase8_release people.txt
+```
+
+Inside chat with `--model-db`, the same evidence is available through
+`/model-info`, `/lineage NODE`, `/corrections`, and `/evidence DOCUMENT`.
+The measured release is a compact deterministic fixture, not a packaged copy of
+the 1.3 GB Phase 7 corpus; the full-corpus packer and million-fact performance
+targets remain follow-ups.
+
 `/suggest-corpus-alignments` adds a corpus-only path for alternate predicate
 wording. It proposes an alignment only when the same distinct subject/object
 pairs are independently parsed under both predicates in separate documents.

@@ -1,0 +1,296 @@
+{
+  "clean_room": {
+    "copied": true,
+    "mode": "release copied to a temporary directory; the original release was moved aside for the entire run; each task received a fresh copy of the release",
+    "originals_hidden_during_eval": true,
+    "originals_required": false,
+    "source_directory_required": false
+  },
+  "corrections": [
+    {
+      "affected": [
+        "fact:mira-reaches-5",
+        "derived:sum-mira"
+      ],
+      "at": "2026-10-21T00:00:00+00:00",
+      "correction_id": "correction:fixture-1",
+      "reason": "corrected fixture value from 4 to 5",
+      "retained": [],
+      "trigger": "fact:mira-reaches-5"
+    }
+  ],
+  "evidence": [
+    {
+      "attribution": "Phase 8 synthetic fixture, CC0 1.0",
+      "body_sha256": "56e5d6b02acf5306bff0ffc6c0ed7148dff6355a82d251173c78d1839be4a025",
+      "document_id": "facts.txt",
+      "licence": "CC0 1.0",
+      "licence_class": "public-domain",
+      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "retrieved_at": "2026-10-21",
+      "revision": "fixture-2026-10-21",
+      "source": "phase8-fixture",
+      "title": "Facts"
+    },
+    {
+      "attribution": "Phase 8 synthetic fixture, CC0 1.0",
+      "body_sha256": "912cd27e2c7cd5a48b2a9ea9c5b34da8738c9be27e343742ce91e7f48a13dfa2",
+      "document_id": "people.txt",
+      "licence": "CC0 1.0",
+      "licence_class": "public-domain",
+      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "retrieved_at": "2026-10-21",
+      "revision": "fixture-2026-10-21",
+      "source": "phase8-fixture",
+      "title": "People"
+    }
+  ],
+  "fixture": {
+    "frozen": "2026-10-21",
+    "sources": 2,
+    "tasks": 12
+  },
+  "format": "crms-phase8-eval",
+  "gate": {
+    "all_tasks_pass": true,
+    "clean_room_copy": true,
+    "corrections_present": true,
+    "evidence_present": true,
+    "integrity_valid": true,
+    "lineage_present": true,
+    "model_schema_v4": true,
+    "originals_not_required": true,
+    "read_only": true,
+    "size_and_runtime_reported": true,
+    "zero_unsafe": true
+  },
+  "gate_passed": true,
+  "lineage": {
+    "dependents": [
+      "rule:phase8-sum"
+    ],
+    "inputs": [
+      "fact:mira-reaches-23",
+      "fact:mira-reaches-5"
+    ],
+    "node": "derived:sum-mira"
+  },
+  "model_bytes": 98304,
+  "overall": {
+    "errors": 0,
+    "failed": 0,
+    "median_task_s": 0.30944974449812435,
+    "p95_task_s": 0.582727920031175,
+    "pass_rate": 1.0,
+    "passed": 12,
+    "tasks": 12,
+    "unsafe_answers": 0
+  },
+  "paths": {
+    "fixture": "corpus/phase8_eval/fixture.json",
+    "release": "data/phase8_release",
+    "report": "experiments/reports/phase8_release.json"
+  },
+  "release": {
+    "compatibility": [
+      "crms-learned-model 1",
+      "crms-learned-model 2",
+      "crms-learned-model 3",
+      "crms-learned-model 4",
+      "crms-learned-model 5"
+    ],
+    "corrections": 1,
+    "dependencies": {
+      "by_kind": {
+        "derived": 1,
+        "fact": 2,
+        "rule": 1,
+        "source": 2
+      },
+      "by_state": {
+        "active": 6
+      },
+      "edges": 5,
+      "nodes": 6
+    },
+    "format": "crms-phase8-release",
+    "licences": {
+      "by_class": {
+        "public-domain": 2
+      },
+      "complete_documents": 2,
+      "coverage": 1.0,
+      "documents": 2
+    },
+    "memories": [
+      "knowledge",
+      "math",
+      "rules"
+    ],
+    "memory_bytes": {
+      "knowledge": 3104,
+      "math": 142,
+      "rules": 448
+    },
+    "metadata_bytes": 69632,
+    "model_bytes": 98304,
+    "model_schema": 4,
+    "path": "/tmp/crms-phase8-run-1j_vuwxd/release-copy",
+    "read_only": true,
+    "registry": {
+      "by_family": {
+        "procedure": 1
+      },
+      "by_state": {
+        "active": 1
+      },
+      "rules": 1
+    },
+    "release_meta": {
+      "corrections": "1",
+      "created_at": "2026-10-21T09:29:04+00:00",
+      "dependency_edges": "5",
+      "dependency_nodes": "6",
+      "format": "crms-phase8-release",
+      "licence_coverage": "{\"by_class\": {\"public-domain\": 2}, \"complete_documents\": 2, \"coverage\": 1.0, \"documents\": 2}",
+      "model_schema": "4",
+      "read_only": "true",
+      "source_documents": "2",
+      "version": "1"
+    },
+    "research": {
+      "documents": 2,
+      "utf8_bytes": 193,
+      "word_units": 36
+    },
+    "total_bytes": 167936,
+    "version": 1
+  },
+  "release_bytes": 167936,
+  "rows": [
+    {
+      "category": "research",
+      "duration_s": 0.3144369869842194,
+      "failures": [],
+      "id": "source-python",
+      "observed": "answered",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "research",
+      "duration_s": 0.34191043803002685,
+      "failures": [],
+      "id": "source-eiffel",
+      "observed": "answered",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "math",
+      "duration_s": 0.3044625020120293,
+      "failures": [],
+      "id": "math-plus",
+      "observed": "answered",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "dialogue",
+      "duration_s": 0.3556881520198658,
+      "failures": [],
+      "id": "dialogue-history",
+      "observed": "answered",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "abstention",
+      "duration_s": 0.3458044519647956,
+      "failures": [],
+      "id": "abstain-unknown",
+      "observed": "abstained",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "reload",
+      "duration_s": 0.582727920031175,
+      "failures": [],
+      "id": "reload-source",
+      "observed": "answered",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "learning",
+      "duration_s": 0.5956257240031846,
+      "failures": [],
+      "id": "learn-math-reload",
+      "observed": "answered",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "registry",
+      "duration_s": 0.2711390199838206,
+      "failures": [],
+      "id": "rule-health",
+      "observed": "answered",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "release",
+      "duration_s": 0.29173905204515904,
+      "failures": [],
+      "id": "model-info",
+      "observed": "answered",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "lineage",
+      "duration_s": 0.28649229503935203,
+      "failures": [],
+      "id": "lineage-derived",
+      "observed": "answered",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "corrections",
+      "duration_s": 0.2847410780377686,
+      "failures": [],
+      "id": "corrections",
+      "observed": "answered",
+      "status": "pass",
+      "unsafe": false
+    },
+    {
+      "category": "evidence",
+      "duration_s": 0.2910546110360883,
+      "failures": [],
+      "id": "evidence",
+      "observed": "answered",
+      "status": "pass",
+      "unsafe": false
+    }
+  ],
+  "runtime": {
+    "build_s": 0.4098609160282649,
+    "median_task_s": 0.30944974449812435,
+    "model_bytes": 98304,
+    "p95_task_s": 0.582727920031175,
+    "release_bytes": 167936,
+    "scoring_s": 4.269334326963872,
+    "total_s": 4.681980066001415
+  },
+  "verification": {
+    "errors": [],
+    "files": 2,
+    "total_bytes": 167936,
+    "valid": true
+  },
+  "version": 1
+}

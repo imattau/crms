@@ -1,0 +1,373 @@
+{
+  "format": "crms-phase8-eval",
+  "version": 1,
+  "frozen": "2026-10-21",
+  "description": "Frozen Phase 8 clean-room scorecard. The seed sources and teaching turns are used once to build a release; all tasks then run from copied releases with no source directory and no original model.",
+  "sources": [
+    {
+      "path": "people.txt",
+      "title": "People",
+      "text": "Python was created by Guido van Rossum in 1991.\nLinux was created by Linus Torvalds in 1991.\nThe Eiffel Tower is a landmark in Paris. It was completed in 1889.\n"
+    },
+    {
+      "path": "facts.txt",
+      "title": "Facts",
+      "text": "Mira reaches 23.\nMira reaches 5.\n"
+    }
+  ],
+  "seed_turns": [
+    "/source-dir __SOURCES__",
+    "/teach-fact Mira|reaches|23|Mira reaches 23.|reaches|positive",
+    "/teach-fact Mira|reaches|5|Mira reaches 5.|reaches|positive",
+    "/teach-math What is 2 plus 3?|5",
+    "/teach-math What is 5 plus 3?|8"
+  ],
+  "licences": [
+    {
+      "document_id": "people.txt",
+      "title": "People",
+      "source": "phase8-fixture",
+      "licence": "CC0 1.0",
+      "licence_class": "public-domain",
+      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Phase 8 synthetic fixture, CC0 1.0",
+      "retrieved_at": "2026-10-21",
+      "revision": "fixture-2026-10-21",
+      "path": "people.txt"
+    },
+    {
+      "document_id": "facts.txt",
+      "title": "Facts",
+      "source": "phase8-fixture",
+      "licence": "CC0 1.0",
+      "licence_class": "public-domain",
+      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Phase 8 synthetic fixture, CC0 1.0",
+      "retrieved_at": "2026-10-21",
+      "revision": "fixture-2026-10-21",
+      "path": "facts.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "source:people.txt",
+      "kind": "source",
+      "trust": "source-reviewed",
+      "state": "active",
+      "payload": {
+        "title": "People",
+        "licence": "CC0 1.0"
+      }
+    },
+    {
+      "id": "source:facts.txt",
+      "kind": "source",
+      "trust": "source-reviewed",
+      "state": "active",
+      "payload": {
+        "title": "Facts",
+        "licence": "CC0 1.0"
+      }
+    },
+    {
+      "id": "fact:mira-reaches-23",
+      "kind": "fact",
+      "trust": "source-reviewed",
+      "state": "active",
+      "payload": {
+        "subject": "Mira",
+        "relation": "reaches",
+        "object": "23",
+        "source": "facts.txt"
+      }
+    },
+    {
+      "id": "fact:mira-reaches-5",
+      "kind": "fact",
+      "trust": "source-reviewed",
+      "state": "active",
+      "payload": {
+        "subject": "Mira",
+        "relation": "reaches",
+        "object": "5",
+        "source": "facts.txt"
+      }
+    },
+    {
+      "id": "derived:sum-mira",
+      "kind": "derived",
+      "trust": "derived",
+      "state": "active",
+      "payload": {
+        "total": 28,
+        "inputs": [
+          "23",
+          "5"
+        ]
+      }
+    },
+    {
+      "id": "rule:phase8-sum",
+      "kind": "rule",
+      "trust": "taught",
+      "state": "active",
+      "payload": {
+        "rule_id": "phase8-sum",
+        "family": "procedure"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "target": "fact:mira-reaches-23",
+      "source": "source:facts.txt",
+      "relation": "supports"
+    },
+    {
+      "target": "fact:mira-reaches-5",
+      "source": "source:facts.txt",
+      "relation": "supports"
+    },
+    {
+      "target": "derived:sum-mira",
+      "source": "fact:mira-reaches-23",
+      "relation": "derived_from"
+    },
+    {
+      "target": "derived:sum-mira",
+      "source": "fact:mira-reaches-5",
+      "relation": "derived_from"
+    },
+    {
+      "target": "rule:phase8-sum",
+      "source": "derived:sum-mira",
+      "relation": "uses"
+    }
+  ],
+  "corrections": [
+    {
+      "correction_id": "correction:fixture-1",
+      "trigger": "fact:mira-reaches-5",
+      "reason": "corrected fixture value from 4 to 5",
+      "affected": [
+        "fact:mira-reaches-5",
+        "derived:sum-mira"
+      ],
+      "retained": [],
+      "at": "2026-10-21T00:00:00+00:00"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "source-python",
+      "category": "research",
+      "provenance": "authored",
+      "notes": "Answer from the embedded source model with an exact citation.",
+      "turns": [
+        "Who created Python?"
+      ],
+      "expect": {
+        "contains": [
+          "Guido van Rossum created Python.",
+          "[Source: people.txt"
+        ],
+        "citations": [
+          {
+            "source": "people.txt",
+            "quote": "Guido van Rossum created Python."
+          }
+        ],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "source-eiffel",
+      "category": "research",
+      "provenance": "authored",
+      "notes": "Second embedded source answer.",
+      "turns": [
+        "Where is the Eiffel Tower?"
+      ],
+      "expect": {
+        "contains": [
+          "The Eiffel Tower is a landmark in Paris.",
+          "[Source: people.txt"
+        ],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "math-plus",
+      "category": "math",
+      "provenance": "authored",
+      "notes": "Learned math memory loaded from the model.",
+      "turns": [
+        "What is 4 plus 5?"
+      ],
+      "expect": {
+        "contains": [
+          "9 (learned 'plus' as exact add"
+        ],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "dialogue-history",
+      "category": "dialogue",
+      "provenance": "authored",
+      "notes": "Dialogue context survives model-only loading.",
+      "turns": [
+        "Who created Python?",
+        "What did I just ask?"
+      ],
+      "expect": {
+        "contains": [
+          "Your last question was: Who created Python?"
+        ],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "abstain-unknown",
+      "category": "abstention",
+      "provenance": "authored",
+      "notes": "Absent entity must abstain rather than invent.",
+      "turns": [
+        "What is the capital of Xyzzyland?"
+      ],
+      "expect": {
+        "regex": [
+          "(?i)i don't know"
+        ],
+        "outcome": "abstain"
+      }
+    },
+    {
+      "id": "reload-source",
+      "category": "reload",
+      "provenance": "authored",
+      "notes": "The copied model answers the same question after a fresh process.",
+      "turns": [
+        "Who created Python?",
+        "__restart__",
+        "Who created Python?"
+      ],
+      "expect": {
+        "occurrences": [
+          {
+            "text": "Guido van Rossum created Python.",
+            "count": 2
+          }
+        ],
+        "contains": [
+          "[Source: people.txt"
+        ],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "learn-math-reload",
+      "category": "learning",
+      "provenance": "authored",
+      "notes": "Teach a new math phrase in the copied model, restart, and reuse it.",
+      "turns": [
+        "/teach-math What is 6 glorp 2?|8",
+        "/teach-math What is 10 glorp 4?|14",
+        "What is 7 glorp 3?",
+        "__restart__",
+        "What is 7 glorp 3?"
+      ],
+      "expect": {
+        "occurrences": [
+          {
+            "text": "10 (learned 'glorp' as exact add",
+            "count": 2
+          }
+        ],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "rule-health",
+      "category": "registry",
+      "provenance": "authored",
+      "notes": "Registry inspection remains available from the model sidecar.",
+      "turns": [
+        "/rule-health"
+      ],
+      "expect": {
+        "contains": [
+          "Rule registry:"
+        ],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "model-info",
+      "category": "release",
+      "provenance": "authored",
+      "notes": "Release size, schema, source count, and licence coverage are inspectable in chat.",
+      "turns": [
+        "/model-info"
+      ],
+      "expect": {
+        "contains": [
+          "Phase 8 release:",
+          "model schema 4",
+          "licence coverage: 100.0%"
+        ],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "lineage-derived",
+      "category": "lineage",
+      "provenance": "authored",
+      "notes": "Derived total has inspectable source and fact inputs.",
+      "turns": [
+        "/lineage derived:sum-mira"
+      ],
+      "expect": {
+        "contains": [
+          "derived:sum-mira",
+          "fact:mira-reaches-23",
+          "fact:mira-reaches-5"
+        ],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "corrections",
+      "category": "corrections",
+      "provenance": "authored",
+      "notes": "Correction history is inspectable.",
+      "turns": [
+        "/corrections"
+      ],
+      "expect": {
+        "contains": [
+          "corrected fixture value from 4 to 5",
+          "fact:mira-reaches-5"
+        ],
+        "outcome": "answer"
+      }
+    },
+    {
+      "id": "evidence",
+      "category": "evidence",
+      "provenance": "authored",
+      "notes": "Per-document licence evidence is inspectable.",
+      "turns": [
+        "/evidence people.txt"
+      ],
+      "expect": {
+        "contains": [
+          "people.txt",
+          "CC0 1.0",
+          "phase8-fixture"
+        ],
+        "outcome": "answer"
+      }
+    }
+  ]
+}
