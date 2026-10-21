@@ -1,0 +1,142 @@
+{
+  "analogical_candidates": [
+    {
+      "accepted": false,
+      "fact_id": "coal",
+      "reasons": [
+        "same predicate",
+        "same lexical class"
+      ],
+      "score": 3
+    },
+    {
+      "accepted": false,
+      "fact_id": "solar",
+      "reasons": [
+        "same predicate",
+        "same lexical class"
+      ],
+      "score": 3
+    },
+    {
+      "accepted": false,
+      "fact_id": "wind",
+      "reasons": [
+        "same predicate",
+        "same lexical class"
+      ],
+      "score": 3
+    }
+  ],
+  "backoff": {
+    "photovoltaic": [
+      "solar_power",
+      "renewable_source",
+      "energy_source"
+    ],
+    "solar_vs_wind": true
+  },
+  "classes": {
+    "energy_source": {
+      "members": [
+        "energy source"
+      ],
+      "parent": null
+    },
+    "fossil_power": {
+      "members": [
+        "coal power"
+      ],
+      "parent": "energy_source"
+    },
+    "hydro_power": {
+      "members": [
+        "hydro power"
+      ],
+      "parent": "renewable_source"
+    },
+    "nuclear_power": {
+      "members": [
+        "nuclear power"
+      ],
+      "parent": null
+    },
+    "renewable_source": {
+      "members": [
+        "renewable source"
+      ],
+      "parent": "energy_source"
+    },
+    "solar_power": {
+      "members": [
+        "solar power",
+        "photovoltaic"
+      ],
+      "parent": "renewable_source"
+    },
+    "wind_power": {
+      "members": [
+        "wind power"
+      ],
+      "parent": "renewable_source"
+    }
+  },
+  "coverage_curve": [
+    {
+      "coverage": 0.0,
+      "facts": 1,
+      "score": 0.0,
+      "sentences": 0,
+      "status": "clarify"
+    },
+    {
+      "coverage": 1.0,
+      "facts": 2,
+      "score": 0.8,
+      "sentences": 2,
+      "status": "needs_revision"
+    },
+    {
+      "coverage": 1.0,
+      "facts": 3,
+      "score": 0.9,
+      "sentences": 3,
+      "status": "ok"
+    },
+    {
+      "coverage": 1.0,
+      "facts": 4,
+      "score": 0.9,
+      "sentences": 4,
+      "status": "ok"
+    },
+    {
+      "coverage": 1.0,
+      "facts": 5,
+      "score": 1.0,
+      "sentences": 4,
+      "status": "ok"
+    },
+    {
+      "coverage": 1.0,
+      "facts": 6,
+      "score": 1.0,
+      "sentences": 5,
+      "status": "ok"
+    }
+  ],
+  "evidence_weights": {
+    "one_source": 0.693147,
+    "three_sources": 1.386294
+  },
+  "format": "crms-phase10-generalisation",
+  "gate": {
+    "backoff": true,
+    "class_hierarchy": true,
+    "coverage_curve_published": true,
+    "evidence_weights": true,
+    "report_only_analogies": true
+  },
+  "gate_passed": true,
+  "version": 1
+}

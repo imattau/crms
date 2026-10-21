@@ -1,0 +1,26 @@
+{
+  "format": "crms-phase10-teacher-proposal",
+  "version": 1,
+  "proposal_id": "teacher-align-jargon-v1",
+  "model": "opencode-go/qwen3.8-flash",
+  "prompt_sha256": "a0797024644389b32588e61fc0d663e7909f77f6c89cff87147c9116d42d3cb7",
+  "rationale": "clarity.jargon_terms flags only 6 of the 9 wordy phrases that clarity.replacements can rewrite; 'utilized', 'in the event that', and 'a large number of' have replacements defined but are never detected as jargon, so they can pass the clarity check whenever the replacement pass is skipped (e.g., a style that post-edits output). Aligning jargon_terms with the replacement keys keeps one source of truth and is trivially testable: assert set(clarity.replacements.keys()) == set(clarity.jargon_terms). No version or format change; the replacement map itself is untouched.",
+  "changes": [
+    {
+      "op": "set",
+      "path": "clarity.jargon_terms",
+      "value": [
+        "utilize",
+        "utilizes",
+        "utilized",
+        "prior to",
+        "in order to",
+        "due to the fact that",
+        "at this point in time",
+        "in the event that",
+        "a large number of"
+      ]
+    }
+  ],
+  "expected": "clarity jargon terms stay aligned with the replacement map"
+}

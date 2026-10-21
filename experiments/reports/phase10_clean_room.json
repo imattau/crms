@@ -1,0 +1,10 @@
+{
+  "cases": 12,
+  "fixture_sha256": "330922e403c21762b7799696776494b3896037fe29b23c1cd4587f3c9414a330",
+  "format": "crms-phase10-clean-room",
+  "gate_passed": true,
+  "identical_outputs": true,
+  "no_llm_or_network_imports": true,
+  "rule_sha256": "a7cdc308ed470cfb8c428c36783b7bd3b3591a6083d8e691ffa217ab75512f7c",
+  "version": 1
+}

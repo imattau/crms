@@ -106,7 +106,8 @@ def main() -> None:
     require(ratio <= 0.75, f"copy ratio too high: {ratio:.3f}")
 
     print("Phase 10 rule file: 10 genres, visible constructions: PASS")
-    print("Frozen cases 7/7, mean copy <= 0.5, evidence attached: PASS")
+    print(f"Frozen cases {report['summary']['passed']}/{report['summary']['cases']}, "
+          "mean copy <= 0.5, evidence attached: PASS")
     print("Deterministic explanation, causal fusion, definition: PASS")
     print("Procedure ordering, contrast, counterpoint: PASS")
     print("Abstention and clarification controls: PASS")

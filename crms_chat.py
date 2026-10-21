@@ -104,6 +104,7 @@ HELP = """Commands:
   /source-dir PATH [--replace|--verify]
                  recursively index text/markup, tables, slides, chats, HTML, DOCX, ODT, EPUB, and PDFs
                  --verify checks file contents when size and timestamp are unchanged
+  /compose PATH  generate rule-composed content from a JSON request
   /summarize QUERY
                  select exact, cited source sentences for an extractive summary
   Show more/fewer sentences | Show the first N sentences
@@ -344,6 +345,7 @@ That pending input is saved across chat restarts. Use /cancel-rule to stop waiti
 HELP_SHORT = """CRMS is a bounded, source-grounded learning system. Try:
   Who likes tea?                         ask a grounded question
   /source PATH                           add a document as evidence
+  /compose PATH                          generate from a JSON request
   /teach-fact Alice|likes|tea|SOURCE QUERY|likes|positive
                                          teach one cited fact
   Teach a question frame from examples: "Who likes juice?" => "Carol"; "Who likes coffee?" => "Bob"
@@ -7464,6 +7466,32 @@ def main() -> int:
                     print(f"... {len(result.failures) - 20} additional failures omitted")
             except (OSError, RuntimeError, ValueError) as error:
                 print(f"Could not index local corpus: {error}")
+            continue
+        if line.startswith("/compose "):
+            compose_value = line[len("/compose "):].strip()
+            compose_path = Path(compose_value).expanduser()
+            if not compose_path.is_file():
+                print(f"Compose request not found: {compose_path}")
+                continue
+            try:
+                import json as _json
+                from crms_generate import request_from_mapping
+                from crms_generation import GenerationEngine
+                from crms_generation_rules import load_rules
+                raw_request = _json.loads(
+                    compose_path.read_text(encoding="utf-8"))
+                result = GenerationEngine(load_rules()).generate(
+                    request_from_mapping(raw_request))
+                if result.text:
+                    print("CRMS> " + result.text)
+                else:
+                    print("CRMS> " + (result.message or "No composed answer."))
+                if result.critique is not None:
+                    print(f"Composition status: {result.status}; "
+                          f"copy ratio {result.critique.copy_ratio:.2f}; "
+                          f"{result.critique.sentence_count} sentences.")
+            except (OSError, ValueError, RuntimeError) as error:
+                print(f"Could not compose that request: {error}")
             continue
         if line.startswith("/source "):
             source_value = line[len("/source "):].strip()

@@ -1,0 +1,57 @@
+{
+  "agreement": {
+    "answer_adequacy_exact": 0.85,
+    "answer_adequacy_kappa": 0.318181818181818,
+    "available": true,
+    "clarity_exact": 0.9,
+    "clarity_kappa": 0.0,
+    "confident_error_exact": 0.85,
+    "confident_error_kappa": 0.5714285714285712,
+    "coverage_exact": 0.85,
+    "coverage_kappa": -0.07142857142857148,
+    "evidence_validity_exact": 0.8,
+    "evidence_validity_kappa": 0.27272727272727326,
+    "items": 20
+  },
+  "baseline": {
+    "class": "hosted 70B-class proxy",
+    "model": "opencode-go/qwen3.8-max",
+    "parameter_count": "not disclosed by provider"
+  },
+  "fixture": "corpus/phase10_eval/fixture.json",
+  "format": "crms-phase10-comparison",
+  "gate": {
+    "agreement_available": true,
+    "baseline_calls_ok": true,
+    "human_raters": false,
+    "measured_70b_model": false,
+    "two_raters_ok": true
+  },
+  "gate_passed": true,
+  "outputs": "experiments/reports/phase10_comparison_outputs.json",
+  "packet": "experiments/reports/phase10_comparison_packet.json",
+  "rater_kind": "two independent hosted model instances; not human",
+  "raters": [
+    "opencode-go/claude-haiku-5-5",
+    "opencode-go/glm-5.3-flash"
+  ],
+  "systems": {
+    "baseline": {
+      "confident_errors": 6,
+      "mean_answer_adequacy": 2,
+      "mean_clarity": 2,
+      "mean_coverage": 2,
+      "mean_evidence_validity": 1.85,
+      "rated_items": 20
+    },
+    "crms": {
+      "confident_errors": 3,
+      "mean_answer_adequacy": 1.75,
+      "mean_clarity": 1.9,
+      "mean_coverage": 1.85,
+      "mean_evidence_validity": 1.85,
+      "rated_items": 20
+    }
+  },
+  "version": 1
+}

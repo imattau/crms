@@ -1,0 +1,16 @@
+{
+  "format": "crms-phase10-teacher-proposal",
+  "version": 1,
+  "proposal_id": "negative-control-short-sentences",
+  "model": "project-authored-negative-control",
+  "prompt_sha256": "",
+  "rationale": "negative control: force a sentence cap that the corpus cannot meet",
+  "changes": [
+    {
+      "op": "set",
+      "path": "clarity.max_sentence_words",
+      "value": 5
+    }
+  ],
+  "expected": "must be rejected because it breaks the frozen cases"
+}

@@ -116,9 +116,10 @@ def _check(result: GenerationResult, checks: dict[str, Any]) -> list[str]:
     return failures
 
 
-def evaluate_fixture(path: Path = FIXTURE) -> dict[str, Any]:
+def evaluate_fixture(path: Path = FIXTURE,
+                     rules=None) -> dict[str, Any]:
     fixture = _load(path)
-    rules = load_rules()
+    rules = rules or load_rules()
     engine = GenerationEngine(rules)
     rows: list[dict[str, Any]] = []
     for case in fixture["cases"]:
@@ -212,8 +213,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--fixture", type=Path, default=FIXTURE)
     parser.add_argument("--out", type=Path, default=REPORT)
+    parser.add_argument("--rule-store", type=Path)
     args = parser.parse_args()
-    report = evaluate_fixture(args.fixture)
+    rules = None
+    if args.rule_store is not None:
+        from crms_composition_memory import GenerationRuleStore
+        with GenerationRuleStore(args.rule_store) as store:
+            rules = store.load_rules()
+    report = evaluate_fixture(args.fixture, rules)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(
         json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")

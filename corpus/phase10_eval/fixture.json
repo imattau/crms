@@ -479,6 +479,409 @@
       }
     },
     {
+      "id": "argument-remote",
+      "genre": "argument",
+      "prompt": "Argue whether remote work should remain an option.",
+      "audience": "professional",
+      "style": "plain",
+      "source_documents": [
+        {
+          "name": "argument.txt",
+          "text": "Knowledge workers can do many tasks remotely. Commuting consumes time and money. Studies link remote work with higher satisfaction. Casual mentoring can suffer when teams rarely meet. Planned in-person time can protect mentoring. A hybrid policy can keep the main benefits."
+        }
+      ],
+      "facts": [
+        {
+          "fact_id": "t",
+          "subject": "Remote work",
+          "verb": "should remain",
+          "complement": "an option for knowledge workers",
+          "role": "thesis",
+          "source": "argument.txt",
+          "source_text": "Knowledge workers can do many tasks remotely."
+        },
+        {
+          "fact_id": "r1",
+          "subject": "Remote work",
+          "verb": "reduces",
+          "object": "commuting time and cost",
+          "role": "reason",
+          "source": "argument.txt",
+          "source_text": "Commuting consumes time and money."
+        },
+        {
+          "fact_id": "e1",
+          "subject": "Surveys",
+          "verb": "link",
+          "object": "remote work with higher satisfaction",
+          "role": "evidence",
+          "source": "argument.txt",
+          "source_text": "Studies link remote work with higher satisfaction."
+        },
+        {
+          "fact_id": "o1",
+          "subject": "Casual mentoring",
+          "verb": "can suffer",
+          "complement": "when teams rarely meet",
+          "role": "objection",
+          "source": "argument.txt",
+          "source_text": "Casual mentoring can suffer when teams rarely meet."
+        },
+        {
+          "fact_id": "resp",
+          "subject": "Planned in-person time",
+          "verb": "can protect",
+          "object": "mentoring",
+          "role": "response",
+          "source": "argument.txt",
+          "source_text": "Planned in-person time can protect mentoring."
+        },
+        {
+          "fact_id": "con",
+          "subject": "A hybrid policy",
+          "verb": "can keep",
+          "object": "the main benefits",
+          "role": "conclusion",
+          "source": "argument.txt",
+          "source_text": "A hybrid policy can keep the main benefits."
+        }
+      ],
+      "checks": {
+        "status": "ok",
+        "min_sentences": 4,
+        "min_paragraphs": 2,
+        "contains": [
+          "However",
+          "Overall"
+        ],
+        "max_copy_ratio": 0.75,
+        "max_sentence_words": 32,
+        "require_evidence": true
+      }
+    },
+    {
+      "id": "professional-hybrid",
+      "genre": "professional",
+      "prompt": "Write a short internal note recommending a hybrid schedule.",
+      "audience": "professional",
+      "style": "plain",
+      "source_documents": [
+        {
+          "name": "memo.txt",
+          "text": "The team works remotely three days each week. Collaboration is strongest on Tuesdays. Managers need a predictable core-hours window. Scheduling conflicts should be reported by Friday."
+        }
+      ],
+      "facts": [
+        {
+          "fact_id": "purpose",
+          "subject": "The purpose of this note",
+          "verb": "is",
+          "complement": "to recommend a hybrid schedule",
+          "role": "purpose",
+          "source": "memo.txt",
+          "source_text": "The team works remotely three days each week."
+        },
+        {
+          "fact_id": "ctx1",
+          "subject": "The team",
+          "verb": "works",
+          "complement": "remotely three days each week",
+          "role": "context",
+          "source": "memo.txt",
+          "source_text": "The team works remotely three days each week."
+        },
+        {
+          "fact_id": "ctx2",
+          "subject": "Collaboration",
+          "verb": "is",
+          "complement": "strongest on Tuesdays",
+          "role": "context",
+          "source": "memo.txt",
+          "source_text": "Collaboration is strongest on Tuesdays."
+        },
+        {
+          "fact_id": "act1",
+          "subject": "We",
+          "verb": "should reserve",
+          "object": "Tuesdays for in-person collaboration",
+          "role": "action",
+          "source": "memo.txt",
+          "source_text": "Collaboration is strongest on Tuesdays."
+        },
+        {
+          "fact_id": "act2",
+          "subject": "Managers",
+          "verb": "should publish",
+          "object": "core hours by Friday",
+          "role": "action",
+          "source": "memo.txt",
+          "source_text": "Managers need a predictable core-hours window."
+        },
+        {
+          "fact_id": "close",
+          "subject": "",
+          "verb": "Please reply",
+          "complement": "with any scheduling conflicts",
+          "role": "closing",
+          "source": "memo.txt",
+          "source_text": "Scheduling conflicts should be reported by Friday."
+        }
+      ],
+      "checks": {
+        "status": "ok",
+        "min_sentences": 4,
+        "min_paragraphs": 2,
+        "contains": [
+          "The purpose",
+          "core hours",
+          "reply"
+        ],
+        "max_copy_ratio": 0.75,
+        "max_sentence_words": 32,
+        "require_evidence": true
+      }
+    },
+    {
+      "id": "narrative-library",
+      "genre": "narrative",
+      "prompt": "Write a short story about a library discovery.",
+      "audience": "general",
+      "style": "plain",
+      "source_documents": [
+        {
+          "name": "story.txt",
+          "text": "Mira discovered an old brass key among the library shelves. It unlocked a room that had been closed for years. The room held letters about a lost expedition. The letters pointed across the town. Mira traced them to an abandoned observatory. The expedition records eventually returned to the museum. Mira now saw the town as a map of unfinished stories."
+        }
+      ],
+      "facts": [
+        {
+          "fact_id": "setup",
+          "subject": "Mira",
+          "verb": "found",
+          "object": "a brass key in the library",
+          "role": "setup",
+          "source": "story.txt",
+          "source_text": "Mira discovered an old brass key among the library shelves."
+        },
+        {
+          "fact_id": "inciting",
+          "subject": "The key",
+          "verb": "opened",
+          "object": "a room that had been sealed for years",
+          "role": "inciting",
+          "source": "story.txt",
+          "source_text": "It unlocked a room that had been closed for years."
+        },
+        {
+          "fact_id": "esc1",
+          "subject": "She",
+          "verb": "found",
+          "object": "letters describing a missing expedition",
+          "role": "escalation",
+          "source": "story.txt",
+          "source_text": "The room held letters about a lost expedition."
+        },
+        {
+          "fact_id": "esc2",
+          "subject": "Each letter",
+          "verb": "pointed",
+          "complement": "to a different part of the town",
+          "role": "escalation",
+          "source": "story.txt",
+          "source_text": "The letters pointed across the town."
+        },
+        {
+          "fact_id": "climax",
+          "subject": "She",
+          "verb": "followed",
+          "object": "the clues to the old observatory",
+          "role": "climax",
+          "source": "story.txt",
+          "source_text": "Mira traced them to an abandoned observatory."
+        },
+        {
+          "fact_id": "resolution",
+          "subject": "The expedition records",
+          "verb": "were returned",
+          "complement": "to the museum",
+          "role": "resolution",
+          "source": "story.txt",
+          "source_text": "The expedition records eventually returned to the museum."
+        },
+        {
+          "fact_id": "change",
+          "subject": "Mira",
+          "verb": "began to see",
+          "object": "the town as a map of unfinished stories",
+          "role": "change",
+          "source": "story.txt",
+          "source_text": "Mira now saw the town as a map of unfinished stories."
+        }
+      ],
+      "checks": {
+        "status": "ok",
+        "min_sentences": 5,
+        "min_paragraphs": 2,
+        "contains": [
+          "Mira",
+          "museum"
+        ],
+        "max_copy_ratio": 0.75,
+        "max_sentence_words": 32,
+        "require_evidence": true
+      }
+    },
+    {
+      "id": "technical-token",
+      "genre": "technical_note",
+      "prompt": "Explain how to rotate a service token.",
+      "audience": "expert",
+      "style": "plain",
+      "source_documents": [
+        {
+          "name": "token.txt",
+          "text": "The backup job uses a service token. Open the service settings. Create a new token and copy it once. Update the backup job with the new token. Revoke the old token after a successful run. Never store the token in the repository."
+        }
+      ],
+      "facts": [
+        {
+          "fact_id": "purpose",
+          "subject": "This note",
+          "verb": "explains",
+          "complement": "how to rotate a service token",
+          "role": "purpose",
+          "source": "token.txt",
+          "source_text": "The backup job uses a service token."
+        },
+        {
+          "fact_id": "ctx",
+          "subject": "The backup job",
+          "verb": "uses",
+          "object": "a service token",
+          "role": "context",
+          "source": "token.txt",
+          "source_text": "The backup job uses a service token."
+        },
+        {
+          "fact_id": "s1",
+          "subject": "",
+          "verb": "open",
+          "object": "the service settings",
+          "role": "step",
+          "order": 1,
+          "source": "token.txt",
+          "source_text": "Open the service settings."
+        },
+        {
+          "fact_id": "s2",
+          "subject": "",
+          "verb": "create",
+          "object": "a new token and copy it once",
+          "role": "step",
+          "order": 2,
+          "source": "token.txt",
+          "source_text": "Create a new token and copy it once."
+        },
+        {
+          "fact_id": "s3",
+          "subject": "",
+          "verb": "update",
+          "object": "the backup job with the new token",
+          "role": "step",
+          "order": 3,
+          "source": "token.txt",
+          "source_text": "Update the backup job with the new token."
+        },
+        {
+          "fact_id": "s4",
+          "subject": "",
+          "verb": "revoke",
+          "object": "the old token after a successful run",
+          "role": "step",
+          "order": 4,
+          "source": "token.txt",
+          "source_text": "Revoke the old token after a successful run."
+        },
+        {
+          "fact_id": "cav",
+          "subject": "",
+          "verb": "never store",
+          "object": "the token in the repository",
+          "role": "caveat",
+          "source": "token.txt",
+          "source_text": "Never store the token in the repository."
+        }
+      ],
+      "checks": {
+        "status": "ok",
+        "min_sentences": 5,
+        "min_paragraphs": 2,
+        "contains": [
+          "First",
+          "Finally",
+          "Never store"
+        ],
+        "max_copy_ratio": 0.75,
+        "max_sentence_words": 32,
+        "require_evidence": true
+      }
+    },
+    {
+      "id": "dialogue-backup",
+      "genre": "dialogue",
+      "prompt": "Tell me when the backup runs.",
+      "audience": "general",
+      "style": "plain",
+      "source_documents": [
+        {
+          "name": "dialogue.txt",
+          "text": "The backup runs every night at 2 a.m. The log is in the operations folder. I can also explain how to restore a file."
+        }
+      ],
+      "facts": [
+        {
+          "fact_id": "ack",
+          "subject": "I",
+          "verb": "can help",
+          "complement": "with that",
+          "role": "acknowledgement",
+          "source": "dialogue.txt",
+          "source_text": "I can also explain how to restore a file."
+        },
+        {
+          "fact_id": "answer",
+          "subject": "The backup",
+          "verb": "runs",
+          "complement": "every night at 2 a.m.",
+          "role": "answer",
+          "source": "dialogue.txt",
+          "source_text": "The backup runs every night at 2 a.m."
+        },
+        {
+          "fact_id": "follow",
+          "subject": "I",
+          "verb": "can also explain",
+          "complement": "how to restore a file",
+          "role": "follow_up",
+          "source": "dialogue.txt",
+          "source_text": "I can also explain how to restore a file."
+        }
+      ],
+      "checks": {
+        "status": "ok",
+        "min_sentences": 3,
+        "min_paragraphs": 2,
+        "contains": [
+          "I can help",
+          "2 a.m.",
+          "restore"
+        ],
+        "max_copy_ratio": 0.75,
+        "max_sentence_words": 32,
+        "require_evidence": true
+      }
+    },
+    {
       "id": "abstain-empty",
       "genre": "explanation",
       "prompt": "Explain a topic with no supplied facts.",

@@ -1,10 +1,14 @@
 # Phase 10 rule-complete generation and LLM-supervised rule development
 
-**Status:** started 2026-10-21. First rule-only vertical slice implemented; the
-full gate is open.
+**Status:** bounded lane completed 2026-10-21. Rule-only generation, SQL
+memory, teacher proposal loop, clean room, CLI, generalisation diagnostics, and
+automated comparison are measured; the full external gate is open.
 **Plan entry:** `docs/master_plan_to_final_state.md`, Phase 10.
 **Core files:** `crms_generation.py`, `crms_generation_rules.py`,
-`crms_generation_rules.json`, `experiments/v1_566_phase10_generation.py`.
+`crms_generation_rules.json`, `crms_composition_memory.py`,
+`crms_examiner.py`, `crms_generalisation.py`, `crms_generate.py`,
+`run_phase10_eval.py`, `run_phase10_teacher.py`,
+`run_phase10_comparison.py`, `run_phase10_external.py`.
 **No distilled model:** generation is deterministic rules, grammar, and search.
 An offline LLM may propose rules and exemplars; it never runs at answer time.
 
@@ -273,6 +277,37 @@ A copied release must generate identically with:
 - one-operation rollback;
 - provenance intact.
 
+### 11. Generalisation mechanisms
+
+What an LLM appears to generalise is largely what its training put in. Rules can
+be made to cover more than they were taught, without gradient training and
+without a model at answer time, through four deterministic mechanisms. All are
+stored in SQL, reproducible, and bypassable.
+
+| Mechanism | What it does | Prototype seed |
+|---|---|---|
+| Learned classes | Induce word and phrase classes from corpus co-occurrence and from the slots rules fill (agent-taking verbs, place nouns, months, genres). A rule over a class covers unseen members. Replaces the hand-written lexicon. | Verb-slot frames over a hand-written verb lexicon |
+| Back-off hierarchy | General-to-specific rule inheritance. A request matches the most specific rule and falls back to a more general one; the fallback path is recorded. | Anchor merging turned "municipality in" and "comune in" into "* in" |
+| Analogical matching | Nearest-example lookup over stored exemplars with a fixed similarity, used to propose a rule or construction for a novel input. Proposal only. | Rephrase-after-failure pattern mining |
+| Evidence-count weights | Explicit hits, misses, scope, and source counts rank competing rules. No hidden state; numbers live in SQL. | Per-frame good/bad counts that disable a bad frame |
+
+Safeguards (from master plan §5.7): a generalised rule starts `proposed`;
+counterexample search runs before activation; validation is source-disjoint; the
+class or back-off path is logged on every use; exact checks decide acceptance.
+The prototype's region-and-country place shortening is the cautionary case: it
+looked good on development questions and dropped required specificity on the
+blind set.
+
+**Rule-scaling curve.** On frozen task families, plot held-out coverage and
+confident-error rate against (a) training examples seen and (b) active rule
+count, from about 10^2 to 10^5. Run each mechanism on and off. Report coverage
+per training example, cost, and the slope against the section 2 thresholds. A
+plateau is diagnosed (missing rule, bad selection, missing knowledge, or
+evaluator error), not hidden. An earlier unsupervised measurement on Simple
+English Wikipedia found reusable relation frames growing about 5 to 6 points per
+tripling of training sentences without flattening; it is evidence that the
+curve is worth measuring, not evidence about this stack.
+
 ## Gate
 
 Thresholds are provisional until the baseline is frozen, then locked.
@@ -293,32 +328,47 @@ Thresholds are provisional until the baseline is frozen, then locked.
   failure attributed to missing rule, selection, knowledge, or evaluator.
 - **Learning:** three teacher-assisted rounds give ≥15% relative held-out gain
   with no confident-error increase.
+- **Generalisation:** rule-scaling curve with per-mechanism ablations; each
+  mechanism's held-out gain and confident-error change reported; no generalised
+  rule active without counterexample search and source-disjoint validation.
 - **Clean room:** no teacher, network, or originals; rules reload and roll back.
 
-## First vertical slice
+## Bounded lane
 
 Implemented:
 
 - generation contract and rule file;
 - content planner over structured propositions;
-- genre schemas for explanation, comparison, procedure, analysis, and summary;
+- genre schemas for all ten declared genres;
 - discourse/paragraph planning;
 - clause and sentence planning with a small construction grammar;
 - deterministic realizer;
 - clarity checks;
 - critic and candidate selection;
-- frozen evaluation experiment.
+- SQL snapshots, judgments, active selection, and rollback;
+- offline teacher proposal loop with accepted and rejected controls;
+- generalisation diagnostics: class hierarchy, back-off, report-only analogies,
+  evidence weights, and a fact-coverage curve;
+- clean-room copied rule/fixture run;
+- JSON-request CLI and `/compose PATH` chat command;
+- frozen evaluation experiment;
+- blind automated comparison against a hosted 70B-class proxy.
 
-This slice is intentionally narrow. It proves the stack and the output shape; it
-does not yet prove broad rule sufficiency, teacher-driven induction, SQL
-lifecycle, human calibration, or the full 300-prompt gate.
+This bounded lane proves the stack and the output shape. It does not yet prove
+broad rule sufficiency, human clarity calibration, or the full independent
+300-prompt gate.
 
-**First-slice result:** 7/7 frozen cases passed, mean copy ratio 0.00, mean 6.6
-sentences. Five of the ten declared genres are tested: explanation, comparison,
-procedure, analysis, and summary, plus abstention and clarification controls.
-The report records the other five as untested and every full-gate item as open.
-Copy ratio is a surface n-gram measure; the zero value reflects reworded source
-documents and structured propositions, not a semantic-novelty proof.
+**Bounded-lane result:** 12/12 frozen cases passed, covering all ten declared
+genres plus abstention and clarification controls. Mean copy ratio is **0.157**
+and mean length is **6.2** sentences. Copy ratio is a surface 5-gram measure;
+it is not a semantic-novelty proof. The teacher proposal loop accepted a clarity
+alignment with no regression and rejected a deliberately bad sentence cap. SQL
+snapshots, judgments, active selection, rollback, and clean-room reload pass.
+The automated 70B-class comparison scores CRMS adequacy **1.75/2**, clarity
+**1.90/2**, coverage **1.85/2**, and evidence **1.85/2** against the proxy's
+2.00, 2.00, 2.00, and 1.85; CRMS has three confident errors and the proxy six.
+Human clarity calibration, an independently authored 300-prompt suite over two
+source-disjoint corpora, and a measured 70B checkpoint remain open.
 
 ## Known limits
 
@@ -328,9 +378,14 @@ documents and structured propositions, not a semantic-novelty proof.
 - The lexicon is hand-seeded and small.
 - The critic uses heuristics; human/comprehension calibration is pending.
 - The evaluation set is small and project-authored.
-- No teacher loop or SQLite rule store is implemented yet.
+- The generalisation diagnostics cover classes, back-off, analogies, evidence
+  weights, and a small fact-coverage curve; the full 10^2–10^5 rule-scaling
+  curve and per-mechanism ablations are not measured.
+- Rater agreement is weak on clarity (kappa 0.0) and coverage (kappa -0.07);
+  the automated panel is not a substitute for humans.
 - Long-form coherence, humour, irony, and literary voice remain hard targets.
-- The 70B comparison is not yet run for this stack.
+- The 70B comparison is a hosted proxy with undisclosed parameter count, not a
+  measured 70B checkpoint.
 
 ## Open decisions
 
@@ -338,5 +393,6 @@ documents and structured propositions, not a semantic-novelty proof.
 2. Store generation rules inside the learned model file or beside it.
 3. Which model proposes and which model judges.
 4. Transcript/teacher-data retention policy.
-5. Whether future probabilistic rule weights are allowed; the first slice is
-   deterministic and weight-free.
+5. Evidence-count rule weights are proposed as allowed (explicit numbers in SQL,
+   reproducible, no hidden state); the first slice is weight-free. Probabilistic
+   or learned-similarity weights beyond counts remain undecided.

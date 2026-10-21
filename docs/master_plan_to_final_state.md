@@ -107,9 +107,9 @@ procedures; portable SQLite model; 533 regression experiments.
 | General breadth unproven | Phase 9 supported subset is 35/35, but independently authored literary breadth is 0/12 with one unsafe answer | Phase 9 follow-up |
 | Human external raters missing | Phase 9 used two automated model raters; no two independent humans have rated the frozen packet | Phase 9 follow-up |
 | 70B comparison is a proxy | Baseline is a hosted model with undisclosed parameter count, not a measured 70B checkpoint | Phase 9 follow-up |
-| Answers are retrieved sentences | Current chat still returns quoted whole sentences; the story path is five fixed templates and request frames are exact-token templates | Phase 10 rule-complete generation stack |
-| Rule sufficiency is unmeasured | No coverage matrix over genres, rhetorical moves, constructions, knowledge, or unseen combinations; no clarity/comprehension gate | Phase 10 rule-sufficiency and clarity gates |
-| LLM-guided improvement is manual | Rule and code fixes in the prototype were proposed and judged by hand in one session; no calibrated judge, no recorded loop | Phase 10 examiner loop |
+| Answers are retrieved sentences | Ordinary research chat still returns quoted whole sentences; the Phase 10 `/compose` path emits composed content only from structured propositions, not arbitrary source text | Phase 10 source-to-proposition intake and chat routing |
+| Rule sufficiency is only partially measured | 12 cases cover all 10 genres and 40 moves, with class/back-off/evidence diagnostics; the independent 300-prompt suite, two-corpus split, and full 10^2–10^5 scaling curve are open | Phase 10 rule-sufficiency and generalisation gates |
+| LLM-guided improvement lacks human calibration | The teacher proposal loop now records model/prompt/change and accepts only on frozen no-regression; the judge is automated and uncalibrated against humans | Phase 10 human judge calibration |
 | Conversation data unused | The feedback ledger is empty; rephrase-after-failure signals are not mined | Phase 10 conversation learning |
 
 ---
@@ -754,6 +754,40 @@ Workstreams and deliverables:
 10. **Packaging and clean room.** Rules reload from SQL; a copied release
     answers identically with no teacher, network, or original files; rollback is
     one operation; corpus and rule provenance survive the copy.
+11. **Generalisation and rule scaling** (`crms_generalisation.py`). Learned
+    lexical classes, back-off hierarchy, report-only analogical candidates, and
+    evidence-count weights. Publish a rule-scaling curve: coverage and
+    confident-error rate against training examples, fact counts, and rule counts,
+    with per-mechanism ablations. The curve makes the sufficiency assumption
+    testable instead of asserting that a finite rule set either can or cannot
+    generalise.
+11. **Generalisation mechanisms** (`crms_generalisation.py`). Make rules cover
+    more than they were taught, without gradient training or an answer-time
+    model. What an LLM appears to generalise is largely what its training put
+    in; rules can be built to reach the same regularities through four
+    deterministic mechanisms, all stored in SQL and inspectable:
+    - **Learned classes.** Induce word and phrase classes from corpus
+      co-occurrence and from the slots rules fill (verbs taking an agent
+      phrase, place nouns, month names, genres). A rule over a class covers
+      members it was never taught; the hand-written verb lexicon is replaced by
+      induced classes.
+    - **Back-off hierarchy.** General-to-specific rule inheritance; a request
+      matches the most specific applicable rule and falls back to a more
+      general one. Every fallback is recorded.
+    - **Analogical matching.** Nearest-example lookup over stored exemplars with
+      a fixed, reproducible similarity, used to propose a rule or construction
+      for a novel input. Proposal only.
+    - **Evidence-count weights.** Explicit hits, misses, scope, and source
+      counts rank competing rules; weights are numbers in SQL with no hidden
+      state.
+
+    A generalised rule starts `proposed`, requires counterexample search and
+    source-disjoint validation before activation, records the class or back-off
+    path on every use, and can be bypassed. Exact checks still decide
+    acceptance. **Rule-scaling curve:** on frozen task families, plot held-out
+    coverage and confident-error rate against training examples seen and against
+    active rule count (about 10² to 10⁵), with each mechanism ablated on and off,
+    and report coverage per training example and cost beside the §2 thresholds.
 
 **Gate** (thresholds provisional until the baseline is frozen, then locked):
 - **Faithfulness:** 100% of factual clauses resolve to a cited span; relation,
@@ -777,25 +811,37 @@ Workstreams and deliverables:
   knowledge domains; unseen-combination and ablation tests; every failure
   attributed to missing rule, bad selection, missing knowledge, or evaluator
   error.
+- **Generalisation:** class hierarchy and back-off published; analogical
+  candidates report-only; evidence weights inspectable; rule-scaling curve
+  covers fact count, rule count, and per-mechanism ablations, with confident
+  errors reported separately.
 - **Learning efficacy:** three teacher-assisted rule rounds give ≥15% relative
   held-out gain with no confident-error increase; teacher calls and human
   minutes are reported.
+- **Generalisation:** the rule-scaling curve is published with per-mechanism
+  ablations; each mechanism's held-out gain and confident-error change are
+  reported; no generalised rule is active without counterexample search and
+  source-disjoint validation; a plateau is diagnosed, not hidden.
 - **Clean room:** copied release answers identically with no LLM, network, or
   originals; rules reload and roll back; CPU-only packaging stays within budget.
 
-**Status (2026-10-21): Phase 10 started; gate open.** The first vertical slice
-is the rule-only generation stack: contract, content planner, discourse plan,
-sentence plan, construction realizer, clarity/critic, and a frozen evaluation
-fixture. The earlier external prototype is retained as design evidence only; it
-is not accepted as a gate result. Initial implementation lives in
-`crms_generation.py`, `crms_generation_rules.py`,
-`crms_generation_rules.json`, and `experiments/v1_566_phase10_generation.py`.
-The first slice deliberately covers a small declared genre set; breadth,
-teacher-driven rule induction, SQL lifecycle, human calibration, and the full
-gate remain open. Measured first slice: **7/7** frozen cases, mean copy ratio
-**0.00**, mean **6.6** sentences; explanation, comparison, procedure, analysis,
-and summary tested, with abstention and clarification controls. Five declared
-genres and every full-gate item remain untested/open.
+**Status (2026-10-21): bounded Phase 10 lane completed; full external gate
+open.** The rule-only stack is implemented: generation contract, content
+planner, discourse plan, sentence plan, construction realizer, clarity/critic,
+candidate search, SQL snapshot memory, offline teacher proposal loop, clean-room
+copy, CLI, `/compose` chat path, generalisation diagnostics, and frozen
+evaluation. Measured bounded lane: **12/12** frozen cases
+across **all 10 declared genres**, mean copy ratio **0.157**, mean **6.2**
+sentences, with abstention and clarification controls. A teacher-proposed
+clarity alignment was accepted with no regression; a deliberately bad sentence
+cap was rejected. SQL snapshots, judgments, active selection, rollback, and
+clean-room reload pass. The automated 70B-class comparison scores CRMS adequacy
+**1.75/2**, clarity **1.90/2**, coverage **1.85/2**, evidence **1.85/2**, and
+three confident errors versus the proxy's 2.00, 2.00, 2.00, 1.85, and six.
+Open: human clarity calibration, an independently authored 300-prompt suite over
+two source-disjoint corpora, and a measured 70B checkpoint. The bounded gate
+report is `experiments/reports/phase10_external.json`; the full gate remains
+false by construction.
 
 
 ---
@@ -867,6 +913,7 @@ counts and rates; never collapse into one "score".
 | Teacher knowledge leaks into facts | An LLM-proposed label or rule asserts something not in a source | Facts only from cited spans; teacher proposals carry provenance and enter as proposals |
 | LLM patch regresses the system | A proposed code change fixes one failure and breaks others | Branch + full-suite diff vs unmodified baseline, human review, no auto-merge |
 | Conversation privacy | Transcripts hold personal data | Local opt-in, redaction, retention limit, no export without consent |
+| Overgeneralisation | A learned class or back-off rule covers cases it should not, as the region-and-country place shortening did in the prototype | Propose-only, counterexample search before activation, source-disjoint blind set, record the class/back-off path on every use, one-operation rollback |
 | Scope creep | New feature without a gate | Reject; the 533-experiment habit is the main delivery risk |
 
 **Kill criteria are part of the plan.** A lane that misses its gate twice is
@@ -949,12 +996,14 @@ redesigned or dropped.
    failure taxonomy, limitations, and licence inventory. — bounded lane done
    (`run_phase9_eval.py`, `experiments/reports/phase9_external.json`); human
    raters, a measured 70B checkpoint, and the full §2 scale gate remain open.
-17. **Phase 10 grounded generation and LLM-supervised learning** — grounded
-   composer, clause-level answer verifier, composition memory in SQL, examiner
-   loop with calibrated judge, reward signal from deterministic verifiers,
-   conversation learning, and a gated code-patch tier. — planned; prototype
-   evidence only (`docs/design_phase10_generation_learning.md`); the decision
-   amendment needs owner sign-off before implementation starts.
+17. **Phase 10 rule-complete generation and LLM-supervised rule development**
+   — content/discourse/sentence planners, construction grammar and realizer,
+   clarity/style revision, critic/search, rule induction and SQL lifecycle,
+   generalisation workstream, frozen coverage/clarity/copy evaluation, and 70B
+   comparison. — bounded lane complete: 12/12 cases, all 10 genres,
+   teacher/SQL/clean-room/automated comparison
+   (`experiments/reports/phase10_external.json`); human, independent-300,
+   two-corpus, and measured-70B gates open.
 18. **Consolidate plan docs** — this file is canonical; link the others as
    history. — canonical status recorded; remaining docs still need pruning.
 
@@ -1008,3 +1057,5 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Phase 8 gate measured: 12/12 clean-room release tasks, zero unsafe answers, 100% licence coverage, 6 dependency nodes/5 edges, 1 registry rule, 1 correction, 167,936-byte release, 0.41s build, 4.27s scoring, 0.31s median task, 0.58s p95, originals hidden | `experiments/reports/phase8_release.json`, `corpus/phase8_eval/fixture.json` |
 | 2026-10-21 | Phase 9 external validation: frozen supported subset 35/35 with zero unsafe answers; independent model-authored literary breadth 0/12 with one unsafe answer; two automated raters (adequacy agreement 0.90/kappa 0.75, evidence 0.65/0.16); blind 10-probe hosted 70B-class comparison; failure taxonomy, limitations, and 10-document licence inventory published | `run_phase9_eval.py`, `experiments/v1_565_phase9_external.py`, `experiments/reports/phase9_external.json`, `docs/design_phase9_external.md`, `docs/phase9_failure_taxonomy.md`, `docs/phase9_limitations.md`, `corpus/phase9_eval/` |
 | 2026-10-21 | Phase 10 re-scoped to rule-complete generation: declared genres, content/discourse/sentence planning, construction grammar realizer, clarity/style revision, critic/search, LLM-supervised rule induction, no LLM at inference. First rule-only vertical slice and frozen generation evaluation added; gate open | `crms_generation.py`, `crms_generation_rules.py`, `crms_generation_rules.json`, `experiments/v1_566_phase10_generation.py`, `docs/design_phase10_generation_learning.md` |
+| 2026-10-21 | Phase 10 gains a generalisation workstream: learned classes, back-off hierarchy, analogical matching proposals, and evidence-count weights, with a rule-scaling curve (coverage and confident errors against training examples and rule count, per-mechanism ablations) and a gate item; the rationale is that LLM generalisation largely reflects training coverage, so rules can be made to reach it deterministically | `docs/design_phase10_generation_learning.md`, `docs/master_plan_to_final_state.md` |
+| 2026-10-21 | Phase 10 bounded lane completed: 12/12 cases across all 10 genres, mean copy 0.157; SQL snapshots/rollback; accepted teacher clarity proposal and rejected negative control; clean-room reload; `/compose` chat path; class/back-off/analogy/evidence generalisation diagnostics; automated 70B-class comparison (CRMS adequacy 1.75 vs 2.00, clarity 1.90 vs 2.00, coverage 1.85 vs 2.00); human/independent-300/two-corpus/measured-70B gates open | `crms_generation.py`, `crms_composition_memory.py`, `crms_examiner.py`, `crms_generate.py`, `run_phase10_eval.py`, `run_phase10_teacher.py`, `run_phase10_comparison.py`, `run_phase10_external.py`, `experiments/reports/phase10_external.json` |

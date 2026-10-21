@@ -1,0 +1,107 @@
+{
+  "format": "crms-phase10-comparison-packet",
+  "version": 1,
+  "instructions": "Rate response_a and response_b independently on five dimensions. evidence_validity: 2 fully supported by sources or shown reasoning, 1 partly supported, 0 unsupported. answer_adequacy: 2 fully answers, 1 partly, 0 not. clarity: 2 easy to follow, 1 uneven, 0 unclear. coverage: 2 covers all important requested content, 1 partly, 0 misses it. confident_error: true when an unsupported or false claim is stated with confidence. Return only a JSON array.",
+  "items": [
+    {
+      "item_id": "explain-sky",
+      "genre": "explanation",
+      "task": "Explain why the sky is blue.",
+      "sources": {
+        "sky.txt": "During the day the sky appears blue. Sunlight is made of many colours. Gases in the air deflect short wavelengths more than long ones. Blue is a short-wavelength colour. That scattered blue reaches the eye from every direction. The effect is known as Rayleigh scattering. Near sunset sunlight crosses more air. The same effect explains the changing colours at sunset."
+      },
+      "response_a": "The sky appears blue during the day because of a phenomenon called Rayleigh scattering. Sunlight looks white, but it is actually made up of many different colours, each with its own wavelength.\n\nAs sunlight passes through the atmosphere, gases in the air deflect short wavelengths more strongly than long ones. Blue light has a short wavelength, so it is scattered much more than the other colours. This scattered blue light reaches our eyes from every direction, making the whole sky look blue.\n\nThe same effect also explains the colours at sunset. When the sun is low on the horizon, its light has to cross a much greater thickness of air to reach us. More of the blue light is scattered away along the way, leaving the longer wavelengths — the reds and oranges — to dominate the sky near the setting sun.",
+      "response_b": "The sky looks blue because the atmosphere scatters blue light more strongly than red light. Sunlight contains all colours. The atmosphere scatters short wavelengths more strongly than long wavelengths.\n\nBecause blue light has a short wavelength, it is scattered across the sky. This scattering is called Rayleigh scattering.\n\nHowever, light travels through more atmosphere at sunset. Blue light is scattered away and leaves reds and oranges. In short, this is why the sky looks blue during the day and red at sunset."
+    },
+    {
+      "item_id": "compare-energy",
+      "genre": "comparison",
+      "task": "Compare solar and wind power.",
+      "sources": {
+        "energy.txt": "Solar panels turn sunlight into electricity. Wind turbines convert moving air into electricity. Solar output depends on sun and cloud. Wind output depends on how fast the wind blows. Solar farms need a lot of space. Wind farms can coexist with agriculture. Combining the two sources can smooth output."
+      },
+      "response_a": "Solar and wind power are both renewable sources that generate electricity from natural forces, but they do so in different ways. Solar panels convert sunlight directly into electricity, while wind turbines capture the energy of moving air and turn it into electrical power.\n\nTheir output depends on different conditions. Solar generation varies with sunshine and cloud cover, whereas wind generation depends on how fast the wind is blowing. This means each source has its own patterns of variability.\n\nThe two also differ in their land requirements. Solar farms need a lot of space to operate effectively, while wind farms can coexist with agriculture, allowing the land between turbines to remain in productive use.\n\nBecause they rely on different resources, combining solar and wind can smooth overall output, helping to offset periods when one source is producing less than usual.",
+      "response_b": "Solar power produces electricity from sunlight. Solar farms require large areas of land. Wind power produces electricity from moving air. Wind farms can share land with farming.\n\nBy contrast, solar output varies with daylight and weather, whereas wind output varies with wind speed. Overall, a mix of solar and wind can balance their different output patterns."
+    },
+    {
+      "item_id": "procedure-tea",
+      "genre": "procedure",
+      "task": "How do I make tea?",
+      "sources": {
+        "tea.txt": "Brewing tea is the aim. Gather tea, water and a cup. Warm the water without boiling it hard. Put leaves into the cup. Add the hot water. Leave it to steep. Over-steeping green tea makes it bitter. Check the strength before serving."
+      },
+      "response_a": "To make tea, start by gathering your tea leaves, water, and a cup. The basic process is simple: heat the water, add the leaves, and let everything steep together until the tea reaches the strength you want.\n\nWarm the water carefully — you want it hot but not boiled hard. Put the tea leaves into your cup, then pour the hot water over them and leave the tea to steep.\n\nTiming matters, especially for green tea: over-steeping makes it bitter, so don't let it sit too long. Before serving, check the strength of the tea and pour or remove the leaves once it tastes right to you.",
+      "response_b": "The goal is to brew a cup of tea. You need tea leaves, hot water, and a cup.\n\nFirst, heat the water to just below boiling. Then, place the tea leaves in the cup. Then, pour the hot water over the leaves. Finally, steep for three to five minutes.\n\nRemember, do not steep green tea for too long or it becomes bitter. Taste the tea and adjust the strength if needed."
+    },
+    {
+      "item_id": "analysis-remote",
+      "genre": "analysis",
+      "task": "Analyze the trade-offs of remote work.",
+      "sources": {
+        "work.txt": "Remote work saves commuting and allows flexible hours. Many surveys find remote workers are more satisfied. Remote arrangements may reduce casual collaboration and mentoring. Whether remote work helps depends on the work and the people. Teams that seldom meet may become less creative. Hybrid work can keep flexibility and protect collaboration."
+      },
+      "response_a": "Remote work can reduce commuting time and increase schedule flexibility. Remote work can weaken informal collaboration and mentoring. Surveys often report higher satisfaction among remote workers.\n\nThe net benefit depends on the task and the team. However, some teams lose creativity when they rarely meet in person. Overall, a hybrid arrangement can preserve flexibility while protecting collaboration.",
+      "response_b": "Remote work offers clear benefits, primarily around time and flexibility. Eliminating the commute saves hours each week, and flexible scheduling lets workers adapt their day to personal needs. These advantages show up in the data: many surveys find remote workers report higher job satisfaction.\n\nThere are meaningful downsides, however. Remote arrangements can reduce casual collaboration and mentoring, since spontaneous conversations and in-person guidance happen less often. Teams that seldom meet may become less creative, losing the exchange of ideas that face-to-face interaction tends to spark.\n\nCrucially, whether remote work helps depends on the work and the people involved — it is not universally better or worse. The type of tasks a team performs and individual preferences for isolation versus social contact determine how the trade-offs play out in practice.\n\nA hybrid arrangement can offer a middle path, keeping the flexibility that remote work provides while protecting the collaboration that purely remote setups tend to weaken. For organizations weighing the trade-offs, hybrid work balances both sides rather than forcing a choice between them."
+    },
+    {
+      "item_id": "summary-report",
+      "genre": "summary",
+      "task": "Summarize the report on remote work.",
+      "sources": {
+        "report.txt": "The study concludes that flexibility is a major benefit of remote work, though collaboration can suffer. Employee surveys point to greater satisfaction. Managers describe fewer informal mentoring moments. Outcomes vary by task and team. Combining office and remote days may retain the advantages."
+      },
+      "response_a": "The report examines remote work and finds that flexibility stands out as its major benefit, though collaboration can suffer. Outcomes are not uniform — they vary depending on the task and the team involved.\n\nEvidence comes from two perspectives. Employee surveys point to greater satisfaction with remote arrangements, while managers report fewer informal mentoring moments, suggesting some workplace development happens less naturally outside the office.\n\nTo balance these trade-offs, the report suggests that combining office and remote days may retain the advantages of both setups — keeping the flexibility and satisfaction employees value while preserving the collaboration and mentoring that thrive in person.",
+      "response_b": "The report finds that remote work improves flexibility but can weaken collaboration. Surveys report higher satisfaction among remote workers. Managers report fewer informal mentoring moments.\n\nHowever, the effect depends on the task and the team. In short, a hybrid arrangement may preserve both benefits."
+    },
+    {
+      "item_id": "argument-remote",
+      "genre": "argument",
+      "task": "Argue whether remote work should remain an option.",
+      "sources": {
+        "argument.txt": "Knowledge workers can do many tasks remotely. Commuting consumes time and money. Studies link remote work with higher satisfaction. Casual mentoring can suffer when teams rarely meet. Planned in-person time can protect mentoring. A hybrid policy can keep the main benefits."
+      },
+      "response_a": "Remote work should remain an option for knowledge workers. Remote work reduces commuting time and cost. Surveys link remote work with higher satisfaction.\n\nHowever, casual mentoring can suffer when teams rarely meet. Planned in-person time can protect mentoring. Overall, a hybrid policy can keep the main benefits.",
+      "response_b": "Remote work should remain an option, because the evidence favors keeping flexibility rather than reverting to full-time office work. Many knowledge workers can complete their tasks effectively from home, and eliminating that option would force them back into commuting — an activity that consumes both time and money without adding value to their work or their employers'.\n\nThe case is strengthened by what the research shows about wellbeing: studies link remote work with higher employee satisfaction. Satisfaction matters in its own right, but it also tends to affect retention and morale, meaning a blanket return to the office could cost organizations talented workers who now expect flexibility.\n\nThe legitimate concern is that casual mentoring can suffer when teams rarely meet in person. However, this problem has a targeted solution: planned in-person time can protect mentoring relationships without requiring everyone to be in the office every day. The drawback is real but manageable, not a reason to remove the option entirely.\n\nOn balance, a hybrid policy captures the main benefits of both arrangements — remote flexibility, saved commuting costs, and higher satisfaction, alongside deliberately scheduled face-to-face time for mentoring and collaboration. Remote work should therefore remain an option, structured within a hybrid framework that safeguards the human connections that purely remote teams risk losing."
+    },
+    {
+      "item_id": "professional-hybrid",
+      "genre": "professional",
+      "task": "Write a short internal note recommending a hybrid schedule.",
+      "sources": {
+        "memo.txt": "The team works remotely three days each week. Collaboration is strongest on Tuesdays. Managers need a predictable core-hours window. Scheduling conflicts should be reported by Friday."
+      },
+      "response_a": "The purpose of this note is to recommend a hybrid schedule. The team works remotely three days each week. Collaboration is strongest on Tuesdays.\n\nWe should reserve Tuesdays for in-person collaboration. Managers should publish core hours by Friday. Please reply with any scheduling conflicts.",
+      "response_b": "**Internal Note: Recommended Hybrid Schedule**\n\n**Proposal.** Keep the team remote three days per week, as we do today, and anchor the two in-office days around Tuesday, when collaboration is strongest. Pairing Tuesday with Thursday gives us a mid-week rhythm: Tuesday for shared working sessions and cross-team problem solving, Thursday for follow-through, with Monday and Wednesday remote for focused work and Friday remote to close out the week.\n\n**Core hours.** To give managers the predictability they need, set a single core-hours window of 10:00–15:00 that applies on all five days, whether in-office or remote. Meetings, reviews, and pairing are scheduled inside the window; time outside it stays flexible for deep work and for colleagues in other time zones. Core hours on Tuesday and Thursday should be treated as firm, since those are the days the whole team is together.\n\n**Conflicts and next steps.** Scheduling conflicts should be reported by Friday for the following week, so managers can resolve overlaps before Monday and the schedule stays stable. I suggest we run this pattern for one quarter, then review it against collaboration quality and delivery, adjusting the second in-office day if Thursday proves less useful than an alternative."
+    },
+    {
+      "item_id": "narrative-library",
+      "genre": "narrative",
+      "task": "Write a short story about a library discovery.",
+      "sources": {
+        "story.txt": "Mira discovered an old brass key among the library shelves. It unlocked a room that had been closed for years. The room held letters about a lost expedition. The letters pointed across the town. Mira traced them to an abandoned observatory. The expedition records eventually returned to the museum. Mira now saw the town as a map of unfinished stories."
+      },
+      "response_a": "The brass key was wedged between two volumes Mira had been reshelving all afternoon, cold and oddly heavy for its size. She almost logged it as lost property, but something about its old-fashioned teeth made her try it on the door at the end of the east stairwell — the one the head librarian always called \"the storage room,\" and never opened. The lock turned as though it had been waiting.\n\nInside, dust lay unbroken over crates of papers, and on top, fanned out like a hand of cards, were letters. They belonged to an expedition that had left town decades ago and never properly returned: field notes, arguments over routes, a sketch of a hilltop with a dome. Each letter referenced a place in town — the mill, the old road, the ridge. Mira spent the next week following them, and they led her, one by one, to an abandoned observatory with its shuttered eye turned toward the sky.\n\nThe records she found there, once the museum had them cleaned and catalogued, filled a whole display case: a lost expedition, recovered by a girl with a key and stubborn shoes. But the strangest change was in Mira herself. Walking home afterward, she saw the town differently now — not as streets and buildings, but as a map of unfinished stories, each one waiting for someone to notice the key hidden in plain sight.",
+      "response_b": "Mira found a brass key in the library. The key opened a room that had been sealed for years.\n\nShe found letters describing a missing expedition. Each letter pointed to a different part of the town. She followed the clues to the old observatory.\n\nThe expedition records were returned to the museum. Mira began to see the town as a map of unfinished stories."
+    },
+    {
+      "item_id": "technical-token",
+      "genre": "technical_note",
+      "task": "Explain how to rotate a service token.",
+      "sources": {
+        "token.txt": "The backup job uses a service token. Open the service settings. Create a new token and copy it once. Update the backup job with the new token. Revoke the old token after a successful run. Never store the token in the repository."
+      },
+      "response_a": "This note explains how to rotate a service token. The backup job uses a service token.\n\nFirst, open the service settings. Then, create a new token and copy it once. Then, update the backup job with the new token. Finally, revoke the old token after a successful run.\n\nHowever, never store the token in the repository.",
+      "response_b": "Rotating a service token means replacing the token your backup job currently uses with a freshly generated one, without leaving the job broken in the process. In this case, the backup job authenticates with a service token, so the rotation happens in the service settings where that token is managed.\n\nThe procedure is straightforward. First, open the service settings and create a new token, copying it immediately — tokens are typically shown only once at creation time. Next, update the backup job to use the new token. Let the job run and confirm it succeeds with the new credentials before doing anything destructive.\n\nOnly after a successful run should you revoke the old token. This ordering matters: if you revoke first and the new token was misconfigured or the job wasn't updated correctly, the backup job would fail with no way to authenticate, potentially leaving you without backups during that window. Revoking the old token last ensures a seamless handover.\n\nFinally, treat the token as a secret at every step. Never store it in the repository — not in code, config files, or commit history. Keep it in whatever secure storage or secret mechanism your environment provides, and only paste it where the backup job actually needs it."
+    },
+    {
+      "item_id": "dialogue-backup",
+      "genre": "dialogue",
+      "task": "Tell me when the backup runs.",
+      "sources": {
+        "dialogue.txt": "The backup runs every night at 2 a.m. The log is in the operations folder. I can also explain how to restore a file."
+      },
+      "response_a": "I can help with that. The backup runs every night at 2 a.m.\n\nI can also explain how to restore a file.",
+      "response_b": "Based on the information provided, the backup runs every night at 2 a.m. This is a recurring, automated schedule, so backups happen daily at the same time.\n\nIf you need to review the backup activity, the log is stored in the operations folder. You can check it there to confirm that each nightly run completed as expected.\n\nAdditionally, if you ever need to recover something from a backup, there is support available to explain how to restore a file. Just ask and the restore process can be walked through with you."
+    }
+  ]
+}

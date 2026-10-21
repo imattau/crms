@@ -1263,6 +1263,1126 @@
       "text": "The report finds that remote work improves flexibility but can weaken collaboration. Surveys report higher satisfaction among remote workers. Managers report fewer informal mentoring moments.\n\nHowever, the effect depends on the task and the team. In short, a hybrid arrangement may preserve both benefits."
     },
     {
+      "candidate_scores": [
+        {
+          "passed": true,
+          "score": 0.8442,
+          "style": "plain"
+        },
+        {
+          "passed": true,
+          "score": 0.8442,
+          "style": "explanatory"
+        },
+        {
+          "passed": true,
+          "score": 0.8122,
+          "style": "concise"
+        }
+      ],
+      "content_plan": {
+        "genre": "argument",
+        "missing": [],
+        "notes": [
+          "Every required move has at least one proposition."
+        ],
+        "sections": [
+          {
+            "facts": [
+              "t"
+            ],
+            "move": "thesis",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "r1",
+              "e1"
+            ],
+            "move": "reasons",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "o1"
+            ],
+            "move": "objection",
+            "required": false,
+            "transition": "However"
+          },
+          {
+            "facts": [
+              "resp"
+            ],
+            "move": "response",
+            "required": false,
+            "transition": null
+          },
+          {
+            "facts": [
+              "con"
+            ],
+            "move": "conclusion",
+            "required": false,
+            "transition": "Overall"
+          }
+        ],
+        "status": "ok"
+      },
+      "critique": {
+        "avg_sentence_words": 7.83,
+        "copy_ratio": 0.3721,
+        "coverage": 1.0,
+        "evidence_valid": true,
+        "issues": [],
+        "max_sentence_words": 9,
+        "multi_fact_sentences": 0,
+        "paragraph_count": 2,
+        "passed": true,
+        "score": 0.8442,
+        "sentence_count": 6
+      },
+      "evidence": [
+        {
+          "fact_id": "t",
+          "role": "thesis",
+          "source": "argument.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "r1",
+          "role": "reason",
+          "source": "argument.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "e1",
+          "role": "evidence",
+          "source": "argument.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "o1",
+          "role": "objection",
+          "source": "argument.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "resp",
+          "role": "response",
+          "source": "argument.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "con",
+          "role": "conclusion",
+          "source": "argument.txt",
+          "span": ""
+        }
+      ],
+      "failures": [],
+      "genre": "argument",
+      "id": "argument-remote",
+      "passed": true,
+      "prompt": "Argue whether remote work should remain an option.",
+      "sentence_plans": [
+        {
+          "fact_ids": [
+            "t"
+          ],
+          "main": {
+            "complement": "an option for knowledge workers",
+            "fact_id": "t",
+            "object": "",
+            "source": "argument.txt",
+            "span": "",
+            "subject": "Remote work",
+            "verb": "should remain"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "r1"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "r1",
+            "object": "commuting time and cost",
+            "source": "argument.txt",
+            "span": "",
+            "subject": "Remote work",
+            "verb": "reduces"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "e1"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "e1",
+            "object": "remote work with higher satisfaction",
+            "source": "argument.txt",
+            "span": "",
+            "subject": "Surveys",
+            "verb": "link"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "o1"
+          ],
+          "main": {
+            "complement": "when teams rarely meet",
+            "fact_id": "o1",
+            "object": "",
+            "source": "argument.txt",
+            "span": "",
+            "subject": "Casual mentoring",
+            "verb": "can suffer"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": "However"
+        },
+        {
+          "fact_ids": [
+            "resp"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "resp",
+            "object": "mentoring",
+            "source": "argument.txt",
+            "span": "",
+            "subject": "Planned in-person time",
+            "verb": "can protect"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "con"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "con",
+            "object": "the main benefits",
+            "source": "argument.txt",
+            "span": "",
+            "subject": "A hybrid policy",
+            "verb": "can keep"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": "Overall"
+        }
+      ],
+      "status": "ok",
+      "style": "plain",
+      "text": "Remote work should remain an option for knowledge workers. Remote work reduces commuting time and cost. Surveys link remote work with higher satisfaction.\n\nHowever, casual mentoring can suffer when teams rarely meet. Planned in-person time can protect mentoring. Overall, a hybrid policy can keep the main benefits."
+    },
+    {
+      "candidate_scores": [
+        {
+          "passed": true,
+          "score": 0.8662,
+          "style": "plain"
+        },
+        {
+          "passed": true,
+          "score": 0.8662,
+          "style": "explanatory"
+        },
+        {
+          "passed": true,
+          "score": 0.8662,
+          "style": "concise"
+        }
+      ],
+      "content_plan": {
+        "genre": "professional",
+        "missing": [],
+        "notes": [
+          "Every required move has at least one proposition."
+        ],
+        "sections": [
+          {
+            "facts": [
+              "purpose"
+            ],
+            "move": "purpose",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "ctx1",
+              "ctx2"
+            ],
+            "move": "context",
+            "required": false,
+            "transition": null
+          },
+          {
+            "facts": [
+              "act1",
+              "act2"
+            ],
+            "move": "action",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "close"
+            ],
+            "move": "closing",
+            "required": false,
+            "transition": null
+          }
+        ],
+        "status": "ok"
+      },
+      "critique": {
+        "avg_sentence_words": 7.33,
+        "copy_ratio": 0.225,
+        "coverage": 1.0,
+        "evidence_valid": true,
+        "issues": [],
+        "max_sentence_words": 11,
+        "multi_fact_sentences": 0,
+        "paragraph_count": 2,
+        "passed": true,
+        "score": 0.8662,
+        "sentence_count": 6
+      },
+      "evidence": [
+        {
+          "fact_id": "purpose",
+          "role": "purpose",
+          "source": "memo.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "ctx1",
+          "role": "context",
+          "source": "memo.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "ctx2",
+          "role": "context",
+          "source": "memo.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "act1",
+          "role": "action",
+          "source": "memo.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "act2",
+          "role": "action",
+          "source": "memo.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "close",
+          "role": "closing",
+          "source": "memo.txt",
+          "span": ""
+        }
+      ],
+      "failures": [],
+      "genre": "professional",
+      "id": "professional-hybrid",
+      "passed": true,
+      "prompt": "Write a short internal note recommending a hybrid schedule.",
+      "sentence_plans": [
+        {
+          "fact_ids": [
+            "purpose"
+          ],
+          "main": {
+            "complement": "to recommend a hybrid schedule",
+            "fact_id": "purpose",
+            "object": "",
+            "source": "memo.txt",
+            "span": "",
+            "subject": "The purpose of this note",
+            "verb": "is"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "ctx1"
+          ],
+          "main": {
+            "complement": "remotely three days each week",
+            "fact_id": "ctx1",
+            "object": "",
+            "source": "memo.txt",
+            "span": "",
+            "subject": "The team",
+            "verb": "works"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "ctx2"
+          ],
+          "main": {
+            "complement": "strongest on Tuesdays",
+            "fact_id": "ctx2",
+            "object": "",
+            "source": "memo.txt",
+            "span": "",
+            "subject": "Collaboration",
+            "verb": "is"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "act1"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "act1",
+            "object": "Tuesdays for in-person collaboration",
+            "source": "memo.txt",
+            "span": "",
+            "subject": "We",
+            "verb": "should reserve"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "act2"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "act2",
+            "object": "core hours by Friday",
+            "source": "memo.txt",
+            "span": "",
+            "subject": "Managers",
+            "verb": "should publish"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "close"
+          ],
+          "main": {
+            "complement": "with any scheduling conflicts",
+            "fact_id": "close",
+            "object": "",
+            "source": "memo.txt",
+            "span": "",
+            "subject": "",
+            "verb": "Please reply"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        }
+      ],
+      "status": "ok",
+      "style": "plain",
+      "text": "The purpose of this note is to recommend a hybrid schedule. The team works remotely three days each week. Collaboration is strongest on Tuesdays.\n\nWe should reserve Tuesdays for in-person collaboration. Managers should publish core hours by Friday. Please reply with any scheduling conflicts."
+    },
+    {
+      "candidate_scores": [
+        {
+          "passed": true,
+          "score": 0.885,
+          "style": "plain"
+        },
+        {
+          "passed": true,
+          "score": 0.885,
+          "style": "explanatory"
+        },
+        {
+          "passed": true,
+          "score": 0.885,
+          "style": "concise"
+        }
+      ],
+      "content_plan": {
+        "genre": "narrative",
+        "missing": [],
+        "notes": [
+          "Every required move has at least one proposition."
+        ],
+        "sections": [
+          {
+            "facts": [
+              "setup"
+            ],
+            "move": "setup",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "inciting"
+            ],
+            "move": "inciting",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "esc1",
+              "esc2"
+            ],
+            "move": "escalation",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "climax"
+            ],
+            "move": "climax",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "resolution"
+            ],
+            "move": "resolution",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "change"
+            ],
+            "move": "change",
+            "required": false,
+            "transition": null
+          }
+        ],
+        "status": "ok"
+      },
+      "critique": {
+        "avg_sentence_words": 9.14,
+        "copy_ratio": 0.1,
+        "coverage": 1.0,
+        "evidence_valid": true,
+        "issues": [],
+        "max_sentence_words": 12,
+        "multi_fact_sentences": 0,
+        "paragraph_count": 3,
+        "passed": true,
+        "score": 0.885,
+        "sentence_count": 7
+      },
+      "evidence": [
+        {
+          "fact_id": "setup",
+          "role": "setup",
+          "source": "story.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "inciting",
+          "role": "inciting",
+          "source": "story.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "esc1",
+          "role": "escalation",
+          "source": "story.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "esc2",
+          "role": "escalation",
+          "source": "story.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "climax",
+          "role": "climax",
+          "source": "story.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "resolution",
+          "role": "resolution",
+          "source": "story.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "change",
+          "role": "change",
+          "source": "story.txt",
+          "span": ""
+        }
+      ],
+      "failures": [],
+      "genre": "narrative",
+      "id": "narrative-library",
+      "passed": true,
+      "prompt": "Write a short story about a library discovery.",
+      "sentence_plans": [
+        {
+          "fact_ids": [
+            "setup"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "setup",
+            "object": "a brass key in the library",
+            "source": "story.txt",
+            "span": "",
+            "subject": "Mira",
+            "verb": "found"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "inciting"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "inciting",
+            "object": "a room that had been sealed for years",
+            "source": "story.txt",
+            "span": "",
+            "subject": "The key",
+            "verb": "opened"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "esc1"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "esc1",
+            "object": "letters describing a missing expedition",
+            "source": "story.txt",
+            "span": "",
+            "subject": "She",
+            "verb": "found"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "esc2"
+          ],
+          "main": {
+            "complement": "to a different part of the town",
+            "fact_id": "esc2",
+            "object": "",
+            "source": "story.txt",
+            "span": "",
+            "subject": "Each letter",
+            "verb": "pointed"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "climax"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "climax",
+            "object": "the clues to the old observatory",
+            "source": "story.txt",
+            "span": "",
+            "subject": "She",
+            "verb": "followed"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "resolution"
+          ],
+          "main": {
+            "complement": "to the museum",
+            "fact_id": "resolution",
+            "object": "",
+            "source": "story.txt",
+            "span": "",
+            "subject": "The expedition records",
+            "verb": "were returned"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "change"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "change",
+            "object": "the town as a map of unfinished stories",
+            "source": "story.txt",
+            "span": "",
+            "subject": "Mira",
+            "verb": "began to see"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        }
+      ],
+      "status": "ok",
+      "style": "plain",
+      "text": "Mira found a brass key in the library. The key opened a room that had been sealed for years.\n\nShe found letters describing a missing expedition. Each letter pointed to a different part of the town. She followed the clues to the old observatory.\n\nThe expedition records were returned to the museum. Mira began to see the town as a map of unfinished stories."
+    },
+    {
+      "candidate_scores": [
+        {
+          "passed": true,
+          "score": 0.8481,
+          "style": "plain"
+        },
+        {
+          "passed": true,
+          "score": 0.8481,
+          "style": "explanatory"
+        },
+        {
+          "passed": true,
+          "score": 0.8353,
+          "style": "concise"
+        }
+      ],
+      "content_plan": {
+        "genre": "technical_note",
+        "missing": [],
+        "notes": [
+          "Every required move has at least one proposition."
+        ],
+        "sections": [
+          {
+            "facts": [
+              "purpose"
+            ],
+            "move": "purpose",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "ctx"
+            ],
+            "move": "context",
+            "required": false,
+            "transition": null
+          },
+          {
+            "facts": [
+              "s1",
+              "s2",
+              "s3",
+              "s4"
+            ],
+            "move": "steps",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "cav"
+            ],
+            "move": "caveat",
+            "required": false,
+            "transition": "Note"
+          }
+        ],
+        "status": "ok"
+      },
+      "critique": {
+        "avg_sentence_words": 8.0,
+        "copy_ratio": 0.3462,
+        "coverage": 1.0,
+        "evidence_valid": true,
+        "issues": [],
+        "max_sentence_words": 9,
+        "multi_fact_sentences": 0,
+        "paragraph_count": 3,
+        "passed": true,
+        "score": 0.8481,
+        "sentence_count": 7
+      },
+      "evidence": [
+        {
+          "fact_id": "purpose",
+          "role": "purpose",
+          "source": "token.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "ctx",
+          "role": "context",
+          "source": "token.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "s1",
+          "role": "step",
+          "source": "token.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "s2",
+          "role": "step",
+          "source": "token.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "s3",
+          "role": "step",
+          "source": "token.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "s4",
+          "role": "step",
+          "source": "token.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "cav",
+          "role": "caveat",
+          "source": "token.txt",
+          "span": ""
+        }
+      ],
+      "failures": [],
+      "genre": "technical_note",
+      "id": "technical-token",
+      "passed": true,
+      "prompt": "Explain how to rotate a service token.",
+      "sentence_plans": [
+        {
+          "fact_ids": [
+            "purpose"
+          ],
+          "main": {
+            "complement": "how to rotate a service token",
+            "fact_id": "purpose",
+            "object": "",
+            "source": "token.txt",
+            "span": "",
+            "subject": "This note",
+            "verb": "explains"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "ctx"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "ctx",
+            "object": "a service token",
+            "source": "token.txt",
+            "span": "",
+            "subject": "The backup job",
+            "verb": "uses"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "s1"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "s1",
+            "object": "the service settings",
+            "source": "token.txt",
+            "span": "",
+            "subject": "",
+            "verb": "open"
+          },
+          "relation": "sequence",
+          "subordinate": null,
+          "transition": "First"
+        },
+        {
+          "fact_ids": [
+            "s2"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "s2",
+            "object": "a new token and copy it once",
+            "source": "token.txt",
+            "span": "",
+            "subject": "",
+            "verb": "create"
+          },
+          "relation": "sequence",
+          "subordinate": null,
+          "transition": "Then"
+        },
+        {
+          "fact_ids": [
+            "s3"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "s3",
+            "object": "the backup job with the new token",
+            "source": "token.txt",
+            "span": "",
+            "subject": "",
+            "verb": "update"
+          },
+          "relation": "sequence",
+          "subordinate": null,
+          "transition": "Then"
+        },
+        {
+          "fact_ids": [
+            "s4"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "s4",
+            "object": "the old token after a successful run",
+            "source": "token.txt",
+            "span": "",
+            "subject": "",
+            "verb": "revoke"
+          },
+          "relation": "sequence",
+          "subordinate": null,
+          "transition": "Finally"
+        },
+        {
+          "fact_ids": [
+            "cav"
+          ],
+          "main": {
+            "complement": "",
+            "fact_id": "cav",
+            "object": "the token in the repository",
+            "source": "token.txt",
+            "span": "",
+            "subject": "",
+            "verb": "never store"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": "However"
+        }
+      ],
+      "status": "ok",
+      "style": "plain",
+      "text": "This note explains how to rotate a service token. The backup job uses a service token.\n\nFirst, open the service settings. Then, create a new token and copy it once. Then, update the backup job with the new token. Finally, revoke the old token after a successful run.\n\nHowever, never store the token in the repository."
+    },
+    {
+      "candidate_scores": [
+        {
+          "passed": true,
+          "score": 0.8211,
+          "style": "plain"
+        },
+        {
+          "passed": true,
+          "score": 0.8211,
+          "style": "explanatory"
+        },
+        {
+          "passed": true,
+          "score": 0.8211,
+          "style": "concise"
+        }
+      ],
+      "content_plan": {
+        "genre": "dialogue",
+        "missing": [],
+        "notes": [
+          "Every required move has at least one proposition."
+        ],
+        "sections": [
+          {
+            "facts": [
+              "ack"
+            ],
+            "move": "acknowledgement",
+            "required": false,
+            "transition": null
+          },
+          {
+            "facts": [
+              "answer"
+            ],
+            "move": "answer",
+            "required": true,
+            "transition": null
+          },
+          {
+            "facts": [
+              "follow"
+            ],
+            "move": "follow_up",
+            "required": false,
+            "transition": null
+          }
+        ],
+        "status": "ok"
+      },
+      "critique": {
+        "avg_sentence_words": 7.67,
+        "copy_ratio": 0.5263,
+        "coverage": 1.0,
+        "evidence_valid": true,
+        "issues": [],
+        "max_sentence_words": 9,
+        "multi_fact_sentences": 0,
+        "paragraph_count": 2,
+        "passed": true,
+        "score": 0.8211,
+        "sentence_count": 3
+      },
+      "evidence": [
+        {
+          "fact_id": "ack",
+          "role": "acknowledgement",
+          "source": "dialogue.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "answer",
+          "role": "answer",
+          "source": "dialogue.txt",
+          "span": ""
+        },
+        {
+          "fact_id": "follow",
+          "role": "follow_up",
+          "source": "dialogue.txt",
+          "span": ""
+        }
+      ],
+      "failures": [],
+      "genre": "dialogue",
+      "id": "dialogue-backup",
+      "passed": true,
+      "prompt": "Tell me when the backup runs.",
+      "sentence_plans": [
+        {
+          "fact_ids": [
+            "ack"
+          ],
+          "main": {
+            "complement": "with that",
+            "fact_id": "ack",
+            "object": "",
+            "source": "dialogue.txt",
+            "span": "",
+            "subject": "I",
+            "verb": "can help"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "answer"
+          ],
+          "main": {
+            "complement": "every night at 2 a.m.",
+            "fact_id": "answer",
+            "object": "",
+            "source": "dialogue.txt",
+            "span": "",
+            "subject": "The backup",
+            "verb": "runs"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        },
+        {
+          "fact_ids": [
+            "follow"
+          ],
+          "main": {
+            "complement": "how to restore a file",
+            "fact_id": "follow",
+            "object": "",
+            "source": "dialogue.txt",
+            "span": "",
+            "subject": "I",
+            "verb": "can also explain"
+          },
+          "relation": "elaboration",
+          "subordinate": null,
+          "transition": null
+        }
+      ],
+      "status": "ok",
+      "style": "plain",
+      "text": "I can help with that. The backup runs every night at 2 a.m.\n\nI can also explain how to restore a file."
+    },
+    {
       "candidate_scores": [],
       "content_plan": {
         "genre": "explanation",
@@ -1343,47 +2463,63 @@
       "technical_note"
     ],
     "moves_tested": [
+      "acknowledgement",
+      "action",
+      "answer",
       "cause_effect",
       "caveat",
+      "change",
       "claim",
+      "climax",
+      "closing",
       "conclusion",
+      "context",
       "contrast",
       "counterpoint",
       "criterion_a",
       "criterion_b",
       "definition",
       "direct_answer",
+      "escalation",
       "evidence",
+      "follow_up",
       "goal",
+      "inciting",
       "interpretation",
       "main_point",
       "mechanism",
+      "objection",
       "pitfall",
       "prerequisites",
+      "purpose",
       "qualification",
+      "reasons",
       "recommendation",
+      "resolution",
+      "response",
+      "setup",
       "steps",
       "summary",
       "supporting",
+      "thesis",
       "verification"
     ],
     "tested_genres": [
       "analysis",
-      "comparison",
-      "explanation",
-      "procedure",
-      "summary"
-    ],
-    "untested_genres": [
       "argument",
+      "comparison",
       "dialogue",
+      "explanation",
       "narrative",
+      "procedure",
       "professional",
+      "summary",
       "technical_note"
-    ]
+    ],
+    "untested_genres": []
   },
   "first_slice_gate_passed": true,
-  "fixture_sha256": "d22e444e37b7a8b494cd5a981bc9c729ea028c8068f763525c825a4d3b0c920a",
+  "fixture_sha256": "330922e403c21762b7799696776494b3896037fe29b23c1cd4587f3c9414a330",
   "format": "crms-phase10-generation-report",
   "frozen": "2026-10-21",
   "gate": {
@@ -1397,7 +2533,7 @@
   "phase10_full_gate": {
     "300_blind_prompts": false,
     "70b_comparison": false,
-    "all_10_genres_tested": false,
+    "all_10_genres_tested": true,
     "clean_room_release": false,
     "human_clarity_calibration": false,
     "judge_separation": false,
@@ -1406,7 +2542,7 @@
     "two_source_disjoint_corpora": false
   },
   "phase10_full_gate_passed": false,
-  "rule_sha256": "a7cdc308ed470cfb8c428c36783b7bd3b3591a6083d8e691ffa217ab75512f7c",
+  "rule_sha256": "4dda365e7509eb1bbbfedc7da5f4bddf08110a42e96834887d51ebcfd12d7343",
   "rules": {
     "constructions": [
       "cause",
@@ -1418,7 +2554,7 @@
       "result",
       "sequence"
     ],
-    "digest": "a7cdc308ed470cfb8c428c36783b7bd3b3591a6083d8e691ffa217ab75512f7c",
+    "digest": "4dda365e7509eb1bbbfedc7da5f4bddf08110a42e96834887d51ebcfd12d7343",
     "genres": [
       "analysis",
       "argument",
@@ -1431,7 +2567,7 @@
       "summary",
       "technical_note"
     ],
-    "path": "/home/lostcause/workspace/crms/crms_generation_rules.json",
+    "path": "data/phase10_composition.sqlite",
     "styles": [
       "concise",
       "explanatory",
@@ -1451,13 +2587,13 @@
     ]
   },
   "summary": {
-    "cases": 7,
+    "cases": 12,
     "completion": 1.0,
     "failed": 0,
-    "max_copy_ratio": 0.0,
-    "mean_copy_ratio": 0.0,
-    "mean_sentences": 6.6,
-    "passed": 7
+    "max_copy_ratio": 0.5263,
+    "mean_copy_ratio": 0.15696,
+    "mean_sentences": 6.2,
+    "passed": 12
   },
   "version": 1
 }

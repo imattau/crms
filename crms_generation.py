@@ -444,6 +444,16 @@ def _conjugate(verb: str, subject: str) -> str:
     if first in {"can", "could", "may", "might", "must", "should", "shall",
                  "will", "would"}:
         return verb
+    if first.endswith("ed") or first in {
+            "was", "were", "had", "did", "found", "began", "went", "said",
+            "made", "took", "saw", "came", "gave", "told", "thought", "knew",
+            "got", "became", "left", "felt", "put", "brought", "kept", "held",
+            "wrote", "stood", "heard", "let", "meant", "set", "met", "ran",
+            "paid", "sat", "spoke", "lay", "led", "read", "grew", "lost",
+            "fell", "sent", "built", "understood", "drew", "broke", "spent",
+            "cut", "rose", "drove", "bought", "wore", "chose", "ate",
+            "drank", "sang", "swam", "flew"}:
+        return verb
     rest = verb[len(verb.split()[0]):]
     irregular = _IRREGULAR.get(first)
     if irregular is not None:

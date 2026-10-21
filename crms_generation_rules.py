@@ -156,6 +156,16 @@ def load_rules(path: str | Path = DEFAULT_RULES_PATH) -> GenerationRules:
     rule_path = Path(path)
     raw_bytes = rule_path.read_bytes()
     raw = json.loads(raw_bytes.decode("utf-8"))
+    return rules_from_mapping(
+        raw, path=rule_path,
+        digest=hashlib.sha256(raw_bytes).hexdigest())
+
+
+def rules_from_mapping(raw: Mapping[str, Any], *,
+                       path: str | Path = "<memory>",
+                       digest: str | None = None) -> GenerationRules:
+    """Validate and construct rules from an in-memory JSON-compatible map."""
+    rule_path = Path(path)
     if raw.get("format") != SUPPORTED_FORMAT:
         raise GenerationRuleError("unsupported generation rule format")
     if raw.get("version") != SUPPORTED_VERSION:
@@ -219,9 +229,13 @@ def load_rules(path: str | Path = DEFAULT_RULES_PATH) -> GenerationRules:
             raise GenerationRuleError(
                 f"style {name!r} fuse must be a bool")
 
+    if digest is None:
+        digest = hashlib.sha256(
+            json.dumps(raw, sort_keys=True, ensure_ascii=False).encode("utf-8")
+        ).hexdigest()
     return GenerationRules(
         path=rule_path,
-        digest=hashlib.sha256(raw_bytes).hexdigest(),
+        digest=digest,
         genres=genres,
         constructions={str(k): str(v) for k, v in constructions.items()},
         transitions={str(k): str(v) for k, v in transitions.items()},

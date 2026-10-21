@@ -1698,16 +1698,20 @@ pass, and critic/search. No LLM or network is used at generation time.
 python3 run_phase10_eval.py
 ```
 
-The frozen first slice covers explanation, comparison, procedure, analysis, and
-summary, plus abstention and clarification controls. Current result: **7/7**
-cases, mean copy ratio **0.00**, five of ten declared genres tested. The full
-Phase 10 gate (300 blind prompts, two source-disjoint corpora, human clarity
-calibration, SQL rule lifecycle, teacher rule induction, clean room, and 70B
-comparison) remains open.
+The frozen bounded lane covers all ten declared genres plus abstention and
+clarification controls. Current result: **12/12** cases, mean copy ratio
+**0.157**, mean **6.2** sentences. SQL snapshots/rollback, an accepted teacher
+clarity proposal with a rejected negative control, clean-room reload, the CLI,
+and an automated 70B-class comparison are measured. The full Phase 10 gate
+(human clarity calibration, an independently authored 300-prompt suite over two
+source-disjoint corpora, and a measured 70B checkpoint) remains open.
 
-Rules: `crms_generation_rules.json`. Engine: `crms_generation.py`. Report:
-`experiments/reports/phase10_generation.json`. Design:
-`docs/design_phase10_generation_learning.md`.
+Rules: `crms_generation_rules.json`. Engine: `crms_generation.py`. CLI:
+`crms_generate.py`; chat: `/compose PATH` with a JSON generation request.
+Scorecard: `docs/phase10_scorecard.md`. Bound gate:
+`experiments/reports/phase10_external.json`. Design:
+`docs/design_phase10_generation_learning.md`. Limitations:
+`docs/phase10_limitations.md`.
 
 `/suggest-corpus-alignments` adds a corpus-only path for alternate predicate
 wording. It proposes an alignment only when the same distinct subject/object

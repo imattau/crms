@@ -33,6 +33,7 @@ FAMILIES = frozenset({
     "task-plan",
     "domain",
     "dialogue-policy",
+    "composition",
 })
 
 STATES = frozenset({"proposed", "validated", "active", "contested", "retired"})

@@ -1,0 +1,324 @@
+{
+  "bounded_gate": {
+    "all_10_genres_tested": true,
+    "clean_room_identical": true,
+    "comparison_adequacy_at_least_80pct": true,
+    "comparison_baseline_calls_ok": true,
+    "comparison_clarity_at_least_90pct": true,
+    "comparison_coverage_at_least_80pct": true,
+    "generalisation_curve_published": true,
+    "generation_cases_12": true,
+    "mean_copy_ratio_at_most_0_4": true,
+    "sql_rule_snapshots_recorded": true,
+    "teacher_negative_control_rejected": true,
+    "teacher_no_regression": true,
+    "two_automated_raters": true
+  },
+  "bounded_gate_passed": true,
+  "format": "crms-phase10-external",
+  "full_gate_passed": false,
+  "limitations": [
+    "Raters are two hosted model instances, not humans.",
+    "The comparison baseline is a hosted 70B-class proxy with undisclosed parameter count.",
+    "The frozen suite has 12 project-authored cases, not 300 independently authored prompts over two source-disjoint corpora.",
+    "Clarity is measured by automated raters and heuristics, not reader comprehension tests.",
+    "The generalisation workstream has diagnostics but not the full 10^2-10^5 scaling curve."
+  ],
+  "metrics": {
+    "agreement": {
+      "answer_adequacy_exact": 0.85,
+      "answer_adequacy_kappa": 0.318181818181818,
+      "available": true,
+      "clarity_exact": 0.9,
+      "clarity_kappa": 0.0,
+      "confident_error_exact": 0.85,
+      "confident_error_kappa": 0.5714285714285712,
+      "coverage_exact": 0.85,
+      "coverage_kappa": -0.07142857142857148,
+      "evidence_validity_exact": 0.8,
+      "evidence_validity_kappa": 0.27272727272727326,
+      "items": 20
+    },
+    "clean_room": {
+      "cases": 12,
+      "fixture_sha256": "330922e403c21762b7799696776494b3896037fe29b23c1cd4587f3c9414a330",
+      "format": "crms-phase10-clean-room",
+      "gate_passed": true,
+      "identical_outputs": true,
+      "no_llm_or_network_imports": true,
+      "rule_sha256": "a7cdc308ed470cfb8c428c36783b7bd3b3591a6083d8e691ffa217ab75512f7c",
+      "version": 1
+    },
+    "comparison": {
+      "baseline": {
+        "confident_errors": 6,
+        "mean_answer_adequacy": 2,
+        "mean_clarity": 2,
+        "mean_coverage": 2,
+        "mean_evidence_validity": 1.85,
+        "rated_items": 20
+      },
+      "crms": {
+        "confident_errors": 3,
+        "mean_answer_adequacy": 1.75,
+        "mean_clarity": 1.9,
+        "mean_coverage": 1.85,
+        "mean_evidence_validity": 1.85,
+        "rated_items": 20
+      }
+    },
+    "comparison_ratios": {
+      "adequacy": 0.875,
+      "clarity": 0.95,
+      "coverage": 0.925
+    },
+    "coverage": {
+      "constructions_tested": [
+        "cause",
+        "contrast",
+        "definition",
+        "elaboration",
+        "sequence"
+      ],
+      "declared_genres": [
+        "analysis",
+        "argument",
+        "comparison",
+        "dialogue",
+        "explanation",
+        "narrative",
+        "procedure",
+        "professional",
+        "summary",
+        "technical_note"
+      ],
+      "moves_tested": [
+        "acknowledgement",
+        "action",
+        "answer",
+        "cause_effect",
+        "caveat",
+        "change",
+        "claim",
+        "climax",
+        "closing",
+        "conclusion",
+        "context",
+        "contrast",
+        "counterpoint",
+        "criterion_a",
+        "criterion_b",
+        "definition",
+        "direct_answer",
+        "escalation",
+        "evidence",
+        "follow_up",
+        "goal",
+        "inciting",
+        "interpretation",
+        "main_point",
+        "mechanism",
+        "objection",
+        "pitfall",
+        "prerequisites",
+        "purpose",
+        "qualification",
+        "reasons",
+        "recommendation",
+        "resolution",
+        "response",
+        "setup",
+        "steps",
+        "summary",
+        "supporting",
+        "thesis",
+        "verification"
+      ],
+      "tested_genres": [
+        "analysis",
+        "argument",
+        "comparison",
+        "dialogue",
+        "explanation",
+        "narrative",
+        "procedure",
+        "professional",
+        "summary",
+        "technical_note"
+      ],
+      "untested_genres": []
+    },
+    "generalisation": {
+      "analogical_candidates": [
+        {
+          "accepted": false,
+          "fact_id": "coal",
+          "reasons": [
+            "same predicate",
+            "same lexical class"
+          ],
+          "score": 3
+        },
+        {
+          "accepted": false,
+          "fact_id": "solar",
+          "reasons": [
+            "same predicate",
+            "same lexical class"
+          ],
+          "score": 3
+        },
+        {
+          "accepted": false,
+          "fact_id": "wind",
+          "reasons": [
+            "same predicate",
+            "same lexical class"
+          ],
+          "score": 3
+        }
+      ],
+      "backoff": {
+        "photovoltaic": [
+          "solar_power",
+          "renewable_source",
+          "energy_source"
+        ],
+        "solar_vs_wind": true
+      },
+      "classes": {
+        "energy_source": {
+          "members": [
+            "energy source"
+          ],
+          "parent": null
+        },
+        "fossil_power": {
+          "members": [
+            "coal power"
+          ],
+          "parent": "energy_source"
+        },
+        "hydro_power": {
+          "members": [
+            "hydro power"
+          ],
+          "parent": "renewable_source"
+        },
+        "nuclear_power": {
+          "members": [
+            "nuclear power"
+          ],
+          "parent": null
+        },
+        "renewable_source": {
+          "members": [
+            "renewable source"
+          ],
+          "parent": "energy_source"
+        },
+        "solar_power": {
+          "members": [
+            "solar power",
+            "photovoltaic"
+          ],
+          "parent": "renewable_source"
+        },
+        "wind_power": {
+          "members": [
+            "wind power"
+          ],
+          "parent": "renewable_source"
+        }
+      },
+      "coverage_curve": [
+        {
+          "coverage": 0.0,
+          "facts": 1,
+          "score": 0.0,
+          "sentences": 0,
+          "status": "clarify"
+        },
+        {
+          "coverage": 1.0,
+          "facts": 2,
+          "score": 0.8,
+          "sentences": 2,
+          "status": "needs_revision"
+        },
+        {
+          "coverage": 1.0,
+          "facts": 3,
+          "score": 0.9,
+          "sentences": 3,
+          "status": "ok"
+        },
+        {
+          "coverage": 1.0,
+          "facts": 4,
+          "score": 0.9,
+          "sentences": 4,
+          "status": "ok"
+        },
+        {
+          "coverage": 1.0,
+          "facts": 5,
+          "score": 1.0,
+          "sentences": 4,
+          "status": "ok"
+        },
+        {
+          "coverage": 1.0,
+          "facts": 6,
+          "score": 1.0,
+          "sentences": 5,
+          "status": "ok"
+        }
+      ],
+      "evidence_weights": {
+        "one_source": 0.693147,
+        "three_sources": 1.386294
+      },
+      "format": "crms-phase10-generalisation",
+      "gate": {
+        "backoff": true,
+        "class_hierarchy": true,
+        "coverage_curve_published": true,
+        "evidence_weights": true,
+        "report_only_analogies": true
+      },
+      "gate_passed": true,
+      "version": 1
+    },
+    "generation": {
+      "cases": 12,
+      "completion": 1.0,
+      "failed": 0,
+      "max_copy_ratio": 0.5263,
+      "mean_copy_ratio": 0.15696,
+      "mean_sentences": 6.2,
+      "passed": 12
+    },
+    "teacher": {
+      "accepted_proposal_no_regression": true,
+      "human_review": false,
+      "negative_control_rejected": true,
+      "sql_snapshot_recorded": true,
+      "teacher_model_recorded": true
+    }
+  },
+  "open_gate": {
+    "human_clarity_calibration": false,
+    "independent_300_prompt_suite": false,
+    "measured_70b_model": false,
+    "two_source_disjoint_corpora": false
+  },
+  "reports": {
+    "clean_room": "experiments/reports/phase10_clean_room.json",
+    "comparison": "experiments/reports/phase10_comparison.json",
+    "generalisation": "experiments/reports/phase10_generalisation.json",
+    "generation": "experiments/reports/phase10_generation.json",
+    "teacher": "experiments/reports/phase10_teacher.json"
+  },
+  "version": 1
+}
