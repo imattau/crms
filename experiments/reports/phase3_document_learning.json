@@ -1,0 +1,143 @@
+{
+  "active_phase3_rules": 15,
+  "claims": 20,
+  "controls": {
+    "controls": [
+      {
+        "expected": "no_proposal",
+        "id": "uncertain-might",
+        "matches": [],
+        "passed": true,
+        "taxonomy": "uncertainty"
+      },
+      {
+        "expected": "no_proposal",
+        "id": "quoted-guide",
+        "matches": [],
+        "passed": true,
+        "taxonomy": "quotation"
+      },
+      {
+        "expected": "no_proposal",
+        "id": "negative-parser",
+        "matches": [],
+        "passed": true,
+        "taxonomy": "negation"
+      },
+      {
+        "expected": "no_proposal",
+        "id": "negative-fact",
+        "matches": [],
+        "passed": true,
+        "taxonomy": "negation"
+      },
+      {
+        "expected": "no_proposal",
+        "id": "uncertain-letter",
+        "matches": [],
+        "passed": true,
+        "taxonomy": "uncertainty"
+      },
+      {
+        "expected": "no_proposal",
+        "id": "attributed-legend",
+        "matches": [],
+        "passed": true,
+        "taxonomy": "attribution"
+      },
+      {
+        "expected": "no_proposal",
+        "id": "negative-compiler",
+        "matches": [],
+        "passed": true,
+        "taxonomy": "negation"
+      }
+    ],
+    "passed": 7,
+    "total": 7
+  },
+  "corpus_path": "corpus/phase3_eval/manifest.json",
+  "documents": 7,
+  "format": "crms-document-learning",
+  "gate": {
+    "controls": true,
+    "precision": true,
+    "proposal_to_active": true,
+    "retention": true,
+    "review_minutes": true,
+    "seeded_recall": true,
+    "transfer": true
+  },
+  "gate_passed": true,
+  "genre_ids": [
+    "prose",
+    "technical-reference"
+  ],
+  "genres": 2,
+  "pre_review": {
+    "active": 0,
+    "promoted": {
+      "accepted": 15,
+      "active_phase3_rules": 15,
+      "rejected": 1
+    },
+    "proposed": 16,
+    "reviewed": 16
+  },
+  "proposal_to_active": 1.0,
+  "publisher_ids": [
+    "hearthlight-press",
+    "meridian-notes",
+    "northwind-docs",
+    "python-software-foundation"
+  ],
+  "publishers": 4,
+  "queue_path": "/tmp/opencode/phase3_queue.sqlite",
+  "registry_path": "/tmp/opencode/phase3_registry.sqlite",
+  "retention": {
+    "active_after": 15,
+    "active_before": 15,
+    "citation_retention": 1.0,
+    "citations_resolved": 15,
+    "distractors": 100,
+    "retention": 1.0
+  },
+  "review": {
+    "abstained": 0,
+    "accepted": 15,
+    "false_positive_taxonomy": {
+      "wrong_role": 1
+    },
+    "mean_review_seconds": 21.375,
+    "median_review_seconds": 21.0,
+    "precision": 0.9375,
+    "rejected": 1,
+    "review_minutes_per_claim": 0.35625,
+    "reviewed": 16,
+    "total": 16
+  },
+  "review_protocol": "frozen adjudication ledger; use run_phase3_review.py for wall-clock human review",
+  "seeded_recall": {
+    "found": 15,
+    "recall": 1.0,
+    "seeded": 15
+  },
+  "transfer": {
+    "active_predicate_heads": [
+      "reject",
+      "return"
+    ],
+    "active_relations": [
+      "created",
+      "emits",
+      "supports"
+    ],
+    "coverage": 1.0,
+    "heldout_labels": 4,
+    "learning_publisher": "northwind-docs",
+    "matched": 4
+  },
+  "useful_yield": 0.75,
+  "useful_yield_per_document": 2.142857142857143,
+  "version": 1
+}

@@ -1,0 +1,6 @@
+Meridian Metrics
+
+| Subject | Relation | Object |
+|---|---|---|
+| Meridian | measures | latency |
+| Meridian | reports | throughput |

@@ -1457,6 +1457,29 @@ learning a second surface predicate from two cited examples. Its chat-runtime
 probe verifies that the new wording retrieves and realizes a fact stored under
 the original predicate, and that the alignment survives reload.
 
+### Governed document learning
+
+Phase 3 runs documents through an explicit proposal-and-review pipeline rather
+than letting extraction mutate runtime. `crms_document_learning.py` validates a
+per-document licence manifest and SHA-256, extracts fact/procedure claims with
+condition scope, negation, quotation, uncertainty, pronoun antecedents, and
+table roles, and inserts every eligible claim into the governed registry as
+`proposed`. A SQLite review queue records the reviewer, citation, decision,
+false-positive taxonomy, and seconds per claim. Only accepted claims are
+validated and activated; rejected proposals are retired. Evaluate the frozen
+clean-room corpus with:
+
+```text
+python3 run_phase3_eval.py
+python3 run_phase3_review.py
+```
+
+The current report is `experiments/reports/phase3_document_learning.json`:
+93.8% precision, 100% seeded recall, 7/7 non-proposal controls, 4/4
+second-publisher transfer labels, 15/15 rule and citation retention after 100
+distractors, and 0.36 review minutes per claim. The corpus is a controlled
+benchmark, not a claim about arbitrary internet prose.
+
 `/suggest-corpus-alignments` adds a corpus-only path for alternate predicate
 wording. It proposes an alignment only when the same distinct subject/object
 pairs are independently parsed under both predicates in separate documents.

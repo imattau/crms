@@ -1,0 +1,11 @@
+Northwind Parser Reference
+
+The parser validates source text.
+Python was created by Guido van Rossum.
+Python created Guido van Rossum.
+The parser will return an abstract syntax tree.
+If the input is empty, the parser will return an empty tree.
+It will reject invalid tokens.
+The parser will not accept compressed files.
+The API might return None.
+The guide says, "The parser will sort the output."

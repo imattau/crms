@@ -1,0 +1,11 @@
+# History and License — Python 3.12.15 documentation
+
+Source URL: https://docs.python.org/3.12/license.html
+Publisher: Python Software Foundation
+Page license: Python Software Foundation License Version 2
+Copyright: Copyright © 2001-2026 Python Software Foundation; All Rights Reserved.
+Captured: 2026-10-18
+
+## History of the software
+
+Python was created in the early 1990s by Guido van Rossum at Stichting Mathematisch Centrum (CWI, see https://www.cwi.nl) in the Netherlands as a successor of a language called ABC. Guido remains Python’s principal author, although it includes many contributions from others.

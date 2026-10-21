@@ -1,0 +1,7 @@
+Meridian Compiler Notes
+
+The compiler emits bytecode.
+The compiler will optimize loops, otherwise it will report a warning.
+Unless debugging is enabled, the compiler will strip comments.
+The compiler will not emit unverified code.
+The compiler will return a report.

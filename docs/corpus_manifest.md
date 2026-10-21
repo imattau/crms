@@ -117,6 +117,21 @@ Add a source by editing the JSON and running:
 python3 experiments/v1_557_corpus_manifest.py
 ```
 
+## Evaluation corpora (never ingested)
+
+Phase 3 uses a separate frozen, clean-room evaluation corpus at
+`corpus/phase3_eval/`: seven complete short documents from four publisher
+identities (Northwind Documentation, Hearthlight Press, Meridian Notes, and the
+Python Software Foundation), two genres (technical reference and prose), three
+licence classes, per-document SHA-256 hashes, 15 accepted seeded claims, one
+rejected wrong-role proposal, and seven non-proposal controls. It is
+evaluation-only and must never be added to a training or retrieval index. See
+`corpus/phase3_eval/README.md` and `docs/design_document_learning.md`.
+
+The Phase 3 result is a controlled boundary and transfer test, not an estimate
+of arbitrary internet-prose precision. A real-publisher sample and independent
+human review remain follow-ups.
+
 ## Limitations and next work
 
 - Estimates are planning numbers, not measured word counts.

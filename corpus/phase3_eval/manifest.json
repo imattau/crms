@@ -1,0 +1,362 @@
+{
+  "format": "crms-phase3-eval-corpus",
+  "version": 1,
+  "description": "Frozen clean-room Phase 3 evaluation corpus. Seven complete short documents from four publisher identities across technical-reference and prose genres, with seeded positive claims, explicit non-proposal controls, and a frozen review ledger. Text is authored for this benchmark under the stated licences; one Python documentation passage is retained under the PSF License 2.0.",
+  "publishers": {
+    "northwind-docs": {
+      "name": "Northwind Documentation",
+      "licence": "CC BY 4.0",
+      "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution": "Northwind Documentation, CC BY 4.0"
+    },
+    "hearthlight-press": {
+      "name": "Hearthlight Press",
+      "licence": "CC0 1.0",
+      "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Hearthlight Press, CC0 1.0"
+    },
+    "meridian-notes": {
+      "name": "Meridian Notes",
+      "licence": "CC BY-SA 4.0",
+      "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Meridian Notes, CC BY-SA 4.0"
+    },
+    "python-software-foundation": {
+      "name": "Python Software Foundation",
+      "licence": "Python Software Foundation License Version 2",
+      "licence_url": "https://docs.python.org/3/license.html",
+      "attribution": "Python Software Foundation, Python 3.12 documentation, PSF License Version 2"
+    }
+  },
+  "documents": [
+    {
+      "id": "northwind-parser",
+      "publisher": "northwind-docs",
+      "genre": "technical-reference",
+      "title": "Northwind Parser Reference",
+      "path": "documents/northwind-parser.txt",
+      "url": "https://example.invalid/northwind-parser",
+      "licence": "CC BY 4.0",
+      "licence_class": "permissive",
+      "attribution": "Northwind Documentation, CC BY 4.0",
+      "retrieved": "2026-10-21",
+      "sha256": "3ef678007bb58ddb7458e8fdb0cafa51f46fe363477de0b8116e4e9df75d4cdd"
+    },
+    {
+      "id": "northwind-table",
+      "publisher": "northwind-docs",
+      "genre": "technical-reference",
+      "title": "Northwind Structured Fields",
+      "path": "documents/northwind-table.txt",
+      "url": "https://example.invalid/northwind-table",
+      "licence": "CC BY 4.0",
+      "licence_class": "permissive",
+      "attribution": "Northwind Documentation, CC BY 4.0",
+      "retrieved": "2026-10-21",
+      "sha256": "9e909c188e7e0cd781f28bf0ee0c99fbab229958932eb008e7d5bcbed61f56ee"
+    },
+    {
+      "id": "hearthlight-lantern",
+      "publisher": "hearthlight-press",
+      "genre": "prose",
+      "title": "The Lantern Society",
+      "path": "documents/hearthlight-lantern.txt",
+      "url": "https://example.invalid/hearthlight-lantern",
+      "licence": "CC0 1.0",
+      "licence_class": "public-domain",
+      "attribution": "Hearthlight Press, CC0 1.0",
+      "retrieved": "2026-10-21",
+      "sha256": "95c65a659da1e04209f0ae7798ab198579cf8bf54a6db949da8384db334a7b62"
+    },
+    {
+      "id": "hearthlight-legend",
+      "publisher": "hearthlight-press",
+      "genre": "prose",
+      "title": "Lantern Legends",
+      "path": "documents/hearthlight-legend.txt",
+      "url": "https://example.invalid/hearthlight-legend",
+      "licence": "CC0 1.0",
+      "licence_class": "public-domain",
+      "attribution": "Hearthlight Press, CC0 1.0",
+      "retrieved": "2026-10-21",
+      "sha256": "1b411f3ee5c1b33e3abdabcc5be424faa19cec8dddfb0411159d57207b44b22c"
+    },
+    {
+      "id": "meridian-compiler",
+      "publisher": "meridian-notes",
+      "genre": "technical-reference",
+      "title": "Meridian Compiler Notes",
+      "path": "documents/meridian-compiler.txt",
+      "url": "https://example.invalid/meridian-compiler",
+      "licence": "CC BY-SA 4.0",
+      "licence_class": "share-alike",
+      "attribution": "Meridian Notes, CC BY-SA 4.0",
+      "retrieved": "2026-10-21",
+      "sha256": "066d8d8653fecc13aa18be43e4ce9ecab20d1087b306cae700390e19b7db6c91"
+    },
+    {
+      "id": "meridian-metrics",
+      "publisher": "meridian-notes",
+      "genre": "technical-reference",
+      "title": "Meridian Metrics",
+      "path": "documents/meridian-metrics.txt",
+      "url": "https://example.invalid/meridian-metrics",
+      "licence": "CC BY-SA 4.0",
+      "licence_class": "share-alike",
+      "attribution": "Meridian Notes, CC BY-SA 4.0",
+      "retrieved": "2026-10-21",
+      "sha256": "98a0a98fdf6b54c9d1040503500a6d35fbf63a05258218b3c77291f1ae29f882"
+    },
+    {
+      "id": "psf-python-history",
+      "publisher": "python-software-foundation",
+      "genre": "technical-reference",
+      "title": "History and License — Python 3.12 documentation",
+      "path": "documents/psf-python-history.txt",
+      "url": "https://docs.python.org/3.12/license.html",
+      "licence": "Python Software Foundation License Version 2",
+      "licence_class": "permissive",
+      "attribution": "Python Software Foundation, Python 3.12 documentation, PSF License Version 2",
+      "retrieved": "2026-10-21",
+      "sha256": "defce2a3f5397723f8a22aeaac7d6a5ef1df4487a026839d06f6bd35183cfecc"
+    }
+  ],
+  "labels": [
+    {
+      "document_id": "northwind-parser",
+      "family": "fact-frame",
+      "subject": "Guido van Rossum",
+      "relation": "created",
+      "object": "Python",
+      "decision": "accept",
+      "review_seconds": 18
+    },
+    {
+      "document_id": "northwind-parser",
+      "family": "procedure",
+      "subject": "The parser",
+      "relation": "return",
+      "object": "return an abstract syntax tree",
+      "decision": "accept",
+      "review_seconds": 24
+    },
+    {
+      "document_id": "northwind-parser",
+      "family": "procedure",
+      "subject": "the parser",
+      "relation": "reject",
+      "object": "reject invalid tokens",
+      "decision": "accept",
+      "review_seconds": 21,
+      "antecedent": "the parser",
+      "roles": {
+        "subject": "the parser",
+        "resolved_pronoun": "It",
+        "antecedent": "the parser"
+      }
+    },
+    {
+      "document_id": "northwind-parser",
+      "family": "procedure",
+      "subject": "the parser",
+      "relation": "return",
+      "object": "return an empty tree",
+      "decision": "accept",
+      "review_seconds": 28,
+      "conditions": [
+        "before: If the input is empty"
+      ]
+    },
+    {
+      "document_id": "northwind-table",
+      "family": "fact-frame",
+      "subject": "Northwind",
+      "relation": "supports",
+      "object": "YAML",
+      "decision": "accept",
+      "review_seconds": 15,
+      "roles": {
+        "table_row": "true"
+      }
+    },
+    {
+      "document_id": "northwind-table",
+      "family": "fact-frame",
+      "subject": "Northwind",
+      "relation": "emits",
+      "object": "JSON",
+      "decision": "accept",
+      "review_seconds": 15,
+      "roles": {
+        "table_row": "true"
+      }
+    },
+    {
+      "document_id": "hearthlight-lantern",
+      "family": "fact-frame",
+      "subject": "Mira",
+      "relation": "founded",
+      "object": "the Lantern Society",
+      "decision": "accept",
+      "review_seconds": 20
+    },
+    {
+      "document_id": "hearthlight-lantern",
+      "family": "fact-frame",
+      "subject": "Mira",
+      "relation": "created",
+      "object": "the Lantern Archive",
+      "decision": "accept",
+      "review_seconds": 20,
+      "antecedent": "Mira",
+      "roles": {
+        "subject": "Mira",
+        "resolved_pronoun": "She",
+        "antecedent": "Mira"
+      }
+    },
+    {
+      "document_id": "hearthlight-lantern",
+      "family": "fact-frame",
+      "subject": "Toma",
+      "relation": "created",
+      "object": "the Lantern Map",
+      "decision": "accept",
+      "review_seconds": 19
+    },
+    {
+      "document_id": "meridian-compiler",
+      "family": "procedure",
+      "subject": "The compiler",
+      "relation": "optimize",
+      "object": "optimize loops",
+      "decision": "accept",
+      "review_seconds": 23,
+      "conditions": [
+        "after: otherwise it will report a warning"
+      ],
+      "note": "contrast scope preserved"
+    },
+    {
+      "document_id": "meridian-compiler",
+      "family": "procedure",
+      "subject": "The compiler",
+      "relation": "return",
+      "object": "return a report",
+      "decision": "accept",
+      "review_seconds": 23
+    },
+    {
+      "document_id": "meridian-compiler",
+      "family": "procedure",
+      "subject": "the compiler",
+      "relation": "strip",
+      "object": "strip comments",
+      "decision": "accept",
+      "review_seconds": 27,
+      "conditions": [
+        "before: Unless debugging is enabled"
+      ]
+    },
+    {
+      "document_id": "meridian-metrics",
+      "family": "fact-frame",
+      "subject": "Meridian",
+      "relation": "measures",
+      "object": "latency",
+      "decision": "accept",
+      "review_seconds": 16,
+      "roles": {
+        "table_row": "true"
+      }
+    },
+    {
+      "document_id": "meridian-metrics",
+      "family": "fact-frame",
+      "subject": "Meridian",
+      "relation": "reports",
+      "object": "throughput",
+      "decision": "accept",
+      "review_seconds": 16,
+      "roles": {
+        "table_row": "true"
+      }
+    },
+    {
+      "document_id": "northwind-parser",
+      "family": "fact-frame",
+      "subject": "Python",
+      "relation": "created",
+      "object": "Guido van Rossum",
+      "decision": "reject",
+      "review_seconds": 31,
+      "taxonomy": "wrong_role",
+      "note": "adversarial wrong-role control"
+    },
+    {
+      "document_id": "psf-python-history",
+      "family": "fact-frame",
+      "subject": "Guido van Rossum",
+      "relation": "created",
+      "object": "Python",
+      "decision": "accept",
+      "review_seconds": 26,
+      "note": "real PSF documentation passage"
+    }
+  ],
+  "controls": [
+    {
+      "id": "uncertain-might",
+      "document_id": "northwind-parser",
+      "sentence": "The API might return None.",
+      "expected": "no_proposal",
+      "taxonomy": "uncertainty"
+    },
+    {
+      "id": "quoted-guide",
+      "document_id": "northwind-parser",
+      "sentence": "The guide says, \"The parser will sort the output.\"",
+      "expected": "no_proposal",
+      "taxonomy": "quotation"
+    },
+    {
+      "id": "negative-parser",
+      "document_id": "northwind-parser",
+      "sentence": "The parser will not accept compressed files.",
+      "expected": "no_proposal",
+      "taxonomy": "negation"
+    },
+    {
+      "id": "negative-fact",
+      "document_id": "hearthlight-lantern",
+      "sentence": "Toma did not write the letter.",
+      "expected": "no_proposal",
+      "taxonomy": "negation"
+    },
+    {
+      "id": "uncertain-letter",
+      "document_id": "hearthlight-lantern",
+      "sentence": "The letter was probably written by Toma.",
+      "expected": "no_proposal",
+      "taxonomy": "uncertainty"
+    },
+    {
+      "id": "attributed-legend",
+      "document_id": "hearthlight-legend",
+      "sentence": "According to legend, Mira founded the Lantern Society.",
+      "expected": "no_proposal",
+      "taxonomy": "attribution"
+    },
+    {
+      "id": "negative-compiler",
+      "document_id": "meridian-compiler",
+      "sentence": "The compiler will not emit unverified code.",
+      "expected": "no_proposal",
+      "taxonomy": "negation"
+    }
+  ],
+  "review": {
+    "reviewer": "phase3-frozen-reviewer",
+    "seconds_per_claim": 22.0
+  }
+}

@@ -1,0 +1,6 @@
+Northwind Structured Fields
+
+| Subject | Relation | Object |
+|---|---|---|
+| Northwind | supports | YAML |
+| Northwind | emits | JSON |

@@ -424,6 +424,14 @@ Deliverables:
 second-publisher transfer, ≤2 minutes review per claim. Miss twice → pivot to
 curated technical documentation/manuals and stop claiming open-corpus learning.
 
+**Status (2026-10-21): bounded Phase 3 lane passed.** Frozen clean-room corpus:
+7 complete documents, 4 publisher identities, 2 genres. 16 reviewed proposals;
+precision 93.8%, seeded recall 100%, 7/7 non-proposal controls, review 0.36
+minutes/claim, 4/4 held-out publisher labels transferred from rules learned on
+one publisher, 15/15 active rules and citations retained after 100 distractors.
+Pre-review registry activation: 0. The lane is deliberately conservative and
+does not claim arbitrary internet-prose precision.
+
 ### Phase 4 — Self-learning from verified work, corrections, and consolidation (weeks 16–28)
 
 **Goal:** provable correctability, safe supervised write-back, and the first
@@ -661,12 +669,18 @@ redesigned or dropped.
    learned frames and typed actions. — done
    (`experiments/scorecard/family_b_spec.md`); 30 scenario tasks plus 6 controls
    cover research, math, units, translation, code generation, and writing.
-9. **Corpus manifest v0** — inventory of candidate sources, licences, sizes,
+9. **Phase 3 document learning** — licence-audited corpus, clause-aware
+   proposals, governed review, transfer and retention metrics. — done for the
+   frozen clean-room lane (`crms_document_learning.py`,
+   `corpus/phase3_eval/manifest.json`,
+   `experiments/reports/phase3_document_learning.json`); real-publisher
+   corpus expansion and independent human review remain follow-ups.
+10. **Corpus manifest v0** — inventory of candidate sources, licences, sizes,
    and domain targets. — done
    (`corpus/manifest_v0.json`, `docs/corpus_manifest.md`,
    `experiments/v1_557_corpus_manifest.py`); 20 candidate groups, 4 documented
    exclusions, and a 94.5M-word core planning estimate.
-10. **Consolidate plan docs** — this file is canonical; link the others as
+11. **Consolidate plan docs** — this file is canonical; link the others as
    history. — canonical status recorded; remaining docs still need pruning.
 
 ---
@@ -705,3 +719,5 @@ corpus size, it has not advanced the goal.
 | 2026-10-21 | Family B typed composition: six new learned goals (research, math, unit conversion, translation, code generation, writing), independent replay/parity verifiers, cited research with re-resolved citations, and no fall-through after a failed plan | `crms_family_b.py`, `crms_request_frames.py`, `crms_request_frames_seed.json`, `crms_planner.py`, `crms_tasks.py`, `crms_chat.py` |
 | 2026-10-21 | Plan instrumentation: append-only JSONL records for completed and failed plans, per-step actions/checks/evidence, failure learning candidates, `Plan plan-…` chat rendering, detailed `why?`, and `run_compounding.py` baseline summary | `crms_plan_log.py`, `crms_chat.py`, `run_compounding.py`, `experiments/v1_558_family_b_plan.py` |
 | 2026-10-21 | Phase 2 gate measured: Family A 30/30, Family B 30/30 plus 6/6 controls, smoke 12/12, zero unsafe answers; tampered research/math outputs rejected; nested plan inputs and dialogue history wired | `experiments/scorecard/family_a.jsonl`, `experiments/scorecard/family_b.jsonl`, `experiments/scorecard/family_b_spec.md`, `crms_dialogue.py`, `crms_eval/oracles.py` |
+| 2026-10-21 | Phase 3 document learning: audited per-document manifests, clause/condition/antecedent/table extraction, proposal-only registry ingestion, SQLite review ledger, accepted-rule promotion, false-positive taxonomy, second-publisher transfer, and 100-document retention | `crms_document_learning.py`, `corpus/phase3_eval/`, `run_phase3_eval.py`, `run_phase3_review.py`, `experiments/v1_559_document_learning.py`, `docs/design_document_learning.md` |
+| 2026-10-21 | Phase 3 gate measured: 16 reviewed proposals, 93.8% precision, 100% seeded recall, 7/7 controls, 0.36 review minutes/claim, 4/4 transfer, 15/15 retention, zero pre-review active rules | `experiments/reports/phase3_document_learning.json` |
