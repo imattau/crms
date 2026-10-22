@@ -1,0 +1,731 @@
+{
+ "questions": 1050,
+ "causes": {
+  "correct": 270,
+  "no_sentence": 499,
+  "infobox_only": 250,
+  "wrong_entity": 12,
+  "vetoed_or_tied": 6,
+  "wrong_boundary": 9,
+  "retrieval_miss": 4
+ },
+ "pattern_addressable": 499,
+ "label_only_in_infobox": 250,
+ "retrieval_problems": 4,
+ "per_relation": {
+  "artist": {
+   "correct": 99,
+   "no_sentence": 46,
+   "wrong_entity": 1,
+   "vetoed_or_tied": 4
+  },
+  "author": {
+   "correct": 56,
+   "no_sentence": 79,
+   "infobox_only": 10,
+   "vetoed_or_tied": 1,
+   "wrong_boundary": 4
+  },
+  "developer": {
+   "vetoed_or_tied": 1,
+   "infobox_only": 40,
+   "correct": 31,
+   "no_sentence": 66,
+   "wrong_entity": 3,
+   "wrong_boundary": 5,
+   "retrieval_miss": 4
+  },
+  "director": {
+   "correct": 44,
+   "no_sentence": 79,
+   "infobox_only": 25,
+   "wrong_entity": 2
+  },
+  "foundation": {
+   "no_sentence": 94,
+   "infobox_only": 41,
+   "wrong_entity": 2,
+   "correct": 13
+  },
+  "founder": {
+   "no_sentence": 68,
+   "infobox_only": 64,
+   "wrong_entity": 3,
+   "correct": 15
+  },
+  "producer": {
+   "no_sentence": 67,
+   "infobox_only": 70,
+   "wrong_entity": 1,
+   "correct": 12
+  }
+ },
+ "examples": {
+  "no_sentence": [
+   {
+    "relation": "director",
+    "question": "Who directed Venom: The Last Dance?",
+    "gold": "Kelly Marcel",
+    "entity": "Venom: The Last Dance",
+    "sentence": "Kelly Marcel",
+    "source": "Venom: The Last Dance"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed We Bare Bears: The Movie?",
+    "gold": "Daniel Chong",
+    "entity": "We Bare Bears: The Movie",
+    "sentence": "Daniel Chong",
+    "source": "We Bare Bears: The Movie"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed The Story of Chinese Gods?",
+    "gold": "Chang Chih Hui",
+    "entity": "Story of Chinese Gods",
+    "sentence": "The Story of Chinese Gods or Dragon Suikoden in Japanese title, Tarzerix is a 1976 Taiwanese-Japanese-American animated action-comedy fantasy martial arts movie directed by Chang Chih Hui, the recurring character resemblance was Bruce Lee called, Er-Lang Shen.",
+    "source": "The Story of Chinese Gods"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Fantasamagorie?",
+    "gold": "Émile Cohl",
+    "entity": "Fantasamagorie",
+    "sentence": "Fantasmagorie is a hand drawn animated movie made in 1908 by Émile Cohl.",
+    "source": "Fantasamagorie"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Main Tera Hero?",
+    "gold": "David Dhawan",
+    "entity": "Main Tera Hero",
+    "sentence": ") is a 2014 Indian Hindi-language action romantic comedy movie, directed by David Dhawan and produced by Shobha Kapoor and Ekta Kapoor under the Balaji Motion Pictures banner.",
+    "source": "Main Tera Hero"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Hello Anatolia?",
+    "gold": "Chrysovalantis Stamelos",
+    "entity": "Hello Anatolia",
+    "sentence": "It was written, directed, and produced by Chrysovalantis Stamelos, a Greek-American filmmaker.",
+    "source": "Hello Anatolia"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Munna Michael?",
+    "gold": "Sabbir Khan",
+    "entity": "Munna Michael",
+    "sentence": "Sabbir Khan directed it and Viki Rajani produced it for Eros International.",
+    "source": "Munna Michael"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Kal Ho Naa Ho?",
+    "gold": "Nikhil Advani",
+    "entity": "Kal Ho Naa Ho",
+    "sentence": "), also abbreviated as KHNH, is a 2003 Indian Hindi-language musical romantic comedy-drama movie directed by Nikhil Advani and Arjun Kapoor, written by Karan Johar with dialogues by Niranjan Iyengar, and produced by Yash Johar.",
+    "source": "Kal Ho Naa Ho"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Masam Masam Manis?",
+    "gold": "P. Ramlee",
+    "entity": "Masam Masam Manis",
+    "sentence": "It was directed by P. Ramlee, who also starred in it, along with Sharifah Hanim, Mariani Ismail, and Mahmud Jun.",
+    "source": "Masam Masam Manis"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Being There?",
+    "gold": "Hal Ashby",
+    "entity": "Being There",
+    "sentence": "It stars Peter Sellers, Shirley MacLaine, and Melvyn Douglas, and was directed by Hal Ashby.",
+    "source": "Being There"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Fortunella?",
+    "gold": "Eduardo De Filippo",
+    "entity": "Fortunella",
+    "sentence": "It was directed by Eduardo De Filippo.",
+    "source": "Fortunella"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Mr. Harrigan's Phone?",
+    "gold": "John Lee Hancock",
+    "entity": "Mr. Harrigan's Phone",
+    "sentence": "The film stars Donald Sutherland, Jaeden Martell, Jaeden Martell, Kirby Howell-Baptiste, Joe Tippett and Cyrus Arnold, written and directed by John Lee Hancock based on the novella of the same name by Stephen King from the collection If It Bleeds.",
+    "source": "Mr. Harrigan's Phone"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Clifford's Really Big Movie?",
+    "gold": "Robert Ramirez",
+    "entity": "Clifford's Really Big Movie",
+    "sentence": "Robert Ramirez",
+    "source": "Clifford's Really Big Movie"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed The Wonderful Ice Cream Suit?",
+    "gold": "Stuart Gordon",
+    "entity": "Wonderful Ice Cream Suit",
+    "sentence": "Stuart Gordon",
+    "source": "The Wonderful Ice Cream Suit"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Tale of Catfish and Toad?",
+    "gold": "Ngô Mạnh Lân",
+    "entity": "Tale of Catfish and Toad",
+    "sentence": ") is a 1993 Vietnamese animated film which was based on the fairy tale, directed by Ngô Mạnh Lân.",
+    "source": "Tale of Catfish and Toad"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed The Best Exotic Marigold Hotel?",
+    "gold": "John Madden",
+    "entity": "Best Exotic Marigold Hotel",
+    "sentence": "John Madden is the director.",
+    "source": "The Best Exotic Marigold Hotel"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed The Last Farm?",
+    "gold": "Rúnar Rúnarsson",
+    "entity": "Last Farm",
+    "sentence": "It was directed by Rúnar Rúnarsson.",
+    "source": "The Last Farm"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed The Brotherhood?",
+    "gold": "Martin Ritt",
+    "entity": "Brotherhood",
+    "sentence": "It was directed by Martin Ritt.",
+    "source": "The Brotherhood"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed The Cured?",
+    "gold": "David Freyne",
+    "entity": "Cured",
+    "sentence": "It was directed by David Freyne starring Elliot Page, Sam Keeley",
+    "source": "The Cured"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Tale of the Woods?",
+    "gold": "Yuri Tarich",
+    "entity": "Tale of the Woods",
+    "sentence": "Yuri Tarich",
+    "source": "Tale of the Woods"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Love Untangled?",
+    "gold": "Namkoong Sun",
+    "entity": "Love Untangled",
+    "sentence": ") is an South Korean romance movie directed by Namkoong Sun and written by Ji Chun-hee and Wang Doo-ri.",
+    "source": "Love Untangled"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Battle: Los Angeles?",
+    "gold": "Jonathan Liebesman",
+    "entity": "Battle: Los Angeles",
+    "sentence": "Jonathan Liebesman directed the movie.",
+    "source": "Battle: Los Angeles"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Chengiz?",
+    "gold": "Rajesh Ganguly",
+    "entity": "Chengiz",
+    "sentence": "Rajesh Ganguly",
+    "source": "Chengiz"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Zindagi Na Milegi Dobara?",
+    "gold": "Zoya Akhtar",
+    "entity": "Zindagi Na Milegi Dobara",
+    "sentence": ") is a 2011 Indian Hindi-language buddy road comedy drama movie directed by Zoya Akhtar and produced by Farhan Akhtar and Ritesh Sidhwani of Excel Entertainment.",
+    "source": "Zindagi Na Milegi Dobara"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed The Usual Suspects?",
+    "gold": "Bryan Singer",
+    "entity": "Usual Suspects",
+    "sentence": "Bryan Singer",
+    "source": "The Usual Suspects"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Alien: Night Shift?",
+    "gold": "Aidan Brezonick",
+    "entity": "Alien: Night Shift",
+    "sentence": "Released via IGN on April 12, 2019 for the 40th anniversary of the franchise, the film was written and directed by Aidan Brezonick, through Tongal Studios and 20th Century Fox.",
+    "source": "Alien: Night Shift"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed The Pursuit of Happyness?",
+    "gold": "Gabriele Muccino",
+    "entity": "Pursuit of Happyness",
+    "sentence": "The movie's director was Gabriele Muccino.",
+    "source": "The Pursuit of Happyness"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Yokai Monsters: Along With Ghosts?",
+    "gold": "Yoshiyuki Kuroda",
+    "entity": "Yokai Monsters: Along With Ghosts",
+    "sentence": "director=Yoshiyuki Kuroda",
+    "source": "Yokai Monsters: Along With Ghosts"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Bakti?",
+    "gold": "L. Krishnan",
+    "entity": "Bakti",
+    "sentence": "Directed by L. Krishnan and produced by Run Run Shaw, it was adapted from Les Misérables.",
+    "source": "Bakti"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed The Mitchells vs. the Machines?",
+    "gold": "Mike Rianda",
+    "entity": "Mitchells vs. the Machines",
+    "sentence": "Mike Rianda",
+    "source": "The Mitchells vs. the Machines"
+   }
+  ],
+  "infobox_only": [
+   {
+    "relation": "director",
+    "question": "Who directed Hockey Homicide?",
+    "gold": "Jack Kinney",
+    "entity": "Hockey Homicide"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Titanic 666?",
+    "gold": "Nick Lyon",
+    "entity": "Titanic 666"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Giantland?",
+    "gold": "Burt Gillett",
+    "entity": "Giantland"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed The Fantastic Four: First Steps?",
+    "gold": "Matt Shakman",
+    "entity": "Fantastic Four: First Steps"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed 97th Academy Awards?",
+    "gold": "Hamish Hamilton",
+    "entity": "97th Academy Awards"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Tarzan and His Mate?",
+    "gold": "Cedric Gibbons",
+    "entity": "Tarzan and His Mate"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Donald's Garden?",
+    "gold": "Dick Lundy",
+    "entity": "Donald's Garden"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Bell, Book and Candle?",
+    "gold": "Richard Quine",
+    "entity": "Bell, Book and Candle"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Rio 2?",
+    "gold": "Carlos Saldanha",
+    "entity": "Rio 2"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Godzilla: Final Wars?",
+    "gold": "Ryuhei Kitamura",
+    "entity": "Godzilla: Final Wars"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Aquamania?",
+    "gold": "Wolfgang Reitherman",
+    "entity": "Aquamania"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Winter Storage?",
+    "gold": "Jack Hannah",
+    "entity": "Winter Storage"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed R.I.P.D. 2: Rise of the Damned?",
+    "gold": "Paul Leyden",
+    "entity": "R.I.P.D. 2: Rise of the Damned"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Brave Little Tailor?",
+    "gold": "Bill Roberts",
+    "entity": "Brave Little Tailor"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Beezy Bear?",
+    "gold": "Jack Hannah",
+    "entity": "Beezy Bear"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Ain't Them Bodies Saints?",
+    "gold": "David Lowery",
+    "entity": "Ain't Them Bodies Saints"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Doraemon: Nobita's Little Star Wars 2021?",
+    "gold": "Susumu Yamaguchi",
+    "entity": "Doraemon: Nobita's Little Star Wars 2021"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Father's Lion?",
+    "gold": "Jack Kinney",
+    "entity": "Father's Lion"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed R'coon Dawg?",
+    "gold": "Charles A. Nichols",
+    "entity": "R'coon Dawg"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Don's Fountain of Youth?",
+    "gold": "Jack Hannah",
+    "entity": "Don's Fountain of Youth"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed 7aum Arivu?",
+    "gold": "A. R. Murugadoss",
+    "entity": "7aum Arivu"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed All This and Rabbit Stew?",
+    "gold": "Fred Avery (not credited)",
+    "entity": "All This and Rabbit Stew"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Maleficent: Mistress of Evil?",
+    "gold": "Joachim Rønning",
+    "entity": "Maleficent: Mistress of Evil"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed The Super Inframan?",
+    "gold": "Hua Shan",
+    "entity": "Super Inframan"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed From Hand to Mouth?",
+    "gold": "Alfred J. Goulding",
+    "entity": "From Hand to Mouth"
+   },
+   {
+    "relation": "producer",
+    "question": "Who produced The Night Coachman?",
+    "gold": "writer = Moses Zats",
+    "entity": "Night Coachman"
+   },
+   {
+    "relation": "producer",
+    "question": "Who produced Thor: Ragnarok?",
+    "gold": "Kevin Feige",
+    "entity": "Thor: Ragnarok"
+   },
+   {
+    "relation": "producer",
+    "question": "Who produced The Clearing?",
+    "gold": "writer = David Matalon",
+    "entity": "Clearing"
+   },
+   {
+    "relation": "producer",
+    "question": "Who produced Thor: The Dark World?",
+    "gold": "Kevin Feige",
+    "entity": "Thor: The Dark World"
+   },
+   {
+    "relation": "producer",
+    "question": "Who produced Batman v Superman: Dawn of Justice?",
+    "gold": "Charles Roven",
+    "entity": "Batman v Superman: Dawn of Justice"
+   }
+  ],
+  "wrong_entity": [
+   {
+    "relation": "director",
+    "question": "Who directed Zombie Night?",
+    "gold": "John Gulager",
+    "answer": "David Michael together directed Zombie Night.",
+    "source": "Zombie Night is an American apocalyptic zombie movie, Directed by David Michael together with the main cast Anthony Michael Hall, Daryl Hannah, Jennifer Taylor, Alan Ruck and Shirley Jones.",
+    "spec": "agent_transformed"
+   },
+   {
+    "relation": "director",
+    "question": "Who directed Revelations?",
+    "gold": "Yeon Sang-ho",
+    "answer": "Víctor Garcia directed Revelations.",
+    "source": "Hellraiser: Revelations is a 2011 American horror movie directed by Víctor Garcia and is the ninth movie in the Hellraiser franchise.",
+    "spec": "agent_transformed"
+   },
+   {
+    "relation": "producer",
+    "question": "Who produced Titanic 666?",
+    "gold": "David Michael Latt",
+    "answer": "The Asylum produced Titanic 666.",
+    "source": "Titanic 666 is a supernatural movie produced by The Asylum, released on April 15, 2022 on the Tubi streaming platform for the 110th anniversary of the sinking of the Titanic",
+    "spec": "agent_transformed"
+   },
+   {
+    "relation": "artist",
+    "question": "Who made To Be One With You?",
+    "gold": "Pluralone",
+    "answer": "To Be One With You is the first studio album by Josh Klinghoffer.",
+    "source": "To Be One with You is the first studio album by Josh Klinghoffer.",
+    "spec": "work_by_artist"
+   },
+   {
+    "relation": "founder",
+    "question": "Who founded ACE EV Group?",
+    "gold": "ubl",
+    "answer": "Gregory McGarvie founded ACE EV Group.",
+    "source": "ACE EV Group was founded in 2017 by Gregory McGarvie, an Australian engineer, and Will Qiang, a Chinese businessman.",
+    "spec": "agent_transformed"
+   },
+   {
+    "relation": "founder",
+    "question": "Who founded Megaupload?",
+    "gold": "dissolved = January 20th, 2012",
+    "answer": "Kim Dotcom founded Megaupload.",
+    "source": "Kim Dotcom is the founder of the former file hosting service Megaupload (2005 - 2012).",
+    "spec": "agent_transformed"
+   },
+   {
+    "relation": "founder",
+    "question": "Who founded Citibank?",
+    "gold": "Samuel Osgood",
+    "answer": "Chairman Chukwuma Soludo founded Citibank.",
+    "source": "Africa Finance Corporation (AFC) was commissioned on December, 2007 by the founding President and Chief Executive Mr Austine Ometoruwa, then Citibank Africa Investment Bank Head and by the founding Chairman Chukwuma Soludo.",
+    "spec": "agent_transformed"
+   },
+   {
+    "relation": "foundation",
+    "question": "When was Naughty Dog founded?",
+    "gold": "1984",
+    "answer": "Naughty Dog was founded in 1986.",
+    "source": "Naughty Dog is a video game company founded by Andy Gavin and Jason Rubin in 1986.",
+    "spec": "when_participle"
+   },
+   {
+    "relation": "foundation",
+    "question": "When was Jelly Belly founded?",
+    "gold": "1869",
+    "answer": "Jelly Belly was founded in 1898.",
+    "source": "The company which makes Jelly Belly beans was founded in 1898 in Fairfield, California.",
+    "spec": "when_participle"
+   },
+   {
+    "relation": "developer",
+    "question": "Who developed Flappy Bird?",
+    "gold": "dotGears",
+    "answer": "Vietnamese video game artist developed Flappy Bird.",
+    "source": "Flappy Bird is a mobile game developed by Vietnamese video game artist and programmer Dong Nguyen (",
+    "spec": "agent_transformed"
+   },
+   {
+    "relation": "developer",
+    "question": "Who developed Dora the Explorer: Barnyard Buddies?",
+    "gold": "Imaginengine",
+    "answer": "Gotham Games developed Dora the Explorer: Barnyard Buddies.",
+    "source": "Dora the Explorer: Barnyard Buddies is an action-adventure game developed and released by Gotham Games for the Sony PlayStation on November 18, 2003 in North America and released in the PAL regions on May 2, 2005.",
+    "spec": "agent_transformed"
+   },
+   {
+    "relation": "developer",
+    "question": "Who developed The Sims FreePlay?",
+    "gold": "EA Mobile,",
+    "answer": "Firemonkeys Studios developed The Sims FreePlay.",
+    "source": "The Sims FreePlay is a life simulation video game developed by Firemonkeys Studios and published by Electronic Arts.",
+    "spec": "agent_transformed"
+   }
+  ],
+  "vetoed_or_tied": [
+   {
+    "relation": "author",
+    "question": "Who wrote Jack and Jill: A Village Story?",
+    "gold": "Louisa May Alcott",
+    "entity": "Jack and Jill: A Village Story",
+    "sentence": "Jack and Jill: A Village Story is a children's book by Louisa May Alcott."
+   },
+   {
+    "relation": "artist",
+    "question": "Who made The Unraveling?",
+    "gold": "Rise Against",
+    "entity": "Unraveling",
+    "sentence": "The Unraveling is the debut album by the American punk rock band Rise Against."
+   },
+   {
+    "relation": "artist",
+    "question": "Who made R.O.S.E.?",
+    "gold": "Jessie J",
+    "entity": "R.O.S.E",
+    "sentence": "hlist ; Jessie J (also exec.)"
+   },
+   {
+    "relation": "artist",
+    "question": "Who made Anthology 4?",
+    "gold": "The Beatles",
+    "entity": "Anthology 4",
+    "sentence": "Anthology 4 is a compilation album made by the English rock band The Beatles."
+   },
+   {
+    "relation": "artist",
+    "question": "Who made The G Files?",
+    "gold": "Warren G",
+    "entity": "G Files",
+    "sentence": "The G Files is the sixth studio album by American rapper Warren G. The album was released on September 29, 2009."
+   },
+   {
+    "relation": "developer",
+    "question": "Who developed Metro Exodus?",
+    "gold": "4A Games",
+    "entity": "Metro Exodus",
+    "sentence": "Metro Exodus is a horror first-person shooter video game developed by 4A Games and published by Deep Silver."
+   }
+  ],
+  "wrong_boundary": [
+   {
+    "relation": "author",
+    "question": "Who wrote Fire and Fury?",
+    "gold": "Michael Wolff",
+    "answer": "Fire and Fury is a book by Michael Woff.",
+    "source": "Fire and Fury is a book by Michael Woff which explains the way the Donald Trump White House operates.",
+    "spec": "work_by_artist"
+   },
+   {
+    "relation": "author",
+    "question": "Who wrote The Bad Beginning?",
+    "gold": "Lemony Snicket (pen name of Daniel Handler)",
+    "answer": "The Bad Beginning is a book by Lemony Snicket.",
+    "source": "The Bad Beginning is a book by Lemony Snicket.",
+    "spec": "work_by_artist"
+   },
+   {
+    "relation": "author",
+    "question": "Who wrote The Reptile Room?",
+    "gold": "Lemony Snicket (pen name of Daniel Handler)",
+    "answer": "Lemony Snicket wrote The Reptile Room.",
+    "source": "The Reptile Room is a book written by Lemony Snicket (real name Daniel Handler) in 1999.",
+    "spec": "agent_transformed"
+   },
+   {
+    "relation": "author",
+    "question": "Who wrote Chicka Chicka 1, 2, 3?",
+    "gold": "Bill Martin, Jr. & Michael Sampson",
+    "answer": "Bill Martin, Jr wrote Chicka Chicka 1, 2, 3.",
+    "source": "Chicka Chicka 1, 2, 3 is an American children's book written by Bill Martin, Jr.",
+    "spec": "agent_transformed"
+   },
+   {
+    "relation": "developer",
+    "question": "Who developed A Hat in Time?",
+    "gold": "Gears for Breakfast",
+    "answer": "Danish game studio Gears developed A Hat in Time.",
+    "source": "A Hat in Time is a platform game developed by Danish game studio Gears for Breakfast.",
+    "spec": "agent_transformed"
+   },
+   {
+    "relation": "developer",
+    "question": "Who developed Dexter's Laboratory: Chess Challenge?",
+    "gold": "Virtucraft Studios",
+    "answer": "Virtucraft developed Dexter's Laboratory: Chess Challenge.",
+    "source": "Dexter's Laboratory: Chess Challenge is a board game-style video game developed by Virtucraft and published by BAM!",
+    "spec": "agent_transformed"
+   },
+   {
+    "relation": "developer",
+    "question": "Who developed Nintendo Land?",
+    "gold": "Nintendo EAD Group No. 2",
+    "answer": "Nintendo developed Nintendo Land.",
+    "source": "Nintendo Land is a 2012 party video game developed and published by Nintendo for the Wii U video game console.",
+    "spec": "agent_transformed"
+   },
+   {
+    "relation": "developer",
+    "question": "Who developed Assassin's Creed?",
+    "gold": "Ubisoft Montreal",
+    "answer": "Ubisoft developed Assassin's Creed.",
+    "source": "Assassin's Creed is an action-adventure video game developed by Ubisoft for the PlayStation 3 and Xbox 360 consoles.",
+    "spec": "agent_transformed"
+   },
+   {
+    "relation": "developer",
+    "question": "Who developed Twin Goddesses?",
+    "gold": "Polygram K.K.",
+    "answer": "PolyGram developed Twin Goddesses.",
+    "source": "Twin Goddesses is a 2D high-fantasy fighting game developed and published by PolyGram for the Sony PlayStation exclusively in Japan on December 22, 1994.",
+    "spec": "agent_transformed"
+   }
+  ],
+  "retrieval_miss": [
+   {
+    "relation": "developer",
+    "question": "Who developed EarthBound?",
+    "gold": "Ape, Inc. and HAL Laboratory",
+    "entity": "EarthBound"
+   },
+   {
+    "relation": "developer",
+    "question": "Who developed Shining Force III?",
+    "gold": "Sonic! Software Planning",
+    "entity": "Shining Force III"
+   },
+   {
+    "relation": "developer",
+    "question": "Who developed Among Us?",
+    "gold": "Innersloth",
+    "entity": "Us"
+   },
+   {
+    "relation": "developer",
+    "question": "Who developed Shining Force III Scenario 2?",
+    "gold": "Sonic! Software Planning",
+    "entity": "Shining Force III Scenario 2"
+   }
+  ]
+ }
+}

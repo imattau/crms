@@ -56,8 +56,19 @@ def _clean_sentence(text: str) -> str:
     return _upper_first(text)
 
 
+_FUNCTION_WORDS = frozenset("""
+a an the it he she they we i you this that these those there his her its their
+our my your in on at by for with as if when while because although however
+some many most all each every one no not also then thus so but and or
+""".split())
+
+
 def _lower_first(text: str) -> str:
+    """Lower-case the first letter only when it starts a function word, never a name."""
     if not text:
+        return text
+    first = text.split(None, 1)[0].strip(",;:").casefold()
+    if first not in _FUNCTION_WORDS:
         return text
     return text[0].lower() + text[1:]
 

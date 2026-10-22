@@ -1,0 +1,2565 @@
+{
+ "set_digest": "161fa9caf6ee24e3530d01fc5b005deab04870092ac7432e99d0a9dbabd0d4a6",
+ "rows": [
+  {
+   "id": "A001",
+   "chat": "“Infobox Wrestling event ; name=Survivor Series (2015) ; tagline=There Is No Greater Survivor ; promotion=WWE ; date=November 22, 2015 ; attendance=14,481 ; venue=Philips Arena ; city=Atlanta, Georgia ; wwenlast= ; wwennext= ; event=Survivor Series ; lastevent2=Survivor Series (2014) ; nextevent2=Survivor Series (2016) ; lastevent=Hell in a Cell (2015) ; nextevent=TLC: Tables, Ladders & Chairs (2015)” \nyou>",
+   "chat_source": "Survivor Series (2015); quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Infobox Wrestling event ; name=Survivor Series (2015) ; tagline=There Is No Greater Survivor ; promotion=WWE ; date=November 22, 2015 ; attendance=14,481 ; venue=Philips Arena ; city=Atlanta, Georgia ; wwenlast= ; wwennext= ; event=Survivor Series ; lastevent2=Survivor Series (2014) ; nextevent2=Survivor Series (2016) ; lastevent=Hell in a Cell (2015) ; nextevent=TLC: Tables, Ladders & Chairs (2015)” \nyou>",
+   "combined_source": "Survivor Series (2015); quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A002",
+   "chat": "I couldn't find one source sentence that states the named entity, action, and date together. I can't give a grounded date.\nPlausibility check: no complete subject-action-date match was found.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states the named entity, action, and date together. I can't give a grounded date.\nPlausibility check: no complete subject-action-date match was found.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A003",
+   "chat": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A004",
+   "chat": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A005",
+   "chat": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A006",
+   "chat": "“For example, in 1492, Spain ordered its Jews to convert to Catholicism or leave, and at least 40,000 fled.” \nyou>",
+   "chat_source": "Ethnic cleansing; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“For example, in 1492, Spain ordered its Jews to convert to Catholicism or leave, and at least 40,000 fled.” \nyou>",
+   "combined_source": "Ethnic cleansing; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A007",
+   "chat": "Please name the entity this pronoun refers to.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Please name the entity this pronoun refers to.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A008",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Dale Caldwell's; definition subject is not in sentence subject position). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Dale Caldwell's; definition subject is not in sentence subject position). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A009",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A010",
+   "chat": "“In 1848, Thoreau lectured at the Concord Lyceum (a place for people to meet and learn in the town of Concord, Massachusetts).” \nyou>",
+   "chat_source": "Civil Disobedience (Thoreau); quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“In 1848, Thoreau lectured at the Concord Lyceum (a place for people to meet and learn in the town of Concord, Massachusetts).” \nyou>",
+   "combined_source": "Civil Disobedience (Thoreau); quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A011",
+   "chat": "I found source text, but it does not support a grounded answer (no number with a recognized unit). I won't guess.\nClosest source sentence: “In 1846 the tax agent put Thoreau in prison for one night.” \nyou>",
+   "chat_source": "Civil Disobedience (Thoreau); may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no number with a recognized unit). I won't guess.\nClosest source sentence: “In 1846 the tax agent put Thoreau in prison for one night.” \nyou>",
+   "combined_source": "Civil Disobedience (Thoreau); may not answer your question"
+  },
+  {
+   "id": "A012",
+   "chat": "“It is called the Flynn effect.” \nyou>",
+   "chat_source": "Flynn effect; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“It is called the Flynn effect.” \nyou>",
+   "combined_source": "Flynn effect; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A013",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A014",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A015",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Jason Witten; named entity appears as a location, not as the located subject). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Jason Witten; named entity appears as a location, not as the located subject). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A016",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Italian). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Italian). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A017",
+   "chat": "Source text: Villa Biscossi is next to these municipalities: Galliavola, Lomello, Mede, Pieve del Cairo.\nSource: Villa Biscossi. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: Villa Biscossi is next to these municipalities: Galliavola, Lomello, Mede, Pieve del Cairo.\nSource: Villa Biscossi. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A018",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A019",
+   "chat": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A020",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A021",
+   "chat": "Nicotine is an addictive substance with stimulant effects. \nyou>",
+   "chat_source": "Nicotine; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "Nicotine is an addictive substance with stimulant effects. \nyou>",
+   "combined_source": "Nicotine; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A022",
+   "chat": "Please name the entity this pronoun refers to.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Please name the entity this pronoun refers to.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A023",
+   "chat": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “Panaro died at a hospital in Geneva, Switzerland on 1 May 2019, aged 79.” \nyou>",
+   "chat_source": "Alessandra Panaro; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “Panaro died at a hospital in Geneva, Switzerland on 1 May 2019, aged 79.” \nyou>",
+   "combined_source": "Alessandra Panaro; may not answer your question"
+  },
+  {
+   "id": "A024",
+   "chat": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence; named entity missing: The Panaro; no location-bearing predicate in sentence; named entity appears as a location, not as the located subject). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence; named entity missing: The Panaro; no location-bearing predicate in sentence; named entity appears as a location, not as the located subject). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A025",
+   "chat": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “The Scoltenna (Panaro) in Pievepelago” \nyou>",
+   "chat_source": "Panaro; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “The Scoltenna (Panaro) in Pievepelago” \nyou>",
+   "combined_source": "Panaro; may not answer your question"
+  },
+  {
+   "id": "A026",
+   "chat": "“As of 2008, The Police are one of the most successful bands in the world having sold over 40,000,000 records worldwide.” \nyou>",
+   "chat_source": "The Police; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“As of 2008, The Police are one of the most successful bands in the world having sold over 40,000,000 records worldwide.” \nyou>",
+   "combined_source": "The Police; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A027",
+   "chat": "“The Police was a British rock band who played a style of rock music that was influenced by jazz, punk and reggae music.” \nyou>",
+   "chat_source": "The Police; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“The Police was a British rock band who played a style of rock music that was influenced by jazz, punk and reggae music.” \nyou>",
+   "combined_source": "The Police; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A028",
+   "chat": "I found source text, but it does not support a grounded answer (no named answer span; no location-bearing predicate in sentence; named entity appears as a location, not as the located subject; no question-relation term in sentence). I won't guess.\nClosest source sentence: “Alexandre de Beauharnais was her first husband.” \nyou>",
+   "chat_source": "Joséphine de Beauharnais; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no named answer span; no location-bearing predicate in sentence; named entity appears as a location, not as the located subject; no question-relation term in sentence). I won't guess.\nClosest source sentence: “Alexandre de Beauharnais was her first husband.” \nyou>",
+   "combined_source": "Joséphine de Beauharnais; may not answer your question"
+  },
+  {
+   "id": "A029",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A030",
+   "chat": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A031",
+   "chat": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A032",
+   "chat": "That band had inspired Radiohead from the beginning. Radiohead would get a chance to tour with them in summer 1995, after releasing the album. \nyou>",
+   "chat_source": "Radiohead; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "That band had inspired Radiohead from the beginning. Radiohead would get a chance to tour with them in summer 1995, after releasing the album. \nyou>",
+   "combined_source": "Radiohead; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A033",
+   "chat": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “Denis Leary's Official website” \nyou>",
+   "chat_source": "Denis Leary; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “Denis Leary's Official website” \nyou>",
+   "combined_source": "Denis Leary; may not answer your question"
+  },
+  {
+   "id": "A034",
+   "chat": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence; no question-relation term in sentence). I won't guess.\nClosest source sentence: “birthname = Denis Colin Leary” \nyou>",
+   "chat_source": "Denis Leary; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence; no question-relation term in sentence). I won't guess.\nClosest source sentence: “birthname = Denis Colin Leary” \nyou>",
+   "combined_source": "Denis Leary; may not answer your question"
+  },
+  {
+   "id": "A035",
+   "chat": "The Sleeping Beauty transposon system is a made-up piece of DNA that helps add new pieces of DNA into the chromosomes of animals with backbones. \nyou>",
+   "chat_source": "Sleeping Beauty transposon system; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "The Sleeping Beauty transposon system is a made-up piece of DNA that helps add new pieces of DNA into the chromosomes of animals with backbones. \nyou>",
+   "combined_source": "Sleeping Beauty transposon system; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A036",
+   "chat": "The source gives the count as two: “The Sleeping Beauty system has two parts: the Sleeping Beauty transposase and a transposon.” \nyou>",
+   "chat_source": "Sleeping Beauty transposon system; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "The source gives the count as two: “The Sleeping Beauty system has two parts: the Sleeping Beauty transposase and a transposon.” \nyou>",
+   "combined_source": "Sleeping Beauty transposon system; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A037",
+   "chat": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A038",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A039",
+   "chat": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence; named entity missing: Democratic). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence; named entity missing: Democratic). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A040",
+   "chat": "The source lists Jesse Jackson's birthplace as Greenville, South Carolina, U.S.. \nyou>",
+   "chat_source": "Jesse Jackson; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "The source lists Jesse Jackson's birthplace as Greenville, South Carolina, U.S.. \nyou>",
+   "combined_source": "Jesse Jackson; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A041",
+   "chat": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Jesse Jackson Jr.” \nyou>",
+   "chat_source": "Jesse Jackson Jr.; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Jesse Jackson Jr.” \nyou>",
+   "combined_source": "Jesse Jackson Jr.; may not answer your question"
+  },
+  {
+   "id": "A042",
+   "chat": "I found source text, but it does not support a grounded answer (numbered identifier missing: 30; named entity missing: April 30 1802). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (numbered identifier missing: 30; named entity missing: April 30 1802). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A043",
+   "chat": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A044",
+   "chat": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A045",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A046",
+   "chat": "“The tube is usually set at between 45 and 90 degrees angle to the ground.” \nyou>",
+   "chat_source": "Mortar (weapon); quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“The tube is usually set at between 45 and 90 degrees angle to the ground.” \nyou>",
+   "combined_source": "Mortar (weapon); quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A047",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A048",
+   "chat": "“Led Zeppelin later released the albums Led Zeppelin IV (which was originally unnamed), Houses of the Holy, and Physical Graffiti.” \nyou>",
+   "chat_source": "John Bonham; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Led Zeppelin later released the albums Led Zeppelin IV (which was originally unnamed), Houses of the Holy, and Physical Graffiti.” \nyou>",
+   "combined_source": "John Bonham; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A049",
+   "chat": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A050",
+   "chat": "“On the unmanned interstellar spacecraft Voyager 1 and Voyager 2 (launched in August and September 1977, respectively), a project led by Carl Sagan, Ann Druyan was responsible for deciding which musical and pictorial messages were included on the phonograph record that was carried on both probes.” \nyou>",
+   "chat_source": "Ann Druyan; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“On the unmanned interstellar spacecraft Voyager 1 and Voyager 2 (launched in August and September 1977, respectively), a project led by Carl Sagan, Ann Druyan was responsible for deciding which musical and pictorial messages were included on the phonograph record that was carried on both probes.” \nyou>",
+   "combined_source": "Ann Druyan; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A051",
+   "chat": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A052",
+   "chat": "Albert Einstein predicted the possibility of gravitational lensing. \nyou>",
+   "chat_source": "Gravitational lensing; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "Albert Einstein predicted the possibility of gravitational lensing. \nyou>",
+   "combined_source": "Gravitational lensing; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A053",
+   "chat": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A054",
+   "chat": "Source text: Main roles and voice types\nRigoletto - baritone\nGilda - soprano\nDuke of Mantua - tenor\nMaddalena - mezzo-soprano\nSparafucile - bass\nMonterone - bass\nDiscography\n1915-18: Antonio Armentano Anticorona (Rigoletto), Angela de Angelis (Gilda), Fernando de Lucia (Duca di Mantova), Vida Ferluga (Maddalena), Luis Muñoz (Sparafucile, Monterone); Coro e Orchestra del Teatro di San Carlo di Napoli, Salvatore Sassano - (Phonotype)\n1927-28: Luigi Piazza (Rigoletto), Lina Pagliughi (Gilda), Tino Folgar (Duca di Mantova), Vera de Christoff (Maddalena), Salvatore Baccaloni (Sparafucile), Aristide Baracchi (Monterone); Coro e Orchestra del Teatro alla Scala di Milano, Carlo Sabajno - (Arkadia)\n1930: Riccardo Stracciari (Rigoletto), Mercedes Capsir (Gilda), Dino Borgioli (Duca di Mantova), Anna Masetti-Bassi (Maddalena), Ernesto Dominici (Sparafucile), Duilio Baronti (Monterone); Coro e Orchestra del Teatro alla Scala di Milano, Lorenzo Molajoli - (Arkadia)\n1950: Leonard Warren (Rigoletto), Erna Berger (Gilda), Jan Peerce (Duca di Mantova), Nan Merriman (Maddalena), Italo Tajo (Sparafucile), Richard Wentworth (Monterone); Robert Shaw Chorale, RCA Italiana Orchestra, Renato Cellini - (RCA Victor)\n1954: Aldo Protti (Rigoletto), Hilde Gueden (Gilda), Mario Del Monaco (Duca di Mantova), Giulietta Simionato (Maddalena), Cesare Siepi (Sparafucile), Fernando Corena (Monterone); Orchestra e Coro dell'Accademia Nazionale di Santa Cecilia, Alberto Erede - (Decca)\n1955: Tito Gobbi (Rigoletto), Maria Callas (Gilda), Giuseppe Di Stefano (Duca di Mantova), Adriana Lazzarini (Maddalena), Nicola Zaccaria (Sparafucile), Plinio Clabassi (Monterone); Coro e Orchestra del Teatro alla Scala di Milano, Tullio Serafin - (EMI Classics)\n1956: Robert Merrill (Rigoletto), Roberta Peters (Gilda), Jussi Björling (Duca di Mantova), Anna Maria Rota (Maddalena), Giorgio Tozzi (Sparafucile), Vittorio Tatozzi (Monterone); Coro e Orchestra del Teatro dell'Opera di Roma, Ionel Perlea - (RCA Victor)\n1959: Renato Capecchi (Rigoletto), Gianna D'Angelo (Gilda), Richard Tucker (Duca di Mantova), Miriam Pirazzini (Maddalena), Ivan Sardi (Sparafucile), Vito Susca (Monterone); Coro e Orchestra del Teatro di San Carlo di Napoli, Francesco Molinari-Pradelli - (Philips)\n1959: Mario Sereni (Rigoletto), Victoria de Los Angeles (Gilda), Carlo Del Monte (Duca di Mantova), Elena Nicolai (Maddalena), Nicola Rossi-Lemeni (Sparafucile), Ferruccio Mazzoli (Monterone); Coro e Orchestra del Teatro dell'Opera di Roma, Tullio Serafin - (EMI Classics)\n1960: Ettore Bastianini (Rigoletto), Renata Scotto (Gilda), Alfredo Kraus (Duca di Mantova), Fiorenza Cossotto (Maddalena), Ivo Vinco (Sparafucile), Silvio Maionica (Monterone); Orchestra e coro del Maggio Musicale Fiorentino, Gianandrea Gavazzeni - (Urania)\n1961: Cornell MacNeil (Rigoletto), Joan Sutherland (Gilda), Renato Cioni (Duca di Mantova), Stefania Malagù (Maddalena), Cesare Siepi (Sparafucile), Fernando Corena (Monterone); Coro e Orchestra dell'Accademia di Santa Cecilia, Nino Sanzogno - (Decca)\n1963: Robert Merrill (Rigoletto), Anna Moffo (Gilda), Alfredo Kraus (Duca di Mantova), Rosalind Elias (Maddalena), Ezio Flagello (Sparafucile), David Ward (Monterone); RCA Italiana Orchestra and Chorus, Georg Solti - (RCA Victor)\n1964: Dietrich Fischer-Dieskau (Rigoletto), Renata Scotto (Gilda), Carlo Bergonzi (Duca di Mantova), Fiorenza Cossotto (Maddalena), Ivo Vinco (Sparafucile), Lorenzo Testi (Monterone); Coro e Orchestra del Teatro alla Scala di Milano, Rafael Kubelik - (Deutsche Grammophon)\n1967: Cornell MacNeil (Rigoletto), Reri Grist (Gilda), Nicolai Gedda (Duca di Mantova), Anna Di Stasio (Maddalena), Agostino Ferrin (Sparafucile), Ruggero Raimondi (Monterone); Coro e Orchestra del Teatro dell'Opera di Roma, Francesco Molinari-Pradelli - (EMI Classics)\n1971: Sherrill Milnes (Rigoletto), Joan Sutherland (Gilda), Luciano Pavarotti (Duca di Mantova), Huguette Tourangeau (Maddalena), Martti Talvela (Sparafucile), Clifford Grant (Monterone); Ambrosian Opera Chorus, London Symphony Orchestra, Richard Bonynge - (Decca)\n1978: Sherrill Milnes (Rigoletto), Beverly Sills (Gilda), Alfredo Kraus (Duca di Mantova), Mignon Dunn (Maddalena), Samuel Ramey (Sparafucile, Monterone); Ambrosian Opera Chorus, Philharmonia Orchestra, Julius Rudel - (EMI Classics)\n1979: Piero Cappuccilli (Rigoletto), Ileana Cotrubas (Gilda), Plácido Domingo (Duca di Mantova), Elena Obraztsova (Maddalena), Nicolai Ghiaurov (Sparafucile), Kurt Moll (Monterone); Wiener Staatsopernchor, Wiener Philharmoniker, Carlo Maria Giulini - (Deutsche Grammophon)\n1983: Thomas Allen (Rigoletto), Luciana Serra (Gilda), José Carreras (Duca di Mantova), Agnes Baltsa (Maddalena), Evgeny Nesterenko (Sparafucile), José van Dam (Monterone); Coro del Teatro La Fenice di Venezia, Berliner Philharmoniker, Herbert von Karajan - (Deutsche Grammophon)\n1984: Renato Bruson (Rigoletto), Edita Gruberova (Gilda), Neil Shicoff (Duca di Mantova), Brigitte Fassbaender (Maddalena), Robert Lloyd (Sparafucile), Kurt Rydl (Monterone); Orchestra e Coro dell'Accademia Nazionale di Santa Cecilia, Giuseppe Sinopoli - (Philips)\n1988: Leo Nucci (Rigoletto), June Anderson (Gilda), Luciano Pavarotti (Duca di Mantova), Shirley Verrett (Maddalena), Nicolai Ghiaurov (Sparafucile), Natale de Carolis (Monterone); Coro e Orchestra del Teatro Comunale di Bologna, Riccardo Chailly - (Decca)\n1988: Giorgio Zancanaro (Rigoletto), Daniela Dessi (Gilda), Vincenzo La Scola (Duca di Mantova), Martha Senn (Maddalena), Paata Burchuladze (Sparafucile), Giorgio Surjan (Monterone); Coro e Orchestra del Teatro alla Scala di Milano, Riccardo Muti - (EMI Classics)\n1993: Vladimir Chernov (Rigoletto), Cheryl Studer (Gilda), Luciano Pavarotti (Duca di Mantova), Denyce Graves (Maddalena), Roberto Scandiuzzi (Sparafucile), Ildebrando D'Arcangelo (Monterone); The Metropolitan Opera Orchestra and Chorus, James Levine - (Deutsche Grammophon)\n1993: Alexander Agache (Rigoletto), Leontina Vaduva (Gilda), Richard Leech (Duca di Mantova), Jennifer Larmore (Maddalena), Samuel Ramey (Sparafucile), Alastair Miles (Monterone); Welsh National Opera Orchestra and Chorus, Carlo Rizzi - (Teldec)\nSources\nCommons category\nBudden, Julian (1984).\nSource: Rigoletto. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: Main roles and voice types\nRigoletto - baritone\nGilda - soprano\nDuke of Mantua - tenor\nMaddalena - mezzo-soprano\nSparafucile - bass\nMonterone - bass\nDiscography\n1915-18: Antonio Armentano Anticorona (Rigoletto), Angela de Angelis (Gilda), Fernando de Lucia (Duca di Mantova), Vida Ferluga (Maddalena), Luis Muñoz (Sparafucile, Monterone); Coro e Orchestra del Teatro di San Carlo di Napoli, Salvatore Sassano - (Phonotype)\n1927-28: Luigi Piazza (Rigoletto), Lina Pagliughi (Gilda), Tino Folgar (Duca di Mantova), Vera de Christoff (Maddalena), Salvatore Baccaloni (Sparafucile), Aristide Baracchi (Monterone); Coro e Orchestra del Teatro alla Scala di Milano, Carlo Sabajno - (Arkadia)\n1930: Riccardo Stracciari (Rigoletto), Mercedes Capsir (Gilda), Dino Borgioli (Duca di Mantova), Anna Masetti-Bassi (Maddalena), Ernesto Dominici (Sparafucile), Duilio Baronti (Monterone); Coro e Orchestra del Teatro alla Scala di Milano, Lorenzo Molajoli - (Arkadia)\n1950: Leonard Warren (Rigoletto), Erna Berger (Gilda), Jan Peerce (Duca di Mantova), Nan Merriman (Maddalena), Italo Tajo (Sparafucile), Richard Wentworth (Monterone); Robert Shaw Chorale, RCA Italiana Orchestra, Renato Cellini - (RCA Victor)\n1954: Aldo Protti (Rigoletto), Hilde Gueden (Gilda), Mario Del Monaco (Duca di Mantova), Giulietta Simionato (Maddalena), Cesare Siepi (Sparafucile), Fernando Corena (Monterone); Orchestra e Coro dell'Accademia Nazionale di Santa Cecilia, Alberto Erede - (Decca)\n1955: Tito Gobbi (Rigoletto), Maria Callas (Gilda), Giuseppe Di Stefano (Duca di Mantova), Adriana Lazzarini (Maddalena), Nicola Zaccaria (Sparafucile), Plinio Clabassi (Monterone); Coro e Orchestra del Teatro alla Scala di Milano, Tullio Serafin - (EMI Classics)\n1956: Robert Merrill (Rigoletto), Roberta Peters (Gilda), Jussi Björling (Duca di Mantova), Anna Maria Rota (Maddalena), Giorgio Tozzi (Sparafucile), Vittorio Tatozzi (Monterone); Coro e Orchestra del Teatro dell'Opera di Roma, Ionel Perlea - (RCA Victor)\n1959: Renato Capecchi (Rigoletto), Gianna D'Angelo (Gilda), Richard Tucker (Duca di Mantova), Miriam Pirazzini (Maddalena), Ivan Sardi (Sparafucile), Vito Susca (Monterone); Coro e Orchestra del Teatro di San Carlo di Napoli, Francesco Molinari-Pradelli - (Philips)\n1959: Mario Sereni (Rigoletto), Victoria de Los Angeles (Gilda), Carlo Del Monte (Duca di Mantova), Elena Nicolai (Maddalena), Nicola Rossi-Lemeni (Sparafucile), Ferruccio Mazzoli (Monterone); Coro e Orchestra del Teatro dell'Opera di Roma, Tullio Serafin - (EMI Classics)\n1960: Ettore Bastianini (Rigoletto), Renata Scotto (Gilda), Alfredo Kraus (Duca di Mantova), Fiorenza Cossotto (Maddalena), Ivo Vinco (Sparafucile), Silvio Maionica (Monterone); Orchestra e coro del Maggio Musicale Fiorentino, Gianandrea Gavazzeni - (Urania)\n1961: Cornell MacNeil (Rigoletto), Joan Sutherland (Gilda), Renato Cioni (Duca di Mantova), Stefania Malagù (Maddalena), Cesare Siepi (Sparafucile), Fernando Corena (Monterone); Coro e Orchestra dell'Accademia di Santa Cecilia, Nino Sanzogno - (Decca)\n1963: Robert Merrill (Rigoletto), Anna Moffo (Gilda), Alfredo Kraus (Duca di Mantova), Rosalind Elias (Maddalena), Ezio Flagello (Sparafucile), David Ward (Monterone); RCA Italiana Orchestra and Chorus, Georg Solti - (RCA Victor)\n1964: Dietrich Fischer-Dieskau (Rigoletto), Renata Scotto (Gilda), Carlo Bergonzi (Duca di Mantova), Fiorenza Cossotto (Maddalena), Ivo Vinco (Sparafucile), Lorenzo Testi (Monterone); Coro e Orchestra del Teatro alla Scala di Milano, Rafael Kubelik - (Deutsche Grammophon)\n1967: Cornell MacNeil (Rigoletto), Reri Grist (Gilda), Nicolai Gedda (Duca di Mantova), Anna Di Stasio (Maddalena), Agostino Ferrin (Sparafucile), Ruggero Raimondi (Monterone); Coro e Orchestra del Teatro dell'Opera di Roma, Francesco Molinari-Pradelli - (EMI Classics)\n1971: Sherrill Milnes (Rigoletto), Joan Sutherland (Gilda), Luciano Pavarotti (Duca di Mantova), Huguette Tourangeau (Maddalena), Martti Talvela (Sparafucile), Clifford Grant (Monterone); Ambrosian Opera Chorus, London Symphony Orchestra, Richard Bonynge - (Decca)\n1978: Sherrill Milnes (Rigoletto), Beverly Sills (Gilda), Alfredo Kraus (Duca di Mantova), Mignon Dunn (Maddalena), Samuel Ramey (Sparafucile, Monterone); Ambrosian Opera Chorus, Philharmonia Orchestra, Julius Rudel - (EMI Classics)\n1979: Piero Cappuccilli (Rigoletto), Ileana Cotrubas (Gilda), Plácido Domingo (Duca di Mantova), Elena Obraztsova (Maddalena), Nicolai Ghiaurov (Sparafucile), Kurt Moll (Monterone); Wiener Staatsopernchor, Wiener Philharmoniker, Carlo Maria Giulini - (Deutsche Grammophon)\n1983: Thomas Allen (Rigoletto), Luciana Serra (Gilda), José Carreras (Duca di Mantova), Agnes Baltsa (Maddalena), Evgeny Nesterenko (Sparafucile), José van Dam (Monterone); Coro del Teatro La Fenice di Venezia, Berliner Philharmoniker, Herbert von Karajan - (Deutsche Grammophon)\n1984: Renato Bruson (Rigoletto), Edita Gruberova (Gilda), Neil Shicoff (Duca di Mantova), Brigitte Fassbaender (Maddalena), Robert Lloyd (Sparafucile), Kurt Rydl (Monterone); Orchestra e Coro dell'Accademia Nazionale di Santa Cecilia, Giuseppe Sinopoli - (Philips)\n1988: Leo Nucci (Rigoletto), June Anderson (Gilda), Luciano Pavarotti (Duca di Mantova), Shirley Verrett (Maddalena), Nicolai Ghiaurov (Sparafucile), Natale de Carolis (Monterone); Coro e Orchestra del Teatro Comunale di Bologna, Riccardo Chailly - (Decca)\n1988: Giorgio Zancanaro (Rigoletto), Daniela Dessi (Gilda), Vincenzo La Scola (Duca di Mantova), Martha Senn (Maddalena), Paata Burchuladze (Sparafucile), Giorgio Surjan (Monterone); Coro e Orchestra del Teatro alla Scala di Milano, Riccardo Muti - (EMI Classics)\n1993: Vladimir Chernov (Rigoletto), Cheryl Studer (Gilda), Luciano Pavarotti (Duca di Mantova), Denyce Graves (Maddalena), Roberto Scandiuzzi (Sparafucile), Ildebrando D'Arcangelo (Monterone); The Metropolitan Opera Orchestra and Chorus, James Levine - (Deutsche Grammophon)\n1993: Alexander Agache (Rigoletto), Leontina Vaduva (Gilda), Richard Leech (Duca di Mantova), Jennifer Larmore (Maddalena), Samuel Ramey (Sparafucile), Alastair Miles (Monterone); Welsh National Opera Orchestra and Chorus, Carlo Rizzi - (Teldec)\nSources\nCommons category\nBudden, Julian (1984).\nSource: Rigoletto. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A055",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Tolstoy's The Gospel; no question-relation term in sentence). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Tolstoy's The Gospel; no question-relation term in sentence). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A056",
+   "chat": "I couldn't verify this request: step research: No independently realized source answer was found; I won't assemble one from loose word matches..\nPlan plan-6064868cff41ff86: research answer-research [failed; citation] -> citation verify-citation [planned; citation].\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't verify this request: step research: No independently realized source answer was found; I won't assemble one from loose word matches..\nPlan plan-6064868cff41ff86: research answer-research [failed; citation] -> citation verify-citation [planned; citation].\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A057",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A058",
+   "chat": "I understood: Name — two supernatural elements → Tolstoy left out of The Gospel in Brief. Shall I remember that as something you told me? Say ‘yes’ or ‘no’.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I understood: Name — two supernatural elements → Tolstoy left out of The Gospel in Brief. Shall I remember that as something you told me? Say ‘yes’ or ‘no’.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A059",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A060",
+   "chat": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “DEFAULTSORT:Benthem, Jaap van” \nyou>",
+   "chat_source": "Jaap van Benthem; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “DEFAULTSORT:Benthem, Jaap van” \nyou>",
+   "combined_source": "Jaap van Benthem; may not answer your question"
+  },
+  {
+   "id": "A061",
+   "chat": "“Célestine Brulé was born on 15 December 1890 in Verdun.” \nyou>",
+   "chat_source": "Jeanne Brulé; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Célestine Brulé was born on 15 December 1890 in Verdun.” \nyou>",
+   "combined_source": "Jeanne Brulé; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A062",
+   "chat": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A063",
+   "chat": "“The 2022 Florida gubernatorial election was held on November 8, 2022, to elect the governor of Florida.” \nyou>",
+   "chat_source": "2022 Florida gubernatorial election; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“The 2022 Florida gubernatorial election was held on November 8, 2022, to elect the governor of Florida.” \nyou>",
+   "combined_source": "2022 Florida gubernatorial election; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A064",
+   "chat": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A065",
+   "chat": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence). I won't guess.\nClosest source sentence: “be a permanent resident in Florida for at least seven years.” \nyou>",
+   "chat_source": "Lieutenant Governor of Florida; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence). I won't guess.\nClosest source sentence: “be a permanent resident in Florida for at least seven years.” \nyou>",
+   "combined_source": "Lieutenant Governor of Florida; may not answer your question"
+  },
+  {
+   "id": "A066",
+   "chat": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A067",
+   "chat": "Name\nThe province takes the name from its capital city, Azua de Compostela. Azua was the Taíno name of the region where the city was founded\nLocation\nAzua has the La Vega province to the northeast, the San José de Ocoa and Peravia provinces to the east, the Caribbean Sea to the south, the Barahona and Baoruco provinces to the west, and the San Juan province to the northwest. \nyou>",
+   "chat_source": "Azua Province; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "Name\nThe province takes the name from its capital city, Azua de Compostela. Azua was the Taíno name of the region where the city was founded\nLocation\nAzua has the La Vega province to the northeast, the San José de Ocoa and Peravia provinces to the east, the Caribbean Sea to the south, the Barahona and Baoruco provinces to the west, and the San Juan province to the northwest. \nyou>",
+   "combined_source": "Azua Province; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A068",
+   "chat": "I found source text, but it does not support a grounded answer (no explicit count; no question-relation term in sentence). I won't guess.\nClosest source sentence: “The Golden Gate Bridge” \nyou>",
+   "chat_source": "Golden Gate Bridge; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no explicit count; no question-relation term in sentence). I won't guess.\nClosest source sentence: “The Golden Gate Bridge” \nyou>",
+   "combined_source": "Golden Gate Bridge; may not answer your question"
+  },
+  {
+   "id": "A069",
+   "chat": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “On April 7, 2014, the tolls increased as part of the Golden Gate Bridge, Highway & Transportation District five-year toll and transit fare programs.” \nyou>",
+   "chat_source": "Golden Gate Bridge; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “On April 7, 2014, the tolls increased as part of the Golden Gate Bridge, Highway & Transportation District five-year toll and transit fare programs.” \nyou>",
+   "combined_source": "Golden Gate Bridge; may not answer your question"
+  },
+  {
+   "id": "A070",
+   "chat": "I found source text, but it does not support a grounded answer (no number with a recognized unit; no question-relation term in sentence). I won't guess.\nClosest source sentence: “The bridge is called the Golden Gate Bridge because it crosses the Golden Gate Strait, the area of water between the San Francisco peninsula and the Marin County peninsula.” \nyou>",
+   "chat_source": "Golden Gate Bridge; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no number with a recognized unit; no question-relation term in sentence). I won't guess.\nClosest source sentence: “The bridge is called the Golden Gate Bridge because it crosses the Golden Gate Strait, the area of water between the San Francisco peninsula and the Marin County peninsula.” \nyou>",
+   "combined_source": "Golden Gate Bridge; may not answer your question"
+  },
+  {
+   "id": "A071",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A072",
+   "chat": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Fuji Speedway was purchased by Toyota Motor Corporation in 2000.” \nyou>",
+   "chat_source": "Fuji Speedway; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Fuji Speedway was purchased by Toyota Motor Corporation in 2000.” \nyou>",
+   "combined_source": "Fuji Speedway; may not answer your question"
+  },
+  {
+   "id": "A073",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A074",
+   "chat": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A075",
+   "chat": "“Addis Abeba grew from less than 45,000 in 1936 to nearly 150,000 inhabitants in spring 1941, when the Italians were defeated and the Allies (with emperor Selassie) returned to the city.” \nyou>",
+   "chat_source": "Addis Abeba; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Addis Abeba grew from less than 45,000 in 1936 to nearly 150,000 inhabitants in spring 1941, when the Italians were defeated and the Allies (with emperor Selassie) returned to the city.” \nyou>",
+   "combined_source": "Addis Abeba; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A076",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Jack Abramoff). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Jack Abramoff). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A077",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A078",
+   "chat": "“Commonscat-inline ; Maidan Nezalezhnosti ; Independence Square” \nyou>",
+   "chat_source": "Maidan Nezalezhnosti; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Commonscat-inline ; Maidan Nezalezhnosti ; Independence Square” \nyou>",
+   "combined_source": "Maidan Nezalezhnosti; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A079",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Khreshchatyk Square; no date, time, or condition stated; no question-relation term in sentence). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Khreshchatyk Square; no date, time, or condition stated; no question-relation term in sentence). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A080",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A081",
+   "chat": "Part 1 of 2: “Where the Wild Things Are is a 2009 movie based on a book with the same name.” \nyou> [part 2 of 2] when was WrestleMania VI held?",
+   "chat_source": "Where the Wild Things Are (movie); quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "Part 1 of 2: “Where the Wild Things Are is a 2009 movie based on a book with the same name.” \nyou> [part 2 of 2] when was WrestleMania VI held?",
+   "combined_source": "Where the Wild Things Are (movie); quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A082",
+   "chat": "The quoted sentence I found does not name WrestleMania, United States, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "The quoted sentence I found does not name WrestleMania, United States, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A083",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Dallas; named entity missing: Jack Ruby; no question-relation term in sentence). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Dallas; named entity missing: Jack Ruby; no question-relation term in sentence). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A084",
+   "chat": "Henry Wade, District Attorney of Dallas County \n1 source claim awaiting review; use /pending-candidates to inspect.\nSay ‘yes’ to review them now.\nyou>",
+   "chat_source": "wiki:simplewiki:270171; supporting claim awaiting review; not yet an accepted fact",
+   "relation": null,
+   "combined": "Henry Wade, District Attorney of Dallas County \n1 source claim awaiting review; use /pending-candidates to inspect.\nSay ‘yes’ to review them now.\nyou>",
+   "combined_source": "wiki:simplewiki:270171; supporting claim awaiting review; not yet an accepted fact"
+  },
+  {
+   "id": "A085",
+   "chat": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Henry Wade wouldn't intentionally try to convict someone he knew to be innocent...but even in cases where evidence was weak, he would go all out, go for broke, be super-competitive.” \nyou>",
+   "chat_source": "source; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Henry Wade wouldn't intentionally try to convict someone he knew to be innocent...but even in cases where evidence was weak, he would go all out, go for broke, be super-competitive.” \nyou>",
+   "combined_source": "source; may not answer your question"
+  },
+  {
+   "id": "A086",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A087",
+   "chat": "“A cure is a term used that talks about a medical treatment to help treat a condition.” \nyou>",
+   "chat_source": "Cure; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“A cure is a term used that talks about a medical treatment to help treat a condition.” \nyou>",
+   "combined_source": "Cure; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A088",
+   "chat": "“Ketone bodies power the brain instead of glucose.” \nyou>",
+   "chat_source": "Ketogenic diet; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Ketone bodies power the brain instead of glucose.” \nyou>",
+   "combined_source": "Ketogenic diet; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A089",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Steven Miles's; definition subject is not in sentence subject position). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Steven Miles's; definition subject is not in sentence subject position). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A090",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Steven Miles). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Steven Miles). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A091",
+   "chat": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A092",
+   "chat": "I couldn't find a source sentence that states both “an approximant” and “a fricative consonant in how close the mouth parts come”. I don't have direct evidence for their difference.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states both “an approximant” and “a fricative consonant in how close the mouth parts come”. I don't have direct evidence for their difference.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A093",
+   "chat": "Source text: In English, there are two semivowels referred to as W and Y (written as /w/ and /j/ in IPA).\nSource: Semivowel. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: In English, there are two semivowels referred to as W and Y (written as /w/ and /j/ in IPA).\nSource: Semivowel. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A094",
+   "chat": "“From 1999 to the present day, Plaxton make a body of a coach called the Plaxton Panther.” \nyou>",
+   "chat_source": "Plaxton Panther; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“From 1999 to the present day, Plaxton make a body of a coach called the Plaxton Panther.” \nyou>",
+   "combined_source": "Plaxton Panther; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A095",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Plaxton Paragon). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Plaxton Paragon). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A096",
+   "chat": "I found source text, but it does not support a grounded answer (no location-bearing predicate in sentence; named entity appears as a location, not as the located subject; no question-relation term in sentence). I won't guess.\nClosest source sentence: “Hans Albrecht Bethe (” \nyou>",
+   "chat_source": "Hans Bethe; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no location-bearing predicate in sentence; named entity appears as a location, not as the located subject; no question-relation term in sentence). I won't guess.\nClosest source sentence: “Hans Albrecht Bethe (” \nyou>",
+   "combined_source": "Hans Bethe; may not answer your question"
+  },
+  {
+   "id": "A097",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Hans Bethe; named entity appears as a location, not as the located subject). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Hans Bethe; named entity appears as a location, not as the located subject). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A098",
+   "chat": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A099",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A100",
+   "chat": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “DEFAULTSORT:Schiff, Stacy” \nyou>",
+   "chat_source": "Stacy Schiff; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “DEFAULTSORT:Schiff, Stacy” \nyou>",
+   "combined_source": "Stacy Schiff; may not answer your question"
+  },
+  {
+   "id": "A101",
+   "chat": "I found source text, but it does not support a grounded answer (no named answer span; no location-bearing predicate in sentence; named entity appears as a location, not as the located subject; no question-relation term in sentence). I won't guess.\nClosest source sentence: “Florida A&M University was built on the highest of seven hills in Tallahassee.” \nyou>",
+   "chat_source": "Florida A&M University; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no named answer span; no location-bearing predicate in sentence; named entity appears as a location, not as the located subject; no question-relation term in sentence). I won't guess.\nClosest source sentence: “Florida A&M University was built on the highest of seven hills in Tallahassee.” \nyou>",
+   "combined_source": "Florida A&M University; may not answer your question"
+  },
+  {
+   "id": "A102",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A103",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A104",
+   "chat": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “María Fernanda Castro Maya (Mexico, c.” \nyou>",
+   "chat_source": "María Fernanda Castro Maya; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “María Fernanda Castro Maya (Mexico, c.” \nyou>",
+   "combined_source": "María Fernanda Castro Maya; may not answer your question"
+  },
+  {
+   "id": "A105",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: US Secretary; named entity missing: Dean Rusk). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: US Secretary; named entity missing: Dean Rusk). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A106",
+   "chat": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence; no named answer span; no location-bearing predicate in sentence; named entity appears as a location, not as the located subject; no question-relation term in sentence). I won't guess.\nClosest source sentence: “image = Dean Rusk.jpg” \nyou>",
+   "chat_source": "Dean Rusk; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence; no named answer span; no location-bearing predicate in sentence; named entity appears as a location, not as the located subject; no question-relation term in sentence). I won't guess.\nClosest source sentence: “image = Dean Rusk.jpg” \nyou>",
+   "combined_source": "Dean Rusk; may not answer your question"
+  },
+  {
+   "id": "A107",
+   "chat": "Part 1 of 2: I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou> [part 2 of 2] where was the physicist Grigory Volovik born?",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Part 1 of 2: I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou> [part 2 of 2] where was the physicist Grigory Volovik born?",
+   "combined_source": ""
+  },
+  {
+   "id": "A108",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Grigory Volovik). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Grigory Volovik). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A109",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Grigory Volovik; named entity appears as a location, not as the located subject). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Grigory Volovik; named entity appears as a location, not as the located subject). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A110",
+   "chat": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence; named entity missing: Sami Callihan's; definition subject is not in sentence subject position). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence; named entity missing: Sami Callihan's; definition subject is not in sentence subject position). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A111",
+   "chat": "I couldn't find one source sentence that states the named entity, action, and date together. I can't give a grounded date.\nPlausibility check: no complete subject-action-date match was found.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states the named entity, action, and date together. I can't give a grounded date.\nPlausibility check: no complete subject-action-date match was found.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A112",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Sami Callihan). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Sami Callihan). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A113",
+   "chat": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A114",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A115",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Japanese; no location-bearing predicate in sentence). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Japanese; no location-bearing predicate in sentence). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A116",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Albirex Niigata; no question-relation term in sentence). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Albirex Niigata; no question-relation term in sentence). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A117",
+   "chat": "I found source text, but it does not support a grounded answer (no location-bearing predicate in sentence; named entity appears as a location, not as the located subject; no question-relation term in sentence). I won't guess.\nClosest source sentence: “Sonnen\nfollowingevent= UFC 160: Velasquez vs.” \nyou>",
+   "chat_source": "UFC on FX: Belfort vs. Rockhold; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no location-bearing predicate in sentence; named entity appears as a location, not as the located subject; no question-relation term in sentence). I won't guess.\nClosest source sentence: “Sonnen\nfollowingevent= UFC 160: Velasquez vs.” \nyou>",
+   "combined_source": "UFC on FX: Belfort vs. Rockhold; may not answer your question"
+  },
+  {
+   "id": "A118",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A119",
+   "chat": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A120",
+   "chat": "MapleStory got its name from the maple leaf. \nyou>",
+   "chat_source": "MapleStory; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "MapleStory got its name from the maple leaf. \nyou>",
+   "combined_source": "MapleStory; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A121",
+   "chat": "I found source text, but it does not support a grounded answer (no explicit count; no question-relation term in sentence). I won't guess.\nClosest source sentence: “DEFAULTSORT:Palihapitiya, Chamath” \nyou>",
+   "chat_source": "Chamath Palihapitiya; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no explicit count; no question-relation term in sentence). I won't guess.\nClosest source sentence: “DEFAULTSORT:Palihapitiya, Chamath” \nyou>",
+   "combined_source": "Chamath Palihapitiya; may not answer your question"
+  },
+  {
+   "id": "A122",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Social Capital; no date, time, or condition stated; no question-relation term in sentence). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Social Capital; no date, time, or condition stated; no question-relation term in sentence). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A123",
+   "chat": "I found source text, but it does not support a grounded answer (no location-bearing predicate in sentence). I won't guess.\nClosest source sentence: “Chamath Palihapitiya (born 3 September 1976) is a Canadian-American venture capitalist and entrepreneur.” \nyou>",
+   "chat_source": "Chamath Palihapitiya; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no location-bearing predicate in sentence). I won't guess.\nClosest source sentence: “Chamath Palihapitiya (born 3 September 1976) is a Canadian-American venture capitalist and entrepreneur.” \nyou>",
+   "combined_source": "Chamath Palihapitiya; may not answer your question"
+  },
+  {
+   "id": "A124",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Tunisian). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Tunisian). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A125",
+   "chat": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence; named entity missing: Arab Spring; no named answer span; no location-bearing predicate in sentence; named entity appears as a location, not as the located subject; no question-relation term in sentence). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence; named entity missing: Arab Spring; no named answer span; no location-bearing predicate in sentence; named entity appears as a location, not as the located subject; no question-relation term in sentence). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A126",
+   "chat": "The park includes the caldera of Crater Lake, the remains of the destroyed volcano Mount Mazama, and nearby hills and forests. \nyou>",
+   "chat_source": "Crater Lake National Park; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "The park includes the caldera of Crater Lake, the remains of the destroyed volcano Mount Mazama, and nearby hills and forests. \nyou>",
+   "combined_source": "Crater Lake National Park; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A127",
+   "chat": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A128",
+   "chat": "Source text: Crater Lake has no streams flowing into or out of it.\nSource: Crater Lake National Park. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: Crater Lake has no streams flowing into or out of it.\nSource: Crater Lake National Park. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A129",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Stephen). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Stephen). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A130",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Boss's; no question-relation term in sentence). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Boss's; no question-relation term in sentence). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A131",
+   "chat": "“The arrondissement of Istres was created in 1981.” \nyou>",
+   "chat_source": "Arrondissement of Istres; quoted evidence, not an accepted fact",
+   "relation": "The arrondissement of Istres was created in 1981.",
+   "combined": "The arrondissement of Istres was created in 1981.",
+   "combined_source": "Arrondissement of Istres"
+  },
+  {
+   "id": "A132",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Istres; no procedural action stated). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Istres; no procedural action stated). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A133",
+   "chat": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “USS Benicia was a screw sloop in the United States Navy during the late 19th century.” \nyou>",
+   "chat_source": "USS Benicia (1868); may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “USS Benicia was a screw sloop in the United States Navy during the late 19th century.” \nyou>",
+   "combined_source": "USS Benicia (1868); may not answer your question"
+  },
+  {
+   "id": "A134",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: USS Benicia). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: USS Benicia). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A135",
+   "chat": "“Santa Clara is one of the twenty-four barangays composing the municipality of Santa Maria, Bulacan, in the Philippines.” \nyou>",
+   "chat_source": "Barangay Santa Clara, Santa Maria, Bulacan; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Santa Clara is one of the twenty-four barangays composing the municipality of Santa Maria, Bulacan, in the Philippines.” \nyou>",
+   "combined_source": "Barangay Santa Clara, Santa Maria, Bulacan; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A136",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Barangay Santa Clara; named entity missing: Santa Maria Bulacan). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Barangay Santa Clara; named entity missing: Santa Maria Bulacan). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A137",
+   "chat": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Santa Clara is one of the twenty-four barangays composing the municipality of Santa Maria, Bulacan, in the Philippines.” \nyou>",
+   "chat_source": "Barangay Santa Clara, Santa Maria, Bulacan; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Santa Clara is one of the twenty-four barangays composing the municipality of Santa Maria, Bulacan, in the Philippines.” \nyou>",
+   "combined_source": "Barangay Santa Clara, Santa Maria, Bulacan; may not answer your question"
+  },
+  {
+   "id": "A138",
+   "chat": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A139",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A140",
+   "chat": "“Volleyball has been part of the Summer Olympic Games since 1964.” \nyou>",
+   "chat_source": "Volleyball; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Volleyball has been part of the Summer Olympic Games since 1964.” \nyou>",
+   "combined_source": "Volleyball; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A141",
+   "chat": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A142",
+   "chat": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “East Nusa Tenggara is the only province in Indonesia where most people are Christian It is the only Indonesian province where Roman Catholicism is the main religion.” \nyou>",
+   "chat_source": "East Nusa Tenggara; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “East Nusa Tenggara is the only province in Indonesia where most people are Christian It is the only Indonesian province where Roman Catholicism is the main religion.” \nyou>",
+   "combined_source": "East Nusa Tenggara; may not answer your question"
+  },
+  {
+   "id": "A143",
+   "chat": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “East Nusa Tenggara is the only province in Indonesia where most people are Christian It is the only Indonesian province where Roman Catholicism is the main religion.” \nyou>",
+   "chat_source": "East Nusa Tenggara; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “East Nusa Tenggara is the only province in Indonesia where most people are Christian It is the only Indonesian province where Roman Catholicism is the main religion.” \nyou>",
+   "combined_source": "East Nusa Tenggara; may not answer your question"
+  },
+  {
+   "id": "A144",
+   "chat": "I found source text, but it does not support a grounded answer (no named answer span; no location-bearing predicate in sentence; no question-relation term in sentence). I won't guess.\nClosest source sentence: “Kataklysm was formed in 1991.” \nyou>",
+   "chat_source": "Kataklysm; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no named answer span; no location-bearing predicate in sentence; no question-relation term in sentence). I won't guess.\nClosest source sentence: “Kataklysm was formed in 1991.” \nyou>",
+   "combined_source": "Kataklysm; may not answer your question"
+  },
+  {
+   "id": "A145",
+   "chat": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A146",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Felsődobsza). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Felsődobsza). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A147",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Miskolc). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Miskolc). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A148",
+   "chat": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Guillaume became West German chancellor Willy Brandt's secretary, and his discovery as a spy in 1973 led to Brandt's resignation as chancellor in what became known as the Guillaume affair.” \nyou>",
+   "chat_source": "Günter Guillaume; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Guillaume became West German chancellor Willy Brandt's secretary, and his discovery as a spy in 1973 led to Brandt's resignation as chancellor in what became known as the Guillaume affair.” \nyou>",
+   "combined_source": "Günter Guillaume; may not answer your question"
+  },
+  {
+   "id": "A149",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Willy Brandt; no date, time, or condition stated). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Willy Brandt; no date, time, or condition stated). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A150",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A151",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Amber Heard's). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Amber Heard's). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A152",
+   "chat": "I found source text, but it does not support a grounded answer (numbered identifier missing: 64; named entity missing: Nintendo 64). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (numbered identifier missing: 64; named entity missing: Nintendo 64). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A153",
+   "chat": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence; named entity missing: Japan). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (source hit is an incomplete sentence; named entity missing: Japan). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A154",
+   "chat": "The source gives the count as 83: “The arrondissement of Autun has 83 communes; they are (with their INSEE codes):” \nyou>",
+   "chat_source": "Arrondissement of Autun; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "The source gives the count as 83: “The arrondissement of Autun has 83 communes; they are (with their INSEE codes):” \nyou>",
+   "combined_source": "Arrondissement of Autun; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A155",
+   "chat": "“Saône-et-Loire is one of the original 83 departments created during the French Revolution on 4 March 1790 with Mâcon as its capital.” \nyou>",
+   "chat_source": "Saône-et-Loire; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Saône-et-Loire is one of the original 83 departments created during the French Revolution on 4 March 1790 with Mâcon as its capital.” \nyou>",
+   "combined_source": "Saône-et-Loire; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "A156",
+   "chat": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A157",
+   "chat": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A158",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A159",
+   "chat": "I couldn't verify this request: step research: No independently realized source answer was found; I won't assemble one from loose word matches..\nPlan plan-2a4261a26782315e: research answer-research [failed; citation] -> citation verify-citation [planned; citation].\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't verify this request: step research: No independently realized source answer was found; I won't assemble one from loose word matches..\nPlan plan-2a4261a26782315e: research answer-research [failed; citation] -> citation verify-citation [planned; citation].\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "A160",
+   "chat": "I found source text, but it does not support a grounded answer (no number with a recognized unit). I won't guess.\nClosest source sentence: “It is the sixteenth movie in the Chhota Bheem series.” \nyou>",
+   "chat_source": "Chhota Bheem and the Throne of Bali; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no number with a recognized unit). I won't guess.\nClosest source sentence: “It is the sixteenth movie in the Chhota Bheem series.” \nyou>",
+   "combined_source": "Chhota Bheem and the Throne of Bali; may not answer your question"
+  },
+  {
+   "id": "B001",
+   "chat": "“We propose nonlinear supervised clustering fusion (NSCF), a neural Q-learning framework with a shared nonlinear covariate representation and low-dimensional treatment embeddings.” \nyou>",
+   "chat_source": "Neural Supervised Clustering for Learning Individualized Treatment Rules with Many Treatments; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“We propose nonlinear supervised clustering fusion (NSCF), a neural Q-learning framework with a shared nonlinear covariate representation and low-dimensional treatment embeddings.” \nyou>",
+   "combined_source": "Neural Supervised Clustering for Learning Individualized Treatment Rules with Many Treatments; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B002",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: NSCF; no question-relation term in sentence). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: NSCF; no question-relation term in sentence). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B003",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: NSCF; no procedural action stated). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: NSCF; no procedural action stated). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B004",
+   "chat": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B005",
+   "chat": "The quoted sentence I found does not name Dynamics Generalization, Information Bottleneck, Deep Reinforcement Learning, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "The quoted sentence I found does not name Dynamics Generalization, Information Bottleneck, Deep Reinforcement Learning, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B006",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Strategic Games; definition subject is not in sentence subject position). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Strategic Games; definition subject is not in sentence subject position). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B007",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Strategic Games; no question-relation term in sentence). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Strategic Games; no question-relation term in sentence). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B008",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B009",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: KG; no question-relation term in sentence). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: KG; no question-relation term in sentence). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B010",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B011",
+   "chat": "“Title: Cross-Media Keyphrase Prediction: A Unified Framework with Multi-Modality Multi-Head Attention and Image Wordings” \nyou>",
+   "chat_source": "Cross-Media Keyphrase Prediction: A Unified Framework with Multi-Modality Multi-Head Attention and Image Wordings; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Title: Cross-Media Keyphrase Prediction: A Unified Framework with Multi-Modality Multi-Head Attention and Image Wordings” \nyou>",
+   "combined_source": "Cross-Media Keyphrase Prediction: A Unified Framework with Multi-Modality Multi-Head Attention and Image Wordings; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B012",
+   "chat": "“For training, we used the CSS10 dataset and our new small dataset based on Common Voice recordings in five languages.” \nyou>",
+   "chat_source": "One Model, Many Languages: Meta-learning for Multilingual Text-to-Speech; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“For training, we used the CSS10 dataset and our new small dataset based on Common Voice recordings in five languages.” \nyou>",
+   "combined_source": "One Model, Many Languages: Meta-learning for Multilingual Text-to-Speech; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B013",
+   "chat": "“First, novice students often treat computer code as almost magic incantations, and like novices in many fields, have trouble creating new algorithms or procedures to solve novel problems.” \nyou>",
+   "chat_source": "Computational Physics and Reality: Looking for Some Overlap at the Blacksmith Shop; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“First, novice students often treat computer code as almost magic incantations, and like novices in many fields, have trouble creating new algorithms or procedures to solve novel problems.” \nyou>",
+   "combined_source": "Computational Physics and Reality: Looking for Some Overlap at the Blacksmith Shop; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B014",
+   "chat": "“In this multiagent system, employing Marginal Contribution Nets (MC-Nets) as rule-based cooperative game representations foster the combination of regulations and ISN games with no loss in expressiveness.” \nyou>",
+   "chat_source": "Coordinating Multiagent Industrial Symbiosis; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“In this multiagent system, employing Marginal Contribution Nets (MC-Nets) as rule-based cooperative game representations foster the combination of regulations and ISN games with no loss in expressiveness.” \nyou>",
+   "combined_source": "Coordinating Multiagent Industrial Symbiosis; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B015",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B016",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Debian; named entity missing: Text-Associated Nodes; no explicit count). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Debian; named entity missing: Text-Associated Nodes; no explicit count). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B017",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Text-Associated Nodes; definition subject is not in sentence subject position). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Text-Associated Nodes; definition subject is not in sentence subject position). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B018",
+   "chat": "“We create two new node-labeled such networks: The package dependency networks in two popular GNU/Linux distributions, Debian and Fedora.” \nyou>",
+   "chat_source": "Learning Embeddings of Directed Networks with Text-Associated Nodes---with Applications in Software Package Dependency Networks; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“We create two new node-labeled such networks: The package dependency networks in two popular GNU/Linux distributions, Debian and Fedora.” \nyou>",
+   "combined_source": "Learning Embeddings of Directed Networks with Text-Associated Nodes---with Applications in Software Package Dependency Networks; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B019",
+   "chat": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Title: Same Operation, Different Permission: Evaluating Whether Guardrails Honor Authorization” \nyou>",
+   "chat_source": "Same Operation, Different Permission: Evaluating Whether Guardrails Honor Authorization; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Title: Same Operation, Different Permission: Evaluating Whether Guardrails Honor Authorization” \nyou>",
+   "combined_source": "Same Operation, Different Permission: Evaluating Whether Guardrails Honor Authorization; may not answer your question"
+  },
+  {
+   "id": "B020",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: According). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: According). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B021",
+   "chat": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Title: A Mixture-of-Experts Framework for Multi-Stream Quickest Change Detection” \nyou>",
+   "chat_source": "A Mixture-of-Experts Framework for Multi-Stream Quickest Change Detection; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Title: A Mixture-of-Experts Framework for Multi-Stream Quickest Change Detection” \nyou>",
+   "combined_source": "A Mixture-of-Experts Framework for Multi-Stream Quickest Change Detection; may not answer your question"
+  },
+  {
+   "id": "B022",
+   "chat": "I found source text, but it does not support a grounded answer (no date, time, or condition stated). I won't guess.\nClosest source sentence: “We propose MAEM, a replay-free, capacity-controlled dynamic mixture-of-experts framework for class-incremental graph learning.” \nyou>",
+   "chat_source": "MAEM: Mitigating Recency Bias via a Replay-Free, Capacity-Controlled Dynamic Mixture of Experts for Class-Incremental Graph Learning; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no date, time, or condition stated). I won't guess.\nClosest source sentence: “We propose MAEM, a replay-free, capacity-controlled dynamic mixture-of-experts framework for class-incremental graph learning.” \nyou>",
+   "combined_source": "MAEM: Mitigating Recency Bias via a Replay-Free, Capacity-Controlled Dynamic Mixture of Experts for Class-Incremental Graph Learning; may not answer your question"
+  },
+  {
+   "id": "B023",
+   "chat": "Source text: To this end, we propose LEASH, a training-free framework that unleashes the strong agent only when the weak agent's latent uncertainty signals it is needed, and keeps it on a leash afterward.\nSource: LEASH: Uncertainty-Aware Weak-to-Strong Escalation and Oversight for Computer-Use Agents. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: To this end, we propose LEASH, a training-free framework that unleashes the strong agent only when the weak agent's latent uncertainty signals it is needed, and keeps it on a leash afterward.\nSource: LEASH: Uncertainty-Aware Weak-to-Strong Escalation and Oversight for Computer-Use Agents. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B024",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B025",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: US). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: US). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B026",
+   "chat": "“Altran Praxis (UK) was selected by NSA to carry out the development of the Tokeneer ID Station.” \nyou>",
+   "chat_source": "An Automatically Verified Prototype of the Tokeneer ID Station Specification; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Altran Praxis (UK) was selected by NSA to carry out the development of the Tokeneer ID Station.” \nyou>",
+   "combined_source": "An Automatically Verified Prototype of the Tokeneer ID Station Specification; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B027",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Tokeneer Z). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Tokeneer Z). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B028",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Tokeneer Z). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Tokeneer Z). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B029",
+   "chat": "Source text: In this paper, we focus on topic modeling as a means to identify topics within a large set of crowd-generated user stories and compare three approaches: (1) a traditional approach based on Latent Dirichlet Allocation, (2) a combination of word embeddings and principal component analysis, and (3) a combination of word embeddings and Word Mover's Distance.\nSource: Topic Modeling on User Stories using Word Mover's Distance. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: In this paper, we focus on topic modeling as a means to identify topics within a large set of crowd-generated user stories and compare three approaches: (1) a traditional approach based on Latent Dirichlet Allocation, (2) a combination of word embeddings and principal component analysis, and (3) a combination of word embeddings and Word Mover's Distance.\nSource: Topic Modeling on User Stories using Word Mover's Distance. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B030",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B031",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B032",
+   "chat": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B033",
+   "chat": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B034",
+   "chat": "Source text: This paper studies the problem of learning real-valued functions on manifolds through filtered hyperinterpolation of input-output data pairs where the inputs may be sampled deterministically or at random and the outputs may be clean or noisy.\nSource: Distributed Learning via Filtered Hyperinterpolation on Manifolds. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: This paper studies the problem of learning real-valued functions on manifolds through filtered hyperinterpolation of input-output data pairs where the inputs may be sampled deterministically or at random and the outputs may be clean or noisy.\nSource: Distributed Learning via Filtered Hyperinterpolation on Manifolds. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B035",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B036",
+   "chat": "Source text: However, in validation frameworks CSAU: Code Scaling, Applicability, and Uncertainty (NUREG/CR-5249) and EMDAP: Evaluation Model Development and Assessment Process (RG 1.203), such a decision-making process is largely implicit and obscure.\nSource: Predictive Capability Maturity Quantification using Bayesian Network. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: However, in validation frameworks CSAU: Code Scaling, Applicability, and Uncertainty (NUREG/CR-5249) and EMDAP: Evaluation Model Development and Assessment Process (RG 1.203), such a decision-making process is largely implicit and obscure.\nSource: Predictive Capability Maturity Quantification using Bayesian Network. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B037",
+   "chat": "I found source text, but it does not support a grounded answer (required modifier missing: highest; no question-relation term in sentence). I won't guess.\nClosest source sentence: “We present ToolBottleneckBench, a benchmark that measures tool-agent performance under controlled pressures and fixed harness budgets.” \nyou>",
+   "chat_source": "ToolBottleneckBench: Measuring Tool-Agent Performance under Controlled Pressures and Fixed Harness Budgets; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (required modifier missing: highest; no question-relation term in sentence). I won't guess.\nClosest source sentence: “We present ToolBottleneckBench, a benchmark that measures tool-agent performance under controlled pressures and fixed harness budgets.” \nyou>",
+   "combined_source": "ToolBottleneckBench: Measuring Tool-Agent Performance under Controlled Pressures and Fixed Harness Budgets; may not answer your question"
+  },
+  {
+   "id": "B038",
+   "chat": "I found source text, but it does not support a grounded answer (no explicit count). I won't guess.\nClosest source sentence: “Title: ToolBottleneckBench: Measuring Tool-Agent Performance under Controlled Pressures and Fixed Harness Budgets” \nyou>",
+   "chat_source": "ToolBottleneckBench: Measuring Tool-Agent Performance under Controlled Pressures and Fixed Harness Budgets; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no explicit count). I won't guess.\nClosest source sentence: “Title: ToolBottleneckBench: Measuring Tool-Agent Performance under Controlled Pressures and Fixed Harness Budgets” \nyou>",
+   "combined_source": "ToolBottleneckBench: Measuring Tool-Agent Performance under Controlled Pressures and Fixed Harness Budgets; may not answer your question"
+  },
+  {
+   "id": "B039",
+   "chat": "The quoted sentence I found does not name ToolBottleneckBench ToolBottleneckBench, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "The quoted sentence I found does not name ToolBottleneckBench ToolBottleneckBench, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B040",
+   "chat": "I found source text, but it does not support a grounded answer (no date, time, or condition stated; no question-relation term in sentence). I won't guess.\nClosest source sentence: “We present ToolBottleneckBench, a benchmark that measures tool-agent performance under controlled pressures and fixed harness budgets.” \nyou>",
+   "chat_source": "ToolBottleneckBench: Measuring Tool-Agent Performance under Controlled Pressures and Fixed Harness Budgets; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no date, time, or condition stated; no question-relation term in sentence). I won't guess.\nClosest source sentence: “We present ToolBottleneckBench, a benchmark that measures tool-agent performance under controlled pressures and fixed harness budgets.” \nyou>",
+   "combined_source": "ToolBottleneckBench: Measuring Tool-Agent Performance under Controlled Pressures and Fixed Harness Budgets; may not answer your question"
+  },
+  {
+   "id": "B041",
+   "chat": "I found source text, but it does not support a grounded answer (no explicit count; no question-relation term in sentence). I won't guess.\nClosest source sentence: “Title: On the Predictive Power of Neural Language Models for Human Real-Time Comprehension Behavior” \nyou>",
+   "chat_source": "On the Predictive Power of Neural Language Models for Human Real-Time Comprehension Behavior; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no explicit count; no question-relation term in sentence). I won't guess.\nClosest source sentence: “Title: On the Predictive Power of Neural Language Models for Human Real-Time Comprehension Behavior” \nyou>",
+   "combined_source": "On the Predictive Power of Neural Language Models for Human Real-Time Comprehension Behavior; may not answer your question"
+  },
+  {
+   "id": "B042",
+   "chat": "I have no grounded cardinal value for 'the relationship between word log - probability and reading time across model architectures and training dataset sizes'. Teach number phrases through grounded CRMS examples first.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I have no grounded cardinal value for 'the relationship between word log - probability and reading time across model architectures and training dataset sizes'. Teach number phrases through grounded CRMS examples first.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B043",
+   "chat": "I couldn't verify this request: step research: No independently realized source answer was found; I won't assemble one from loose word matches..\nPlan plan-d03b4bd2d5815162: research answer-research [failed; citation] -> citation verify-citation [planned; citation].\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't verify this request: step research: No independently realized source answer was found; I won't assemble one from loose word matches..\nPlan plan-d03b4bd2d5815162: research answer-research [failed; citation] -> citation verify-citation [planned; citation].\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B044",
+   "chat": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “Abstract: On transformation to the Fourier space $({\\bf k}, ω)$, the partial differential Maxwell equations simplify to algebraic equations, and the Helmholtz theorem of vector calculus reduces to vector algebraic projections.” \nyou>",
+   "chat_source": "Maxwell equations and the redundant gauge degree of freedom; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “Abstract: On transformation to the Fourier space $({\\bf k}, ω)$, the partial differential Maxwell equations simplify to algebraic equations, and the Helmholtz theorem of vector calculus reduces to vector algebraic projections.” \nyou>",
+   "combined_source": "Maxwell equations and the redundant gauge degree of freedom; may not answer your question"
+  },
+  {
+   "id": "B045",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Fourier). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Fourier). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B046",
+   "chat": "I found source text, but it does not support a grounded answer (no explicit count). I won't guess.\nClosest source sentence: “This study aims at analyzing whether supporting software developers with a chatbot during task execution can improve the overall development experience.” \nyou>",
+   "chat_source": "Exploring Context-Aware Conversational Agents in Software Development; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no explicit count). I won't guess.\nClosest source sentence: “This study aims at analyzing whether supporting software developers with a chatbot during task execution can improve the overall development experience.” \nyou>",
+   "combined_source": "Exploring Context-Aware Conversational Agents in Software Development; may not answer your question"
+  },
+  {
+   "id": "B047",
+   "chat": "The quoted sentence I found does not name Exploring Context-Aware Conversational Agents, Software Development, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "The quoted sentence I found does not name Exploring Context-Aware Conversational Agents, Software Development, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B048",
+   "chat": "“[Question/problem] In this paper, we investigate two aspects of refining vision videos: (1) Refining the vision by providing alternative answers to previously open issues about the system to be built.” \nyou>",
+   "chat_source": "Refining Vision Videos; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“[Question/problem] In this paper, we investigate two aspects of refining vision videos: (1) Refining the vision by providing alternative answers to previously open issues about the system to be built.” \nyou>",
+   "combined_source": "Refining Vision Videos; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B049",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B050",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Not X; no date, time, or condition stated). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Not X; no date, time, or condition stated). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B051",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Mandarin; named entity missing: X; named entity missing: Y). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Mandarin; named entity missing: X; named entity missing: Y). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B052",
+   "chat": "“The model achieves strong generalization, outperforming existing baselines on average and on four of five evaluated datasets, while maintaining a high true negative rate on pristine images.” \nyou>",
+   "chat_source": "DINO-FIL: Multi-Layer Transformer Fusion for Generative Inpainting Forgery Localization; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“The model achieves strong generalization, outperforming existing baselines on average and on four of five evaluated datasets, while maintaining a high true negative rate on pristine images.” \nyou>",
+   "combined_source": "DINO-FIL: Multi-Layer Transformer Fusion for Generative Inpainting Forgery Localization; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B053",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B054",
+   "chat": "Generally, optimization models are useful for farmers to find no dominated solutions, but it remains difficult if the farmers have to agree on one solution. We combine two approaches in order to support a group of farmers engaged in this kind of decision making process. We firstly generate a set of no dominated solutions thanks to a centralized optimization model. Based on this set of solution we then used a Group Decision Support System called GRUS for choosing the best solution for the group of farmers. \nyou>",
+   "chat_source": "Group Decision Support for agriculture planning by a combination of Mathematical Model and Collaborative Tool; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "Generally, optimization models are useful for farmers to find no dominated solutions, but it remains difficult if the farmers have to agree on one solution. We combine two approaches in order to support a group of farmers engaged in this kind of decision making process. We firstly generate a set of no dominated solutions thanks to a centralized optimization model. Based on this set of solution we then used a Group Decision Support System called GRUS for choosing the best solution for the group of farmers. \nyou>",
+   "combined_source": "Group Decision Support for agriculture planning by a combination of Mathematical Model and Collaborative Tool; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B055",
+   "chat": "Source text: The land area allocated to each crop should be fixed every season according to several parameters: prices, demand, harvesting periods, seeds, ground, season etc...\nSource: Group Decision Support for agriculture planning by a combination of Mathematical Model and Collaborative Tool. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: The land area allocated to each crop should be fixed every season according to several parameters: prices, demand, harvesting periods, seeds, ground, season etc...\nSource: Group Decision Support for agriculture planning by a combination of Mathematical Model and Collaborative Tool. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B056",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B057",
+   "chat": "“We propose Shared Residual Distillation (SRD), an on-policy self-distillation method that learns from the model's own unverified peer trajectories.” \nyou>",
+   "chat_source": "Learning from Unverified Peers via Shared Residual Distillation; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“We propose Shared Residual Distillation (SRD), an on-policy self-distillation method that learns from the model's own unverified peer trajectories.” \nyou>",
+   "combined_source": "Learning from Unverified Peers via Shared Residual Distillation; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B058",
+   "chat": "Authors: Juan Rocha, Linda Luvuno, Jesse Rieb, Erin Crockett, Katja Malmborg, Michael Schoon, Garry Peterson \nyou>",
+   "chat_source": "Panarchy: ripples of a boundary concept",
+   "relation": null,
+   "combined": "Authors: Juan Rocha, Linda Luvuno, Jesse Rieb, Erin Crockett, Katja Malmborg, Michael Schoon, Garry Peterson \nyou>",
+   "combined_source": "Panarchy: ripples of a boundary concept"
+  },
+  {
+   "id": "B059",
+   "chat": "“In 2002 Holling and colleagues proposed the concept of Panarchy, which presented social-ecological systems as an interacting set of adaptive cycles, each of which is produced by the dynamic tensions between novelty and efficiency at multiple scales.” \nyou>",
+   "chat_source": "Panarchy: ripples of a boundary concept; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“In 2002 Holling and colleagues proposed the concept of Panarchy, which presented social-ecological systems as an interacting set of adaptive cycles, each of which is produced by the dynamic tensions between novelty and efficiency at multiple scales.” \nyou>",
+   "combined_source": "Panarchy: ripples of a boundary concept; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B060",
+   "chat": "“Document analysis was used to code panarchy features that are commonly used in the scientific literature (N = 42), a qualitative analysis that was complemented with topic modeling of 2177 documents.” \nyou>",
+   "chat_source": "Panarchy: ripples of a boundary concept; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Document analysis was used to code panarchy features that are commonly used in the scientific literature (N = 42), a qualitative analysis that was complemented with topic modeling of 2177 documents.” \nyou>",
+   "combined_source": "Panarchy: ripples of a boundary concept; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B061",
+   "chat": "“Title: Dynamic Context Selection for Document-level Neural Machine Translation via Reinforcement Learning” \nyou>",
+   "chat_source": "Dynamic Context Selection for Document-level Neural Machine Translation via Reinforcement Learning; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Title: Dynamic Context Selection for Document-level Neural Machine Translation via Reinforcement Learning” \nyou>",
+   "combined_source": "Dynamic Context Selection for Document-level Neural Machine Translation via Reinforcement Learning; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B062",
+   "chat": "Metadata license: CC0 (bibliographic metadata only; not article text)\nTitle: Dynamic Context Selection for Document-level Neural Machine Translation via Reinforcement Learning\nAbstract: Document-level neural machine translation has yielded attractive improvements. \nyou>",
+   "chat_source": "Dynamic Context Selection for Document-level Neural Machine Translation via Reinforcement Learning; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "Metadata license: CC0 (bibliographic metadata only; not article text)\nTitle: Dynamic Context Selection for Document-level Neural Machine Translation via Reinforcement Learning\nAbstract: Document-level neural machine translation has yielded attractive improvements. \nyou>",
+   "combined_source": "Dynamic Context Selection for Document-level Neural Machine Translation via Reinforcement Learning; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B063",
+   "chat": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find one source sentence that states who answers that question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B064",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B065",
+   "chat": "“Computational searches provide further graphs on $81$ and $156$ vertices, using Muzychuk's Construction~B and a generalised quadrangle, respectively; their coherent closures have ranks $13$ and $10$.” \nyou>",
+   "chat_source": "Graphs with three eigenvalues from group divisible designs; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Computational searches provide further graphs on $81$ and $156$ vertices, using Muzychuk's Construction~B and a generalised quadrangle, respectively; their coherent closures have ranks $13$ and $10$.” \nyou>",
+   "combined_source": "Graphs with three eigenvalues from group divisible designs; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B066",
+   "chat": "“We demonstrate our approach with two different datasets, MNIST and FashionMNIST, using a network architecture inspired by the learning center of the insect brain.” \nyou>",
+   "chat_source": "Neuromorphic Architecture Optimization for Task-Specific Dynamic Learning; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“We demonstrate our approach with two different datasets, MNIST and FashionMNIST, using a network architecture inspired by the learning center of the insect brain.” \nyou>",
+   "combined_source": "Neuromorphic Architecture Optimization for Task-Specific Dynamic Learning; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B067",
+   "chat": "I found source text, but it does not support a grounded answer (no procedural action stated). I won't guess.\nClosest source sentence: “This allows us to cast meta-learning as a mathematical optimization problem.” \nyou>",
+   "chat_source": "Neuromorphic Architecture Optimization for Task-Specific Dynamic Learning; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no procedural action stated). I won't guess.\nClosest source sentence: “This allows us to cast meta-learning as a mathematical optimization problem.” \nyou>",
+   "combined_source": "Neuromorphic Architecture Optimization for Task-Specific Dynamic Learning; may not answer your question"
+  },
+  {
+   "id": "B068",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B069",
+   "chat": "“Abstract: We use runtime verification (RV) to check various specifications in a smart apartment.” \nyou>",
+   "chat_source": "Bringing Runtime Verification Home -- A Case Study on the Hierarchical Monitoring of Smart Homes using Decentralized Specifications; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Abstract: We use runtime verification (RV) to check various specifications in a smart apartment.” \nyou>",
+   "combined_source": "Bringing Runtime Verification Home -- A Case Study on the Hierarchical Monitoring of Smart Homes using Decentralized Specifications; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B070",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B071",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: SWEPatchTest). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: SWEPatchTest). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B072",
+   "chat": "“Title: Sharp discrete isoperimetric inequalities in periodic graphs via discrete PDE and Semidiscrete Optimal Transport” \nyou>",
+   "chat_source": "Sharp discrete isoperimetric inequalities in periodic graphs via discrete PDE and Semidiscrete Optimal Transport; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Title: Sharp discrete isoperimetric inequalities in periodic graphs via discrete PDE and Semidiscrete Optimal Transport” \nyou>",
+   "combined_source": "Sharp discrete isoperimetric inequalities in periodic graphs via discrete PDE and Semidiscrete Optimal Transport; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B073",
+   "chat": "Source text: The method is a discrete counterpart to Optimal Transport and ABP method proofs valid in the continuum, and answers a question appearing in Hamamuki \\cite{hamamuki}, extending that work valid for rectangular grids, to a larger class of graphs, including graphs dual to simplicial meshes of equal volume.\nSource: Sharp discrete isoperimetric inequalities in periodic graphs via discrete PDE and Semidiscrete Optimal Transport. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: The method is a discrete counterpart to Optimal Transport and ABP method proofs valid in the continuum, and answers a question appearing in Hamamuki \\cite{hamamuki}, extending that work valid for rectangular grids, to a larger class of graphs, including graphs dual to simplicial meshes of equal volume.\nSource: Sharp discrete isoperimetric inequalities in periodic graphs via discrete PDE and Semidiscrete Optimal Transport. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B074",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: According; no question-relation term in sentence). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: According; no question-relation term in sentence). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B075",
+   "chat": "“We show how profit maximization shapes safety investment in an AI supply chain with an upstream LLM provider and several competing downstream firms.” \nyou>",
+   "chat_source": "Market Incentives for AI Safety Investment; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“We show how profit maximization shapes safety investment in an AI supply chain with an upstream LLM provider and several competing downstream firms.” \nyou>",
+   "combined_source": "Market Incentives for AI Safety Investment; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B076",
+   "chat": "The quoted sentence I found does not name AI, Market Incentives, AI Safety Investment, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "The quoted sentence I found does not name AI, Market Incentives, AI Safety Investment, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B077",
+   "chat": "I understood: Name — three of → the 18 sectors covered by FDE-Gym. Shall I remember that as something you told me? Say ‘yes’ or ‘no’.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I understood: Name — three of → the 18 sectors covered by FDE-Gym. Shall I remember that as something you told me? Say ‘yes’ or ‘no’.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B078",
+   "chat": "I couldn't verify this request: step math: I couldn't resolve that request to exact learned arithmetic or unit evidence..\nPlan plan-6878cc8b9b7d0658: math answer-math [failed; exact].\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't verify this request: step math: I couldn't resolve that request to exact learned arithmetic or unit evidence..\nPlan plan-6878cc8b9b7d0658: math answer-math [failed; exact].\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B079",
+   "chat": "I found source text, but it does not support a grounded answer (no procedural action stated; too little question detail matches the procedure). I won't guess.\nClosest source sentence: “Title: FDE-Gym: The Last Mile of AI Delivery” \nyou>",
+   "chat_source": "FDE-Gym: The Last Mile of AI Delivery; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no procedural action stated; too little question detail matches the procedure). I won't guess.\nClosest source sentence: “Title: FDE-Gym: The Last Mile of AI Delivery” \nyou>",
+   "combined_source": "FDE-Gym: The Last Mile of AI Delivery; may not answer your question"
+  },
+  {
+   "id": "B080",
+   "chat": "I found source text, but it does not support a grounded answer (numbered identifier missing: 2020; named entity missing: Check_square; named entity missing: CheckThat 2020). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (numbered identifier missing: 2020; named entity missing: Check_square; named entity missing: CheckThat 2020). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B081",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B082",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B083",
+   "chat": "“Code: https://github.com/davidkaczer/contextlift” \nyou>",
+   "chat_source": "ContextLift: Breaking the Spurious Correlation Behind Conditional Emergent Misalignment; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Code: https://github.com/davidkaczer/contextlift” \nyou>",
+   "combined_source": "ContextLift: Breaking the Spurious Correlation Behind Conditional Emergent Misalignment; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B084",
+   "chat": "“On Qwen2.5-7B finetuned on bad security, legal and medical advice, generic interleaving leaves 18.9%, 41.9% and 58.2% misaligned answers under a domain cue; ContextLift reduces this to 2.6%, 6.1% and 12.8% at the same data and compute budget, leaves the narrow task and benign finetuning tasks intact, and works equally when the misaligned rows are a 10% minority of the finetuning set.” \nyou>",
+   "chat_source": "ContextLift: Breaking the Spurious Correlation Behind Conditional Emergent Misalignment; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“On Qwen2.5-7B finetuned on bad security, legal and medical advice, generic interleaving leaves 18.9%, 41.9% and 58.2% misaligned answers under a domain cue; ContextLift reduces this to 2.6%, 6.1% and 12.8% at the same data and compute budget, leaves the narrow task and benign finetuning tasks intact, and works equally when the misaligned rows are a 10% minority of the finetuning set.” \nyou>",
+   "combined_source": "ContextLift: Breaking the Spurious Correlation Behind Conditional Emergent Misalignment; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B085",
+   "chat": "“Abstract: Posterior inference for random fields from sparse observations presents two major challenges: accurately characterizing complex spatial uncertainty and preventing conditional sampling costs from growing substantially as the spatial grid is refined.” \nyou>",
+   "chat_source": "Latent Annealed Posterior Sampling with a Variance-Preserving Bridge for Sparsely Observed Random Fields; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Abstract: Posterior inference for random fields from sparse observations presents two major challenges: accurately characterizing complex spatial uncertainty and preventing conditional sampling costs from growing substantially as the spatial grid is refined.” \nyou>",
+   "combined_source": "Latent Annealed Posterior Sampling with a Variance-Preserving Bridge for Sparsely Observed Random Fields; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B086",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Faster Uncertainty Quantification; named entity missing: Inverse Problems; named entity missing: Conditional Normalizing Flows; definition subject is not in sentence subject position). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Faster Uncertainty Quantification; named entity missing: Inverse Problems; named entity missing: Conditional Normalizing Flows; definition subject is not in sentence subject position). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B087",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: PaXNet). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: PaXNet). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B088",
+   "chat": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I don't have a direct source statement for this exact proposition, so I can't answer yes or no from the sources I have.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B089",
+   "chat": "The source gives this reason: In many cases, dental caries is hard to identify using x-rays and can be misinterpreted as shadows due to different reasons such as low image quality. \nyou>",
+   "chat_source": "PaXNet: Dental Caries Detection in Panoramic X-ray using Ensemble Transfer Learning and Capsule Classifier; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "The source gives this reason: In many cases, dental caries is hard to identify using x-rays and can be misinterpreted as shadows due to different reasons such as low image quality. \nyou>",
+   "combined_source": "PaXNet: Dental Caries Detection in Panoramic X-ray using Ensemble Transfer Learning and Capsule Classifier; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B090",
+   "chat": "The quoted sentence I found does not name Partially Thermalized, Scale Sterile Neutrinos, Dynamical Dark Energy, Non-Flat Cosmologies, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "The quoted sentence I found does not name Partially Thermalized, Scale Sterile Neutrinos, Dynamical Dark Energy, Non-Flat Cosmologies, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B091",
+   "chat": "I found source text, but it does not support a grounded answer (no number with a recognized unit). I won't guess.\nClosest source sentence: “The sterile state is modeled as a thermally distributed non-cold relic with a temperature below that of the active-neutrino background.” \nyou>",
+   "chat_source": "Partially Thermalized eV-Scale Sterile Neutrinos in Dynamical Dark Energy and Non-Flat Cosmologies; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no number with a recognized unit). I won't guess.\nClosest source sentence: “The sterile state is modeled as a thermally distributed non-cold relic with a temperature below that of the active-neutrino background.” \nyou>",
+   "combined_source": "Partially Thermalized eV-Scale Sterile Neutrinos in Dynamical Dark Energy and Non-Flat Cosmologies; may not answer your question"
+  },
+  {
+   "id": "B092",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B093",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B094",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: PhysClosureBench). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: PhysClosureBench). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B095",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B096",
+   "chat": "I found source text, but it does not support a grounded answer (no procedural action stated). I won't guess.\nClosest source sentence: “The acoustic characteristics of creaky voice are, however, rather distinct from modal phonation.” \nyou>",
+   "chat_source": "Data-driven Detection and Analysis of the Patterns of Creaky Voice; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no procedural action stated). I won't guess.\nClosest source sentence: “The acoustic characteristics of creaky voice are, however, rather distinct from modal phonation.” \nyou>",
+   "combined_source": "Data-driven Detection and Analysis of the Patterns of Creaky Voice; may not answer your question"
+  },
+  {
+   "id": "B097",
+   "chat": "“But while the Clifford fermions manifest the half integer spins -- in agreement with the observed properties of quarks and leptons and antiquarks and antileptons -- the \"Grassmann fermions\" manifest the integer spins.” \nyou>",
+   "chat_source": "Understanding the second quantization of fermions in Clifford and in Grassmann space -- New way of second quantization of fermions, Part I; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“But while the Clifford fermions manifest the half integer spins -- in agreement with the observed properties of quarks and leptons and antiquarks and antileptons -- the \"Grassmann fermions\" manifest the integer spins.” \nyou>",
+   "combined_source": "Understanding the second quantization of fermions in Clifford and in Grassmann space -- New way of second quantization of fermions, Part I; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B098",
+   "chat": "Source text: The oddness of the \"basis vectors\", transferred to the creation operators, which are tensor products of the finite number of \"basis vectors\" and the infinite number of momentum basis, and to their Hermitian conjugated partners annihilation operators, offers the second quantization of fermions without postulating the conditions proposed by Dirac, enabling the explanation of the Dirac's postulates.\nSource: Understanding the second quantization of fermions in Clifford and in Grassmann space -- New way of second quantization of fermions, Part I. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: The oddness of the \"basis vectors\", transferred to the creation operators, which are tensor products of the finite number of \"basis vectors\" and the infinite number of momentum basis, and to their Hermitian conjugated partners annihilation operators, offers the second quantization of fermions without postulating the conditions proposed by Dirac, enabling the explanation of the Dirac's postulates.\nSource: Understanding the second quantization of fermions in Clifford and in Grassmann space -- New way of second quantization of fermions, Part I. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B099",
+   "chat": "I found source text, but it does not support a grounded answer (no explicit count). I won't guess.\nClosest source sentence: “The results unequivocally fix that Glow Curves respond to a chaotic regime.” \nyou>",
+   "chat_source": "Evidence of Low Dimensional Chaos in Glow Curves of Thermoluminescence; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no explicit count). I won't guess.\nClosest source sentence: “The results unequivocally fix that Glow Curves respond to a chaotic regime.” \nyou>",
+   "combined_source": "Evidence of Low Dimensional Chaos in Glow Curves of Thermoluminescence; may not answer your question"
+  },
+  {
+   "id": "B100",
+   "chat": "Source text: The results unequivocally fix that Glow Curves respond to a chaotic regime.\nSource: Evidence of Low Dimensional Chaos in Glow Curves of Thermoluminescence. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: The results unequivocally fix that Glow Curves respond to a chaotic regime.\nSource: Evidence of Low Dimensional Chaos in Glow Curves of Thermoluminescence. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B101",
+   "chat": "“Abstract: Electron trapping following exposition to ionising radiations and consequent electron release during variation of temperature in solids represent processes happening at the quantum microphysical level.” \nyou>",
+   "chat_source": "Evidence of Low Dimensional Chaos in Glow Curves of Thermoluminescence; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Abstract: Electron trapping following exposition to ionising radiations and consequent electron release during variation of temperature in solids represent processes happening at the quantum microphysical level.” \nyou>",
+   "combined_source": "Evidence of Low Dimensional Chaos in Glow Curves of Thermoluminescence; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B102",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B103",
+   "chat": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (multiple equally supported source sentences). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B104",
+   "chat": "Authors: Sam Powers, Dejan Stojkovic \nyou>",
+   "chat_source": "Emergent Space, Time, and Lorentz Symmetry from Binary Sequences",
+   "relation": null,
+   "combined": "Authors: Sam Powers, Dejan Stojkovic \nyou>",
+   "combined_source": "Emergent Space, Time, and Lorentz Symmetry from Binary Sequences"
+  },
+  {
+   "id": "B105",
+   "chat": "“Averaging over those locations ultimately yields the Minkowski interval as an invariant object that maximizes (information) entropy.” \nyou>",
+   "chat_source": "Emergent Space, Time, and Lorentz Symmetry from Binary Sequences; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Averaging over those locations ultimately yields the Minkowski interval as an invariant object that maximizes (information) entropy.” \nyou>",
+   "combined_source": "Emergent Space, Time, and Lorentz Symmetry from Binary Sequences; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B106",
+   "chat": "Source text: We study the impact of both correlation-based feature selection (CFS) filter methods and wrapper feature selection methods on five widely-used prediction models and demonstrate how these models perform with or without feature selection to predict the number of bugs in five different open source Java software systems.\nSource: The Impact of Feature Selection on Predicting the Number of Bugs. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: We study the impact of both correlation-based feature selection (CFS) filter methods and wrapper feature selection methods on five widely-used prediction models and demonstrate how these models perform with or without feature selection to predict the number of bugs in five different open source Java software systems.\nSource: The Impact of Feature Selection on Predicting the Number of Bugs. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B107",
+   "chat": "“We study the impact of both correlation-based feature selection (CFS) filter methods and wrapper feature selection methods on five widely-used prediction models and demonstrate how these models perform with or without feature selection to predict the number of bugs in five different open source Java software systems.” \nyou>",
+   "chat_source": "The Impact of Feature Selection on Predicting the Number of Bugs; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“We study the impact of both correlation-based feature selection (CFS) filter methods and wrapper feature selection methods on five widely-used prediction models and demonstrate how these models perform with or without feature selection to predict the number of bugs in five different open source Java software systems.” \nyou>",
+   "combined_source": "The Impact of Feature Selection on Predicting the Number of Bugs; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B108",
+   "chat": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Title: LLM-based Code Auditing by Inferring and Evaluating Developer Assumptions” \nyou>",
+   "chat_source": "LLM-based Code Auditing by Inferring and Evaluating Developer Assumptions; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Title: LLM-based Code Auditing by Inferring and Evaluating Developer Assumptions” \nyou>",
+   "combined_source": "LLM-based Code Auditing by Inferring and Evaluating Developer Assumptions; may not answer your question"
+  },
+  {
+   "id": "B109",
+   "chat": "“We develop such a belief-guided program analysis for vulnerability detection (VD).” \nyou>",
+   "chat_source": "LLM-based Code Auditing by Inferring and Evaluating Developer Assumptions; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“We develop such a belief-guided program analysis for vulnerability detection (VD).” \nyou>",
+   "combined_source": "LLM-based Code Auditing by Inferring and Evaluating Developer Assumptions; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B110",
+   "chat": "I don't have a verified proof rule for that mathematical claim. My current math route handles exact arithmetic and learned operations; it cannot establish general theorem proofs yet. I won't use a loosely matching paper as a proof.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I don't have a verified proof rule for that mathematical claim. My current math route handles exact arithmetic and learned operations; it cannot establish general theorem proofs yet. I won't use a loosely matching paper as a proof.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B111",
+   "chat": "I found source text, but it does not support a grounded answer (required modifier missing: first). I won't guess.\nClosest source sentence: “Gowers uniformity norms are the central objects of higher order Fourier analysis, one of the cornerstones of additive combinatorics, and play an important role in both Gowers' proof of Szemerédi's theorem and the Green-Tao theorem.” \nyou>",
+   "chat_source": "Quantitative inverse theory of Gowers uniformity norms; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (required modifier missing: first). I won't guess.\nClosest source sentence: “Gowers uniformity norms are the central objects of higher order Fourier analysis, one of the cornerstones of additive combinatorics, and play an important role in both Gowers' proof of Szemerédi's theorem and the Green-Tao theorem.” \nyou>",
+   "combined_source": "Quantitative inverse theory of Gowers uniformity norms; may not answer your question"
+  },
+  {
+   "id": "B112",
+   "chat": "“Across three models, NatScale achieves the lowest native-to-quantized KL divergence and the highest top-token agreement in all nine settings against five allocation baselines.” \nyou>",
+   "chat_source": "Beyond Expert Rankings: Contrast Calibration for Mixed-Precision MoE Quantization; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Across three models, NatScale achieves the lowest native-to-quantized KL divergence and the highest top-token agreement in all nine settings against five allocation baselines.” \nyou>",
+   "combined_source": "Beyond Expert Rankings: Contrast Calibration for Mixed-Precision MoE Quantization; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B113",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B114",
+   "chat": "“Abstract: Mixture-of-Experts (MoE) models reduce computation by routing each token to a small set of experts, but each selected expert is still used at a fixed precision.” \nyou>",
+   "chat_source": "DPA-MoE: A Runtime Precision Control Framework for MoE Inference; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Abstract: Mixture-of-Experts (MoE) models reduce computation by routing each token to a small set of experts, but each selected expert is still used at a fixed precision.” \nyou>",
+   "combined_source": "DPA-MoE: A Runtime Precision Control Framework for MoE Inference; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B115",
+   "chat": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I couldn't find a source sentence that states the asked entity, action, and item together, so I can't give a grounded count.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B116",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Planner). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Planner). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B117",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: NLP). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: NLP). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B118",
+   "chat": "I found source text, but it does not support a grounded answer (no location-bearing predicate in sentence; named entity appears as a location, not as the located subject). I won't guess.\nClosest source sentence: “Title: Multi-task learning for natural language processing in the 2020s: where are we going?” \nyou>",
+   "chat_source": "Multi-task learning for natural language processing in the 2020s: where are we going?; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no location-bearing predicate in sentence; named entity appears as a location, not as the located subject). I won't guess.\nClosest source sentence: “Title: Multi-task learning for natural language processing in the 2020s: where are we going?” \nyou>",
+   "combined_source": "Multi-task learning for natural language processing in the 2020s: where are we going?; may not answer your question"
+  },
+  {
+   "id": "B119",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Tensor-generating). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Tensor-generating). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B120",
+   "chat": "“Furthermore, we prove an analogue of Kleiman's criterion of ampleness for $\\otimes$-generation.” \nyou>",
+   "chat_source": "Tensor-generating line bundles on toric varieties; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Furthermore, we prove an analogue of Kleiman's criterion of ampleness for $\\otimes$-generation.” \nyou>",
+   "combined_source": "Tensor-generating line bundles on toric varieties; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B121",
+   "chat": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Title: An ADMM Based Framework for AutoML Pipeline Configuration” \nyou>",
+   "chat_source": "An ADMM Based Framework for AutoML Pipeline Configuration; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Title: An ADMM Based Framework for AutoML Pipeline Configuration” \nyou>",
+   "combined_source": "An ADMM Based Framework for AutoML Pipeline Configuration; may not answer your question"
+  },
+  {
+   "id": "B122",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B123",
+   "chat": "Source text: QRRT is shown to be (1) probabilistically complete, and (2) can reduce the runtime by at least one order of magnitude.\nSource: Rapidly-Exploring Quotient-Space Trees: Motion Planning using Sequential Simplifications. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: QRRT is shown to be (1) probabilistically complete, and (2) can reduce the runtime by at least one order of magnitude.\nSource: Rapidly-Exploring Quotient-Space Trees: Motion Planning using Sequential Simplifications. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B124",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: QRRT; no date, time, or condition stated). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: QRRT; no date, time, or condition stated). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B125",
+   "chat": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “The idea behind it is that Einsteinian gravity has a validity limit and must be extended to Moiré gravity, in which the Friedmann equation changes and a new scalar field emerges.” \nyou>",
+   "chat_source": "Constraining a model supported in Moiré gravity with a recent data release; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “The idea behind it is that Einsteinian gravity has a validity limit and must be extended to Moiré gravity, in which the Friedmann equation changes and a new scalar field emerges.” \nyou>",
+   "combined_source": "Constraining a model supported in Moiré gravity with a recent data release; may not answer your question"
+  },
+  {
+   "id": "B126",
+   "chat": "Source text: The idea behind it is that Einsteinian gravity has a validity limit and must be extended to Moiré gravity, in which the Friedmann equation changes and a new scalar field emerges.\nSource: Constraining a model supported in Moiré gravity with a recent data release. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: The idea behind it is that Einsteinian gravity has a validity limit and must be extended to Moiré gravity, in which the Friedmann equation changes and a new scalar field emerges.\nSource: Constraining a model supported in Moiré gravity with a recent data release. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B127",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B128",
+   "chat": "“In this paper, we propose a model-based reinforcement learning framework that learns an active feature acquisition policy to solve the exploration-exploitation problem during its execution.” \nyou>",
+   "chat_source": "Reinforcement Learning with Efficient Active Feature Acquisition; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“In this paper, we propose a model-based reinforcement learning framework that learns an active feature acquisition policy to solve the exploration-exploitation problem during its execution.” \nyou>",
+   "combined_source": "Reinforcement Learning with Efficient Active Feature Acquisition; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B129",
+   "chat": "“We introduce LintEval, a multilingual benchmark for linter-guided file refactoring across C++, Python, and Java, comprising 13,061 programs with correct initial functionality and 171,662 lint alerts extracted using language-specific linters.” \nyou>",
+   "chat_source": "LintEval: Benchmarking LLMs on Linter-Guided File Refactoring; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“We introduce LintEval, a multilingual benchmark for linter-guided file refactoring across C++, Python, and Java, comprising 13,061 programs with correct initial functionality and 171,662 lint alerts extracted using language-specific linters.” \nyou>",
+   "combined_source": "LintEval: Benchmarking LLMs on Linter-Guided File Refactoring; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B130",
+   "chat": "The source gives the count as 061: “We introduce LintEval, a multilingual benchmark for linter-guided file refactoring across C++, Python, and Java, comprising 13,061 programs with correct initial functionality and 171,662 lint alerts extracted using language-specific linters.” \nyou>",
+   "chat_source": "LintEval: Benchmarking LLMs on Linter-Guided File Refactoring; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "The source gives the count as 061: “We introduce LintEval, a multilingual benchmark for linter-guided file refactoring across C++, Python, and Java, comprising 13,061 programs with correct initial functionality and 171,662 lint alerts extracted using language-specific linters.” \nyou>",
+   "combined_source": "LintEval: Benchmarking LLMs on Linter-Guided File Refactoring; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B131",
+   "chat": "“We introduce LintEval, a multilingual benchmark for linter-guided file refactoring across C++, Python, and Java, comprising 13,061 programs with correct initial functionality and 171,662 lint alerts extracted using language-specific linters.” \nyou>",
+   "chat_source": "LintEval: Benchmarking LLMs on Linter-Guided File Refactoring; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“We introduce LintEval, a multilingual benchmark for linter-guided file refactoring across C++, Python, and Java, comprising 13,061 programs with correct initial functionality and 171,662 lint alerts extracted using language-specific linters.” \nyou>",
+   "combined_source": "LintEval: Benchmarking LLMs on Linter-Guided File Refactoring; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B132",
+   "chat": "The quoted sentence I found does not name LintEval LintEval, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "The quoted sentence I found does not name LintEval LintEval, so I can't safely attribute it to that entity. Please provide a source that names it or rephrase the question.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B133",
+   "chat": "“Abstract: Peking Opera has been the most dominant form of Chinese performing art since around 200 years ago.” \nyou>",
+   "chat_source": "Peking Opera Synthesis via Duration Informed Attention Network; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Abstract: Peking Opera has been the most dominant form of Chinese performing art since around 200 years ago.” \nyou>",
+   "combined_source": "Peking Opera Synthesis via Duration Informed Attention Network; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B134",
+   "chat": "I found source text, but it does not support a grounded answer (no procedural action stated; too little question detail matches the procedure). I won't guess.\nClosest source sentence: “Title: Peking Opera Synthesis via Duration Informed Attention Network” \nyou>",
+   "chat_source": "Peking Opera Synthesis via Duration Informed Attention Network; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no procedural action stated; too little question detail matches the procedure). I won't guess.\nClosest source sentence: “Title: Peking Opera Synthesis via Duration Informed Attention Network” \nyou>",
+   "combined_source": "Peking Opera Synthesis via Duration Informed Attention Network; may not answer your question"
+  },
+  {
+   "id": "B135",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Thomson). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Thomson). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B136",
+   "chat": "“Title: Thomson backscattering in combined uniform magnetic and envelope modulating circularly-polarized laser fields” \nyou>",
+   "chat_source": "Thomson backscattering in combined uniform magnetic and envelope modulating circularly-polarized laser fields; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Title: Thomson backscattering in combined uniform magnetic and envelope modulating circularly-polarized laser fields” \nyou>",
+   "combined_source": "Thomson backscattering in combined uniform magnetic and envelope modulating circularly-polarized laser fields; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B137",
+   "chat": "I found source text, but it does not support a grounded answer (no explicit count). I won't guess.\nClosest source sentence: “Title: Synergy between Machine/Deep Learning and Software Engineering: How Far Are We?” \nyou>",
+   "chat_source": "Synergy between Machine/Deep Learning and Software Engineering: How Far Are We?; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no explicit count). I won't guess.\nClosest source sentence: “Title: Synergy between Machine/Deep Learning and Software Engineering: How Far Are We?” \nyou>",
+   "combined_source": "Synergy between Machine/Deep Learning and Software Engineering: How Far Are We?; may not answer your question"
+  },
+  {
+   "id": "B138",
+   "chat": "“Abstract: Since 2009, the deep learning revolution, which was triggered by the introduction of ImageNet, has stimulated the synergy between Machine Learning (ML)/Deep Learning (DL) and Software Engineering (SE).” \nyou>",
+   "chat_source": "Synergy between Machine/Deep Learning and Software Engineering: How Far Are We?; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Abstract: Since 2009, the deep learning revolution, which was triggered by the introduction of ImageNet, has stimulated the synergy between Machine Learning (ML)/Deep Learning (DL) and Software Engineering (SE).” \nyou>",
+   "combined_source": "Synergy between Machine/Deep Learning and Software Engineering: How Far Are We?; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B139",
+   "chat": "“In this paper we introduce IntegrationDistiller as an automated solution and tool to identify integration scenarios and generate test cases (in the form of method call sequences) for .NET applications.” \nyou>",
+   "chat_source": "IntegrationDistiller: Automating Integration Analysis and Testing of Object-Oriented Applications; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“In this paper we introduce IntegrationDistiller as an automated solution and tool to identify integration scenarios and generate test cases (in the form of method call sequences) for .NET applications.” \nyou>",
+   "combined_source": "IntegrationDistiller: Automating Integration Analysis and Testing of Object-Oriented Applications; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B140",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B141",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Effectiveness; named entity missing: Localizing Reasoning Failures). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Effectiveness; named entity missing: Localizing Reasoning Failures). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B142",
+   "chat": "“On incorrect 8B traces, the confidence probe, a calibrated correctness probe at a midpoint cutoff, misses 81% of cases in which a single step makes the trace unrecoverable and 47% of cases in which another attempt would succeed.” \nyou>",
+   "chat_source": "Effectiveness of Hidden-State Probes for Localizing Reasoning Failures; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“On incorrect 8B traces, the confidence probe, a calibrated correctness probe at a midpoint cutoff, misses 81% of cases in which a single step makes the trace unrecoverable and 47% of cases in which another attempt would succeed.” \nyou>",
+   "combined_source": "Effectiveness of Hidden-State Probes for Localizing Reasoning Failures; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B143",
+   "chat": "“At both scales, no single tested probe locates the failing step more accurately than a rule based only on trace length, and at 4B a probe trained to predict that step fails to outperform this rule in any of 10 runs on identical traces.” \nyou>",
+   "chat_source": "Effectiveness of Hidden-State Probes for Localizing Reasoning Failures; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“At both scales, no single tested probe locates the failing step more accurately than a rule based only on trace length, and at 4B a probe trained to predict that step fails to outperform this rule in any of 10 runs on identical traces.” \nyou>",
+   "combined_source": "Effectiveness of Hidden-State Probes for Localizing Reasoning Failures; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B144",
+   "chat": "“We introduce the Neural Power Unit (NPU) that operates on the full domain of real numbers and is capable of learning arbitrary power functions in a single layer.” \nyou>",
+   "chat_source": "Neural Power Units; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“We introduce the Neural Power Unit (NPU) that operates on the full domain of real numbers and is capable of learning arbitrary power functions in a single layer.” \nyou>",
+   "combined_source": "Neural Power Units; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B145",
+   "chat": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “We introduce the Neural Power Unit (NPU) that operates on the full domain of real numbers and is capable of learning arbitrary power functions in a single layer.” \nyou>",
+   "chat_source": "Neural Power Units; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “We introduce the Neural Power Unit (NPU) that operates on the full domain of real numbers and is capable of learning arbitrary power functions in a single layer.” \nyou>",
+   "combined_source": "Neural Power Units; may not answer your question"
+  },
+  {
+   "id": "B146",
+   "chat": "Source text: We train our model via imitation learning from the strong branching expert rule, and demonstrate on a series of hard problems that our approach produces policies that improve upon state-of-the-art machine-learning methods for branching and generalize to instances significantly larger than seen during training.\nSource: Exact Combinatorial Optimization with Graph Convolutional Neural Networks. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "Source text: We train our model via imitation learning from the strong branching expert rule, and demonstrate on a series of hard problems that our approach produces policies that improve upon state-of-the-art machine-learning methods for branching and generalize to instances significantly larger than seen during training.\nSource: Exact Combinatorial Optimization with Graph Convolutional Neural Networks. This is quoted evidence, not an accepted fact; ask ‘why?’ for its citation.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B147",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: SGD). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: SGD). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B148",
+   "chat": "I found source text, but it does not support a grounded answer (no procedural action stated). I won't guess.\nClosest source sentence: “By retaining the sampling bias at random comparison points, we remove the explicit $1/n$ factor from the stepsize restriction.” \nyou>",
+   "chat_source": "Large-Step Last-Iterate Convergence of Random-Reshuffling Stochastic Gradient Descent; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no procedural action stated). I won't guess.\nClosest source sentence: “By retaining the sampling bias at random comparison points, we remove the explicit $1/n$ factor from the stepsize restriction.” \nyou>",
+   "combined_source": "Large-Step Last-Iterate Convergence of Random-Reshuffling Stochastic Gradient Descent; may not answer your question"
+  },
+  {
+   "id": "B149",
+   "chat": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “To address the problem, we introduce GraphBEAT (Graph-based Bucketized Event Aggregation over Time), a temporal graph representation learning framework that groups clinical events into time buckets and transforms observed features into patient-specific, temporally directed graphs to enable early risk stratification for gastrointestinal cancers.” \nyou>",
+   "chat_source": "GraphBEAT: Graph-based Bucketized Event Aggregation Over Time for Early Risk Stratification of Gastrointestinal Cancers; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “To address the problem, we introduce GraphBEAT (Graph-based Bucketized Event Aggregation over Time), a temporal graph representation learning framework that groups clinical events into time buckets and transforms observed features into patient-specific, temporally directed graphs to enable early risk stratification for gastrointestinal cancers.” \nyou>",
+   "combined_source": "GraphBEAT: Graph-based Bucketized Event Aggregation Over Time for Early Risk Stratification of Gastrointestinal Cancers; may not answer your question"
+  },
+  {
+   "id": "B150",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: GraphBEAT EHR). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: GraphBEAT EHR). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B151",
+   "chat": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Title: Short Text Topic Modeling Techniques, Applications, and Performance: A Survey” \nyou>",
+   "chat_source": "Short Text Topic Modeling Techniques, Applications, and Performance: A Survey; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (no question-relation term in sentence). I won't guess.\nClosest source sentence: “Title: Short Text Topic Modeling Techniques, Applications, and Performance: A Survey” \nyou>",
+   "combined_source": "Short Text Topic Modeling Techniques, Applications, and Performance: A Survey; may not answer your question"
+  },
+  {
+   "id": "B152",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B153",
+   "chat": "I found source text, but it does not support a grounded answer (named entity missing: Reasoning Over History Context Aware Visual Dialog; definition subject is not in sentence subject position). I won't guess.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (named entity missing: Reasoning Over History Context Aware Visual Dialog; definition subject is not in sentence subject position). I won't guess.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B154",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  },
+  {
+   "id": "B155",
+   "chat": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “Title: Beware the evolving 'intelligent' web service!” \nyou>",
+   "chat_source": "Beware the evolving 'intelligent' web service! An integration architecture tactic to guard AI-first components; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “Title: Beware the evolving 'intelligent' web service!” \nyou>",
+   "combined_source": "Beware the evolving 'intelligent' web service! An integration architecture tactic to guard AI-first components; may not answer your question"
+  },
+  {
+   "id": "B156",
+   "chat": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “Title: Beware the evolving 'intelligent' web service!” \nyou>",
+   "chat_source": "Beware the evolving 'intelligent' web service! An integration architecture tactic to guard AI-first components; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “Title: Beware the evolving 'intelligent' web service!” \nyou>",
+   "combined_source": "Beware the evolving 'intelligent' web service! An integration architecture tactic to guard AI-first components; may not answer your question"
+  },
+  {
+   "id": "B157",
+   "chat": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “Title: Testing the running vacuum model in light of DESI-DR2 Measurements” \nyou>",
+   "chat_source": "Testing the running vacuum model in light of DESI-DR2 Measurements; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “Title: Testing the running vacuum model in light of DESI-DR2 Measurements” \nyou>",
+   "combined_source": "Testing the running vacuum model in light of DESI-DR2 Measurements; may not answer your question"
+  },
+  {
+   "id": "B158",
+   "chat": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “The corresponding Friedmann equations are derived and analyzed to study their impact on cosmic expansion.” \nyou>",
+   "chat_source": "Testing the running vacuum model in light of DESI-DR2 Measurements; may not answer your question",
+   "relation": null,
+   "combined": "I found source text, but it does not support a grounded answer (definition subject is not in sentence subject position). I won't guess.\nClosest source sentence: “The corresponding Friedmann equations are derived and analyzed to study their impact on cosmic expansion.” \nyou>",
+   "combined_source": "Testing the running vacuum model in light of DESI-DR2 Measurements; may not answer your question"
+  },
+  {
+   "id": "B159",
+   "chat": "“Abstract: Product owners in the Scrum framework - respectively the on-site customer when applying eXtreme Programming - have an important role in the development process.” \nyou>",
+   "chat_source": "On the Tasks and Characteristics of Product Owners: A Case Study in the Oil & Gas Industry; quoted evidence, not an accepted fact",
+   "relation": null,
+   "combined": "“Abstract: Product owners in the Scrum framework - respectively the on-site customer when applying eXtreme Programming - have an important role in the development process.” \nyou>",
+   "combined_source": "On the Tasks and Characteristics of Product Owners: A Case Study in the Oil & Gas Industry; quoted evidence, not an accepted fact"
+  },
+  {
+   "id": "B160",
+   "chat": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "chat_source": "",
+   "relation": null,
+   "combined": "I found topic matches, but no retrieved sentence states a cause. Try a more specific question or add a source.\nyou>",
+   "combined_source": ""
+  }
+ ]
+}

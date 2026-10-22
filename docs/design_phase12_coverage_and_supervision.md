@@ -1,6 +1,6 @@
 # Phase 12 coverage and supervised learning at scale, generation first
 
-**Status:** planned 2026-10-22; not started.
+**Status:** in progress (2026-10-22).
 **Plan entry:** `docs/master_plan_to_final_state.md`, Phase 12.
 **Builds on:** Phase 10 (generation stack, teacher loop skeleton), Phase 11 Stage A
 (pattern layer, spec verifier, SQL pattern memory, infobox oracle).
@@ -34,16 +34,22 @@ every change.
 
 ## 1. Independent evaluation (first, blocking)
 
-- An externally authored set of at least 300 prompts over two source-disjoint
-  corpora. The author sees no code, specs, or prior outputs.
-- A human-graded slice of at least 100 answers rated by two people on correctness,
-  faithfulness, and clarity; agreement and kappa reported.
-- The judge model differs from the proposing model; judge/human agreement is part
-  of the gate.
+Decision (project owner, 2026-10-22): the independent author and the raters are LLM
+sessions, not people.
+
+- A fresh LLM session writes at least 300 prompts with gold answers over two
+  source-disjoint corpora. It is given passages from the corpora only: no code,
+  specs, prior outputs, or failure reports. The set is frozen with a digest and
+  never used for tuning.
+- Two separate LLM judge sessions, differing in model size where available, rate a
+  slice of at least 100 answers on correctness, faithfulness, and clarity. Each sees
+  only the question, the cited source, and the answer. Agreement and kappa are
+  reported, and each judge is also compared with the deterministic oracle label.
+- The judges differ from the proposing session.
 - Report correct, wrong, abstain, and coverage separately.
-- Resources outside the project are needed. If they are unavailable the gate stays
-  open and the independent-evaluation claim is withheld; the other workstreams
-  continue.
+- Limit: the author, judges, and builder share a model family, so shared blind
+  spots and self-preference are possible. Every result is labelled
+  model-validated. A human-rated slice stays an optional upgrade.
 
 ## 2. Automated teacher loop
 
@@ -63,7 +69,7 @@ passage -> question + gold span (teacher)
   reported). Teacher-generated questions cover relations the oracle cannot.
 - Acceptance needs: verifier passes; oracle wrong share does not rise; the
   parity bank does not regress.
-- Budget and report teacher calls and human minutes per round.
+- Budget and report teacher and judge calls per round.
 
 ### Coverage program
 
@@ -135,7 +141,7 @@ source. The clean-room run covers index-based intake.
 - Independent set: wrong share of answered ≤5% over two corpora; coverage on
   in-scope relations against the 26% baseline with a frozen target; zero unsafe
   answers on safety controls.
-- Judge validity: human/judge kappa ≥0.6 on ≥100 answers; judge ≠ proposer.
+- Judge validity: judge/judge kappa ≥0.6 on ≥100 answers and per-judge agreement with the oracle; judges ≠ proposer.
 - Learning efficacy: three automated rounds give ≥15% relative held-out gain with
   no confident-error increase; the scaling curve and ablations published.
 - Generation: index-based outputs of at least three facts, 100% of clauses
@@ -148,17 +154,17 @@ source. The clean-room run covers index-based intake.
 
 | Risk | Response |
 |---|---|
-| Judge self-preference | Separate judge and proposer; human-graded slice decides |
+| Judge self-preference | Separate judge and proposer sessions; oracle cross-check; results labelled model-validated |
 | Reward hacking by abstention or by easy questions | Report answered, abstained, wrong separately; oracle plus teacher questions |
 | Spec explosion and shadowing | Bank non-regression, consolidation, matching budget, utility accounting |
 | Oracle label noise | Report gold-error examples; normalise template residue; use hand slices |
-| Independent author or raters unavailable | Withhold the claim; continue other workstreams |
+| LLM author and judges share a model family | Fresh contexts, separate sessions, oracle cross-check, label results model-validated |
 | Retrieval misses (facts on other pages) | Neighbour retrieval workstream; report separately from pattern misses |
 | Teacher cost | Budget per round; prioritise by oracle gap |
 
 ## Open decisions
 
-1. Who authors the independent set and who rates the graded slice.
+1. Whether to add a human-rated slice later (optional).
 2. Which model proposes and which judges (Phase 10 decision).
 3. Whether pattern tables live in the model file or beside it.
 4. Retention and redaction policy for conversation data.

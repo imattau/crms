@@ -1,0 +1,23 @@
+{
+ "rated": 124,
+ "judge_vs_judge": {
+  "n": 124,
+  "agreement": 0.9919,
+  "kappa": 0.9875
+ },
+ "judge_a_vs_oracle": {
+  "n": 124,
+  "agreement": 0.9032,
+  "kappa": 0.8491
+ },
+ "judge_b_vs_oracle": {
+  "n": 124,
+  "agreement": 0.9113,
+  "kappa": 0.8618
+ },
+ "judges": {
+  "A": "sonnet",
+  "B": "haiku"
+ },
+ "model_validated": true
+}

@@ -1036,7 +1036,9 @@ and the Phase 9 and 10 independent-evaluation gates are still open.
 
 **Principles.**
 1. **Independent evaluation comes first.** No capability claim without an
-   externally authored set and a human-graded slice.
+   independently authored set and an independently graded slice. The author and
+   the raters are LLM sessions kept apart from the system's own authors (see
+   workstream 1), not people; the claim is worded as model-validated.
 2. **The verifier decides.** A teacher proposes; deterministic checks accept.
 3. **Reward rule everywhere.** +1 correct, −3 wrong, 0 abstain. Coverage may not be
    bought with a higher wrong share.
@@ -1048,10 +1050,12 @@ and the Phase 9 and 10 independent-evaluation gates are still open.
 
 Workstreams and deliverables:
 
-1. **Independent evaluation** (first, blocking). An externally authored set of at
-   least 300 prompts over two source-disjoint corpora; a human-graded slice of at
-   least 100 answers by two raters with agreement reported; judge model different
-   from the proposing model; correct, wrong, abstain, and coverage reported
+1. **Independent evaluation** (first, blocking). An independently authored set of at
+   least 300 prompts over two source-disjoint corpora, written by a fresh LLM
+   session that sees the corpora but no code, specs, or system output; a graded
+   slice of at least 100 answers rated by two separate LLM judge sessions (different
+   model sizes where available) with agreement reported; the judges differ from the
+   proposing session and see only question, source, and answer; correct, wrong, abstain, and coverage reported
    separately and never collapsed.
 2. **Automated teacher loop** (`crms_examiner.py`, `run_phase12_eval.py`).
    Questions generated from passages with gold spans; failures grouped by cause
@@ -1065,7 +1069,7 @@ Workstreams and deliverables:
    documents; qualifier and conflict handling ("current" vs "former", dated facts,
    "sources disagree" with citations); neighbour retrieval for facts stated on a
    related page; critic checks for relation and role order; variation that reduces
-   restatement where sources are already simple; human clarity calibration.
+   restatement where sources are already simple; judge-session clarity calibration.
 4. **Gated retrofit lane.** Families chosen by measured failure, starting with the
    evidence gate's locative and answer-type checks (27 of 61 abstentions in one
    exam came from the location predicate) and bare arithmetic. Each family is one
@@ -1083,10 +1087,11 @@ Workstreams and deliverables:
 - **Independent evaluation:** wrong share of answered ≤5% on the independent set
   over two corpora; coverage on in-scope relations reported against the 26%
   Phase 11 baseline with a frozen target; zero unsafe answers on safety controls.
-- **Judge validity:** human/judge kappa ≥0.6 on ≥100 graded answers; judge differs
-  from proposer.
+- **Judge validity:** judge/judge kappa ≥0.6 on ≥100 graded answers, and agreement of each
+  judge with the deterministic oracle label where one exists; judges differ from
+  the proposer.
 - **Learning efficacy:** three automated teacher rounds give ≥15% relative
-  held-out gain with no confident-error increase; teacher calls and human minutes
+  held-out gain with no confident-error increase; teacher and judge calls
   reported; the rule-scaling curve published with ablations; plateaus diagnosed.
 - **Generation:** index-based intake composes outputs of at least three
   facts with 100% of clauses resolving to a cited span; conflicting or dated facts
@@ -1097,10 +1102,30 @@ Workstreams and deliverables:
 - **Clean room:** a copied release runs index-based intake and the pattern layer
   with no LLM, network, or originals; patterns reload from SQL and roll back.
 
-**Status (2026-10-22): planned; not started.** Depends on resources outside the
-project: an independent question author and two human raters. If they are not
-available, the gate stays open and the teacher-loop and generation work proceed
-with the independent-evaluation claim withheld.
+**Status (2026-10-22): in progress.** The independent author and the raters are
+LLM sessions, as decided by the project owner. This weakens the independence
+claim: the author and judges share a model family with the system's builder, so
+self-preference and shared blind spots are possible. Mitigations: fresh contexts
+with no code or prior output, separate author and judge sessions, deterministic
+oracle labels as a cross-check, and every report is marked model-validated, never
+human-validated. A human-rated slice remains an optional upgrade, not a gate.
+
+**Results so far (2026-10-22, model-validated).**
+
+| Measure | Result |
+|---|---|
+| Independent set | 320 questions (160 Simple English Wikipedia, 160 arXiv abstracts; 85% answerable) written by a fresh LLM session that saw only the passages; frozen with a digest (`corpus/phase12_eval/independent_set.json`) |
+| System on it (chat; relation layer adds 1 answer) | 55 correct, 44 wrong, 221 abstained; wrong share of answered 44%; 14 of 48 unanswerable questions answered; utility −77. **The provisional gate (wrong share ≤5%) is not met.** |
+| Why | The relation layer covers who/when relations about named entities; these questions are mostly why, how, define, count and list, which the chat answers by quoting a sentence, often an unrelated one |
+| Judges | Two separate LLM judge sessions (sonnet-class and haiku-class) rated 124 answers: judge/judge agreement 0.99, kappa 0.99; each judge against the deterministic label: kappa 0.85 and 0.86. The deterministic label is reliable on this set; the judges agree almost entirely, so the rubric is easy rather than the judges independent in a strong sense |
+| Failure causes (Phase 11 oracle sample) | 509 of 1,050 prose gaps no spec reads, 250 labels exist only in infobox residue, 4 retrieval misses (`run_phase12_causes.py`) |
+| Page-subject resolution | Bracket mode ships: +2 correct, 0 wrong on the fresh blind sample. Pronoun mode is off: +21 correct but +7 wrong, net utility 0 (on the sample used to design it, pronoun mode looked like +32 correct, +1 wrong) |
+| Conflicts | Sources that disagree are both stated with their sources ("…1901 according to a.txt. However, Oldtown was established in 1950 according to b.txt") instead of abstaining; the engine's own answer is unchanged |
+
+Not done: the automated teacher loop, the neighbour-retrieval and tense/quantifier
+work, any new retrofit family beyond Phase 11, conversation learning, and packaging
+the pattern tables. The independent result is the main finding: the largest gap is
+question types the specs do not cover, not pattern precision.
 
 
 ---
@@ -1179,7 +1204,7 @@ counts and rates; never collapse into one "score".
 | Rule shadowing | One spec captures questions meant for another (seen as 'Mapai established in 1930') | Bank non-regression check in the verifier; ordering and restriction tests |
 | Coverage bought with wrong answers | Spec count rises while the wrong share of answered rises | Reward rule gate, oracle wrong share must not rise, per-spec utility counts and contest |
 | Spec explosion | Thousands of overlapping specs, shadowing, slow matching | Verifier bank non-regression, consolidation and retirement, matching budget, per-spec utility accounting |
-| External resources unavailable | No independent author or human raters | Withhold the independent-evaluation claim, keep the gate open, continue the other workstreams |
+| LLM author and judges share a model family | Shared blind spots and self-preference inflate scores | Fresh contexts without code, separate author and judge sessions, oracle cross-check, report as model-validated, publish disagreement |
 | Scope creep | New feature without a gate | Reject; the 533-experiment habit is the main delivery risk |
 
 **Kill criteria are part of the plan.** A lane that misses its gate twice is
@@ -1282,8 +1307,8 @@ redesigned or dropped.
    independent evaluation, automated teacher loop and coverage program,
    index-based generation with conflict handling, a gated retrofit lane with a
    footprint ratchet, real conversation learning, and packaging. — planned
-   (`docs/design_phase12_coverage_and_supervision.md`); needs an independent
-   author and human raters.
+   (`docs/design_phase12_coverage_and_supervision.md`); the independent author and
+   raters are LLM sessions.
 20. **Consolidate plan docs** — this file is canonical; link the others as
    history. — canonical status recorded; remaining docs still need pruning.
 
@@ -1342,3 +1367,4 @@ corpus size, it has not advanced the goal.
 | 2026-10-22 | Phase 11 planned: staged transition from ad-hoc regex to one structure-aware pattern layer, generation layer first (engine port, SQL store, source-to-proposition intake, pattern-based generation rules, spec verifier), with parity gate, retire-on-parity rule, and later stages for evidence extraction, request understanding, and knowledge extraction. Prototype evidence recorded with its limits; gate open | `docs/design_phase11_pattern_transition.md`, `docs/master_plan_to_final_state.md` |
 | 2026-10-22 | Phase 11 Stage A completed and merged: pattern engine, SQL pattern memory and seed, spec verifier, specs as `fact-frame` registry rules, `/compose` source intake, pattern-based clarity rewriting and number/polarity/name/role-order critic checks, infobox-oracle evaluation with frozen 1,050-question sample; combined system 388 correct / 47 wrong vs quote baseline 182 / 55 (utility 247 vs 17), one correct answer lost; Phase 10 parity 12/12; no new failures in the full suite; Stages B–E followed at pilot scope (see Phase 11 status) | `crms_patterns.py`, `crms_relation_specs.py`, `crms_pattern_memory.py`, `crms_spec_verifier.py`, `crms_spec_registry.py`, `crms_source_intake.py`, `crms_generation_checks.py`, `run_phase11_eval.py`, `experiments/reports/phase11_stage_a.json` |
 | 2026-10-22 | Phase 12 planned: coverage and supervised learning at scale, generation first (independent evaluation, automated teacher loop and coverage program, index-based generation with conflict handling, gated retrofit lane with footprint ratchet, real conversation learning, packaging); rationale recorded against a wholesale regex retrofit; not started | `docs/design_phase12_coverage_and_supervision.md`, `docs/master_plan_to_final_state.md` |
+| 2026-10-22 | Phase 12 started with LLM sessions as independent author and judges (project owner's decision): 320-question independent set frozen; chat scores 55 correct / 44 wrong / 221 abstain (gate not met); judge/judge kappa 0.99, judge/oracle 0.85–0.86; conflict reporting with sources; failure-cause grouping; page-subject resolution (bracket mode on, pronoun mode off after a blind-sample check); teacher loop, retrofit families, and packaging not done | `crms_independent_eval.py`, `crms_failure_causes.py`, `run_phase12_independent.py`, `run_phase12_eval.py`, `run_phase12_causes.py`, `corpus/phase12_eval/`, `experiments/reports/phase12_*.json` |

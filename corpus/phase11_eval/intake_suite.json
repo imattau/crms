@@ -294,14 +294,14 @@
     ]
    },
    "expect": {
-    "status": "clarify",
-    "facts": 2,
-    "contains": [],
-    "excludes": [
-     "1901",
-     "1950"
+    "status": "ok",
+    "facts": 4,
+    "contains": [
+     "Oldtown was established in 1901 according to a.txt",
+     "However, Oldtown was established in 1950 according to b.txt"
     ],
-    "note": "two sources disagree on the main question: it abstains and does not pick one"
+    "excludes": [],
+    "note": "Phase 12: sources disagree on the main question; both sides are stated with their sources instead of abstaining"
    }
   },
   {

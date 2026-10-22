@@ -111,7 +111,8 @@ _ABSTAIN = re.compile(
     r"do not have|I couldn't|couldn't find|no retrieved sentence|I can't|not enough", re.I)
 
 
-def chat_answer(chat: Path, index: Path, question: str, *, timeout: int = 180) -> str:
+def chat_answer(chat: Path, index: Path, question: str, *, timeout: int = 180,
+                keep_source: bool = False) -> str:
     """Ask one question in a fresh, isolated chat session; return the answer text."""
     import subprocess
     import tempfile
@@ -129,7 +130,8 @@ def chat_answer(chat: Path, index: Path, question: str, *, timeout: int = 180) -
     if len(parts) < 2:
         return ""
     answer = re.sub(r"\s*you>\s*$", "", parts[1].strip())
-    answer = re.sub(r"\[Source:[^\]]*\]", "", answer)
+    if not keep_source:
+        answer = re.sub(r"\[Source:[^\]]*\]", "", answer)
     return answer.split("CRMS state saved")[0].strip()
 
 

@@ -1,0 +1,3202 @@
+[
+ {
+  "id": "A001",
+  "corpus": "A",
+  "title": "Survivor Series (2015)",
+  "question": "How many people attended Survivor Series (2015) at the Philips Arena?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A002",
+  "corpus": "A",
+  "title": "Survivor Series (2015)",
+  "question": "When did WWE hold the Survivor Series 2015 event?",
+  "answerable": true,
+  "gold": "November 22, 2015",
+  "support": "It took place on November 22, 2015, at the Philips Arena in Atlanta, Georgia.",
+  "type": "when"
+ },
+ {
+  "id": "A003",
+  "corpus": "A",
+  "title": "Survivor Series (2015)",
+  "question": "Who beat Dean Ambrose in the tournament final at Survivor Series (2015) to win the vacant WWE World Heavyweight Championship?",
+  "answerable": true,
+  "gold": "Roman Reigns",
+  "support": "In the scheduled main event, Roman Reigns became a world champion for the first time, when he defeated Dean Ambrose in a tournament final to win the vacant WWE World Heavyweight Championship.",
+  "type": "who"
+ },
+ {
+  "id": "A004",
+  "corpus": "A",
+  "title": "Ethnic cleansing",
+  "question": "What is ethnic cleansing?",
+  "answerable": true,
+  "gold": "One ethnic or religious group forces another to leave an area",
+  "support": "In an ethnic cleansing, one ethnic or religious group forces another to leave an area.",
+  "type": "define"
+ },
+ {
+  "id": "A005",
+  "corpus": "A",
+  "title": "Ethnic cleansing",
+  "question": "Is every case of ethnic cleansing also a genocide?",
+  "answerable": true,
+  "gold": "No",
+  "support": "However, not every ethnic cleansing is a genocide.",
+  "type": "yesno"
+ },
+ {
+  "id": "A006",
+  "corpus": "A",
+  "title": "Ethnic cleansing",
+  "question": "When Spain ordered its Jews in 1492 to convert or leave, at least how many fled?",
+  "answerable": true,
+  "gold": "At least 40,000",
+  "support": "For example, in 1492, Spain ordered its Jews to convert to Catholicism or leave, and at least 40,000 fled.",
+  "type": "count"
+ },
+ {
+  "id": "A007",
+  "corpus": "A",
+  "title": "Ethnic cleansing",
+  "question": "Name two methods that ethnic cleansing has used to remove a group from an area.",
+  "answerable": true,
+  "gold": "Forcing people to move and deporting people",
+  "support": "Methods of ethnic cleansing include forcing people to move; deporting people; threatening them until they leave; rape; and mass murder.",
+  "type": "list"
+ },
+ {
+  "id": "A008",
+  "corpus": "A",
+  "title": "Dale Caldwell",
+  "question": "What is the name of Dale Caldwell's wife?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who"
+ },
+ {
+  "id": "A009",
+  "corpus": "A",
+  "title": "Dale Caldwell",
+  "question": "Why did Governor Sherrill formally call for Dale Caldwell to resign?",
+  "answerable": true,
+  "gold": "Investigations found he engaged in serious, repeated violations of state policy",
+  "support": "On September 24, 2026, Governor Sherrill formally called for Caldwell to resign after investigations found he \"engaged in serious, repeated violations of state policy and failed to uphold the responsibilities of his office\".",
+  "type": "why"
+ },
+ {
+  "id": "A010",
+  "corpus": "A",
+  "title": "Civil Disobedience (Thoreau)",
+  "question": "How many people attended Thoreau's lecture at the Concord Lyceum in 1848?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A011",
+  "corpus": "A",
+  "title": "Civil Disobedience (Thoreau)",
+  "question": "How long did the tax agent keep Thoreau in prison in 1846?",
+  "answerable": true,
+  "gold": "One night",
+  "support": "In 1846 the tax agent put Thoreau in prison for one night.",
+  "type": "how"
+ },
+ {
+  "id": "A012",
+  "corpus": "A",
+  "title": "Flynn effect",
+  "question": "What is the Flynn effect?",
+  "answerable": true,
+  "gold": "A rise in average IQ scores since the beginning of measurements",
+  "support": "There is a rise in average IQ scores since the beginning of measurements.",
+  "type": "define"
+ },
+ {
+  "id": "A013",
+  "corpus": "A",
+  "title": "Flynn effect",
+  "question": "Why are IQ tests re-normalized every so often?",
+  "answerable": true,
+  "gold": "To hold the average score for an age group at 100",
+  "support": "IQ tests are re-normalized every so often to hold the average score for an age group at 100.",
+  "type": "why"
+ },
+ {
+  "id": "A014",
+  "corpus": "A",
+  "title": "Jason Witten",
+  "question": "How many career touchdowns did Jason Witten score for the Dallas Cowboys?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A015",
+  "corpus": "A",
+  "title": "Jason Witten",
+  "question": "At which university did Jason Witten play college football?",
+  "answerable": true,
+  "gold": "University of Tennessee",
+  "support": "He played college football at the University of Tennessee.",
+  "type": "where"
+ },
+ {
+  "id": "A016",
+  "corpus": "A",
+  "title": "Villa Biscossi",
+  "question": "In which Italian region is the comune of Villa Biscossi found?",
+  "answerable": true,
+  "gold": "Lombardy",
+  "support": "Villa Biscossi is a comune in the Province of Pavia in the Lombardy region in Italy.",
+  "type": "where"
+ },
+ {
+  "id": "A017",
+  "corpus": "A",
+  "title": "Villa Biscossi",
+  "question": "Name two municipalities that border Villa Biscossi.",
+  "answerable": true,
+  "gold": "Galliavola and Lomello",
+  "support": "Villa Biscossi is next to these municipalities: Galliavola, Lomello, Mede, Pieve del Cairo.",
+  "type": "list"
+ },
+ {
+  "id": "A018",
+  "corpus": "A",
+  "title": "The Fountainhead",
+  "question": "How many copies of The Fountainhead have been sold worldwide?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A019",
+  "corpus": "A",
+  "title": "The Fountainhead",
+  "question": "Who is the author of the novel The Fountainhead?",
+  "answerable": true,
+  "gold": "Ayn Rand",
+  "support": "The Fountainhead is a novel written by Ayn Rand.",
+  "type": "who"
+ },
+ {
+  "id": "A020",
+  "corpus": "A",
+  "title": "The Fountainhead",
+  "question": "Why was Howard Roark kicked out of the Stanton architecture school in The Fountainhead?",
+  "answerable": true,
+  "gold": "He wanted to design modern buildings made with glass, concrete and steel",
+  "support": "Howard Roark has just been kicked out of Stanton because he wants to design modern buildings made with glass, concrete and steel.",
+  "type": "why"
+ },
+ {
+  "id": "A021",
+  "corpus": "A",
+  "title": "Nicotine",
+  "question": "What is nicotine?",
+  "answerable": true,
+  "gold": "A chemical in tobacco",
+  "support": "Nicotine is a chemical in tobacco, which is used in cigarettes, cigars, pipes tobacco, chewing tobacco, some vaping liquids and some e-cigarette products.",
+  "type": "define"
+ },
+ {
+  "id": "A022",
+  "corpus": "A",
+  "title": "Nicotine",
+  "question": "Name two plants besides tobacco that contain small quantities of nicotine.",
+  "answerable": true,
+  "gold": "Tomato and potato plants",
+  "support": "Small quantities of it can be found in tomato, potato plants, or aubergine (eggplants) and green pepper (capsicum).",
+  "type": "list"
+ },
+ {
+  "id": "A023",
+  "corpus": "A",
+  "title": "Panaro",
+  "question": "What is the length of the Panaro river in kilometres?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A024",
+  "corpus": "A",
+  "title": "Panaro",
+  "question": "The Panaro is the last important right tributary of which river?",
+  "answerable": true,
+  "gold": "The Po",
+  "support": ") is a river of northeastern Italy, the last important right tributary of the Po river.",
+  "type": "define"
+ },
+ {
+  "id": "A025",
+  "corpus": "A",
+  "title": "Panaro",
+  "question": "What does the Panaro river's name change to at Pievepelago?",
+  "answerable": true,
+  "gold": "Scoltenna",
+  "support": "At Pievepelago (in the Modena province), its name changes to Scoltenna.",
+  "type": "how"
+ },
+ {
+  "id": "A026",
+  "corpus": "A",
+  "title": "The Police",
+  "question": "How many records had The Police sold worldwide as of 2008?",
+  "answerable": true,
+  "gold": "Over 40,000,000",
+  "support": "As of 2008, The Police are one of the most successful bands in the world having sold over 40,000,000 records worldwide.",
+  "type": "count"
+ },
+ {
+  "id": "A027",
+  "corpus": "A",
+  "title": "The Police",
+  "question": "Which musical styles influenced the British rock band The Police?",
+  "answerable": true,
+  "gold": "Jazz, punk and reggae",
+  "support": "The Police was a British rock band who played a style of rock music that was influenced by jazz, punk and reggae music.",
+  "type": "list"
+ },
+ {
+  "id": "A028",
+  "corpus": "A",
+  "title": "Alexandre de Beauharnais",
+  "question": "Where is Alexandre de Beauharnais buried?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "where"
+ },
+ {
+  "id": "A029",
+  "corpus": "A",
+  "title": "Alexandre de Beauharnais",
+  "question": "Why did the Committee of General Safety order Beauharnais's arrest on 2 March 1794?",
+  "answerable": true,
+  "gold": "For poorly defending Mainz in 1793 and for being a noble",
+  "support": "On 2 March 1794, the Committee of General Safety ordered his arrest, accusing him of poorly defending Mainz during the siege of 1793, and because he was a part of the nobility.",
+  "type": "why"
+ },
+ {
+  "id": "A030",
+  "corpus": "A",
+  "title": "Radiohead",
+  "question": "Who produced Radiohead's first album Pablo Honey?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who"
+ },
+ {
+  "id": "A031",
+  "corpus": "A",
+  "title": "Radiohead",
+  "question": "Who is the lead singer and songwriter of Radiohead?",
+  "answerable": true,
+  "gold": "Thom Yorke",
+  "support": "The lead singer and songwriter of the band is Thom Yorke, who also plays guitar and piano.",
+  "type": "who"
+ },
+ {
+  "id": "A032",
+  "corpus": "A",
+  "title": "Radiohead",
+  "question": "How did the band Radiohead get its name?",
+  "answerable": true,
+  "gold": "From the song \"Radio Head\" on the album True Stories by Talking Heads",
+  "support": "This name came from the song \"Radio Head\" on the album True Stories by Talking Heads.",
+  "type": "how"
+ },
+ {
+  "id": "A033",
+  "corpus": "A",
+  "title": "Denis Leary",
+  "question": "What is the name of Denis Leary's wife?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who"
+ },
+ {
+  "id": "A034",
+  "corpus": "A",
+  "title": "Denis Leary",
+  "question": "Which television show did Denis Leary star in and co-create?",
+  "answerable": true,
+  "gold": "Rescue Me",
+  "support": "He is the star and co-creator of the television show Rescue Me.",
+  "type": "define"
+ },
+ {
+  "id": "A035",
+  "corpus": "A",
+  "title": "Sleeping Beauty transposon system",
+  "question": "What is the Sleeping Beauty transposon system?",
+  "answerable": true,
+  "gold": "A made-up piece of DNA that helps add new pieces of DNA into the chromosomes of animals with backbones",
+  "support": "The Sleeping Beauty transposon system is a made-up piece of DNA that helps add new pieces of DNA into the chromosomes of animals with backbones.",
+  "type": "define"
+ },
+ {
+  "id": "A036",
+  "corpus": "A",
+  "title": "Sleeping Beauty transposon system",
+  "question": "How many parts does the Sleeping Beauty system have?",
+  "answerable": true,
+  "gold": "Two",
+  "support": "The Sleeping Beauty system has two parts: the Sleeping Beauty transposase and a transposon.",
+  "type": "count"
+ },
+ {
+  "id": "A037",
+  "corpus": "A",
+  "title": "Annie van de Blankevoort",
+  "question": "What was Annie van de Blankevoort's best time in the 80 metres?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A038",
+  "corpus": "A",
+  "title": "Annie van de Blankevoort",
+  "question": "Why did the media call Annie van de Blankevoort \"the invincible\"?",
+  "answerable": true,
+  "gold": "She won most of the 80 metres competitions she entered",
+  "support": "She won most of the 80 metres competitons she competed in and was therefore named in the media as “the invincible”.",
+  "type": "why"
+ },
+ {
+  "id": "A039",
+  "corpus": "A",
+  "title": "Jesse Jackson",
+  "question": "In which years did Jesse Jackson run for the Democratic presidential nomination?",
+  "answerable": true,
+  "gold": "1984 and 1988",
+  "support": "Jackson ran for the Democratic nomination for President of the United States in 1984 and in 1988.",
+  "type": "when"
+ },
+ {
+  "id": "A040",
+  "corpus": "A",
+  "title": "Jesse Jackson",
+  "question": "Where was Jesse Jackson born?",
+  "answerable": true,
+  "gold": "Greenville, South Carolina",
+  "support": "Born Jesse Louis Burns, in Greenville, South Carolina, his mother, Helen Burns, was 16 years old at the time he was born.",
+  "type": "where"
+ },
+ {
+  "id": "A041",
+  "corpus": "A",
+  "title": "Jesse Jackson",
+  "question": "Which professional baseball team offered Jesse Jackson a contract after high school?",
+  "answerable": true,
+  "gold": "Chicago White Sox",
+  "support": "After he graduated from high school, Jackson had an offer to play professional baseball from the Chicago White Sox.",
+  "type": "who"
+ },
+ {
+  "id": "A042",
+  "corpus": "A",
+  "title": "April 30",
+  "question": "How many people died when the Puentes Reservoir in Spain broke on April 30, 1802?",
+  "answerable": true,
+  "gold": "608",
+  "support": "1802 – The break of the Puentes Reservoir in Spain kills 608 people",
+  "type": "count"
+ },
+ {
+  "id": "A043",
+  "corpus": "A",
+  "title": "April 30",
+  "question": "Did Louisiana become a US state on April 30?",
+  "answerable": true,
+  "gold": "Yes, in 1812",
+  "support": "1812 – Louisiana becomes a state of the US.",
+  "type": "yesno"
+ },
+ {
+  "id": "A044",
+  "corpus": "A",
+  "title": "Mortar (weapon)",
+  "question": "What is a mortar weapon?",
+  "answerable": true,
+  "gold": "An artillery weapon which fires explosive shells",
+  "support": "A mortar is an artillery weapon which fires explosive shells.",
+  "type": "define"
+ },
+ {
+  "id": "A045",
+  "corpus": "A",
+  "title": "Mortar (weapon)",
+  "question": "Why is a mortar called an indirect fire weapon?",
+  "answerable": true,
+  "gold": "The bomb drops onto the target from above rather than being aimed straight at it",
+  "support": "They are called an indirect fire weapon because the bomb drops onto the target from above, rather than being aimed straight at it.",
+  "type": "why"
+ },
+ {
+  "id": "A046",
+  "corpus": "A",
+  "title": "Mortar (weapon)",
+  "question": "What happens to a mortar's range as the tube is set at a higher angle?",
+  "answerable": true,
+  "gold": "The range gets shorter",
+  "support": "The higher the angle, the shorter the range.",
+  "type": "compare"
+ },
+ {
+  "id": "A047",
+  "corpus": "A",
+  "title": "Led Zeppelin IV",
+  "question": "How many weeks did Led Zeppelin IV stay at number one on the UK chart?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A048",
+  "corpus": "A",
+  "title": "Led Zeppelin IV",
+  "question": "In what house was Led Zeppelin IV recorded?",
+  "answerable": true,
+  "gold": "Headley Grange",
+  "support": "It was released on November 8, 1971 and recorded at a big house called Headley Grange in 1971.",
+  "type": "where"
+ },
+ {
+  "id": "A049",
+  "corpus": "A",
+  "title": "Ann Druyan",
+  "question": "Whom did Ann Druyan marry in July 1981?",
+  "answerable": true,
+  "gold": "Carl Sagan",
+  "support": "She was the third wife of the late Carl Sagan; they married in July 1981.",
+  "type": "who"
+ },
+ {
+  "id": "A050",
+  "corpus": "A",
+  "title": "Ann Druyan",
+  "question": "What was Ann Druyan responsible for on the Voyager 1 and Voyager 2 spacecraft?",
+  "answerable": true,
+  "gold": "Deciding which musical and pictorial messages went on the phonograph record",
+  "support": "On the unmanned interstellar spacecraft Voyager 1 and Voyager 2 (launched in August and September 1977, respectively), a project led by Carl Sagan, Ann Druyan was responsible for deciding which musical and pictorial messages were included on the phonograph record that was carried on both probes.",
+  "type": "how"
+ },
+ {
+  "id": "A051",
+  "corpus": "A",
+  "title": "Gravitational lensing",
+  "question": "What causes gravitational lensing?",
+  "answerable": true,
+  "gold": "A massive body between a distant object and ourselves",
+  "support": "Gravitational lensing is caused by a massive body between a distant object and ourselves.",
+  "type": "why"
+ },
+ {
+  "id": "A052",
+  "corpus": "A",
+  "title": "Gravitational lensing",
+  "question": "Who predicted the possibility of gravitational lensing?",
+  "answerable": true,
+  "gold": "Albert Einstein",
+  "support": "Albert Einstein predicted the possibility of gravitational lensing.",
+  "type": "who"
+ },
+ {
+  "id": "A053",
+  "corpus": "A",
+  "title": "Rigoletto",
+  "question": "Who composed the music of the opera Rigoletto?",
+  "answerable": true,
+  "gold": "Giuseppe Verdi",
+  "support": "Giuseppe Verdi wrote the music.",
+  "type": "who"
+ },
+ {
+  "id": "A054",
+  "corpus": "A",
+  "title": "Rigoletto",
+  "question": "In the opera Rigoletto, why does Sparafucile kill Gilda?",
+  "answerable": true,
+  "gold": "He thinks she is the Duke",
+  "support": "Sparafucile thinks she is the Duke and kills her.",
+  "type": "why"
+ },
+ {
+  "id": "A055",
+  "corpus": "A",
+  "title": "The Gospel in Brief",
+  "question": "How many copies of Tolstoy's The Gospel in Brief were printed in 1896?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A056",
+  "corpus": "A",
+  "title": "The Gospel in Brief",
+  "question": "Who wrote The Gospel in Brief?",
+  "answerable": true,
+  "gold": "Leo Tolstoy",
+  "support": ") is a work by Russian author Leo Tolstoy.",
+  "type": "who"
+ },
+ {
+  "id": "A057",
+  "corpus": "A",
+  "title": "The Gospel in Brief",
+  "question": "Why did the Russian Orthodox Church excommunicate Tolstoy in 1901?",
+  "answerable": true,
+  "gold": "Partly because of books like The Gospel in Brief and other writings on religion",
+  "support": "In 1901, partly because of books like The Gospel in Brief and other writings on religion, the Church excommunicated him.",
+  "type": "why"
+ },
+ {
+  "id": "A058",
+  "corpus": "A",
+  "title": "The Gospel in Brief",
+  "question": "Name two supernatural elements Tolstoy left out of The Gospel in Brief.",
+  "answerable": true,
+  "gold": "Jesus's divine birth and his miracles",
+  "support": "In The Gospel in Brief, Tolstoy leaves out many of the supernatural elements of the original biblical gospels, such as Jesus's divine birth and his miracles.",
+  "type": "list"
+ },
+ {
+  "id": "A059",
+  "corpus": "A",
+  "title": "Jaap van Benthem",
+  "question": "How many children did Jaap van Benthem have?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A060",
+  "corpus": "A",
+  "title": "Jaap van Benthem",
+  "question": "What was Jaap van Benthem's field of specialization?",
+  "answerable": true,
+  "gold": "Fifteenth-century Franco-Flemish composers",
+  "support": "He was specialized in the field of fifteenth-century Franco-Flemish composers.",
+  "type": "define"
+ },
+ {
+  "id": "A061",
+  "corpus": "A",
+  "title": "Jeanne Brulé",
+  "question": "In which town was Célestine Brulé born?",
+  "answerable": true,
+  "gold": "Verdun",
+  "support": "Célestine Brulé was born on 15 December 1890 in Verdun.",
+  "type": "where"
+ },
+ {
+  "id": "A062",
+  "corpus": "A",
+  "title": "Jeanne Brulé",
+  "question": "Was Jeanne Brulé a member of the sports club Fémina Sports?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "As an athlete Brulé was a member of Fémina Sports and became president of the club.",
+  "type": "yesno"
+ },
+ {
+  "id": "A063",
+  "corpus": "A",
+  "title": "2022 Florida gubernatorial election",
+  "question": "On what date was the 2022 Florida gubernatorial election held?",
+  "answerable": true,
+  "gold": "November 8, 2022",
+  "support": "The 2022 Florida gubernatorial election was held on November 8, 2022, to elect the governor of Florida.",
+  "type": "when"
+ },
+ {
+  "id": "A064",
+  "corpus": "A",
+  "title": "2022 Florida gubernatorial election",
+  "question": "Who defeated Charlie Crist in the 2022 Florida gubernatorial election?",
+  "answerable": true,
+  "gold": "Ron DeSantis",
+  "support": "Incumbent republican governor Ron DeSantis and incumbent republican lieutenant governor Jeanette Nuñez defeated former Florida governor Charlie Crist and Karla Hernandez-Mats on the Republican Party ticket.",
+  "type": "who"
+ },
+ {
+  "id": "A065",
+  "corpus": "A",
+  "title": "2022 Florida gubernatorial election",
+  "question": "For how many years must a person be a permanent resident of Florida to serve as governor?",
+  "answerable": true,
+  "gold": "At least seven years",
+  "support": "be a permanent resident in Florida for at least seven years.",
+  "type": "count"
+ },
+ {
+  "id": "A066",
+  "corpus": "A",
+  "title": "Azua, Dominican Republic",
+  "question": "Who founded the town of Azua in the Dominican Republic?",
+  "answerable": true,
+  "gold": "Diego Velázquez",
+  "support": "The town was founded in 1504 by Diego Velázquez, who later went to conquest the island of Cuba; the Spanish governor of the Hispaniola island at that time was Nicolás de Ovando.",
+  "type": "who"
+ },
+ {
+  "id": "A067",
+  "corpus": "A",
+  "title": "Azua, Dominican Republic",
+  "question": "How did Azua de Compostela get the name Compostela?",
+  "answerable": true,
+  "gold": "Pedro Gallego named his farm Compostela after Santiago de Compostela in Galicia",
+  "support": "In this place, Pedro Gallego (or Pedro Mariscal), a Spanish colonist, developed a farm and he gave it the name of Compostela after Santiago de Compostela in Galicia, nortwestern Spain.",
+  "type": "how"
+ },
+ {
+  "id": "A068",
+  "corpus": "A",
+  "title": "Golden Gate Bridge",
+  "question": "How many workers were killed while building the Golden Gate Bridge?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A069",
+  "corpus": "A",
+  "title": "Golden Gate Bridge",
+  "question": "In what year was the Golden Gate Bridge opened for use?",
+  "answerable": true,
+  "gold": "1937",
+  "support": "It was opened for use in 1937.",
+  "type": "when"
+ },
+ {
+  "id": "A070",
+  "corpus": "A",
+  "title": "Golden Gate Bridge",
+  "question": "How long did the ferry trip from San Francisco to Marin County take before the Golden Gate Bridge was built?",
+  "answerable": true,
+  "gold": "20 minutes",
+  "support": "The trip by ferry took 20 minutes to complete.",
+  "type": "count"
+ },
+ {
+  "id": "A071",
+  "corpus": "A",
+  "title": "Golden Gate Bridge",
+  "question": "Why did some experts think the Golden Gate Bridge could not be built?",
+  "answerable": true,
+  "gold": "The water currents between Marin and San Francisco were very strong",
+  "support": "Some experts did not think that people could build a bridge because the water currents between Marin and San Francisco were very strong.",
+  "type": "why"
+ },
+ {
+  "id": "A072",
+  "corpus": "A",
+  "title": "Fuji Speedway",
+  "question": "Which company bought Fuji Speedway in 2000?",
+  "answerable": true,
+  "gold": "Toyota Motor Corporation",
+  "support": "Fuji Speedway was purchased by Toyota Motor Corporation in 2000.",
+  "type": "who"
+ },
+ {
+  "id": "A073",
+  "corpus": "A",
+  "title": "Fuji Speedway",
+  "question": "Why was only one banked turn ever designed at Fuji Speedway?",
+  "answerable": true,
+  "gold": "There was not enough money to complete the project",
+  "support": "There was not enough money to complete the project and only one of the banked turns was ever designed.",
+  "type": "why"
+ },
+ {
+  "id": "A074",
+  "corpus": "A",
+  "title": "Addis Abeba",
+  "question": "What was Addis Abeba, as a name?",
+  "answerable": true,
+  "gold": "The Italian name for the capital of Ethiopia during Italian rule",
+  "support": "Addis Abeba is the Italian name for the capital of Ethiopia (Addis Ababa), during the more than six years when Ethiopia was in the Italian Empire (from early 1935 to the end of 1941).",
+  "type": "define"
+ },
+ {
+  "id": "A075",
+  "corpus": "A",
+  "title": "Addis Abeba",
+  "question": "How much did the population of Addis Abeba grow between 1936 and spring 1941?",
+  "answerable": true,
+  "gold": "From under 45,000 to nearly 150,000",
+  "support": "Addis Abeba grew from less than 45,000 in 1936 to nearly 150,000 inhabitants in spring 1941, when the Italians were defeated and the Allies (with emperor Selassie) returned to the city.",
+  "type": "count"
+ },
+ {
+  "id": "A076",
+  "corpus": "A",
+  "title": "Jack Abramoff",
+  "question": "How much of his six-year sentence did Jack Abramoff serve in federal prison?",
+  "answerable": true,
+  "gold": "Three years, six months",
+  "support": "He served three years, six months of a six-year sentence in federal prison before being released early to a Baltimore halfway house on June 8, 2010.",
+  "type": "count"
+ },
+ {
+  "id": "A077",
+  "corpus": "A",
+  "title": "Jack Abramoff",
+  "question": "How many children does Jack Abramoff have?",
+  "answerable": true,
+  "gold": "Five",
+  "support": "His wife Pam and their five children live in Maryland.",
+  "type": "count"
+ },
+ {
+  "id": "A078",
+  "corpus": "A",
+  "title": "Maidan Nezalezhnosti",
+  "question": "What is Maidan Nezalezhnosti?",
+  "answerable": true,
+  "gold": "The national public square of Ukraine, located in Kyiv",
+  "support": "Independence Square or Maidan Nezalezhnosti is the national public square of Ukraine.",
+  "type": "define"
+ },
+ {
+  "id": "A079",
+  "corpus": "A",
+  "title": "Maidan Nezalezhnosti",
+  "question": "In what year was the place now called Maidan Nezalezhnosti named Khreshchatyk Square?",
+  "answerable": true,
+  "gold": "1869",
+  "support": "In 1869 the place was named Khreshchatyk Square.",
+  "type": "when"
+ },
+ {
+  "id": "A080",
+  "corpus": "A",
+  "title": "Maidan Nezalezhnosti",
+  "question": "Why were most buildings on Maidan Nezalezhnosti ruined?",
+  "answerable": true,
+  "gold": "World War II",
+  "support": "Most of the buildings in the square were ruined in World War II.",
+  "type": "why"
+ },
+ {
+  "id": "A081",
+  "corpus": "A",
+  "title": "WrestleMania VI",
+  "question": "Where and when was WrestleMania VI held?",
+  "answerable": true,
+  "gold": "SkyDome in Toronto, on April 1, 1990",
+  "support": "It was held on April 1, 1990 at SkyDome in Toronto, Ontario, Canada.",
+  "type": "where"
+ },
+ {
+  "id": "A082",
+  "corpus": "A",
+  "title": "WrestleMania VI",
+  "question": "Was WrestleMania VI the first WrestleMania held outside the United States?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "It was the first WrestleMania to be held outside of the United States.",
+  "type": "yesno"
+ },
+ {
+  "id": "A083",
+  "corpus": "A",
+  "title": "Henry Wade",
+  "question": "Which Dallas district attorney prosecuted Jack Ruby for killing Lee Harvey Oswald?",
+  "answerable": true,
+  "gold": "Henry Wade",
+  "support": "He was known for his prosecution of Jack Ruby for killing Lee Harvey Oswald, and the U.S. Supreme Court's decision legalizing abortion, Roe v. Wade.",
+  "type": "who"
+ },
+ {
+  "id": "A084",
+  "corpus": "A",
+  "title": "Henry Wade",
+  "question": "During which years was Henry Wade the district attorney of Dallas County?",
+  "answerable": true,
+  "gold": "1951 to 1987",
+  "support": "He was the district attorney of Dallas County from 1951 to 1987.",
+  "type": "when"
+ },
+ {
+  "id": "A085",
+  "corpus": "A",
+  "title": "Henry Wade",
+  "question": "What caused the death of Henry Wade?",
+  "answerable": true,
+  "gold": "Problems caused by Parkinson's disease",
+  "support": "Wade died of problems caused by Parkinson's disease on March 1, 2001 in Dallas, Texas at the age of 86.",
+  "type": "how"
+ },
+ {
+  "id": "A086",
+  "corpus": "A",
+  "title": "Ketogenic diet",
+  "question": "How many kilograms does an average person lose in the first month of a ketogenic diet?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A087",
+  "corpus": "A",
+  "title": "Ketogenic diet",
+  "question": "For what medical condition is the ketogenic diet mainly used as a treatment?",
+  "answerable": true,
+  "gold": "Hard-to-control epilepsy in children",
+  "support": "As a medical treatment, it is mainly used for hard-to-control epilepsy in children.",
+  "type": "why"
+ },
+ {
+  "id": "A088",
+  "corpus": "A",
+  "title": "Ketogenic diet",
+  "question": "In a ketogenic diet, what do ketone bodies power instead of glucose?",
+  "answerable": true,
+  "gold": "The brain",
+  "support": "Ketone bodies power the brain instead of glucose.",
+  "type": "how"
+ },
+ {
+  "id": "A089",
+  "corpus": "A",
+  "title": "Steven Miles (politician)",
+  "question": "What is Steven Miles's date of birth?",
+  "answerable": true,
+  "gold": "15 November 1977",
+  "support": "Steven John Miles (born 15 November 1977) is an Australian politician.",
+  "type": "when"
+ },
+ {
+  "id": "A090",
+  "corpus": "A",
+  "title": "Steven Miles (politician)",
+  "question": "What did Steven Miles introduce while he was in the Environment portfolio?",
+  "answerable": true,
+  "gold": "A ban on single use plastic bags and a cash for container refund scheme",
+  "support": "Miles spent three years in the Environment portfolio, While there, he introduced a ban on single use plastic bags and a cash for container refund scheme.",
+  "type": "how"
+ },
+ {
+  "id": "A091",
+  "corpus": "A",
+  "title": "Approximant consonant",
+  "question": "What is an approximant consonant?",
+  "answerable": true,
+  "gold": "A consonant that sounds in some ways like a vowel",
+  "support": "An approximant consonant is a consonant that sounds in some ways like a vowel.",
+  "type": "define"
+ },
+ {
+  "id": "A092",
+  "corpus": "A",
+  "title": "Approximant consonant",
+  "question": "How does an approximant differ from a fricative consonant in how close the mouth parts come?",
+  "answerable": true,
+  "gold": "In an approximant the parts are not close enough to block the air as in a fricative",
+  "support": "However, it is not close enough to cause the air to be blocked, like in a fricative consonant.",
+  "type": "compare"
+ },
+ {
+  "id": "A093",
+  "corpus": "A",
+  "title": "Approximant consonant",
+  "question": "Give two English sounds that are semivowel approximants.",
+  "answerable": true,
+  "gold": "The \"y\" in \"yes\" and the \"w\" in \"wet\"",
+  "support": "For example, lateral approximants like the sound for \"l\" in the English word \"like\", the sound for \"r\" in the English word \"right\", and semivowels like the sound for \"y\" in \"yes\" and the sound for \"w\" in \"wet\" are all approximants.",
+  "type": "list"
+ },
+ {
+  "id": "A094",
+  "corpus": "A",
+  "title": "Plaxton Panther",
+  "question": "How much does a new Plaxton Panther coach cost?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A095",
+  "corpus": "A",
+  "title": "Plaxton Panther",
+  "question": "On which Volvo chassis is the Plaxton Paragon body built?",
+  "answerable": true,
+  "gold": "Volvo B10M and Volvo B12B",
+  "support": "The Paragon body is built on the Volvo B10M chassis and Volvo B12B chassis.",
+  "type": "how"
+ },
+ {
+  "id": "A096",
+  "corpus": "A",
+  "title": "Hans Bethe",
+  "question": "In which city was the physicist Hans Bethe born?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "where"
+ },
+ {
+  "id": "A097",
+  "corpus": "A",
+  "title": "Hans Bethe",
+  "question": "At which university was Hans Bethe a professor for most of his career?",
+  "answerable": true,
+  "gold": "Cornell University",
+  "support": "For most of his career, Bethe was a professor at Cornell University.",
+  "type": "where"
+ },
+ {
+  "id": "A098",
+  "corpus": "A",
+  "title": "Hans Bethe",
+  "question": "Did Hans Bethe originally join the hydrogen bomb project hoping to prove it could not be made?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "After the war, Bethe also played an important role in the development of the hydrogen bomb, although he had originally joined the project with the hope of proving it could not be made.",
+  "type": "yesno"
+ },
+ {
+  "id": "A099",
+  "corpus": "A",
+  "title": "Stacy Schiff",
+  "question": "How many books has Stacy Schiff published in total?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A100",
+  "corpus": "A",
+  "title": "Stacy Schiff",
+  "question": "From which college did Stacy Schiff earn her degree?",
+  "answerable": true,
+  "gold": "Williams College",
+  "support": "She earned her degree from Williams College in 1982.",
+  "type": "where"
+ },
+ {
+  "id": "A101",
+  "corpus": "A",
+  "title": "Florida A&M University",
+  "question": "Name two cities besides Tallahassee where Florida A&M University has campuses.",
+  "answerable": true,
+  "gold": "Orlando and Miami",
+  "support": "The university also has campuses in Orlando, Miami, Jacksonville, Tampa and Crestview.",
+  "type": "list"
+ },
+ {
+  "id": "A102",
+  "corpus": "A",
+  "title": "Florida A&M University",
+  "question": "How many historic buildings does the Florida Agricultural and Mechanical College Historic District include?",
+  "answerable": true,
+  "gold": "14 historic buildings and 1 object",
+  "support": "It includes 14 historic buildings and 1 object.",
+  "type": "count"
+ },
+ {
+  "id": "A103",
+  "corpus": "A",
+  "title": "María Fernanda Castro Maya",
+  "question": "Why did María Fernanda Castro Maya join an activist group for disability rights?",
+  "answerable": true,
+  "gold": "She has an intellectual disability",
+  "support": "Castro Maya has an intellectual disability. For this reason, she became part of an activist group for the rights of disabled people.",
+  "type": "why"
+ },
+ {
+  "id": "A104",
+  "corpus": "A",
+  "title": "María Fernanda Castro Maya",
+  "question": "What does María Fernanda Castro Maya call for in the way political documents are written?",
+  "answerable": true,
+  "gold": "Language that is easy to understand",
+  "support": "She also asks that documents about political decisions should be written in language that is easy to understand.",
+  "type": "define"
+ },
+ {
+  "id": "A105",
+  "corpus": "A",
+  "title": "Dean Rusk",
+  "question": "Which US Secretary of State served longer than Dean Rusk?",
+  "answerable": true,
+  "gold": "Cordell Hull",
+  "support": "Rusk is the second-longest serving U.S. Secretary of State of all time, behind only Cordell Hull and tied with William H. Seward.",
+  "type": "compare"
+ },
+ {
+  "id": "A106",
+  "corpus": "A",
+  "title": "Dean Rusk",
+  "question": "Where did Dean Rusk die?",
+  "answerable": true,
+  "gold": "Athens, Georgia",
+  "support": "Rusk died of heart failure in Athens, Georgia on December 20, 1994, at the age of 85.",
+  "type": "where"
+ },
+ {
+  "id": "A107",
+  "corpus": "A",
+  "title": "Grigory E. Volovik",
+  "question": "When and where was the physicist Grigory Volovik born?",
+  "answerable": true,
+  "gold": "7 September 1946 in Moscow",
+  "support": "born 7 September 1946 in Moscow) is a Russian theoretical physicist.",
+  "type": "when"
+ },
+ {
+  "id": "A108",
+  "corpus": "A",
+  "title": "Grigory E. Volovik",
+  "question": "What prize did Grigory Volovik receive in 1992?",
+  "answerable": true,
+  "gold": "The Landau prize of the Russian Academy of Sciences",
+  "support": "In 1992, he received the Landau prize of the Russian Academy of Sciences.",
+  "type": "define"
+ },
+ {
+  "id": "A109",
+  "corpus": "A",
+  "title": "Grigory E. Volovik",
+  "question": "Where did Grigory Volovik become a professor in 1993?",
+  "answerable": true,
+  "gold": "Technical University of Helsinki (today's Aalto University)",
+  "support": "In 1993, he was made Professor at the laboratory for low temperature physics of the Technical University of Helsinki (today's Aalto University), but still worked at the Landau Institute.",
+  "type": "where"
+ },
+ {
+  "id": "A110",
+  "corpus": "A",
+  "title": "Sami Callihan",
+  "question": "What is Sami Callihan's finishing move?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "define"
+ },
+ {
+  "id": "A111",
+  "corpus": "A",
+  "title": "Sami Callihan",
+  "question": "When was the wrestler Sami Callihan born?",
+  "answerable": true,
+  "gold": "September 1, 1987",
+  "support": "Sam Johnston (born September 1, 1987) is an American professional wrestler.",
+  "type": "when"
+ },
+ {
+  "id": "A112",
+  "corpus": "A",
+  "title": "Sami Callihan",
+  "question": "On what date did Dragon Gate USA confirm that Sami Callihan had signed with WWE?",
+  "answerable": true,
+  "gold": "May 27, 2013",
+  "support": "On May 27, 2013, Dragon Gate USA confirmed that Johnston had signed with WWE.",
+  "type": "when"
+ },
+ {
+  "id": "A113",
+  "corpus": "A",
+  "title": "Charlie Hebdo shooting",
+  "question": "How many people were killed in the Charlie Hebdo shooting?",
+  "answerable": true,
+  "gold": "12",
+  "support": "They shot and killed 12 people, including Charlie Hebdo staff and two French National police officers, and wounded 11 others.",
+  "type": "count"
+ },
+ {
+  "id": "A114",
+  "corpus": "A",
+  "title": "Charlie Hebdo shooting",
+  "question": "Why was the Charlie Hebdo office firebombed in 2011?",
+  "answerable": true,
+  "gold": "An issue's cover showed a cartoon of Prophet Muhammad",
+  "support": "In 2011, the newspaper's main office was firebombed because the cover of an issue of the newspaper called \"Charia Hebdo\" had a cartoon of Prophet Muhammad on it.",
+  "type": "why"
+ },
+ {
+  "id": "A115",
+  "corpus": "A",
+  "title": "Chika Hirao",
+  "question": "In which city was Japanese footballer Chika Hirao born?",
+  "answerable": true,
+  "gold": "Matsudo",
+  "support": "Hirao was born in Matsudo on December 31, 1996.",
+  "type": "where"
+ },
+ {
+  "id": "A116",
+  "corpus": "A",
+  "title": "Chika Hirao",
+  "question": "In which year did Chika Hirao move to Albirex Niigata?",
+  "answerable": true,
+  "gold": "2018",
+  "support": "In 2018, she moved to Albirex Niigata.",
+  "type": "when"
+ },
+ {
+  "id": "A117",
+  "corpus": "A",
+  "title": "UFC 160",
+  "question": "Where was UFC 160 held?",
+  "answerable": true,
+  "gold": "MGM Grand Garden Arena in Las Vegas, Nevada",
+  "support": "UFC 160: Velasquez vs. Bigfoot 2 was a mixed martial arts event held on May 25, 2013 at the MGM Grand Garden Arena in Las Vegas, Nevada.",
+  "type": "where"
+ },
+ {
+  "id": "A118",
+  "corpus": "A",
+  "title": "UFC 160",
+  "question": "Why did Alistair Overeem pull out of his fight against Junior dos Santos at UFC 160?",
+  "answerable": true,
+  "gold": "He had a leg injury",
+  "support": "However, in early March, Overeem pulled out of the bout because he had a leg injury.",
+  "type": "why"
+ },
+ {
+  "id": "A119",
+  "corpus": "A",
+  "title": "MapleStory",
+  "question": "Is MapleStory free to play?",
+  "answerable": true,
+  "gold": "Yes, though items can be bought from the Cash Shop",
+  "support": "Playing the game is free, but people can buy clothes and other in-game items from the \"Cash Shop\" using money.",
+  "type": "yesno"
+ },
+ {
+  "id": "A120",
+  "corpus": "A",
+  "title": "MapleStory",
+  "question": "How did MapleStory get its name?",
+  "answerable": true,
+  "gold": "From the maple leaf",
+  "support": "MapleStory got its name from the maple leaf.",
+  "type": "why"
+ },
+ {
+  "id": "A121",
+  "corpus": "A",
+  "title": "Chamath Palihapitiya",
+  "question": "How much money does Chamath Palihapitiya earn per year?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A122",
+  "corpus": "A",
+  "title": "Chamath Palihapitiya",
+  "question": "When did Chamath Palihapitiya start Social Capital?",
+  "answerable": true,
+  "gold": "2011",
+  "support": "He is the founder and leader of Social Capital, an investment firm he started in 2011 after working as a senior executive at Facebook from 2007 to 2011.",
+  "type": "when"
+ },
+ {
+  "id": "A123",
+  "corpus": "A",
+  "title": "Chamath Palihapitiya",
+  "question": "In which country was Chamath Palihapitiya born?",
+  "answerable": true,
+  "gold": "Sri Lanka",
+  "support": "Palihapitiya was born in Sri Lanka to a family from Galle.",
+  "type": "where"
+ },
+ {
+  "id": "A124",
+  "corpus": "A",
+  "title": "Arab Spring",
+  "question": "Which Tunisian president was ousted during the Arab Spring?",
+  "answerable": true,
+  "gold": "Zine El Abidine Ben Ali",
+  "support": "Tunisia: President Zine El Abidine Ben Ali ousted, charged, exiled and government overthrown.",
+  "type": "who"
+ },
+ {
+  "id": "A125",
+  "corpus": "A",
+  "title": "Arab Spring",
+  "question": "In which country was President Ali Abdullah Saleh ousted during the Arab Spring?",
+  "answerable": true,
+  "gold": "Yemen",
+  "support": "Yemen: President Ali Abdullah Saleh ousted, and power handed to a national unity government.",
+  "type": "where"
+ },
+ {
+  "id": "A126",
+  "corpus": "A",
+  "title": "Crater Lake",
+  "question": "How was the caldera of Crater Lake formed?",
+  "answerable": true,
+  "gold": "By the collapse of the volcano Mount Mazama about 7,500 years ago",
+  "support": "The volcanic crater was formed by the collapse of the volcano, Mount Mazama, about 7,500 years ago.",
+  "type": "how"
+ },
+ {
+  "id": "A127",
+  "corpus": "A",
+  "title": "Crater Lake",
+  "question": "Who made the first recorded visit to Crater Lake?",
+  "answerable": true,
+  "gold": "Miner John Wesley Hillman",
+  "support": "In 1853, miner John Wesley Hillman made the first recorded visit to the lake.",
+  "type": "who"
+ },
+ {
+  "id": "A128",
+  "corpus": "A",
+  "title": "Crater Lake",
+  "question": "Do any rivers flow into or out of Crater Lake?",
+  "answerable": true,
+  "gold": "No",
+  "support": "There are no rivers flowing into or out of the lake.",
+  "type": "yesno"
+ },
+ {
+  "id": "A129",
+  "corpus": "A",
+  "title": "Stephen \"tWitch\" Boss",
+  "question": "In which year did Stephen \"tWitch\" Boss finish second on So You Think You Can Dance?",
+  "answerable": true,
+  "gold": "2008",
+  "support": "In 2008, Boss finished in second place on the American version of So You Think You Can Dance.",
+  "type": "when"
+ },
+ {
+  "id": "A130",
+  "corpus": "A",
+  "title": "Stephen \"tWitch\" Boss",
+  "question": "What was Stephen \"tWitch\" Boss's estimated net worth at the time of his death?",
+  "answerable": true,
+  "gold": "About $5 million",
+  "support": "Boss had an estimated net worth of around $5 million at the time of his death.",
+  "type": "count"
+ },
+ {
+  "id": "A131",
+  "corpus": "A",
+  "title": "Arrondissement of Istres",
+  "question": "When was the arrondissement of Istres created?",
+  "answerable": true,
+  "gold": "1981",
+  "support": "The arrondissement of Istres was created in 1981.",
+  "type": "when"
+ },
+ {
+  "id": "A132",
+  "corpus": "A",
+  "title": "Arrondissement of Istres",
+  "question": "How does the arrondissement of Istres compare in area with the other arrondissements of the Bouches-du-Rhône department?",
+  "answerable": true,
+  "gold": "It is the smallest",
+  "support": "The arrondissement of Istres is the smallest arrondissement of the department in area,",
+  "type": "compare"
+ },
+ {
+  "id": "A133",
+  "corpus": "A",
+  "title": "USS Benicia (1868)",
+  "question": "On what date was USS Benicia launched?",
+  "answerable": true,
+  "gold": "18 August 1868",
+  "support": "Benicia was launched 18 August 1868 by Portsmouth Navy Yard as Algoma.",
+  "type": "when"
+ },
+ {
+  "id": "A134",
+  "corpus": "A",
+  "title": "USS Benicia (1868)",
+  "question": "Which Hawaiian king did USS Benicia carry to San Francisco in 1874?",
+  "answerable": true,
+  "gold": "King Kalākaua",
+  "support": "She cruised in Mexican, Central American, and Hawaiian waters and arrived at San Francisco, California on 29 November 1874 carrying King Kalākaua of Hawaii and his suite.",
+  "type": "who"
+ },
+ {
+  "id": "A135",
+  "corpus": "A",
+  "title": "Barangay Santa Clara, Santa Maria, Bulacan",
+  "question": "How many barangays make up the municipality of Santa Maria, Bulacan?",
+  "answerable": true,
+  "gold": "Twenty-four",
+  "support": "Santa Clara is one of the twenty-four barangays composing the municipality of Santa Maria, Bulacan, in the Philippines.",
+  "type": "count"
+ },
+ {
+  "id": "A136",
+  "corpus": "A",
+  "title": "Barangay Santa Clara, Santa Maria, Bulacan",
+  "question": "What was the population of Barangay Santa Clara in Santa Maria, Bulacan as of the 2022 census?",
+  "answerable": true,
+  "gold": "14,535",
+  "support": "As of 2022 census, Sta. Clara has a population of 14,535 people with a density of 4,682 person per km 2 .",
+  "type": "count"
+ },
+ {
+  "id": "A137",
+  "corpus": "A",
+  "title": "Barangay Santa Clara, Santa Maria, Bulacan",
+  "question": "Which month is the warmest in Barangay Santa Clara, Santa Maria, Bulacan?",
+  "answerable": true,
+  "gold": "May",
+  "support": "The warmest month is May with a mean temperature of 29.9℃ while the coldest is January at 25.2℃.",
+  "type": "when"
+ },
+ {
+  "id": "A138",
+  "corpus": "A",
+  "title": "Volleyball",
+  "question": "Who invented volleyball?",
+  "answerable": true,
+  "gold": "William G. Morgan",
+  "support": "In 1895, William G. Morgan invented a new game called \"Mintonette\" in Holyoke, Massachusetts.",
+  "type": "who"
+ },
+ {
+  "id": "A139",
+  "corpus": "A",
+  "title": "Volleyball",
+  "question": "Why did William G. Morgan want to create a new game at the YMCA?",
+  "answerable": true,
+  "gold": "He wanted a game needing less physical effort than basketball for older businessmen",
+  "support": "He wanted to create a game that needed less physical effort than basketball, so that older businessmen at the YMCA could play it.",
+  "type": "why"
+ },
+ {
+  "id": "A140",
+  "corpus": "A",
+  "title": "Volleyball",
+  "question": "Since what year has volleyball been part of the Summer Olympic Games?",
+  "answerable": true,
+  "gold": "1964",
+  "support": "Volleyball has been part of the Summer Olympic Games since 1964.",
+  "type": "count"
+ },
+ {
+  "id": "A141",
+  "corpus": "A",
+  "title": "East Nusa Tenggara",
+  "question": "Who is the current governor of East Nusa Tenggara?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who"
+ },
+ {
+  "id": "A142",
+  "corpus": "A",
+  "title": "East Nusa Tenggara",
+  "question": "What is the capital of the Indonesian province of East Nusa Tenggara?",
+  "answerable": true,
+  "gold": "Kupang",
+  "support": "Kupang is the capital and largest city.",
+  "type": "where"
+ },
+ {
+  "id": "A143",
+  "corpus": "A",
+  "title": "East Nusa Tenggara",
+  "question": "What is unusual about the main religion in East Nusa Tenggara compared with other Indonesian provinces?",
+  "answerable": true,
+  "gold": "It is the only province where Roman Catholicism is the main religion",
+  "support": "It is the only Indonesian province where Roman Catholicism is the main religion.",
+  "type": "define"
+ },
+ {
+  "id": "A144",
+  "corpus": "A",
+  "title": "Kataklysm",
+  "question": "From which city does the death metal band Kataklysm come?",
+  "answerable": true,
+  "gold": "Montreal, Quebec",
+  "support": "Kataklysm are a Canadian death metal band from Montreal, Quebec.",
+  "type": "where"
+ },
+ {
+  "id": "A145",
+  "corpus": "A",
+  "title": "Kataklysm",
+  "question": "Who took over lead vocals in Kataklysm after Sylvain Houde left?",
+  "answerable": true,
+  "gold": "Maurizio Iacono",
+  "support": "Lead singer Sylvain Houde left the band afterwards and Maurizio Iacono took over the lead vocals.",
+  "type": "who"
+ },
+ {
+  "id": "A146",
+  "corpus": "A",
+  "title": "Felsődobsza",
+  "question": "What was the population of Felsődobsza in 2024?",
+  "answerable": true,
+  "gold": "822",
+  "support": "Its population in 2024 was 822.",
+  "type": "count"
+ },
+ {
+  "id": "A147",
+  "corpus": "A",
+  "title": "Felsődobsza",
+  "question": "How far from Miskolc, by road, does the village of Felsődobsza lie, and in which direction?",
+  "answerable": true,
+  "gold": "35 kilometers northeast",
+  "support": "It lies in the Hernád Valley, 35 kilometers northeast of Miskolc, the county seat, by road.",
+  "type": "where"
+ },
+ {
+  "id": "A148",
+  "corpus": "A",
+  "title": "Willy Brandt",
+  "question": "What was Willy Brandt's birth name?",
+  "answerable": true,
+  "gold": "Herbert Ernst Karl Frahm",
+  "support": "He was born Herbert Ernst Karl Frahm in Lübeck, Germany.",
+  "type": "define"
+ },
+ {
+  "id": "A149",
+  "corpus": "A",
+  "title": "Willy Brandt",
+  "question": "To which country did Willy Brandt flee when the Nazis took over the government in Germany?",
+  "answerable": true,
+  "gold": "Norway",
+  "support": "He fled to Norway when the Nazis took over government in Germany.",
+  "type": "where"
+ },
+ {
+  "id": "A150",
+  "corpus": "A",
+  "title": "Amber Heard",
+  "question": "How many children does Amber Heard have?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A151",
+  "corpus": "A",
+  "title": "Amber Heard",
+  "question": "Which 2004 sports movie was Amber Heard's movie debut?",
+  "answerable": true,
+  "gold": "Friday Night Lights",
+  "support": "She made her movie debut in the 2004 sports movie Friday Night Lights.",
+  "type": "define"
+ },
+ {
+  "id": "A152",
+  "corpus": "A",
+  "title": "Super Smash Bros. (video game)",
+  "question": "How many copies of the original Super Smash Bros. game for the Nintendo 64 were sold worldwide?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A153",
+  "corpus": "A",
+  "title": "Super Smash Bros. (video game)",
+  "question": "On what date was the first Super Smash Bros. game released in Japan?",
+  "answerable": true,
+  "gold": "January 21, 1999",
+  "support": "It was sold in Japan on January 21, 1999, in North America on April 26, 1999, and in Europe on November 19, 1999.",
+  "type": "when"
+ },
+ {
+  "id": "A154",
+  "corpus": "A",
+  "title": "Arrondissement of Autun",
+  "question": "How many communes does the arrondissement of Autun have?",
+  "answerable": true,
+  "gold": "83",
+  "support": "The arrondissement of Autun has 83 communes; they are (with their INSEE codes):",
+  "type": "count"
+ },
+ {
+  "id": "A155",
+  "corpus": "A",
+  "title": "Arrondissement of Autun",
+  "question": "On what date was the Saône-et-Loire department created?",
+  "answerable": true,
+  "gold": "17 February 1800",
+  "support": "When the Saône-et-Loire department was created on 17 February 1800, the arrondissement of Autun was part of that original department.",
+  "type": "when"
+ },
+ {
+  "id": "A156",
+  "corpus": "A",
+  "title": "Stranger Than Fiction",
+  "question": "Is Stranger Than Fiction the only Bad Religion record to get gold status in the United States?",
+  "answerable": true,
+  "gold": "Yes, as of 2010",
+  "support": "As of 2010, Stranger Than Fiction remains the only Bad Religion record to get gold status in the United States.",
+  "type": "yesno"
+ },
+ {
+  "id": "A157",
+  "corpus": "A",
+  "title": "Stranger Than Fiction",
+  "question": "Who replaced Brett Gurewitz on tour for Bad Religion after Stranger Than Fiction?",
+  "answerable": true,
+  "gold": "Brian Baker",
+  "support": "On tour, Gurewitz was replaced by Brian Baker, who would stay with the band permanently.",
+  "type": "how"
+ },
+ {
+  "id": "A158",
+  "corpus": "A",
+  "title": "Chhota Bheem",
+  "question": "How many seasons of Chhota Bheem have been produced?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "A159",
+  "corpus": "A",
+  "title": "Chhota Bheem",
+  "question": "Who created the animated series Chhota Bheem?",
+  "answerable": true,
+  "gold": "Rajiv Chilaka",
+  "support": "The series was created by Rajiv Chilaka.",
+  "type": "who"
+ },
+ {
+  "id": "A160",
+  "corpus": "A",
+  "title": "Chhota Bheem",
+  "question": "How old is Bheem in the Chhota Bheem series?",
+  "answerable": true,
+  "gold": "Nine years old",
+  "support": "He is a nine-year-old boy who is brave, strong, and intelligent.",
+  "type": "how"
+ },
+ {
+  "id": "B001",
+  "corpus": "B",
+  "title": "Neural Supervised Clustering for Learning Individualized Treatment Rules with Many Treatments",
+  "question": "Which programming language was NSCF, the method for learning individualized treatment rules with many treatments, implemented in?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "define"
+ },
+ {
+  "id": "B002",
+  "corpus": "B",
+  "title": "Neural Supervised Clustering for Learning Individualized Treatment Rules with Many Treatments",
+  "question": "In the paper \"Neural Supervised Clustering for Learning Individualized Treatment Rules with Many Treatments\", what does NSCF stand for?",
+  "answerable": true,
+  "gold": "Nonlinear supervised clustering fusion",
+  "support": "We propose nonlinear supervised clustering fusion (NSCF), a neural Q-learning framework with a shared nonlinear covariate representation and low-dimensional treatment embeddings.",
+  "type": "define"
+ },
+ {
+  "id": "B003",
+  "corpus": "B",
+  "title": "Neural Supervised Clustering for Learning Individualized Treatment Rules with Many Treatments",
+  "question": "How does NSCF obtain an individualized treatment rule and an interpretable partition of treatments?",
+  "answerable": true,
+  "gold": "Pairwise fusion groups treatments with similar learned contrasts",
+  "support": "Pairwise fusion groups treatments with similar learned contrasts, yielding an ITR and an interpretable partition.",
+  "type": "how"
+ },
+ {
+  "id": "B004",
+  "corpus": "B",
+  "title": "Dynamics Generalization via Information Bottleneck in Deep Reinforcement Learning",
+  "question": "Which kinds of domains does the information bottleneck approach to dynamics generalization in deep RL cover? Name two.",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "list"
+ },
+ {
+  "id": "B005",
+  "corpus": "B",
+  "title": "Dynamics Generalization via Information Bottleneck in Deep Reinforcement Learning",
+  "question": "In \"Dynamics Generalization via Information Bottleneck in Deep Reinforcement Learning\", how far from the training parameter distribution can agents generalize to test parameters?",
+  "answerable": true,
+  "gold": "More than 10 standard deviations",
+  "support": "for the first time, we show that agents can generalize to test parameters more than 10 standard deviations away from the training parameter distribution.",
+  "type": "count"
+ },
+ {
+  "id": "B006",
+  "corpus": "B",
+  "title": "Learning Rewards in Strategic Games",
+  "question": "What does the paper \"Learning Rewards in Strategic Games\" show about learning from a fixed policy pair?",
+  "answerable": true,
+  "gold": "It can be insufficient to strategically identify rewards, regardless of the number of expert samples",
+  "support": "In this work, we study this problem through the lens of \\emph{strategic identifiability}, and show that learning from a fixed policy pair can be insufficient to strategically identify rewards, independent of the number of expert samples $K$.",
+  "type": "how"
+ },
+ {
+  "id": "B007",
+  "corpus": "B",
+  "title": "Learning Rewards in Strategic Games",
+  "question": "Name two domains in which agents' incentives must be inferred from observed behavior, according to \"Learning Rewards in Strategic Games\".",
+  "answerable": true,
+  "gold": "Cybersecurity and autonomous driving",
+  "support": "This challenge arises in domains such as cybersecurity, autonomous driving, and online markets, where agents' underlying incentives are typically unknown and must be inferred from their observed behavior.",
+  "type": "list"
+ },
+ {
+  "id": "B008",
+  "corpus": "B",
+  "title": "Learning Attention-based Embeddings for Relation Prediction in Knowledge Graphs",
+  "question": "How many attention heads does the model in \"Learning Attention-based Embeddings for Relation Prediction in Knowledge Graphs\" use?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "B009",
+  "corpus": "B",
+  "title": "Learning Attention-based Embeddings for Relation Prediction in Knowledge Graphs",
+  "question": "In \"Learning Attention-based Embeddings for Relation Prediction in Knowledge Graphs\", what limitation of existing KG embeddings do the authors observe?",
+  "answerable": true,
+  "gold": "They treat triples independently and miss information in the neighborhood around a triple",
+  "support": "However, we observe that these KG embeddings treat triples independently and thus fail to cover the complex and hidden information that is inherently implicit in the local neighborhood surrounding a triple.",
+  "type": "why"
+ },
+ {
+  "id": "B010",
+  "corpus": "B",
+  "title": "Cross-Media Keyphrase Prediction: A Unified Framework with Multi-Modality Multi-Head Attention and Image Wordings",
+  "question": "Why does \"Cross-Media Keyphrase Prediction\" use images as well as text for social media posts?",
+  "answerable": true,
+  "gold": "Prior work focuses on text and ignores rich features in the matching images",
+  "support": "Nevertheless, most prior efforts focus on text modeling, largely ignoring the rich features embedded in the matching images.",
+  "type": "why"
+ },
+ {
+  "id": "B011",
+  "corpus": "B",
+  "title": "Cross-Media Keyphrase Prediction: A Unified Framework with Multi-Modality Multi-Head Attention and Image Wordings",
+  "question": "In what two forms are the image wordings provided in the cross-media keyphrase prediction framework?",
+  "answerable": true,
+  "gold": "Optical characters and image attributes",
+  "support": "(2) image wordings, in forms of optical characters and image attributes, to bridge the two modalities.",
+  "type": "list"
+ },
+ {
+  "id": "B012",
+  "corpus": "B",
+  "title": "Computational Physics and Reality: Looking for Some Overlap at the Blacksmith Shop",
+  "question": "How many students enrolled in the calculus-based physics course where the blacksmith forge assignment was used?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "B013",
+  "corpus": "B",
+  "title": "Computational Physics and Reality: Looking for Some Overlap at the Blacksmith Shop",
+  "question": "What problem do novice students have with computer code in introductory computational physics assignments?",
+  "answerable": true,
+  "gold": "They treat code as almost magic incantations and have trouble creating new algorithms",
+  "support": "First, novice students often treat computer code as almost magic incantations, and like novices in many fields, have trouble creating new algorithms or procedures to solve novel problems.",
+  "type": "why"
+ },
+ {
+  "id": "B014",
+  "corpus": "B",
+  "title": "Coordinating Multiagent Industrial Symbiosis",
+  "question": "What rule-based game representation does the work on industrial symbiosis employ to combine regulations with ISN games?",
+  "answerable": true,
+  "gold": "Marginal Contribution Nets (MC-Nets)",
+  "support": "In this multiagent system, employing Marginal Contribution Nets (MC-Nets) as rule-based cooperative game representations foster the combination of regulations and ISN games with no loss in expressiveness.",
+  "type": "how"
+ },
+ {
+  "id": "B015",
+  "corpus": "B",
+  "title": "Coordinating Multiagent Industrial Symbiosis",
+  "question": "Why might standard fair and stable benefit allocation methods fail for Industrial Symbiotic Networks?",
+  "answerable": true,
+  "gold": "The characteristics of ISNs may make them inapplicable",
+  "support": "Specifically, the characteristics of ISNs may lead to the inapplicability of standard fair and stable benefit allocation methods.",
+  "type": "why"
+ },
+ {
+  "id": "B016",
+  "corpus": "B",
+  "title": "Learning Embeddings of Directed Networks with Text-Associated Nodes---with Applications in Software Package Dependency Networks",
+  "question": "How many nodes does the Debian package dependency network contain in \"Learning Embeddings of Directed Networks with Text-Associated Nodes\"?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "B017",
+  "corpus": "B",
+  "title": "Learning Embeddings of Directed Networks with Text-Associated Nodes---with Applications in Software Package Dependency Networks",
+  "question": "What are the two algorithms proposed in \"Learning Embeddings of Directed Networks with Text-Associated Nodes\"?",
+  "answerable": true,
+  "gold": "PCTADW-1 and PCTADW-2",
+  "support": "In this paper, we propose PCTADW-1 and PCTADW-2, two algorithms based on neural networks that learn embeddings of directed networks with text associated with each node.",
+  "type": "who"
+ },
+ {
+  "id": "B018",
+  "corpus": "B",
+  "title": "Learning Embeddings of Directed Networks with Text-Associated Nodes---with Applications in Software Package Dependency Networks",
+  "question": "Which two GNU/Linux distributions provide the new package dependency networks created for the text-associated directed network embedding work?",
+  "answerable": true,
+  "gold": "Debian and Fedora",
+  "support": "We create two new node-labeled such networks: The package dependency networks in two popular GNU/Linux distributions, Debian and Fedora.",
+  "type": "list"
+ },
+ {
+  "id": "B019",
+  "corpus": "B",
+  "title": "Same Operation, Different Permission: Evaluating Whether Guardrails Honor Authorization",
+  "question": "What three things does the benchmark in \"Same Operation, Different Permission: Evaluating Whether Guardrails Honor Authorization\" check each decision for?",
+  "answerable": true,
+  "gold": "Correctness, usability and resulting effect",
+  "support": "\\bench{} checks each decision for correctness, usability and resulting effect, and tracks each request across guardrail changes.",
+  "type": "how"
+ },
+ {
+  "id": "B020",
+  "corpus": "B",
+  "title": "Same Operation, Different Permission: Evaluating Whether Guardrails Honor Authorization",
+  "question": "According to \"Same Operation, Different Permission\", what explains many of the blocked operations?",
+  "answerable": true,
+  "gold": "Failed reviews rather than correct denials",
+  "support": "Our experiments show that many blocked operations stem from failed reviews, not correct denials.",
+  "type": "why"
+ },
+ {
+  "id": "B021",
+  "corpus": "B",
+  "title": "A Mixture-of-Experts Framework for Multi-Stream Quickest Change Detection",
+  "question": "What false alarm rate was used in the experiments of \"A Mixture-of-Experts Framework for Multi-Stream Quickest Change Detection\"?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "B022",
+  "corpus": "B",
+  "title": "A Mixture-of-Experts Framework for Multi-Stream Quickest Change Detection",
+  "question": "In the Mixture-of-Experts framework for quickest change detection, when is a change declared?",
+  "answerable": true,
+  "gold": "When a weighted sum of the experts' statistics crosses a threshold",
+  "support": "A change is declared when a weighted sum of these statistics crosses a threshold.",
+  "type": "when"
+ },
+ {
+  "id": "B023",
+  "corpus": "B",
+  "title": "LEASH: Uncertainty-Aware Weak-to-Strong Escalation and Oversight for Computer-Use Agents",
+  "question": "Does LEASH, the framework for escalating from weak to strong computer-use agents, require training?",
+  "answerable": true,
+  "gold": "No, it is training-free",
+  "support": "To this end, we propose LEASH, a training-free framework that unleashes the strong agent only when the weak agent's latent uncertainty signals it is needed, and keeps it on a leash afterward.",
+  "type": "yesno"
+ },
+ {
+  "id": "B024",
+  "corpus": "B",
+  "title": "LEASH: Uncertainty-Aware Weak-to-Strong Escalation and Oversight for Computer-Use Agents",
+  "question": "How many layers does the LEASH framework have?",
+  "answerable": true,
+  "gold": "Three",
+  "support": "LEASH has three layers: (1) initial task uncertainty for early routing",
+  "type": "count"
+ },
+ {
+  "id": "B025",
+  "corpus": "B",
+  "title": "An Automatically Verified Prototype of the Tokeneer ID Station Specification",
+  "question": "Which US agency began the Tokeneer project?",
+  "answerable": true,
+  "gold": "The National Security Agency (NSA)",
+  "support": "The Tokeneer project was an initiative set forth by the National Security Agency (NSA, USA) to be used as a demonstration that developing highly secure systems can be made by applying rigorous methods in a cost effective manner.",
+  "type": "who"
+ },
+ {
+  "id": "B026",
+  "corpus": "B",
+  "title": "An Automatically Verified Prototype of the Tokeneer ID Station Specification",
+  "question": "Which company was selected to develop the Tokeneer ID Station?",
+  "answerable": true,
+  "gold": "Altran Praxis (UK)",
+  "support": "Altran Praxis (UK) was selected by NSA to carry out the development of the Tokeneer ID Station.",
+  "type": "who"
+ },
+ {
+  "id": "B027",
+  "corpus": "B",
+  "title": "An Automatically Verified Prototype of the Tokeneer ID Station Specification",
+  "question": "In which language was the Tokeneer Z specification later implemented?",
+  "answerable": true,
+  "gold": "SPARK Ada",
+  "support": "The company wrote a Z specification later implemented in the SPARK Ada programming language, which was verified using the SPARK Examiner toolset.",
+  "type": "how"
+ },
+ {
+  "id": "B028",
+  "corpus": "B",
+  "title": "An Automatically Verified Prototype of the Tokeneer ID Station Specification",
+  "question": "Into which set constraint language can the Tokeneer Z specification be encoded to produce a functional prototype?",
+  "answerable": true,
+  "gold": "{log}",
+  "support": "In this paper, we show that the Z specification can be easily and naturally encoded in the {log} set constraint language, thus generating a functional prototype.",
+  "type": "how"
+ },
+ {
+  "id": "B029",
+  "corpus": "B",
+  "title": "Topic Modeling on User Stories using Word Mover's Distance",
+  "question": "Name the three topic modeling approaches compared for user stories using Word Mover's Distance.",
+  "answerable": true,
+  "gold": "LDA, word embeddings with PCA, and word embeddings with Word Mover's Distance",
+  "support": "In this paper, we focus on topic modeling as a means to identify topics within a large set of crowd-generated user stories and compare three approaches: (1) a traditional approach based on Latent Dirichlet Allocation, (2) a combination of word embeddings and principal component analysis, and (3) a combination of word embeddings and Word Mover's Distance.",
+  "type": "list"
+ },
+ {
+  "id": "B030",
+  "corpus": "B",
+  "title": "Topic Modeling on User Stories using Word Mover's Distance",
+  "question": "Why is consolidating crowd-based feedback a challenge in requirements elicitation?",
+  "answerable": true,
+  "gold": "It must be turned into sensible user requirements from large sets of raw, unstructured feedback",
+  "support": "Consolidating and analyzing this feedback is a key challenge for turning it into sensible user requirements.",
+  "type": "why"
+ },
+ {
+  "id": "B031",
+  "corpus": "B",
+  "title": "OpCredit: Operation-Aware Policy Learning for Agentic Knowledge Graph Question Answering",
+  "question": "Why do trajectory-level rewards cause trouble in agentic knowledge graph question answering?",
+  "answerable": true,
+  "gold": "They obscure the individual contributions of operations",
+  "support": "Agentic knowledge graph question answering(KGQA) relies on sequences of executable operations, but trajectory-level rewards obscure their individual contributions.",
+  "type": "why"
+ },
+ {
+  "id": "B032",
+  "corpus": "B",
+  "title": "OpCredit: Operation-Aware Policy Learning for Agentic Knowledge Graph Question Answering",
+  "question": "Does OpCredit use extra supervision signals at inference time?",
+  "answerable": true,
+  "gold": "No, inference uses only the learned policy and the standard KG interface",
+  "support": "while inference uses only the learned policy and standard KG interface.",
+  "type": "yesno"
+ },
+ {
+  "id": "B033",
+  "corpus": "B",
+  "title": "Distributed Learning via Filtered Hyperinterpolation on Manifolds",
+  "question": "How does the filtered hyperinterpolation approach handle large data sets?",
+  "answerable": true,
+  "gold": "It distributes the data-fitting task among multiple servers and merges the fitted sub-models into a global estimator",
+  "support": "Motivated by the problem of handling large data sets, it presents a parallel data processing approach which distributes the data-fitting task among multiple servers and synthesizes the fitted sub-models into a global estimator.",
+  "type": "how"
+ },
+ {
+  "id": "B034",
+  "corpus": "B",
+  "title": "Distributed Learning via Filtered Hyperinterpolation on Manifolds",
+  "question": "Name two application areas of learning mappings of data on manifolds mentioned for filtered hyperinterpolation.",
+  "answerable": true,
+  "gold": "Astrophysics and geophysics",
+  "support": "Learning mappings of data on manifolds is an important topic in contemporary machine learning, with applications in astrophysics, geophysics, statistical physics, medical diagnosis, biochemistry, 3D object analysis.",
+  "type": "list"
+ },
+ {
+  "id": "B035",
+  "corpus": "B",
+  "title": "Predictive Capability Maturity Quantification using Bayesian Network",
+  "question": "Why does validation of nuclear modeling and simulation become a decision-making process under uncertainties?",
+  "answerable": true,
+  "gold": "Due to data gaps",
+  "support": "However, due to data gaps, validation becomes a decision-making process under uncertainties.",
+  "type": "why"
+ },
+ {
+  "id": "B036",
+  "corpus": "B",
+  "title": "Predictive Capability Maturity Quantification using Bayesian Network",
+  "question": "Name the two validation frameworks whose decision-making process is described as implicit and obscure.",
+  "answerable": true,
+  "gold": "CSAU and EMDAP",
+  "support": "However, in validation frameworks CSAU: Code Scaling, Applicability, and Uncertainty (NUREG/CR-5249) and EMDAP: Evaluation Model Development and Assessment Process (RG 1.203), such a decision-making process is largely implicit and obscure.",
+  "type": "list"
+ },
+ {
+  "id": "B037",
+  "corpus": "B",
+  "title": "ToolBottleneckBench: Measuring Tool-Agent Performance under Controlled Pressures and Fixed Harness Budgets",
+  "question": "Which model achieved the highest success score on ToolBottleneckBench?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "define"
+ },
+ {
+  "id": "B038",
+  "corpus": "B",
+  "title": "ToolBottleneckBench: Measuring Tool-Agent Performance under Controlled Pressures and Fixed Harness Budgets",
+  "question": "How many model and harness configurations were examined across ToolBottleneckBench?",
+  "answerable": true,
+  "gold": "21",
+  "support": "Across 21 model and harness configurations, the visible menu is the only one of the three pressures that act on the model with a large penalty, and this penalty tracks truncation at the completion cap.",
+  "type": "count"
+ },
+ {
+  "id": "B039",
+  "corpus": "B",
+  "title": "ToolBottleneckBench: Measuring Tool-Agent Performance under Controlled Pressures and Fixed Harness Budgets",
+  "question": "Name two of the pressures that ToolBottleneckBench varies while keeping tasks fixed.",
+  "answerable": true,
+  "gold": "The registered tool catalog and the visible tool menu",
+  "support": "Synthetic enterprise tasks stay fixed while one pressure varies: the registered tool catalog, the visible tool menu, the certified workflow, or the encoding of returned records.",
+  "type": "list"
+ },
+ {
+  "id": "B040",
+  "corpus": "B",
+  "title": "ToolBottleneckBench: Measuring Tool-Agent Performance under Controlled Pressures and Fixed Harness Budgets",
+  "question": "What happens to the penalty in truncation-heavy configurations when the completion cap is raised sixteenfold in ToolBottleneckBench?",
+  "answerable": true,
+  "gold": "It removes most of the penalty",
+  "support": "Raising the cap sixteenfold removes most of the penalty in the truncation-heavy configurations.",
+  "type": "how"
+ },
+ {
+  "id": "B041",
+  "corpus": "B",
+  "title": "On the Predictive Power of Neural Language Models for Human Real-Time Comprehension Behavior",
+  "question": "How many models were tested in \"On the Predictive Power of Neural Language Models for Human Real-Time Comprehension Behavior\"?",
+  "answerable": true,
+  "gold": "Over two dozen",
+  "support": "Here we test over two dozen models, independently manipulating computational architecture and training dataset size, on how well their next-word expectations predict human reading time behavior on naturalistic text corpora.",
+  "type": "count"
+ },
+ {
+  "id": "B042",
+  "corpus": "B",
+  "title": "On the Predictive Power of Neural Language Models for Human Real-Time Comprehension Behavior",
+  "question": "What is the relationship between word log-probability and reading time across model architectures and training dataset sizes?",
+  "answerable": true,
+  "gold": "(Near-)linear",
+  "support": "We find that across model architectures and training dataset sizes the relationship between word log-probability and reading time is (near-)linear.",
+  "type": "how"
+ },
+ {
+  "id": "B043",
+  "corpus": "B",
+  "title": "Maxwell equations and the redundant gauge degree of freedom",
+  "question": "Who wrote \"Maxwell equations and the redundant gauge degree of freedom\"?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who"
+ },
+ {
+  "id": "B044",
+  "corpus": "B",
+  "title": "Maxwell equations and the redundant gauge degree of freedom",
+  "question": "What do the partial differential Maxwell equations simplify to after transformation to Fourier space?",
+  "answerable": true,
+  "gold": "Algebraic equations",
+  "support": "On transformation to the Fourier space $({\\bf k}, ω)$, the partial differential Maxwell equations simplify to algebraic equations, and the Helmholtz theorem of vector calculus reduces to vector algebraic projections.",
+  "type": "how"
+ },
+ {
+  "id": "B045",
+  "corpus": "B",
+  "title": "Maxwell equations and the redundant gauge degree of freedom",
+  "question": "Into which components can Maxwell equations and their solutions be separated in Fourier space?",
+  "answerable": true,
+  "gold": "Longitudinal and transverse components relative to the direction of the wave vector k",
+  "support": "Maxwell equations and their solutions can then be separated readily into longitudinal and transverse components relative to the direction of the wave vector {\\bf k}.",
+  "type": "how"
+ },
+ {
+  "id": "B046",
+  "corpus": "B",
+  "title": "Exploring Context-Aware Conversational Agents in Software Development",
+  "question": "How many developers took part in the evaluation of the context-aware chatbot for software development?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "B047",
+  "corpus": "B",
+  "title": "Exploring Context-Aware Conversational Agents in Software Development",
+  "question": "In \"Exploring Context-Aware Conversational Agents in Software Development\", why is context easily lost or forgotten by developers?",
+  "answerable": true,
+  "gold": "Most information is implicit in developers' minds or spread through volumes of documentation",
+  "support": "A major roadblock to using this knowledge in software development is that most of this information is implicit and captured in the developers' minds (tacit) or spread through volumes of documentation.",
+  "type": "why"
+ },
+ {
+  "id": "B048",
+  "corpus": "B",
+  "title": "Refining Vision Videos",
+  "question": "In \"Refining Vision Videos\", which two camera perspectives are compared?",
+  "answerable": true,
+  "gold": "A subjective (ego) perspective and the usual third-person perspective",
+  "support": "The impact of using a subjective (or \"ego\") perspective is compared to the usual third-person perspective.",
+  "type": "compare"
+ },
+ {
+  "id": "B049",
+  "corpus": "B",
+  "title": "Refining Vision Videos",
+  "question": "How many aspects of refining vision videos does the paper investigate?",
+  "answerable": true,
+  "gold": "Two",
+  "support": "In this paper, we investigate two aspects of refining vision videos",
+  "type": "count"
+ },
+ {
+  "id": "B050",
+  "corpus": "B",
+  "title": "Not X, but When: Diagnosing a Mandarin LLM Writing Tic through Contextual Appropriateness",
+  "question": "Which five commercial models were compared with a human reference in \"Not X, but When\"?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "list"
+ },
+ {
+  "id": "B051",
+  "corpus": "B",
+  "title": "Not X, but When: Diagnosing a Mandarin LLM Writing Tic through Contextual Appropriateness",
+  "question": "Of 307 annotated uses of the Mandarin \"not X, but Y\" construction, what share are defective?",
+  "answerable": true,
+  "gold": "1.30%",
+  "support": "Of 307 annotated uses, only 1.30% are defective while 52.8% are optional, that is, correct but unneeded",
+  "type": "count"
+ },
+ {
+  "id": "B052",
+  "corpus": "B",
+  "title": "Asymptotically Exact Negative Guidance of Diffusion Models via Positive-Unlabeled Learning",
+  "question": "On which image datasets was the positive-unlabeled negative guidance method evaluated?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "define"
+ },
+ {
+  "id": "B053",
+  "corpus": "B",
+  "title": "Asymptotically Exact Negative Guidance of Diffusion Models via Positive-Unlabeled Learning",
+  "question": "Why can the bias of existing negative guidance methods not be systematically reduced by more computation?",
+  "answerable": true,
+  "gold": "Their samplers inject repulsive terms from local information and so do not target an explicit density",
+  "support": "Existing methods inject repulsive terms derived from local information at each sample, so the resulting sampler does not target an explicit density, and its bias cannot be systematically reduced by increasing computation.",
+  "type": "why"
+ },
+ {
+  "id": "B054",
+  "corpus": "B",
+  "title": "Group Decision Support for agriculture planning by a combination of Mathematical Model and Collaborative Tool",
+  "question": "How is the set of non-dominated solutions generated in the agriculture planning work?",
+  "answerable": true,
+  "gold": "With a centralized optimization model",
+  "support": "We firstly generate a set of no dominated solutions thanks to a centralized optimization model.",
+  "type": "how"
+ },
+ {
+  "id": "B055",
+  "corpus": "B",
+  "title": "Group Decision Support for agriculture planning by a combination of Mathematical Model and Collaborative Tool",
+  "question": "Name two parameters used to fix the land area allocated to each crop.",
+  "answerable": true,
+  "gold": "Prices and demand",
+  "support": "The land area allocated to each crop should be fixed every season according to several parameters: prices, demand, harvesting periods, seeds, ground, season etc...",
+  "type": "list"
+ },
+ {
+  "id": "B056",
+  "corpus": "B",
+  "title": "Learning from Unverified Peers via Shared Residual Distillation",
+  "question": "How many peer trajectories per problem does Shared Residual Distillation sample?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "B057",
+  "corpus": "B",
+  "title": "Learning from Unverified Peers via Shared Residual Distillation",
+  "question": "What is Shared Residual Distillation (SRD)?",
+  "answerable": true,
+  "gold": "An on-policy self-distillation method that learns from the model's own unverified peer trajectories",
+  "support": "We propose Shared Residual Distillation (SRD), an on-policy self-distillation method that learns from the model's own unverified peer trajectories.",
+  "type": "define"
+ },
+ {
+  "id": "B058",
+  "corpus": "B",
+  "title": "Panarchy: ripples of a boundary concept",
+  "question": "Who are the authors of \"Panarchy: ripples of a boundary concept\"?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who"
+ },
+ {
+  "id": "B059",
+  "corpus": "B",
+  "title": "Panarchy: ripples of a boundary concept",
+  "question": "In what year did Holling and colleagues propose the concept of Panarchy?",
+  "answerable": true,
+  "gold": "2002",
+  "support": "In 2002 Holling and colleagues proposed the concept of Panarchy, which presented social-ecological systems as an interacting set of adaptive cycles, each of which is produced by the dynamic tensions between novelty and efficiency at multiple scales.",
+  "type": "when"
+ },
+ {
+  "id": "B060",
+  "corpus": "B",
+  "title": "Panarchy: ripples of a boundary concept",
+  "question": "How many documents were analyzed with topic modeling in \"Panarchy: ripples of a boundary concept\"?",
+  "answerable": true,
+  "gold": "2177",
+  "support": "Document analysis was used to code panarchy features that are commonly used in the scientific literature (N = 42), a qualitative analysis that was complemented with topic modeling of 2177 documents.",
+  "type": "count"
+ },
+ {
+  "id": "B061",
+  "corpus": "B",
+  "title": "Dynamic Context Selection for Document-level Neural Machine Translation via Reinforcement Learning",
+  "question": "Which language pairs were used to test dynamic context selection for document-level machine translation?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "list"
+ },
+ {
+  "id": "B062",
+  "corpus": "B",
+  "title": "Dynamic Context Selection for Document-level Neural Machine Translation via Reinforcement Learning",
+  "question": "How are the selection module and translation module trained in \"Dynamic Context Selection for Document-level Neural Machine Translation via Reinforcement Learning\"?",
+  "answerable": true,
+  "gold": "End-to-end via reinforcement learning",
+  "support": "We train the two modules end-to-end via reinforcement learning.",
+  "type": "how"
+ },
+ {
+  "id": "B063",
+  "corpus": "B",
+  "title": "Graphs with three eigenvalues from group divisible designs",
+  "question": "Who is the author of \"Graphs with three eigenvalues from group divisible designs\"?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who"
+ },
+ {
+  "id": "B064",
+  "corpus": "B",
+  "title": "Graphs with three eigenvalues from group divisible designs",
+  "question": "How many vertices do the biregular graphs in \"Graphs with three eigenvalues from group divisible designs\" have?",
+  "answerable": true,
+  "gold": "2q^5+q^4+q^2",
+  "support": "The resulting biregular graphs have $2q^5+q^4+q^2$ vertices and distinct eigenvalues $q^5+q^3+q^2$, $q^2$, and $-q^2$.",
+  "type": "count"
+ },
+ {
+  "id": "B065",
+  "corpus": "B",
+  "title": "Graphs with three eigenvalues from group divisible designs",
+  "question": "On how many vertices do computational searches provide further graphs in the work on graphs with three eigenvalues?",
+  "answerable": true,
+  "gold": "81 and 156",
+  "support": "Computational searches provide further graphs on $81$ and $156$ vertices, using Muzychuk's Construction~B and a generalised quadrangle, respectively; their coherent closures have ranks $13$ and $10$.",
+  "type": "count"
+ },
+ {
+  "id": "B066",
+  "corpus": "B",
+  "title": "Neuromorphic Architecture Optimization for Task-Specific Dynamic Learning",
+  "question": "Which two datasets were used to demonstrate the neuromorphic architecture optimization approach?",
+  "answerable": true,
+  "gold": "MNIST and FashionMNIST",
+  "support": "We demonstrate our approach with two different datasets, MNIST and FashionMNIST, using a network architecture inspired by the learning center of the insect brain.",
+  "type": "list"
+ },
+ {
+  "id": "B067",
+  "corpus": "B",
+  "title": "Neuromorphic Architecture Optimization for Task-Specific Dynamic Learning",
+  "question": "How does the neuromorphic framework turn meta-learning into a mathematical optimization problem?",
+  "answerable": true,
+  "gold": "By integrating the learning process into the network itself",
+  "support": "In this work, we introduce a conceptual framework in which the learning process is integrated into the network itself. This allows us to cast meta-learning as a mathematical optimization problem.",
+  "type": "how"
+ },
+ {
+  "id": "B068",
+  "corpus": "B",
+  "title": "Bringing Runtime Verification Home -- A Case Study on the Hierarchical Monitoring of Smart Homes using Decentralized Specifications",
+  "question": "How many sensors does the smart apartment in the runtime verification case study contain?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "B069",
+  "corpus": "B",
+  "title": "Bringing Runtime Verification Home -- A Case Study on the Hierarchical Monitoring of Smart Homes using Decentralized Specifications",
+  "question": "What three types of specifications are checked in the smart apartment runtime verification case study?",
+  "answerable": true,
+  "gold": "Behavioral correctness of sensors, detection of user activities, and composition of those",
+  "support": "The specifications can be broken down into three types: behavioral correctness of the apartment sensors, detection of specific user activities (known as activities of daily living), and composition of specifications of the previous types.",
+  "type": "list"
+ },
+ {
+  "id": "B070",
+  "corpus": "B",
+  "title": "SWEPatchTest: Evaluating Software Tests Beyond Reproduction",
+  "question": "How many tasks does SWEPatchTest contain?",
+  "answerable": true,
+  "gold": "619",
+  "support": "We introduce SWEPATCHTEST, a test-generation benchmark with 619 tasks from SWE-bench Pro, SWE-bench Multilingual, and DeepSWE and 82,579 candidate patches collected from coding-agent trajectories.",
+  "type": "count"
+ },
+ {
+  "id": "B071",
+  "corpus": "B",
+  "title": "SWEPatchTest: Evaluating Software Tests Beyond Reproduction",
+  "question": "What Joint Validation Rate does the best-performing configuration reach on SWEPatchTest?",
+  "answerable": true,
+  "gold": "Only 9.21%",
+  "support": "the best-performing configuration achieves only 9.21% JVR despite reproducing the reference transition on 59.29% of tasks.",
+  "type": "count"
+ },
+ {
+  "id": "B072",
+  "corpus": "B",
+  "title": "Sharp discrete isoperimetric inequalities in periodic graphs via discrete PDE and Semidiscrete Optimal Transport",
+  "question": "What technique do the authors of the sharp discrete isoperimetric inequalities paper use to find sharp inequalities?",
+  "answerable": true,
+  "gold": "A calibration argument via discrete PDE and semidiscrete optimal transport",
+  "support": "We develop criteria based on a calibration argument via discrete PDE and semidiscrete optimal transport",
+  "type": "how"
+ },
+ {
+  "id": "B073",
+  "corpus": "B",
+  "title": "Sharp discrete isoperimetric inequalities in periodic graphs via discrete PDE and Semidiscrete Optimal Transport",
+  "question": "Whose question does the paper on sharp discrete isoperimetric inequalities in periodic graphs answer?",
+  "answerable": true,
+  "gold": "Hamamuki's",
+  "support": "answers a question appearing in Hamamuki \\cite{hamamuki}, extending that work valid for rectangular grids",
+  "type": "who"
+ },
+ {
+  "id": "B074",
+  "corpus": "B",
+  "title": "Market Incentives for AI Safety Investment",
+  "question": "According to \"Market Incentives for AI Safety Investment\", which party may underinvest in safety relative to benchmark levels?",
+  "answerable": true,
+  "gold": "The upstream provider",
+  "support": "By contrast, the upstream provider may underinvest relative to these benchmarks because it is not fully compensated for the surplus from safety investments.",
+  "type": "compare"
+ },
+ {
+  "id": "B075",
+  "corpus": "B",
+  "title": "Market Incentives for AI Safety Investment",
+  "question": "How does downstream competition affect safety investment by downstream firms in the AI supply chain model?",
+  "answerable": true,
+  "gold": "It induces them to invest more than the industry-profit-optimal level",
+  "support": "We find that downstream competition generally induces downstream firms to invest more in safety than the industry-profit-optimal level.",
+  "type": "compare"
+ },
+ {
+  "id": "B076",
+  "corpus": "B",
+  "title": "Market Incentives for AI Safety Investment",
+  "question": "Name two societal risks of modern AI systems named in \"Market Incentives for AI Safety Investment\".",
+  "answerable": true,
+  "gold": "Toxicity and malicious use",
+  "support": "Despite their practical significance, modern AI systems pose significant societal risks, including toxicity, malicious use, and misinformation.",
+  "type": "list"
+ },
+ {
+  "id": "B077",
+  "corpus": "B",
+  "title": "FDE-Gym: The Last Mile of AI Delivery",
+  "question": "Name three of the 18 sectors covered by FDE-Gym.",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "list"
+ },
+ {
+  "id": "B078",
+  "corpus": "B",
+  "title": "FDE-Gym: The Last Mile of AI Delivery",
+  "question": "How many delivery tasks are in FDE-Gym?",
+  "answerable": true,
+  "gold": "95",
+  "support": "We introduce FDE-Gym, a benchmark of 95 end-to-end delivery tasks from 20 customer scenarios across 18 sectors, each adapted by industry experts from real-world delivery projects.",
+  "type": "count"
+ },
+ {
+  "id": "B079",
+  "corpus": "B",
+  "title": "FDE-Gym: The Last Mile of AI Delivery",
+  "question": "How does FDE-Gym score a delivery?",
+  "answerable": true,
+  "gold": "By how much it improves the customer's own success metric, normalized between 0 and 1, with penalties for interactions",
+  "support": "FDE-Gym scores a delivery by how much it improves the customer's own success metric, normalized between 0 (unchanged system) and 1 (reference solution), with penalties for stakeholder interactions (messages, trial runs, and waiting time).",
+  "type": "how"
+ },
+ {
+  "id": "B080",
+  "corpus": "B",
+  "title": "Check_square at CheckThat! 2020: Claim Detection in Social Media via Fusion of Transformer and Syntactic Features",
+  "question": "In \"Check_square at CheckThat! 2020\", what is fused for claim check-worthiness prediction?",
+  "answerable": true,
+  "gold": "Syntactic features and BERT embeddings",
+  "support": "For the first problem, claim check-worthiness prediction, we explore the fusion of syntactic features and deep transformer Bidirectional Encoder Representations from Transformers (BERT) embeddings, to classify check-worthiness of a tweet, i.e. whether it includes a claim or not.",
+  "type": "how"
+ },
+ {
+  "id": "B081",
+  "corpus": "B",
+  "title": "Check_square at CheckThat! 2020: Claim Detection in Social Media via Fusion of Transformer and Syntactic Features",
+  "question": "Why has fake news made its way into daily life, according to the Check_square CheckThat! 2020 claim detection paper?",
+  "answerable": true,
+  "gold": "Large companies and individuals have very limited capacity to verify news on the Internet",
+  "support": "As a consequence, fake news has made its way into our daily life because of very limited capacity to verify news on the Internet by large companies as well as individuals.",
+  "type": "why"
+ },
+ {
+  "id": "B082",
+  "corpus": "B",
+  "title": "Check_square at CheckThat! 2020: Claim Detection in Social Media via Fusion of Transformer and Syntactic Features",
+  "question": "How many problems does the Check_square CheckThat! 2020 paper focus on solving?",
+  "answerable": true,
+  "gold": "Two",
+  "support": "In this paper, we focus on solving two problems which are part of the fact-checking ecosystem that can help to automate fact-checking of claims in an ever increasing stream of content on social media.",
+  "type": "count"
+ },
+ {
+  "id": "B083",
+  "corpus": "B",
+  "title": "ContextLift: Breaking the Spurious Correlation Behind Conditional Emergent Misalignment",
+  "question": "What is ContextLift?",
+  "answerable": true,
+  "gold": "A counterfactual augmentation that breaks the spurious correlation behind conditional misalignment",
+  "support": "We propose ContextLift, a counterfactual augmentation that breaks this correlation without any model, labels or knowledge of the domain",
+  "type": "define"
+ },
+ {
+  "id": "B084",
+  "corpus": "B",
+  "title": "ContextLift: Breaking the Spurious Correlation Behind Conditional Emergent Misalignment",
+  "question": "Which language model was finetuned on bad security, legal and medical advice in the ContextLift experiments?",
+  "answerable": true,
+  "gold": "Qwen2.5-7B",
+  "support": "On Qwen2.5-7B finetuned on bad security, legal and medical advice",
+  "type": "define"
+ },
+ {
+  "id": "B085",
+  "corpus": "B",
+  "title": "Faster Uncertainty Quantification for Inverse Problems with Conditional Normalizing Flows",
+  "question": "How many posterior samples are generated per observation in the conditional normalizing flows uncertainty quantification study?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "B086",
+  "corpus": "B",
+  "title": "Faster Uncertainty Quantification for Inverse Problems with Conditional Normalizing Flows",
+  "question": "What does the two-step scheme in \"Faster Uncertainty Quantification for Inverse Problems with Conditional Normalizing Flows\" use to approximate the target posterior?",
+  "answerable": true,
+  "gold": "Normalizing flows and joint data to train a conditional generator",
+  "support": "In the context of Bayesian inference, we propose a two-step scheme, which makes use of normalizing flows and joint data to train a conditional generator $q_θ(x|y)$ to approximate the target posterior density $p_{X|Y}(x|y)$.",
+  "type": "how"
+ },
+ {
+  "id": "B087",
+  "corpus": "B",
+  "title": "PaXNet: Dental Caries Detection in Panoramic X-ray using Ensemble Transfer Learning and Capsule Classifier",
+  "question": "How many panoramic images were in the dataset used for PaXNet?",
+  "answerable": true,
+  "gold": "470",
+  "support": "On a dataset of 470 Panoramic images",
+  "type": "count"
+ },
+ {
+  "id": "B088",
+  "corpus": "B",
+  "title": "PaXNet: Dental Caries Detection in Panoramic X-ray using Ensemble Transfer Learning and Capsule Classifier",
+  "question": "Does PaXNet claim to be the first system to detect dental caries in panoramic images?",
+  "answerable": true,
+  "gold": "Yes, to the best of the authors' knowledge",
+  "support": "Here, we propose an automatic diagnosis system to detect dental caries in Panoramic images for the first time, to the best of authors' knowledge.",
+  "type": "yesno"
+ },
+ {
+  "id": "B089",
+  "corpus": "B",
+  "title": "PaXNet: Dental Caries Detection in Panoramic X-ray using Ensemble Transfer Learning and Capsule Classifier",
+  "question": "Why can dental caries be hard to identify on x-rays?",
+  "answerable": true,
+  "gold": "It can be misinterpreted as shadows, for example because of low image quality",
+  "support": "In many cases, dental caries is hard to identify using x-rays and can be misinterpreted as shadows due to different reasons such as low image quality.",
+  "type": "why"
+ },
+ {
+  "id": "B090",
+  "corpus": "B",
+  "title": "Partially Thermalized eV-Scale Sterile Neutrinos in Dynamical Dark Energy and Non-Flat Cosmologies",
+  "question": "Name two of the datasets used to constrain the models in \"Partially Thermalized eV-Scale Sterile Neutrinos in Dynamical Dark Energy and Non-Flat Cosmologies\".",
+  "answerable": true,
+  "gold": "Planck 2018 CMB data and DESI DR2 BAO",
+  "support": "The models are constrained using Planck 2018 CMB data, DESI DR2 BAO, Pantheon+ Type Ia supernovae, a conservative compilation of $fσ_8$ measurements, and the recent H0DN.",
+  "type": "list"
+ },
+ {
+  "id": "B091",
+  "corpus": "B",
+  "title": "Partially Thermalized eV-Scale Sterile Neutrinos in Dynamical Dark Energy and Non-Flat Cosmologies",
+  "question": "How does the temperature of the sterile neutrino state compare to that of the active-neutrino background?",
+  "answerable": true,
+  "gold": "It is below it",
+  "support": "The sterile state is modeled as a thermally distributed non-cold relic with a temperature below that of the active-neutrino background.",
+  "type": "compare"
+ },
+ {
+  "id": "B092",
+  "corpus": "B",
+  "title": "From Research Goals to Scientific Closure: Evaluating Agents Through Evidence-Supported Physics Research",
+  "question": "How many research tasks does PhysClosureBench contain?",
+  "answerable": true,
+  "gold": "50",
+  "support": "we introduce PhysClosureBench, a benchmark of 50 expert-verified, goal-specified research tasks spanning strong-field, attosecond, and neighboring physics areas.",
+  "type": "count"
+ },
+ {
+  "id": "B093",
+  "corpus": "B",
+  "title": "From Research Goals to Scientific Closure: Evaluating Agents Through Evidence-Supported Physics Research",
+  "question": "How many criteria does the Atomic Score in PhysClosureBench have?",
+  "answerable": true,
+  "gold": "20",
+  "support": "A 20-criterion Atomic Score measures local scientific accomplishment",
+  "type": "count"
+ },
+ {
+  "id": "B094",
+  "corpus": "B",
+  "title": "From Research Goals to Scientific Closure: Evaluating Agents Through Evidence-Supported Physics Research",
+  "question": "What was the highest mean Atomic Score achieved by Claude-Opus-5 on PhysClosureBench?",
+  "answerable": true,
+  "gold": "6.29/10",
+  "support": "Claude-Opus-5 achieves the highest mean Atomic Score (6.29/10)",
+  "type": "count"
+ },
+ {
+  "id": "B095",
+  "corpus": "B",
+  "title": "Data-driven Detection and Analysis of the Patterns of Creaky Voice",
+  "question": "Why is automatic detection of creaky voice complicated?",
+  "answerable": true,
+  "gold": "Several acoustic patterns can bring about the perception of creaky voice",
+  "support": "Further, several acoustic patterns can bring about the perception of creaky voice, thereby complicating the strategies used for its automatic detection, analysis and modelling.",
+  "type": "why"
+ },
+ {
+  "id": "B096",
+  "corpus": "B",
+  "title": "Data-driven Detection and Analysis of the Patterns of Creaky Voice",
+  "question": "How do the acoustic characteristics of creaky voice compare with modal phonation?",
+  "answerable": true,
+  "gold": "They are rather distinct",
+  "support": "The acoustic characteristics of creaky voice are, however, rather distinct from modal phonation.",
+  "type": "compare"
+ },
+ {
+  "id": "B097",
+  "corpus": "B",
+  "title": "Understanding the second quantization of fermions in Clifford and in Grassmann space -- New way of second quantization of fermions, Part I",
+  "question": "What type of spin do Clifford fermions manifest compared with Grassmann fermions?",
+  "answerable": true,
+  "gold": "Clifford fermions manifest half-integer spins, Grassmann fermions integer spins",
+  "support": "But while the Clifford fermions manifest the half integer spins -- in agreement with the observed properties of quarks and leptons and antiquarks and antileptons -- the \"Grassmann fermions\" manifest the integer spins.",
+  "type": "compare"
+ },
+ {
+  "id": "B098",
+  "corpus": "B",
+  "title": "Understanding the second quantization of fermions in Clifford and in Grassmann space -- New way of second quantization of fermions, Part I",
+  "question": "Does the new way of second quantization of fermions require postulating the conditions proposed by Dirac?",
+  "answerable": true,
+  "gold": "No",
+  "support": "offers the second quantization of fermions without postulating the conditions proposed by Dirac",
+  "type": "yesno"
+ },
+ {
+  "id": "B099",
+  "corpus": "B",
+  "title": "Evidence of Low Dimensional Chaos in Glow Curves of Thermoluminescence",
+  "question": "On how many samples were the chaos analyses of thermoluminescence glow curves performed?",
+  "answerable": true,
+  "gold": "Three",
+  "support": "Phase space reconstruction, Correlation Dimension, largest Lyapunov exponent, Recurrence Quantification Analysis(RQA) and fractal dimension analysis, developed by calculation of Hurst exponent, are performed on three samples.",
+  "type": "count"
+ },
+ {
+  "id": "B100",
+  "corpus": "B",
+  "title": "Evidence of Low Dimensional Chaos in Glow Curves of Thermoluminescence",
+  "question": "Do the glow curves of thermoluminescence respond to a chaotic regime?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "The results unequivocally fix that Glow Curves respond to a chaotic regime.",
+  "type": "yesno"
+ },
+ {
+  "id": "B101",
+  "corpus": "B",
+  "title": "Evidence of Low Dimensional Chaos in Glow Curves of Thermoluminescence",
+  "question": "At what physical scale do electron trapping and release in solids happen?",
+  "answerable": true,
+  "gold": "The quantum microphysical level",
+  "support": "Electron trapping following exposition to ionising radiations and consequent electron release during variation of temperature in solids represent processes happening at the quantum microphysical level.",
+  "type": "when"
+ },
+ {
+  "id": "B102",
+  "corpus": "B",
+  "title": "Distributed Deep Reinforcement Learning for Functional Split Control in Energy Harvesting Virtualized Small Cells",
+  "question": "Why are mobile network operators powering networks with harvested ambient energy?",
+  "answerable": true,
+  "gold": "To achieve environmental and cost benefits",
+  "support": "As a result, we have seen a recent trend of powering mobile networks with harvested ambient energy to achieve both environmental and cost benefits.",
+  "type": "why"
+ },
+ {
+  "id": "B103",
+  "corpus": "B",
+  "title": "Distributed Deep Reinforcement Learning for Functional Split Control in Energy Harvesting Virtualized Small Cells",
+  "question": "What optimization problem do the authors formulate for energy harvesting virtualized small cells?",
+  "answerable": true,
+  "gold": "Minimizing grid energy and traffic drop rate",
+  "support": "We formulate the corresponding grid energy and traffic drop rate minimization problem, and propose a distributed deep reinforcement learning (DDRL) solution.",
+  "type": "define"
+ },
+ {
+  "id": "B104",
+  "corpus": "B",
+  "title": "Emergent Space, Time, and Lorentz Symmetry from Binary Sequences",
+  "question": "Who are the authors of \"Emergent Space, Time, and Lorentz Symmetry from Binary Sequences\"?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who"
+ },
+ {
+  "id": "B105",
+  "corpus": "B",
+  "title": "Emergent Space, Time, and Lorentz Symmetry from Binary Sequences",
+  "question": "What invariant object does averaging over symbol locations yield in the binary sequences framework?",
+  "answerable": true,
+  "gold": "The Minkowski interval",
+  "support": "Averaging over those locations ultimately yields the Minkowski interval as an invariant object that maximizes (information) entropy.",
+  "type": "define"
+ },
+ {
+  "id": "B106",
+  "corpus": "B",
+  "title": "The Impact of Feature Selection on Predicting the Number of Bugs",
+  "question": "Do wrapper feature selection methods outperform the CFS filter at predicting the number of bugs?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "Our results show that wrappers outperform the CFS filter; they improve prediction accuracy by up to 33% while eliminating more than half of the features.",
+  "type": "yesno"
+ },
+ {
+  "id": "B107",
+  "corpus": "B",
+  "title": "The Impact of Feature Selection on Predicting the Number of Bugs",
+  "question": "On how many open source Java systems did \"The Impact of Feature Selection on Predicting the Number of Bugs\" evaluate prediction models?",
+  "answerable": true,
+  "gold": "Five",
+  "support": "We study the impact of both correlation-based feature selection (CFS) filter methods and wrapper feature selection methods on five widely-used prediction models and demonstrate how these models perform with or without feature selection to predict the number of bugs in five different open source Java software systems.",
+  "type": "count"
+ },
+ {
+  "id": "B108",
+  "corpus": "B",
+  "title": "LLM-based Code Auditing by Inferring and Evaluating Developer Assumptions",
+  "question": "In \"LLM-based Code Auditing by Inferring and Evaluating Developer Assumptions\", what does a null pointer check reveal about the developer?",
+  "answerable": true,
+  "gold": "That the developer believes the pointer may not be initialized",
+  "support": "When we see a null pointer check, we know that the developer believes that the pointer may not be initialized.",
+  "type": "why"
+ },
+ {
+  "id": "B109",
+  "corpus": "B",
+  "title": "LLM-based Code Auditing by Inferring and Evaluating Developer Assumptions",
+  "question": "What kind of program analysis do the authors develop for vulnerability detection?",
+  "answerable": true,
+  "gold": "A belief-guided program analysis",
+  "support": "We develop such a belief-guided program analysis for vulnerability detection (VD).",
+  "type": "define"
+ },
+ {
+  "id": "B110",
+  "corpus": "B",
+  "title": "Quantitative inverse theory of Gowers uniformity norms",
+  "question": "Who achieved a breakthrough in 2018 with a new proof of the inverse theorem for Gowers uniformity norms?",
+  "answerable": true,
+  "gold": "Manners",
+  "support": "In 2018 Manners achieved a breakthrough by giving a new proof of the inverse theorem.",
+  "type": "who"
+ },
+ {
+  "id": "B111",
+  "corpus": "B",
+  "title": "Quantitative inverse theory of Gowers uniformity norms",
+  "question": "Which mathematicians first proved the inverse theorem for Gowers norms in a qualitative sense?",
+  "answerable": true,
+  "gold": "Green, Tao, and Ziegler",
+  "support": "This was proved in a qualitative sense by Green, Tao, and Ziegler, but with a proof that was incapable of providing reasonable bounds.",
+  "type": "who"
+ },
+ {
+  "id": "B112",
+  "corpus": "B",
+  "title": "Beyond Expert Rankings: Contrast Calibration for Mixed-Precision MoE Quantization",
+  "question": "Which mixture-of-experts language models were quantized in the NatScale experiments?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "list"
+ },
+ {
+  "id": "B113",
+  "corpus": "B",
+  "title": "Beyond Expert Rankings: Contrast Calibration for Mixed-Precision MoE Quantization",
+  "question": "Why must all expert weights be stored in a mixture-of-experts language model even though only a few experts are active per token?",
+  "answerable": true,
+  "gold": "Only a few experts are activated per token, yet all expert weights must be stored",
+  "support": "Mixture-of-experts (MoE) language models activate only a few experts per token, yet all expert weights must be stored.",
+  "type": "why"
+ },
+ {
+  "id": "B114",
+  "corpus": "B",
+  "title": "Beyond Expert Rankings: Contrast Calibration for Mixed-Precision MoE Quantization",
+  "question": "How does mixed-precision quantization reduce storage cost in MoE models?",
+  "answerable": true,
+  "gold": "By assigning higher bit-widths to sensitive experts and lower bit-widths to resilient ones",
+  "support": "Mixed-precision quantization reduces this storage cost by assigning higher bit-widths to sensitive experts and lower bit-widths to resilient ones, but expert rankings alone do not determine how strongly to weight their errors.",
+  "type": "how"
+ },
+ {
+  "id": "B115",
+  "corpus": "B",
+  "title": "HTN-Orchestrate: A Hierarchical Task Network Framework for Multi-Agent Orchestration",
+  "question": "How many layers does the HTN-Orchestrate framework have?",
+  "answerable": true,
+  "gold": "Two",
+  "support": "Therefore, we introduce HTN-Orchestrate, a two-layer framework that separates these responsibilities through a hierarchical task network (HTN).",
+  "type": "count"
+ },
+ {
+  "id": "B116",
+  "corpus": "B",
+  "title": "HTN-Orchestrate: A Hierarchical Task Network Framework for Multi-Agent Orchestration",
+  "question": "In HTN-Orchestrate, what does the Planner do?",
+  "answerable": true,
+  "gold": "It maintains subtask hierarchies and dependencies and defers decomposition until prerequisite results are available",
+  "support": "The Planner maintains subtask hierarchies and dependencies, deferring decomposition until prerequisite results become available, while local Orchestrators schedule workers to execute each leaf subtask.",
+  "type": "how"
+ },
+ {
+  "id": "B117",
+  "corpus": "B",
+  "title": "Multi-task learning for natural language processing in the 2020s: where are we going?",
+  "question": "How many papers are covered in the multi-task learning for NLP survey?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "B118",
+  "corpus": "B",
+  "title": "Multi-task learning for natural language processing in the 2020s: where are we going?",
+  "question": "In \"Multi-task learning for natural language processing in the 2020s: where are we going?\", does multi-task learning pre-date the deep learning era?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "Multi-task learning (MTL) significantly pre-dates the deep learning era, and it has seen a resurgence in the past few years as researchers have been applying MTL to deep learning solutions for natural language tasks.",
+  "type": "yesno"
+ },
+ {
+  "id": "B119",
+  "corpus": "B",
+  "title": "Tensor-generating line bundles on toric varieties",
+  "question": "When is a line bundle called tensor-generating in \"Tensor-generating line bundles on toric varieties\"?",
+  "answerable": true,
+  "gold": "If its powers generate the derived category of perfect complexes",
+  "support": "A line bundle is $\\otimes$-generating if its powers generate the derived category of perfect complexes.",
+  "type": "define"
+ },
+ {
+  "id": "B120",
+  "corpus": "B",
+  "title": "Tensor-generating line bundles on toric varieties",
+  "question": "What analogue of a classical criterion do the authors prove for tensor-generation?",
+  "answerable": true,
+  "gold": "An analogue of Kleiman's criterion of ampleness",
+  "support": "Furthermore, we prove an analogue of Kleiman's criterion of ampleness for $\\otimes$-generation.",
+  "type": "define"
+ },
+ {
+  "id": "B121",
+  "corpus": "B",
+  "title": "An ADMM Based Framework for AutoML Pipeline Configuration",
+  "question": "Which method does \"An ADMM Based Framework for AutoML Pipeline Configuration\" leverage for its AutoML scheme?",
+  "answerable": true,
+  "gold": "The alternating direction method of multipliers (ADMM)",
+  "support": "We propose a novel AutoML scheme by leveraging the alternating direction method of multipliers (ADMM).",
+  "type": "define"
+ },
+ {
+  "id": "B122",
+  "corpus": "B",
+  "title": "An ADMM Based Framework for AutoML Pipeline Configuration",
+  "question": "Why is automatically configuring machine learning pipelines a challenging optimization problem?",
+  "answerable": true,
+  "gold": "It is black-box (gradient-free) with mixed integer and continuous variables",
+  "support": "This black-box (gradient-free) optimization with mixed integer & continuous variables is a challenging problem.",
+  "type": "why"
+ },
+ {
+  "id": "B123",
+  "corpus": "B",
+  "title": "Rapidly-Exploring Quotient-Space Trees: Motion Planning using Sequential Simplifications",
+  "question": "Is QRRT probabilistically complete?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "QRRT is shown to be (1) probabilistically complete, and (2) can reduce the runtime by at least one order of magnitude.",
+  "type": "yesno"
+ },
+ {
+  "id": "B124",
+  "corpus": "B",
+  "title": "Rapidly-Exploring Quotient-Space Trees: Motion Planning using Sequential Simplifications",
+  "question": "When can a quotient-space sequence reduce runtime the most, according to the QRRT experiments?",
+  "answerable": true,
+  "gold": "The more narrow the environment is",
+  "support": "To find out why, we perform an additional experiment, showing that the more narrow an environment, the more a quotient-space sequence can reduce runtime.",
+  "type": "why"
+ },
+ {
+  "id": "B125",
+  "corpus": "B",
+  "title": "Constraining a model supported in Moiré gravity with a recent data release",
+  "question": "What is Moiré gravity?",
+  "answerable": true,
+  "gold": "A framework extending Moiré theory from solid-state physics to gravity",
+  "support": "Moiré theory is a revolutionary alternative arising from solid-state physics that can be extended to gravity, forming a framework called Moiré gravity.",
+  "type": "define"
+ },
+ {
+  "id": "B126",
+  "corpus": "B",
+  "title": "Constraining a model supported in Moiré gravity with a recent data release",
+  "question": "Name two datasets used to constrain the Moiré gravity model.",
+  "answerable": true,
+  "gold": "Cosmic chronometers and type Ia supernovae",
+  "support": "through the use of datasets that contain cosmic chronometers, type Ia supernovae, intermediate-luminosity quasars, and hydrogen II galaxies",
+  "type": "list"
+ },
+ {
+  "id": "B127",
+  "corpus": "B",
+  "title": "Reinforcement Learning with Efficient Active Feature Acquisition",
+  "question": "Why is acquiring information costly in real-life sequential decision making, per \"Reinforcement Learning with Efficient Active Feature Acquisition\"?",
+  "answerable": true,
+  "gold": "For example, it might correspond to performing a medical test on a patient",
+  "support": "However, in real-life, acquiring valuable information is often highly costly, e.g., in the medical domain, information acquisition might correspond to performing a medical test on a patient.",
+  "type": "why"
+ },
+ {
+  "id": "B128",
+  "corpus": "B",
+  "title": "Reinforcement Learning with Efficient Active Feature Acquisition",
+  "question": "What kind of learned policy is proposed in the model-based reinforcement learning framework for active feature acquisition?",
+  "answerable": true,
+  "gold": "An active feature acquisition policy",
+  "support": "In this paper, we propose a model-based reinforcement learning framework that learns an active feature acquisition policy to solve the exploration-exploitation problem during its execution.",
+  "type": "define"
+ },
+ {
+  "id": "B129",
+  "corpus": "B",
+  "title": "LintEval: Benchmarking LLMs on Linter-Guided File Refactoring",
+  "question": "Which linter is used for Python files in LintEval?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "define"
+ },
+ {
+  "id": "B130",
+  "corpus": "B",
+  "title": "LintEval: Benchmarking LLMs on Linter-Guided File Refactoring",
+  "question": "How many programs does LintEval comprise?",
+  "answerable": true,
+  "gold": "13,061",
+  "support": "comprising 13,061 programs with correct initial functionality and 171,662 lint alerts extracted using language-specific linters",
+  "type": "count"
+ },
+ {
+  "id": "B131",
+  "corpus": "B",
+  "title": "LintEval: Benchmarking LLMs on Linter-Guided File Refactoring",
+  "question": "Across which programming languages does LintEval benchmark linter-guided file refactoring?",
+  "answerable": true,
+  "gold": "C++, Python, and Java",
+  "support": "We introduce LintEval, a multilingual benchmark for linter-guided file refactoring across C++, Python, and Java",
+  "type": "list"
+ },
+ {
+  "id": "B132",
+  "corpus": "B",
+  "title": "LintEval: Benchmarking LLMs on Linter-Guided File Refactoring",
+  "question": "Name two of the four things that LintEval jointly evaluates.",
+  "answerable": true,
+  "gold": "Functionality preservation and lint alert reduction",
+  "support": "LintEval jointly evaluates functionality preservation, lint alert reduction, new alert avoidance, and edit minimality.",
+  "type": "list"
+ },
+ {
+  "id": "B133",
+  "corpus": "B",
+  "title": "Peking Opera Synthesis via Duration Informed Attention Network",
+  "question": "For how long has Peking Opera been the dominant form of Chinese performing art?",
+  "answerable": true,
+  "gold": "Around 200 years",
+  "support": "Peking Opera has been the most dominant form of Chinese performing art since around 200 years ago.",
+  "type": "define"
+ },
+ {
+  "id": "B134",
+  "corpus": "B",
+  "title": "Peking Opera Synthesis via Duration Informed Attention Network",
+  "question": "How does \"Peking Opera Synthesis via Duration Informed Attention Network\" tackle the rhythm mismatch?",
+  "answerable": true,
+  "gold": "It uses a Lagrange multiplier to find the optimal phoneme duration sequence under the note duration constraint",
+  "support": "To tackle the rhythm mismatch, Lagrange multiplier is used to find the optimal output phoneme duration sequence with the constraint of the given note duration from music score.",
+  "type": "how"
+ },
+ {
+  "id": "B135",
+  "corpus": "B",
+  "title": "Thomson backscattering in combined uniform magnetic and envelope modulating circularly-polarized laser fields",
+  "question": "How many fundamental laws about the scale invariance of radiation spectra are revealed in the Thomson backscattering study?",
+  "answerable": true,
+  "gold": "Four",
+  "support": "four fundamental laws related to the scale invariance of the radiation spectra are analytically revealed and numerically validated",
+  "type": "count"
+ },
+ {
+  "id": "B136",
+  "corpus": "B",
+  "title": "Thomson backscattering in combined uniform magnetic and envelope modulating circularly-polarized laser fields",
+  "question": "What fields are used in the Thomson backscattering study?",
+  "answerable": true,
+  "gold": "Combined uniform magnetic and cosine-envelope circularly-polarized laser fields",
+  "support": "The Thomson backscattering spectra in combined uniform magnetic and cosine-envelope circularly-polarized laser fields are studied in detail.",
+  "type": "define"
+ },
+ {
+  "id": "B137",
+  "corpus": "B",
+  "title": "Synergy between Machine/Deep Learning and Software Engineering: How Far Are We?",
+  "question": "How many papers were reviewed in the systematic literature review \"Synergy between Machine/Deep Learning and Software Engineering: How Far Are We?\"",
+  "answerable": true,
+  "gold": "906",
+  "support": "we conducted a 10-year Systematic Literature Review (SLR) on 906 ML/DL-related SE papers published between 2009 and 2018",
+  "type": "count"
+ },
+ {
+  "id": "B138",
+  "corpus": "B",
+  "title": "Synergy between Machine/Deep Learning and Software Engineering: How Far Are We?",
+  "question": "What triggered the deep learning revolution since 2009?",
+  "answerable": true,
+  "gold": "The introduction of ImageNet",
+  "support": "Since 2009, the deep learning revolution, which was triggered by the introduction of ImageNet, has stimulated the synergy between Machine Learning (ML)/Deep Learning (DL) and Software Engineering (SE).",
+  "type": "why"
+ },
+ {
+  "id": "B139",
+  "corpus": "B",
+  "title": "IntegrationDistiller: Automating Integration Analysis and Testing of Object-Oriented Applications",
+  "question": "For what type of application does IntegrationDistiller generate test cases?",
+  "answerable": true,
+  "gold": ".NET applications",
+  "support": "In this paper we introduce IntegrationDistiller as an automated solution and tool to identify integration scenarios and generate test cases (in the form of method call sequences) for .NET application",
+  "type": "define"
+ },
+ {
+  "id": "B140",
+  "corpus": "B",
+  "title": "IntegrationDistiller: Automating Integration Analysis and Testing of Object-Oriented Applications",
+  "question": "Why is manual integration testing hard to apply to large industrial systems?",
+  "answerable": true,
+  "gold": "Manual solutions hinder scalability and applicability",
+  "support": "On the other hand, most of the integration testing solutions proposed in the literature are manual which hinders their scalability and applicability when it comes to large industrial systems.",
+  "type": "why"
+ },
+ {
+  "id": "B141",
+  "corpus": "B",
+  "title": "Effectiveness of Hidden-State Probes for Localizing Reasoning Failures",
+  "question": "Which 4B reasoning model was probed in \"Effectiveness of Hidden-State Probes for Localizing Reasoning Failures\"?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "list"
+ },
+ {
+  "id": "B142",
+  "corpus": "B",
+  "title": "Effectiveness of Hidden-State Probes for Localizing Reasoning Failures",
+  "question": "What share of single-step unrecoverable cases does the confidence probe miss on incorrect 8B traces?",
+  "answerable": true,
+  "gold": "81%",
+  "support": "On incorrect 8B traces, the confidence probe, a calibrated correctness probe at a midpoint cutoff, misses 81% of cases in which a single step makes the trace unrecoverable and 47% of cases in which another attempt would succeed.",
+  "type": "count"
+ },
+ {
+  "id": "B143",
+  "corpus": "B",
+  "title": "Effectiveness of Hidden-State Probes for Localizing Reasoning Failures",
+  "question": "How can the failing step in a wrong reasoning trace be located?",
+  "answerable": true,
+  "gold": "With Monte Carlo rollouts, at additional inference cost",
+  "support": "Monte Carlo rollouts distinguish the cases and locate the failing step at additional inference cost.",
+  "type": "how"
+ },
+ {
+  "id": "B144",
+  "corpus": "B",
+  "title": "Neural Power Units",
+  "question": "What learning rate was used to train the Neural Power Unit?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "B145",
+  "corpus": "B",
+  "title": "Neural Power Units",
+  "question": "What does the Neural Power Unit (NPU) learn?",
+  "answerable": true,
+  "gold": "Arbitrary power functions in a single layer",
+  "support": "We introduce the Neural Power Unit (NPU) that operates on the full domain of real numbers and is capable of learning arbitrary power functions in a single layer.",
+  "type": "define"
+ },
+ {
+  "id": "B146",
+  "corpus": "B",
+  "title": "Neural Power Units",
+  "question": "Do conventional neural networks generalize beyond the range of numbers seen during training when approximating arithmetic?",
+  "answerable": true,
+  "gold": "No",
+  "support": "Conventional Neural Networks can approximate simple arithmetic operations, but fail to generalize beyond the range of numbers that were seen during training.",
+  "type": "yesno"
+ },
+ {
+  "id": "B147",
+  "corpus": "B",
+  "title": "Large-Step Last-Iterate Convergence of Random-Reshuffling Stochastic Gradient Descent",
+  "question": "What bound do the authors establish for the last iterate of random-reshuffling SGD?",
+  "answerable": true,
+  "gold": "An expected objective-gap bound",
+  "support": "We establish an expected objective-gap bound for the last iterate of standard RR-SGD on unconstrained problems",
+  "type": "define"
+ },
+ {
+  "id": "B148",
+  "corpus": "B",
+  "title": "Large-Step Last-Iterate Convergence of Random-Reshuffling Stochastic Gradient Descent",
+  "question": "How do the authors remove the explicit 1/n factor from the stepsize restriction?",
+  "answerable": true,
+  "gold": "By retaining the sampling bias at random comparison points",
+  "support": "By retaining the sampling bias at random comparison points, we remove the explicit $1/n$ factor from the stepsize restriction.",
+  "type": "how"
+ },
+ {
+  "id": "B149",
+  "corpus": "B",
+  "title": "GraphBEAT: Graph-based Bucketized Event Aggregation Over Time for Early Risk Stratification of Gastrointestinal Cancers",
+  "question": "What does GraphBEAT stand for?",
+  "answerable": true,
+  "gold": "Graph-based Bucketized Event Aggregation over Time",
+  "support": "we introduce GraphBEAT (Graph-based Bucketized Event Aggregation over Time), a temporal graph representation learning framework that groups clinical events into time buckets",
+  "type": "define"
+ },
+ {
+  "id": "B150",
+  "corpus": "B",
+  "title": "GraphBEAT: Graph-based Bucketized Event Aggregation Over Time for Early Risk Stratification of Gastrointestinal Cancers",
+  "question": "What information does each node in a GraphBEAT EHR graph encode?",
+  "answerable": true,
+  "gold": "Feature identity, observed value, and temporal position of clinical events",
+  "support": "Each node in an EHR graph encodes feature identity, observed value, and temporal position of clinical events.",
+  "type": "define"
+ },
+ {
+  "id": "B151",
+  "corpus": "B",
+  "title": "Short Text Topic Modeling Techniques, Applications, and Performance: A Survey",
+  "question": "What three categories of methods does \"Short Text Topic Modeling Techniques, Applications, and Performance: A Survey\" present?",
+  "answerable": true,
+  "gold": "Dirichlet multinomial mixture, global word co-occurrences, and self-aggregation",
+  "support": "We present three categories of methods based on Dirichlet multinomial mixture, global word co-occurrences, and self-aggregation",
+  "type": "list"
+ },
+ {
+  "id": "B152",
+  "corpus": "B",
+  "title": "Short Text Topic Modeling Techniques, Applications, and Performance: A Survey",
+  "question": "Why do long text topic models like LDA struggle with short texts?",
+  "answerable": true,
+  "gold": "Only very limited word co-occurrence information is available in short texts",
+  "support": "Traditional long text topic modeling algorithms (e.g., PLSA and LDA) based on word co-occurrences cannot solve this problem very well since only very limited word co-occurrence information is available in short texts.",
+  "type": "why"
+ },
+ {
+  "id": "B153",
+  "corpus": "B",
+  "title": "Reasoning Over History: Context Aware Visual Dialog",
+  "question": "What does the MAC network do in \"Reasoning Over History: Context Aware Visual Dialog\"?",
+  "answerable": true,
+  "gold": "It decomposes a task into a series of attention-based reasoning steps",
+  "support": "One strong VQA model is the MAC network, which decomposes a task into a series of attention-based reasoning steps.",
+  "type": "define"
+ },
+ {
+  "id": "B154",
+  "corpus": "B",
+  "title": "Reasoning Over History: Context Aware Visual Dialog",
+  "question": "Why can the MAC network not refer to past dialog turns?",
+  "answerable": true,
+  "gold": "It is designed for single-turn question answering",
+  "support": "However, since the MAC network is designed for single-turn question answering, it is not capable of referring to past dialog turns.",
+  "type": "why"
+ },
+ {
+  "id": "B155",
+  "corpus": "B",
+  "title": "Beware the evolving 'intelligent' web service! An integration architecture tactic to guard AI-first components",
+  "question": "What do intelligent services provide to developers, according to \"Beware the evolving 'intelligent' web service!\"?",
+  "answerable": true,
+  "gold": "The power of AI via simple RESTful API endpoints",
+  "support": "Intelligent services provide the power of AI to developers via simple RESTful API endpoints, abstracting away many complexities of machine learning.",
+  "type": "define"
+ },
+ {
+  "id": "B156",
+  "corpus": "B",
+  "title": "Beware the evolving 'intelligent' web service! An integration architecture tactic to guard AI-first components",
+  "question": "What does the proposal in \"Beware the evolving 'intelligent' web service!\" offer?",
+  "answerable": true,
+  "gold": "An architectural tactic to improve robustness of software depending on intelligent services",
+  "support": "Our proposal is an architectural tactic designed to improve intelligent service-dependent software robustness.",
+  "type": "define"
+ },
+ {
+  "id": "B157",
+  "corpus": "B",
+  "title": "Testing the running vacuum model in light of DESI-DR2 Measurements",
+  "question": "What do the generalized running vacuum models in the DESI-DR2 paper let the vacuum energy density depend on?",
+  "answerable": true,
+  "gold": "Both H^2 and the time derivative of H",
+  "support": "This formulation extends previous running vacuum approaches by incorporating a dependence of the vacuum energy density on both, $H^2$ and $\\dot{H}$.",
+  "type": "how"
+ },
+ {
+  "id": "B158",
+  "corpus": "B",
+  "title": "Testing the running vacuum model in light of DESI-DR2 Measurements",
+  "question": "What is derived and analyzed to study impact on cosmic expansion in the running vacuum paper?",
+  "answerable": true,
+  "gold": "The corresponding Friedmann equations",
+  "support": "The corresponding Friedmann equations are derived and analyzed to study their impact on cosmic expansion.",
+  "type": "define"
+ },
+ {
+  "id": "B159",
+  "corpus": "B",
+  "title": "On the Tasks and Characteristics of Product Owners: A Case Study in the Oil & Gas Industry",
+  "question": "In which agile framework do product owners have an important role in the development process?",
+  "answerable": true,
+  "gold": "Scrum",
+  "support": "Product owners in the Scrum framework - respectively the on-site customer when applying eXtreme Programming - have an important role in the development process.",
+  "type": "define"
+ },
+ {
+  "id": "B160",
+  "corpus": "B",
+  "title": "On the Tasks and Characteristics of Product Owners: A Case Study in the Oil & Gas Industry",
+  "question": "Why do many companies struggle on their way towards an agile work environment, per the product owner study?",
+  "answerable": true,
+  "gold": "They find it hard to define the tasks and responsibilities of a product owner",
+  "support": "However, many companies face the difficulty of defining the tasks and the responsibilities of a product owner on their way towards an agile work environment.",
+  "type": "why"
+ }
+]

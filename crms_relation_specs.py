@@ -102,6 +102,9 @@ class RelationEngine:
         self.allowed: set[str] | None = None   # active spec names from the registry; None = all
         self._propositions = {s.name: dict(s.proposition) for s in specs if s.proposition}
         self._pool: list[tuple[str, str]] | None = None
+        self._alts: list[dict] = []
+        self._tie: list[dict] = []          # incompatible best candidates of the last choice
+        self._conflicts: list[SpecAnswer] = []
 
     def _parse(self, pattern: str) -> list:
         if pattern not in self._parsed:
@@ -110,10 +113,15 @@ class RelationEngine:
 
     # ------------------------------------------------------------ public API
     def ask(self, question: str, *, pool: Sequence[tuple[str, str]] | None = None,
-            extra: Sequence[tuple] = (), exclude: Iterable[str] = ()
-            ) -> SpecAnswer | None:
+            extra: Sequence[tuple] = (), exclude: Iterable[str] = (),
+            conflicts: list | None = None) -> SpecAnswer | None:
         """Answer from the first matching spec, or None. `pool` replaces
-        retrieval (used by the verifier); `extra` are candidate specs tried first."""
+        retrieval (used by the verifier); `extra` are candidate specs tried first.
+        When `conflicts` is a list and sources disagree, one answer per side is
+        appended, each with its own source. The engine's own result is unchanged:
+        an equal-cost tie still abstains, and otherwise the best answer is
+        returned, so the report never alters the accuracy the oracle measures."""
+        self._conflicts = []
         text = re.sub(r"\s+", " ", question.strip().rstrip("?!. "))
         language = self.language
         tokens = tokenize(text, language)
@@ -137,6 +145,8 @@ class RelationEngine:
                             return result
         finally:
             self._pool = None
+            if conflicts is not None:
+                conflicts.extend(self._conflicts)
         return None
 
     def instances(self, question: str) -> tuple[str, list[dict]] | None:
@@ -159,6 +169,30 @@ class RelationEngine:
                     inst = self._gather(s.sentence_patterns, entity, etoks, variables, question)
                     if inst:
                         return s.name, inst
+        return None
+
+    def pool_for(self, question: str) -> tuple[str, list[tuple[str, str]]] | None:
+        """(entity, retrieved sentences) for the first spec whose question pattern
+        matches, or None when no question pattern matches. Used to explain a miss."""
+        text = " ".join(question.strip().rstrip("?!. ").split())
+        tokens = tokenize(text, self.language)
+        starts = chunk(tokens, self.language)
+        for s in self.specs:
+            for qp in s.question_patterns:
+                for m in match_patterns(self._parse(qp),
+                                        MatchContext(self.language, tokens, starts),
+                                        start_positions=[0]):
+                    if m["end"] != len(tokens):
+                        continue
+                    prepared = self._prepare(s.verb_class, text, tokens, m["binds"])
+                    if prepared is None:
+                        continue
+                    words = prepared[0].split()
+                    if len(words) > 1 and words[0].lower() in ("the", "a", "an"):
+                        words = words[1:]
+                    entity = " ".join(words)
+                    pool = list(self.source.sentences(entity, question)) if self.source else []
+                    return entity, pool
         return None
 
     # ------------------------------------------------------------- internals
@@ -194,10 +228,20 @@ class RelationEngine:
         inst = self._gather(spats, entity, etoks, variables, question)
         if not inst:
             return None
+        self._tie = []
+        self._alts = []
         chosen = self._choose(inst)
         if chosen is None:
+            if self._tie and not self._conflicts:
+                self._conflicts = [self._render(name, template, c, entity, variables,
+                                                text, tokens, binds) for c in self._tie]
             return None
-        return self._render(name, template, chosen, entity, variables, text, tokens, binds)
+        answer = self._render(name, template, chosen, entity, variables, text, tokens, binds)
+        if self._alts and not self._conflicts:
+            self._conflicts = [answer] + [
+                self._render(name, template, c, entity, variables, text, tokens, binds)
+                for c in self._alts]
+        return answer
 
     def _gather(self, spats, entity, etoks, variables, question) -> list[dict]:
         language = self.language
@@ -262,8 +306,21 @@ class RelationEngine:
         answers = {c["nA"] for c in best}
         if len(answers) > 1 and not any(
                 a in o for a in answers for o in answers if a != o):
+            seen_answers: set[str] = set()
+            for c in best:                       # one candidate per distinct answer
+                if c["nA"] not in seen_answers:
+                    seen_answers.add(c["nA"])
+                    self._tie.append(c)
             return None   # equally good, incompatible answers: abstain
         chosen = best[0]
+        self._alts = []
+        window2 = p.get("conflict_window", 2.0)
+        for c in ranked[1:]:
+            if (c["cost"] <= chosen["cost"] + window2 and c["S"] != chosen["S"]
+                    and not (c["nA"] in chosen["nA"] or chosen["nA"] in c["nA"])
+                    and all(not (c["nA"] in a["nA"] or a["nA"] in c["nA"])
+                            for a in self._alts)):
+                self._alts.append(c)
         if p.get("veto_next_cap", 0) >= 1 and chosen["f"]["a_next_cap"] == 1:
             return None   # likely a truncated name
         if p.get("veto_extended_title", 0) >= 1 and _extended_title(chosen):

@@ -22,6 +22,7 @@ DEFAULT_PARAMS: dict[str, float] = {
     "rk_e_late": -12.0,    # entity not at the start of the sentence
     "rk_title_eq": 1.0,    # page title equals the entity
     "rk_window": 14.0,     # cost window for preferring the most specific compatible answer
+    "conflict_window": 2.0,  # report a disagreement when a different source's incompatible answer is this close in cost
     "veto_next_cap": 1.0,  # abstain when the answer is followed by a capitalised word
     "veto_extended_title": 0.0,  # abstain when the source page's title extends the entity
 }
