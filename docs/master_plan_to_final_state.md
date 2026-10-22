@@ -1313,8 +1313,73 @@ are not answerable by span patterns at all. These are the numbers Phase 13 moves
 - **Regression:** full sharded suite with no new failures; the regex footprint ratchet
   passes.
 
-**Status (2026-10-22): planned; not started.** Phase 12 work continues in parallel
-until its independent-evaluation items are closed.
+**Status (2026-10-23): partly delivered; the first-run safety gate is not met.** Delivered:
+the answerability gate now weighs question terms by corpus rarity, the math route no
+longer hijacks definition questions, the pattern tables ship in the release with a
+clean-room smoke test and one-step rollback, and a stricter grader aligns the label with
+what a judge reads. Not delivered: composed answers for why/how/list questions (C), and a
+spec-induction or learned-reader route that adds coverage (B, negative result).
+
+*A. First-run answer quality.* A word-rarity table (`corpus/phase13_model/word_df.tsv`,
+62k documents, 32k words, 349 KiB) replaces a hand-written generic-word list. The gate gains
+a policy-driven `weighted_coverage` dimension (threshold 0.4, chosen by offline replay of
+the gate over recorded chat traces, checked on split halves), and relation-term matching
+folds a trailing e so "live" matches "lived". `crms_math` returns no result for a
+non-numeric "What is X" instead of a number-phrase refusal. Grader version 2 counts a plain
+refusal as an abstention and credits a "Yes" answer that quotes its supporting sentence
+(version 1 is kept for earlier reports).
+
+| Measure | Before | After |
+|---|---|---|
+| Training set (400, development data, grader v2): correct / wrong | 69 / 13 | 61 / 8 |
+| Same, wrong share of answered | 15.9% | 11.6% |
+| **Fresh blind set D (300, one run, grader v2): correct / wrong / abstain** | 44 / 17 / 239 | 41 / 10 / 249 |
+| Blind D wrong share of answered | 27.9% | 19.6% |
+| Blind D unanswerable questions answered | 5 of 44 | 3 of 44 |
+| Blind D utility (+1, −3, 0) | −7 | +11 |
+
+On blind D the change lost 3 correct answers (6.8% of 44), turned 7 wrong answers into
+abstentions, and created no new wrong answers. The gate target (wrong share ≤10%, ≤5% of
+correct answers lost, unanswerable answered ≤5%) is **not met**: wrong share is 19.6%, the
+loss is one answer over, and 3 of 44 unanswerable questions are still answered. The
+training-set thresholds were tuned on that set, so its numbers are optimistic. Set D is
+now spent for gate decisions. Two fixes were made afterwards on development data only (relation
+terms fold a trailing e, so "live" matches "lived", and licensed predicates use the same fold;
+the sharded regression found the second mismatch and it was fixed); the training-set counts
+were identical before and after, and set D could not be re-run.
+
+*B. Spec induction and a learned reader (negative result).* `crms_spec_induction.py`
+aligns each (question, sentence, answer) triple and turns it into a question frame and a
+sentence pattern; 2,796 LLM-authored triples (six author sessions) give 2,345 aligned
+patterns but only 10 to 18 groups of three or more triples that share a shape, because
+phrasing is heavy-tailed. Of the first 11 candidates the verifier accepted 4, and they moved
+the dev split by nothing (3 correct of 191 before and after), so none ships.
+`crms_span_reader.py` is a small inspectable extractive reader (named features, learned
+weights, calibrated confidence, typed abstention). Trained on the same triples it reaches
+about 32% top-1 on its dev set with the right passage given, and at the confidence that
+answers 30 of 400 questions it is wrong on 30%. It is not wired into chat. Entity
+detection in induction was found and fixed to stop treating a verb as part of the entity.
+
+*C. Composed answers.* Not built. The induction and reader results say sentence selection
+and answerability, not composition, are the binding constraint; composing cited clauses on
+top of weak selection would reproduce its errors fluently. A definition route that adds the
+subject page's lead sentence as a gate candidate was tried and changed nothing, so it was
+reverted.
+
+*D. Packaging.* `crms_pattern_pack.py` builds `patterns.sqlite` (verbs, classes, specs with
+evidence, intents, gate policy, parameters, rewrites, audit trail, word rarity, manifest);
+`build_release(..., patterns_db=...)` ships it with a digest and `Release.verify` checks it;
+the chat reads it from beside `--model-db`; `update_patterns` and `rollback_patterns` swap it
+in one operation. `experiments/v1_588_pattern_release.py` passes: a changed pattern file is
+refused, a missing policy fails, the chat gate reads the installed policy, and ten fixed
+questions run through the real chat CLI from a clean room (answers and refusals).
+
+*E. Evaluation discipline.* Blind sets C and D were authored by fresh LLM sessions, run once,
+and retired; development used the training set and the oracle samples; judge agreement from
+Phase 12 still stands.
+
+Remaining gap to the Phase 13 gate: wrong share 19.6% against 10%; coverage of answerable
+questions about 16%, not doubled; composed answers and induction throughput undelivered.
 
 ---
 
@@ -1565,3 +1630,4 @@ corpus size, it has not advanced the goal.
 | 2026-10-22 | Phase 12 started with LLM sessions as independent author and judges (project owner's decision): 320-question independent set frozen; chat scores 55 correct / 44 wrong / 221 abstain (gate not met); judge/judge kappa 0.99, judge/oracle 0.85–0.86; conflict reporting with sources; failure-cause grouping; page-subject resolution (bracket mode on, pronoun mode off after a blind-sample check); teacher loop, retrofit families, and packaging not done | `crms_independent_eval.py`, `crms_failure_causes.py`, `run_phase12_independent.py`, `run_phase12_eval.py`, `run_phase12_causes.py`, `corpus/phase12_eval/`, `experiments/reports/phase12_*.json` |
 | 2026-10-22 | Phase 12: abstention gate with named deviation dimensions and SQL policy (`pat_gate_policy`); independent set wrong share 44% → 36%, unanswerable answered 14 → 6, but 4 of 55 correct lost net (target ≤5% missed); route-first `agent` family on by default (oracle samples +153 / +126 correct, wrong 51 → 39 / 40 → 37); full sharded regression clean | `crms_nl_gate.py`, `crms_pattern_memory.py`, `crms_pattern_seed.json`, `crms_chat.py`, `run_phase12_gate.py`, `experiments/v1_584_*`, `experiments/v1_585_*`, `experiments/reports/phase12_gate.json` |
 | 2026-10-22 | Phase 13 planned: release candidate, a pre-trained CRMS a user can run at once (first-run answer quality, spec induction, composed answers for why/how/list/define, packaging with clean-room install and rollback); built on Phase 12 results (blind set: 19 correct / 18 wrong / 203 abstain after the gate; teacher loop about one accepted spec per round); not started | `docs/design_phase13_release_candidate.md`, `docs/master_plan_to_final_state.md` |
+| 2026-10-23 | Phase 13 partly delivered: rarity-weighted answerability gate, math-route fix, grader v2, pattern tables packaged in the release with clean-room smoke test and rollback; blind set D (one run): wrong 17 → 10, correct 44 → 41, wrong share 27.9% → 19.6%, utility −7 → +11 (gate target not met); spec induction and a learned span reader are negative results; composed answers not built | `crms_word_rarity.py`, `crms_pattern_pack.py`, `crms_spec_induction.py`, `crms_span_reader.py`, `run_phase13_*.py`, `experiments/v1_588_*`, `experiments/v1_589_*`, `corpus/phase13_model/` |

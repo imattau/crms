@@ -37,6 +37,7 @@ VERSION = 1
 MODEL_SCHEMA_VERSION = 4
 MODEL_FILE = "model.sqlite"
 PHASE8_FILE = "phase8.sqlite"
+PATTERNS_FILE = "patterns.sqlite"
 RELEASE_FILE = "release.json"
 COMPATIBILITY = (
     "crms-learned-model 1",
@@ -149,7 +150,8 @@ def build_release(output: str | Path, *, model_db: str | Path,
                   dependency_edges: Iterable[Mapping[str, Any]] = (),
                   registry_db: str | Path | None = None,
                   corrections: Iterable[Mapping[str, Any]] = (),
-                  replace: bool = False) -> dict[str, Any]:
+                  replace: bool = False,
+                  patterns_db: str | Path | None = None) -> dict[str, Any]:
     """Publish a validated, read-only Phase 8 release directory."""
     destination = Path(output).expanduser().resolve()
     source_model = Path(model_db).expanduser().resolve()
@@ -188,6 +190,14 @@ def build_release(output: str | Path, *, model_db: str | Path,
         staging = Path(temporary)
         model_path = staging / MODEL_FILE
         shutil.copy2(source_model, model_path)
+        patterns_path = None
+        if patterns_db is not None:     # Phase 13: the pattern tables ship with the model
+            from crms_pattern_pack import verify_pattern_db
+            problems = verify_pattern_db(patterns_db)
+            if problems:
+                raise ValueError("pattern database failed verification: " + "; ".join(problems))
+            patterns_path = staging / PATTERNS_FILE
+            shutil.copy2(patterns_db, patterns_path)
         phase8_path = staging / PHASE8_FILE
         connection = sqlite3.connect(phase8_path)
         try:
@@ -243,6 +253,11 @@ def build_release(output: str | Path, *, model_db: str | Path,
             connection.execute(
                 "INSERT INTO integrity VALUES(?,?,?,?)",
                 (MODEL_FILE, model_sha, model_bytes, "chat-model"))
+            if patterns_path is not None:
+                connection.execute(
+                    "INSERT INTO integrity VALUES(?,?,?,?)",
+                    (PATTERNS_FILE, _sha256(patterns_path), patterns_path.stat().st_size,
+                     "pattern-memory"))
             coverage = _coverage(licence_rows)
             metadata = {
                 "format": FORMAT,
@@ -273,6 +288,9 @@ def build_release(output: str | Path, *, model_db: str | Path,
             {"path": PHASE8_FILE, "sha256": phase8_sha, "bytes": phase8_bytes,
              "role": "phase8-metadata"},
         ]
+        if patterns_path is not None:
+            files.append({"path": PATTERNS_FILE, "sha256": _sha256(patterns_path),
+                          "bytes": patterns_path.stat().st_size, "role": "pattern-memory"})
         release = {
             "format": FORMAT,
             "version": VERSION,
@@ -295,7 +313,7 @@ def build_release(output: str | Path, *, model_db: str | Path,
             "registry_rules": None,
             "corrections": len(correction_rows),
             "files": files,
-            "total_bytes": model_bytes + phase8_bytes,
+            "total_bytes": sum(int(item["bytes"]) for item in files),
         }
         # Re-open the staged metadata for accurate registry counts.
         check = sqlite3.connect(phase8_path.as_uri() + "?mode=ro", uri=True)
@@ -333,6 +351,12 @@ class Release:
     @property
     def phase8_path(self) -> Path:
         return self.path / PHASE8_FILE
+
+    @property
+    def patterns_path(self) -> Path | None:
+        """The shipped pattern database, when the release carries one."""
+        path = self.path / PATTERNS_FILE
+        return path if path.is_file() else None
 
     def _scalar(self, query: str, parameters: Sequence[Any] = ()) -> int:
         return int(self.phase8.execute(query, parameters).fetchone()[0])
@@ -462,6 +486,9 @@ class Release:
             inspect_model_database(self.model_path)
         except Exception as error:
             errors.append(f"model validation failed: {error}")
+        if self.patterns_path is not None:
+            from crms_pattern_pack import verify_pattern_db
+            errors.extend(f"pattern database: {p}" for p in verify_pattern_db(self.patterns_path))
         try:
             rows = dict(self.phase8.execute(
                 "SELECT path,sha256 FROM integrity"))

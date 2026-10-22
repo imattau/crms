@@ -1916,6 +1916,15 @@
    "typed_reason": "the roles are reversed",
    "rationale": "entity, relation, and answer appear in a different order than asked",
    "origin": "seed"
+  },
+  {
+   "dimension": "weighted_coverage",
+   "answer_types": null,
+   "invariant": true,
+   "threshold": 0.4,
+   "typed_reason": "the question's distinctive terms are mostly absent from the sentence",
+   "rationale": "term weights come from document frequency (corpus/phase13_model/word_df.tsv): a sentence missing the rare terms of the question is about something else; 0.4 chosen by offline replay on the training set (split-half checked)",
+   "origin": "seed"
   }
  ]
 }

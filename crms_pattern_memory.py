@@ -117,6 +117,14 @@ class PatternMemory:
                 origin TEXT NOT NULL,
                 status TEXT NOT NULL CHECK(status IN ('accepted','rejected','retired'))
             ) WITHOUT ROWID;
+            CREATE TABLE IF NOT EXISTS pat_word_df (
+                word TEXT PRIMARY KEY,
+                df INTEGER NOT NULL
+            ) WITHOUT ROWID;
+            CREATE TABLE IF NOT EXISTS pat_meta (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            ) WITHOUT ROWID;
             CREATE TABLE IF NOT EXISTS pat_param (
                 name TEXT NOT NULL,
                 version INTEGER NOT NULL,

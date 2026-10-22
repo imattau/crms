@@ -27,14 +27,35 @@ def load_set(path: str | Path) -> list[dict[str, Any]]:
     return items
 
 
-def oracle_label(item: Mapping[str, Any], answer: str | None) -> str:
+_REFUSALS = ("i have no ", "no accepted fact supports", "i don't have a grounded", "i could not find",
+             "teach it with", "teach number phrases")
+
+
+def _overlap(support: str, answer: str) -> float:
+    """Share of the support sentence's words that appear in the answer."""
+    words = [w for w in support.casefold().split() if w]
+    have = set(answer.casefold().split())
+    return sum(w in have for w in words) / len(words) if words else 0.0
+
+
+def oracle_label(item: Mapping[str, Any], answer: str | None, *, version: int = 1) -> str:
     """Deterministic label: abstain, correct (gold matched) or wrong.
 
-    An unanswerable question has no gold, so any non-abstaining answer is wrong."""
+    An unanswerable question has no gold, so any non-abstaining answer is wrong.
+
+    Version 2 (Phase 13) aligns two cases with what a judge reads: a plain refusal such as
+    "I have no grounded cardinal value..." is an abstention, and a yes/no question whose gold is
+    "Yes" is answered correctly when the answer quotes its supporting sentence (the quote is the
+    evidence that the answer is yes). Version 1 is the Phase 12 behaviour."""
     if not answer or _ABSTAIN.search(answer):
+        return "abstain"
+    if version >= 2 and any(r in answer.casefold() for r in _REFUSALS):
         return "abstain"
     if not item["answerable"]:
         return "wrong"
+    if (version >= 2 and item.get("type") == "yesno" and item["gold"].strip().casefold() == "yes"
+            and item.get("support") and _overlap(item["support"], answer) >= 0.7):
+        return "correct"
     return "correct" if matches(item["gold"], answer) else "wrong"
 
 

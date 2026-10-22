@@ -1,6 +1,6 @@
 # Phase 13 release candidate: a pre-trained CRMS a user can run at once
 
-**Status:** planned 2026-10-22; not started.
+**Status:** partly delivered 2026-10-23; results at the end of this file.
 **Plan entry:** `docs/master_plan_to_final_state.md`, Phase 13.
 **Builds on:** Phase 11 (pattern layer, SQL pattern memory, spec verifier) and Phase 12
 (independent evaluation, teacher loop, abstention gate, route-first wiring).
@@ -146,3 +146,30 @@ because it reuses that selection. E is continuous.
    on first run.
 3. Whether to add a human-rated slice before calling the release candidate done.
 4. Whether `exam-fixes` merges or is dropped.
+
+## Results (2026-10-23)
+
+See the Phase 13 section of the master plan for the tables. Summary:
+
+- **A (quality):** gate improved on a fresh blind set (wrong 17 to 10, correct 44 to 41,
+  wrong share 27.9% to 19.6%) but misses the target. Remaining wrong answers are mostly
+  related-but-unresponsive sentences that share the question's rare terms.
+- **B (induction, reader):** negative results. Induction alignment works (84%) but shapes
+  rarely repeat; the reader's precision at useful coverage is too low. Both are kept as
+  tools, not shipped.
+- **C (composed answers):** not built; sentence selection is the constraint.
+- **D (packaging):** delivered and tested, including tamper refusal, update, and one-step
+  rollback.
+- **E (discipline):** two single-use blind sets (C, D), retired.
+
+### What to do next
+
+1. A stricter responsiveness test. Two ideas the data support: require the sentence to
+   contain the answer-type element the question asks for *near* the entity (not anywhere),
+   and learn per-dimension weights from the recorded traces instead of fixed thresholds
+   (the replay harness in `run_phase13_replay.py` already scores any policy offline).
+2. More supervised data of the kind that worked: LLM-authored triples cost little. A
+   second reader attempt should add features from the replay traces and use the gate's
+   deviations as inputs, then be judged on a fresh blind set.
+3. Defer composed answers until selection reaches the Phase 13 safety gate.
+

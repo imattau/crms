@@ -127,12 +127,23 @@ def make_bank(engines: CorpusEngines, controls: Sequence[Item]) -> Callable[...,
     return bank
 
 
-def spec_precision(engines: CorpusEngines, candidate: tuple, items: Sequence[Item]) -> dict[str, int]:
-    """How the candidate spec alone does on labelled items: answered / correct / wrong."""
+def spec_precision(engines: CorpusEngines, candidate: tuple, items: Sequence[Item], *,
+                   pool_mode: bool = False) -> dict[str, int]:
+    """How the candidate spec alone does on labelled items: answered / correct / wrong.
+
+    With `pool_mode` the spec reads only the item's supporting sentence (fast; measures extraction
+    given the right sentence). Otherwise it reads whatever retrieval returns (slow; also measures
+    false positives on wrong sentences)."""
     name = candidate[0]
     counts = {"answered": 0, "correct": 0, "wrong": 0}
     for item in items:
-        answer = engines.engines[item["corpus"]].ask(item["question"], extra=[candidate])
+        if pool_mode:
+            if not item.get("support"):
+                continue
+            answer = engines.engines[item["corpus"]].ask(
+                item["question"], pool=[(item.get("title", "x"), item["support"])], extra=[candidate])
+        else:
+            answer = engines.engines[item["corpus"]].ask(item["question"], extra=[candidate])
         if answer is None or answer.spec != name:
             continue
         counts["answered"] += 1
@@ -144,8 +155,8 @@ def spec_precision(engines: CorpusEngines, candidate: tuple, items: Sequence[Ite
 def apply_proposals(proposals: Sequence[dict[str, Any]], engines: CorpusEngines,
                     controls: Sequence[Item], corpus_sentences: Sequence[str], *,
                     round_no: int, precision_items: Sequence[Item] = (),
-                    min_answered: int = 3, max_wrong_share: float = 0.25
-                    ) -> list[dict[str, Any]]:
+                    min_answered: int = 3, max_wrong_share: float = 0.25,
+                    pool_precision: bool = False) -> list[dict[str, Any]]:
     """Verify each proposal; accept the ones that pass, one at a time.
 
     The random-sentence fire-rate check swaps the question's entity for a sentence's
@@ -178,7 +189,8 @@ def apply_proposals(proposals: Sequence[dict[str, Any]], engines: CorpusEngines,
             result = verify_spec(proposal, next(iter(engines.engines.values())), bank=bank,
                                  corpus_sentences=() if precision_items else corpus_sentences)
             if result.ok and precision_items:
-                counts = spec_precision(engines, candidate_tuple(proposal), precision_items)
+                counts = spec_precision(engines, candidate_tuple(proposal), precision_items,
+                                        pool_mode=pool_precision)
                 result.metrics["train_precision"] = counts
                 if counts["answered"] < min_answered:
                     result.ok = False

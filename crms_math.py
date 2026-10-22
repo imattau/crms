@@ -60,6 +60,13 @@ _NUMBER_CUE_WORDS = frozenset({
     "seventy", "eighty", "ninety", "hundred", "thousand", "million",
     "billion", "trillion", "dozen", "score", "half", "quarter",
 })
+
+
+def _has_number_cue(text: str) -> bool:
+    """Whether a phrase contains a digit or a number word, i.e. could be arithmetic."""
+    return any(ch.isdigit() for ch in text) or any(
+        word in _NUMBER_CUE_WORDS for word in tokens(text))
+
 _OPERATIONS = ("add", "subtract", "multiply", "divide", "modulo")
 _SYMBOL_OPERATIONS = {
     "+": "add", "-": "subtract", "−": "subtract",
@@ -1085,6 +1092,8 @@ class CRMSMath:
                 "unknown", request=request)
         except _UnknownNumber as error:
             phrase = str(error)
+            if not _has_number_cue(phrase):
+                return None       # a definition question ("What is self-attention?"), not arithmetic
             return MathResult(
                 "unknown", request=(f"I have no grounded cardinal value for "
                                     f"'{phrase}'. Teach number phrases through "

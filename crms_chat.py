@@ -6666,6 +6666,10 @@ def main() -> int:
     model_research_sidecar: Path | None = None
     dialogue_memory_path = args.dialogue_model
     if args.model_db is not None:
+        sibling_patterns = args.model_db.with_name("patterns.sqlite")
+        if sibling_patterns.is_file():      # the release ships its pattern tables beside the model
+            from crms_pattern_defaults import use_pattern_db
+            use_pattern_db(sibling_patterns)
         memories = inspect_model_database(args.model_db)
         for name, value in model_database_rule_settings(
                 args.model_db, validate=False).items():

@@ -4,10 +4,10 @@ from __future__ import annotations
 import json
 import os
 import re
-from functools import lru_cache
 from typing import Any, NamedTuple
 
 from crms_intent_rules import classify as classify_intent
+from crms_word_rarity import weight as word_weight
 from crms_knowledge import _IRREGULAR_VERB_PARADIGMS
 
 
@@ -306,7 +306,6 @@ class Deviation(NamedTuple):
     reason: str      # the witness: what in this sentence shows the deviation
 
 
-@lru_cache(maxsize=1)
 def gate_policy() -> dict[str, dict[str, Any]]:
     """Gate policy rows (``pat_gate_policy``) from the seeded pattern memory.
 
@@ -531,11 +530,11 @@ def _deviations(question: str, sentence: str,
         add("relation_not_predicated", "required modifier missing: "
             + ", ".join(sorted(q_modifiers - s_words)))
 
-    content = {_stem(word) for word in q_tokens
+    content = {_loose(word) for word in q_tokens
                if word.casefold() not in _STOP | _SUPERLATIVES
                and word.casefold() not in mention_terms
                and not word.isdigit()}
-    sentence_stems = {_stem(word) for word in sentence_tokens}
+    sentence_stems = {_loose(word) for word in sentence_tokens}
     relation_terms = set(content)
     licensed_groups: dict[str, set[str]] = {}
     for record in licensed_predicates:
@@ -545,7 +544,7 @@ def _deviations(question: str, sentence: str,
         phrase = str(record.get("text", "")).strip()
         if evidence and phrase:
             licensed_groups.setdefault(evidence, set()).update(
-                _stem(word) for word in _tokens(phrase))
+                _loose(word) for word in _tokens(phrase))
     for terms in licensed_groups.values():
         if content & terms:
             relation_terms.update(terms)
@@ -581,10 +580,34 @@ def _deviations(question: str, sentence: str,
             if terms & sentence_stems for term in terms}
         missing = [word for word in words
                    if _loose(word) not in loose_sentence
-                   and _stem(word) not in licensed_present]
+                   and _loose(word) not in licensed_present]
         if words and len(missing) / len(words) >= coverage["threshold"]:
             add("relation_coverage",
                 "question terms absent from the sentence: " + ", ".join(missing))
+    rare = gate_policy().get("rare_term_absent")
+    weighted = gate_policy().get("weighted_coverage")
+    if rare or weighted:
+        # Rarity replaces the hand-written generic-word list: a rare question term the sentence
+        # lacks says it is about something else; the weighted share of absent terms says how much.
+        topic = {_loose(word) for word in _tokens(title)}
+        terms = [word for word in q_tokens
+                 if word.casefold() not in _STOP | _SUPERLATIVES
+                 and not word.isdigit() and _loose(word) not in topic]
+        loose_sentence = {_loose(word) for word in sentence_tokens}
+        present_licensed = {term for terms_ in licensed_groups.values()
+                            if terms_ & sentence_stems for term in terms_}
+        absent = [word for word in terms if _loose(word) not in loose_sentence
+                  and _loose(word) not in present_licensed]
+        if rare and rare["threshold"] is not None:
+            rare_absent = [w for w in absent if word_weight(w) >= rare["threshold"]]
+            if rare_absent:
+                add("rare_term_absent", "rare question term absent from the sentence: "
+                    + ", ".join(rare_absent))
+        if weighted and weighted["threshold"] is not None and terms:
+            total_weight = sum(word_weight(w) for w in terms)
+            if total_weight and sum(word_weight(w) for w in absent) / total_weight >= weighted["threshold"]:
+                add("weighted_coverage", "question terms, weighted by rarity, absent from the sentence: "
+                    + ", ".join(absent))
     return found, len(overlap)
 
 

@@ -104,10 +104,9 @@ def _no_chunks() -> dict:
 
 @lru_cache(maxsize=None)
 def _family(family: str) -> IntentRules:
-    from crms_pattern_memory import PatternMemory
+    from crms_pattern_defaults import open_memory
     language = seeded_resources()[0]
-    memory = PatternMemory(":memory:")
-    memory.seed()
+    memory = open_memory()
     rules = memory.intents(family)
     memory.close()
     return IntentRules(language, rules)
