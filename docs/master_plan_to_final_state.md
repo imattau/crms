@@ -115,6 +115,7 @@ procedures; portable SQLite model; 533 regression experiments.
 | Pattern layer exists only as a prototype | Matcher, relation specs, spec verifier, and SQL store live in a session scratchpad, not the repository or the packaged model | Phase 11 Stage A |
 | Coverage is low and supervision is manual | Phase 11 Stage A: about 74% of oracle questions return no candidate; specs, judgments, and calibration were done by one author in one session; the feedback ledger is empty | Phase 12 automated teacher loop and coverage program |
 | Independent evaluation still open | No externally authored suite and no human raters for Phases 9–11 | Phase 12 independent evaluation |
+| Not a shippable release | Learned rules reach the chat only for one question family; the first-run user sees about 49% wrong among answers on a fresh blind set; pattern tables are not in the packaged model | Phase 13 release candidate |
 
 ---
 
@@ -1239,6 +1240,82 @@ the pattern tables. The independent result is the main finding: the largest gap 
 question types the specs do not cover, not pattern precision.
 
 
+### Phase 13 — Release candidate: a pre-trained CRMS a user can run at once (weeks 180–220)
+
+**Goal:** turn the Phase 11–12 machinery into a shippable, pre-trained CRMS. A user
+installs one package, asks ordinary questions, and gets correct, cited answers or a
+typed refusal, with no teacher, no network, and no setup. This follows the project
+owner's direction (2026-10-22) that all pattern, teacher, and generation work exists
+to produce a pre-trained model, as an LLM is pre-trained before use. Detail:
+`docs/design_phase13_release_candidate.md`.
+
+**Starting point (Phase 12, model-validated).** On a fresh 240-question blind set
+the gated chat answers 19 correct, 18 wrong, 203 abstain: 49% of the answers shown
+are wrong, and only about 8% of answerable questions are answered. The teacher loop
+adds about one accepted span spec per round; why, how, list, and yes/no questions
+are not answerable by span patterns at all. These are the numbers Phase 13 moves.
+
+**Principles.**
+1. **Safe by default before broad.** Wrong answers cost three times a correct one
+   (the reward rule); a first-run user must see an honest refusal before a wrong
+   quote. Coverage never buys a higher wrong share.
+2. **Only what the chat route calls counts.** Learned rules, gate policy, and
+   composed answers are measured through the shipped chat, not only a harness.
+3. **A blind set is single use.** Every gate step gets a fresh LLM-authored set from
+   unseen passages; a set that informed a change becomes tuning data and is retired.
+   Development uses the training set, the oracle samples, and the Phase 12 loop data.
+4. **The verifier decides; proposers are replaceable.** Hand-written, induced, and
+   teacher-proposed rules pass the same deterministic gate.
+5. **Everything ships as data.** Pattern tables, intents, gate policy, verbs, and
+   parameters live in the packaged model with versioning and one-step rollback.
+
+**Workstreams.**
+- **A. First-run answer quality.** Characterise the wrong answers that pass the gate,
+  using development data only. Add answer-bearing sentence selection (rank retrieved
+  sentences by question-term coverage and answer type, prefer the entity's own page
+  over a different page) and a stricter answerability test (does this sentence state
+  what was asked). Keep the deviation dimensions and policy in SQL. Measure once on a
+  fresh blind set.
+- **B. Spec induction from labelled examples.** Generalise rules from the
+  (question, sentence, answer) triples by finding the shared pattern across examples,
+  with the LLM teacher used only for cases induction cannot cover. Every candidate
+  passes the existing verifier with the full oracle bank. Sources of triples: the
+  infobox oracle and fresh LLM-authored sets. Publish the scaling curve (accepted
+  specs against dev coverage and wrong share).
+- **C. Composed answers for why, how, list, and define.** A separate route, used only
+  when the gate says the evidence supports it: take the top retrieved sentences,
+  compress each to its answering clause, and compose with a citation per clause using
+  the Phase 10 generation layer and the Phase 12 intake with conflict handling. It
+  abstains with a typed reason when the evidence is thin.
+- **D. Packaging and first run.** Move the pattern tables, intents, gate policy,
+  learned verbs, and parameters into the Phase 8 model schema with a migration; clean-
+  room install check; one-step rollback; a first-run smoke test (install, ask ten fixed
+  questions, check answers and refusals).
+- **E. Evaluation discipline.** Budget fresh blind sets per gate step, keep the judge
+  sessions separate from the proposer, report correct, wrong, abstain, and coverage
+  separately, and label every result model-validated.
+- **F. Housekeeping.** Resolve the `exam-fixes` branch (merge or drop), remove finished
+  worktrees, prune superseded docs.
+
+**Gate (provisional until measured against the Phase 12 baseline).**
+- **First-run safety:** on a fresh independent set over two corpora, wrong share of
+  answered ≤10% (stretch ≤5%); unanswerable questions answered ≤5%; no more than 5% of
+  currently correct answers lost.
+- **Coverage:** answerable questions answered correctly at least double the Phase 12
+  figure on the same kind of set, with the target frozen from that baseline.
+- **Throughput:** at least 20 specs accepted per induction round with the dev wrong
+  share not rising; scaling curve published.
+- **Composed answers:** why, how, list, and define questions answered correctly at
+  least 30% of the time with wrong share ≤10%, every clause citing a source span.
+- **Packaging:** a clean-room install from the release artifact with no LLM, network,
+  or original files runs the smoke test; every table reloads from SQL; rollback to the
+  previous model version is one operation.
+- **Regression:** full sharded suite with no new failures; the regex footprint ratchet
+  passes.
+
+**Status (2026-10-22): planned; not started.** Phase 12 work continues in parallel
+until its independent-evaluation items are closed.
+
 ---
 
 ## 7. Corpus strategy in detail
@@ -1316,6 +1393,9 @@ counts and rates; never collapse into one "score".
 | Coverage bought with wrong answers | Spec count rises while the wrong share of answered rises | Reward rule gate, oracle wrong share must not rise, per-spec utility counts and contest |
 | Spec explosion | Thousands of overlapping specs, shadowing, slow matching | Verifier bank non-regression, consolidation and retirement, matching budget, per-spec utility accounting |
 | LLM author and judges share a model family | Shared blind spots and self-preference inflate scores | Fresh contexts without code, separate author and judge sessions, oracle cross-check, report as model-validated, publish disagreement |
+| Safety gate hides a low ceiling | The gate cuts wrong answers by refusing more, so coverage stays near 8% | Phase 13 sets a coverage floor alongside the safety gate; improvement must come from selection and induction, not only refusal |
+| Induced specs overfit or shadow | Many induced rules fit the training sentences and misfire elsewhere | Same verifier, full oracle bank, measured precision gate, fresh blind set per step |
+| Composed answers reintroduce fluent errors | Compression or composition states something the sources do not | Per-clause cited span, Phase 10 critic checks, abstain on thin evidence |
 | Scope creep | New feature without a gate | Reject; the 533-experiment habit is the main delivery risk |
 
 **Kill criteria are part of the plan.** A lane that misses its gate twice is
@@ -1420,7 +1500,11 @@ redesigned or dropped.
    footprint ratchet, real conversation learning, and packaging. — planned
    (`docs/design_phase12_coverage_and_supervision.md`); the independent author and
    raters are LLM sessions.
-20. **Consolidate plan docs** — this file is canonical; link the others as
+20. **Phase 13 release candidate: a pre-trained CRMS** — first-run answer quality,
+   spec induction from labelled examples, composed answers for why/how/list/define,
+   packaging with clean-room install and rollback, evaluation discipline. — planned
+   (`docs/design_phase13_release_candidate.md`).
+21. **Consolidate plan docs** — this file is canonical; link the others as
    history. — canonical status recorded; remaining docs still need pruning.
 
 ---
@@ -1480,3 +1564,4 @@ corpus size, it has not advanced the goal.
 | 2026-10-22 | Phase 12 planned: coverage and supervised learning at scale, generation first (independent evaluation, automated teacher loop and coverage program, index-based generation with conflict handling, gated retrofit lane with footprint ratchet, real conversation learning, packaging); rationale recorded against a wholesale regex retrofit; not started | `docs/design_phase12_coverage_and_supervision.md`, `docs/master_plan_to_final_state.md` |
 | 2026-10-22 | Phase 12 started with LLM sessions as independent author and judges (project owner's decision): 320-question independent set frozen; chat scores 55 correct / 44 wrong / 221 abstain (gate not met); judge/judge kappa 0.99, judge/oracle 0.85–0.86; conflict reporting with sources; failure-cause grouping; page-subject resolution (bracket mode on, pronoun mode off after a blind-sample check); teacher loop, retrofit families, and packaging not done | `crms_independent_eval.py`, `crms_failure_causes.py`, `run_phase12_independent.py`, `run_phase12_eval.py`, `run_phase12_causes.py`, `corpus/phase12_eval/`, `experiments/reports/phase12_*.json` |
 | 2026-10-22 | Phase 12: abstention gate with named deviation dimensions and SQL policy (`pat_gate_policy`); independent set wrong share 44% → 36%, unanswerable answered 14 → 6, but 4 of 55 correct lost net (target ≤5% missed); route-first `agent` family on by default (oracle samples +153 / +126 correct, wrong 51 → 39 / 40 → 37); full sharded regression clean | `crms_nl_gate.py`, `crms_pattern_memory.py`, `crms_pattern_seed.json`, `crms_chat.py`, `run_phase12_gate.py`, `experiments/v1_584_*`, `experiments/v1_585_*`, `experiments/reports/phase12_gate.json` |
+| 2026-10-22 | Phase 13 planned: release candidate, a pre-trained CRMS a user can run at once (first-run answer quality, spec induction, composed answers for why/how/list/define, packaging with clean-room install and rollback); built on Phase 12 results (blind set: 19 correct / 18 wrong / 203 abstain after the gate; teacher loop about one accepted spec per round); not started | `docs/design_phase13_release_candidate.md`, `docs/master_plan_to_final_state.md` |
