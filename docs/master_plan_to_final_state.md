@@ -1110,6 +1110,17 @@ with no code or prior output, separate author and judge sessions, deterministic
 oracle labels as a cross-check, and every report is marked model-validated, never
 human-validated. A human-rated slice remains an optional upgrade, not a gate.
 
+**Release target (project owner, 2026-10-22).** Phases 11 and 12 exist to produce a
+**pre-trained CRMS**: a packaged model an end user installs and uses at once, as an LLM
+is pre-trained before use. Offline LLM sessions supervise the training; the user's own
+conversations may refine it afterwards. This sets the order of work. Learned rules
+count only when (1) the chat route calls them (today the relation layer runs only in
+the evaluation harness), (2) they ship in the packaged model with one-step rollback,
+and (3) a first-run user is safe by default: the quote fallback currently answers
+44% wrong on the independent set and answers unanswerable questions, so an
+abstention gate on that fallback is a release blocker, ahead of more coverage.
+Acceptance is the blind independent set plus a clean-room install.
+
 **Results so far (2026-10-22, model-validated).**
 
 | Measure | Result |
@@ -1198,8 +1209,32 @@ claim-review flow; fixed by deferring to the old route when it has a candidate);
 final sharded run shows no new failures other than the new test, since fixed. The
 default is therefore `agent`. Other families (when, where, role holder) are untried.
 
-Not done: the automated teacher loop, the neighbour-retrieval and tense/quantifier
-work, any new retrofit family beyond Phase 11, conversation learning, and packaging
+**Teacher loop (built 2026-10-22).** `crms_teacher_loop.py` and `run_phase12_loop.py`
+run measure, brief, propose, verify, accept, remeasure rounds; the teacher is an LLM
+session, and the deterministic spec verifier decides. Training questions are a
+separate LLM-authored 400-question set (`corpus/phase12_eval/train_set.json`), so the
+independent set stays blind. Results over rounds 1 to 3 (dev split of 191 questions,
+relation layer alone): 1 → 4 correct, 0 wrong; 3 of 19 proposals accepted. Round 4
+(three teachers in parallel, 10 proposals) accepted 3 specs, but the dev split went
+from 3 correct / 0 wrong to 4 / 1, so the keep rule rolled the round back and retired
+them; 7 were rejected for regressions on the oracle bank, low precision, or a
+failed held-out example. Findings:
+(1) the verifier's random-sentence fire-rate check wrongly flags definition and
+counting specs, so a measured-precision gate on labelled training questions replaces
+it for them (a rule change made after seeing rejections); (2) a 110-question control
+bank missed a spec (`when_born_dated`) that added 9 wrong answers on the oracle sample;
+the bank is now the full 1,050-question oracle sample; (3) corpus-induced verbs
+(`crms_lexicon_growth.py`, kept only in groups that leave the oracle bank unchanged)
+added 32 verbs with no measured effect yet. On the independent set, with the three
+early learned specs, relation-layer correct rose 1 → 3 (1 wrong) and combined correct
+55 → 56; the wrong share stayed 44% because the quote fallback is untouched. Two
+specs (`define_copula_predicate`, `where_event_in_place`) are in the seed;
+`when_born_dated` is retired. Yield is about one accepted spec per round per
+teacher, so reaching useful coverage needs far more throughput than this; a
+scaling curve is still to be published.
+
+Not done: the neighbour-retrieval and tense/quantifier
+work, spec induction from labelled triples, a mechanism for why/how/yes-no questions, any new retrofit family beyond Phase 11, conversation learning, and packaging
 the pattern tables. The independent result is the main finding: the largest gap is
 question types the specs do not cover, not pattern precision.
 

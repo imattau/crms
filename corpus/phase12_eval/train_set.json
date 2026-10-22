@@ -1,0 +1,4002 @@
+[
+ {
+  "corpus": "A",
+  "title": "Tijani Babangida",
+  "question": "Which Dutch player's style was Tijani Babangida's pace compared to?",
+  "answerable": true,
+  "gold": "Marc Overmars",
+  "support": "Known for his pace, his playing style was sometimes compared to that of Marc Overmars.",
+  "type": "who",
+  "id": "TA001"
+ },
+ {
+  "corpus": "A",
+  "title": "Tijani Babangida",
+  "question": "Which club did Tijani Babangida first sign for as a professional?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "where",
+  "id": "TA002"
+ },
+ {
+  "corpus": "A",
+  "title": "Australian soccer league system",
+  "question": "Does the Australian women's football system also have one national league at the top with state leagues below?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "The women's football league system works similar to the men's, with one national league (the A-League Women) at the top and many state and territory leagues below.",
+  "type": "yesno",
+  "id": "TA003"
+ },
+ {
+  "corpus": "A",
+  "title": "Australian soccer league system",
+  "question": "What was the NSL in Australian football?",
+  "answerable": true,
+  "gold": "National Soccer League, the national league from 1977 to 2004",
+  "support": "From 1977 until 2004, the national league was called the National Soccer League (NSL).",
+  "type": "define",
+  "id": "TA004"
+ },
+ {
+  "corpus": "A",
+  "title": "Limón y Sal",
+  "question": "Which Mexican singer-songwriter released the album Limón y Sal?",
+  "answerable": true,
+  "gold": "Julieta Venegas",
+  "support": "Limón y Sal (\"Lemon and Salt\") is the fourth studio album released by Mexican singer-songwriter Julieta Venegas.",
+  "type": "who",
+  "id": "TA005"
+ },
+ {
+  "corpus": "A",
+  "title": "Limón y Sal",
+  "question": "What does the title Limón y Sal mean in English?",
+  "answerable": true,
+  "gold": "Lemon and Salt",
+  "support": "Limón y Sal (\"Lemon and Salt\") is the fourth studio album released by Mexican singer-songwriter Julieta Venegas.",
+  "type": "define",
+  "id": "TA006"
+ },
+ {
+  "corpus": "A",
+  "title": "Limón y Sal",
+  "question": "In which year did Julieta Venegas put out Limón y Sal?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "when",
+  "id": "TA007"
+ },
+ {
+  "corpus": "A",
+  "title": "List of suicide crisis lines",
+  "question": "What is a suicide crisis line?",
+  "answerable": true,
+  "gold": "a free telephone service",
+  "support": "A suicide crisis line (sometimes called a crisis hotline) is a free telephone service.",
+  "type": "define",
+  "id": "TA008"
+ },
+ {
+  "corpus": "A",
+  "title": "List of suicide crisis lines",
+  "question": "When someone phones a suicide crisis line, what does the counselor do?",
+  "answerable": true,
+  "gold": "listens, offers support, and keeps the conversation private",
+  "support": "The counselor listens, offers support, and keeps the conversation private.",
+  "type": "how",
+  "id": "TA009"
+ },
+ {
+  "corpus": "A",
+  "title": "List of suicide crisis lines",
+  "question": "Who typically operates a suicide crisis line?",
+  "answerable": true,
+  "gold": "a government or a charity",
+  "support": "A government or a charity often runs the service.",
+  "type": "who",
+  "id": "TA010"
+ },
+ {
+  "corpus": "A",
+  "title": "R179 (New York City Subway car)",
+  "question": "Which older NYC subway car types did the R179 replace?",
+  "answerable": true,
+  "gold": "R32s and R42s",
+  "support": "The cars replaced all remaining R32s and R42s.",
+  "type": "list",
+  "id": "TA011"
+ },
+ {
+  "corpus": "A",
+  "title": "R179 (New York City Subway car)",
+  "question": "How does the R179 resemble the R160 and R143 cars?",
+  "answerable": true,
+  "gold": "similar to them, but runs on the A, C, J and Z lines",
+  "support": "The R179 is similar to the R160 and R143 but it runs on the A, C, J and Z lines.",
+  "type": "compare",
+  "id": "TA012"
+ },
+ {
+  "corpus": "A",
+  "title": "R179 (New York City Subway car)",
+  "question": "What was the total price paid for the R179 order?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count",
+  "id": "TA013"
+ },
+ {
+  "corpus": "A",
+  "title": "Copper(II) chloride",
+  "question": "What is copper(II) chloride?",
+  "answerable": true,
+  "gold": "a chemical compound, also known as cupric chloride",
+  "support": "Copper(II) chloride, also known as cupric chloride, is a chemical compound.",
+  "type": "define",
+  "id": "TA014"
+ },
+ {
+  "corpus": "A",
+  "title": "Copper(II) chloride",
+  "question": "What colour is anhydrous copper(II) chloride?",
+  "answerable": true,
+  "gold": "light brown",
+  "support": "Copper(II) chloride is light brown when anhydrous.",
+  "type": "how",
+  "id": "TA015"
+ },
+ {
+  "corpus": "A",
+  "title": "Copper(II) chloride",
+  "question": "What colour is hydrated copper(II) chloride, as opposed to the anhydrous form?",
+  "answerable": true,
+  "gold": "green",
+  "support": "It is green when hydrated.",
+  "type": "compare",
+  "id": "TA016"
+ },
+ {
+  "corpus": "A",
+  "title": "Copper(II) chloride",
+  "question": "What is the melting point of copper(II) chloride?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "define",
+  "id": "TA017"
+ },
+ {
+  "corpus": "A",
+  "title": "Hart Crane",
+  "question": "In which Ohio town was the poet Hart Crane born?",
+  "answerable": true,
+  "gold": "Garrettsville",
+  "support": "Crane was born in Garrettsville, Ohio, in 1899.",
+  "type": "where",
+  "id": "TA018"
+ },
+ {
+  "corpus": "A",
+  "title": "Hart Crane",
+  "question": "Why did Hart Crane miss so much school as a boy?",
+  "answerable": true,
+  "gold": "his mother often took him out of school for travel",
+  "support": "His mother often took him out of school for travel.",
+  "type": "why",
+  "id": "TA019"
+ },
+ {
+  "corpus": "A",
+  "title": "Empress Jitō",
+  "question": "Which number emperor of Japan, in the traditional order, was Empress Jitō?",
+  "answerable": true,
+  "gold": "41st",
+  "support": "was the 41st Emperor of Japan, according to the traditional order of succession.",
+  "type": "count",
+  "id": "TA020"
+ },
+ {
+  "corpus": "A",
+  "title": "Empress Jitō",
+  "question": "Among the eight women who have been empress in Japan's history, where does Jitō fall in order?",
+  "answerable": true,
+  "gold": "third",
+  "support": "In the history of Japan, Jitō was the third of eight women to be empress.",
+  "type": "count",
+  "id": "TA021"
+ },
+ {
+  "corpus": "A",
+  "title": "11 (Bryan Adams album)",
+  "question": "The Bryan Adams album 11 is which numbered studio album of his?",
+  "answerable": true,
+  "gold": "eleventh",
+  "support": "11 is the eleventh studio album by the Canadian rock artist Bryan Adams.",
+  "type": "count",
+  "id": "TA022"
+ },
+ {
+  "corpus": "A",
+  "title": "11 (Bryan Adams album)",
+  "question": "What singles came from Bryan Adams's album 11?",
+  "answerable": true,
+  "gold": "\"I Thought I'd Seen Everything\", \"Tonight We Have the Stars\" and \"She's Got a Way\"",
+  "support": "Three singles have been released from the album: \"I Thought I'd Seen Everything\", \"Tonight We Have the Stars\" and \"She's Got a Way\".",
+  "type": "list",
+  "id": "TA023"
+ },
+ {
+  "corpus": "A",
+  "title": "11 (Bryan Adams album)",
+  "question": "Who designed the cover artwork for Bryan Adams's album 11?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who",
+  "id": "TA024"
+ },
+ {
+  "corpus": "A",
+  "title": "2019 Uruguayan general election",
+  "question": "Why was Tabaré Vázquez not able to run again in Uruguay's 2019 election?",
+  "answerable": true,
+  "gold": "term limits",
+  "support": "Incumbent president Tabaré Vázquez was unable to run for re-election because of term limits.",
+  "type": "why",
+  "id": "TA025"
+ },
+ {
+  "corpus": "A",
+  "title": "2019 Uruguayan general election",
+  "question": "How many seats did the Broad Front win in Uruguay's 2019 parliamentary vote?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count",
+  "id": "TA026"
+ },
+ {
+  "corpus": "A",
+  "title": "2019 Uruguayan general election",
+  "question": "How did Uruguay's 2019 security referendum turn out?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "how",
+  "id": "TA027"
+ },
+ {
+  "corpus": "A",
+  "title": "List of urban legends",
+  "question": "In lists of urban legends, who is the Hookman?",
+  "answerable": true,
+  "gold": "a killer with a hook for a hand",
+  "support": "The Hookman is a killer with a hook for a hand.",
+  "type": "define",
+  "id": "TA028"
+ },
+ {
+  "corpus": "A",
+  "title": "List of urban legends",
+  "question": "How does the urban legend of the Killer in the Backseat usually get interrupted?",
+  "answerable": true,
+  "gold": "another driver warns the victim by flashing headlights",
+  "support": "Another driver warns the victim by flashing headlights.",
+  "type": "how",
+  "id": "TA029"
+ },
+ {
+  "corpus": "A",
+  "title": "List of urban legends",
+  "question": "How are Slender Man's looks described in the list of urban legends?",
+  "answerable": true,
+  "gold": "a tall, faceless figure in a suit",
+  "support": "Slender Man is a tall, faceless figure in a suit.",
+  "type": "define",
+  "id": "TA030"
+ },
+ {
+  "corpus": "A",
+  "title": "Teddy Blueger",
+  "question": "For how many years did Blueger play at Minnesota State?",
+  "answerable": true,
+  "gold": "four",
+  "support": "Before playing in the NHL, Blueger played four years with the Minnesota State Mavericks of the Western Collegiate Hockey Association (WCHA).",
+  "type": "count",
+  "id": "TA031"
+ },
+ {
+  "corpus": "A",
+  "title": "Teddy Blueger",
+  "question": "In which country did Teddy Blueger play junior hockey before college?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "where",
+  "id": "TA032"
+ },
+ {
+  "corpus": "A",
+  "title": "Teddy Blueger",
+  "question": "Is Teddy Blueger a Latvian ice hockey centre?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "Teodors Bļugers (born 15 August 1994) is a Latvian professional ice hockey centre.",
+  "type": "yesno",
+  "id": "TA033"
+ },
+ {
+  "corpus": "A",
+  "title": "Powa Technologies",
+  "question": "What was PowaTag?",
+  "answerable": true,
+  "gold": "the company's flagship mobile application",
+  "support": "The company’s flagship product was the mobile application PowaTag.",
+  "type": "define",
+  "id": "TA034"
+ },
+ {
+  "corpus": "A",
+  "title": "Powa Technologies",
+  "question": "Why did Powa Technologies end up being placed in administration?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "why",
+  "id": "TA035"
+ },
+ {
+  "corpus": "A",
+  "title": "Powa Technologies",
+  "question": "How did the PowaTag app technically work?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "how",
+  "id": "TA036"
+ },
+ {
+  "corpus": "A",
+  "title": "Bluff City, Kansas",
+  "question": "What was the population of Bluff City, Kansas in 2020?",
+  "answerable": true,
+  "gold": "45",
+  "support": "In 2020, 45 people lived there.",
+  "type": "count",
+  "id": "TA037"
+ },
+ {
+  "corpus": "A",
+  "title": "Bluff City, Kansas",
+  "question": "Why is Bluff City, Kansas called that?",
+  "answerable": true,
+  "gold": "it was named after Bluff Creek",
+  "support": "The city was named after Bluff Creek, which goes near it.",
+  "type": "why",
+  "id": "TA038"
+ },
+ {
+  "corpus": "A",
+  "title": "Bluff City, Kansas",
+  "question": "What climate type does Bluff City, Kansas have under the Köppen system?",
+  "answerable": true,
+  "gold": "humid subtropical (Cfa)",
+  "support": "According to the Köppen Climate Classification system, Bluff City has a humid subtropical climate, abbreviated \"Cfa\" on climate maps.",
+  "type": "how",
+  "id": "TA039"
+ },
+ {
+  "corpus": "A",
+  "title": "Mission San Luis Obispo de Tolosa",
+  "question": "Where on the California coast is Mission San Luis Obispo de Tolosa?",
+  "answerable": true,
+  "gold": "halfway between San Diego and Monterey",
+  "support": "It is on the central coast of California, halfway between San Diego and Monterey.",
+  "type": "where",
+  "id": "TA040"
+ },
+ {
+  "corpus": "A",
+  "title": "Mission San Luis Obispo de Tolosa",
+  "question": "What sets Mission San Luis Obispo apart from the other California missions?",
+  "answerable": true,
+  "gold": "it is one of the smallest and has a unique design",
+  "support": "Mission San Luis Obispo is different from all the other' missions' because it is one of the smallest and has a unique design.",
+  "type": "compare",
+  "id": "TA041"
+ },
+ {
+  "corpus": "A",
+  "title": "Mission San Luis Obispo de Tolosa",
+  "question": "Mission San Luis Obispo de Tolosa was which of California's twenty-one missions?",
+  "answerable": true,
+  "gold": "fifth",
+  "support": "It was the fifth of twenty-one missions in California.",
+  "type": "count",
+  "id": "TA042"
+ },
+ {
+  "corpus": "A",
+  "title": "Fabio Ingolitsch",
+  "question": "At what age did Fabio Ingolitsch stop playing?",
+  "answerable": true,
+  "gold": "25",
+  "support": "At the age of 25 he ended his career as player.",
+  "type": "count",
+  "id": "TA043"
+ },
+ {
+  "corpus": "A",
+  "title": "Fabio Ingolitsch",
+  "question": "Why did Fabio Ingolitsch leave Liefering for Red Bull Salzburg?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "why",
+  "id": "TA044"
+ },
+ {
+  "corpus": "A",
+  "title": "World Painted Blood",
+  "question": "What makes World Painted Blood the last Slayer album with certain members?",
+  "answerable": true,
+  "gold": "it is Slayer's last album with drummer Dave Lombardo and guitarist Jeff Hanneman",
+  "support": "It is Slayer's last album to feature drummer Dave Lombardo who was fired and guitarist Jeff Hanneman who died of liver failure, both in 2013.",
+  "type": "why",
+  "id": "TA045"
+ },
+ {
+  "corpus": "A",
+  "title": "World Painted Blood",
+  "question": "How high did World Painted Blood place on the Billboard 200?",
+  "answerable": true,
+  "gold": "number 12",
+  "support": "The album peaked at #12 on the Billboard 200, #18 on the Digital Albums, #2 on the Top Hard Rock Albums, #4 on the Top Rock Albums, and at #1 on the Top Tastemaker Albums charts.",
+  "type": "how",
+  "id": "TA046"
+ },
+ {
+  "corpus": "A",
+  "title": "World Painted Blood",
+  "question": "Why was drummer Dave Lombardo fired from Slayer?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "why",
+  "id": "TA047"
+ },
+ {
+  "corpus": "A",
+  "title": "Insular Italy",
+  "question": "What is Insular Italy?",
+  "answerable": true,
+  "gold": "one of five official statistical regions of Italy",
+  "support": ") is one of the five official statistical regions of Italy used by the National Institute of Statistics (ISTAT), a NUTS1 level region.",
+  "type": "define",
+  "id": "TA048"
+ },
+ {
+  "corpus": "A",
+  "title": "Insular Italy",
+  "question": "Which islands make up Insular Italy?",
+  "answerable": true,
+  "gold": "Sicily and Sardinia",
+  "support": "Insular Italy is defined only for statistical and for some elections and includes the two main Italian islands: Sicily and Sardinia, together with other small islands and archipelagos next to them.",
+  "type": "list",
+  "id": "TA049"
+ },
+ {
+  "corpus": "A",
+  "title": "Insular Italy",
+  "question": "Which is larger, Sicily or Sardinia?",
+  "answerable": true,
+  "gold": "Sicily",
+  "support": "Sicily is the largest Mediterranean island with an area of",
+  "type": "compare",
+  "id": "TA050"
+ },
+ {
+  "corpus": "A",
+  "title": "Stripped",
+  "question": "What was \"Xtina\" in the context of Stripped?",
+  "answerable": true,
+  "gold": "a new identity Aguilera created",
+  "support": "She also changed her image, creating a new identity called “Xtina.” The album includes pop and R&B songs, with influences from soul, rock, hip hop, and Latin music.",
+  "type": "define",
+  "id": "TA051"
+ },
+ {
+  "corpus": "A",
+  "title": "Stripped",
+  "question": "Did Stripped receive entirely positive reviews?",
+  "answerable": true,
+  "gold": "No, mixed reviews",
+  "support": "Stripped got mixed reviews.",
+  "type": "yesno",
+  "id": "TA052"
+ },
+ {
+  "corpus": "A",
+  "title": "Stripped",
+  "question": "What month was Stripped first released?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "when",
+  "id": "TA053"
+ },
+ {
+  "corpus": "A",
+  "title": "Edgardo Angara",
+  "question": "How old was Edgardo Angara when he died?",
+  "answerable": true,
+  "gold": "83",
+  "support": "Angara died on May 13, 2018 in Tagaytay, Philippines of a heart attack at the age of 83.",
+  "type": "count",
+  "id": "TA054"
+ },
+ {
+  "corpus": "A",
+  "title": "Edgardo Angara",
+  "question": "In what place did Edgardo Angara die?",
+  "answerable": true,
+  "gold": "Tagaytay, Philippines",
+  "support": "Angara died on May 13, 2018 in Tagaytay, Philippines of a heart attack at the age of 83.",
+  "type": "where",
+  "id": "TA055"
+ },
+ {
+  "corpus": "A",
+  "title": "Naracoorte Caves National Park",
+  "question": "Why was the Naracoorte area made a national park?",
+  "answerable": true,
+  "gold": "its extraordinarily extensive fossil finds",
+  "support": "1994, the area was declared a national park because of its extraordinarily extensive fossil finds and classified together with Riversleigh in Queensland as a UNESCO World Heritage Site.",
+  "type": "why",
+  "id": "TA056"
+ },
+ {
+  "corpus": "A",
+  "title": "Naracoorte Caves National Park",
+  "question": "How many people visit Naracoorte Caves each year?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count",
+  "id": "TA057"
+ },
+ {
+  "corpus": "A",
+  "title": "Naracoorte Caves National Park",
+  "question": "Who first discovered the fossils in the Naracoorte Caves?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who",
+  "id": "TA058"
+ },
+ {
+  "corpus": "A",
+  "title": "John Sall",
+  "question": "In which Illinois city was John Sall born?",
+  "answerable": true,
+  "gold": "Rockford",
+  "support": "John Sall was born in Rockford, Illinois in 1948, and was interested in science as a child.",
+  "type": "where",
+  "id": "TA059"
+ },
+ {
+  "corpus": "A",
+  "title": "John Sall",
+  "question": "What statistical software did John Sall create?",
+  "answerable": true,
+  "gold": "JMP",
+  "support": "Sall (born 1948) is an American billionaire and software programmer who co-founded SAS Institute and created JMP statistical software.",
+  "type": "define",
+  "id": "TA060"
+ },
+ {
+  "corpus": "A",
+  "title": "Anders Holm",
+  "question": "In which city was comedian Anders Holm born?",
+  "answerable": true,
+  "gold": "Evanston, Illinois",
+  "support": "Holm was born the youngest of three boys on May 29, 1981, in Evanston, Illinois, His brothers are Olen (born 1975) and Erik (born 1976).",
+  "type": "where",
+  "id": "TA061"
+ },
+ {
+  "corpus": "A",
+  "title": "Anders Holm",
+  "question": "Anders Holm was the youngest of how many boys?",
+  "answerable": true,
+  "gold": "three",
+  "support": "Holm was born the youngest of three boys on May 29, 1981, in Evanston, Illinois, His brothers are Olen (born 1975) and Erik (born 1976).",
+  "type": "count",
+  "id": "TA062"
+ },
+ {
+  "corpus": "A",
+  "title": "Thermoregulation",
+  "question": "What is thermoregulation?",
+  "answerable": true,
+  "gold": "an organism's ability to control its body temperature within certain limits",
+  "support": "Thermoregulation is the ability of an organism to control its body temperature within certain limits, even when the surrounding temperature is different.",
+  "type": "define",
+  "id": "TA063"
+ },
+ {
+  "corpus": "A",
+  "title": "Thermoregulation",
+  "question": "What is the term for the ability of warm-blooded animals to keep their body temperature high?",
+  "answerable": true,
+  "gold": "endothermy",
+  "support": "This ability is called endothermy.",
+  "type": "define",
+  "id": "TA064"
+ },
+ {
+  "corpus": "A",
+  "title": "Thermoregulation",
+  "question": "Why does shivering or running around warm up an animal?",
+  "answerable": true,
+  "gold": "all movement creates heat from the chemical reactions of respiration",
+  "support": "This is because all movement by animals creates heat from the chemical reactions of respiration.",
+  "type": "why",
+  "id": "TA065"
+ },
+ {
+  "corpus": "A",
+  "title": "Thermoregulation",
+  "question": "Are all mammals and birds endotherms?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "All mammals and birds are endotherms (homeotherms or homoiotherms).",
+  "type": "yesno",
+  "id": "TA066"
+ },
+ {
+  "corpus": "A",
+  "title": "The Nose (opera)",
+  "question": "What happens to the main character in the story of the opera The Nose?",
+  "answerable": true,
+  "gold": "he wakes up to find his nose has gone",
+  "support": "It is about a man who wakes up one day to find his nose has gone.",
+  "type": "how",
+  "id": "TA067"
+ },
+ {
+  "corpus": "A",
+  "title": "The Nose (opera)",
+  "question": "Which other operas did Dmitri Shostakovich compose besides The Nose?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "list",
+  "id": "TA068"
+ },
+ {
+  "corpus": "A",
+  "title": "Aleš Hemský",
+  "question": "For how many NHL seasons did Aleš Hemský play?",
+  "answerable": true,
+  "gold": "15",
+  "support": "He played parts of 15 seasons in the National Hockey League (NHL).",
+  "type": "count",
+  "id": "TA069"
+ },
+ {
+  "corpus": "A",
+  "title": "Aleš Hemský",
+  "question": "Which NHL clubs did Aleš Hemský play for?",
+  "answerable": true,
+  "gold": "Edmonton Oilers, Ottawa Senators, Dallas Stars, and Montreal Canadiens",
+  "support": "He played for the Edmonton Oilers, Ottawa Senators, Dallas Stars, and Montreal Canadiens.",
+  "type": "list",
+  "id": "TA070"
+ },
+ {
+  "corpus": "A",
+  "title": "Aleš Hemský",
+  "question": "How many goals did Hemský score in his rookie QMJHL season?",
+  "answerable": true,
+  "gold": "36",
+  "support": "This came after he finished his rookie season, scoring 36 goals and recording 100 points which led all rookies in the league.",
+  "type": "count",
+  "id": "TA071"
+ },
+ {
+  "corpus": "A",
+  "title": "Izhevsk",
+  "question": "Why was Izhevsk named Ustinov between 1984 and 1987?",
+  "answerable": true,
+  "gold": "in honour of Defense Minister Dmitry Ustinov",
+  "support": "From 1984 to 1987, the city's name was Ustinov (in honour of the Minister of Defense of the USSR and the Marshal of the Soviet Union, Dmitry Ustinov).",
+  "type": "why",
+  "id": "TA072"
+ },
+ {
+  "corpus": "A",
+  "title": "Izhevsk",
+  "question": "Was Izhevsk once known as Ustinov?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "From 1984 to 1987, the city's name was Ustinov (in honour of the Minister of Defense of the USSR and the Marshal of the Soviet Union, Dmitry Ustinov).",
+  "type": "yesno",
+  "id": "TA073"
+ },
+ {
+  "corpus": "A",
+  "title": "Izhevsk",
+  "question": "What is the dominant kind of industry in Izhevsk?",
+  "answerable": true,
+  "gold": "military industry",
+  "support": "Military industry is the most popular type of economy in Izhevsk.",
+  "type": "how",
+  "id": "TA074"
+ },
+ {
+  "corpus": "A",
+  "title": "Makoto Hasebe",
+  "question": "Where was footballer Makoto Hasebe born?",
+  "answerable": true,
+  "gold": "Fujieda",
+  "support": "Hasebe was born in Fujieda on January 18, 1984.",
+  "type": "where",
+  "id": "TA075"
+ },
+ {
+  "corpus": "A",
+  "title": "Makoto Hasebe",
+  "question": "Which Asian title did Hasebe win in 2007?",
+  "answerable": true,
+  "gold": "the AFC Champions League",
+  "support": "He won the first Asian title of the 2007 AFC Champions League.",
+  "type": "how",
+  "id": "TA076"
+ },
+ {
+  "corpus": "A",
+  "title": "Catholic Church and the Independent State of Croatia",
+  "question": "Who was Archbishop of Zagreb when the Church sponsored the Ustaše?",
+  "answerable": true,
+  "gold": "Alojzije Stepinac",
+  "support": "Alojzije Cardinal Stepinac, then the Archbishop of Zagreb was crucial in the Church's decision to sponsor the Ustaše due to his perception that the Ustaše was the",
+  "type": "who",
+  "id": "TA077"
+ },
+ {
+  "corpus": "A",
+  "title": "Catholic Church and the Independent State of Croatia",
+  "question": "Whom did Pope Pius XII send as his representative to the NDH?",
+  "answerable": true,
+  "gold": "Giuseppe Ramiro Marcone",
+  "support": "It was followed by Pope Pius XII's posting of Giuseppe Ramiro Marcone (1882–1952) as his rep to the NDH, despite Pope Pius XII's clear knowledge of the ongoing genocides of Croatian Jews, Roma and Serbs.",
+  "type": "who",
+  "id": "TA078"
+ },
+ {
+  "corpus": "A",
+  "title": "Catholic Church and the Independent State of Croatia",
+  "question": "Why did many Serbs convert to Catholicism in the Independent State of Croatia?",
+  "answerable": true,
+  "gold": "to avoid immediate death",
+  "support": "To avoid immediate death, many Serbs were forced to convert to Catholicism, while Jews who converted were still killed as the Ustaše regime followed the Nazi racial policies on seeking to wipe out Jews as a race rather than",
+  "type": "why",
+  "id": "TA079"
+ },
+ {
+  "corpus": "A",
+  "title": "List of Canadian artists",
+  "question": "What kinds of artists does the List of Canadian artists include?",
+  "answerable": true,
+  "gold": "artists working in visual or plastic media",
+  "support": "The following is a list of Canadian artists working in visual or plastic media (including 20th-century artists working in video art, performance art, or other types of new media).",
+  "type": "define",
+  "id": "TA080"
+ },
+ {
+  "corpus": "A",
+  "title": "List of Canadian artists",
+  "question": "What year was the painter Robert Bateman born, per the list of Canadian artists?",
+  "answerable": true,
+  "gold": "1930",
+  "support": "Robert Bateman (born 1930), painter, naturalist",
+  "type": "when",
+  "id": "TA081"
+ },
+ {
+  "corpus": "A",
+  "title": "Seether",
+  "question": "In which South African city was the band Seether formed?",
+  "answerable": true,
+  "gold": "Pretoria",
+  "support": "Seether is a South African rock band formed in Pretoria in 1999.",
+  "type": "where",
+  "id": "TA082"
+ },
+ {
+  "corpus": "A",
+  "title": "Seether",
+  "question": "Has Seether been described as post-grunge?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "Seether has been described as post-grunge, alternative metal, hard rock, and alternative rock.",
+  "type": "yesno",
+  "id": "TA083"
+ },
+ {
+  "corpus": "A",
+  "title": "Seether",
+  "question": "What does the name Seether mean?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "define",
+  "id": "TA084"
+ },
+ {
+  "corpus": "A",
+  "title": "Smoothbore",
+  "question": "What is a smoothbore weapon?",
+  "answerable": true,
+  "gold": "a weapon with a barrel without rifling",
+  "support": "A smoothbore weapon is one that has a barrel without rifling.",
+  "type": "define",
+  "id": "TA085"
+ },
+ {
+  "corpus": "A",
+  "title": "Smoothbore",
+  "question": "What basic parts make up a gun?",
+  "answerable": true,
+  "gold": "a barrel, a charge and a projectile",
+  "support": "The basic parts that make up a gun are a barrel, a charge and a projectile.",
+  "type": "list",
+  "id": "TA086"
+ },
+ {
+  "corpus": "A",
+  "title": "Smoothbore",
+  "question": "What were the earliest guns made from?",
+  "answerable": true,
+  "gold": "bamboo",
+  "support": "The earliest guns were made of bamboo, later replaced with metal barrels.",
+  "type": "how",
+  "id": "TA087"
+ },
+ {
+  "corpus": "A",
+  "title": "Rocky Romero",
+  "question": "What ring name does John Raymond Rivera wrestle under?",
+  "answerable": true,
+  "gold": "Rocky Romero",
+  "support": "He currently wrestles for New Japan Pro-Wrestling (NJPW) and All Elite Wrestling (AEW) under the ring name Rocky Romero.",
+  "type": "who",
+  "id": "TA088"
+ },
+ {
+  "corpus": "A",
+  "title": "Rocky Romero",
+  "question": "How many times has Rocky Romero held the CMLL World Super Lightweight title?",
+  "answerable": true,
+  "gold": "three",
+  "support": "In CMLL, he was a three-time CMLL World Super Lightweight Champion, one-time NWA World Historic Welterweight Champion, the co-winner of the Copa Bicentenario with Místico.",
+  "type": "count",
+  "id": "TA089"
+ },
+ {
+  "corpus": "A",
+  "title": "Rocky Romero",
+  "question": "How many times has Rocky Romero won the IWGP Junior Heavyweight Tag Team Championship?",
+  "answerable": true,
+  "gold": "eight",
+  "support": "In NJPW, he is a one-time IWGP Junior Heavyweight Champion, eight-time IWGP Junior Heavyweight Tag Team Champion, the winner of the Best of the American Super Juniors tournament in 2008, and the co-winner of the Super Jr.",
+  "type": "count",
+  "id": "TA090"
+ },
+ {
+  "corpus": "A",
+  "title": "Shanghai International Circuit",
+  "question": "What did the Shanghai International Circuit cost?",
+  "answerable": true,
+  "gold": "about $450 million (USD)",
+  "support": "The circuit costing about $450 million (USD).",
+  "type": "count",
+  "id": "TA091"
+ },
+ {
+  "corpus": "A",
+  "title": "Shanghai International Circuit",
+  "question": "How long did it take to turn the swampland into the Shanghai race track?",
+  "answerable": true,
+  "gold": "18 months",
+  "support": "The site was transformed from swampland to an international racetrack in 18 months.",
+  "type": "how",
+  "id": "TA092"
+ },
+ {
+  "corpus": "A",
+  "title": "Shanghai International Circuit",
+  "question": "How many people worked around the clock to build the Shanghai circuit?",
+  "answerable": true,
+  "gold": "3000",
+  "support": "A team of 3000 worked around the clock to finish the construction.",
+  "type": "count",
+  "id": "TA093"
+ },
+ {
+  "corpus": "A",
+  "title": "Italian Mogadiscio",
+  "question": "What does Mogadiscio refer to?",
+  "answerable": true,
+  "gold": "the name of Mogadishu under Italian rule, 1905 to 1947",
+  "support": "Mogadiscio was the name of Mogadishu, capital of Somalia, when it was under Italy's rule from 1905 until 1947.",
+  "type": "define",
+  "id": "TA094"
+ },
+ {
+  "corpus": "A",
+  "title": "Italian Mogadiscio",
+  "question": "Who owned the Italian company that leased Mogadishu in 1885?",
+  "answerable": true,
+  "gold": "Vincenzo Filonardi",
+  "support": "In 1885, Ali bin Said leased the city to an Italian chartered company owned by Vincenzo Filonardi.",
+  "type": "who",
+  "id": "TA095"
+ },
+ {
+  "corpus": "A",
+  "title": "List of JoJo's Bizarre Adventure characters",
+  "question": "Who wrote the manga Jojo's Bizarre Adventure?",
+  "answerable": true,
+  "gold": "Hirohiko Araki",
+  "support": "Here is a list of characters from the manga series Jojo's Bizarre Adventure by Hirohiko Araki.",
+  "type": "who",
+  "id": "TA096"
+ },
+ {
+  "corpus": "A",
+  "title": "List of JoJo's Bizarre Adventure characters",
+  "question": "What birthmark marks most members of the Joestar family?",
+  "answerable": true,
+  "gold": "a star-shaped birthmark above the left shoulder blade",
+  "support": "The Joestar Family is a family with English roots with a majority of its members bearing a star-shaped birthmark above their left shoulder blade.",
+  "type": "define",
+  "id": "TA097"
+ },
+ {
+  "corpus": "A",
+  "title": "Gary Neville",
+  "question": "Did Gary Neville ever win the UEFA Champions League with Manchester United?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "yesno",
+  "id": "TA098"
+ },
+ {
+  "corpus": "A",
+  "title": "Gary Neville",
+  "question": "Did Gary Neville ever win the UEFA Champions League with Manchester United?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "yesno",
+  "id": "TA099"
+ },
+ {
+  "corpus": "A",
+  "title": "Amon Amarth (band)",
+  "question": "From which Swedish area does Amon Amarth come?",
+  "answerable": true,
+  "gold": "Tumba, an outer quarter of Stockholm",
+  "support": "Amon Amarth is a melodic death metal band from Tumba, an outer quarter of Stockholm, Sweden.",
+  "type": "where",
+  "id": "TA100"
+ },
+ {
+  "corpus": "A",
+  "title": "Amon Amarth (band)",
+  "question": "What are Amon Amarth's lyrics mostly about?",
+  "answerable": true,
+  "gold": "viking battles and viking gods",
+  "support": "Their lyrics are mostly about viking battles and viking gods, but they do not want to be called a \"Viking Metal band\".",
+  "type": "how",
+  "id": "TA101"
+ },
+ {
+  "corpus": "A",
+  "title": "Saffir–Simpson scale",
+  "question": "What is the Saffir–Simpson scale used for?",
+  "answerable": true,
+  "gold": "sorting tropical cyclones (hurricanes) in the Western Hemisphere",
+  "support": "The Saffir–Simpson Hurricane Wind Scale is a scale that is used to sort tropical cyclones in the Western Hemisphere.",
+  "type": "define",
+  "id": "TA102"
+ },
+ {
+  "corpus": "A",
+  "title": "Saffir–Simpson scale",
+  "question": "Does the Saffir–Simpson scale measure rainfall or storm surge?",
+  "answerable": true,
+  "gold": "No",
+  "support": "It does not measure rainfall or storm surge or how wide the storm is.",
+  "type": "yesno",
+  "id": "TA103"
+ },
+ {
+  "corpus": "A",
+  "title": "Saffir–Simpson scale",
+  "question": "Why are Saffir–Simpson classifications used?",
+  "answerable": true,
+  "gold": "to predict the possible wind damage a hurricane will create at landfall",
+  "support": "The classifications are used mainly to predict the possible wind damage a hurricane will create when it makes landfall.",
+  "type": "why",
+  "id": "TA104"
+ },
+ {
+  "corpus": "A",
+  "title": "Symphony No. 5 (Shostakovich)",
+  "question": "Who conducted the first performance of Shostakovich's Symphony No. 5?",
+  "answerable": true,
+  "gold": "Yevgeny Mravinsky",
+  "support": "It was first played in Leningrad by the Leningrad Philharmonic in 1937, conducted by Yevgeny Mravinsky.",
+  "type": "who",
+  "id": "TA105"
+ },
+ {
+  "corpus": "A",
+  "title": "Symphony No. 5 (Shostakovich)",
+  "question": "In which city was Shostakovich's Symphony No. 5 first played?",
+  "answerable": true,
+  "gold": "Leningrad",
+  "support": "It was first played in Leningrad by the Leningrad Philharmonic in 1937, conducted by Yevgeny Mravinsky.",
+  "type": "where",
+  "id": "TA106"
+ },
+ {
+  "corpus": "A",
+  "title": "Symphony No. 5 (Shostakovich)",
+  "question": "How long was the standing ovation at the premiere of Shostakovich's Fifth Symphony?",
+  "answerable": true,
+  "gold": "more than 30 minutes",
+  "support": "This concert went very well, and the listeners liked it so much that they gave a standing ovation for more than 30 minutes.",
+  "type": "count",
+  "id": "TA107"
+ },
+ {
+  "corpus": "A",
+  "title": "1710",
+  "question": "Who led the settlers who founded New Bern in 1710?",
+  "answerable": true,
+  "gold": "Christoph von Graffenried",
+  "support": "June – Swiss and Palatine German Protestants under the leadership of Christoph von Graffenried travel to Bath County in the Province of Carolina.",
+  "type": "who",
+  "id": "TA108"
+ },
+ {
+  "corpus": "A",
+  "title": "1710",
+  "question": "Why was New Bern given that name?",
+  "answerable": true,
+  "gold": "after von Graffenried's hometown of Berne, Switzerland",
+  "support": "The settlers displace the native town of Chattoka and found New Bern, named for von Graffenried's hometown of Berne, Switzerland.",
+  "type": "why",
+  "id": "TA109"
+ },
+ {
+  "corpus": "A",
+  "title": "Michael Hurst",
+  "question": "Which character on Hercules and Xena is Michael Hurst best known for playing?",
+  "answerable": true,
+  "gold": "Iolaus",
+  "support": "He is probably best known for playing Iolaus in the television programs Hercules: The Legendary Journeys and Xena: Warrior Princess.",
+  "type": "who",
+  "id": "TA110"
+ },
+ {
+  "corpus": "A",
+  "title": "Michael Hurst",
+  "question": "Where did Michael Hurst's family move when he was seven?",
+  "answerable": true,
+  "gold": "Christchurch, New Zealand",
+  "support": "When he was seven his family moved to Christchurch, New Zealand.",
+  "type": "where",
+  "id": "TA111"
+ },
+ {
+  "corpus": "A",
+  "title": "Alcatel",
+  "question": "Which company is Alcatel Mobile a subsidiary of?",
+  "answerable": true,
+  "gold": "TCL Communication Technology Holdings Limited",
+  "support": "Alcatel Mobile, also known as Alcatel, is a French mobile phone brand that is a subsidiary of TCL Communication Technology Holdings Limited.",
+  "type": "who",
+  "id": "TA112"
+ },
+ {
+  "corpus": "A",
+  "title": "Alcatel",
+  "question": "What did the Alcatel joint venture let TCL do?",
+  "answerable": true,
+  "gold": "tap into Alcatel-Lucent's telecommunications expertise",
+  "support": "This joint venture allowed TCL Corporation to tap into Alcatel-Lucent's expertise in telecommunications while leveraging its own manufacturing capabilities.",
+  "type": "why",
+  "id": "TA113"
+ },
+ {
+  "corpus": "A",
+  "title": "Alcatel",
+  "question": "Was Alcatel Mobile ever owned by Nokia?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "yesno",
+  "id": "TA114"
+ },
+ {
+  "corpus": "A",
+  "title": "6 (New York City Subway service)",
+  "question": "How is express service of the New York 6 line marked?",
+  "answerable": true,
+  "gold": "with a diamond-shaped bullet",
+  "support": "Local service is shown by a (6) in a circular bullet, and express service is shown by a in a diamond-shaped bullet.",
+  "type": "how",
+  "id": "TA115"
+ },
+ {
+  "corpus": "A",
+  "title": "Long and short scales",
+  "question": "How do the long and short scales differ in their basis?",
+  "answerable": true,
+  "gold": "long scale uses powers of one million, short uses powers of one thousand",
+  "support": "The long scale is based on powers of one million (1,000,000), whereas the short scale is based on powers of one thousand (1,000).",
+  "type": "compare",
+  "id": "TA116"
+ },
+ {
+  "corpus": "A",
+  "title": "Long and short scales",
+  "question": "Do the long and short scales agree for numbers below a thousand million?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "For whole numbers less than a thousand million ( 9 ), the two scales are the same.",
+  "type": "yesno",
+  "id": "TA117"
+ },
+ {
+  "corpus": "A",
+  "title": "Long and short scales",
+  "question": "What does a short-scale trillion equal?",
+  "answerable": true,
+  "gold": "a thousand billion",
+  "support": "\"trillion\" (10 12 ) means a thousand billion,",
+  "type": "how",
+  "id": "TA118"
+ },
+ {
+  "corpus": "A",
+  "title": "February 18",
+  "question": "In what year was the Duke of Clarence executed in the Tower of London?",
+  "answerable": true,
+  "gold": "1478",
+  "support": "1478 – George Plantagenet, 1st Duke of Clarence is executed in the Tower of London after being convicted of treason against his older brother, King Edward IV of England.",
+  "type": "when",
+  "id": "TA119"
+ },
+ {
+  "corpus": "A",
+  "title": "February 18",
+  "question": "Who beat the Livonian Brothers of the Sword at Rakvere in 1268?",
+  "answerable": true,
+  "gold": "Dovmont of Pskov",
+  "support": "1268 – The Livonian Brothers of the Sword are defeated by Dovmont of Pskov in the Battle of Rakvere.",
+  "type": "who",
+  "id": "TA120"
+ },
+ {
+  "corpus": "A",
+  "title": "February 18",
+  "question": "When was Surakarta founded?",
+  "answerable": true,
+  "gold": "1745",
+  "support": "1745 – Surakarta, Central Java, is founded.",
+  "type": "when",
+  "id": "TA121"
+ },
+ {
+  "corpus": "A",
+  "title": "List of British Rail modern traction locomotive classes",
+  "question": "Since what year does the list of British Rail modern traction classes cover mainline stock?",
+  "answerable": true,
+  "gold": "1948",
+  "support": "This page lists every locomotive allocated a TOPS classification and all modern traction (e.g. diesel, electric, gas turbine, petrol) stock used on the mainline network since 1948 (i.e.",
+  "type": "when",
+  "id": "TA122"
+ },
+ {
+  "corpus": "A",
+  "title": "List of British Rail modern traction locomotive classes",
+  "question": "What do the letters in TOPS stand for in the British Rail classification system?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "define",
+  "id": "TA123"
+ },
+ {
+  "corpus": "A",
+  "title": "Heusenstamm",
+  "question": "In which German state is Heusenstamm?",
+  "answerable": true,
+  "gold": "Hesse",
+  "support": "Heusenstamm is a city in the Offenbach Rural District in the state of Hesse, Germany.",
+  "type": "where",
+  "id": "TA124"
+ },
+ {
+  "corpus": "A",
+  "title": "Heusenstamm",
+  "question": "Why is the soil around Heusenstamm mostly sandy and poor?",
+  "answerable": true,
+  "gold": "the region was once under a shallow sea and rose again leaving sandy soil",
+  "support": "Then the region rose again and the water left, leaving soil which is mostly sandy and poor.",
+  "type": "why",
+  "id": "TA125"
+ },
+ {
+  "corpus": "A",
+  "title": "Heusenstamm",
+  "question": "Does Heusenstamm have hills?",
+  "answerable": true,
+  "gold": "No",
+  "support": "It is a plain area with no hills.",
+  "type": "yesno",
+  "id": "TA126"
+ },
+ {
+  "corpus": "A",
+  "title": "Redange",
+  "question": "Which river is the town of Redange on?",
+  "answerable": true,
+  "gold": "Attert",
+  "support": "Redange is in the valley on the Attert river, a tributary of the Alzette.",
+  "type": "where",
+  "id": "TA127"
+ },
+ {
+  "corpus": "A",
+  "title": "Redange",
+  "question": "How many persons lived in the commune of Redange in 2017?",
+  "answerable": true,
+  "gold": "2,795",
+  "support": "There were 2,795 persons living in the commune in 2017, for a population density of",
+  "type": "count",
+  "id": "TA128"
+ },
+ {
+  "corpus": "A",
+  "title": "Redange",
+  "question": "Which communes surround Redange?",
+  "answerable": true,
+  "gold": "Rambrouch, Préizerdaul, Useldange, Beckerich and Ell",
+  "support": "Redange is surrounded by five communes of Luxembourg, all of them part of the Redange cantonː Rambrouch, Préizerdaul, Useldange, Beckerich and Ell.",
+  "type": "list",
+  "id": "TA129"
+ },
+ {
+  "corpus": "A",
+  "title": "Oy, pri luzhku",
+  "question": "What sort of song is \"Oy, pri luzhku\"?",
+  "answerable": true,
+  "gold": "a Russian and Ukrainian Cossack folk song",
+  "support": ") — a Russian and Ukrainian Cossack folk song.",
+  "type": "define",
+  "id": "TA130"
+ },
+ {
+  "corpus": "A",
+  "title": "Oy, pri luzhku",
+  "question": "At what events is \"On the meadow\" often sung?",
+  "answerable": true,
+  "gold": "weddings",
+  "support": "It is often sung during the weddings and sometimes is called as a \"wedding song\".",
+  "type": "when",
+  "id": "TA131"
+ },
+ {
+  "corpus": "A",
+  "title": "Moselle (department)",
+  "question": "In which region of France is the Moselle department?",
+  "answerable": true,
+  "gold": "Grand Est",
+  "support": "Moselle is a department in the Grand Est region of France, named after the Moselle river.",
+  "type": "where",
+  "id": "TA132"
+ },
+ {
+  "corpus": "A",
+  "title": "Moselle (department)",
+  "question": "Why was the original Moselle department eliminated in 1871?",
+  "answerable": true,
+  "gold": "part of its territory became part of Germany",
+  "support": "The Moselle department was eliminated in 1871 when part of the territory became part of Germany; the remaining parts were combined with the Meurthe department to form Meurthe-et-Moselle.",
+  "type": "why",
+  "id": "TA133"
+ },
+ {
+  "corpus": "A",
+  "title": "Moselle (department)",
+  "question": "How many districts was Moselle first divided into?",
+  "answerable": true,
+  "gold": "nine",
+  "support": "It was divided in nine districts: Metz, Bitche, Boulay, Briey, Longwy, Morhange, Sarreguemines, Sarrelouis and Thionville, with Metz as is capital.",
+  "type": "count",
+  "id": "TA134"
+ },
+ {
+  "corpus": "A",
+  "title": "English literature",
+  "question": "What does the term English literature mean?",
+  "answerable": true,
+  "gold": "literature written in the English language",
+  "support": "The term English literature means literature written in the English language.",
+  "type": "define",
+  "id": "TA135"
+ },
+ {
+  "corpus": "A",
+  "title": "English literature",
+  "question": "With which epic poem did English literature begin?",
+  "answerable": true,
+  "gold": "Beowulf",
+  "support": "English literature began in Old English with the epic poem Beowulf, which dates from sometime between the 8th to the 11th centuries.",
+  "type": "who",
+  "id": "TA136"
+ },
+ {
+  "corpus": "A",
+  "title": "English literature",
+  "question": "How is the poem Beowulf written in terms of sound devices?",
+  "answerable": true,
+  "gold": "with alliteration and no rhymes",
+  "support": "The poem is written with no rhymes but with alliteration.",
+  "type": "how",
+  "id": "TA137"
+ },
+ {
+  "corpus": "A",
+  "title": "Seth Jones",
+  "question": "How many times has Seth Jones been named an All-Star?",
+  "answerable": true,
+  "gold": "five",
+  "support": "He is also a five-time All-Star, being named one in 2017, 2018, 2019, 2020, and 2023.",
+  "type": "count",
+  "id": "TA138"
+ },
+ {
+  "corpus": "A",
+  "title": "Seth Jones",
+  "question": "Which NHL team does Seth Jones play for?",
+  "answerable": true,
+  "gold": "Florida Panthers",
+  "support": "He currently plays for the Florida Panthers of the National Hockey League (NHL).",
+  "type": "who",
+  "id": "TA139"
+ },
+ {
+  "corpus": "A",
+  "title": "Seth Jones",
+  "question": "In which year did Seth Jones win the Stanley Cup?",
+  "answerable": true,
+  "gold": "2025",
+  "support": "Jones is a one-time Stanely Cup champion, winning with the Panthers in 2025.",
+  "type": "when",
+  "id": "TA140"
+ },
+ {
+  "corpus": "A",
+  "title": "Samudragupta's subjugation of the Kushan Empire",
+  "question": "Which empire subjugated the Kushans under Samudragupta?",
+  "answerable": true,
+  "gold": "the Gupta Empire",
+  "support": "Then in the mid-4th century they were subjugated by the Gupta Empire under Samudragupta.",
+  "type": "who",
+  "id": "TA141"
+ },
+ {
+  "corpus": "A",
+  "title": "Samudragupta's subjugation of the Kushan Empire",
+  "question": "Where were the \"Little Kushans\" based?",
+  "answerable": true,
+  "gold": "the Punjab",
+  "support": "The Kushan Empire continued as a remnant known as the \"Little Kushans\", based in the Punjab.",
+  "type": "where",
+  "id": "TA142"
+ },
+ {
+  "corpus": "A",
+  "title": "Samudragupta's subjugation of the Kushan Empire",
+  "question": "When was the Kushan remnant subjugated by the Guptas?",
+  "answerable": true,
+  "gold": "mid-4th century",
+  "support": "Then in the mid-4th century they were subjugated by the Gupta Empire under Samudragupta.",
+  "type": "when",
+  "id": "TA143"
+ },
+ {
+  "corpus": "A",
+  "title": "Thomas Voeckler",
+  "question": "When was cyclist Thomas Voeckler born?",
+  "answerable": true,
+  "gold": "22 June 1979",
+  "support": "Thomas Voeckler (born 22 June 1979) is a French professional road racing cyclist.",
+  "type": "when",
+  "id": "TA144"
+ },
+ {
+  "corpus": "A",
+  "title": "Thomas Voeckler",
+  "question": "What does Thomas Voeckler's nickname le Chouchou mean?",
+  "answerable": true,
+  "gold": "Sweetheart",
+  "support": "His nickname is le Chouchou which means Sweetheart.",
+  "type": "define",
+  "id": "TA145"
+ },
+ {
+  "corpus": "A",
+  "title": "Thomas Voeckler",
+  "question": "For how long did Voeckler wear the yellow jersey in 2004?",
+  "answerable": true,
+  "gold": "ten days",
+  "support": "He wore the jersey for ten days, which made him famous.",
+  "type": "how",
+  "id": "TA146"
+ },
+ {
+  "corpus": "A",
+  "title": "Boba Fett",
+  "question": "On which planet was Boba Fett born?",
+  "answerable": true,
+  "gold": "Kamino",
+  "support": "Boba was born on the planet Kamino, as a perfect genetic clone of his father, Jango.",
+  "type": "where",
+  "id": "TA147"
+ },
+ {
+  "corpus": "A",
+  "title": "Boba Fett",
+  "question": "Who hires Boba Fett in the Star Wars films?",
+  "answerable": true,
+  "gold": "Darth Vader",
+  "support": "In The Empire Strikes Back and Return of the Jedi, he is a bounty hunter hired by Darth Vader, in order to track down the Rebel Alliance.",
+  "type": "who",
+  "id": "TA148"
+ },
+ {
+  "corpus": "A",
+  "title": "Boba Fett",
+  "question": "Why did Boba Fett seek revenge against the Jedi?",
+  "answerable": true,
+  "gold": "for his father's murder",
+  "support": "After Jango is killed during the Battle of Geonosis, Boba inherits his father's armor and grew up fighting into the Clone Wars, seeking revenge against the Jedi for his father's murder.",
+  "type": "why",
+  "id": "TA149"
+ },
+ {
+  "corpus": "A",
+  "title": "Emperor Kinmei",
+  "question": "Which number emperor of Japan was Emperor Kinmei?",
+  "answerable": true,
+  "gold": "29th",
+  "support": ", also written as Kimmei, was the 29th emperor of Japan, according to the traditional order of succession.",
+  "type": "count",
+  "id": "TA150"
+ },
+ {
+  "corpus": "A",
+  "title": "Emperor Kinmei",
+  "question": "When did Emperor Kinmei's reign begin and end?",
+  "answerable": true,
+  "gold": "540 to 571",
+  "support": "His reign started in 540 and ended in 571.",
+  "type": "when",
+  "id": "TA151"
+ },
+ {
+  "corpus": "A",
+  "title": "Emperor Kinmei",
+  "question": "Who was Emperor Kinmei's father?",
+  "answerable": true,
+  "gold": "Emperor Keitai",
+  "support": "Emperor Kinmei's father was Emperor Keitai and his mother was Emperor Ninken's daughter,",
+  "type": "who",
+  "id": "TA152"
+ },
+ {
+  "corpus": "A",
+  "title": "Communes of the Charente-Maritime department",
+  "question": "How many communes are listed for the Charente-Maritime department?",
+  "answerable": true,
+  "gold": "472",
+  "support": "The following is a list of the 472 communes of the Charente-Maritime département in France.",
+  "type": "count",
+  "id": "TA153"
+ },
+ {
+  "corpus": "A",
+  "title": "Thomas P. Grazulis",
+  "question": "What project did Thomas P. Grazulis head?",
+  "answerable": true,
+  "gold": "The Tornado Project",
+  "support": "Grazulis (born August 17, 1942) is an American meteorologist who has written extensively about tornadoes and produced documentaries as head of The Tornado Project.",
+  "type": "who",
+  "id": "TA154"
+ },
+ {
+  "corpus": "A",
+  "title": "Thomas P. Grazulis",
+  "question": "When was Thomas P. Grazulis born?",
+  "answerable": true,
+  "gold": "August 17, 1942",
+  "support": "Grazulis (born August 17, 1942) is an American meteorologist who has written extensively about tornadoes and produced documentaries as head of The Tornado Project.",
+  "type": "when",
+  "id": "TA155"
+ },
+ {
+  "corpus": "A",
+  "title": "Thomas P. Grazulis",
+  "question": "How many people were killed by the 1953 Worcester tornado?",
+  "answerable": true,
+  "gold": "94",
+  "support": "Thomas Grazulis grew up in Worcester, Massachusetts and first confronted the power of a tornado at age 11 following the violent 1953 Worcester tornado, an F4 which killed 94 people and passed approximately",
+  "type": "count",
+  "id": "TA156"
+ },
+ {
+  "corpus": "A",
+  "title": "AS-202",
+  "question": "On what date was AS-202 launched?",
+  "answerable": true,
+  "gold": "August 25, 1966",
+  "support": "It was launched on August 25, 1966, and was the first flight which included the spacecraft guidance and navigation control system and fuel cells.",
+  "type": "when",
+  "id": "TA157"
+ },
+ {
+  "corpus": "A",
+  "title": "AS-202",
+  "question": "How was the AS-202 flight designed to go beyond AS-201?",
+  "answerable": true,
+  "gold": "higher launch and twice as long a flight",
+  "support": "It was designed to test the rocket more than had been done on AS-201 by launching the rocket higher and having the flight lasting twice as long.",
+  "type": "compare",
+  "id": "TA158"
+ },
+ {
+  "corpus": "A",
+  "title": "AS-202",
+  "question": "How many times was the AS-202 engine meant to fire?",
+  "answerable": true,
+  "gold": "four",
+  "support": "It would also test the command and service module (CSM-011) by having the engine fire four times during the flight.",
+  "type": "count",
+  "id": "TA159"
+ },
+ {
+  "corpus": "A",
+  "title": "Literature in Interlingua",
+  "question": "In which year were the first Interlingua learning books published?",
+  "answerable": true,
+  "gold": "1954",
+  "support": "The first works written in Interlingua were books for learning the language, such as the Interlingua-English Dictionary and A Brief Grammar of Interlingua for Readers, both published in 1954.",
+  "type": "when",
+  "id": "TA160"
+ },
+ {
+  "corpus": "A",
+  "title": "Literature in Interlingua",
+  "question": "Which books were the first works written in Interlingua?",
+  "answerable": true,
+  "gold": "the Interlingua-English Dictionary and A Brief Grammar of Interlingua for Readers",
+  "support": "The first works written in Interlingua were books for learning the language, such as the Interlingua-English Dictionary and A Brief Grammar of Interlingua for Readers, both published in 1954.",
+  "type": "list",
+  "id": "TA161"
+ },
+ {
+  "corpus": "A",
+  "title": "Nancy Pelosi Taiwan visit",
+  "question": "Besides Taiwan, which countries did Pelosi visit on her Asia tour?",
+  "answerable": true,
+  "gold": "Singapore, Malaysia, South Korea and Japan",
+  "support": "She also visited Singapore, Malaysia, South Korea and Japan.",
+  "type": "list",
+  "id": "TA162"
+ },
+ {
+  "corpus": "A",
+  "title": "Nancy Pelosi Taiwan visit",
+  "question": "Who travelled with Nancy Pelosi in her delegation to Taiwan?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who",
+  "id": "TA163"
+ },
+ {
+  "corpus": "A",
+  "title": "Nancy Pelosi Taiwan visit",
+  "question": "How did China's military respond to Pelosi's visit to Taiwan?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "how",
+  "id": "TA164"
+ },
+ {
+  "corpus": "A",
+  "title": "Ladislaus Hunyadi",
+  "question": "In what year was Ladislaus Hunyadi born?",
+  "answerable": true,
+  "gold": "1431",
+  "support": "László Hunyadi (Slovak: Ladislav Huňady) was born in 1431, he was the eldest son of John Hunyadi, regent of Hungary and Elizabeth Szilágyi, he was the older brother of Matthias Corvinus, he grew up in Hunedoara; receiving a humanist education and military training, preparing him for leadership against the Ottoman Empire.300x300px",
+  "type": "when",
+  "id": "TA165"
+ },
+ {
+  "corpus": "A",
+  "title": "Ladislaus Hunyadi",
+  "question": "Who was Ladislaus Hunyadi's younger brother?",
+  "answerable": true,
+  "gold": "Matthias Corvinus",
+  "support": "László Hunyadi (Slovak: Ladislav Huňady) was born in 1431, he was the eldest son of John Hunyadi, regent of Hungary and Elizabeth Szilágyi, he was the older brother of Matthias Corvinus, he grew up in Hunedoara; receiving a humanist education and military training, preparing him for leadership against the Ottoman Empire.300x300px",
+  "type": "who",
+  "id": "TA166"
+ },
+ {
+  "corpus": "A",
+  "title": "Ural Batyr",
+  "question": "What is Ural Batyr?",
+  "answerable": true,
+  "gold": "a Bashkir folk epic poem",
+  "support": "Ural batyr) is a Bashkir folk epic poem.",
+  "type": "define",
+  "id": "TA167"
+ },
+ {
+  "corpus": "A",
+  "title": "Ural Batyr",
+  "question": "How many poetic and prose lines does the Ural Batyr epic contain?",
+  "answerable": true,
+  "gold": "4,576 poetic and 19 prose lines",
+  "support": "The epic poetry contains of 4,576 poetic and 19 prose lines.",
+  "type": "count",
+  "id": "TA168"
+ },
+ {
+  "corpus": "A",
+  "title": "List of current champions in WWE",
+  "question": "Which group owns WWE?",
+  "answerable": true,
+  "gold": "TKO Group Holdings",
+  "support": "It is owned by TKO Group Holdings.",
+  "type": "who",
+  "id": "TA169"
+ },
+ {
+  "corpus": "A",
+  "title": "List of current champions in WWE",
+  "question": "Who ran WWE as chairman and CEO from 1982 to 2024?",
+  "answerable": true,
+  "gold": "Vince K. McMahon",
+  "support": "McMahon ran the company as the chairman and CEO from 1982 to 2024.",
+  "type": "who",
+  "id": "TA170"
+ },
+ {
+  "corpus": "A",
+  "title": "Benito Juárez",
+  "question": "How many presidential terms did Benito Juárez serve?",
+  "answerable": true,
+  "gold": "five",
+  "support": "Benito Pablo Juárez García (March 21, 1806 - July 18, 1872) was a Zapotec who served five terms (1858–1861 as interim), (1861–1865), (1865–1867), (1867–1871), and (1871–1872), as President of Mexico.",
+  "type": "count",
+  "id": "TA171"
+ },
+ {
+  "corpus": "A",
+  "title": "Benito Juárez",
+  "question": "On what date was Benito Juárez born?",
+  "answerable": true,
+  "gold": "March 21, 1806",
+  "support": "Benito Juarez was born in March 21,1806, San Pablo Guelatao Oaxaca Which is now La Sierra Juarez.",
+  "type": "when",
+  "id": "TA172"
+ },
+ {
+  "corpus": "A",
+  "title": "Benito Juárez",
+  "question": "How many brothers and sisters did Benito Juárez have?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count",
+  "id": "TA173"
+ },
+ {
+  "corpus": "A",
+  "title": "Installation art",
+  "question": "What is installation art?",
+  "answerable": true,
+  "gold": "a style of visual art that uses three-dimensional objects",
+  "support": "Installation art is a style of visual art that uses three-dimensional objects.",
+  "type": "define",
+  "id": "TA174"
+ },
+ {
+  "corpus": "A",
+  "title": "Installation art",
+  "question": "When did installation art really begin to develop?",
+  "answerable": true,
+  "gold": "the 1970s",
+  "support": "However, the real development started in the 1970s.",
+  "type": "when",
+  "id": "TA175"
+ },
+ {
+  "corpus": "A",
+  "title": "Royal Palace of Aranjuez",
+  "question": "Who built the Royal Palace of Aranjuez as a summer palace?",
+  "answerable": true,
+  "gold": "Philip II",
+  "support": "Philip II built it as a modest summer palace.",
+  "type": "who",
+  "id": "TA176"
+ },
+ {
+  "corpus": "A",
+  "title": "Royal Palace of Aranjuez",
+  "question": "In what Spanish town is the Royal Palace of Aranjuez?",
+  "answerable": true,
+  "gold": "Aranjuez, Community of Madrid",
+  "support": "It is in the town of Aranjuez, Community of Madrid, Spain.",
+  "type": "where",
+  "id": "TA177"
+ },
+ {
+  "corpus": "A",
+  "title": "Oceanic dolphin",
+  "question": "What are oceanic dolphins?",
+  "answerable": true,
+  "gold": "members of the family Delphinidae",
+  "support": "Oceanic dolphins are the members of the Delphinidae family, of the order Cetacea.",
+  "type": "define",
+  "id": "TA178"
+ },
+ {
+  "corpus": "A",
+  "title": "Oceanic dolphin",
+  "question": "Do oceanic dolphins usually live in open seas, unlike river dolphins?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "These dolphins usually live in the open seas, unlike the river dolphins.",
+  "type": "yesno",
+  "id": "TA179"
+ },
+ {
+  "corpus": "A",
+  "title": "Compo LLC",
+  "question": "In which city is Compo LLC's head office?",
+  "answerable": true,
+  "gold": "Brest, Belarus",
+  "support": "The head office is located in Brest, Belarus.",
+  "type": "where",
+  "id": "TA180"
+ },
+ {
+  "corpus": "A",
+  "title": "Compo LLC",
+  "question": "Why is the company called Compo?",
+  "answerable": true,
+  "gold": "from \"composite materials\"",
+  "support": "The name Compo comes from 2 words \"composite materials\", as the company began with production of plastic parts for the carpet and weaving industry.",
+  "type": "why",
+  "id": "TA181"
+ },
+ {
+  "corpus": "A",
+  "title": "Compo LLC",
+  "question": "What does Compo LLC currently concentrate on producing?",
+  "answerable": true,
+  "gold": "equipment for the meat and dairy industries",
+  "support": "Currently, the focus is on the production of equipment for the meat and dairy industries under the Kaizen system.",
+  "type": "how",
+  "id": "TA182"
+ },
+ {
+  "corpus": "A",
+  "title": "Briarcliff Manor, New York",
+  "question": "What is Briarcliff Manor's ZIP code?",
+  "answerable": true,
+  "gold": "10510",
+  "support": "It is shared between the towns of Mount Pleasant and Ossining, and its ZIP code is 10510.",
+  "type": "count",
+  "id": "TA183"
+ },
+ {
+  "corpus": "A",
+  "title": "Briarcliff Manor, New York",
+  "question": "Who founded the village of Briarcliff Manor?",
+  "answerable": true,
+  "gold": "Walter William Law",
+  "support": "Briarcliff Manor was founded by Walter William Law in 1902, and has grown from 331 people then to 7,867 in 2010.",
+  "type": "who",
+  "id": "TA184"
+ },
+ {
+  "corpus": "A",
+  "title": "Wright Axcess",
+  "question": "Between which years did Wrightbus make the Axcess bus bodies?",
+  "answerable": true,
+  "gold": "1995 to 2001",
+  "support": "They were made from 1995 to 2001 by Wrightbus.",
+  "type": "when",
+  "id": "TA185"
+ },
+ {
+  "corpus": "A",
+  "title": "Wright Axcess",
+  "question": "What was the Wright Axcess?",
+  "answerable": true,
+  "gold": "a series of two single-decker low-floor bus bodies",
+  "support": "The Wright Axcess was a series of two single-decker bodies of buses.",
+  "type": "define",
+  "id": "TA186"
+ },
+ {
+  "corpus": "A",
+  "title": "Wright Axcess",
+  "question": "On which Scania chassis was the Wright Axcess-Floline built?",
+  "answerable": true,
+  "gold": "Scania L94UB",
+  "support": "The Axcess-Floline was built on the Scania L94UB chassis.",
+  "type": "how",
+  "id": "TA187"
+ },
+ {
+  "corpus": "A",
+  "title": "Gulf of Mexico",
+  "question": "Why does the Gulf of Mexico have very small tides?",
+  "answerable": true,
+  "gold": "because of its narrow connection to the Atlantic Ocean",
+  "support": "Because of its narrow connection to the Atlantic Ocean, the Gulf has very small tides.",
+  "type": "why",
+  "id": "TA188"
+ },
+ {
+  "corpus": "A",
+  "title": "Gulf of Mexico",
+  "question": "Which countries surround the Gulf of Mexico?",
+  "answerable": true,
+  "gold": "the United States, Mexico, and Cuba",
+  "support": "The United States, Mexico, and Cuba are the countries around it.",
+  "type": "list",
+  "id": "TA189"
+ },
+ {
+  "corpus": "A",
+  "title": "Army of Northern Virginia",
+  "question": "Who took over the Army of Northern Virginia in June 1862?",
+  "answerable": true,
+  "gold": "General Robert E. Lee",
+  "support": "Lee, who took over in June of 1862.",
+  "type": "who",
+  "id": "TA190"
+ },
+ {
+  "corpus": "A",
+  "title": "Army of Northern Virginia",
+  "question": "Why was the Army of Northern Virginia often called \"Lee's army\"?",
+  "answerable": true,
+  "gold": "because Lee was its best-known final leader",
+  "support": "For that reason it was often called \"Lee's army\".",
+  "type": "why",
+  "id": "TA191"
+ },
+ {
+  "corpus": "A",
+  "title": "Army of Northern Virginia",
+  "question": "What was the Army of Northern Virginia in the American Civil War?",
+  "answerable": true,
+  "gold": "the main Confederate fighting force in the Eastern Theater",
+  "support": "It was the main Confederate fighting force in the Eastern Theater of the American Civil War.",
+  "type": "define",
+  "id": "TA192"
+ },
+ {
+  "corpus": "A",
+  "title": "Kasperi Kapanen",
+  "question": "When was Kasperi Kapanen born?",
+  "answerable": true,
+  "gold": "23 July 1996",
+  "support": "Samu Kasperi Kapanen (born 23 July 1996) is a Finnish professional ice hockey right winger.",
+  "type": "when",
+  "id": "TA193"
+ },
+ {
+  "corpus": "A",
+  "title": "Kasperi Kapanen",
+  "question": "Did Kasperi Kapanen play for the Toronto Maple Leafs?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "He has also played for the Toronto Maple Leafs, Pittsburgh Penguins, and St.",
+  "type": "yesno",
+  "id": "TA194"
+ },
+ {
+  "corpus": "A",
+  "title": "Yaw Preko",
+  "question": "When was the Ghanaian footballer Yaw Preko born?",
+  "answerable": true,
+  "gold": "8 September 1974",
+  "support": "Yaw Preko (born 8 September 1974) is a former Ghanaian football player.",
+  "type": "when",
+  "id": "TA195"
+ },
+ {
+  "corpus": "A",
+  "title": "President of Russia",
+  "question": "Who was the first president of Russia?",
+  "answerable": true,
+  "gold": "Boris Yeltsin",
+  "support": "Boris Yeltsin was the first president of Russia, Vladimir Putin was second and fourth, and Dmitry Medvedev was the third.",
+  "type": "who",
+  "id": "TA196"
+ },
+ {
+  "corpus": "A",
+  "title": "President of Russia",
+  "question": "What is the President of Russia, in constitutional terms?",
+  "answerable": true,
+  "gold": "the head of state and head of the executive of the central government",
+  "support": "The President of Russia is the head of state and head of the executive of the central government of Russia and the commander in chief of the Russian Armed Forces.",
+  "type": "define",
+  "id": "TA197"
+ },
+ {
+  "corpus": "A",
+  "title": "AS Val",
+  "question": "Who was the lead designer of the AS Val rifle?",
+  "answerable": true,
+  "gold": "Pyotr Serdyukov",
+  "support": "The lead designer of the rifle is Pyotr Serdyukov.",
+  "type": "who",
+  "id": "TA198"
+ },
+ {
+  "corpus": "A",
+  "title": "AS Val",
+  "question": "In which city was the AS Val developed?",
+  "answerable": true,
+  "gold": "Klimovsk",
+  "support": "The development began in the first half of the late 1980s in the Central Research Institute of Precision Engineering, in the city of Klimovsk part of the Moscow region.",
+  "type": "where",
+  "id": "TA199"
+ },
+ {
+  "corpus": "A",
+  "title": "AS Val",
+  "question": "What is the AS Val?",
+  "answerable": true,
+  "gold": "a special assault rifle designed by the Soviets with a built-in suppressor",
+  "support": "The AS also referred to as \"Val\" is a special assault rifle designed (created) by the Soviets.",
+  "type": "define",
+  "id": "TA200"
+ },
+ {
+  "corpus": "B",
+  "title": "CodeLift: Your Test Suite Is Secretly a Dense SWE Curriculum",
+  "question": "According to the CodeLift paper, has the pass-all-test binary reward become a standard recipe for training software engineering agents?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "Abstract: The pass-all-test binary reward has become a standard recipe for training software engineering agents, but its sparsity eliminates difference of partially correct patches.",
+  "type": "yesno",
+  "id": "TB001"
+ },
+ {
+  "corpus": "B",
+  "title": "CodeLift: Your Test Suite Is Secretly a Dense SWE Curriculum",
+  "question": "Who are the authors of \"CodeLift: Your Test Suite Is Secretly a Dense SWE Curriculum\"?",
+  "answerable": true,
+  "gold": "Junjielong Xu, Huachao Zhu, Alyssa Wu, Zhichao Hu, Pinjia He",
+  "support": "Authors: Junjielong Xu, Huachao Zhu, Alyssa Wu, Zhichao Hu, Pinjia He",
+  "type": "who",
+  "id": "TB002"
+ },
+ {
+  "corpus": "B",
+  "title": "On varieties defined by large sets of quadrics and their application to error-correcting codes",
+  "question": "What minimum distance does the linear code from the points of V(U) have in \"On varieties defined by large sets of quadrics and their application to error-correcting codes\"?",
+  "answerable": true,
+  "gold": "at least the code length minus k",
+  "support": "If ${\\mathbb F}$ is a finite field then the linear code generated by the matrix whose columns are the points of $V(U)$ is a $k$-dimensional linear code of length $|V(U)|$ and minimum distance at least $|V(U)|-k$.",
+  "type": "count",
+  "id": "TB003"
+ },
+ {
+  "corpus": "B",
+  "title": "On varieties defined by large sets of quadrics and their application to error-correcting codes",
+  "question": "What does MDS stand for in the quadrics and error-correcting codes paper?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "define",
+  "id": "TB004"
+ },
+ {
+  "corpus": "B",
+  "title": "On varieties defined by large sets of quadrics and their application to error-correcting codes",
+  "question": "In the paper on varieties defined by large sets of quadrics and error-correcting codes, how many points of V(U) can a hyperplane meet at most?",
+  "answerable": true,
+  "gold": "at most k",
+  "support": "We will prove that if there is a group $G$ which fixes $U$ and no line of $\\mathrm{PG}(k-1,{\\mathbb F})$ and $V(U)$ spans $\\mathrm{PG}(k-1,{\\mathbb F})$ then any hyperplane of $\\mathrm{PG}(k-1,{\\mathbb F})$ is incident with at most $k$ points of $V(U)$.",
+  "type": "count",
+  "id": "TB005"
+ },
+ {
+  "corpus": "B",
+  "title": "No Krasnoselskii number for general sets in $\\mathbb{R}^2$",
+  "question": "How long ago did Peterson pose the question tackled in \"No Krasnoselskii number for general sets in R^2\"?",
+  "answerable": true,
+  "gold": "more than 35 years ago",
+  "support": "More than 35 years ago, Peterson asked whether there exists a Krasnoselskii number for general sets in $\\mathbb{R}^d$.",
+  "type": "when",
+  "id": "TB006"
+ },
+ {
+  "corpus": "B",
+  "title": "No Krasnoselskii number for general sets in $\\mathbb{R}^2$",
+  "question": "Who proved an analogue of Krasnoselskii's theorem for visibility through polygonal paths?",
+  "answerable": true,
+  "gold": "Magazanik and Perles",
+  "support": "In addition, we consider Krasnoselskii numbers with respect to visibility through polygonal paths of length $ \\leq n$, for which an analogue of Krasnoselskii's theorem was proved by Magazanik and Perles.",
+  "type": "who",
+  "id": "TB007"
+ },
+ {
+  "corpus": "B",
+  "title": "No Krasnoselskii number for general sets in $\\mathbb{R}^2$",
+  "question": "Who showed that any Krasnoselskii number for general sets in R^2 must exceed 8?",
+  "answerable": true,
+  "gold": "Breen",
+  "support": "Excluding results for special cases of sets with strong topological restrictions, the best known result is due to Breen, who showed that if such a Krasnoselskii number in $\\mathbb{R}^2$ exists, then it is larger than $8$.",
+  "type": "who",
+  "id": "TB008"
+ },
+ {
+  "corpus": "B",
+  "title": "Acceleration and its Limits in Gaussian Variational Inference",
+  "question": "How many queries does any randomized algorithm need on the hard targets in \"Acceleration and its Limits in Gaussian Variational Inference\"?",
+  "answerable": true,
+  "gold": "kappa^(1-o(1)) queries",
+  "support": "However, when only pointwise derivatives are available, we construct a family of strongly log-concave targets for which any randomized algorithm requires $κ^{1-o(1)}$ queries to achieve a fixed objective accuracy, even when the initial objective gap is bounded independently of $κ$.",
+  "type": "count",
+  "id": "TB009"
+ },
+ {
+  "corpus": "B",
+  "title": "Acceleration and its Limits in Gaussian Variational Inference",
+  "question": "Do experiments in \"Acceleration and its Limits in Gaussian Variational Inference\" show empirical speedups from acceleration?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "Finally, experiments on real datasets show substantial empirical speedups from acceleration across a broad range of methods.",
+  "type": "yesno",
+  "id": "TB010"
+ },
+ {
+  "corpus": "B",
+  "title": "Electrodynamics of the strong-field approximation and deficiencies of the tunneling model",
+  "question": "How do oscillatory electric fields and propagating plane-wave laser fields differ, according to the paper on the strong-field approximation?",
+  "answerable": true,
+  "gold": "they are different electrodynamic phenomena whose similarities diminish as intensity increases",
+  "support": "Oscillatory electric fields and propagating plane-wave laser fields are different electrodynamic phenomena, and similarities in their effects diminish as field intensity increases.",
+  "type": "compare",
+  "id": "TB011"
+ },
+ {
+  "corpus": "B",
+  "title": "Electrodynamics of the strong-field approximation and deficiencies of the tunneling model",
+  "question": "At what frequencies do oscillatory electric fields act adiabatically?",
+  "answerable": true,
+  "gold": "very low frequencies",
+  "support": "Major differences are known in the case of very low frequencies where oscillatory electric fields act adiabatically as the frequency declines, in contrast to extreme relativistic effects of strong laser fields.",
+  "type": "when",
+  "id": "TB012"
+ },
+ {
+  "corpus": "B",
+  "title": "Learning to Steer LLM Agents and Multi-Agent Systems",
+  "question": "Who authored \"Learning to Steer LLM Agents and Multi-Agent Systems\"?",
+  "answerable": true,
+  "gold": "Leyang Shen, Yaxin Gong, Yang Zhang, Chenxiao Fan, Jiakai Wang, Dong Wang, Yang Liu, Fuli Feng, Chun Kai Ling, Tat-Seng Chua",
+  "support": "Authors: Leyang Shen, Yaxin Gong, Yang Zhang, Chenxiao Fan, Jiakai Wang, Dong Wang, Yang Liu, Fuli Feng, Chun Kai Ling, Tat-Seng Chua",
+  "type": "who",
+  "id": "TB013"
+ },
+ {
+  "corpus": "B",
+  "title": "Learning to Steer LLM Agents and Multi-Agent Systems",
+  "question": "When does the steering agent use the fast low-cost path?",
+  "answerable": true,
+  "gold": "to decide when to intervene",
+  "support": "The steering agent observes the execution context, deciding when to intervene with a low-cost fast path and how to intervene with a high-cost slow path.",
+  "type": "when",
+  "id": "TB014"
+ },
+ {
+  "corpus": "B",
+  "title": "Data Loss Detector: Automatically Revealing Data Loss Bugs in Android Apps",
+  "question": "When must an Android app handle interruptions, according to the Data Loss Detector paper?",
+  "answerable": true,
+  "gold": "even if a phone call is received or the layout is redrawn after rotation",
+  "support": "For instance, an app must work properly even if a phone call is received, or after its layout is redrawn because the smartphone has been rotated.",
+  "type": "when",
+  "id": "TB015"
+ },
+ {
+  "corpus": "B",
+  "title": "Data Loss Detector: Automatically Revealing Data Loss Bugs in Android Apps",
+  "question": "In which country were the Data Loss Detector experiments conducted?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "where",
+  "id": "TB016"
+ },
+ {
+  "corpus": "B",
+  "title": "Data Loss Detector: Automatically Revealing Data Loss Bugs in Android Apps",
+  "question": "How many Android apps were used to evaluate Data Loss Detector?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count",
+  "id": "TB017"
+ },
+ {
+  "corpus": "B",
+  "title": "Graph-Stega: Semantic Controllable Steganographic Text Generation Guided by Knowledge Graph",
+  "question": "How does Graph-Stega hide secret information?",
+  "answerable": true,
+  "gold": "by coding the path in the knowledge graph rather than conditional word probabilities",
+  "support": "On the one hand, we hide the secret information by coding the path in the knowledge graph, but not the conditional probability of each generated word; on the other hand, we can control the semantic expression of the generated steganographic text to a certain extent.",
+  "type": "how",
+  "id": "TB018"
+ },
+ {
+  "corpus": "B",
+  "title": "Graph-Stega: Semantic Controllable Steganographic Text Generation Guided by Knowledge Graph",
+  "question": "Why does the quality of steganographic text drop as embedding rate rises in the Graph-Stega paper?",
+  "answerable": true,
+  "gold": "models pick words with lower conditional probability",
+  "support": "Firstly, with the increase of embedding rate, these models will choose words with lower conditional probability, which will reduce the quality of the generated steganographic texts; secondly, they can not control the semantic expression of the final generated steganographic text.",
+  "type": "why",
+  "id": "TB019"
+ },
+ {
+  "corpus": "B",
+  "title": "Graph-Stega: Semantic Controllable Steganographic Text Generation Guided by Knowledge Graph",
+  "question": "When do steganographic models choose lower conditional probability words in the Graph-Stega paper?",
+  "answerable": true,
+  "gold": "as the embedding rate increases",
+  "support": "Firstly, with the increase of embedding rate, these models will choose words with lower conditional probability, which will reduce the quality of the generated steganographic texts; secondly, they can not control the semantic expression of the final generated steganographic text.",
+  "type": "when",
+  "id": "TB020"
+ },
+ {
+  "corpus": "B",
+  "title": "Do Agents Need a New Kind of Paper? SPRA: Structured Paper Representation for Agents",
+  "question": "Across how many AI papers is SPRA instantiated?",
+  "answerable": true,
+  "gold": "more than one million",
+  "support": "We instantiate SPRA across more than one million AI papers, with 19.95 million research units and 24.07 million internal relations.",
+  "type": "count",
+  "id": "TB021"
+ },
+ {
+  "corpus": "B",
+  "title": "Do Agents Need a New Kind of Paper? SPRA: Structured Paper Representation for Agents",
+  "question": "Who needs to connect research problems, methods, and findings across narrative articles according to the SPRA paper?",
+  "answerable": true,
+  "gold": "scientific agents",
+  "support": "Abstract: Scientific agents must connect research problems, methods, and findings dispersed through narrative articles.",
+  "type": "who",
+  "id": "TB022"
+ },
+ {
+  "corpus": "B",
+  "title": "Neural Message Passing for Multi-Label Classification",
+  "question": "What is multi-label classification in \"Neural Message Passing for Multi-Label Classification\"?",
+  "answerable": true,
+  "gold": "assigning a set of target labels to a given sample",
+  "support": "Abstract: Multi-label classification (MLC) is the task of assigning a set of target labels for a given sample.",
+  "type": "define",
+  "id": "TB023"
+ },
+ {
+  "corpus": "B",
+  "title": "Neural Message Passing for Multi-Label Classification",
+  "question": "How does LaMP compute the hidden representation of each label?",
+  "answerable": true,
+  "gold": "it treats labels as nodes on a label-interaction graph and uses attention-based neural message passing",
+  "support": "LaMP treats labels as nodes on a label-interaction graph and computes the hidden representation of each label node conditioned on the input using attention-based neural message passing.",
+  "type": "how",
+  "id": "TB024"
+ },
+ {
+  "corpus": "B",
+  "title": "Variable Neighborhood Search for the Bin Packing Problem with Compatible Categories",
+  "question": "What is the Bin Packing Problem with Compatible Categories?",
+  "answerable": true,
+  "gold": "a variant of bin packing with conflicts where items belong to conflicting or compatible categories",
+  "support": "In this work, we introduce the Bin Packing Problem with Compatible Categories (BPCC), a variant of the BPC in which items belong to conflicting or compatible categories, in opposition to the item-by-item incompatibility found in previous literature.",
+  "type": "define",
+  "id": "TB025"
+ },
+ {
+  "corpus": "B",
+  "title": "Variable Neighborhood Search for the Bin Packing Problem with Compatible Categories",
+  "question": "In what real-life setting does the Bin Packing Problem with Compatible Categories arise?",
+  "answerable": true,
+  "gold": "last mile distribution to nanostores in densely populated areas",
+  "support": "It is a common problem in the context of last mile distribution to nanostores located in densely populated areas.",
+  "type": "where",
+  "id": "TB026"
+ },
+ {
+  "corpus": "B",
+  "title": "Variable Neighborhood Search for the Bin Packing Problem with Compatible Categories",
+  "question": "Which algorithm do the authors propose for the Bin Packing Problem with Compatible Categories?",
+  "answerable": true,
+  "gold": "a Variable Neighborhood Search metaheuristic",
+  "support": "To efficiently solve real-life sized instances of the problem, we propose a Variable Neighborhood Search (VNS) metaheuristic algorithm.",
+  "type": "how",
+  "id": "TB027"
+ },
+ {
+  "corpus": "B",
+  "title": "Approximating Euclidean by Imprecise Markov Decision Processes",
+  "question": "What do finite state imprecise Markov decision processes do in \"Approximating Euclidean by Imprecise Markov Decision Processes\"?",
+  "answerable": true,
+  "gold": "approximate the behavior of infinite Euclidean models",
+  "support": "Finite state imprecise, Markov decision processes can be used to approximate the behavior of these infinite models.",
+  "type": "define",
+  "id": "TB028"
+ },
+ {
+  "corpus": "B",
+  "title": "Approximating Euclidean by Imprecise Markov Decision Processes",
+  "question": "What do the authors show about finite-horizon cost functions in \"Approximating Euclidean by Imprecise Markov Decision Processes\"?",
+  "answerable": true,
+  "gold": "the approximations become arbitrarily precise",
+  "support": "We show that for cost functions over finite time horizons the approximations become arbitrarily precise.",
+  "type": "how",
+  "id": "TB029"
+ },
+ {
+  "corpus": "B",
+  "title": "Approximating Euclidean by Imprecise Markov Decision Processes",
+  "question": "Why do the authors use imprecise MDP approximations in the Euclidean MDP paper?",
+  "answerable": true,
+  "gold": "to analyse and validate cost functions and strategies from reinforcement learning",
+  "support": "Second, we use imprecise Markov decision process approximations as a tool to analyse and validate cost functions and strategies obtained by reinforcement learning.",
+  "type": "why",
+  "id": "TB030"
+ },
+ {
+  "corpus": "B",
+  "title": "The Role of Agentic Instruction Categories for Code Generation: A Study of Five Python Libraries",
+  "question": "Does the number of instructions alone determine token usage for agent-file generation in the five Python libraries study?",
+  "answerable": true,
+  "gold": "No",
+  "support": "Results show that the number of instructions alone does not determine token usage for agent-file generation, with substantial variation across models and libraries.",
+  "type": "yesno",
+  "id": "TB031"
+ },
+ {
+  "corpus": "B",
+  "title": "The Role of Agentic Instruction Categories for Code Generation: A Study of Five Python Libraries",
+  "question": "Why did the authors choose Gemma 4 for the agentic instruction study?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "why",
+  "id": "TB032"
+ },
+ {
+  "corpus": "B",
+  "title": "On Graph Neural Networks versus Graph-Augmented MLPs",
+  "question": "Can GA-MLPs with suitable operators distinguish almost all non-isomorphic graphs?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "From the perspective of graph isomorphism testing, we show both theoretically and numerically that GA-MLPs with suitable operators can distinguish almost all non-isomorphic graphs, just like the Weifeiler-Lehman (WL) test.",
+  "type": "yesno",
+  "id": "TB033"
+ },
+ {
+  "corpus": "B",
+  "title": "On Graph Neural Networks versus Graph-Augmented MLPs",
+  "question": "How does the distinguishing power of GA-MLPs relate to the Weisfeiler-Lehman test?",
+  "answerable": true,
+  "gold": "GA-MLPs can distinguish almost all non-isomorphic graphs just like the WL test",
+  "support": "From the perspective of graph isomorphism testing, we show both theoretically and numerically that GA-MLPs with suitable operators can distinguish almost all non-isomorphic graphs, just like the Weifeiler-Lehman (WL) test.",
+  "type": "compare",
+  "id": "TB034"
+ },
+ {
+  "corpus": "B",
+  "title": "On Graph Neural Networks versus Graph-Augmented MLPs",
+  "question": "How does the training runtime of GA-MLPs compare with GNNs?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "how",
+  "id": "TB035"
+ },
+ {
+  "corpus": "B",
+  "title": "Nonexistence of Strongly Regular Graphs via Gegenbauer Positivity and SRG Counting",
+  "question": "Which parameter sets get new counting certificates for least eigenvalue -3 in the strongly regular graph nonexistence paper?",
+  "answerable": true,
+  "gold": "(351,140,73,44), (550,162,75,36), (703,182,81,35) and (1344,221,88,26)",
+  "support": "For least eigenvalue $-3$, it gives new counting certificates for $(351,140,73,44)$, $(550,162,75,36)$, $(703,182,81,35)$ and $(1344,221,88,26)$, previously excluded by Liao and Yu~\\cite[Theorem~1]{LY}, and for six additional parameter sets: \\[ \\begin{array}{@{}lll@{}} (375,102,45,21), & (405,132,63,33), & (441,88,35,13),\\\\ (476,133,60,28), & (540,147,66,30), & (575,112,45,16). \\end{array} \\] Seven certificates use Gegenbauer positivity and counting information alone at the displayed orders.",
+  "type": "list",
+  "id": "TB036"
+ },
+ {
+  "corpus": "B",
+  "title": "Nonexistence of Strongly Regular Graphs via Gegenbauer Positivity and SRG Counting",
+  "question": "Whose earlier theorem had excluded some strongly regular graph parameter sets, which the Gegenbauer positivity paper now covers with certificates?",
+  "answerable": true,
+  "gold": "Liao and Yu",
+  "support": "For least eigenvalue $-3$, it gives new counting certificates for $(351,140,73,44)$, $(550,162,75,36)$, $(703,182,81,35)$ and $(1344,221,88,26)$, previously excluded by Liao and Yu~\\cite[Theorem~1]{LY}, and for six additional parameter sets: \\[ \\begin{array}{@{}lll@{}} (375,102,45,21), & (405,132,63,33), & (441,88,35,13),\\\\ (476,133,60,28), & (540,147,66,30), & (575,112,45,16). \\end{array} \\] Seven certificates use Gegenbauer positivity and counting information alone at the displayed orders.",
+  "type": "who",
+  "id": "TB037"
+ },
+ {
+  "corpus": "B",
+  "title": "Nonexistence of Strongly Regular Graphs via Gegenbauer Positivity and SRG Counting",
+  "question": "What does eliminating the counting equations give in the strongly regular graph nonexistence paper?",
+  "answerable": true,
+  "gold": "a semidefinite feasibility problem",
+  "support": "Eliminating the counting equations gives a semidefinite feasibility problem.",
+  "type": "define",
+  "id": "TB038"
+ },
+ {
+  "corpus": "B",
+  "title": "A Solution to the electroweak horizon problem in the R_h=ct universe",
+  "question": "About when after the big bang does the electroweak phase transition occur in \"A Solution to the electroweak horizon problem in the R_h=ct universe\"?",
+  "answerable": true,
+  "gold": "roughly 10^-11 seconds",
+  "support": "With the discovery of the Higgs particle, it is now quite likely that the Universe underwent another (electroweak) phase transition, at T=159.5 +/- 1.5 GeV---roughly ~10^{-11} seconds after the big bang.",
+  "type": "when",
+  "id": "TB039"
+ },
+ {
+  "corpus": "B",
+  "title": "A Solution to the electroweak horizon problem in the R_h=ct universe",
+  "question": "What happens during the electroweak transition according to the R_h=ct paper?",
+  "answerable": true,
+  "gold": "fermions gain mass and the electric force separates from the weak force",
+  "support": "During this event, the fermions gained mass and the electric force separated from the weak force.",
+  "type": "how",
+  "id": "TB040"
+ },
+ {
+  "corpus": "B",
+  "title": "A Solution to the electroweak horizon problem in the R_h=ct universe",
+  "question": "At what cosmic time did the accelerated expansion of the earlier phase transition occur, in the R_h=ct electroweak paper?",
+  "answerable": true,
+  "gold": "t~10^-36 to 10^-33 seconds",
+  "support": "The accelerated cosmic expansion during this transition, at cosmic time t~10^{-36}-10^{-33} seconds, is often viewed as an explanation for the uniformity of the CMB temperature, T, which would otherwise have required inexplicable initial conditions.",
+  "type": "when",
+  "id": "TB041"
+ },
+ {
+  "corpus": "B",
+  "title": "TextRank Based Search Term Identification for Software Change Tasks",
+  "question": "What does the TextRank-based technique in \"TextRank Based Search Term Identification for Software Change Tasks\" do?",
+  "answerable": true,
+  "gold": "automatically identifies and suggests search terms from a task description",
+  "support": "In this paper, we propose and evaluate a novel TextRank-based technique that automatically identifies and suggests search terms for a software change task by analyzing its task description.",
+  "type": "define",
+  "id": "TB042"
+ },
+ {
+  "corpus": "B",
+  "title": "TextRank Based Search Term Identification for Software Change Tasks",
+  "question": "Who deals with software change requests during maintenance in the TextRank search term paper?",
+  "answerable": true,
+  "gold": "software developers",
+  "support": "Abstract: During maintenance, software developers deal with a number of software change requests.",
+  "type": "who",
+  "id": "TB043"
+ },
+ {
+  "corpus": "B",
+  "title": "TextRank Based Search Term Identification for Software Change Tasks",
+  "question": "At what stage of a change task does a developer start mapping concepts to code?",
+  "answerable": true,
+  "gold": "with a search within the project",
+  "support": "This mapping generally starts with a search within the project that requires one or more suitable search terms.",
+  "type": "when",
+  "id": "TB044"
+ },
+ {
+  "corpus": "B",
+  "title": "Testuary: Agentic Test Generation with Zero-Shot Parallelism",
+  "question": "How does Testuary remove redundant tests?",
+  "answerable": true,
+  "gold": "with a runtime-weighted set-cover reduction",
+  "support": "A runtime-weighted set-cover reduction removes redundant tests without losing covered lines, branches, or killed mutants.",
+  "type": "how",
+  "id": "TB045"
+ },
+ {
+  "corpus": "B",
+  "title": "Testuary: Agentic Test Generation with Zero-Shot Parallelism",
+  "question": "How many agentic phases follow the merged suite in Testuary?",
+  "answerable": true,
+  "gold": "two",
+  "support": "After that, two agentic phases target the remaining gaps in coverage and mutation score.",
+  "type": "count",
+  "id": "TB046"
+ },
+ {
+  "corpus": "B",
+  "title": "Testuary: Agentic Test Generation with Zero-Shot Parallelism",
+  "question": "How long does Testuary take to generate a test suite for a typical project?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "how",
+  "id": "TB047"
+ },
+ {
+  "corpus": "B",
+  "title": "Unsupervised Graph Representation by Periphery and Hierarchical Information Maximization",
+  "question": "Why do the authors of \"Unsupervised Graph Representation by Periphery and Hierarchical Information Maximization\" want an unsupervised method?",
+  "answerable": true,
+  "gold": "obtaining labels for many graphs is expensive",
+  "support": "But obtaining labels of a large number of graphs is expensive for real world applications.",
+  "type": "why",
+  "id": "TB048"
+ },
+ {
+  "corpus": "B",
+  "title": "Unsupervised Graph Representation by Periphery and Hierarchical Information Maximization",
+  "question": "What two ideas does the periphery paper combine into a single framework?",
+  "answerable": true,
+  "gold": "hierarchical graph neural networks and mutual information maximization",
+  "support": "For this purpose, we combine the idea of hierarchical graph neural networks and mutual information maximization into a single framework.",
+  "type": "how",
+  "id": "TB049"
+ },
+ {
+  "corpus": "B",
+  "title": "Unsupervised Graph Representation by Periphery and Hierarchical Information Maximization",
+  "question": "In what kind of space is the entire graph represented by the periphery paper's method?",
+  "answerable": true,
+  "gold": "a vector space",
+  "support": "Invent of graph neural networks has improved the state-of-the-art for both node and the entire graph representation in a vector space.",
+  "type": "where",
+  "id": "TB050"
+ },
+ {
+  "corpus": "B",
+  "title": "Minimax estimation of the pseudo-spectral gap of continuous Markov chains, with applications to empirical concentration bounds",
+  "question": "Whose finite-state work does \"Minimax estimation of the pseudo-spectral gap of continuous Markov chains\" extend?",
+  "answerable": true,
+  "gold": "Wolfer and Kontorovich (2024)",
+  "support": "Extending earlier works on finite-state space chains by Wolfer and Kontorovich (2024), we provide an estimator in the case of a compact, continuous state-space.",
+  "type": "who",
+  "id": "TB051"
+ },
+ {
+  "corpus": "B",
+  "title": "Minimax estimation of the pseudo-spectral gap of continuous Markov chains, with applications to empirical concentration bounds",
+  "question": "Does the UCB variant for rested Markov bandits in the pseudo-spectral gap paper require knowledge of the pseudo-spectral gap?",
+  "answerable": true,
+  "gold": "No",
+  "support": "In particular, for rested bandits with Markov rewards, we provide a version of UCB with a regret bound similar to the one in the iid case, without assuming any knowledge on the pseudo-spectral gap of the chains.",
+  "type": "yesno",
+  "id": "TB052"
+ },
+ {
+  "corpus": "B",
+  "title": "Minimax estimation of the pseudo-spectral gap of continuous Markov chains, with applications to empirical concentration bounds",
+  "question": "In what year is the finite-state minimax work by Wolfer and Kontorovich dated in the pseudo-spectral gap paper?",
+  "answerable": true,
+  "gold": "2024",
+  "support": "Extending earlier works on finite-state space chains by Wolfer and Kontorovich (2024), we provide an estimator in the case of a compact, continuous state-space.",
+  "type": "when",
+  "id": "TB053"
+ },
+ {
+  "corpus": "B",
+  "title": "Believed but Not Said: Measuring Hidden Belief Collapse in Multi-Agent LLM Discussions",
+  "question": "How many agents take part in each factual discussion in \"Believed but Not Said\"?",
+  "answerable": true,
+  "gold": "ten",
+  "support": "In a ten-agent factual discussion, one or three adversarial agents repeatedly assert a plausible false answer.",
+  "type": "count",
+  "id": "TB054"
+ },
+ {
+  "corpus": "B",
+  "title": "Believed but Not Said: Measuring Hidden Belief Collapse in Multi-Agent LLM Discussions",
+  "question": "At what point are private answers probed in \"Believed but Not Said\"?",
+  "answerable": true,
+  "gold": "after each round",
+  "support": "After each round we probe each benign agent's private answer through a separate call whose response is hidden from its peers, and we separately label its public stance toward the claim.",
+  "type": "when",
+  "id": "TB055"
+ },
+ {
+  "corpus": "B",
+  "title": "Believed but Not Said: Measuring Hidden Belief Collapse in Multi-Agent LLM Discussions",
+  "question": "Who funded the study in \"Believed but Not Said: Measuring Hidden Belief Collapse in Multi-Agent LLM Discussions\"?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who",
+  "id": "TB056"
+ },
+ {
+  "corpus": "B",
+  "title": "On the Use of Grey Literature: A Survey with the Brazilian Software Engineering Research Community",
+  "question": "At what kind of event were participants recruited for the Brazilian grey literature survey?",
+  "answerable": true,
+  "gold": "a flagship software engineering conference in Brazil",
+  "support": "Method: We surveyed 76 active SE researchers participants of a flagship SE conference in Brazil, using a questionnaire with 11 questions to share their views on the use of GL in the context of SE research.",
+  "type": "where",
+  "id": "TB057"
+ },
+ {
+  "corpus": "B",
+  "title": "On the Use of Grey Literature: A Survey with the Brazilian Software Engineering Research Community",
+  "question": "How many questions were in the questionnaire used for \"On the Use of Grey Literature\"?",
+  "answerable": true,
+  "gold": "11",
+  "support": "Method: We surveyed 76 active SE researchers participants of a flagship SE conference in Brazil, using a questionnaire with 11 questions to share their views on the use of GL in the context of SE research.",
+  "type": "count",
+  "id": "TB058"
+ },
+ {
+  "corpus": "B",
+  "title": "On the Use of Grey Literature: A Survey with the Brazilian Software Engineering Research Community",
+  "question": "Whose use of grey literature does the survey paper study?",
+  "answerable": true,
+  "gold": "Brazilian software engineering researchers",
+  "support": "Objective: To understand how Brazilian SE researchers use GL, we aimed to become aware of the criteria to assess the credibility of their use, as well as the benefits and challenges.",
+  "type": "who",
+  "id": "TB059"
+ },
+ {
+  "corpus": "B",
+  "title": "On the Use of Grey Literature: A Survey with the Brazilian Software Engineering Research Community",
+  "question": "Over what period has interest in grey literature in software engineering grown?",
+  "answerable": true,
+  "gold": "over the last years",
+  "support": "In Software Engineering (SE), this topic has an increasing interest over the last years.",
+  "type": "when",
+  "id": "TB060"
+ },
+ {
+  "corpus": "B",
+  "title": "What Gives the Answer Away? Question Answering Bias Analysis on Video QA Datasets",
+  "question": "What share of questions can pretrained language models answer without multimodal context in \"What Gives the Answer Away?\"?",
+  "answerable": true,
+  "gold": "37-48%",
+  "support": "In this paper, we analyze QA biases in popular video question answering datasets and discover pretrained language models can answer 37-48% questions correctly without using any multimodal context information, far exceeding the 20% random guess baseline for 5-choose-1 multiple-choice questions.",
+  "type": "count",
+  "id": "TB061"
+ },
+ {
+  "corpus": "B",
+  "title": "What Gives the Answer Away? Question Answering Bias Analysis on Video QA Datasets",
+  "question": "How does the 37-48% language-only accuracy compare with random guessing on 5-choice video QA?",
+  "answerable": true,
+  "gold": "far exceeds the 20% random guess baseline",
+  "support": "In this paper, we analyze QA biases in popular video question answering datasets and discover pretrained language models can answer 37-48% questions correctly without using any multimodal context information, far exceeding the 20% random guess baseline for 5-choose-1 multiple-choice questions.",
+  "type": "compare",
+  "id": "TB062"
+ },
+ {
+  "corpus": "B",
+  "title": "What Gives the Answer Away? Question Answering Bias Analysis on Video QA Datasets",
+  "question": "According to \"What Gives the Answer Away?\", where can video QA biases come from?",
+  "answerable": true,
+  "gold": "annotators and type of questions",
+  "support": "Our ablation study shows biases can come from annotators and type of questions.",
+  "type": "where",
+  "id": "TB063"
+ },
+ {
+  "corpus": "B",
+  "title": "A complete classification of perfect state transfer in Grover walks on abelian Cayley graphs",
+  "question": "What valencies can a Cayley graph with perfect state transfer have in Grover walks?",
+  "answerable": true,
+  "gold": "1, 2 or 4",
+  "support": "First, we show that a Cayley graph over any finite group exhibiting perfect state transfer has valency $1$, $2$, or $4$.",
+  "type": "count",
+  "id": "TB064"
+ },
+ {
+  "corpus": "B",
+  "title": "A complete classification of perfect state transfer in Grover walks on abelian Cayley graphs",
+  "question": "Whose classification of circulant graphs does the Grover walks perfect state transfer paper extend?",
+  "answerable": true,
+  "gold": "Kubota and Yoshino",
+  "support": "Our results extend the classification of circulant graphs of valency at most four obtained by Kubota and Yoshino [Circulant graphs with valency up to 4 that admit perfect state transfer in Grover walks, \\emph{J.",
+  "type": "who",
+  "id": "TB065"
+ },
+ {
+  "corpus": "B",
+  "title": "A complete classification of perfect state transfer in Grover walks on abelian Cayley graphs",
+  "question": "What does \"A complete classification of perfect state transfer in Grover walks on abelian Cayley graphs\" classify?",
+  "answerable": true,
+  "gold": "connected Cayley graphs over finite abelian groups exhibiting perfect state transfer",
+  "support": "Abstract: We completely classify connected Cayley graphs over finite abelian groups that exhibit perfect state transfer in Grover walks.",
+  "type": "define",
+  "id": "TB066"
+ },
+ {
+  "corpus": "B",
+  "title": "A complete classification of perfect state transfer in Grover walks on abelian Cayley graphs",
+  "question": "Must a Cayley graph with perfect state transfer in Grover walks have valency 1, 2 or 4?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "First, we show that a Cayley graph over any finite group exhibiting perfect state transfer has valency $1$, $2$, or $4$.",
+  "type": "yesno",
+  "id": "TB067"
+ },
+ {
+  "corpus": "B",
+  "title": "Convergence Rate of $\\mathcal{O}(1/k)$ for Optimistic Gradient and Extra-gradient Methods in Smooth Convex-Concave Saddle Point Problems",
+  "question": "How do the OGDA and EG analyses interpret these methods?",
+  "answerable": true,
+  "gold": "as approximate variants of the proximal point method",
+  "support": "To do so, we first show that both OGDA and EG can be interpreted as approximate variants of the proximal point method.",
+  "type": "how",
+  "id": "TB068"
+ },
+ {
+  "corpus": "B",
+  "title": "Convergence Rate of $\\mathcal{O}(1/k)$ for Optimistic Gradient and Extra-gradient Methods in Smooth Convex-Concave Saddle Point Problems",
+  "question": "Whose earlier work treated extra-gradient as an approximation of the conceptual mirror prox?",
+  "answerable": true,
+  "gold": "Nemirovski, 2004",
+  "support": "This is similar to the approach taken in [Nemirovski, 2004] which analyzes EG as an approximation of the `conceptual mirror prox'.",
+  "type": "who",
+  "id": "TB069"
+ },
+ {
+  "corpus": "B",
+  "title": "Convergence Rate of $\\mathcal{O}(1/k)$ for Optimistic Gradient and Extra-gradient Methods in Smooth Convex-Concave Saddle Point Problems",
+  "question": "In what year did Nemirovski analyze extra-gradient as an approximation of the conceptual mirror prox?",
+  "answerable": true,
+  "gold": "2004",
+  "support": "This is similar to the approach taken in [Nemirovski, 2004] which analyzes EG as an approximation of the `conceptual mirror prox'.",
+  "type": "when",
+  "id": "TB070"
+ },
+ {
+  "corpus": "B",
+  "title": "SolBehave: Evaluating the Behavioural Correctness of LLM-Generated Smart Contracts",
+  "question": "How many Ethereum contracts does the SolBehave benchmark use?",
+  "answerable": true,
+  "gold": "250",
+  "support": "Across 250 real, reproducible Ethereum contracts, we apply three complementary tests of behavioural fidelity: differential fuzzing, historical-transaction replay, and, as our core contribution, synthetic-transaction replay guided by a Dynamic Condition Response (DCR) graph that enumerates the space of legitimate function-call sequences.",
+  "type": "count",
+  "id": "TB071"
+ },
+ {
+  "corpus": "B",
+  "title": "SolBehave: Evaluating the Behavioural Correctness of LLM-Generated Smart Contracts",
+  "question": "How many open-weight models are evaluated in SolBehave?",
+  "answerable": true,
+  "gold": "seven",
+  "support": "We evaluate seven state-of-the-art open-weight models after one round of automated repair.",
+  "type": "count",
+  "id": "TB072"
+ },
+ {
+  "corpus": "B",
+  "title": "SolBehave: Evaluating the Behavioural Correctness of LLM-Generated Smart Contracts",
+  "question": "When was the SolBehave benchmark first released?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "when",
+  "id": "TB073"
+ },
+ {
+  "corpus": "B",
+  "title": "Morphological Skip-Gram: Using morphological knowledge to improve word representation",
+  "question": "What are word embeddings in the Morphological Skip-Gram paper?",
+  "answerable": true,
+  "gold": "continuous word representations",
+  "support": "Word embeddings are continuous word representations, they are an essential module for those applications and are generally used as input word representation to the deep learning models.",
+  "type": "define",
+  "id": "TB074"
+ },
+ {
+  "corpus": "B",
+  "title": "Morphological Skip-Gram: Using morphological knowledge to improve word representation",
+  "question": "Which two methods are cited as popular for learning word embeddings?",
+  "answerable": true,
+  "gold": "Word2Vec and GloVe",
+  "support": "Word2Vec and GloVe are two popular methods to learn word embeddings.",
+  "type": "list",
+  "id": "TB075"
+ },
+ {
+  "corpus": "B",
+  "title": "Morphological Skip-Gram: Using morphological knowledge to improve word representation",
+  "question": "Where are word embeddings generally used as input?",
+  "answerable": true,
+  "gold": "deep learning models",
+  "support": "Word embeddings are continuous word representations, they are an essential module for those applications and are generally used as input word representation to the deep learning models.",
+  "type": "where",
+  "id": "TB076"
+ },
+ {
+  "corpus": "B",
+  "title": "New Cosystolic Expanders from Tensors Imply Explicit Quantum LDPC Codes with $Ω(\\sqrt{n}\\log^kn)$ Distance",
+  "question": "What does the cosystolic expanders paper say tensoring two cosystolic expanders yields?",
+  "answerable": true,
+  "gold": "a new cosystolic expander, if one complex is a collective cosystolic expander",
+  "support": "We show that tensoring two cosystolic expanders yields a new cosystolic expander, assuming one of the complexes in the product, is not only cosystolic expander, but rather a collective cosystolic expander.",
+  "type": "define",
+  "id": "TB077"
+ },
+ {
+  "corpus": "B",
+  "title": "New Cosystolic Expanders from Tensors Imply Explicit Quantum LDPC Codes with $Ω(\\sqrt{n}\\log^kn)$ Distance",
+  "question": "Whose recent result do the quantum LDPC codes in the cosystolic expander paper improve?",
+  "answerable": true,
+  "gold": "Evra et al.",
+  "support": "Using our new constructed bounded degree cosystolic expanders we construct {\\em explicit} quantum LDPC codes of distance $\\sqrt{n} \\log^k n$ for any $k$, improving a recent result of Evra et. al. \\cite{EKZ}, and setting a new record for distance of explicit quantum LDPC codes.",
+  "type": "who",
+  "id": "TB078"
+ },
+ {
+  "corpus": "B",
+  "title": "New Cosystolic Expanders from Tensors Imply Explicit Quantum LDPC Codes with $Ω(\\sqrt{n}\\log^kn)$ Distance",
+  "question": "Which complexes are shown to be collective cosystolic expanders?",
+  "answerable": true,
+  "gold": "Ramanujan complexes",
+  "support": "We then show that the well known bounded degree cosystolic expanders, the Ramanujan complexes are, in fact, collective cosystolic expanders.",
+  "type": "define",
+  "id": "TB079"
+ },
+ {
+  "corpus": "B",
+  "title": "Learning Changes the World and Then What Was Learned has Changed: Training and Deploying Neural Networks in the Control Loop",
+  "question": "What three failure modes form the taxonomy in \"Learning Changes the World and Then What Was Learned has Changed\"?",
+  "answerable": true,
+  "gold": "Closed-Loop Identification Error, Action Error and Tracking Error",
+  "support": "This paper introduces a unified taxonomy to categorize these sequential failure modes: the initial Closed-Loop Identification Error, the deployment-induced Action Error, and the continuous Tracking Error.",
+  "type": "list",
+  "id": "TB080"
+ },
+ {
+  "corpus": "B",
+  "title": "Learning Changes the World and Then What Was Learned has Changed: Training and Deploying Neural Networks in the Control Loop",
+  "question": "On what system are the ablations run in the neural networks in the control loop paper?",
+  "answerable": true,
+  "gold": "a nonlinear Duffing oscillator",
+  "support": "These mechanisms are validated through ablation studies on a nonlinear Duffing oscillator, demonstrating that bounded continuous learning successfully mitigates trajectory divergence whereas static deployments fail, offering concrete guidelines for practitioners deploying machine learning components in safety-critical feedback systems.",
+  "type": "where",
+  "id": "TB081"
+ },
+ {
+  "corpus": "B",
+  "title": "Learning Changes the World and Then What Was Learned has Changed: Training and Deploying Neural Networks in the Control Loop",
+  "question": "Who are the practitioners the guidelines in the closed-loop neural network paper are aimed at?",
+  "answerable": true,
+  "gold": "practitioners",
+  "support": "These mechanisms are validated through ablation studies on a nonlinear Duffing oscillator, demonstrating that bounded continuous learning successfully mitigates trajectory divergence whereas static deployments fail, offering concrete guidelines for practitioners deploying machine learning components in safety-critical feedback systems.",
+  "type": "who",
+  "id": "TB082"
+ },
+ {
+  "corpus": "B",
+  "title": "MUZZ: Thread-aware Grey-box Fuzzing for Effective Bug Hunting in Multithreaded Programs",
+  "question": "What is MUZZ?",
+  "answerable": true,
+  "gold": "a grey-box fuzzing technique that hunts for bugs in multithreaded programs",
+  "support": "To this end, we propose MUZZ, a new grey-box fuzzing technique that hunts for bugs in multithreaded programs.",
+  "type": "define",
+  "id": "TB083"
+ },
+ {
+  "corpus": "B",
+  "title": "MUZZ: Thread-aware Grey-box Fuzzing for Effective Bug Hunting in Multithreaded Programs",
+  "question": "Why can mainstream grey-box fuzzers not test multithreaded programs well, per the MUZZ paper?",
+  "answerable": true,
+  "gold": "they do not stress thread-interleavings",
+  "support": "Meanwhile, the existing grey-box fuzzing techniques do not stress thread-interleavings which affect execution states in multithreaded programs.",
+  "type": "why",
+  "id": "TB084"
+ },
+ {
+  "corpus": "B",
+  "title": "MUZZ: Thread-aware Grey-box Fuzzing for Effective Bug Hunting in Multithreaded Programs",
+  "question": "Where are multithreading-relevant bugs usually buried?",
+  "answerable": true,
+  "gold": "in sophisticated program flows",
+  "support": "In practice, multithreading-relevant bugs are usually buried in sophisticated program flows.",
+  "type": "where",
+  "id": "TB085"
+ },
+ {
+  "corpus": "B",
+  "title": "An open-source software platform for translational photoacoustic research and its application to motion-corrected blood oxygenation estimation",
+  "question": "Under which toolkit is the photoacoustic imaging system's software developed?",
+  "answerable": true,
+  "gold": "Medical Imaging Interaction Toolkit (MITK)",
+  "support": "In this contribution, we present a custom-built, hybrid, multispectral, real-time photoacoustic and ultrasonic imaging system with a linear array probe that is controlled by software developed within the Medical Imaging Interaction Toolkit (MITK) a highly customizable and extendable open-source software platform.",
+  "type": "where",
+  "id": "TB086"
+ },
+ {
+  "corpus": "B",
+  "title": "An open-source software platform for translational photoacoustic research and its application to motion-corrected blood oxygenation estimation",
+  "question": "Why is photoacoustic work with hand held linear probes easier to put in a clinical workflow?",
+  "answerable": true,
+  "gold": "simultaneous access to ultrasonic imaging and its familiarity to clinicians",
+  "support": "Such systems can be more easily integrated in a clinical workflow due to the simultaneous access to ultrasonic imaging and their familiarity of use to clinicians.",
+  "type": "why",
+  "id": "TB087"
+ },
+ {
+  "corpus": "B",
+  "title": "An open-source software platform for translational photoacoustic research and its application to motion-corrected blood oxygenation estimation",
+  "question": "Who can use the open-source photoacoustic platform as a starting point?",
+  "answerable": true,
+  "gold": "translational research projects",
+  "support": "Our software offers direct control of both the laser and the ultrasonic system and may serve as a starting point for various translational research projects and developments.",
+  "type": "who",
+  "id": "TB088"
+ },
+ {
+  "corpus": "B",
+  "title": "An open-source software platform for translational photoacoustic research and its application to motion-corrected blood oxygenation estimation",
+  "question": "Is most translational work with photoacoustic scanners based on proprietary development?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "However, most translational work with such scanners is based on proprietary development and as such not accessible to the community.",
+  "type": "yesno",
+  "id": "TB089"
+ },
+ {
+  "corpus": "B",
+  "title": "Abstracts or full text? Evaluating input scope and computational efficiency in biomedical lay summarization",
+  "question": "How many research questions does \"Abstracts or full text?\" ask about biomedical lay summarization?",
+  "answerable": true,
+  "gold": "two",
+  "support": "This study asks two questions: (1) whether abstracts contain enough information to produce lay summaries as good as those based on full-text articles, and (2) whether few-shot learning performs as well as task-specific fine-tuning.",
+  "type": "count",
+  "id": "TB090"
+ },
+ {
+  "corpus": "B",
+  "title": "Abstracts or full text? Evaluating input scope and computational efficiency in biomedical lay summarization",
+  "question": "Why is generating lay summaries from full texts costly?",
+  "answerable": true,
+  "gold": "articles are long and costly to process",
+  "support": "However, generating lay summaries from full-text articles requires more computing power because the articles are long and costly to process.",
+  "type": "why",
+  "id": "TB091"
+ },
+ {
+  "corpus": "B",
+  "title": "Abstracts or full text? Evaluating input scope and computational efficiency in biomedical lay summarization",
+  "question": "Who benefits from automated lay summarization of biomedical research?",
+  "answerable": true,
+  "gold": "patients and the public",
+  "support": "Automated lay summarization has become a solution to make biomedical knowledge easier for patients and the public to understand.",
+  "type": "who",
+  "id": "TB092"
+ },
+ {
+  "corpus": "B",
+  "title": "Stronger and Faster Wasserstein Adversarial Attacks",
+  "question": "What accuracy did the new Wasserstein attack reduce the residual network on CIFAR-10 to?",
+  "answerable": true,
+  "gold": "3.4%",
+  "support": "For instance, we decrease the accuracy of a residual network on CIFAR-10 to $3.4\\%$ within a Wasserstein perturbation ball of radius $0.005$, in contrast to $65.6\\%$ using the previous Wasserstein attack based on an \\emph{approximate} projection operator.",
+  "type": "count",
+  "id": "TB093"
+ },
+ {
+  "corpus": "B",
+  "title": "Stronger and Faster Wasserstein Adversarial Attacks",
+  "question": "How does the 3.4% accuracy from the new attack compare with the earlier approximate-projection Wasserstein attack?",
+  "answerable": true,
+  "gold": "the earlier attack left 65.6% accuracy",
+  "support": "For instance, we decrease the accuracy of a residual network on CIFAR-10 to $3.4\\%$ within a Wasserstein perturbation ball of radius $0.005$, in contrast to $65.6\\%$ using the previous Wasserstein attack based on an \\emph{approximate} projection operator.",
+  "type": "compare",
+  "id": "TB094"
+ },
+ {
+  "corpus": "B",
+  "title": "Stronger and Faster Wasserstein Adversarial Attacks",
+  "question": "Which authors wrote \"Stronger and Faster Wasserstein Adversarial Attacks\"?",
+  "answerable": true,
+  "gold": "Kaiwen Wu, Allen Houze Wang, Yaoliang Yu",
+  "support": "Authors: Kaiwen Wu, Allen Houze Wang, Yaoliang Yu",
+  "type": "who",
+  "id": "TB095"
+ },
+ {
+  "corpus": "B",
+  "title": "Stronger and Faster Wasserstein Adversarial Attacks",
+  "question": "Why did the Wasserstein attack paper choose CIFAR-10 for its experiments?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "why",
+  "id": "TB096"
+ },
+ {
+  "corpus": "B",
+  "title": "Generalization in portfolio-based algorithm selection",
+  "question": "For how long has portfolio-based algorithm selection seen practical success?",
+  "answerable": true,
+  "gold": "over the past two decades",
+  "support": "Abstract: Portfolio-based algorithm selection has seen tremendous practical success over the past two decades.",
+  "type": "when",
+  "id": "TB097"
+ },
+ {
+  "corpus": "B",
+  "title": "Generalization in portfolio-based algorithm selection",
+  "question": "What three reasons for divergence does \"Generalization in portfolio-based algorithm selection\" analyze?",
+  "answerable": true,
+  "gold": "complexity of the selector, the size of the portfolio, and complexity of performance as a function of parameters",
+  "support": "This involves analyzing three key reasons why these two quantities may diverge: 1) the learning-theoretic complexity of the algorithm selector, 2) the size of the portfolio, and 3) the learning-theoretic complexity of the algorithm's performance as a function of its parameters.",
+  "type": "list",
+  "id": "TB098"
+ },
+ {
+  "corpus": "B",
+  "title": "Generalization in portfolio-based algorithm selection",
+  "question": "What does portfolio-based algorithm selection do first?",
+  "answerable": true,
+  "gold": "selects a portfolio of diverse algorithm parameter settings",
+  "support": "This algorithm configuration procedure works by first selecting a portfolio of diverse algorithm parameter settings, and then, on a given problem instance, using an algorithm selector to choose a parameter setting from the portfolio with strong predicted performance.",
+  "type": "define",
+  "id": "TB099"
+ },
+ {
+  "corpus": "B",
+  "title": "Joint Neural Posterior Estimation and Model Selection for Chemical Reaction Networks",
+  "question": "What mechanism learns summary statistics in \"Joint Neural Posterior Estimation and Model Selection for Chemical Reaction Networks\"?",
+  "answerable": true,
+  "gold": "shared 1D-CNNs and a permutation-invariant Set Attention mechanism",
+  "support": "Our pipeline utilizes shared 1D-CNNs and a permutation-invariant Set Attention mechanism to learn low-dimensional summary statistics from variable-length, multi-experiment time-series data.",
+  "type": "how",
+  "id": "TB100"
+ },
+ {
+  "corpus": "B",
+  "title": "Joint Neural Posterior Estimation and Model Selection for Chemical Reaction Networks",
+  "question": "Why do the authors of the chemical reaction network paper reject Sequential Monte Carlo ABC?",
+  "answerable": true,
+  "gold": "it relies on handcrafted summary statistics and scales poorly",
+  "support": "Classical approaches, such as Sequential Monte Carlo ABC, rely on handcrafted summary statistics and scale poorly across large parameter spaces.",
+  "type": "why",
+  "id": "TB101"
+ },
+ {
+  "corpus": "B",
+  "title": "Joint Neural Posterior Estimation and Model Selection for Chemical Reaction Networks",
+  "question": "On what real example is the chemical reaction network approach demonstrated?",
+  "answerable": true,
+  "gold": "a protodeboronation example",
+  "support": "We demonstrate the practical utility of our approach on a real protodeboronation example, illustrating how it handles structural ambiguity and extracts kinetic parameters from competing catalyst deactivation pathways.",
+  "type": "where",
+  "id": "TB102"
+ },
+ {
+  "corpus": "B",
+  "title": "Service Chain Composition with Failures in NFV Systems: A Game-Theoretic Perspective",
+  "question": "What kind of game is service chain composition formulated as in the NFV paper?",
+  "answerable": true,
+  "gold": "a non-cooperative game, shown to be a weighted potential game",
+  "support": "In this paper, we formulate the problem of service chain composition in NFV systems with failures as a non-cooperative game.",
+  "type": "define",
+  "id": "TB103"
+ },
+ {
+  "corpus": "B",
+  "title": "Service Chain Composition with Failures in NFV Systems: A Game-Theoretic Perspective",
+  "question": "Which techniques underlie the two learning-aided comparison schemes in the NFV paper?",
+  "answerable": true,
+  "gold": "deep reinforcement learning and Monte Carlo tree search",
+  "support": "Besides, we develop two novel learning-aided schemes as comparisons, which are based on deep reinforcement learning (DRL) and Monte Carlo tree search (MCTS) techniques, respectively.",
+  "type": "list",
+  "id": "TB104"
+ },
+ {
+  "corpus": "B",
+  "title": "Service Chain Composition with Failures in NFV Systems: A Game-Theoretic Perspective",
+  "question": "In which type of systems is service chain composition studied in the game-theoretic paper?",
+  "answerable": true,
+  "gold": "network function virtualization (NFV) systems",
+  "support": "Abstract: For state-of-the-art network function virtualization (NFV) systems, it remains a key challenge to conduct effective service chain composition for different network services (NSs) with ultra-low request latencies and minimum network congestion.",
+  "type": "where",
+  "id": "TB105"
+ },
+ {
+  "corpus": "B",
+  "title": "RoleQ: Role-Aligned Scales for Converting Language Models to Ternary",
+  "question": "Does RoleQ need search, calibration or stored state?",
+  "answerable": true,
+  "gold": "No",
+  "support": "The rule is structural, needs no search, calibration or stored state, and holds on integer and ternary grids.",
+  "type": "yesno",
+  "id": "TB106"
+ },
+ {
+  "corpus": "B",
+  "title": "RoleQ: Role-Aligned Scales for Converting Language Models to Ternary",
+  "question": "How many parameters does the largest RoleQ ternary model have?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count",
+  "id": "TB107"
+ },
+ {
+  "corpus": "B",
+  "title": "RoleQ: Role-Aligned Scales for Converting Language Models to Ternary",
+  "question": "Does RoleQ support 2-bit weight quantization?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "yesno",
+  "id": "TB108"
+ },
+ {
+  "corpus": "B",
+  "title": "Self-Attentional Models for Lattice Inputs",
+  "question": "What are probabilistic reachability masks in \"Self-Attentional Models for Lattice Inputs\"?",
+  "answerable": true,
+  "gold": "masks that incorporate lattice structure into the model",
+  "support": "To extend such models to handle lattices, we introduce probabilistic reachability masks that incorporate lattice structure into the model and support lattice scores if available.",
+  "type": "define",
+  "id": "TB109"
+ },
+ {
+  "corpus": "B",
+  "title": "Self-Attentional Models for Lattice Inputs",
+  "question": "Why is extending self-attention to lattices attractive compared with recurrent networks?",
+  "answerable": true,
+  "gold": "recurrent lattice models are very slow",
+  "support": "Previous work has extended recurrent neural networks to model lattice inputs and achieved improvements in various tasks, but these models suffer from very slow computation speeds.",
+  "type": "why",
+  "id": "TB110"
+ },
+ {
+  "corpus": "B",
+  "title": "Self-Attentional Models for Lattice Inputs",
+  "question": "What is self-attention in the lattice paper?",
+  "answerable": true,
+  "gold": "a sequence modeling technique relating inputs by pairwise similarities",
+  "support": "Self-attention is a sequence modeling technique that relates inputs to one another by computing pairwise similarities and has gained popularity for both its strong results and its computational efficiency.",
+  "type": "define",
+  "id": "TB111"
+ },
+ {
+  "corpus": "B",
+  "title": "Self-Attentional Models for Lattice Inputs",
+  "question": "Under what condition does the lattice self-attention model use lattice scores?",
+  "answerable": true,
+  "gold": "if lattice scores are available",
+  "support": "To extend such models to handle lattices, we introduce probabilistic reachability masks that incorporate lattice structure into the model and support lattice scores if available.",
+  "type": "when",
+  "id": "TB112"
+ },
+ {
+  "corpus": "B",
+  "title": "An Audio-enriched BERT-based Framework for Spoken Multiple-choice Question Answering",
+  "question": "What is spoken multiple-choice question answering for the audio-enriched BERT framework?",
+  "answerable": true,
+  "gold": "a task answering a question about a passage by choosing among options",
+  "support": "Abstract: In a spoken multiple-choice question answering (SMCQA) task, given a passage, a question, and multiple choices all in the form of speech, the machine needs to pick the correct choice to answer the question.",
+  "type": "define",
+  "id": "TB113"
+ },
+ {
+  "corpus": "B",
+  "title": "An Audio-enriched BERT-based Framework for Spoken Multiple-choice Question Answering",
+  "question": "Why can acoustic information help spoken question answering systems?",
+  "answerable": true,
+  "gold": "it can offset text inaccuracies caused by speech recognition",
+  "support": "However, previous studies have evidenced that acoustic-level statistics can offset text inaccuracies caused by the automatic speech recognition systems or representation inadequacy lurking in word embedding generators, thereby making the SMCQA system robust.",
+  "type": "why",
+  "id": "TB114"
+ },
+ {
+  "corpus": "B",
+  "title": "An Audio-enriched BERT-based Framework for Spoken Multiple-choice Question Answering",
+  "question": "At what point is audio information typically ignored in spoken multiple-choice question answering systems?",
+  "answerable": true,
+  "gold": "during system development, which usually uses only auto-transcribed text",
+  "support": "While the audio could contain useful cues for SMCQA, usually only the auto-transcribed text is utilized in system development.",
+  "type": "when",
+  "id": "TB115"
+ },
+ {
+  "corpus": "B",
+  "title": "eclingo: A solver for Epistemic Logic Programs",
+  "question": "Which clingo feature implements the eclingo solving process?",
+  "answerable": true,
+  "gold": "multi-shot functionalities",
+  "support": "This process is implemented using the multi-shot functionalities of clingo.",
+  "type": "how",
+  "id": "TB116"
+ },
+ {
+  "corpus": "B",
+  "title": "eclingo: A solver for Epistemic Logic Programs",
+  "question": "Whose 1991 semantics does the eclingo solver build on?",
+  "answerable": true,
+  "gold": "Gelfond",
+  "support": "Abstract: We describe eclingo, a solver for epistemic logic programs under Gelfond 1991 semantics built upon the Answer Set Programming system clingo.",
+  "type": "who",
+  "id": "TB117"
+ },
+ {
+  "corpus": "B",
+  "title": "eclingo: A solver for Epistemic Logic Programs",
+  "question": "Who currently maintains the eclingo software?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who",
+  "id": "TB118"
+ },
+ {
+  "corpus": "B",
+  "title": "Teaching machines to understand data science code by semantic enrichment of dataflow graphs",
+  "question": "Who bears the burden of understanding code, according to \"Teaching machines to understand data science code by semantic enrichment of dataflow graphs\"?",
+  "answerable": true,
+  "gold": "human knowledge workers",
+  "support": "That burden falls upon human knowledge workers, who are increasingly asked to write and understand code.",
+  "type": "who",
+  "id": "TB119"
+ },
+ {
+  "corpus": "B",
+  "title": "Teaching machines to understand data science code by semantic enrichment of dataflow graphs",
+  "question": "How does the data science code paper form semantic representations of programs?",
+  "answerable": true,
+  "gold": "by enriching dataflow graphs with semantic information",
+  "support": "To create the representations, we introduce an algorithm for enriching dataflow graphs with semantic information.",
+  "type": "how",
+  "id": "TB120"
+ },
+ {
+  "corpus": "B",
+  "title": "Teaching machines to understand data science code by semantic enrichment of dataflow graphs",
+  "question": "Which authors wrote \"Teaching machines to understand data science code by semantic enrichment of dataflow graphs\"?",
+  "answerable": true,
+  "gold": "Evan Patterson, Ioana Baldini, Aleksandra Mojsilovic, Kush R. Varshney",
+  "support": "Authors: Evan Patterson, Ioana Baldini, Aleksandra Mojsilovic, Kush R.",
+  "type": "who",
+  "id": "TB121"
+ },
+ {
+  "corpus": "B",
+  "title": "When Agent Evaluation Becomes Unreliable: An Empirical Study of Oracle Failures and Configuration-Dependent Measurement in an LLM Agent Benchmark",
+  "question": "How many state-integrity invariants does the oracle auditing approach have?",
+  "answerable": true,
+  "gold": "five",
+  "support": "We introduce an oracle-integrity auditing approach with five state-integrity invariants and three known-answer controls.",
+  "type": "count",
+  "id": "TB122"
+ },
+ {
+  "corpus": "B",
+  "title": "When Agent Evaluation Becomes Unreliable: An Empirical Study of Oracle Failures and Configuration-Dependent Measurement in an LLM Agent Benchmark",
+  "question": "How many oracle defect classes are injected in the agent evaluation unreliability study?",
+  "answerable": true,
+  "gold": "seven",
+  "support": "We evaluate it by injecting seven oracle defect classes across two task domains and a synthetic domain.",
+  "type": "count",
+  "id": "TB123"
+ },
+ {
+  "corpus": "B",
+  "title": "When Agent Evaluation Becomes Unreliable: An Empirical Study of Oracle Failures and Configuration-Dependent Measurement in an LLM Agent Benchmark",
+  "question": "At what point does the reward-function defect change the environment state in the agent benchmark audit?",
+  "answerable": true,
+  "gold": "before post-run scoring",
+  "support": "Applied to an agent benchmark, the audit reveals a reward-function defect that changes the environment state before post-run scoring.",
+  "type": "when",
+  "id": "TB124"
+ },
+ {
+  "corpus": "B",
+  "title": "Learning Topology-Aware Representations for Mechanics-Relevant TPMS Metamaterials",
+  "question": "By how much does the TPMS method improve family classification?",
+  "answerable": true,
+  "gold": "up to 3.9%",
+  "support": "Across the two datasets, our method demonstrates strong performance in both structural family and mechanical-property classification, improving family classification by up to 3.9% while achieving the best linear-probe performance.",
+  "type": "count",
+  "id": "TB125"
+ },
+ {
+  "corpus": "B",
+  "title": "Learning Topology-Aware Representations for Mechanics-Relevant TPMS Metamaterials",
+  "question": "What R^2 does regression keep in the TPMS metamaterials paper?",
+  "answerable": true,
+  "gold": "0.993",
+  "support": "More notably, unsupervised property-clustering performance improves by up to 26.7% and 51.5% across the two datasets, while strong regression performance is retained with $R^2=0.993$.",
+  "type": "count",
+  "id": "TB126"
+ },
+ {
+  "corpus": "B",
+  "title": "Learning Topology-Aware Representations for Mechanics-Relevant TPMS Metamaterials",
+  "question": "What does the persistence-guided masking strategy prioritize?",
+  "answerable": true,
+  "gold": "patches associated with persistent topological features",
+  "support": "A persistence-guided masking strategy prioritizes patches associated with persistent topological features, while an auxiliary persistent-homology decoder encourages the latent representation to retain information about topological feature counts across connected components, tunnels, and voids.",
+  "type": "how",
+  "id": "TB127"
+ },
+ {
+  "corpus": "B",
+  "title": "Shortcut Sensitivity in Agent-Safety Evaluations",
+  "question": "What three levels does the shortcut-auditing framework distinguish?",
+  "answerable": true,
+  "gold": "label predictability, observational guard association, and paired decision sensitivity",
+  "support": "We distinguish label predictability, observational guard association, and paired decision sensitivity.",
+  "type": "define",
+  "id": "TB128"
+ },
+ {
+  "corpus": "B",
+  "title": "Shortcut Sensitivity in Agent-Safety Evaluations",
+  "question": "In which trajectories do shorter shell commands predict labels in \"Shortcut Sensitivity in Agent-Safety Evaluations\"?",
+  "answerable": true,
+  "gold": "LinuxArena",
+  "support": "In LinuxArena, shorter average shell commands strongly predict trajectory labels.",
+  "type": "where",
+  "id": "TB129"
+ },
+ {
+  "corpus": "B",
+  "title": "Shortcut Sensitivity in Agent-Safety Evaluations",
+  "question": "On which trajectories is the shortcut audit run in \"Shortcut Sensitivity in Agent-Safety Evaluations\"?",
+  "answerable": true,
+  "gold": "LinuxArena trajectories and two TS-Bench-derived step datasets",
+  "support": "We introduce a three-level shortcut-auditing framework and audit completed LinuxArena trajectories and two TS-Bench-derived step datasets.",
+  "type": "where",
+  "id": "TB130"
+ },
+ {
+  "corpus": "B",
+  "title": "Dependency-Based Neural Representations for Classifying Lines of Programs",
+  "question": "What is Vulcan in the line classification paper?",
+  "answerable": true,
+  "gold": "a neural architecture for classifying lines of programs as vulnerable",
+  "support": "We present a neural architecture, Vulcan, that successfully demonstrates both these requirements.",
+  "type": "define",
+  "id": "TB131"
+ },
+ {
+  "corpus": "B",
+  "title": "Dependency-Based Neural Representations for Classifying Lines of Programs",
+  "question": "How does Vulcan extract contextual information about tokens?",
+  "answerable": true,
+  "gold": "as AST paths fed to a bi-directional LSTM with attention",
+  "support": "It extracts contextual information about tokens in a line and inputs them as Abstract Syntax Tree (AST) paths to a bi-directional LSTM with an attention mechanism.",
+  "type": "how",
+  "id": "TB132"
+ },
+ {
+  "corpus": "B",
+  "title": "Dependency-Based Neural Representations for Classifying Lines of Programs",
+  "question": "How many hidden layers does the Vulcan architecture use?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count",
+  "id": "TB133"
+ },
+ {
+  "corpus": "B",
+  "title": "DocPilot: Interactive Agent Orchestration and Training for Long Visual Document Understanding",
+  "question": "Who is the DocPilot framework designed to make document solving learnable by?",
+  "answerable": true,
+  "gold": "small language models",
+  "support": "We introduce DocPilot, an agentic document framework that supports expressive orchestration and makes complex document solving learnable by small language models (SLMs).",
+  "type": "who",
+  "id": "TB134"
+ },
+ {
+  "corpus": "B",
+  "title": "DocPilot: Interactive Agent Orchestration and Training for Long Visual Document Understanding",
+  "question": "On what kind of documents does DocPilot operate?",
+  "answerable": true,
+  "gold": "long visual documents",
+  "support": "Abstract: Multimodal long-document question answering requires models to seek sparse evidence across pages and modalities, understand heterogeneous document content, and reason over the collected evidence.",
+  "type": "where",
+  "id": "TB135"
+ },
+ {
+  "corpus": "B",
+  "title": "DocPilot: Interactive Agent Orchestration and Training for Long Visual Document Understanding",
+  "question": "How many GPUs were used to train DocPilot?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count",
+  "id": "TB136"
+ },
+ {
+  "corpus": "B",
+  "title": "An empirically constrained Covariant Modified Gravity: exact reconstruction of galactic rotation curves and lensing",
+  "question": "What does the covariant modified gravity paper reproduce exactly?",
+  "answerable": true,
+  "gold": "flat rotation curves, gravitational lensing and Tully-Fisher scalings",
+  "support": "The action presented hence leads to field equations whose trace, under the approximations taken, has as solutions metric coefficients which exactly reproduce flat rotation curves, gravitational lensing observations and observationally determined Tully-Fisher galactic mass scalings of any required index.",
+  "type": "define",
+  "id": "TB137"
+ },
+ {
+  "corpus": "B",
+  "title": "An empirically constrained Covariant Modified Gravity: exact reconstruction of galactic rotation curves and lensing",
+  "question": "Up to what scale does the covariant modified gravity fit observational dynamics?",
+  "answerable": true,
+  "gold": "galaxy cluster scales",
+  "support": "This last allowing for an accurate fitting of observational dynamics up to galaxy cluster scales.",
+  "type": "where",
+  "id": "TB138"
+ },
+ {
+  "corpus": "B",
+  "title": "On Task-Level Dialogue Composition of Generative Transformer Model",
+  "question": "Why is task composition in generative dialogue models hard according to the dialogue composition paper?",
+  "answerable": true,
+  "gold": "models struggle to compose multiple tasks learned from single task dialogues",
+  "support": "The results from our experiments highlight the difficulty of even the sophisticated variant of transformer model in learning to compose multiple tasks from single task dialogues.",
+  "type": "why",
+  "id": "TB139"
+ },
+ {
+  "corpus": "B",
+  "title": "On Task-Level Dialogue Composition of Generative Transformer Model",
+  "question": "What two solutions are proposed in \"On Task-Level Dialogue Composition of Generative Transformer Model\"?",
+  "answerable": true,
+  "gold": "synthetic multiple task dialogue data and invariant encoder representations",
+  "support": "To that end, we propose and explore two solutions: (1) creating synthetic multiple task dialogue data for training from human-human single task dialogue and (2) forcing the encoder representation to be invariant to single and multiple task dialogues using an auxiliary loss.",
+  "type": "list",
+  "id": "TB140"
+ },
+ {
+  "corpus": "B",
+  "title": "On Task-Level Dialogue Composition of Generative Transformer Model",
+  "question": "Who naturally wants to accomplish several tasks in one conversation with a task-oriented dialogue system?",
+  "answerable": true,
+  "gold": "users",
+  "support": "It is natural for users of the system to want to accomplish multiple tasks within the same conversation, but the ability of generative models to compose multiple tasks is not well studied.",
+  "type": "who",
+  "id": "TB141"
+ },
+ {
+  "corpus": "B",
+  "title": "Causal Syntax Circuits in CodeLMs: Budget and Probe Decide What Looks Localised",
+  "question": "Over how many model-language settings is the causal syntax circuits pipeline run?",
+  "answerable": true,
+  "gold": "55",
+  "support": "We run one pipeline---mean ablation, activation patching, greedy circuit extraction, a random-control significance test, and activation steering---over 55 model-language settings spanning ten open code models (five base and five instruction-tuned), three target languages (Rust, C#, PHP), two prompt suites, and two component budgets.",
+  "type": "count",
+  "id": "TB142"
+ },
+ {
+  "corpus": "B",
+  "title": "Causal Syntax Circuits in CodeLMs: Budget and Probe Decide What Looks Localised",
+  "question": "By how much on average is the Python preference larger on instruction-tuned checkpoints than base versions?",
+  "answerable": true,
+  "gold": "12%",
+  "support": "First, the preference is large, grows with model size, and survives instruction tuning: it is larger on every instruction-tuned checkpoint than on its base version, by 12% on average.",
+  "type": "count",
+  "id": "TB143"
+ },
+ {
+  "corpus": "B",
+  "title": "Causal Syntax Circuits in CodeLMs: Budget and Probe Decide What Looks Localised",
+  "question": "How does the measured size of the Python preference change when using XLCoST parallel functions?",
+  "answerable": true,
+  "gold": "it drops from about 1.6 to about 0.01",
+  "support": "Second, its measured size is mostly a property of the probe; replacing our aligned prompts with XLCoST parallel functions takes the same measurement on the same models from about 1.6 to about 0.01.",
+  "type": "compare",
+  "id": "TB144"
+ },
+ {
+  "corpus": "B",
+  "title": "Causal Syntax Circuits in CodeLMs: Budget and Probe Decide What Looks Localised",
+  "question": "When does the Python preference stay large according to the causal syntax circuits paper?",
+  "answerable": true,
+  "gold": "after instruction tuning",
+  "support": "First, the preference is large, grows with model size, and survives instruction tuning: it is larger on every instruction-tuned checkpoint than on its base version, by 12% on average.",
+  "type": "when",
+  "id": "TB145"
+ },
+ {
+  "corpus": "B",
+  "title": "Training Multilingual Machine Translation by Alternately Freezing Language-Specific Encoders-Decoders",
+  "question": "Who are the authors of \"Training Multilingual Machine Translation by Alternately Freezing Language-Specific Encoders-Decoders\"?",
+  "answerable": true,
+  "gold": "Carlos Escolano, Marta R. Costa-jussà, José A. ...",
+  "support": "Authors: Carlos Escolano, Marta R.",
+  "type": "who",
+  "id": "TB146"
+ },
+ {
+  "corpus": "B",
+  "title": "Training Multilingual Machine Translation by Alternately Freezing Language-Specific Encoders-Decoders",
+  "question": "How does alternately freezing modules affect the common representation?",
+  "answerable": true,
+  "gold": "it indirectly forces a common intermediate representation for all languages",
+  "support": "Differently from previous works, we simultaneously train $N$ languages in all translation directions by alternately freezing encoder or decoder modules, which indirectly forces the system to train in a common intermediate representation for all languages.",
+  "type": "how",
+  "id": "TB147"
+ },
+ {
+  "corpus": "B",
+  "title": "BlackWatch: Increasing Attack Awareness Within Web Applications",
+  "question": "What is BlackWatch?",
+  "answerable": true,
+  "gold": "a tool that identifies malicious behaviour within web applications",
+  "support": "This research seeks to improve web application security by identifying malicious behaviour from within the context of web applications using our tool BlackWatch.",
+  "type": "define",
+  "id": "TB148"
+ },
+ {
+  "corpus": "B",
+  "title": "BlackWatch: Increasing Attack Awareness Within Web Applications",
+  "question": "Why must web applications be attack-aware beyond prevention?",
+  "answerable": true,
+  "gold": "detecting attacks lets them respond to slow or deter attackers",
+  "support": "Being able to detect when an attack is occurring provides applications with the ability to execute responses against malicious users in an attempt to slow down or deter their attacks.",
+  "type": "why",
+  "id": "TB149"
+ },
+ {
+  "corpus": "B",
+  "title": "BlackWatch: Increasing Attack Awareness Within Web Applications",
+  "question": "Against whom do attack-aware web applications execute responses in the BlackWatch paper?",
+  "answerable": true,
+  "gold": "malicious users",
+  "support": "Being able to detect when an attack is occurring provides applications with the ability to execute responses against malicious users in an attempt to slow down or deter their attacks.",
+  "type": "who",
+  "id": "TB150"
+ },
+ {
+  "corpus": "B",
+  "title": "PremiseSQL: Evaluating Premise Critique and Abstention in Text-to-SQL Systems",
+  "question": "How many flawed queries does PremiseSQL contain?",
+  "answerable": true,
+  "gold": "1,800",
+  "support": "To evaluate this capability, we propose PremiseSQL, a benchmark containing 1,800 flawed NL2SQL queries across four categories of premise failures, along with their 1,800 original queries.",
+  "type": "count",
+  "id": "TB151"
+ },
+ {
+  "corpus": "B",
+  "title": "PremiseSQL: Evaluating Premise Critique and Abstention in Text-to-SQL Systems",
+  "question": "Across how many categories of premise failure does PremiseSQL span?",
+  "answerable": true,
+  "gold": "four",
+  "support": "To evaluate this capability, we propose PremiseSQL, a benchmark containing 1,800 flawed NL2SQL queries across four categories of premise failures, along with their 1,800 original queries.",
+  "type": "count",
+  "id": "TB152"
+ },
+ {
+  "corpus": "B",
+  "title": "PremiseSQL: Evaluating Premise Critique and Abstention in Text-to-SQL Systems",
+  "question": "What is premise critique ability in NL2SQL?",
+  "answerable": true,
+  "gold": "the ability to recognize flawed queries and abstain from generating misleading SQL",
+  "support": "We introduce premise critique ability in NL2SQL, namely the ability to recognize flawed queries and abstain from generating misleading SQL.",
+  "type": "define",
+  "id": "TB153"
+ },
+ {
+  "corpus": "B",
+  "title": "PremiseSQL: Evaluating Premise Critique and Abstention in Text-to-SQL Systems",
+  "question": "Do current LLMs rarely critique flawed premises in PremiseSQL?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "Experiments on frontier LLMs show that current models are strongly premise-trusting by default and rarely critique flawed premises.",
+  "type": "yesno",
+  "id": "TB154"
+ },
+ {
+  "corpus": "B",
+  "title": "A unified approach to combinatorial triangles: a generalized Eulerian polynomial",
+  "question": "What does the \"unified approach to combinatorial triangles\" generalize?",
+  "answerable": true,
+  "gold": "the Eulerian polynomial",
+  "support": "Title: A unified approach to combinatorial triangles: a generalized Eulerian polynomial",
+  "type": "define",
+  "id": "TB155"
+ },
+ {
+  "corpus": "B",
+  "title": "A unified approach to combinatorial triangles: a generalized Eulerian polynomial",
+  "question": "To which arrays are the results applied in the combinatorial triangles paper?",
+  "answerable": true,
+  "gold": "an array from the Lambert function, staircase tableaux triangle, alternating-runs triangle of type B",
+  "support": "Finally, we apply our results to an array from the Lambert function, a triangular array from staircase tableaux and the alternating-runs triangle of type $B$ in a unified approach.",
+  "type": "list",
+  "id": "TB156"
+ },
+ {
+  "corpus": "B",
+  "title": "A unified approach to combinatorial triangles: a generalized Eulerian polynomial",
+  "question": "What is the Lambert function as defined in the combinatorial triangles paper?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "define",
+  "id": "TB157"
+ },
+ {
+  "corpus": "B",
+  "title": "Peri-Net-Pro: The neural processes with quantified uncertainty for crack patterns",
+  "question": "Why does Peri-Net-Pro use peridynamics instead of finite element methods?",
+  "answerable": true,
+  "gold": "it can compensate for FEM's problems generating crack pattern images",
+  "support": "First, we increased the amount and quality of the data using peridynamics, which can theoretically compensate for the problems of the finite element method (FEM) in generating crack pattern images.",
+  "type": "why",
+  "id": "TB158"
+ },
+ {
+  "corpus": "B",
+  "title": "Peri-Net-Pro: The neural processes with quantified uncertainty for crack patterns",
+  "question": "In which kind of simulation are the crack patterns obtained in Peri-Net-Pro?",
+  "answerable": true,
+  "gold": "molecular dynamics simulation using peridynamics",
+  "support": "In that way, the crack patterns are obtained according to each mode by Molecular Dynamic (MD) simulation using the peridynamics.",
+  "type": "where",
+  "id": "TB159"
+ },
+ {
+  "corpus": "B",
+  "title": "Peri-Net-Pro: The neural processes with quantified uncertainty for crack patterns",
+  "question": "What do the abbreviations PMB, LPS and VES stand for in Peri-Net-Pro?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "define",
+  "id": "TB160"
+ },
+ {
+  "corpus": "B",
+  "title": "Function-Space Temporal Self-Distillation for Policy Optimization",
+  "question": "By how much does FSPO improve over the strongest baseline?",
+  "answerable": true,
+  "gold": "approximately 4% points on average",
+  "support": "Across reasoning and tool-use benchmarks, FSPO achieves the highest average accuracy under a 5-hour training budget, improving over the strongest baseline by approximately 4% points on average while reducing peak memory from about 70 GB to 56 GB on Olmo3-7B-Instruct.",
+  "type": "count",
+  "id": "TB161"
+ },
+ {
+  "corpus": "B",
+  "title": "Function-Space Temporal Self-Distillation for Policy Optimization",
+  "question": "How much peak memory does FSPO use compared to before?",
+  "answerable": true,
+  "gold": "from about 70 GB to 56 GB",
+  "support": "Across reasoning and tool-use benchmarks, FSPO achieves the highest average accuracy under a 5-hour training budget, improving over the strongest baseline by approximately 4% points on average while reducing peak memory from about 70 GB to 56 GB on Olmo3-7B-Instruct.",
+  "type": "count",
+  "id": "TB162"
+ },
+ {
+  "corpus": "B",
+  "title": "Function-Space Temporal Self-Distillation for Policy Optimization",
+  "question": "Why was Olmo3-7B-Instruct chosen for FSPO experiments?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "why",
+  "id": "TB163"
+ },
+ {
+  "corpus": "B",
+  "title": "Learning Abstract Models for Strategic Exploration and Fast Reward Transfer",
+  "question": "What is an abstract MDP in \"Learning Abstract Models for Strategic Exploration and Fast Reward Transfer\"?",
+  "answerable": true,
+  "gold": "an MDP over low-dimensional coarse abstract states",
+  "support": "Instead, to avoid compounding errors, we propose learning an abstract MDP over abstract states: low-dimensional coarse representations of the state (e.g., capturing agent position, ignoring other objects).",
+  "type": "define",
+  "id": "TB164"
+ },
+ {
+  "corpus": "B",
+  "title": "Learning Abstract Models for Strategic Exploration and Fast Reward Transfer",
+  "question": "Why do the authors avoid learning a full MDP over raw pixels?",
+  "answerable": true,
+  "gold": "it requires function approximation that leads to compounding errors",
+  "support": "However, learning an accurate Markov Decision Process (MDP) over high-dimensional states (e.g., raw pixels) is extremely challenging because it requires function approximation, which leads to compounding errors.",
+  "type": "why",
+  "id": "TB165"
+ },
+ {
+  "corpus": "B",
+  "title": "Progress Reward Model for Reinforcement Learning via Large Language Models",
+  "question": "What is PRM4RL?",
+  "answerable": true,
+  "gold": "the Progress Reward Model for RL, integrating task planning and dense reward",
+  "support": "In this paper, we propose the Progress Reward Model for RL (PRM4RL), a novel framework that integrates task planning and dense reward to enhance RL.",
+  "type": "define",
+  "id": "TB166"
+ },
+ {
+  "corpus": "B",
+  "title": "Progress Reward Model for Reinforcement Learning via Large Language Models",
+  "question": "How is a complex task handled for high-level planning in PRM4RL?",
+  "answerable": true,
+  "gold": "it is decomposed into simple subtasks with a progress function",
+  "support": "For high-level planning, a complex task is decomposed into a series of simple manageable subtasks, with a subtask-oriented, fine-grained progress function designed to monitor task execution progress.",
+  "type": "how",
+  "id": "TB167"
+ },
+ {
+  "corpus": "B",
+  "title": "Progress Reward Model for Reinforcement Learning via Large Language Models",
+  "question": "Who are the authors of \"Progress Reward Model for Reinforcement Learning via Large Language Models\"?",
+  "answerable": true,
+  "gold": "Xiuhui Zhang, Ning Gao, Xingyu Jiang, Yihui Chen, Yuheng Pan, Mohan Zhang, Yue Deng",
+  "support": "Authors: Xiuhui Zhang, Ning Gao, Xingyu Jiang, Yihui Chen, Yuheng Pan, Mohan Zhang, Yue Deng",
+  "type": "who",
+  "id": "TB168"
+ },
+ {
+  "corpus": "B",
+  "title": "End-to-End Speech Translation with Knowledge Distillation",
+  "question": "On which corpora were the end-to-end speech translation experiments run?",
+  "answerable": true,
+  "gold": "English-French Augmented LibriSpeech and English-Chinese TED",
+  "support": "Experiments on English- French Augmented LibriSpeech and English-Chinese TED corpus show that end-to-end ST is possible to implement on both similar and dissimilar language pairs.",
+  "type": "where",
+  "id": "TB169"
+ },
+ {
+  "corpus": "B",
+  "title": "End-to-End Speech Translation with Knowledge Distillation",
+  "question": "What advantages do end-to-end speech translation models have over pipelines?",
+  "answerable": true,
+  "gold": "lower latency, smaller model size and less error propagation",
+  "support": "Compared to conventional pipeline systems, end-to-end ST models have advantages of lower latency, smaller model size and less error propagation.",
+  "type": "list",
+  "id": "TB170"
+ },
+ {
+  "corpus": "B",
+  "title": "End-to-End Speech Translation with Knowledge Distillation",
+  "question": "How do end-to-end speech translation models compare with conventional pipeline systems?",
+  "answerable": true,
+  "gold": "lower latency, smaller model size and less error propagation",
+  "support": "Compared to conventional pipeline systems, end-to-end ST models have advantages of lower latency, smaller model size and less error propagation.",
+  "type": "compare",
+  "id": "TB171"
+ },
+ {
+  "corpus": "B",
+  "title": "Infusing Disease Knowledge into BERT for Health Question Answering, Medical Inference and Disease Name Recognition",
+  "question": "Which BERT models are enhanced by disease knowledge infusion?",
+  "answerable": true,
+  "gold": "BERT, BioBERT, SciBERT, ClinicalBERT, BlueBERT, and ALBERT",
+  "support": "Specifically, we propose a new disease knowledge infusion training procedure and evaluate it on a suite of BERT models including BERT, BioBERT, SciBERT, ClinicalBERT, BlueBERT, and ALBERT.",
+  "type": "list",
+  "id": "TB172"
+ },
+ {
+  "corpus": "B",
+  "title": "Infusing Disease Knowledge into BERT for Health Question Answering, Medical Inference and Disease Name Recognition",
+  "question": "How many tasks are used to evaluate disease knowledge infusion?",
+  "answerable": true,
+  "gold": "three",
+  "support": "Experiments over the three tasks show that these models can be enhanced in nearly all cases, demonstrating the viability of disease knowledge infusion.",
+  "type": "count",
+  "id": "TB173"
+ },
+ {
+  "corpus": "B",
+  "title": "Fast and Stable Interval Bounds Propagation for Training Verifiably Robust Models",
+  "question": "On whose work is the interval bounds propagation paper built?",
+  "answerable": true,
+  "gold": "Gowal et al.",
+  "support": "This framework is built upon the work of Gowal et al., who applies the interval arithmetic to bound the activations at each layer and keeps the prediction invariant to the input perturbation.",
+  "type": "who",
+  "id": "TB174"
+ },
+ {
+  "corpus": "B",
+  "title": "Fast and Stable Interval Bounds Propagation for Training Verifiably Robust Models",
+  "question": "Why is the original interval bound propagation method hard to use?",
+  "answerable": true,
+  "gold": "it needs careful hyper-parameter tuning and many epochs",
+  "support": "While that method is faster than competitive approaches, it requires careful tuning of hyper-parameters and a large number of epochs to converge.",
+  "type": "why",
+  "id": "TB175"
+ },
+ {
+  "corpus": "B",
+  "title": "Fast and Stable Interval Bounds Propagation for Training Verifiably Robust Models",
+  "question": "Whose practical convenience is improved by the less sensitive interval bounds propagation model?",
+  "answerable": true,
+  "gold": "practitioners",
+  "support": "Moreover, the proposed model is not so sensitive to the exact specification of the training process, which makes it easier to use by practitioners.",
+  "type": "who",
+  "id": "TB176"
+ },
+ {
+  "corpus": "B",
+  "title": "Formulations of elastodynamic equations for anisotropic multiphase porous piezoelectric media based on global energy conservation",
+  "question": "What theory is established from global energy conservation for porous piezoelectric media?",
+  "answerable": true,
+  "gold": "a linear dynamic and constitutive theory",
+  "support": "In this work, we establish a linear dynamic and constitutive theory for anisotropic multiphase porous piezoelectric media from global energy conservation (GEC).",
+  "type": "define",
+  "id": "TB177"
+ },
+ {
+  "corpus": "B",
+  "title": "Formulations of elastodynamic equations for anisotropic multiphase porous piezoelectric media based on global energy conservation",
+  "question": "Why do existing theories of multiphase porous piezoelectric media have problems?",
+  "answerable": true,
+  "gold": "they need ad hoc virtual-mass tensors or lack thermodynamic safeguards",
+  "support": "The former forces \\emph{ad hoc} virtual-mass tensors to describe interphase inertia, while the latter provides no intrinsic safeguard against thermodynamic inconsistency when piezoelectric and multiphase couplings are superposed.",
+  "type": "why",
+  "id": "TB178"
+ },
+ {
+  "corpus": "B",
+  "title": "Safe Stream-Based Programming with Refinement Types",
+  "question": "How does the stream-based programming paper prove UI thread-safety?",
+  "answerable": true,
+  "gold": "with type refinement tracking threads",
+  "support": "Our key insight is that the fluent APIs of stream-processing frameworks enable the tracking of threads via type-refinement, making it possible to reason automatically about what thread a piece of code runs on -- a difficult problem in general.",
+  "type": "how",
+  "id": "TB179"
+ },
+ {
+  "corpus": "B",
+  "title": "Safe Stream-Based Programming with Refinement Types",
+  "question": "Why is stream-based code hard to reason about when interacting with UI frameworks?",
+  "answerable": true,
+  "gold": "threading behaviour of streaming constructs is non-intuitive",
+  "support": "This is particularly impactful when asynchronous stream-based code interacts with thread-limited features such as UI frameworks that restrict UI access to a single thread, since the threading behavior of streaming constructs is often non-intuitive and insufficiently documented.",
+  "type": "why",
+  "id": "TB180"
+ },
+ {
+  "corpus": "B",
+  "title": "Safe Stream-Based Programming with Refinement Types",
+  "question": "Is the code for \"Safe Stream-Based Programming with Refinement Types\" publicly available on GitHub?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "yesno",
+  "id": "TB181"
+ },
+ {
+  "corpus": "B",
+  "title": "Diff Diffusion: Predicting Edit Paths with Diffusion Models for Efficient Code Editing",
+  "question": "Why is regenerating a full code segment wasteful for edit prediction?",
+  "answerable": true,
+  "gold": "changes are sparse and preserve most source tokens",
+  "support": "Such changes are usually sparse and preserve most source tokens, so regenerating a full code segment wastes computation.",
+  "type": "why",
+  "id": "TB182"
+ },
+ {
+  "corpus": "B",
+  "title": "Diff Diffusion: Predicting Edit Paths with Diffusion Models for Efficient Code Editing",
+  "question": "In which software tools does edit prediction matter for the Diff Diffusion paper?",
+  "answerable": true,
+  "gold": "AI-assisted IDEs",
+  "support": "This setting is poorly matched to modern AI-assisted IDEs, where edit prediction must infer the next code change from recent edits, the current file, and cursor-local context.",
+  "type": "where",
+  "id": "TB183"
+ },
+ {
+  "corpus": "B",
+  "title": "Diff Diffusion: Predicting Edit Paths with Diffusion Models for Efficient Code Editing",
+  "question": "Does Diff Diffusion represent denoising as structured edit operations?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "Diff Diffusion represents denoising as structured edit operations, and combines this formulation with multi-stage training and efficient parallel decoding.",
+  "type": "yesno",
+  "id": "TB184"
+ },
+ {
+  "corpus": "B",
+  "title": "Diff Diffusion: Predicting Edit Paths with Diffusion Models for Efficient Code Editing",
+  "question": "Does the Diff Diffusion paper report results on HumanEval?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "yesno",
+  "id": "TB185"
+ },
+ {
+  "corpus": "B",
+  "title": "Total $k$-Uniform Graphs",
+  "question": "What is a total k-uniform graph?",
+  "answerable": true,
+  "gold": "a graph where total domination number equals Grundy total domination number equal to k",
+  "support": "For every positive integer $k$, we call $G$ a total $k$-uniform graph if $γ_t(G)=γ_{gr}^t(G)=k$.",
+  "type": "define",
+  "id": "TB186"
+ },
+ {
+  "corpus": "B",
+  "title": "Total $k$-Uniform Graphs",
+  "question": "Is there a total k-uniform graph when k is odd?",
+  "answerable": true,
+  "gold": "No",
+  "support": "We prove that there is no total $k$-uniform graph when $k$ is odd.",
+  "type": "yesno",
+  "id": "TB187"
+ },
+ {
+  "corpus": "B",
+  "title": "Evaluation Awareness Beyond English: Do LLMs Act Differently When Tested in Indic Languages?",
+  "question": "How many Indic languages are tested in \"Evaluation Awareness Beyond English\"?",
+  "answerable": true,
+  "gold": "five",
+  "support": "We test four instruction-tuned models from three families in five Indic languages alongside English.",
+  "type": "count",
+  "id": "TB188"
+ },
+ {
+  "corpus": "B",
+  "title": "Evaluation Awareness Beyond English: Do LLMs Act Differently When Tested in Indic Languages?",
+  "question": "What is evaluation awareness?",
+  "answerable": true,
+  "gold": "the ability of LLMs to tell when they are being tested",
+  "support": "This ability, known as evaluation awareness, can lead models to act more cautiously during safety evaluations than in real use.",
+  "type": "define",
+  "id": "TB189"
+ },
+ {
+  "corpus": "B",
+  "title": "Evaluation Awareness Beyond English: Do LLMs Act Differently When Tested in Indic Languages?",
+  "question": "How many people speak Indic languages?",
+  "answerable": true,
+  "gold": "over a billion",
+  "support": "Indic languages are spoken by over a billion people, yet evaluation awareness remains almost entirely unstudied in them.",
+  "type": "count",
+  "id": "TB190"
+ },
+ {
+  "corpus": "B",
+  "title": "Applying GPGPU to Recurrent Neural Network Language Model based Fast Network Search in the Real-Time LVCSR",
+  "question": "What does GPGPU stand for in the RNNLM paper?",
+  "answerable": true,
+  "gold": "General Purpose Graphic Processing Units",
+  "support": "In order to accelerate the speed of RNNLM-based network searches during decoding, we apply the General Purpose Graphic Processing Units (GPGPUs).",
+  "type": "define",
+  "id": "TB191"
+ },
+ {
+  "corpus": "B",
+  "title": "Applying GPGPU to Recurrent Neural Network Language Model based Fast Network Search in the Real-Time LVCSR",
+  "question": "How does the RNNLM GPGPU paper speed up decoding?",
+  "answerable": true,
+  "gold": "by reducing redundant CPU computation and CPU-GPU transfer",
+  "support": "We have achieved our goal by reducing redundant computations on CPUs and amount of transfer between GPGPUs and CPUs.",
+  "type": "how",
+  "id": "TB192"
+ },
+ {
+  "corpus": "B",
+  "title": "Applying GPGPU to Recurrent Neural Network Language Model based Fast Network Search in the Real-Time LVCSR",
+  "question": "In which kind of application is the RNNLM applied using GPGPUs?",
+  "answerable": true,
+  "gold": "real-time LVCSR",
+  "support": "However, the high computational complexity of RNNLMs has been a hurdle in applying the RNNLM to a real-time Large Vocabulary Continuous Speech Recognition (LVCSR).",
+  "type": "where",
+  "id": "TB193"
+ },
+ {
+  "corpus": "B",
+  "title": "SCRIBE: Scalable Contextual Representations of Interpretable Brain-Grounded Semantics",
+  "question": "When are brain activity recordings collected in the SCRIBE study?",
+  "answerable": true,
+  "gold": "while participants listen to naturalistic stories",
+  "support": "Using brain activity recorded while participants listen to naturalistic stories, we further demonstrate that SCRIBE predicts neural responses in language-selective brain regions, significantly outperforming non-contextual semantic representations.",
+  "type": "when",
+  "id": "TB194"
+ },
+ {
+  "corpus": "B",
+  "title": "SCRIBE: Scalable Contextual Representations of Interpretable Brain-Grounded Semantics",
+  "question": "Who is the corresponding author of SCRIBE?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who",
+  "id": "TB195"
+ },
+ {
+  "corpus": "B",
+  "title": "SCRIBE: Scalable Contextual Representations of Interpretable Brain-Grounded Semantics",
+  "question": "In which country was the SCRIBE behavioral study conducted?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "where",
+  "id": "TB196"
+ },
+ {
+  "corpus": "B",
+  "title": "SCRIBE: Scalable Contextual Representations of Interpretable Brain-Grounded Semantics",
+  "question": "How were the 921 SCRIBE participants recruited?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "how",
+  "id": "TB197"
+ },
+ {
+  "corpus": "B",
+  "title": "Balanced Meta-Softmax for Long-Tailed Visual Recognition",
+  "question": "Who are the authors of \"Balanced Meta-Softmax for Long-Tailed Visual Recognition\"?",
+  "answerable": true,
+  "gold": "Jiawei Ren, Cunjun Yu, Shunan Sheng, Xiao Ma, Haiyu Zhao, Shuai Yi, Hongsheng Li",
+  "support": "Authors: Jiawei Ren, Cunjun Yu, Shunan Sheng, Xiao Ma, Haiyu Zhao, Shuai Yi, Hongsheng Li",
+  "type": "who",
+  "id": "TB198"
+ },
+ {
+  "corpus": "B",
+  "title": "Balanced Meta-Softmax for Long-Tailed Visual Recognition",
+  "question": "In what year was the Balanced Meta-Softmax work published?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "when",
+  "id": "TB199"
+ },
+ {
+  "corpus": "B",
+  "title": "Balanced Meta-Softmax for Long-Tailed Visual Recognition",
+  "question": "Which datasets does the Balanced Meta-Softmax paper evaluate on?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "list",
+  "id": "TB200"
+ }
+]
