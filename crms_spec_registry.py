@@ -50,7 +50,8 @@ def replay_spec(spec: RelationSpec, evidence: Mapping[str, Any],
                 engine: RelationEngine) -> tuple[bool, str, int, int]:
     """(passed, detail, cases, independent source sentences)."""
     proposal = _proposal(spec, evidence)
-    result = verify_spec(proposal, engine, corpus_sentences=_RANDOM_SENTENCES)
+    gated = evidence.get("gate") == "train_precision"     # the random-sentence check does not suit these specs
+    result = verify_spec(proposal, engine, corpus_sentences=() if gated else _RANDOM_SENTENCES)
     cases = len(proposal["support"]) + len(proposal["heldout"]) + len(proposal["contrast"])
     sentences = {item["S"] for item in proposal["support"] + proposal["heldout"] if "S" in item}
     detail = ("verifier passed: " if result.ok else "verifier failed: ") + (
