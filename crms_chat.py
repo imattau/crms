@@ -53,7 +53,9 @@ from crms_frame_registry import (
     frame_rule_for, governed_frame_ids, record_request_frame_use,
     register_request_frame_rule, sync_request_frame_registry,
 )
-from crms_nl_gate import gate_quoted_evidence, supports_question_type
+from crms_nl_gate import (gate_displayed_quote, gate_quoted_evidence,
+                          is_plain_question, supports_question_type,
+                          trace_gate_decision)
 from crms_procedure_discovery import (
     nearest_parameter_heading,
     propose_contextual_procedure_phrase_candidates,
@@ -6148,8 +6150,36 @@ def _natural_rule_requests(message: str) -> tuple[str, list[list[int]]] | None:
     return instruction, values
 
 
+# Intent families whose relation specs may answer before the quote route. One
+# family per change; a family is on by default only after the full regression
+# shows no new failures.
+RELATION_FAMILIES: dict[str, frozenset[str]] = {
+    "agent": frozenset({"work_by_artist", "agent_transformed"}),
+}
+RELATION_FIRST_DEFAULT = "agent"
+
+
+def _relation_first_engine(index: Any, family: str):
+    """RelationEngine over the packaged pattern resources (the seeded defaults)
+    for one intent family, or None when the index cannot serve its sentences."""
+    if family == "off" or not hasattr(index, "exact_title_matches"):
+        return None
+    from crms_pattern_defaults import seeded_resources
+    from crms_pattern_sources import IndexSentenceSource
+    from crms_relation_specs import RelationEngine
+    language, specs, params, _rewrites = seeded_resources()
+    engine = RelationEngine(language, specs, IndexSentenceSource(index), params)
+    engine.allowed = set(RELATION_FAMILIES[family])
+    return engine
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--relation-first", default=RELATION_FIRST_DEFAULT,
+                        choices=("off", *RELATION_FAMILIES),
+                        help="try the learned relation specs of this intent family "
+                             "before the quote route, falling back when they return "
+                             "nothing (default: %(default)s)")
     parser.add_argument("--model-db", type=Path, default=None,
                         help="start from a portable CRMS SQLite learned-model database")
     parser.add_argument("--knowledge", type=Path, default=Path("crms_knowledge.json"),
@@ -6750,6 +6780,7 @@ def main() -> int:
         if sqlite_index
         else CRMSResearchIndex())
     initial_index_state = _index_file_state(args.index)
+    relation_first_engine = _relation_first_engine(index, args.relation_first)
     if args.index_read_only:
         print(f"Research index opened read-only: {args.index}")
     from crms_dialogue_intent import CRMSDialogueIntentModel
@@ -11480,6 +11511,30 @@ def main() -> int:
         retrieved_source_sentences = (
             list(turn.research.source_sentences or [])
             if turn.research is not None else [])
+        relation_first_used = False
+        if (relation_first_engine is not None
+                and turn.status in {"unknown", "sources_found"}
+                and not (turn.research is not None and turn.research.candidates)
+                and not (turn.response is not None
+                         and turn.response.status in {"answered", "ambiguous"})):
+            relation_conflicts: list = []
+            relation_answer = relation_first_engine.ask(
+                resolved_line, conflicts=relation_conflicts)
+            if relation_answer is not None and not relation_conflicts:
+                relation_first_used = True
+                turn.status = "relation_answered"
+                turn.text = (f"{relation_answer.answer} "
+                             f"[Source: {relation_answer.title}; relation "
+                             f"{relation_answer.spec}; quoted evidence, not an "
+                             "accepted fact]")
+                if turn.research is None:
+                    turn.research = ResearchResult(status="sources_found")
+                turn.research.source_sentences = [{
+                    "title": relation_answer.title,
+                    "text": relation_answer.source,
+                    "context_kind": "assertion"}]
+                turn.research.realized_answer = None
+                turn.research.passages = []
         percentage_point_question = _natural_percentage_point_question(line)
         percentage_point_evidence = None
         percentage_point_route_used = False
@@ -12810,6 +12865,7 @@ def main() -> int:
             and source_realization.get("method")
                 == "explicit-agent subject-gap realization")
         specialist_route_used = any((
+            relation_first_used,
             who_route_used, typed_relation_route_used, polar_route_used,
             where_route_used, when_route_used, why_route_used, object_wh_route_used,
             irregular_form_route_used,
@@ -12879,6 +12935,29 @@ def main() -> int:
                 gate_rows.insert(0, {"text": quoted.group(1)})
             decision = gate_quoted_evidence(
                 gate_question, gate_rows, licensed_predicates=licensed_predicates)
+            if (decision["status"] == "unsupported" and turn.research is not None
+                    and is_plain_question(gate_question)):
+                # No bounded parser for this question shape (or a yes/no
+                # question): the chat would quote its top hit unchecked.
+                # Judge the one sentence it is about to show on the
+                # shape-independent dimensions and keep it only if none fails.
+                shown_row = None
+                if (turn.text.startswith("Source text:")
+                        and turn.research.source_sentences):
+                    shown_row = turn.research.source_sentences[0]
+                elif quoted_evidence_reply and has_realized_answer:
+                    realized = turn.research.realized_answer
+                    shown_row = {"text": str(realized.get("text", "")),
+                                 "title": realized.get("source_title", "")}
+                if shown_row is not None and shown_row.get("text"):
+                    decision = gate_displayed_quote(
+                        gate_question, shown_row,
+                        licensed_predicates=licensed_predicates)
+                    if decision["status"] == "accepted":
+                        decision = {"status": "unchanged", "evidence": None,
+                                    "reasons": []}
+            trace_gate_decision(gate_question, gate_rows, licensed_predicates,
+                                decision)
             selected = decision.get("evidence")
             if decision["status"] == "accepted" and selected is not None:
                 title = selected.get("title") or selected.get("source_title") or "source"

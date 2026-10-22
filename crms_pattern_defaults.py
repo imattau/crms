@@ -20,3 +20,13 @@ def seeded_resources() -> tuple[Any, tuple, dict, tuple]:
                  tuple(memory.rewrites()))
     memory.close()
     return resources
+
+
+@lru_cache(maxsize=1)
+def seeded_policy() -> dict[str, dict[str, Any]]:
+    """Quote-evidence gate policy (``pat_gate_policy``) from the seed file."""
+    memory = PatternMemory(":memory:")
+    memory.seed()
+    policy = memory.gate_policy()
+    memory.close()
+    return policy

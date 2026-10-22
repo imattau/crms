@@ -1667,6 +1667,139 @@
    "anchored": false,
    "rationale": "negative polarity cue",
    "origin": "seed"
+  },
+  {
+   "family": "fragment_cue",
+   "name": "section_label",
+   "priority": 10,
+   "patterns": [
+    "X[title|abstract|conclusion|conclusions|objective|objectives|background|methods|results|introduction|purpose|summary] X[:]"
+   ],
+   "result": "leading section label",
+   "anchored": true,
+   "rationale": "a document section heading pasted before the text, not a sentence",
+   "origin": "seed"
+  },
+  {
+   "family": "fragment_cue",
+   "name": "infobox",
+   "priority": 20,
+   "patterns": [
+    "X[infobox]"
+   ],
+   "result": "infobox markup",
+   "anchored": true,
+   "rationale": "template markup from an article header",
+   "origin": "seed"
+  },
+  {
+   "family": "fragment_cue",
+   "name": "dated_list_entry",
+   "priority": 30,
+   "patterns": [
+    "NUM X[–|—]",
+    "X[january|february|march|april|may|june|july|august|september|october|november|december] NUM X[–|—]",
+    "DATE X[–|—]"
+   ],
+   "result": "timeline list entry",
+   "anchored": true,
+   "rationale": "a dated list item whose subject is the page, not a sentence about the question's entity",
+   "origin": "seed"
+  },
+  {
+   "family": "generic_word",
+   "name": "generic_nouns",
+   "priority": 10,
+   "patterns": [
+    "X[kind|kinds|type|types|sort|sorts|point|paper|papers|article|method|methods|approach|model|models|study|work|event|thing|things|example|examples|framework]"
+   ],
+   "result": "GENERIC",
+   "anchored": false,
+   "rationale": "words that name the document or a category, not the relation asked about",
+   "origin": "seed"
+  }
+ ],
+ "gate_policy": [
+  {
+   "dimension": "fragment",
+   "answer_types": null,
+   "invariant": true,
+   "threshold": null,
+   "typed_reason": "pasted fragment, title, or truncated text",
+   "rationale": "a source hit that is a heading, table row, or cut-off text cannot be an answer for any question shape",
+   "origin": "seed"
+  },
+  {
+   "dimension": "entity_absent",
+   "answer_types": null,
+   "invariant": true,
+   "threshold": null,
+   "typed_reason": "the question's entity is not in the sentence",
+   "rationale": "a sentence that never names what was asked about answers about something else",
+   "origin": "seed"
+  },
+  {
+   "dimension": "relation_not_predicated",
+   "answer_types": null,
+   "invariant": true,
+   "threshold": null,
+   "typed_reason": "the asked relation is not stated",
+   "rationale": "no question term, or a required modifier, is missing from the sentence",
+   "origin": "seed"
+  },
+  {
+   "dimension": "relation_coverage",
+   "answer_types": null,
+   "invariant": true,
+   "threshold": 0.67,
+   "typed_reason": "too few of the question's terms are in the sentence",
+   "rationale": "at half or more of the non-generic question terms missing, the sentence is topical rather than responsive",
+   "origin": "seed"
+  },
+  {
+   "dimension": "answer_type_mismatch",
+   "answer_types": [
+    "WHO",
+    "WHERE",
+    "WHEN",
+    "MEASURE",
+    "COUNT",
+    "HOW",
+    "DEF",
+    "NAME"
+   ],
+   "invariant": true,
+   "threshold": null,
+   "typed_reason": "the sentence cannot hold this kind of answer",
+   "rationale": "a date, number, place, name, or procedure is required and absent",
+   "origin": "seed"
+  },
+  {
+   "dimension": "answer_slot_unfilled",
+   "answer_types": null,
+   "invariant": true,
+   "threshold": null,
+   "typed_reason": "the slot the question asks for is empty",
+   "rationale": "a year, or a number next to the counted noun, is required and absent",
+   "origin": "seed"
+  },
+  {
+   "dimension": "role_order",
+   "answer_types": [
+    "WHO",
+    "WHERE",
+    "WHEN",
+    "MEASURE",
+    "COUNT",
+    "HOW",
+    "DEF",
+    "NAME"
+   ],
+   "invariant": true,
+   "threshold": null,
+   "typed_reason": "the roles are reversed",
+   "rationale": "entity, relation, and answer appear in a different order than asked",
+   "origin": "seed"
   }
  ]
 }

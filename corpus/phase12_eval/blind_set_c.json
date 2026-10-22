@@ -1,0 +1,2402 @@
+[
+ {
+  "id": "CA001",
+  "corpus": "A",
+  "title": "Metal Gear Solid 2: Sons of Liberty",
+  "question": "Who voiced Raiden in Metal Gear Solid 2: Sons of Liberty?",
+  "answerable": true,
+  "gold": "Quinton Flynn",
+  "support": "Raiden (Jack), an orphan, voiced by Quinton Flynn.",
+  "type": "who"
+ },
+ {
+  "id": "CA002",
+  "corpus": "A",
+  "title": "Metal Gear Solid 2: Sons of Liberty",
+  "question": "When was Metal Gear Solid 2: Sons of Liberty published for the PlayStation 2?",
+  "answerable": true,
+  "gold": "2001",
+  "support": "Metal Gear Solid 2: Sons Of Liberty is an action stealth video game created by Konami Computer Entertainment Japan and published by Konami for the PlayStation 2 in 2001.",
+  "type": "when"
+ },
+ {
+  "id": "CA003",
+  "corpus": "A",
+  "title": "Metal Gear Solid 2: Sons of Liberty",
+  "question": "Did Metal Gear Solid 2: Sons of Liberty sell more than ten million copies worldwide?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "yesno"
+ },
+ {
+  "id": "CA004",
+  "corpus": "A",
+  "title": "Punta del Este International Airport",
+  "question": "How long is the main runway at Punta del Este International Airport?",
+  "answerable": true,
+  "gold": "2,133 m",
+  "support": "The main runway is 2,133 m long and 45 m wide, and is capable of receiving medium-sized aircraft, such as Boeing 737 and Airbus A320.",
+  "type": "count"
+ },
+ {
+  "id": "CA005",
+  "corpus": "A",
+  "title": "Punta del Este International Airport",
+  "question": "When did Consorcio Aeropuertos Internacionales S.A. begin operating the Punta del Este air terminal?",
+  "answerable": true,
+  "gold": "December 24, 1993",
+  "support": "It began operating the Punta del Este air terminal on December 24, 1993.",
+  "type": "when"
+ },
+ {
+  "id": "CA006",
+  "corpus": "A",
+  "title": "Punta del Este International Airport",
+  "question": "Why was Naval Air Base No. 2 at Laguna del Sauce named after Carlos Curbelo?",
+  "answerable": true,
+  "gold": "He was the head of the Navy Aeronautical Service who died in operation in 1942",
+  "support": "Naval Air Base No. 2 was named Lieutenant Commander Carlos Curbelo, head of the Navy Aeronautical Service, who had died in operation in 1942.",
+  "type": "why"
+ },
+ {
+  "id": "CA007",
+  "corpus": "A",
+  "title": "Lady Susan",
+  "question": "Who wrote the epistolary novel Lady Susan?",
+  "answerable": true,
+  "gold": "Jane Austen",
+  "support": "Lady Susan is an early epistolary novel (novel in letters) by Jane Austen.",
+  "type": "who"
+ },
+ {
+  "id": "CA008",
+  "corpus": "A",
+  "title": "Lady Susan",
+  "question": "What is an epistolary novel, as described in the Lady Susan article?",
+  "answerable": true,
+  "gold": "A novel in letters",
+  "support": "Lady Susan is an early epistolary novel (novel in letters) by Jane Austen.",
+  "type": "define"
+ },
+ {
+  "id": "CA009",
+  "corpus": "A",
+  "title": "Lady Susan",
+  "question": "How many copies of Lady Susan were printed in its first edition?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "how"
+ },
+ {
+  "id": "CA010",
+  "corpus": "A",
+  "title": "Slobodan Milošević",
+  "question": "When did Slobodan Milošević become President of the Presidency of the Socialist Republic of Serbia?",
+  "answerable": true,
+  "gold": "May 8, 1989",
+  "support": "Became \"President of the Presidency\" of the Socialist Republic of Serbia (a constituent country of SFR Yugoslavia) on May 8, 1989.",
+  "type": "when"
+ },
+ {
+  "id": "CA011",
+  "corpus": "A",
+  "title": "Slobodan Milošević",
+  "question": "Why was the ICTY trial of Slobodan Milošević never completed?",
+  "answerable": true,
+  "gold": "He died after five years in prison before the trial finished",
+  "support": "However, he died after five years in prison before the trial was completed.",
+  "type": "why"
+ },
+ {
+  "id": "CA012",
+  "corpus": "A",
+  "title": "Slobodan Milošević",
+  "question": "Did Slobodan Milošević study law at the University of Belgrade?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "yesno"
+ },
+ {
+  "id": "CA013",
+  "corpus": "A",
+  "title": "MacCarthy of Muskerry",
+  "question": "Who founded the MacCarthy of Muskerry branch of the MacCarthy dynasty?",
+  "answerable": true,
+  "gold": "Dermot MacCarthy",
+  "support": "The MacCarthy of Muskerry branch was founded by Dermot MacCarthy, the second son of Cormac MacCarthy Mor, King of Desmond.",
+  "type": "who"
+ },
+ {
+  "id": "CA014",
+  "corpus": "A",
+  "title": "MacCarthy of Muskerry",
+  "question": "Why did the MacCarthy of Muskerry family lose its noble status?",
+  "answerable": true,
+  "gold": "Donough MacCarthy, 4th Earl of Clancarty, supported James II in the Williamite War and was attainted",
+  "support": "In 1691, Donough MacCarthy, the 4th Earl of Clancarty, supported James II during the Williamite War in Ireland.",
+  "type": "why"
+ },
+ {
+  "id": "CA015",
+  "corpus": "A",
+  "title": "MacCarthy of Muskerry",
+  "question": "Where is the burial place of Dermot MacCarthy, the first Lord of Muskerry?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "where"
+ },
+ {
+  "id": "CA016",
+  "corpus": "A",
+  "title": "Pygmy peoples",
+  "question": "What does the word pygmy describe?",
+  "answerable": true,
+  "gold": "Several ethnic groups with unusually short people",
+  "support": "Pygmy is a word that describes several ethnic groups with unusually short people.",
+  "type": "define"
+ },
+ {
+  "id": "CA017",
+  "corpus": "A",
+  "title": "Pygmy peoples",
+  "question": "Which pygmy groups are the best known?",
+  "answerable": true,
+  "gold": "The Aka, Efé and Mbuti of central Africa",
+  "support": "The best known pygmies are the Aka, Efé and Mbuti of central Africa.",
+  "type": "list"
+ },
+ {
+  "id": "CA018",
+  "corpus": "A",
+  "title": "Pygmy peoples",
+  "question": "How tall are Mbuti pygmies on average in centimetres?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "how"
+ },
+ {
+  "id": "CA019",
+  "corpus": "A",
+  "title": "Wartburg Castle",
+  "question": "Where is Wartburg Castle located?",
+  "answerable": true,
+  "gold": "On a cliff southwest of Eisenach in Thuringia, Germany",
+  "support": "Wartburg Castle is a castle on a 1230-foot (410-m) cliff to the southwest of Eisenach, in the state of Thuringia, Germany.",
+  "type": "where"
+ },
+ {
+  "id": "CA020",
+  "corpus": "A",
+  "title": "Wartburg Castle",
+  "question": "When was Wartburg Castle added to the UNESCO World Heritage List?",
+  "answerable": true,
+  "gold": "1999",
+  "support": "In 1999 UNESCO added Wartburg Castle to the World Heritage List as an \"Outstanding Monument of the Feudal Period in Central Europe\" because of its \"Cultural Values of Universal Significance\".",
+  "type": "when"
+ },
+ {
+  "id": "CA021",
+  "corpus": "A",
+  "title": "Wartburg Castle",
+  "question": "Who stayed at Wartburg Castle from May 1521 until March 1522?",
+  "answerable": true,
+  "gold": "Martin Luther",
+  "support": "From May 1521 until March 1522, Martin Luther stayed at the castle, after Frederick the Wise had him taken there for his safety.",
+  "type": "who"
+ },
+ {
+  "id": "CA022",
+  "corpus": "A",
+  "title": "Africa",
+  "question": "How many fully recognised independent countries are there in Africa?",
+  "answerable": true,
+  "gold": "54",
+  "support": "There are 54 fully recognised and independent countries in Africa, and 14.7% (1.216 billion) of the world's population lives there.",
+  "type": "count"
+ },
+ {
+  "id": "CA023",
+  "corpus": "A",
+  "title": "Africa",
+  "question": "How does the number of slaves taken by the Arab slave trade from Africa compare with the Atlantic slave trade?",
+  "answerable": true,
+  "gold": "The Arab slave trade took 18 million, the Atlantic slave trade an estimated 7-12 million",
+  "support": "Between the 7th and 20th centuries, the Arab slave trade took 18 million slaves from Africa via trans-Saharan routes and the Indian Ocean. Between the 15th and 20th centuries (a period of 500 years), the Atlantic slave trade took an estimated 7–12 million slaves to the Americas.",
+  "type": "compare"
+ },
+ {
+  "id": "CA024",
+  "corpus": "A",
+  "title": "Africa",
+  "question": "Is Mount Kilimanjaro the highest peak in Africa according to the Africa article?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "yesno"
+ },
+ {
+  "id": "CA025",
+  "corpus": "A",
+  "title": "Joseph P. Kennedy Sr.",
+  "question": "Whom did Joseph P. Kennedy Sr. marry in 1914?",
+  "answerable": true,
+  "gold": "Rose Fitzgerald",
+  "support": "In 1914 he married Rose Fitzgerald.",
+  "type": "who"
+ },
+ {
+  "id": "CA026",
+  "corpus": "A",
+  "title": "Joseph P. Kennedy Sr.",
+  "question": "Where did Joseph P. Kennedy Sr. die?",
+  "answerable": true,
+  "gold": "Hyannis Port, Massachusetts",
+  "support": "Kennedy died on November 18, 1969 in Hyannis Port, Massachusetts from a stroke, aged 81.",
+  "type": "where"
+ },
+ {
+  "id": "CA027",
+  "corpus": "A",
+  "title": "Joseph P. Kennedy Sr.",
+  "question": "Did Joseph P. Kennedy Sr. serve in the United States Senate?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "yesno"
+ },
+ {
+  "id": "CA028",
+  "corpus": "A",
+  "title": "Firefighter",
+  "question": "What is a fire engine, according to the Firefighter article?",
+  "answerable": true,
+  "gold": "The vehicle, also called a fire truck, that firefighters drive to emergencies",
+  "support": "When somebody needs their help, firefighters will drive to the location of the emergency on a vehicle called a fire engine (also known as a fire truck).",
+  "type": "define"
+ },
+ {
+  "id": "CA029",
+  "corpus": "A",
+  "title": "Firefighter",
+  "question": "From where do firefighters respond to emergency situations?",
+  "answerable": true,
+  "gold": "A fire station",
+  "support": "Firefighters are based in and respond to emergency situations from a fire station (also known as a fire house or fire hall).",
+  "type": "where"
+ },
+ {
+  "id": "CA030",
+  "corpus": "A",
+  "title": "Firefighter",
+  "question": "How many firefighters are employed in the United States?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "CA031",
+  "corpus": "A",
+  "title": "Disintegration (The Cure album)",
+  "question": "When was The Cure's album Disintegration released?",
+  "answerable": true,
+  "gold": "2 May 1989",
+  "support": "It was released on 2 May 1989 through Fiction Records.",
+  "type": "when"
+ },
+ {
+  "id": "CA032",
+  "corpus": "A",
+  "title": "Disintegration (The Cure album)",
+  "question": "What was the peak chart position of The Cure's Disintegration in the United States?",
+  "answerable": true,
+  "gold": "Number 12",
+  "support": "It went to number 2 in Belgium, Germany, Ireland and number 3 in France, the Netherlands, the United Kingdom, number 6 in New Zealand, number 9 in Australia and number 12 in the United States.",
+  "type": "count"
+ },
+ {
+  "id": "CA033",
+  "corpus": "A",
+  "title": "Disintegration (The Cure album)",
+  "question": "Who produced the album Disintegration by The Cure?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who"
+ },
+ {
+  "id": "CA034",
+  "corpus": "A",
+  "title": "Web design",
+  "question": "What is web design?",
+  "answerable": true,
+  "gold": "A profession where a person designs a web page or a web site",
+  "support": "Web design is a profession where a person designs a web page or a web site.",
+  "type": "define"
+ },
+ {
+  "id": "CA035",
+  "corpus": "A",
+  "title": "Web design",
+  "question": "What is the median salary of web designers in the United States of America?",
+  "answerable": true,
+  "gold": "$46,327",
+  "support": "Web designers in the United States of America can earn between $31,650 and $69,510 a year, with a median salary of $46,327.",
+  "type": "count"
+ },
+ {
+  "id": "CA036",
+  "corpus": "A",
+  "title": "Web design",
+  "question": "Which technologies do web designers use to make their pages?",
+  "answerable": true,
+  "gold": "HTML or DHTML, CSS, JavaScript and many others",
+  "support": "Web designers use HTML or Dynamic HTML (DHTML), Cascading Style Sheets (CSS), JavaScript, and many other technologies to make their pages.",
+  "type": "list"
+ },
+ {
+  "id": "CA037",
+  "corpus": "A",
+  "title": "Jeff O'Neill",
+  "question": "When was Jeff O'Neill born?",
+  "answerable": true,
+  "gold": "February 23, 1976",
+  "support": "Jeffrey O'Neill (born February 23, 1976) is a Canadian broadcaster and former professional ice hockey right winger.",
+  "type": "when"
+ },
+ {
+  "id": "CA038",
+  "corpus": "A",
+  "title": "Jeff O'Neill",
+  "question": "Why did Jeff O'Neill join the Toronto Maple Leafs?",
+  "answerable": true,
+  "gold": "To be closer to his family after his brother was killed in a car accident",
+  "support": "O'Neill decided to join the Maple Leafs to be closer to his family after his brother was killed in a car accident.",
+  "type": "why"
+ },
+ {
+  "id": "CA039",
+  "corpus": "A",
+  "title": "Jeff O'Neill",
+  "question": "How many goals did Jeff O'Neill score in his NHL career?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "CA040",
+  "corpus": "A",
+  "title": "Star Channel",
+  "question": "When did Star Channel begin broadcasting under the Fox name?",
+  "answerable": true,
+  "gold": "August 14, 1993",
+  "support": "It began broadcasting on August 14, 1993 under the Fox name, presenting comedy, action, and drama series under its original name (except for The Simpsons and Futurama), as well as films of various cinematographic genres.",
+  "type": "when"
+ },
+ {
+  "id": "CA041",
+  "corpus": "A",
+  "title": "Star Channel",
+  "question": "Which company owns the Latin American channel Star Channel?",
+  "answerable": true,
+  "gold": "The Walt Disney Company Latin America",
+  "support": "Star Channel (formerly known as FOX and later Fox Channel) is a Latin American subscription television channel of US origin, owned by The Walt Disney Company Latin America and operated by Disney Media Networks Latin America.",
+  "type": "who"
+ },
+ {
+  "id": "CA042",
+  "corpus": "A",
+  "title": "Star Channel",
+  "question": "Why did Star Channel stop airing The Simpsons in 2022?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "why"
+ },
+ {
+  "id": "CA043",
+  "corpus": "A",
+  "title": "Munas Dabbur",
+  "question": "Which club signed Munas Dabbur on 12 July 2023 and for what reported fee?",
+  "answerable": true,
+  "gold": "Shabab Al-Ahli, for €1.5 million",
+  "support": "On 12 July 2023, Emirati club Shabab Al-Ahli announced the signing of Dabbur, for a reported fee of €1.5 million.",
+  "type": "who"
+ },
+ {
+  "id": "CA044",
+  "corpus": "A",
+  "title": "Munas Dabbur",
+  "question": "How many times was Munas Dabbur top scorer of the Austrian Bundesliga?",
+  "answerable": true,
+  "gold": "Two times (2018 and 2019)",
+  "support": "After he came back he became two times (2018, 2019) top scorer of the Bundesliga.",
+  "type": "count"
+ },
+ {
+  "id": "CA045",
+  "corpus": "A",
+  "title": "Munas Dabbur",
+  "question": "Which youth academies did Munas Dabbur start in?",
+  "answerable": true,
+  "gold": "Maccabi Nazareth and Maccabi Tel Aviv",
+  "support": "He started in the Israeli Maccabi Nazareth and Maccabi Tel Aviv youth academies.",
+  "type": "list"
+ },
+ {
+  "id": "CA046",
+  "corpus": "A",
+  "title": "Mary Anna Custis Lee",
+  "question": "When did Mary Anna Custis Lee marry Robert E. Lee?",
+  "answerable": true,
+  "gold": "30 June 1831",
+  "support": "Mary and Robert were married at her parents' home, Arlington House, on 30 June 1831.",
+  "type": "when"
+ },
+ {
+  "id": "CA047",
+  "corpus": "A",
+  "title": "Mary Anna Custis Lee",
+  "question": "How many children did Mary Anna Custis Lee have with Robert E. Lee?",
+  "answerable": true,
+  "gold": "Seven",
+  "support": "They married at her parents' home, and had seven children together.",
+  "type": "count"
+ },
+ {
+  "id": "CA048",
+  "corpus": "A",
+  "title": "Mary Anna Custis Lee",
+  "question": "Was Mary Anna Custis Lee a third cousin of Robert E. Lee?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "She was also his third cousin.",
+  "type": "yesno"
+ },
+ {
+  "id": "CA049",
+  "corpus": "A",
+  "title": "Lose My Breath",
+  "question": "Which group recorded the song Lose My Breath?",
+  "answerable": true,
+  "gold": "Destiny's Child",
+  "support": "for Destiny's Child's fifth and last studio album, Destiny Fulfilled (2004).",
+  "type": "who"
+ },
+ {
+  "id": "CA050",
+  "corpus": "A",
+  "title": "Lose My Breath",
+  "question": "In which countries did the song Lose My Breath reach number one?",
+  "answerable": true,
+  "gold": "Belgium, China, India, Israel, Ireland, and Switzerland",
+  "support": "The song reached number one in Belgium, China, India, Israel, Ireland, and Switzerland and entered the top ten on the majority of the charts it appeared on, making it one of Destiny's Child most successful single releases.",
+  "type": "list"
+ },
+ {
+  "id": "CA051",
+  "corpus": "A",
+  "title": "Lose My Breath",
+  "question": "How many weeks did Lose My Breath spend at number one on the Billboard Hot 100?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "CA052",
+  "corpus": "A",
+  "title": "Tadeusz Mazowiecki",
+  "question": "What office did Tadeusz Mazowiecki hold from 1989 to 1991?",
+  "answerable": true,
+  "gold": "Prime Minister of Poland",
+  "support": "Mazowiecki was the first Prime Minister of Poland. His term began in 1989 and ended in 1991.",
+  "type": "who"
+ },
+ {
+  "id": "CA053",
+  "corpus": "A",
+  "title": "Tadeusz Mazowiecki",
+  "question": "Where did Tadeusz Mazowiecki die?",
+  "answerable": true,
+  "gold": "Warsaw, Poland",
+  "support": "Mazowiecki died on 28 October 2013 in Warsaw, Poland from complications from a fever caused by pneumonia.",
+  "type": "where"
+ },
+ {
+  "id": "CA054",
+  "corpus": "A",
+  "title": "Tadeusz Mazowiecki",
+  "question": "How many books did Tadeusz Mazowiecki write?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "CA055",
+  "corpus": "A",
+  "title": "Ernest Borgnine",
+  "question": "For which film did Ernest Borgnine win an Academy Award and a Golden Globe Award?",
+  "answerable": true,
+  "gold": "Marty (1955)",
+  "support": "Borgnine won an Academy Award and a Golden Globe Award for his role in the movie Marty (1955), one of the best movies of his career.",
+  "type": "list"
+ },
+ {
+  "id": "CA056",
+  "corpus": "A",
+  "title": "Ernest Borgnine",
+  "question": "Where was Ernest Borgnine born?",
+  "answerable": true,
+  "gold": "Hamden, Connecticut",
+  "support": "Borgnine was born Ermes Effron Borgnino in Hamden, Connecticut on January 24, 1917 to Italian immigrant parents.",
+  "type": "where"
+ },
+ {
+  "id": "CA057",
+  "corpus": "A",
+  "title": "Ernest Borgnine",
+  "question": "Whom did Ernest Borgnine play in The Poseidon Adventure?",
+  "answerable": true,
+  "gold": "Mike Rogo",
+  "support": "He played Mike Rogo, who helped rescue people from the ship.",
+  "type": "who"
+ },
+ {
+  "id": "CA058",
+  "corpus": "A",
+  "title": "1973-74 Austrian football championship",
+  "question": "How many teams contested the 1973-74 Austrian football championship?",
+  "answerable": true,
+  "gold": "17",
+  "support": "The championship was contested by 17 teams, each of which met twice throughout the season.",
+  "type": "count"
+ },
+ {
+  "id": "CA059",
+  "corpus": "A",
+  "title": "1973-74 Austrian football championship",
+  "question": "Who won the 1973-74 Austrian football championship?",
+  "answerable": true,
+  "gold": "SK VOEST Linz",
+  "support": "SK VOEST Linz won the Austrian football championship for the first time.",
+  "type": "who"
+ },
+ {
+  "id": "CA060",
+  "corpus": "A",
+  "title": "1973-74 Austrian football championship",
+  "question": "Why did the Austrian Football Association reduce the number of top-division clubs to ten for 1974-75?",
+  "answerable": true,
+  "gold": "To raise the level of the league",
+  "support": "In order to raise the level of the league, the number of participating clubs was reduced to ten.",
+  "type": "why"
+ },
+ {
+  "id": "CA061",
+  "corpus": "A",
+  "title": "Cerrado",
+  "question": "Where is the Cerrado located?",
+  "answerable": true,
+  "gold": "Eastern Brazil",
+  "support": "is a large ecoregion of tropical savanna in eastern Brazil.",
+  "type": "where"
+ },
+ {
+  "id": "CA062",
+  "corpus": "A",
+  "title": "Cerrado",
+  "question": "What percentage of Brazil's land area does the Cerrado take up?",
+  "answerable": true,
+  "gold": "21 percent",
+  "support": "The Cerrado takes up 21 percent of the country's land area.",
+  "type": "count"
+ },
+ {
+  "id": "CA063",
+  "corpus": "A",
+  "title": "Cerrado",
+  "question": "Which mammal species live in the Cerrado?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "list"
+ },
+ {
+  "id": "CA064",
+  "corpus": "A",
+  "title": "Bhatt",
+  "question": "What does Bhatt mean in Sanskrit?",
+  "answerable": true,
+  "gold": "Scholar",
+  "support": "means \"scholar\" in Sanskrit.",
+  "type": "define"
+ },
+ {
+  "id": "CA065",
+  "corpus": "A",
+  "title": "Bhatt",
+  "question": "Where is the surname Bhatt widely recognized to have originated?",
+  "answerable": true,
+  "gold": "Kashmir",
+  "support": "Kashmir is widely recognized as the origin of the surname Bhatt.",
+  "type": "where"
+ },
+ {
+  "id": "CA066",
+  "corpus": "A",
+  "title": "Bhatt",
+  "question": "How many people in India carry the surname Bhatt?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "CA067",
+  "corpus": "A",
+  "title": "Tytonidae",
+  "question": "What is the bird family Tytonidae?",
+  "answerable": true,
+  "gold": "The barn-owls, one of the two families of owls",
+  "support": "Barn-owls (family Tytonidae) are one of the two families of owls.",
+  "type": "define"
+ },
+ {
+  "id": "CA068",
+  "corpus": "A",
+  "title": "Tytonidae",
+  "question": "How do barn-owls locate prey by sound?",
+  "answerable": true,
+  "gold": "Their heart-shaped facial disc feathers amplify and locate the source of sounds",
+  "support": "The feathers help to amplify and locate the source of sounds when the bird hunts.",
+  "type": "how"
+ },
+ {
+  "id": "CA069",
+  "corpus": "A",
+  "title": "Tytonidae",
+  "question": "Are barn-owls (Tytonidae) found in Saharan Africa?",
+  "answerable": true,
+  "gold": "No",
+  "support": "They are not found in northern North America, Saharan Africa and large areas of Asia.",
+  "type": "yesno"
+ },
+ {
+  "id": "CA070",
+  "corpus": "A",
+  "title": "Ishi in Two Worlds",
+  "question": "Who wrote Ishi in Two Worlds?",
+  "answerable": true,
+  "gold": "Theodora Kroeber",
+  "support": "Theodora Kroeber wrote the book.",
+  "type": "who"
+ },
+ {
+  "id": "CA071",
+  "corpus": "A",
+  "title": "Ishi in Two Worlds",
+  "question": "When was Ishi in Two Worlds published?",
+  "answerable": true,
+  "gold": "1961",
+  "support": "It was published in 1961.",
+  "type": "when"
+ },
+ {
+  "id": "CA072",
+  "corpus": "A",
+  "title": "Ishi in Two Worlds",
+  "question": "What are the two parts of the book Ishi in Two Worlds called?",
+  "answerable": true,
+  "gold": "'Ishi the Yahi' and 'Mister Ishi'",
+  "support": "The book has two parts. The first part is called \"Ishi the Yahi\". It tells about the history and the culture of the Yahi people. The second part is called \"Mister Ishi\".",
+  "type": "list"
+ },
+ {
+  "id": "CA073",
+  "corpus": "A",
+  "title": "Kentucky",
+  "question": "What is the capital of Kentucky?",
+  "answerable": true,
+  "gold": "Frankfort",
+  "support": "Its capital is Frankfort.",
+  "type": "define"
+ },
+ {
+  "id": "CA074",
+  "corpus": "A",
+  "title": "Kentucky",
+  "question": "Why do some people call Kentucky the Bluegrass State?",
+  "answerable": true,
+  "gold": "Because of a special kind of grass that grows there",
+  "support": "Some people call it the \"Bluegrass State\" because of a special kind of grass that grows there.",
+  "type": "why"
+ },
+ {
+  "id": "CA075",
+  "corpus": "A",
+  "title": "Kentucky",
+  "question": "When did Kentucky become a state of the United States?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "when"
+ },
+ {
+  "id": "CA076",
+  "corpus": "A",
+  "title": "Signal transduction",
+  "question": "What is signal transduction in biology?",
+  "answerable": true,
+  "gold": "A cellular mechanism that converts a stimulus into a response in the cell",
+  "support": "A signal transduction in biology is a cellular mechanism. It converts a stimulus into a response in the cell.",
+  "type": "define"
+ },
+ {
+  "id": "CA077",
+  "corpus": "A",
+  "title": "Signal transduction",
+  "question": "How can a small stimulus cause a large response in signal transduction?",
+  "answerable": true,
+  "gold": "Through a cascade in which the signal is amplified at each step",
+  "support": "Sometimes there is a cascade of signals within the cell. With each step of the cascade, the signal can be amplified, so a small signal can result in a large response.",
+  "type": "how"
+ },
+ {
+  "id": "CA078",
+  "corpus": "A",
+  "title": "Signal transduction",
+  "question": "How long can signal transduction processes last?",
+  "answerable": true,
+  "gold": "From milliseconds to days",
+  "support": "They may last from milliseconds (in the case of ion flux) to days for gene expression.",
+  "type": "count"
+ },
+ {
+  "id": "CA079",
+  "corpus": "A",
+  "title": "Battle of Anzio",
+  "question": "Who commanded the Allied attack in the Battle of Anzio?",
+  "answerable": true,
+  "gold": "Major General John P. Lucas",
+  "support": "The attack was commanded by American Major General John P. Lucas.",
+  "type": "who"
+ },
+ {
+  "id": "CA080",
+  "corpus": "A",
+  "title": "Battle of Anzio",
+  "question": "When was Rome captured after the Battle of Anzio?",
+  "answerable": true,
+  "gold": "4 June",
+  "support": "The Allies went north-west to Rome which was captured on 4 June.",
+  "type": "when"
+ },
+ {
+  "id": "CA081",
+  "corpus": "A",
+  "title": "Battle of Anzio",
+  "question": "How many tanks did the Allies land at Anzio on the first day?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "CA082",
+  "corpus": "A",
+  "title": "145452 Ritona",
+  "question": "Who discovered the Kuiper belt object 145452 Ritona?",
+  "answerable": true,
+  "gold": "Andrew Becker, Andrew Puckett and Jeremy Kubica",
+  "support": "It was discovered on September 10, 2005 by astronomers Andrew Becker, Andrew Puckett and Jeremy Kubica at Apache Point Observatory in Sunspot, New Mexico.",
+  "type": "who"
+ },
+ {
+  "id": "CA083",
+  "corpus": "A",
+  "title": "145452 Ritona",
+  "question": "Why is there no way to measure the mass or density of 145452 Ritona?",
+  "answerable": true,
+  "gold": "It has no known natural satellites or moons",
+  "support": "Ritona is not known to have any natural satellites or moons, which means there is currently no way to measure it's mass or density.",
+  "type": "why"
+ },
+ {
+  "id": "CA084",
+  "corpus": "A",
+  "title": "145452 Ritona",
+  "question": "Where was 145452 Ritona discovered?",
+  "answerable": true,
+  "gold": "Apache Point Observatory in Sunspot, New Mexico",
+  "support": "It was discovered on September 10, 2005 by astronomers Andrew Becker, Andrew Puckett and Jeremy Kubica at Apache Point Observatory in Sunspot, New Mexico.",
+  "type": "where"
+ },
+ {
+  "id": "CA085",
+  "corpus": "A",
+  "title": "Aristarkh Lentulov",
+  "question": "Where was the Russian artist Aristarkh Lentulov born?",
+  "answerable": true,
+  "gold": "Penza Oblast",
+  "support": "Aristarkh Lentulov was born in Penza Oblast, 625 kilometers (388 mi) southeast of Moscow, into the family of a country priest.",
+  "type": "where"
+ },
+ {
+  "id": "CA086",
+  "corpus": "A",
+  "title": "Aristarkh Lentulov",
+  "question": "Which avant-garde group was Aristarkh Lentulov one of the founders of?",
+  "answerable": true,
+  "gold": "The Knave of Diamonds (Jack of Diamonds) group",
+  "support": "He lived in Moscow from 1909, and he was one of the founders of the avant-garde Knave of Diamonds (Jack of Diamonds) group.",
+  "type": "who"
+ },
+ {
+  "id": "CA087",
+  "corpus": "A",
+  "title": "Aristarkh Lentulov",
+  "question": "Which French painters did Aristarkh Lentulov meet in Paris?",
+  "answerable": true,
+  "gold": "Albert Gleizes, Jean Metzinger, Fernand Léger and Robert Delaunay",
+  "support": "While there, he met contemporary French painters such as Albert Gleizes, Jean Metzinger, Fernand Léger and Robert Delaunay.",
+  "type": "list"
+ },
+ {
+  "id": "CA088",
+  "corpus": "A",
+  "title": "Mulholland Drive (movie)",
+  "question": "Who directed the 2001 movie Mulholland Drive?",
+  "answerable": true,
+  "gold": "David Lynch",
+  "support": "a 2001 mystery movie written and directed by David Lynch.",
+  "type": "who"
+ },
+ {
+  "id": "CA089",
+  "corpus": "A",
+  "title": "Mulholland Drive (movie)",
+  "question": "Why did ABC cancel the proposed Mulholland Drive television series?",
+  "answerable": true,
+  "gold": "ABC executives cancelled it after viewing Lynch's cut",
+  "support": "After viewing Lynch's cut, however, ABC executives cancelled the proposed series.",
+  "type": "why"
+ },
+ {
+  "id": "CA090",
+  "corpus": "A",
+  "title": "Mulholland Drive (movie)",
+  "question": "How much money did the movie Mulholland Drive gross?",
+  "answerable": true,
+  "gold": "$20.1 million",
+  "support": "It was also a moderate commercial success, grossing $20.1 million on a budget of $15 million.",
+  "type": "count"
+ },
+ {
+  "id": "CA091",
+  "corpus": "A",
+  "title": "Ramallah and Al-Bireh Governorate",
+  "question": "How many governorates does Palestine have, of which Ramallah and Al-Bireh is one?",
+  "answerable": true,
+  "gold": "16",
+  "support": "is one of 16 governorates of Palestine.",
+  "type": "count"
+ },
+ {
+  "id": "CA092",
+  "corpus": "A",
+  "title": "Ramallah and Al-Bireh Governorate",
+  "question": "Where is the seat of the Ramallah and Al-Bireh Governorate?",
+  "answerable": true,
+  "gold": "The city of al-Bireh",
+  "support": "Its district capital or muhfaza (seat) is the city of al-Bireh.",
+  "type": "where"
+ },
+ {
+  "id": "CA093",
+  "corpus": "A",
+  "title": "Ramallah and Al-Bireh Governorate",
+  "question": "Who was the first governor of the Ramallah and Al-Bireh Governorate?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who"
+ },
+ {
+  "id": "CA094",
+  "corpus": "A",
+  "title": "Primetime Emmy Awards",
+  "question": "When were the Primetime Emmy Awards first awarded?",
+  "answerable": true,
+  "gold": "1949",
+  "support": "First awarded in 1949, they were originally referred to as just the \"Emmy Awards\"",
+  "type": "when"
+ },
+ {
+  "id": "CA095",
+  "corpus": "A",
+  "title": "Primetime Emmy Awards",
+  "question": "Who presents the Primetime Emmy Awards?",
+  "answerable": true,
+  "gold": "The Academy of Television Arts & Sciences",
+  "support": "The Primetime Emmy Awards are awards presented by the Academy of Television Arts & Sciences in recognition of excellence in American primetime television programming.",
+  "type": "who"
+ },
+ {
+  "id": "CA096",
+  "corpus": "A",
+  "title": "Primetime Emmy Awards",
+  "question": "Why was the word primetime added to the name of the Emmy Awards?",
+  "answerable": true,
+  "gold": "To distinguish them from the Daytime Emmy Awards",
+  "support": "First awarded in 1949, they were originally referred to as just the \"Emmy Awards\" until the first Daytime Emmy Award ceremonies were held in the 1970s, and the word \"primetime\" was added to disambiguate between the two.",
+  "type": "why"
+ },
+ {
+  "id": "CA097",
+  "corpus": "A",
+  "title": "Troodon",
+  "question": "How many teeth did Troodon have?",
+  "answerable": true,
+  "gold": "122",
+  "support": "Troodon had 122 teeth.",
+  "type": "count"
+ },
+ {
+  "id": "CA098",
+  "corpus": "A",
+  "title": "Troodon",
+  "question": "When did the dinosaur Troodon live?",
+  "answerable": true,
+  "gold": "75 to 65 million years ago, in the later Cretaceous",
+  "support": "Troodon (or Troödon) is a genus of relatively small, bird-like dinosaurs, from the later part of the Cretaceous period, 75 - 65 million years ago.",
+  "type": "when"
+ },
+ {
+  "id": "CA099",
+  "corpus": "A",
+  "title": "Troodon",
+  "question": "How did the size of northern Troodons compare with southern Troodons?",
+  "answerable": true,
+  "gold": "Northern individuals were larger than southern ones",
+  "support": "In general, individuals that lived further north were larger than those that lived in more southern areas.",
+  "type": "compare"
+ },
+ {
+  "id": "CA100",
+  "corpus": "A",
+  "title": "Ultima Online",
+  "question": "When was Ultima Online launched?",
+  "answerable": true,
+  "gold": "1997",
+  "support": "The game was launched in 1997 by Origin Systems.",
+  "type": "when"
+ },
+ {
+  "id": "CA101",
+  "corpus": "A",
+  "title": "Ultima Online",
+  "question": "What are game servers called in Ultima Online?",
+  "answerable": true,
+  "gold": "Shards",
+  "support": "Game servers are called shards.",
+  "type": "define"
+ },
+ {
+  "id": "CA102",
+  "corpus": "A",
+  "title": "Ultima Online",
+  "question": "What are the basic player statistics in Ultima Online?",
+  "answerable": true,
+  "gold": "Strength, intelligence and dexterity",
+  "support": "Basic player statistics are strength, intelligence and dexterity.",
+  "type": "list"
+ },
+ {
+  "id": "CA103",
+  "corpus": "A",
+  "title": "Margherita of Savoy",
+  "question": "When was Margherita of Savoy born?",
+  "answerable": true,
+  "gold": "November 20, 1851",
+  "support": "Margherita of Savoy or Margaret of Savoy (born November 20, 1851 in Turin, died January 4, 1926 in Bordighera), was an Italian queen of the Kingdom of Italy during the reign (1878-1900) of her husband, Humbert I.",
+  "type": "when"
+ },
+ {
+  "id": "CA104",
+  "corpus": "A",
+  "title": "Margherita of Savoy",
+  "question": "Why is the pizza Margherita called by that name?",
+  "answerable": true,
+  "gold": "It was named after Margherita of Savoy in 1889",
+  "support": "In 1889 the pizza Margherita was named after her.",
+  "type": "why"
+ },
+ {
+  "id": "CA105",
+  "corpus": "A",
+  "title": "Margherita of Savoy",
+  "question": "Who assassinated Humbert I, the husband of Margherita of Savoy?",
+  "answerable": true,
+  "gold": "The anarchist Gaetano Bresci",
+  "support": "Humbert was assassinated by anarchist Gaetano Bresci on July 29, 1900.",
+  "type": "who"
+ },
+ {
+  "id": "CA106",
+  "corpus": "A",
+  "title": "Baby Blue (group)",
+  "question": "Who are the members of the Filipino girl group Baby Blue?",
+  "answerable": true,
+  "gold": "Jan Elaurza, Coleen Trinidad and Amy Isidto",
+  "support": "Said sub-unit is formed by MNL48 members Jan Elaurza, Coleen Trinidad and Amy Isidto.",
+  "type": "who"
+ },
+ {
+  "id": "CA107",
+  "corpus": "A",
+  "title": "Baby Blue (group)",
+  "question": "What was the debut single of the Filipino girl group Baby Blue?",
+  "answerable": true,
+  "gold": "Sweet Talking Sugar",
+  "support": "Following the announcement, Baby Blue officially released its debut single titled \"Sweet Talking Sugar\"",
+  "type": "define"
+ },
+ {
+  "id": "CA108",
+  "corpus": "A",
+  "title": "Baby Blue (group)",
+  "question": "Is Baby Blue the first sub-unit of the idol group MNL48?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "On September 1, MNL48 announced the formation of Baby Blue, the group's first-ever sub-unit, in partnership with Tower Records Japan, a major Japanese music retailer.",
+  "type": "yesno"
+ },
+ {
+  "id": "CA109",
+  "corpus": "A",
+  "title": "George Gaylord Simpson",
+  "question": "What word did George Gaylord Simpson coin in 1940?",
+  "answerable": true,
+  "gold": "Hypodigm",
+  "support": "He coined the word hypodigm, referring to a sample from which the characters of a population are to be inferred, in 1940.",
+  "type": "define"
+ },
+ {
+  "id": "CA110",
+  "corpus": "A",
+  "title": "George Gaylord Simpson",
+  "question": "Where was George Gaylord Simpson born?",
+  "answerable": true,
+  "gold": "Chicago, Illinois",
+  "support": "George Simpson was born in Chicago, Illinois, although he was raised primarily in Denver, Colorado.",
+  "type": "where"
+ },
+ {
+  "id": "CA111",
+  "corpus": "A",
+  "title": "George Gaylord Simpson",
+  "question": "Did George Gaylord Simpson support Alfred Wegener's theory of continental drift?",
+  "answerable": true,
+  "gold": "No, he opposed it",
+  "support": "Simpson opposed Alfred Wegener's theory of continental drift.",
+  "type": "yesno"
+ },
+ {
+  "id": "CA112",
+  "corpus": "A",
+  "title": "Pope Paul VI",
+  "question": "What number pope was Pope Paul VI?",
+  "answerable": true,
+  "gold": "The 263rd",
+  "support": "was an Italian priest of the Roman Catholic Church and the 263rd Pope from 1963 until his death in 1978.",
+  "type": "count"
+ },
+ {
+  "id": "CA113",
+  "corpus": "A",
+  "title": "Pope Paul VI",
+  "question": "Why was Pope Paul VI known as the pilgrim pope?",
+  "answerable": true,
+  "gold": "For his numerous travels",
+  "support": "Paul VI was known as the \"pilgrim\" pope for his numerous travels.",
+  "type": "why"
+ },
+ {
+  "id": "CA114",
+  "corpus": "A",
+  "title": "Pope Paul VI",
+  "question": "When did Pope Paul VI issue the encyclical Humanae Vitae?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "when"
+ },
+ {
+  "id": "CA115",
+  "corpus": "A",
+  "title": "Christian Keglevits",
+  "question": "How many caps did Christian Keglevits earn for the Austria national football team?",
+  "answerable": true,
+  "gold": "18",
+  "support": "He earned 18 caps and scored 3 goals for the Austria national football team from 1980 to 1991, 3 games of those in World Cup qualification matches, He participated in the 1990 FIFA World Cup.",
+  "type": "count"
+ },
+ {
+  "id": "CA116",
+  "corpus": "A",
+  "title": "Christian Keglevits",
+  "question": "When was Christian Keglevits born?",
+  "answerable": true,
+  "gold": "29 January 1961",
+  "support": "Christian Keglevits (born 29 January 1961 in Weiden bei Rechnitz) is a retired Austrian footballer.",
+  "type": "when"
+ },
+ {
+  "id": "CA117",
+  "corpus": "A",
+  "title": "Christian Keglevits",
+  "question": "Which clubs did Christian Keglevits play for during his career?",
+  "answerable": true,
+  "gold": "SC Eisenstadt, SK Rapid Wien, Wiener Sportclub, LASK Linz and SV Austria Salzburg",
+  "support": "He started his career at SC Eisenstadt and also played for SK Rapid Wien, Wiener Sportclub, LASK Linz and SV Austria Salzburg.",
+  "type": "list"
+ },
+ {
+  "id": "CA118",
+  "corpus": "A",
+  "title": "Ambert",
+  "question": "In which department of France is the commune of Ambert located?",
+  "answerable": true,
+  "gold": "Puy-de-Dôme",
+  "support": "Ambert is a commune in the Puy-de-Dôme department in the Auvergne-Rhône-Alpes region in central-southern France.",
+  "type": "where"
+ },
+ {
+  "id": "CA119",
+  "corpus": "A",
+  "title": "Ambert",
+  "question": "What is the population of Ambert?",
+  "answerable": true,
+  "gold": "6,794",
+  "support": "With a population of 6,794, Ambert has a population density of",
+  "type": "count"
+ },
+ {
+  "id": "CA120",
+  "corpus": "A",
+  "title": "Ambert",
+  "question": "What are the inhabitants of Ambert called in French?",
+  "answerable": true,
+  "gold": "Ambertois (women: Ambertoises)",
+  "support": "The inhabitants of Ambert are known, in French, as Ambertois (women: Ambertoises).",
+  "type": "define"
+ },
+ {
+  "id": "CB001",
+  "corpus": "B",
+  "title": "Motion- and Gravity-Aware Feedforward 3D Reconstruction",
+  "question": "How are residual optical flow and gravity direction used in the paper Motion- and Gravity-Aware Feedforward 3D Reconstruction?",
+  "answerable": true,
+  "gold": "As privileged signals during training only",
+  "support": "During training, residual optical flow and gravity direction are provided as privileged signals to guide geometric representation learning; during inference, the model uses standard visual inputs only.",
+  "type": "how"
+ },
+ {
+  "id": "CB002",
+  "corpus": "B",
+  "title": "Motion- and Gravity-Aware Feedforward 3D Reconstruction",
+  "question": "Who are the authors of Motion- and Gravity-Aware Feedforward 3D Reconstruction?",
+  "answerable": true,
+  "gold": "Shiyao Qian, Yuan Ren, Dongfeng Bai",
+  "support": "Authors: Shiyao Qian, Yuan Ren, Dongfeng Bai",
+  "type": "who"
+ },
+ {
+  "id": "CB003",
+  "corpus": "B",
+  "title": "Motion- and Gravity-Aware Feedforward 3D Reconstruction",
+  "question": "In Motion- and Gravity-Aware Feedforward 3D Reconstruction, how does the best injection stage differ between VGGT and π3?",
+  "answerable": true,
+  "gold": "Middle-layer integration for VGGT, late-stage integration for π3",
+  "support": "middle-layer integration is generally preferable for VGGT, while late-stage integration is more effective for π3.",
+  "type": "compare"
+ },
+ {
+  "id": "CB004",
+  "corpus": "B",
+  "title": "Toward the Automatic Classification of Self-Affirmed Refactoring",
+  "question": "How many commit messages were used to evaluate the model in Toward the Automatic Classification of Self-Affirmed Refactoring?",
+  "answerable": true,
+  "gold": "2,867",
+  "support": "We challenge our model using a total of 2,867 commit messages extracted from well-engineered open-source Java projects.",
+  "type": "count"
+ },
+ {
+  "id": "CB005",
+  "corpus": "B",
+  "title": "Toward the Automatic Classification of Self-Affirmed Refactoring",
+  "question": "What is Self-Affirmed Refactoring (SAR) in Toward the Automatic Classification of Self-Affirmed Refactoring?",
+  "answerable": true,
+  "gold": "Developers' explicit documentation of refactoring operations in commit messages",
+  "support": "The concept of Self-Affirmed Refactoring (SAR) was introduced to explore how developers document their refactoring activities in commit messages, i.e., developers' explicit documentation of refactoring operations intentionally introduced during a code change.",
+  "type": "define"
+ },
+ {
+  "id": "CB006",
+  "corpus": "B",
+  "title": "Toward the Automatic Classification of Self-Affirmed Refactoring",
+  "question": "How many developers took part in the manual study behind Toward the Automatic Classification of Self-Affirmed Refactoring?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "how"
+ },
+ {
+  "id": "CB007",
+  "corpus": "B",
+  "title": "Identification, Tracking and Impact: Understanding the trade secret of catchphrases",
+  "question": "From what data does the paper Identification, Tracking and Impact: Understanding the trade secret of catchphrases extract catchphrases?",
+  "answerable": true,
+  "gold": "Abstracts of patents granted by the U.S. Patent and Trademark Office",
+  "support": "In this paper, we propose an unsupervised method for the extraction of catchphrases from the abstracts of patents granted by the U.S. Patent and Trademark Office over the years.",
+  "type": "where"
+ },
+ {
+  "id": "CB008",
+  "corpus": "B",
+  "title": "Identification, Tracking and Impact: Understanding the trade secret of catchphrases",
+  "question": "Why is understanding the innovation secrets of organizations from patents difficult, according to the catchphrases paper Identification, Tracking and Impact?",
+  "answerable": true,
+  "gold": "Searching and understanding the enormous textual information is a natural bottleneck",
+  "support": "However, searching and understanding this enormous textual information is a natural bottleneck.",
+  "type": "why"
+ },
+ {
+  "id": "CB009",
+  "corpus": "B",
+  "title": "Identification, Tracking and Impact: Understanding the trade secret of catchphrases",
+  "question": "How many patents were analysed in Identification, Tracking and Impact: Understanding the trade secret of catchphrases?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "CB010",
+  "corpus": "B",
+  "title": "Gradient Coding Based on Block Designs for Mitigating Adversarial Stragglers",
+  "question": "What are stragglers in Gradient Coding Based on Block Designs for Mitigating Adversarial Stragglers?",
+  "answerable": true,
+  "gold": "Slow running machines in distributed gradient-based methods",
+  "support": "Distributed implementations of gradient-based methods, wherein a server distributes gradient computations across worker machines, suffer from slow running machines, called 'stragglers'.",
+  "type": "define"
+ },
+ {
+  "id": "CB011",
+  "corpus": "B",
+  "title": "Gradient Coding Based on Block Designs for Mitigating Adversarial Stragglers",
+  "question": "How are the approximate gradient codes built in Gradient Coding Based on Block Designs for Mitigating Adversarial Stragglers?",
+  "answerable": true,
+  "gold": "Using balanced incomplete block designs (BIBDs)",
+  "support": "Towards this end, we propose a class of approximate gradient codes based on balanced incomplete block designs (BIBDs).",
+  "type": "how"
+ },
+ {
+  "id": "CB012",
+  "corpus": "B",
+  "title": "Gradient Coding Based on Block Designs for Mitigating Adversarial Stragglers",
+  "question": "What is the adversarial threshold in the gradient coding paper based on block designs?",
+  "answerable": true,
+  "gold": "The smallest number of workers an adversary must straggle to inflict a certain approximation error",
+  "support": "Next, to characterize fundamental limits of adversarial straggling, we consider the notion of 'adversarial threshold' -- the smallest number of workers that an adversary must straggle to inflict certain approximation error.",
+  "type": "define"
+ },
+ {
+  "id": "CB013",
+  "corpus": "B",
+  "title": "Options as responses: Grounding behavioural hierarchies in multi-agent RL",
+  "question": "How is the hierarchical agent organised in Options as responses: Grounding behavioural hierarchies in multi-agent RL?",
+  "answerable": true,
+  "gold": "The top level chooses strategic responses to opponents and the low level implements them as policies over primitive actions",
+  "support": "We then propose a novel hierarchical agent architecture, where the hierarchy is grounded in the game-theoretic structure of the game -- the top level chooses strategic responses to opponents, while the low level implements them into policy over primitive actions.",
+  "type": "how"
+ },
+ {
+  "id": "CB014",
+  "corpus": "B",
+  "title": "Options as responses: Grounding behavioural hierarchies in multi-agent RL",
+  "question": "Who wrote Options as responses: Grounding behavioural hierarchies in multi-agent RL?",
+  "answerable": true,
+  "gold": "Alexander Sasha Vezhnevets, Yuhuai Wu, Remi Leblond, Joel Z. Leibo",
+  "support": "Authors: Alexander Sasha Vezhnevets, Yuhuai Wu, Remi Leblond, Joel Z. Leibo",
+  "type": "who"
+ },
+ {
+  "id": "CB015",
+  "corpus": "B",
+  "title": "Options as responses: Grounding behavioural hierarchies in multi-agent RL",
+  "question": "Does the paper Options as responses: Grounding behavioural hierarchies in multi-agent RL evaluate its agent on StarCraft II?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "yesno"
+ },
+ {
+  "id": "CB016",
+  "corpus": "B",
+  "title": "Exploring the Observational Constraints and Cosmological Dynamics in f(Q,L_m) Gravity",
+  "question": "How many critical points does the dynamical system analysis identify for each model in Exploring the Observational Constraints and Cosmological Dynamics in f(Q,L_m) Gravity?",
+  "answerable": true,
+  "gold": "Two",
+  "support": "The dynamical system analysis identifies two critical points for each of the proposed linear and nonlinear matter--geometry coupling models.",
+  "type": "count"
+ },
+ {
+  "id": "CB017",
+  "corpus": "B",
+  "title": "Exploring the Observational Constraints and Cosmological Dynamics in f(Q,L_m) Gravity",
+  "question": "Which datasets give the statistical constraints in Exploring the Observational Constraints and Cosmological Dynamics in f(Q,L_m) Gravity?",
+  "answerable": true,
+  "gold": "CC+BAO, DESI DR II, and Pantheon+",
+  "support": "Statistical constraints derived from CC+BAO, DESI DR II, and Pantheon$^+$ datasets provide best-fit values for the model parameters",
+  "type": "list"
+ },
+ {
+  "id": "CB018",
+  "corpus": "B",
+  "title": "Exploring the Observational Constraints and Cosmological Dynamics in f(Q,L_m) Gravity",
+  "question": "Do the authors of the f(Q,L_m) gravity paper Exploring the Observational Constraints and Cosmological Dynamics conclude that this gravity is a viable alternative for explaining late-time acceleration?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "provides a viable alternative framework for explaining late-time acceleration",
+  "type": "yesno"
+ },
+ {
+  "id": "CB019",
+  "corpus": "B",
+  "title": "JevCoder: When Does Decision Delegation Pay Off in Code Repair?",
+  "question": "By how much does JevCoder reduce mean repair-model token use compared to unguided repair?",
+  "answerable": true,
+  "gold": "21.6%-50.6%",
+  "support": "Compared to unguided repair, JevCoder reduces mean repair-model token use by 21.6%-50.6%, with higher observed repair rates across all three models.",
+  "type": "count"
+ },
+ {
+  "id": "CB020",
+  "corpus": "B",
+  "title": "JevCoder: When Does Decision Delegation Pay Off in Code Repair?",
+  "question": "Which benchmarks supply the 400 tasks in JevCoder: When Does Decision Delegation Pay Off in Code Repair?",
+  "answerable": true,
+  "gold": "200 from SWE-bench Verified and 200 from SWE-Bench Pro Verified",
+  "support": "We evaluate three repair models, each on the same 400 tasks: 200 from SWE-bench Verified and 200 from SWE-Bench Pro Verified.",
+  "type": "list"
+ },
+ {
+  "id": "CB021",
+  "corpus": "B",
+  "title": "JevCoder: When Does Decision Delegation Pay Off in Code Repair?",
+  "question": "What is Jev in JevCoder: When Does Decision Delegation Pay Off in Code Repair?",
+  "answerable": true,
+  "gold": "A low-cost probabilistic judge",
+  "support": "Based on these studies, we propose JevCoder, a workflow built around Jev, a low-cost probabilistic judge.",
+  "type": "define"
+ },
+ {
+  "id": "CB022",
+  "corpus": "B",
+  "title": "Question Identification in Arabic Language Using Emotional Based Features",
+  "question": "What kind of classifier is implemented in Question Identification in Arabic Language Using Emotional Based Features?",
+  "answerable": true,
+  "gold": "A binary classifier that decides whether Arabic text is a question seeking an answer",
+  "support": "In this paper, we have implemented a binary classifier to classify Arabic text to either question seeking answer or not.",
+  "type": "define"
+ },
+ {
+  "id": "CB023",
+  "corpus": "B",
+  "title": "Question Identification in Arabic Language Using Emotional Based Features",
+  "question": "Did emotional features improve the classifier accuracy in Question Identification in Arabic Language Using Emotional Based Features?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "Experimental evaluation has done and showed that these emotional features have improved the accuracy of the classifier.",
+  "type": "yesno"
+ },
+ {
+  "id": "CB024",
+  "corpus": "B",
+  "title": "Question Identification in Arabic Language Using Emotional Based Features",
+  "question": "What accuracy does the classifier in Question Identification in Arabic Language Using Emotional Based Features reach?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "CB025",
+  "corpus": "B",
+  "title": "Opening the Software Engineering Toolbox for the Assessment of Trustworthy AI",
+  "question": "Which body defined the seven key requirements discussed in Opening the Software Engineering Toolbox for the Assessment of Trustworthy AI?",
+  "answerable": true,
+  "gold": "The European Commission's AI high-level expert group",
+  "support": "We make the connection between the seven key requirements as defined by the European Commission's AI high-level expert group and established procedures from software engineering and raise questions for future work.",
+  "type": "who"
+ },
+ {
+  "id": "CB026",
+  "corpus": "B",
+  "title": "Opening the Software Engineering Toolbox for the Assessment of Trustworthy AI",
+  "question": "Why do the authors of Opening the Software Engineering Toolbox for the Assessment of Trustworthy AI apply software engineering practices to AI?",
+  "answerable": true,
+  "gold": "AI implementations are still based on software",
+  "support": "While AI systems are highly complex, their implementations are still based on software.",
+  "type": "why"
+ },
+ {
+  "id": "CB027",
+  "corpus": "B",
+  "title": "Opening the Software Engineering Toolbox for the Assessment of Trustworthy AI",
+  "question": "How many key requirements for Trustworthy AI are connected to software engineering procedures in Opening the Software Engineering Toolbox for the Assessment of Trustworthy AI?",
+  "answerable": true,
+  "gold": "Seven",
+  "support": "We make the connection between the seven key requirements as defined by the European Commission's AI high-level expert group and established procedures from software engineering and raise questions for future work.",
+  "type": "count"
+ },
+ {
+  "id": "CB028",
+  "corpus": "B",
+  "title": "Improving Automatic Source Code Summarization via Deep Reinforcement Learning",
+  "question": "How is the reward defined to train the networks in Improving Automatic Source Code Summarization via Deep Reinforcement Learning?",
+  "answerable": true,
+  "gold": "An advantage reward composed of the BLEU metric",
+  "support": "We employ an advantage reward composed of BLEU metric to train both networks.",
+  "type": "how"
+ },
+ {
+  "id": "CB029",
+  "corpus": "B",
+  "title": "Improving Automatic Source Code Summarization via Deep Reinforcement Learning",
+  "question": "Why do decoders in existing code summarization approaches suffer from exposure bias, as discussed in Improving Automatic Source Code Summarization via Deep Reinforcement Learning?",
+  "answerable": true,
+  "gold": "They are trained with ground-truth words but must generate the entire sequence from scratch at test time",
+  "support": "However, it is expected to generate the entire sequence from scratch at test time.",
+  "type": "why"
+ },
+ {
+  "id": "CB030",
+  "corpus": "B",
+  "title": "Improving Automatic Source Code Summarization via Deep Reinforcement Learning",
+  "question": "Who are the authors of Improving Automatic Source Code Summarization via Deep Reinforcement Learning?",
+  "answerable": true,
+  "gold": "Yao Wan, Zhou Zhao, Min Yang, Guandong Xu, Haochao Ying",
+  "support": "Authors: Yao Wan, Zhou Zhao, Min Yang, Guandong Xu, Haochao Ying",
+  "type": "who"
+ },
+ {
+  "id": "CB031",
+  "corpus": "B",
+  "title": "N-Gram Memories at Two Bits: Quantizing Lookup Tables in Large Language Models",
+  "question": "By how much does CP's two-bit code lower output KL in N-Gram Memories at Two Bits: Quantizing Lookup Tables in Large Language Models?",
+  "answerable": true,
+  "gold": "41-63% relative to 2-bit round-to-nearest",
+  "support": "CP's two-bit code lowers output KL by 41--63\\% relative to 2-bit round-to-nearest.",
+  "type": "count"
+ },
+ {
+  "id": "CB032",
+  "corpus": "B",
+  "title": "N-Gram Memories at Two Bits: Quantizing Lookup Tables in Large Language Models",
+  "question": "In N-Gram Memories at Two Bits: Quantizing Lookup Tables in Large Language Models, how much does DeepSeek's table storage shrink?",
+  "answerable": true,
+  "gold": "From 203GB to 51GB",
+  "support": "For DeepSeek, it reduces table storage from 203GB to 51GB, leaving room for larger workloads when the table is kept on GPU.",
+  "type": "count"
+ },
+ {
+  "id": "CB033",
+  "corpus": "B",
+  "title": "N-Gram Memories at Two Bits: Quantizing Lookup Tables in Large Language Models",
+  "question": "How many bits does the local scale use in N-Gram Memories at Two Bits: Quantizing Lookup Tables in Large Language Models?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "define"
+ },
+ {
+  "id": "CB034",
+  "corpus": "B",
+  "title": "Robust Reinforcement Learning using Adversarial Populations",
+  "question": "How does Robust Reinforcement Learning using Adversarial Populations train its policy?",
+  "answerable": true,
+  "gold": "By randomly initializing a population of adversaries and sampling from it uniformly during training",
+  "support": "We propose a population-based augmentation to the Robust RL formulation in which we randomly initialize a population of adversaries and sample from the population uniformly during training.",
+  "type": "how"
+ },
+ {
+  "id": "CB035",
+  "corpus": "B",
+  "title": "Robust Reinforcement Learning using Adversarial Populations",
+  "question": "Why is training against a single adversary a problem in Robust Reinforcement Learning using Adversarial Populations?",
+  "answerable": true,
+  "gold": "The resulting policy is highly exploitable by new adversaries",
+  "support": "In this work, we demonstrate that using a single adversary does not consistently yield robustness to dynamics variations under standard parametrizations of the adversary; the resulting policy is highly exploitable by new adversaries.",
+  "type": "why"
+ },
+ {
+  "id": "CB036",
+  "corpus": "B",
+  "title": "Robust Reinforcement Learning using Adversarial Populations",
+  "question": "How does the adversarial population approach compare with domain randomization in Robust Reinforcement Learning using Adversarial Populations?",
+  "answerable": true,
+  "gold": "It gives comparable robustness and generalization while avoiding a domain randomization failure mode",
+  "support": "Finally, we demonstrate that this approach provides comparable robustness and generalization as domain randomization on these benchmarks while avoiding a ubiquitous domain randomization failure mode.",
+  "type": "compare"
+ },
+ {
+  "id": "CB037",
+  "corpus": "B",
+  "title": "Embedding Geometry Shapes LLM Routing: Tracing Failure Modes and Improving Generalization",
+  "question": "Which model's hidden state is used as the prompt representation in Embedding Geometry Shapes LLM Routing: Tracing Failure Modes and Improving Generalization?",
+  "answerable": true,
+  "gold": "Qwen2.5-7B-Instruct",
+  "support": "We therefore replace the semantic embedding with the following map: we run a partial forward pass of Qwen2.5-7B-Instruct on the prompt and use the hidden state of its last token at a deep layer as the representation.",
+  "type": "define"
+ },
+ {
+  "id": "CB038",
+  "corpus": "B",
+  "title": "Embedding Geometry Shapes LLM Routing: Tracing Failure Modes and Improving Generalization",
+  "question": "Why do semantic-embedding routers struggle on unseen tasks in Embedding Geometry Shapes LLM Routing?",
+  "answerable": true,
+  "gold": "Features that determine the neighbors of unseen prompts are an unreliable proxy for LLM selection",
+  "support": "By studying the geometry of semantic embeddings, we trace a clear failure mode: features that determine the neighbors of unseen prompts are an unreliable proxy for LLM selection.",
+  "type": "why"
+ },
+ {
+  "id": "CB039",
+  "corpus": "B",
+  "title": "Embedding Geometry Shapes LLM Routing: Tracing Failure Modes and Improving Generalization",
+  "question": "Do the simple methods in Embedding Geometry Shapes LLM Routing beat a recent state-of-the-art hidden-states based router on RouterBench?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "Our two simple methods also beat a recent SoTA hidden-states based router on RouterBench.",
+  "type": "yesno"
+ },
+ {
+  "id": "CB040",
+  "corpus": "B",
+  "title": "Modular Constraint Solver Cooperation via Abstract Interpretation",
+  "question": "Which two new cooperation schemes are contributed in Modular Constraint Solver Cooperation via Abstract Interpretation?",
+  "answerable": true,
+  "gold": "Interval propagators completion and delayed product",
+  "support": "We contribute to two new cooperation schemes: (i) interval propagators completion that allows abstract domains to exchange bound constraints, and (ii) delayed product which exchanges over-approximations of constraints between two abstract domains.",
+  "type": "list"
+ },
+ {
+  "id": "CB041",
+  "corpus": "B",
+  "title": "Modular Constraint Solver Cooperation via Abstract Interpretation",
+  "question": "How does Modular Constraint Solver Cooperation via Abstract Interpretation differ from SMT approaches?",
+  "answerable": true,
+  "gold": "In SMT the cooperation scheme is usually fixed, e.g. Nelson-Oppen",
+  "support": "This differs from existing approaches such as SMT where the cooperation scheme is usually fixed (e.g., Nelson-Oppen).",
+  "type": "compare"
+ },
+ {
+  "id": "CB042",
+  "corpus": "B",
+  "title": "Modular Constraint Solver Cooperation via Abstract Interpretation",
+  "question": "In which programming language is the framework of Modular Constraint Solver Cooperation via Abstract Interpretation implemented?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "where"
+ },
+ {
+  "id": "CB043",
+  "corpus": "B",
+  "title": "Agentic-Priors: Using Large Language Models to Address the Cold Start Problem in Preference Elicitation",
+  "question": "By how much does Agentic-Priors improve cold start accuracy over an uninformed prior?",
+  "answerable": true,
+  "gold": "5-40 percentage points",
+  "support": "Across seven choice datasets, Agentic-Priors improves cold start accuracy over an uninformed prior by 5-40 percentage points.",
+  "type": "count"
+ },
+ {
+  "id": "CB044",
+  "corpus": "B",
+  "title": "Agentic-Priors: Using Large Language Models to Address the Cold Start Problem in Preference Elicitation",
+  "question": "Which LLM prior-elicitation method does Agentic-Priors outperform on three datasets?",
+  "answerable": true,
+  "gold": "AutoElicit",
+  "support": "It also outperforms AutoElicit, a state-of-the-art LLM prior-elicitation method, on three datasets and loses on one.",
+  "type": "who"
+ },
+ {
+  "id": "CB045",
+  "corpus": "B",
+  "title": "Agentic-Priors: Using Large Language Models to Address the Cold Start Problem in Preference Elicitation",
+  "question": "What is the cold start problem in Agentic-Priors: Using Large Language Models to Address the Cold Start Problem in Preference Elicitation?",
+  "answerable": true,
+  "gold": "Before any choices are observed, the agent must rely solely on a prior",
+  "support": "An agent that learns a user's preferences from their choices faces a cold start problem: before any choices are observed, it must rely solely on a prior.",
+  "type": "define"
+ },
+ {
+  "id": "CB046",
+  "corpus": "B",
+  "title": "A Review of Automated Speech and Language Features for Assessment of Cognitive and Thought Disorders",
+  "question": "Into which two categories is the review A Review of Automated Speech and Language Features for Assessment of Cognitive and Thought Disorders split?",
+  "answerable": true,
+  "gold": "Language features based on NLP and speech features based on speech signal processing",
+  "support": "Broadly speaking, the review is split into two categories: language features based on natural language processing and speech features based on speech signal processing.",
+  "type": "list"
+ },
+ {
+  "id": "CB047",
+  "corpus": "B",
+  "title": "A Review of Automated Speech and Language Features for Assessment of Cognitive and Thought Disorders",
+  "question": "Who wrote A Review of Automated Speech and Language Features for Assessment of Cognitive and Thought Disorders?",
+  "answerable": true,
+  "gold": "Rohit Voleti, Julie M. Liss, Visar Berisha",
+  "support": "Authors: Rohit Voleti, Julie M. Liss, Visar Berisha",
+  "type": "who"
+ },
+ {
+  "id": "CB048",
+  "corpus": "B",
+  "title": "A Review of Automated Speech and Language Features for Assessment of Cognitive and Thought Disorders",
+  "question": "How many studies are included in A Review of Automated Speech and Language Features for Assessment of Cognitive and Thought Disorders?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "CB049",
+  "corpus": "B",
+  "title": "Analyzing the Effect of Multi-task Learning for Biomedical Named Entity Recognition",
+  "question": "Why is biomedical named entity recognition hard in Analyzing the Effect of Multi-task Learning for Biomedical Named Entity Recognition?",
+  "answerable": true,
+  "gold": "Deep-learning solutions need large annotated datasets, which are not available in the biomedical domain",
+  "support": "State-of-the-art deep-learning based solutions for entity recognition often require large annotated datasets, which is not available in the biomedical domain.",
+  "type": "why"
+ },
+ {
+  "id": "CB050",
+  "corpus": "B",
+  "title": "Analyzing the Effect of Multi-task Learning for Biomedical Named Entity Recognition",
+  "question": "How do the authors of Analyzing the Effect of Multi-task Learning for Biomedical Named Entity Recognition propose to improve performance?",
+  "answerable": true,
+  "gold": "By combining transfer learning and multi-task learning",
+  "support": "Besides, we propose combining transfer learning and multi-task learning to improve the performance of biomedical named entity recognition systems, which is not applied before to the best of our knowledge.",
+  "type": "how"
+ },
+ {
+  "id": "CB051",
+  "corpus": "B",
+  "title": "Analyzing the Effect of Multi-task Learning for Biomedical Named Entity Recognition",
+  "question": "Does Analyzing the Effect of Multi-task Learning for Biomedical Named Entity Recognition release a new annotated biomedical corpus?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "yesno"
+ },
+ {
+  "id": "CB052",
+  "corpus": "B",
+  "title": "Unsupervised Differentiable Multi-aspect Network Embedding",
+  "question": "What is asp2vec in Unsupervised Differentiable Multi-aspect Network Embedding?",
+  "answerable": true,
+  "gold": "An end-to-end framework for multi-aspect network embedding where aspects are dynamically assigned from local context",
+  "support": "In this paper, we propose a novel end-to-end framework for multi-aspect network embedding, called asp2vec, in which the aspects of each node are dynamically assigned based on its local context.",
+  "type": "define"
+ },
+ {
+  "id": "CB053",
+  "corpus": "B",
+  "title": "Unsupervised Differentiable Multi-aspect Network Embedding",
+  "question": "How is aspect selection made differentiable in Unsupervised Differentiable Multi-aspect Network Embedding?",
+  "answerable": true,
+  "gold": "Via the Gumbel-Softmax trick",
+  "support": "More precisely, among multiple aspects, we dynamically assign a single aspect to each node based on its current context, and our aspect selection module is end-to-end differentiable via the Gumbel-Softmax trick.",
+  "type": "how"
+ },
+ {
+  "id": "CB054",
+  "corpus": "B",
+  "title": "Unsupervised Differentiable Multi-aspect Network Embedding",
+  "question": "Why is offline graph clustering a drawback for multi-aspect network embedding in Unsupervised Differentiable Multi-aspect Network Embedding?",
+  "answerable": true,
+  "gold": "It fixes each node's aspect distribution and hinders end-to-end training, making embedding quality depend on the clustering",
+  "support": "We argue that this not only makes each node always have the same aspect distribution regardless of its dynamic context, but also hinders the end-to-end training of the model that eventually leads to the final embedding quality largely dependent on the clustering.",
+  "type": "why"
+ },
+ {
+  "id": "CB055",
+  "corpus": "B",
+  "title": "The emergence of gravity as a retro-causal post-inflation macro-quantum-coherent holographic vacuum Higgs-Goldstone field",
+  "question": "What does the paper The emergence of gravity as a retro-causal post-inflation macro-quantum-coherent holographic vacuum Higgs-Goldstone field predict about the LHC?",
+  "answerable": true,
+  "gold": "The LHC will never detect exotic real on-mass-shell particles that can explain dark matter",
+  "support": "We predict, as a consequence, that the LHC will never detect exotic real on-mass-shell particles that can explain dark matter.",
+  "type": "define"
+ },
+ {
+  "id": "CB056",
+  "corpus": "B",
+  "title": "The emergence of gravity as a retro-causal post-inflation macro-quantum-coherent holographic vacuum Higgs-Goldstone field",
+  "question": "How does gravity arise in The emergence of gravity as a retro-causal post-inflation macro-quantum-coherent holographic vacuum Higgs-Goldstone field?",
+  "answerable": true,
+  "gold": "From 2nd order topological defects in the post-inflation virtual condensate component",
+  "support": "Gravity, in contrast, arises from the 2nd order topological defects in the post-inflation virtual \"condensate\" (coherent) component.",
+  "type": "how"
+ },
+ {
+  "id": "CB057",
+  "corpus": "B",
+  "title": "The emergence of gravity as a retro-causal post-inflation macro-quantum-coherent holographic vacuum Higgs-Goldstone field",
+  "question": "How many free parameters does the gravity model in The emergence of gravity as a retro-causal post-inflation macro-quantum-coherent holographic vacuum Higgs-Goldstone field have?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "CB058",
+  "corpus": "B",
+  "title": "A novel approach for multi-agent cooperative pursuit to capture grouped evaders",
+  "question": "Which techniques does A novel approach for multi-agent cooperative pursuit to capture grouped evaders combine?",
+  "answerable": true,
+  "gold": "A self-organizing feature map (SOFM) and reinforcement learning based on the agent group role membership function (AGRMF)",
+  "support": "An approach of mobile multi-agent pursuit based on application of self-organizing feature map (SOFM) and along with that reinforcement learning based on agent group role membership function (AGRMF) model is proposed.",
+  "type": "define"
+ },
+ {
+  "id": "CB059",
+  "corpus": "B",
+  "title": "A novel approach for multi-agent cooperative pursuit to capture grouped evaders",
+  "question": "Who wrote A novel approach for multi-agent cooperative pursuit to capture grouped evaders?",
+  "answerable": true,
+  "gold": "Muhammad Zuhair Qadir, Songhao Piao, Haiyang Jiang, Mohammed El Habib Souidi",
+  "support": "Authors: Muhammad Zuhair Qadir, Songhao Piao, Haiyang Jiang, Mohammed El Habib Souidi",
+  "type": "who"
+ },
+ {
+  "id": "CB060",
+  "corpus": "B",
+  "title": "A novel approach for multi-agent cooperative pursuit to capture grouped evaders",
+  "question": "Does A novel approach for multi-agent cooperative pursuit to capture grouped evaders discuss a new reward function?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "Besides, we also discuss a new reward function.",
+  "type": "yesno"
+ },
+ {
+  "id": "CB061",
+  "corpus": "B",
+  "title": "Observational viability of Herglotz $f(R,T)$ gravity: A multi-probe Bayesian analysis",
+  "question": "What value of H0 does the joint analysis yield in Observational viability of Herglotz f(R,T) gravity: A multi-probe Bayesian analysis?",
+  "answerable": true,
+  "gold": "66.67 km/s/Mpc",
+  "support": "The joint analysis yields $H_0=66.67^{+1.32}_{-1.28}\\,\\mathrm{km\\,s^{-1}\\,Mpc^{-1}}$",
+  "type": "count"
+ },
+ {
+  "id": "CB062",
+  "corpus": "B",
+  "title": "Observational viability of Herglotz $f(R,T)$ gravity: A multi-probe Bayesian analysis",
+  "question": "Which datasets are used in Observational viability of Herglotz f(R,T) gravity: A multi-probe Bayesian analysis?",
+  "answerable": true,
+  "gold": "Cosmic Chronometer, DESI DR2 BAO and Union3 Type-Ia supernova data",
+  "support": "We employ Cosmic Chronometer (CC), DESI DR2 baryon acoustic oscillation (BAO), and Union3 Type-Ia supernova data, both independently and in combination.",
+  "type": "list"
+ },
+ {
+  "id": "CB063",
+  "corpus": "B",
+  "title": "Observational viability of Herglotz $f(R,T)$ gravity: A multi-probe Bayesian analysis",
+  "question": "What is the linear Herglotz-type f(R,T) model studied in Observational viability of Herglotz f(R,T) gravity: A multi-probe Bayesian analysis?",
+  "answerable": true,
+  "gold": "f(R,T)=R+αT",
+  "support": "We investigate the observational viability of the linear Herglotz-type $f(R,T)$ gravity model, $f(R,T)=R+αT$, which incorporates both geometry--matter coupling and non-conservative gravitational dynamics.",
+  "type": "define"
+ },
+ {
+  "id": "CB064",
+  "corpus": "B",
+  "title": "ML Engineering Agents - A Data Management Perspective",
+  "question": "What are MLE agents in ML Engineering Agents - A Data Management Perspective?",
+  "answerable": true,
+  "gold": "A new paradigm for automating end-to-end ML pipeline development",
+  "support": "Machine learning engineering (MLE) agents are emerging as a new paradigm for automating end-to-end ML pipeline development.",
+  "type": "define"
+ },
+ {
+  "id": "CB065",
+  "corpus": "B",
+  "title": "ML Engineering Agents - A Data Management Perspective",
+  "question": "At which conference was the tutorial ML Engineering Agents - A Data Management Perspective presented?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "when"
+ },
+ {
+  "id": "CB066",
+  "corpus": "B",
+  "title": "ML Engineering Agents - A Data Management Perspective",
+  "question": "Which open challenges does ML Engineering Agents - A Data Management Perspective cover?",
+  "answerable": true,
+  "gold": "Efficient pipeline execution, data discovery and augmentation over heterogeneous sources, reliability and debugging, and fairness and compliance",
+  "support": "We cover how agents combine program synthesis with iterative and evolutionary optimization, and discuss open challenges in efficient pipeline execution, data discovery and augmentation over heterogeneous sources, reliability and debugging, as well as fairness and compliance.",
+  "type": "list"
+ },
+ {
+  "id": "CB067",
+  "corpus": "B",
+  "title": "Extremal results for directed tree connectivity",
+  "question": "What is an (S, r)-tree in Extremal results for directed tree connectivity?",
+  "answerable": true,
+  "gold": "An out-tree T rooted at r with S contained in V(T)",
+  "support": "For a digraph $D=(V(D), A(D))$, and a set $S\\subseteq V(D)$ with $r\\in S$ and $|S|\\geq 2$, an $(S, r)$-tree is an out-tree $T$ rooted at $r$ with $S\\subseteq V(T)$.",
+  "type": "define"
+ },
+ {
+  "id": "CB068",
+  "corpus": "B",
+  "title": "Extremal results for directed tree connectivity",
+  "question": "What do the authors compute for minimally generalized strongly connected digraphs in Extremal results for directed tree connectivity?",
+  "answerable": true,
+  "gold": "The minimum and maximum sizes of these digraphs",
+  "support": "We compute the minimum and maximum sizes of these digraphs, and give characterizations of such digraphs for some pairs of $k$ and $\\ell$.",
+  "type": "how"
+ },
+ {
+  "id": "CB069",
+  "corpus": "B",
+  "title": "Extremal results for directed tree connectivity",
+  "question": "Are generalized k-vertex-strong connectivity and generalized k-arc-strong connectivity also called directed tree connectivity in Extremal results for directed tree connectivity?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "The generalized $k$-vertex-strong connectivity and generalized $k$-arc-strong connectivity are also called directed tree connectivity which could be seen as a generalization of classical connectivity of digraphs.",
+  "type": "yesno"
+ },
+ {
+  "id": "CB070",
+  "corpus": "B",
+  "title": "Sign Betting for Misspecified Regression: Variance Adaptivity and Optimal Approximation",
+  "question": "What universal approximation factor does sign betting achieve in Sign Betting for Misspecified Regression: Variance Adaptivity and Optimal Approximation?",
+  "answerable": true,
+  "gold": "Factor 3",
+  "support": "We further characterize the optimal universal approximation factor for proper learning by showing that sign betting achieves factor 3",
+  "type": "count"
+ },
+ {
+  "id": "CB071",
+  "corpus": "B",
+  "title": "Sign Betting for Misspecified Regression: Variance Adaptivity and Optimal Approximation",
+  "question": "Why is the L1 metric natural in Sign Betting for Misspecified Regression: Variance Adaptivity and Optimal Approximation?",
+  "answerable": true,
+  "gold": "It suits downstream decision problems such as bandits and reinforcement learning",
+  "support": "This $L_1$ metric is natural for downstream decision problems such as bandits and reinforcement learning.",
+  "type": "why"
+ },
+ {
+  "id": "CB072",
+  "corpus": "B",
+  "title": "Sign Betting for Misspecified Regression: Variance Adaptivity and Optimal Approximation",
+  "question": "Whose min-max estimator is analyzed in Sign Betting for Misspecified Regression: Variance Adaptivity and Optimal Approximation?",
+  "answerable": true,
+  "gold": "Baraud & Maillard (2025)",
+  "support": "We analyze the min--max estimator of Baraud & Maillard (2025), which we call \\emph{sign-betting regression}.",
+  "type": "who"
+ },
+ {
+  "id": "CB073",
+  "corpus": "B",
+  "title": "Partial equivalence of statistical ensembles in a simple spin model with discontinuous phase transitions",
+  "question": "How do fluctuations differ between the microcanonical and canonical ensembles in Partial equivalence of statistical ensembles in a simple spin model with discontinuous phase transitions?",
+  "answerable": true,
+  "gold": "There is no fluctuation in the microcanonical ensemble, while the canonical ensemble shows size-dependent power-law fluctuations",
+  "support": "In the microcanonical ensemble, there is no fluctuation at all. In the canonical ensemble, one observes power-law fluctuations, which are, however, size-dependent and disappear in the thermodynamic limit.",
+  "type": "compare"
+ },
+ {
+  "id": "CB074",
+  "corpus": "B",
+  "title": "Partial equivalence of statistical ensembles in a simple spin model with discontinuous phase transitions",
+  "question": "What does the simple spin model represent in Partial equivalence of statistical ensembles in a simple spin model with discontinuous phase transitions?",
+  "answerable": true,
+  "gold": "An equilibrium statistical mechanics representation of the biased random walk",
+  "support": "We focus on a very simple spin model, that was shown to be an equilibrium statistical mechanics representation of the biased random walk.",
+  "type": "define"
+ },
+ {
+  "id": "CB075",
+  "corpus": "B",
+  "title": "Partial equivalence of statistical ensembles in a simple spin model with discontinuous phase transitions",
+  "question": "How many spins were used in the simulations of Partial equivalence of statistical ensembles in a simple spin model with discontinuous phase transitions?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ },
+ {
+  "id": "CB076",
+  "corpus": "B",
+  "title": "EliteReplay: Preserving Diverse Solutions in RL Post-Training via Quality-Diversity Search",
+  "question": "What is EliteReplay in EliteReplay: Preserving Diverse Solutions in RL Post-Training via Quality-Diversity Search?",
+  "answerable": true,
+  "gold": "A post-training recipe that pairs GRPO with an elite archive built by quality-diversity search",
+  "support": "We propose EliteReplay, a post-training recipe that pairs GRPO with an \"elite\" archive built by quality-diversity search.",
+  "type": "define"
+ },
+ {
+  "id": "CB077",
+  "corpus": "B",
+  "title": "EliteReplay: Preserving Diverse Solutions in RL Post-Training via Quality-Diversity Search",
+  "question": "How many more distinct correct strategies does EliteReplay produce than the strongest baselines?",
+  "answerable": true,
+  "gold": "Up to 77% more",
+  "support": "On multiple text-to-SQL tasks, EliteReplay achieves a higher pass@128 than all baselines, producing up to 77% more distinct correct strategies than the strongest baselines.",
+  "type": "count"
+ },
+ {
+  "id": "CB078",
+  "corpus": "B",
+  "title": "EliteReplay: Preserving Diverse Solutions in RL Post-Training via Quality-Diversity Search",
+  "question": "Why is RL post-training a concern for solution diversity in EliteReplay: Preserving Diverse Solutions in RL Post-Training via Quality-Diversity Search?",
+  "answerable": true,
+  "gold": "Such training can narrow the set of solutions the model can produce",
+  "support": "However, such training can narrow the set of solutions the model can produce.",
+  "type": "why"
+ },
+ {
+  "id": "CB079",
+  "corpus": "B",
+  "title": "Few-shot Slot Tagging with Collapsed Dependency Transfer and Label-enhanced Task-adaptive Projection Network",
+  "question": "By how many F1 points does the model outperform the strongest baseline in the one-shot setting in Few-shot Slot Tagging with Collapsed Dependency Transfer and Label-enhanced Task-adaptive Projection Network?",
+  "answerable": true,
+  "gold": "14.64",
+  "support": "Experimental results show that our model significantly outperforms the strongest few-shot learning baseline by 14.64 F1 scores in the one-shot setting.",
+  "type": "count"
+ },
+ {
+  "id": "CB080",
+  "corpus": "B",
+  "title": "Few-shot Slot Tagging with Collapsed Dependency Transfer and Label-enhanced Task-adaptive Projection Network",
+  "question": "What is L-TapNet in Few-shot Slot Tagging with Collapsed Dependency Transfer and Label-enhanced Task-adaptive Projection Network?",
+  "answerable": true,
+  "gold": "A Label-enhanced Task-Adaptive Projection Network based on TapNet that uses label name semantics",
+  "support": "To calculate such similarity, we propose a Label-enhanced Task-Adaptive Projection Network (L-TapNet) based on the state-of-the-art few-shot classification model -- TapNet, by leveraging label name semantics in representing labels.",
+  "type": "define"
+ },
+ {
+  "id": "CB081",
+  "corpus": "B",
+  "title": "Few-shot Slot Tagging with Collapsed Dependency Transfer and Label-enhanced Task-adaptive Projection Network",
+  "question": "Which organization funded the research in Few-shot Slot Tagging with Collapsed Dependency Transfer and Label-enhanced Task-adaptive Projection Network?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "who"
+ },
+ {
+  "id": "CB082",
+  "corpus": "B",
+  "title": "ESG-Kor: A Korean Dataset for ESG-related Information Extraction and Practical Use Cases",
+  "question": "How many sentences does the ESG-Kor dataset consist of?",
+  "answerable": true,
+  "gold": "118,946",
+  "support": "ESG-Kor is a dataset consisting of a total of 118,946 sentences that extracted information on each ESG component from Korean companies' sustainability reports and manually labeled it according to objective rules provided by ESG evaluation agencies.",
+  "type": "count"
+ },
+ {
+  "id": "CB083",
+  "corpus": "B",
+  "title": "ESG-Kor: A Korean Dataset for ESG-related Information Extraction and Practical Use Cases",
+  "question": "What does ESG stand for in ESG-Kor: A Korean Dataset for ESG-related Information Extraction and Practical Use Cases?",
+  "answerable": true,
+  "gold": "Environmental, Social, and Governance",
+  "support": "Therefore, we have built a Korean dataset called ESG-Kor to automatically extract Environmental, Social, and Governance (ESG) information, which has recently gained importance.",
+  "type": "define"
+ },
+ {
+  "id": "CB084",
+  "corpus": "B",
+  "title": "ESG-Kor: A Korean Dataset for ESG-related Information Extraction and Practical Use Cases",
+  "question": "Which Korean language model achieved the best classification performance on ESG-Kor?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "list"
+ },
+ {
+  "id": "CB085",
+  "corpus": "B",
+  "title": "Adversarial Image Translation: Unrestricted Adversarial Examples in Face Recognition Systems",
+  "question": "What attack success rates are reported in Adversarial Image Translation: Unrestricted Adversarial Examples in Face Recognition Systems?",
+  "answerable": true,
+  "gold": "About 90% under white-box and 80% under black-box settings",
+  "support": "Our experimental results indicate that our method achieved about $90$ and $80\\%$ attack success rates under white- and black-box settings, respectively",
+  "type": "count"
+ },
+ {
+  "id": "CB086",
+  "corpus": "B",
+  "title": "Adversarial Image Translation: Unrestricted Adversarial Examples in Face Recognition Systems",
+  "question": "Why are unrestricted adversarial examples more serious in Adversarial Image Translation: Unrestricted Adversarial Examples in Face Recognition Systems?",
+  "answerable": true,
+  "gold": "Conventional certified defenses might be ineffective against them",
+  "support": "Adversarial examples that are not restricted to small perturbations could be more serious since conventional certified defenses might be ineffective against them.",
+  "type": "why"
+ },
+ {
+  "id": "CB087",
+  "corpus": "B",
+  "title": "Adversarial Image Translation: Unrestricted Adversarial Examples in Face Recognition Systems",
+  "question": "How does Adversarial Image Translation generate unrestricted adversarial examples?",
+  "answerable": true,
+  "gold": "Using image translation techniques",
+  "support": "To shed light on the vulnerability to such adversarial examples, we propose a flexible and efficient method for generating unrestricted adversarial examples using image translation techniques.",
+  "type": "how"
+ },
+ {
+  "id": "CB088",
+  "corpus": "B",
+  "title": "MetAL: Active Semi-Supervised Learning on Graphs via Meta Learning",
+  "question": "How is the active learning task formulated in MetAL: Active Semi-Supervised Learning on Graphs via Meta Learning?",
+  "answerable": true,
+  "gold": "As a bilevel optimization problem",
+  "support": "For a semi-supervised learning problem, we formulate the AL task as a bilevel optimization problem.",
+  "type": "how"
+ },
+ {
+  "id": "CB089",
+  "corpus": "B",
+  "title": "MetAL: Active Semi-Supervised Learning on Graphs via Meta Learning",
+  "question": "What is the objective of active learning according to MetAL: Active Semi-Supervised Learning on Graphs via Meta Learning?",
+  "answerable": true,
+  "gold": "To train classification models with fewer labeled instances by labeling only the most informative ones",
+  "support": "The objective of active learning (AL) is to train classification models with less number of labeled instances by selecting only the most informative instances for labeling.",
+  "type": "define"
+ },
+ {
+  "id": "CB090",
+  "corpus": "B",
+  "title": "MetAL: Active Semi-Supervised Learning on Graphs via Meta Learning",
+  "question": "Which specific graph datasets was MetAL evaluated on?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "list"
+ },
+ {
+  "id": "CB091",
+  "corpus": "B",
+  "title": "Combining LLM and Dynamic Analysis for Universal Testing of Static Application Security Testing Tools",
+  "question": "How many unique faults did LLM4SAST identify across how many SAST tools?",
+  "answerable": true,
+  "gold": "66 unique faults across six SAST tools",
+  "support": "LLM4SAST identified 66 unique faults across six SAST tools, with 32 confirmed or fixed after being reported to developers, demonstrating effectiveness.",
+  "type": "count"
+ },
+ {
+  "id": "CB092",
+  "corpus": "B",
+  "title": "Combining LLM and Dynamic Analysis for Universal Testing of Static Application Security Testing Tools",
+  "question": "Which two heuristics are proposed in Combining LLM and Dynamic Analysis for Universal Testing of Static Application Security Testing Tools?",
+  "answerable": true,
+  "gold": "Dynamic-feedback-driven selection and program-differencing-based clustering",
+  "support": "To reduce erroneous variants and identify unique faults, we propose two heuristics: dynamic-feedback-driven selection and program-differencing-based clustering.",
+  "type": "list"
+ },
+ {
+  "id": "CB093",
+  "corpus": "B",
+  "title": "Combining LLM and Dynamic Analysis for Universal Testing of Static Application Security Testing Tools",
+  "question": "Is LLM4SAST described as the first universal framework for detecting faults in SAST tools?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "We present LLM4SAST, the first universal framework detecting faults in SAST tools using large language models and dynamic feedback.",
+  "type": "yesno"
+ },
+ {
+  "id": "CB094",
+  "corpus": "B",
+  "title": "Connectivity keeping pendant extensions of paths in $k$-connected triangle-free graphs",
+  "question": "What does P_m^+(i) denote in Connectivity keeping pendant extensions of paths in k-connected triangle-free graphs?",
+  "answerable": true,
+  "gold": "The tree obtained from a path of order m-1 by adding one pendant vertex adjacent to its ith vertex",
+  "support": "let $P_m^+(i)$ denote the tree obtained from a path of order $m-1$ by adding one pendant vertex adjacent to its $i$th vertex.",
+  "type": "define"
+ },
+ {
+  "id": "CB095",
+  "corpus": "B",
+  "title": "Connectivity keeping pendant extensions of paths in $k$-connected triangle-free graphs",
+  "question": "Which conjecture motivates Connectivity keeping pendant extensions of paths in k-connected triangle-free graphs?",
+  "answerable": true,
+  "gold": "Mader's conjecture on connectivity keeping trees",
+  "support": "Motivated by Mader's conjecture on connectivity keeping trees, we study the corresponding problem in triangle-free graphs.",
+  "type": "who"
+ },
+ {
+  "id": "CB096",
+  "corpus": "B",
+  "title": "Connectivity keeping pendant extensions of paths in $k$-connected triangle-free graphs",
+  "question": "Is the minimum degree bound sharp in Connectivity keeping pendant extensions of paths in k-connected triangle-free graphs?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "The minimum degree bound is sharp, and the result confirms the bipartite conjecture for all pendant extensions of paths.",
+  "type": "yesno"
+ },
+ {
+  "id": "CB097",
+  "corpus": "B",
+  "title": "Grid-Bench: Can LLMs Predict How Discrete Worlds Change?",
+  "question": "How many LLMs are evaluated in Grid-Bench: Can LLMs Predict How Discrete Worlds Change?",
+  "answerable": true,
+  "gold": "Six",
+  "support": "Evaluating six LLMs shows that complete-state accuracy falls sharply as histories grow, with substantial divergence among models that perform similarly on single events.",
+  "type": "count"
+ },
+ {
+  "id": "CB098",
+  "corpus": "B",
+  "title": "Grid-Bench: Can LLMs Predict How Discrete Worlds Change?",
+  "question": "What grid dimensions are used in Grid-Bench: Can LLMs Predict How Discrete Worlds Change?",
+  "answerable": true,
+  "gold": "Two-, three-, and four-dimensional grids",
+  "support": "We introduce Grid-Bench, an executable benchmark in which eight families of operations transform discrete worlds represented as two-, three-, and four-dimensional grids.",
+  "type": "list"
+ },
+ {
+  "id": "CB099",
+  "corpus": "B",
+  "title": "Grid-Bench: Can LLMs Predict How Discrete Worlds Change?",
+  "question": "Where can the Grid-Bench: Can LLMs Predict How Discrete Worlds Change? code be downloaded?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "where"
+ },
+ {
+  "id": "CB100",
+  "corpus": "B",
+  "title": "A Tree Architecture of LSTM Networks for Sequential Regression with Missing Data",
+  "question": "How does A Tree Architecture of LSTM Networks for Sequential Regression with Missing Data incorporate missingness information?",
+  "answerable": true,
+  "gold": "By selecting a subset of LSTM networks based on the presence-pattern of previous inputs",
+  "support": "In particular, we incorporate the missingness information by selecting a subset of these LSTM networks based on \"presence-pattern\" of a certain number of previous inputs.",
+  "type": "define"
+ },
+ {
+  "id": "CB101",
+  "corpus": "B",
+  "title": "A Tree Architecture of LSTM Networks for Sequential Regression with Missing Data",
+  "question": "How does the computational complexity of A Tree Architecture of LSTM Networks for Sequential Regression with Missing Data compare with conventional LSTMs?",
+  "answerable": true,
+  "gold": "It is in the same order as conventional LSTM architectures for the sequence length",
+  "support": "We also provide the computational complexity analysis of the proposed architecture, which is in the same order of the complexity of the conventional LSTM architectures for the sequence length.",
+  "type": "compare"
+ },
+ {
+  "id": "CB102",
+  "corpus": "B",
+  "title": "A Tree Architecture of LSTM Networks for Sequential Regression with Missing Data",
+  "question": "Can the tree architecture in A Tree Architecture of LSTM Networks for Sequential Regression with Missing Data be extended to GRUs?",
+  "answerable": true,
+  "gold": "Yes",
+  "support": "Our method can be readily extended to similar structures such as GRUs, RNNs as remarked in the paper.",
+  "type": "yesno"
+ },
+ {
+  "id": "CB103",
+  "corpus": "B",
+  "title": "Text-Informed Training Data Filtering for Enhanced Virtual Flow Meter Performance",
+  "question": "From what to what does the multimodal approach reduce downstream MAPE in Text-Informed Training Data Filtering for Enhanced Virtual Flow Meter Performance?",
+  "answerable": true,
+  "gold": "From 7.1% to 5.4%",
+  "support": "Ablation studies show that textual operator comments can provide filtering-relevant signals beyond sensor data alone, with the multimodal approach reducing downstream MAPE from 7.1% to 5.4% relative to sensor-only filtering.",
+  "type": "count"
+ },
+ {
+  "id": "CB104",
+  "corpus": "B",
+  "title": "Text-Informed Training Data Filtering for Enhanced Virtual Flow Meter Performance",
+  "question": "What are the two steps of the method in Text-Informed Training Data Filtering for Enhanced Virtual Flow Meter Performance?",
+  "answerable": true,
+  "gold": "Contextual anomaly detection over both data modalities, then generation of a binary mask to filter the training data",
+  "support": "The method consists of two steps: (1) contextual anomaly detection by reasoning over both data modalities, and (2) generation of a binary mask that is applied to filter the training dataset for model development.",
+  "type": "how"
+ },
+ {
+  "id": "CB105",
+  "corpus": "B",
+  "title": "Text-Informed Training Data Filtering for Enhanced Virtual Flow Meter Performance",
+  "question": "What is a virtual flow meter in Text-Informed Training Data Filtering for Enhanced Virtual Flow Meter Performance?",
+  "answerable": true,
+  "gold": "A steady-state soft-sensor regression model that estimates well flow rates",
+  "support": "To investigate the potential benefit, a steady-state soft-sensor regression model, namely a virtual flow meter that estimates well flow rates, is used as the downstream evaluation target.",
+  "type": "define"
+ },
+ {
+  "id": "CB106",
+  "corpus": "B",
+  "title": "Visuomotor Mechanical Search: Learning to Retrieve Target Objects in Clutter",
+  "question": "Which three components does the Deep RL procedure combine in Visuomotor Mechanical Search: Learning to Retrieve Target Objects in Clutter?",
+  "answerable": true,
+  "gold": "Teacher-aided exploration, a critic with privileged information, and mid-level representations",
+  "support": "In this work we present a novel Deep RL procedure that combines i) teacher-aided exploration, ii) a critic with privileged information, and iii) mid-level representations, resulting in sample efficient and effective learning for the problem of uncovering a target object occluded by a heap of unknown objects.",
+  "type": "list"
+ },
+ {
+  "id": "CB107",
+  "corpus": "B",
+  "title": "Visuomotor Mechanical Search: Learning to Retrieve Target Objects in Clutter",
+  "question": "Why does Deep RL fail when applied directly in Visuomotor Mechanical Search: Learning to Retrieve Target Objects in Clutter?",
+  "answerable": true,
+  "gold": "It is sample inefficient",
+  "support": "However, Deep RL is sample inefficient and fails when applied directly to the problem of unoccluding objects based on images.",
+  "type": "why"
+ },
+ {
+  "id": "CB108",
+  "corpus": "B",
+  "title": "Visuomotor Mechanical Search: Learning to Retrieve Target Objects in Clutter",
+  "question": "On which physical robot was Visuomotor Mechanical Search: Learning to Retrieve Target Objects in Clutter tested?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "where"
+ },
+ {
+  "id": "CB109",
+  "corpus": "B",
+  "title": "PROBE: Learning to Audit Policy Compliance in Tool-Using LLM Agents",
+  "question": "What does PROBE stand for in PROBE: Learning to Audit Policy Compliance in Tool-Using LLM Agents?",
+  "answerable": true,
+  "gold": "Policy Rule Observation via Behavioral Exploration",
+  "support": "We propose PROBE (Policy Rule Observation via Behavioral Exploration), an algorithm for training LLM-based auditors that interact with deployed agents as realistic users and probe them for policy violations through multi-turn, tool-mediated dialogue.",
+  "type": "define"
+ },
+ {
+  "id": "CB110",
+  "corpus": "B",
+  "title": "PROBE: Learning to Audit Policy Compliance in Tool-Using LLM Agents",
+  "question": "How is agent auditing formalized in PROBE: Learning to Audit Policy Compliance in Tool-Using LLM Agents?",
+  "answerable": true,
+  "gold": "As a two-player Markov game",
+  "support": "We formalize agent auditing as a two-player Markov game and propose a composite reward that balances violation discovery, behavioral plausibility, conversation progress, and policy diversity.",
+  "type": "how"
+ },
+ {
+  "id": "CB111",
+  "corpus": "B",
+  "title": "PROBE: Learning to Audit Policy Compliance in Tool-Using LLM Agents",
+  "question": "Which optimization methods are compared in PROBE: Learning to Audit Policy Compliance in Tool-Using LLM Agents?",
+  "answerable": true,
+  "gold": "GRPO, DPO, and GFlowNet-based optimization",
+  "support": "To study training objectives and reward design, we compare GRPO, DPO, and GFlowNet-based optimization in a controlled setting.",
+  "type": "list"
+ },
+ {
+  "id": "CB112",
+  "corpus": "B",
+  "title": "Should I visit this place? Inclusion and Exclusion Phrase Mining from Reviews",
+  "question": "How many factors are considered in Should I visit this place? Inclusion and Exclusion Phrase Mining from Reviews?",
+  "answerable": true,
+  "gold": "11",
+  "support": "In this paper, we focus on the problem of mining inclusion and exclusion phrases associated with 11 such factors, from reviews related to a tourist spot.",
+  "type": "count"
+ },
+ {
+  "id": "CB113",
+  "corpus": "B",
+  "title": "Should I visit this place? Inclusion and Exclusion Phrase Mining from Reviews",
+  "question": "How large is the dataset used in Should I visit this place? Inclusion and Exclusion Phrase Mining from Reviews?",
+  "answerable": true,
+  "gold": "2000 reviews related to 1000 tourist spots",
+  "support": "Using a dataset of 2000 reviews related to 1000 tourist spots",
+  "type": "count"
+ },
+ {
+  "id": "CB114",
+  "corpus": "B",
+  "title": "Should I visit this place? Inclusion and Exclusion Phrase Mining from Reviews",
+  "question": "Is the dataset of Should I visit this place? Inclusion and Exclusion Phrase Mining from Reviews written only in English?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "yesno"
+ },
+ {
+  "id": "CB115",
+  "corpus": "B",
+  "title": "Word Level Language Identification in English Telugu Code Mixed Data",
+  "question": "Which model performs best in Word Level Language Identification in English Telugu Code Mixed Data?",
+  "answerable": true,
+  "gold": "The CRF-based system with an f1-score of 0.91",
+  "support": "Our best performing system is CRF-based with an f1-score of 0.91.",
+  "type": "who"
+ },
+ {
+  "id": "CB116",
+  "corpus": "B",
+  "title": "Word Level Language Identification in English Telugu Code Mixed Data",
+  "question": "Which models are studied in Word Level Language Identification in English Telugu Code Mixed Data?",
+  "answerable": true,
+  "gold": "Nave Bayes Classifier, Random Forest Classifier, CRF and HMM",
+  "support": "In this paper, we present a study of various models - Nave Bayes Classifier, Random Forest Classifier, Conditional Random Field (CRF), and Hidden Markov Model (HMM) for Language Identification in English - Telugu Code Mixed Data.",
+  "type": "list"
+ },
+ {
+  "id": "CB117",
+  "corpus": "B",
+  "title": "Word Level Language Identification in English Telugu Code Mixed Data",
+  "question": "Why is language identification needed in Word Level Language Identification in English Telugu Code Mixed Data?",
+  "answerable": true,
+  "gold": "It is the necessary step for any further advancement in code-mixed data",
+  "support": "To do any further advancement in code-mixed data, the necessary step is Language Identification.",
+  "type": "why"
+ },
+ {
+  "id": "CB118",
+  "corpus": "B",
+  "title": "Optimal Unsupervised Domain Translation",
+  "question": "How does Optimal Unsupervised Domain Translation reformulate the problem?",
+  "answerable": true,
+  "gold": "In the Optimal Transport (OT) framework",
+  "support": "We observe that these methods yield solutions which are approximately minimal w.r.t. a given transportation cost, leading us to reformulate the problem in the Optimal Transport (OT) framework.",
+  "type": "how"
+ },
+ {
+  "id": "CB119",
+  "corpus": "B",
+  "title": "Optimal Unsupervised Domain Translation",
+  "question": "What is Domain Translation according to Optimal Unsupervised Domain Translation?",
+  "answerable": true,
+  "gold": "The problem of finding a meaningful correspondence between two domains",
+  "support": "Domain Translation is the problem of finding a meaningful correspondence between two domains.",
+  "type": "define"
+ },
+ {
+  "id": "CB120",
+  "corpus": "B",
+  "title": "Optimal Unsupervised Domain Translation",
+  "question": "How many datasets are used in the experiments of Optimal Unsupervised Domain Translation?",
+  "answerable": false,
+  "gold": "",
+  "support": "",
+  "type": "count"
+ }
+]

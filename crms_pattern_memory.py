@@ -107,6 +107,16 @@ class PatternMemory:
                 status TEXT NOT NULL CHECK(status IN ('accepted','rejected','retired')),
                 PRIMARY KEY(family, name)
             ) WITHOUT ROWID;
+            CREATE TABLE IF NOT EXISTS pat_gate_policy (
+                dimension TEXT PRIMARY KEY,
+                answer_types TEXT NOT NULL,
+                invariant INTEGER NOT NULL CHECK(invariant IN (0,1)),
+                threshold REAL,
+                typed_reason TEXT NOT NULL,
+                rationale TEXT NOT NULL DEFAULT '',
+                origin TEXT NOT NULL,
+                status TEXT NOT NULL CHECK(status IN ('accepted','rejected','retired'))
+            ) WITHOUT ROWID;
             CREATE TABLE IF NOT EXISTS pat_param (
                 name TEXT NOT NULL,
                 version INTEGER NOT NULL,
@@ -215,6 +225,33 @@ class PatternMemory:
                     "SELECT * FROM pat_intent WHERE family=? AND status='accepted' "
                     "ORDER BY priority,name", (family,))]
 
+    # ------------------------------------------------------ gate policy
+    def put_gate_policy(self, dimension: str, *, answer_types: Iterable[str] | None,
+                        invariant: bool, typed_reason: str, origin: str,
+                        threshold: float | None = None, rationale: str = "",
+                        status: str = "accepted") -> None:
+        """Declare how the quote-evidence gate treats a deviation dimension.
+
+        An invariant dimension that fails withholds the quote and abstains with
+        `typed_reason`; `answer_types` of None means every question shape."""
+        if origin not in ORIGINS:
+            raise PatternMemoryError(f"unknown origin: {origin!r}")
+        self.connection.execute(
+            "INSERT OR REPLACE INTO pat_gate_policy VALUES(?,?,?,?,?,?,?,?)",
+            (dimension, "*" if answer_types is None else ",".join(sorted(answer_types)),
+             int(invariant), threshold, typed_reason, rationale, origin, status))
+
+    def gate_policy(self) -> dict[str, dict[str, Any]]:
+        out: dict[str, dict[str, Any]] = {}
+        for r in self.connection.execute(
+                "SELECT * FROM pat_gate_policy WHERE status='accepted' ORDER BY dimension"):
+            out[r["dimension"]] = {
+                "answer_types": None if r["answer_types"] == "*"
+                else frozenset(r["answer_types"].split(",")),
+                "invariant": bool(r["invariant"]), "threshold": r["threshold"],
+                "typed_reason": r["typed_reason"]}
+        return out
+
     # ----------------------------------------------------------- params
     def set_param(self, name: str, value: float, *, origin: str, rationale: str = "",
                   metrics: Mapping[str, Any] | None = None) -> int:
@@ -304,6 +341,12 @@ class PatternMemory:
                             anchored=row.get("anchored", False),
                             rationale=row.get("rationale", ""),
                             origin=row.get("origin", "seed"))
+        for row in payload.get("gate_policy", ()):
+            self.put_gate_policy(
+                row["dimension"], answer_types=row["answer_types"],
+                invariant=row["invariant"], typed_reason=row["typed_reason"],
+                threshold=row.get("threshold"), rationale=row.get("rationale", ""),
+                origin=row.get("origin", "seed"))
         count = 0
         for raw in payload["specs"]:
             raw = expand(dict(raw))

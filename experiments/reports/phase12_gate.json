@@ -1,0 +1,78 @@
+{
+ "phase": 12,
+ "workstream": "abstention gate on the quote fallback",
+ "independent": {
+  "set_digest": "161fa9caf6ee24e3530d01fc5b005deab04870092ac7432e99d0a9dbabd0d4a6",
+  "unchanged_chat": {
+   "questions": 320,
+   "correct": 55,
+   "wrong": 44,
+   "abstain": 221,
+   "wrong_share_of_answered": 0.4444,
+   "coverage_answerable": 0.2022,
+   "unsafe_on_unanswerable": 14,
+   "unanswerable": 48,
+   "utility": -77
+  },
+  "with_gate": {
+   "questions": 320,
+   "correct": 51,
+   "wrong": 29,
+   "abstain": 240,
+   "wrong_share_of_answered": 0.3625,
+   "coverage_answerable": 0.1875,
+   "unsafe_on_unanswerable": 6,
+   "unanswerable": 48,
+   "utility": -36
+  },
+  "rejections_by_dimension": {
+   "answer_slot_unfilled": 15,
+   "answer_type_mismatch": 65,
+   "entity_absent": 65,
+   "fragment": 57,
+   "relation_coverage": 84,
+   "relation_not_predicated": 43,
+   "role_order": 12
+  },
+  "correct_lost": [
+   "A135",
+   "B062",
+   "B072",
+   "B101",
+   "B133",
+   "B136",
+   "B138",
+   "B159"
+  ]
+ },
+ "oracle": {
+  "oracle_a": {
+   "questions": 1050,
+   "correct": 339,
+   "wrong": 39,
+   "abstain": 672,
+   "wrong_share_of_answered": 0.1032,
+   "rejections_by_dimension": {
+    "answer_type_mismatch": 80,
+    "entity_absent": 3,
+    "fragment": 66,
+    "relation_coverage": 110,
+    "relation_not_predicated": 109
+   }
+  },
+  "oracle_b": {
+   "questions": 911,
+   "correct": 313,
+   "wrong": 37,
+   "abstain": 561,
+   "wrong_share_of_answered": 0.1057,
+   "rejections_by_dimension": {
+    "answer_type_mismatch": 69,
+    "entity_absent": 3,
+    "fragment": 56,
+    "relation_coverage": 107,
+    "relation_not_predicated": 106
+   }
+  }
+ }
+}

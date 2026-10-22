@@ -1122,6 +1122,82 @@ human-validated. A human-rated slice remains an optional upgrade, not a gate.
 | Page-subject resolution | Bracket mode ships: +2 correct, 0 wrong on the fresh blind sample. Pronoun mode is off: +21 correct but +7 wrong, net utility 0 (on the sample used to design it, pronoun mode looked like +32 correct, +1 wrong) |
 | Conflicts | Sources that disagree are both stated with their sources ("…1901 according to a.txt. However, Oldtown was established in 1950 according to b.txt") instead of abstaining; the engine's own answer is unchanged |
 
+**Abstention gate and route-first wiring (2026-10-22, model-validated).** Two changes
+to what a first-run user sees; both measured, neither finished.
+
+*Part 1: the quote fallback names why it refuses.* `crms_nl_gate` now returns named
+deviations (dimension plus witness reason) instead of bare strings: `fragment`,
+`entity_absent`, `relation_not_predicated`, `relation_coverage`, `answer_type_mismatch`,
+`answer_slot_unfilled`, `role_order`. Which are invariant, for which question shapes,
+and the coverage threshold (0.67) are rows in the SQL table `pat_gate_policy`
+(seeded from `crms_pattern_seed.json`); fragment cues and generic words are
+`pat_intent` families (`fragment_cue`, `generic_word`); no regex site was added.
+New checks: pasted fragments (section labels, table rows, truncated or unbalanced
+text), a missing year or a number not next to the counted noun, and question terms
+absent from the sentence (words that name the cited document are topic, not
+relation). The chat also judges the one sentence it would quote unchecked for
+question shapes the gate cannot parse and for yes/no questions (plain questions
+only), and abstains with the typed reason.
+
+| Measure | Unchanged chat | With gate (one final run) |
+|---|---|---|
+| Independent set (320): correct / wrong / abstain | 55 / 44 / 221 | 51 / 29 / 240 |
+| Wrong share of answered | 44.4% | 36.3% |
+| Unanswerable questions answered (of 48) | 14 | 6 |
+| Correct answers lost | | 8 lost, 4 gained by another candidate (net −4, 7%); target ≤5% **not met** |
+
+On the development data (the 400-question train set and the oracle samples, used to
+choose the thresholds): wrong 55 → 22, correct 66 → 66, unanswerable
+answered 5 → 1. **The targets are only partly met.** Wrong share fell from 44% to 36%,
+not "well below"; answers to unanswerable questions more than halved; the correct-loss
+limit was missed. Of the 8 lost correct answers, 3 are arXiv sentences carried as
+"Abstract: <full sentence>" which the section-label cue wrongly treats as a fragment
+(a label followed by a whole sentence should be stripped, not rejected), and 5 come
+from the coverage or count-slot checks. That fix was seen only after the independent
+measurement; it is now applied (a label followed by a whole sentence is stripped and
+the sentence judged) and was checked once on a fresh 240-question blind set
+(`corpus/phase12_eval/blind_set_c.json`, below). Of the 24 wrong answers the gate
+let through on the independent set, the new checks flag 14 (fragment 6, relation
+coverage 9, answer slot 3, several in combination); 10 pass every check (a
+pronoun-led sentence about a different page, a count of the wrong thing, a related
+but not responsive sentence). About 20 of the 44 wrong answers never pass through
+this gate: they come from specialist routes (typed relations), clarification prompts, and yes/no
+answers the oracle labels wrong because the gold is "Yes" and the quote is correct.
+
+*Blind check of the fixed gate (fresh set C, 240 questions, one run, model-validated).*
+
+| Measure | Unchanged chat | Gated chat |
+|---|---|---|
+| Correct / wrong / abstain | 19 / 37 / 184 | 19 / 18 / 203 |
+| Wrong share of answered | 66% | 49% |
+| Unanswerable questions answered | 6 | 2 |
+| Utility (+1, −3, 0) | −92 | −35 |
+
+The correct-answer loss target is met (no correct answer lost on this set). One small
+refinement, not stripping a label when what follows begins with "To" (a purpose
+phrase, to keep an existing test's meaning), was added after the first run; the run
+was repeated and gave identical counts. The
+wrong answers halve but half of the answers shown are still wrong, mostly because
+the system finds a related sentence and nothing checks that it answers the question;
+the unchanged chat answers correctly on about 8% of this set. Set C is now spent for
+gate decisions. A first-run user would still see too many wrong answers: more
+coverage and a stricter gate are both needed before release.
+
+*Part 2: relation specs before the quote route.* `--relation-first {off,agent}`
+tries the `agent` family (`work_by_artist`, `agent_transformed`: "Who directed /
+produced / wrote / founded / developed X?") with the packaged pattern memory
+(seeded defaults) before the quote route and falls back when it returns nothing, when
+sources conflict, or when the old route already holds a reviewable claim. One family
+per change. Oracle samples (all answerable): sample A 186 correct / 51 wrong → 339 / 39;
+sample B 187 / 40 → 313 / 37 (these include the Part 1 gate, which moves them by at
+most 1 each). The 400-question train set and the independent set contain almost no
+such questions, so they do not move. The first regression run showed 3 new failures
+from the gate (imperatives and "the first one" selections judged as questions;
+fixed by judging plain questions only) and the second 6 from route-first (it hid the
+claim-review flow; fixed by deferring to the old route when it has a candidate); the
+final sharded run shows no new failures other than the new test, since fixed. The
+default is therefore `agent`. Other families (when, where, role holder) are untried.
+
 Not done: the automated teacher loop, the neighbour-retrieval and tense/quantifier
 work, any new retrofit family beyond Phase 11, conversation learning, and packaging
 the pattern tables. The independent result is the main finding: the largest gap is
@@ -1368,3 +1444,4 @@ corpus size, it has not advanced the goal.
 | 2026-10-22 | Phase 11 Stage A completed and merged: pattern engine, SQL pattern memory and seed, spec verifier, specs as `fact-frame` registry rules, `/compose` source intake, pattern-based clarity rewriting and number/polarity/name/role-order critic checks, infobox-oracle evaluation with frozen 1,050-question sample; combined system 388 correct / 47 wrong vs quote baseline 182 / 55 (utility 247 vs 17), one correct answer lost; Phase 10 parity 12/12; no new failures in the full suite; Stages B–E followed at pilot scope (see Phase 11 status) | `crms_patterns.py`, `crms_relation_specs.py`, `crms_pattern_memory.py`, `crms_spec_verifier.py`, `crms_spec_registry.py`, `crms_source_intake.py`, `crms_generation_checks.py`, `run_phase11_eval.py`, `experiments/reports/phase11_stage_a.json` |
 | 2026-10-22 | Phase 12 planned: coverage and supervised learning at scale, generation first (independent evaluation, automated teacher loop and coverage program, index-based generation with conflict handling, gated retrofit lane with footprint ratchet, real conversation learning, packaging); rationale recorded against a wholesale regex retrofit; not started | `docs/design_phase12_coverage_and_supervision.md`, `docs/master_plan_to_final_state.md` |
 | 2026-10-22 | Phase 12 started with LLM sessions as independent author and judges (project owner's decision): 320-question independent set frozen; chat scores 55 correct / 44 wrong / 221 abstain (gate not met); judge/judge kappa 0.99, judge/oracle 0.85–0.86; conflict reporting with sources; failure-cause grouping; page-subject resolution (bracket mode on, pronoun mode off after a blind-sample check); teacher loop, retrofit families, and packaging not done | `crms_independent_eval.py`, `crms_failure_causes.py`, `run_phase12_independent.py`, `run_phase12_eval.py`, `run_phase12_causes.py`, `corpus/phase12_eval/`, `experiments/reports/phase12_*.json` |
+| 2026-10-22 | Phase 12: abstention gate with named deviation dimensions and SQL policy (`pat_gate_policy`); independent set wrong share 44% → 36%, unanswerable answered 14 → 6, but 4 of 55 correct lost net (target ≤5% missed); route-first `agent` family on by default (oracle samples +153 / +126 correct, wrong 51 → 39 / 40 → 37); full sharded regression clean | `crms_nl_gate.py`, `crms_pattern_memory.py`, `crms_pattern_seed.json`, `crms_chat.py`, `run_phase12_gate.py`, `experiments/v1_584_*`, `experiments/v1_585_*`, `experiments/reports/phase12_gate.json` |
