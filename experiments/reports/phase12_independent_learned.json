@@ -1,0 +1,110 @@
+{
+ "phase": 12,
+ "set_digest": "161fa9caf6ee24e3530d01fc5b005deab04870092ac7432e99d0a9dbabd0d4a6",
+ "model_validated": true,
+ "chat": {
+  "overall": {
+   "questions": 320,
+   "correct": 55,
+   "wrong": 44,
+   "abstain": 221,
+   "wrong_share_of_answered": 0.4444,
+   "coverage_answerable": 0.2022,
+   "unsafe_on_unanswerable": 14,
+   "unanswerable": 48,
+   "utility": -77
+  },
+  "A": {
+   "questions": 160,
+   "correct": 20,
+   "wrong": 19,
+   "abstain": 121,
+   "wrong_share_of_answered": 0.4872,
+   "coverage_answerable": 0.1471,
+   "unsafe_on_unanswerable": 3,
+   "unanswerable": 24,
+   "utility": -37
+  },
+  "B": {
+   "questions": 160,
+   "correct": 35,
+   "wrong": 25,
+   "abstain": 100,
+   "wrong_share_of_answered": 0.4167,
+   "coverage_answerable": 0.2574,
+   "unsafe_on_unanswerable": 11,
+   "unanswerable": 24,
+   "utility": -40
+  }
+ },
+ "relation": {
+  "overall": {
+   "questions": 320,
+   "correct": 3,
+   "wrong": 1,
+   "abstain": 316,
+   "wrong_share_of_answered": 0.25,
+   "coverage_answerable": 0.011,
+   "unsafe_on_unanswerable": 0,
+   "unanswerable": 48,
+   "utility": 0
+  },
+  "A": {
+   "questions": 160,
+   "correct": 3,
+   "wrong": 1,
+   "abstain": 156,
+   "wrong_share_of_answered": 0.25,
+   "coverage_answerable": 0.0221,
+   "unsafe_on_unanswerable": 0,
+   "unanswerable": 24,
+   "utility": 0
+  },
+  "B": {
+   "questions": 160,
+   "correct": 0,
+   "wrong": 0,
+   "abstain": 160,
+   "wrong_share_of_answered": 0.0,
+   "coverage_answerable": 0.0,
+   "unsafe_on_unanswerable": 0,
+   "unanswerable": 24,
+   "utility": 0
+  }
+ },
+ "combined": {
+  "overall": {
+   "questions": 320,
+   "correct": 56,
+   "wrong": 44,
+   "abstain": 220,
+   "wrong_share_of_answered": 0.44,
+   "coverage_answerable": 0.2059,
+   "unsafe_on_unanswerable": 14,
+   "unanswerable": 48,
+   "utility": -76
+  },
+  "A": {
+   "questions": 160,
+   "correct": 21,
+   "wrong": 19,
+   "abstain": 120,
+   "wrong_share_of_answered": 0.475,
+   "coverage_answerable": 0.1544,
+   "unsafe_on_unanswerable": 3,
+   "unanswerable": 24,
+   "utility": -36
+  },
+  "B": {
+   "questions": 160,
+   "correct": 35,
+   "wrong": 25,
+   "abstain": 100,
+   "wrong_share_of_answered": 0.4167,
+   "coverage_answerable": 0.2574,
+   "unsafe_on_unanswerable": 11,
+   "unanswerable": 24,
+   "utility": -40
+  }
+ }
+}

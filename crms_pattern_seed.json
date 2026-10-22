@@ -1306,6 +1306,122 @@
     "verb": "is",
     "complement": "the {q} of {E}"
    }
+  },
+  {
+   "name": "define_copula_predicate",
+   "priority": 40,
+   "question_patterns": [
+    "...{0,6}:g W[who|what] COP TAIL:E",
+    "W[what] W[does] ...{1,3}:E W[refer|mean] (P[to])?"
+   ],
+   "sentence_patterns": [
+    "E ( , ...{0,8}:g , )? COP TAIL:A"
+   ],
+   "template": "{E} {cop} {A}.",
+   "verb_class": "",
+   "rationale": "Definition questions answered by the predicate nominal after 'E is/are'.",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "What is thermoregulation?",
+      "S": "Thermoregulation is the ability of an organism to control its body temperature within certain limits, even when the surrounding temperature is different.",
+      "A": "the ability of an organism to control its body temperature within certain limits, even when the surrounding temperature is different",
+      "E": "thermoregulation"
+     },
+     {
+      "q": "What is copper(II) chloride?",
+      "S": "Copper(II) chloride, also known as cupric chloride, is a chemical compound.",
+      "A": "a chemical compound",
+      "E": "copper(II) chloride"
+     },
+     {
+      "q": "In lists of urban legends, who is the Hookman?",
+      "S": "The Hookman is a killer with a hook for a hand.",
+      "A": "a killer with a hook for a hand",
+      "E": "the Hookman"
+     }
+    ],
+    "heldout": [
+     {
+      "q": "What does Mogadiscio refer to?",
+      "S": "Mogadiscio was the name of Mogadishu, capital of Somalia, when it was under Italy's rule from 1905 until 1947.",
+      "A": "the name of Mogadishu, capital of Somalia, when it was under Italy's rule from 1905 until 1947",
+      "E": "Mogadiscio"
+     }
+    ],
+    "contrast": [
+     {
+      "q": "What is thermoregulation?",
+      "S": "Birds rely on thermoregulation to survive harsh winters, which is difficult."
+     },
+     {
+      "q": "Who is the Hookman?",
+      "S": "Teenagers in the story fear the Hookman, who is rumoured to roam lovers lanes."
+     }
+    ],
+    "round": "phase12 teacher loop",
+    "gate": "train_precision"
+   },
+   "proposition": {}
+  },
+  {
+   "name": "where_event_in_place",
+   "priority": 42,
+   "question_patterns": [
+    "W[where] AUX ...{0,2}:g NP[name]:E V.any:v",
+    "P[in|on|at] W[which|what] ...{1,3}:c AUX ...{0,2}:g NP[name]:E V.any:v ...{0,3}:r"
+   ],
+   "sentence_patterns": [
+    "E ...{0,10}:g V.part[@v] P[in|at|near] NP[name]:A",
+    "E ...{0,10}:g V.fin[@v] ...{0,6}:h P[in|at|near] NP[name]:A"
+   ],
+   "template": "{E} {cop} {v.part} in {A}.",
+   "verb_class": "",
+   "rationale": "Where/in-which-place questions about a birth, formation or death answered by the 'in <Place>' phrase after the event verb.",
+   "origin": "teacher",
+   "evidence": {
+    "support": [
+     {
+      "q": "In which Illinois city was John Sall born?",
+      "S": "John Sall was born in Rockford, Illinois in 1948, and was interested in science as a child.",
+      "A": "Rockford, Illinois",
+      "E": "John Sall"
+     },
+     {
+      "q": "Where was footballer Makoto Hasebe born?",
+      "S": "Hasebe was born in Fujieda on January 18, 1984.",
+      "A": "Fujieda",
+      "E": "Makoto Hasebe"
+     },
+     {
+      "q": "In which South African city was the band Seether formed?",
+      "S": "Seether is a South African rock band formed in Pretoria in 1999.",
+      "A": "Pretoria",
+      "E": "Seether"
+     }
+    ],
+    "heldout": [
+     {
+      "q": "In what place did Edgardo Angara die?",
+      "S": "Angara died on May 13, 2018 in Tagaytay, Philippines of a heart attack at the age of 83.",
+      "A": "Tagaytay, Philippines",
+      "E": "Angara"
+     }
+    ],
+    "contrast": [
+     {
+      "q": "Where was John Sall born?",
+      "S": "John Sall was interested in science as a child and later studied in Rockford."
+     },
+     {
+      "q": "Where was Makoto Hasebe born?",
+      "S": "Hasebe was born on January 18, 1984, and moved abroad in his twenties."
+     }
+    ],
+    "round": "phase12 teacher loop"
+   },
+   "proposition": {}
   }
  ],
  "note": "Seed state exported from the Phase 11 prototype. Classes are corpus-induced (see support counts); specs were teacher-proposed and verified. Specs marked grandfathered predate the verifier and carry less evidence.",

@@ -49,7 +49,7 @@ def main() -> None:
         language = memory.language()
         params = memory.params()
         specs = memory.specs()
-        require(count == 14 and len(specs) == 14, f"seed loaded {count} specs / {len(specs)} active")
+        require(count == 16 and len(specs) == 16, f"seed loaded {count} specs / {len(specs)} active")
         require(len(language.verbs) >= 30 and "place_noun" in language.classes,
                 "language resources did not load from SQL")
 
@@ -119,7 +119,8 @@ def main() -> None:
                 proposal["base"] = evidence["base"]
                 proposal["transforms"] = evidence.get("transforms", [])
             # replay against the engine that already holds this spec, excluding it so the candidate is the only copy
-            result = verify_spec(proposal, engine, corpus_sentences=RANDOM_SENTENCES)
+            gated = evidence.get("gate") == "train_precision"     # the random-sentence check does not suit these
+            result = verify_spec(proposal, engine, corpus_sentences=() if gated else RANDOM_SENTENCES)
             if not result.ok:
                 replay_failures.append((spec.name, result.reasons))
         require(not replay_failures, f"seed specs failed their own evidence: {replay_failures}")
@@ -160,7 +161,7 @@ def main() -> None:
         require("population_of" not in {s.name for s in memory.specs()}, "retirement did not remove the spec")
         memory.connection.commit()
     with PatternMemory(Path(folder) / "patterns.sqlite") as reopened:
-        require(len(reopened.specs()) == 13 and reopened.params()["rk_window"] == 20.0,
+        require(len(reopened.specs()) == 15 and reopened.params()["rk_window"] == 20.0,
                 "memory did not persist across reopen")
         require(reopened.changes(), "audit trail is empty")
 
