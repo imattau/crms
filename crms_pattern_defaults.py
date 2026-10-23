@@ -8,6 +8,7 @@ gate policy, word rarity) then reads the installed tables instead of the seed.
 from __future__ import annotations
 
 from functools import lru_cache
+import json
 from pathlib import Path
 import sqlite3
 from typing import Any
@@ -15,6 +16,8 @@ from typing import Any
 from crms_pattern_memory import PatternMemory
 
 _INSTALLED: Path | None = None
+ASSOC_FILE = Path(__file__).resolve().parent / "corpus" / "phase13_model" / "responsiveness_assoc.json"
+SCORER_FILE = Path(__file__).resolve().parent / "corpus" / "phase13_model" / "responsiveness_weights.json"
 
 
 def installed_path() -> Path | None:
@@ -27,6 +30,7 @@ def use_pattern_db(path: str | Path | None) -> None:
     _INSTALLED = Path(path).expanduser().resolve() if path else None
     seeded_resources.cache_clear()
     seeded_policy.cache_clear()
+    scorer_model.cache_clear()
     for module_name, function in (("crms_intent_rules", "_family"), ("crms_word_rarity", "_load")):
         import sys
         module = sys.modules.get(module_name)
@@ -46,6 +50,10 @@ def open_memory() -> PatternMemory:
         memory.connection.row_factory = sqlite3.Row
     else:
         memory.seed()
+        if SCORER_FILE.is_file():
+            memory.put_scorer_weights(json.loads(SCORER_FILE.read_text(encoding="utf-8"))["weights"])
+        if ASSOC_FILE.is_file():
+            memory.put_associations(json.loads(ASSOC_FILE.read_text(encoding="utf-8")))
     return memory
 
 
@@ -66,3 +74,16 @@ def seeded_policy() -> dict[str, dict[str, Any]]:
     policy = memory.gate_policy()
     memory.close()
     return policy
+
+
+@lru_cache(maxsize=1)
+def scorer_model() -> tuple[dict[str, float], float]:
+    """(feature weights, minimum probability) of the learned responsiveness scorer; empty weights
+    mean the scorer is not installed and the rule-based gate decides alone."""
+    memory = open_memory()
+    weights = memory.scorer_weights()
+    threshold = memory.params().get("resp_threshold", 0.7)
+    from crms_responsiveness import set_association
+    set_association(memory.associations())
+    memory.close()
+    return weights, threshold

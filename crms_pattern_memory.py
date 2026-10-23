@@ -121,6 +121,16 @@ class PatternMemory:
                 word TEXT PRIMARY KEY,
                 df INTEGER NOT NULL
             ) WITHOUT ROWID;
+            CREATE TABLE IF NOT EXISTS pat_assoc (
+                q TEXT NOT NULL,
+                s TEXT NOT NULL,
+                w REAL NOT NULL,
+                PRIMARY KEY(q, s)
+            ) WITHOUT ROWID;
+            CREATE TABLE IF NOT EXISTS pat_scorer (
+                feature TEXT PRIMARY KEY,
+                weight REAL NOT NULL
+            ) WITHOUT ROWID;
             CREATE TABLE IF NOT EXISTS pat_meta (
                 key TEXT PRIMARY KEY,
                 value TEXT NOT NULL
@@ -203,6 +213,26 @@ class PatternMemory:
         from crms_pattern_rewrite import Rewrite
         return [Rewrite(r["kind"], r["source"], r["target"]) for r in self.connection.execute(
             "SELECT kind,source,target FROM pat_rewrite WHERE status='accepted' ORDER BY kind,source")]
+
+    # ------------------------------------------------------- scorer weights
+    def put_scorer_weights(self, weights: Mapping[str, float]) -> None:
+        self.connection.executemany("INSERT OR REPLACE INTO pat_scorer VALUES(?,?)",
+                                    [(k, float(v)) for k, v in sorted(weights.items())])
+
+    def put_associations(self, table: Mapping[str, Mapping[str, float]]) -> None:
+        self.connection.executemany(
+            "INSERT OR REPLACE INTO pat_assoc VALUES(?,?,?)",
+            [(q, s_, float(w)) for q, row in sorted(table.items()) for s_, w in sorted(row.items())])
+
+    def associations(self) -> dict[str, dict[str, float]]:
+        out: dict[str, dict[str, float]] = {}
+        for r in self.connection.execute("SELECT q,s,w FROM pat_assoc"):
+            out.setdefault(r["q"], {})[r["s"]] = r["w"]
+        return out
+
+    def scorer_weights(self) -> dict[str, float]:
+        return {r["feature"]: r["weight"] for r in self.connection.execute(
+            "SELECT feature,weight FROM pat_scorer")}
 
     # ---------------------------------------------------------- intents
     def put_intent(self, family: str, name: str, *, priority: int,

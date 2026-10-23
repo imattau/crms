@@ -23,6 +23,7 @@ DEFAULT_PARAMS: dict[str, float] = {
     "rk_title_eq": 1.0,    # page title equals the entity
     "rk_window": 14.0,     # cost window for preferring the most specific compatible answer
     "conflict_window": 2.0,  # report a disagreement when a different source's incompatible answer is this close in cost
+    "resp_threshold": 0.7,   # learned responsiveness: minimum probability that the best sentence answers
     "veto_next_cap": 1.0,  # abstain when the answer is followed by a capitalised word
     "veto_extended_title": 0.0,  # abstain when the source page's title extends the entity
 }

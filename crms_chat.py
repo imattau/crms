@@ -53,7 +53,7 @@ from crms_frame_registry import (
     frame_rule_for, governed_frame_ids, record_request_frame_use,
     register_request_frame_rule, sync_request_frame_registry,
 )
-from crms_nl_gate import (gate_displayed_quote, gate_quoted_evidence,
+from crms_nl_gate import (gate_displayed_quote, gate_quoted_evidence, gate_with_scorer,
                           is_plain_question, supports_question_type,
                           trace_gate_decision)
 from crms_procedure_discovery import (
@@ -6783,6 +6783,11 @@ def main() -> int:
         else CRMSSQLiteResearchIndex(args.index)
         if sqlite_index
         else CRMSResearchIndex())
+    try:        # the learned responsiveness scorer is more lenient on a small collection
+        from crms_responsiveness import SMALL_INDEX_DOCUMENTS, set_index_small
+        set_index_small(index.document_count() < SMALL_INDEX_DOCUMENTS)
+    except (AttributeError, OSError, ValueError):
+        pass
     initial_index_state = _index_file_state(args.index)
     relation_first_engine = _relation_first_engine(index, args.relation_first)
     if args.index_read_only:
@@ -12937,7 +12942,7 @@ def main() -> int:
                                   == quoted.group(1).strip()
                                   for row in gate_rows):
                 gate_rows.insert(0, {"text": quoted.group(1)})
-            decision = gate_quoted_evidence(
+            decision = gate_with_scorer(
                 gate_question, gate_rows, licensed_predicates=licensed_predicates)
             if (decision["status"] == "unsupported" and turn.research is not None
                     and is_plain_question(gate_question)):

@@ -26,8 +26,10 @@ PATTERNS_FILE = "patterns.sqlite"
 PREVIOUS_FILE = "patterns.previous.sqlite"
 PROJECT = Path(__file__).resolve().parent
 WORD_DF = PROJECT / "corpus" / "phase13_model" / "word_df.tsv"
+ASSOC = PROJECT / "corpus" / "phase13_model" / "responsiveness_assoc.json"
+SCORER = PROJECT / "corpus" / "phase13_model" / "responsiveness_weights.json"
 SEED = PROJECT / "crms_pattern_seed.json"
-REQUIRED_TABLES = ("pat_verb", "pat_class", "pat_spec", "pat_intent", "pat_gate_policy",
+REQUIRED_TABLES = ("pat_assoc", "pat_scorer", "pat_verb", "pat_class", "pat_spec", "pat_intent", "pat_gate_policy",
                    "pat_param", "pat_rewrite", "pat_change", "pat_word_df", "pat_meta")
 
 
@@ -58,8 +60,20 @@ def build_pattern_db(path: str | Path, *, version: str = "1", seed: Path = SEED,
                     rows.append((word, int(count)))
             memory.connection.executemany("INSERT OR REPLACE INTO pat_word_df VALUES(?,?)", rows)
             words = len(rows)
+        scorer_features = 0
+        if SCORER.is_file():
+            weights = json.loads(SCORER.read_text(encoding="utf-8"))["weights"]
+            memory.put_scorer_weights(weights)
+            scorer_features = len(weights)
+        pairs = 0
+        if ASSOC.is_file():
+            table = json.loads(ASSOC.read_text(encoding="utf-8"))
+            memory.put_associations(table)
+            pairs = sum(len(v) for v in table.values())
         manifest = {
             "format": "crms-pattern-db", "version": version,
+            "scorer_features": str(scorer_features), "association_pairs": str(pairs),
+            "scorer_sha256": _sha256(SCORER) if SCORER.is_file() else "",
             "seed_sha256": _sha256(seed),
             "word_df_sha256": _sha256(word_df) if word_df.is_file() else "",
             "word_df_documents": str(documents), "word_df_words": str(words),

@@ -7,6 +7,7 @@ import re
 from typing import Any, NamedTuple
 
 from crms_intent_rules import classify as classify_intent
+from crms_responsiveness import SMALL_INDEX
 from crms_word_rarity import weight as word_weight
 from crms_knowledge import _IRREGULAR_VERB_PARADIGMS
 
@@ -751,3 +752,59 @@ def trace_gate_decision(question: str, rows: list[dict[str, Any]],
             handle.write(json.dumps(record, ensure_ascii=False) + "\n")
     except OSError:
         pass
+
+
+def deviation_dimensions(question: str, sentence: str, title: str = "") -> list[str]:
+    """Names of the deviations the rule gate finds for a sentence (features for the learned scorer)."""
+    try:
+        found, _score = _deviations(question, sentence, [], _answer_type(question), title)
+    except Exception:
+        return []
+    return sorted({d.dimension for d in found})
+
+
+CORROBORATED_THRESHOLD = 0.4        # minimum probability when the rule gate agrees (small collections only)
+_HARD_VETOES = frozenset({"fragment", "entity_absent"})
+
+
+def gate_with_scorer(question: str, candidates: list[dict[str, Any]], *,
+                     licensed_predicates: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    """Learned decision when the scorer is installed, else the rule gate.
+
+    The best retrieved sentence by learned probability is answered only above the policy threshold and only
+    if it is not a pasted fragment and names the question's entity; otherwise the answer is a typed
+    refusal. Same result shape as `gate_quoted_evidence`."""
+    from crms_pattern_defaults import scorer_model
+    from crms_responsiveness import decide
+    weights, threshold = scorer_model()
+    if not weights or not is_plain_question(question):
+        return gate_quoted_evidence(question, candidates, licensed_predicates=licensed_predicates)
+    unique: dict[str, dict[str, Any]] = {}
+    for row in candidates:
+        sentence = str(row.get("text", "")).strip()
+        if sentence:
+            unique.setdefault(sentence.casefold(), row)
+    if not unique:
+        return {"status": "no_candidates", "evidence": None, "reasons": []}
+    decision = decide(question, list(unique.values()), weights, threshold=threshold,
+                      deviation_fn=deviation_dimensions)
+    if decision["status"] == "rejected" and SMALL_INDEX["small"]:
+        # in a small collection the rule gate's agreement is enough corroboration for a middling score
+        rule = gate_quoted_evidence(question, candidates, licensed_predicates=licensed_predicates)
+        chosen = decision.get("evidence") or {}
+        if (rule["status"] == "accepted"
+                and str((rule["evidence"] or {}).get("text", "")).strip().casefold()
+                == str(chosen.get("text", "")).strip().casefold()
+                and decision.get("probability", 0.0) >= CORROBORATED_THRESHOLD):
+            decision = {"status": "accepted", "evidence": chosen, "reasons": [],
+                        "probability": decision.get("probability")}
+    if decision["status"] == "accepted":
+        row = decision["evidence"]
+        ok, fatal, _score = _judge(question, str(row.get("text", "")), licensed_predicates or [],
+                                   _row_title(row))
+        vetoes = [d for d in fatal if d.dimension in _HARD_VETOES]
+        if vetoes:
+            return {"status": "rejected", "evidence": row, "reasons": [d.reason for d in vetoes],
+                    "dimensions": sorted({d.dimension for d in vetoes})}
+    return {k: v for k, v in decision.items() if k != "probability" and k != "why"} | {
+        "probability": decision.get("probability")}
